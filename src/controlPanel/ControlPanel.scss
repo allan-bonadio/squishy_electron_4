@@ -1,0 +1,298 @@
+/*
+** blah blah -- like a source file for Squishy Electron
+** Copyright (C) 2021-2021 Tactile Interactive, all rights reserved
+*/
+
+.ControlPanel {
+	// with the tabs
+	.cpSecondRow {
+		display: flex;
+		flex-direction: row;
+	}
+
+	.subPanel {
+		flex: 0 0 10em;
+	}
+
+	/* **************************************** all log sliders */
+
+	/* make the overall any width you want. */
+	.LogSlider {
+		padding: .2em;
+
+		aside {
+			display: flex;
+		}
+
+		input[type=range] {
+			background-color: #48f;
+			color: #fc4
+		}
+	}
+
+
+
+	.CPToolbar {
+		float: none;
+
+		.frameRateBox {
+			display: inline-block;
+			margin-left: .5em;
+		}
+
+		.rateSelector {
+			background-color: #222;
+			color: #eee;
+		}
+
+		.toolbarThing {
+			display: inline-block;
+		}
+
+		/* **************************************** toolbar buttons */
+
+		.toolbarGradient {
+			background: linear-gradient(#889, #dcd 20%, #ccd 25%, #cdd 30%, #223);
+			display: inline-block;
+			font-size: 2em;
+			padding: .1em .5em .2em;
+			margin: .1em .3em;
+			line-height: 1.3em;
+			border: none;
+		}
+
+		button.toolbarButton {
+			cursor: pointer;
+			color: #fff;
+		}
+
+		button.toolbarButton:active {
+			color: #000;
+		}
+
+		.startStopToggle {
+			width: 8em;
+		}
+
+		.stepButton {
+			width: 4em;
+		}
+
+
+		.goButton, .stopButton {
+			display: block;
+			text-align: center;
+			line-height: 1em;
+			padding: 0;
+			border: none;
+			background-color: transparent;
+			margin: 0;
+			position: relative;
+		}
+
+		button.goButton {
+			color: #040;
+			font-size: 4em;
+			margin-left: -.065em;
+
+			&:hover {
+				color: #262;
+			}
+
+			&.on {
+				color: #4f4;
+			}
+		}
+
+
+		button.stopButton {
+			color: #400;
+			font-size: 5em;
+			margin-left: -.125em;
+
+			&:hover {
+				color: #411;
+			}
+
+			&.on {
+				color: #f44;
+			}
+
+			div {
+				position: relative;
+				top: .125em
+			}
+		}
+
+		/* **************************************** sliders */
+
+		.cpSlider {
+			display: inline-block;
+			width: 26em;
+			padding: 0 .5em 0 .5em;
+		}
+
+
+	}
+
+
+	/* **************************************** Tab bar & Tabs */
+
+	/* the vertical bar on the left */
+	ul.TabBar {
+		margin: 0;
+		padding: 0;
+		position: absolute;
+		z-index: 10;
+		position: relative;
+		cursor: pointer;
+
+		/* a tab button */
+		li {
+			list-style: none;
+			display: block;
+			border: outset #abc 2px;
+			border-radius: .5em 0 0 .5em;
+			padding: .2em .5em .2em 2em;
+			width: calc(7em + 2px);
+			margin: 0 0 .2em .5em;
+			text-align: right;
+		}
+
+		li.selected {
+			background-color: #eef;
+			color: #222;
+			border-style: inset;
+			border-color: #abc;
+			border-right: solid #eef 2px;
+			width: 7.2em;
+		}
+	}
+
+
+	.tabFrame {
+		width: 90%;
+		border: inset #abc 2px;
+		padding: .2em .5em;
+		color: #222;
+		background-color: #eef;
+		margin-left: -.2em;
+
+		h3 {
+			margin: .2em;
+		}
+		h4 {
+			margin: .2em;
+			display: inline-block;
+
+			width: 6em;
+			text-align: right;
+		}
+	}
+
+
+	.MiniGraph {
+		border: #888 solid 1px;
+		background: #222;
+	}
+
+
+	/* **************************************** Set Wave tab */
+
+	/* a column in the SetWave band */
+	.waveTabCol {
+		float: left;
+		text-align: right;
+		padding: 0 .5em;
+
+		&.middle  label {
+			display: block;
+			text-align: right;
+		}
+
+		input {
+			display: inline;
+		}
+
+		.selected {
+			background: #ccf;
+		}
+	}
+
+
+	/* **************************************** Set Potential tab */
+
+	.setPotentialTab {
+		width: calc( 50em + 200px );
+		height: 8em;
+
+		.divider {
+			float: left;
+			height: 6em;
+			border-left: 1px #888 solid;
+			margin: 1em .5em;
+		}
+
+		.potentialTitlePanel {
+			float: left;
+			width: 14em;
+		}
+
+		.potentialValleyPanel {
+			float: left;
+			width: 24em;
+		}
+
+		.valleyMiniGraph {
+			float: left;
+			width: 200px;
+		}
+	}
+
+
+	/* **************************************** Set Resolution tab/dialog */
+
+	.setResolutionButton {
+		float: right;
+	}
+
+	/* button in control panel */
+	.setResolutionOKButton {
+		flex: 0 0 15em;
+		margin: 1em;
+		/*height: 6em;*/
+	}
+
+
+	/* **************************************** Set Iteration tab/dialog */
+
+	.SetIterationTab {
+		.sliderBlock, .iStats {
+			width: 40%;
+			float: left;
+			margin-left: 3em;
+		}
+
+		.sliderBlock .middle {
+			width: 10em;
+		}
+
+		.iStats table {
+			float: left;
+			margin-left: 3em;
+
+			td {
+				text-align: right;
+
+				&:first-child {
+					font-size: .7em;
+				}
+				&:last-child {
+					width: 7em;
+					font-weight: normal;
+				}
+			}
+		}
+	}
+
+}

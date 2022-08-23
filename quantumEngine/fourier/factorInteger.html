@@ -1,0 +1,55 @@
+//<script>
+// i did this bored shopping for FFT algorithms
+primes = [2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47, 53, 59, 61, 67, 71, 73, 79, 83, 89, 97];
+// I'm not gonna do non-power-of-2 FFTs, too overwhelming
+
+function primeDecompose(N) {
+	//debugger;
+	//console.log(`gonna try N=${N}`);
+
+	// this gets primes divided out of it
+	let NN = N;
+
+	// indexed by primeNo
+	let counts = (new Array(primes.length)).fill(0);
+
+	primes.some((prime, primeNo) => {
+		// for this prime, try dividing
+		while (true) {
+			let frac = NN / prime;
+			if (Number.isInteger(frac)) {
+				counts[primeNo]++;
+				NN = frac;
+			}
+			else
+				break;
+		}
+
+		// done with that prime, onto the next, or we're done
+		return false;  // return NN == 1;
+	});
+	return counts;
+}
+
+
+
+// test it
+function testOne(N) {
+	let counts = primeDecompose(N);
+	//console.log(`factorization of ${N}: `, counts);
+	let out = '';
+	counts.forEach((count, ix) => {
+		if (count) {
+			ar = (new Array(count)).fill(primes[ix]);
+			out += ' × ' + ar.join(' × ')
+		}
+	})
+	console.log(`           ${N} = `, out.substr(3));
+}
+
+for (let N = 1; N < 100; N++)
+	testOne(N);
+
+
+//</script>
+

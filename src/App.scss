@@ -1,0 +1,201 @@
+/*
+** App -- CSS overall for Squishy Electron
+** Copyright (C) 2021-2021 Tactile Interactive, all rights reserved
+*/
+
+/* **************************************** general */
+
+* {
+	box-sizing: border-box;
+}
+
+body {
+	background-color: #222;
+	font-size: 16px;
+	font-family: verdana, helvetica, sans-serif;
+	color: #eee;
+	margin: 0;
+	padding: 0;
+	/* padding: .5em; */
+
+}
+
+/* **************************************** app outer components */
+
+h2.App-header {
+	text-align: center;
+	color: black;
+	background-color: white;
+	background-image: linear-gradient(#fef, #fee, #ffe, #efe, #eff, #eef);
+	padding: 0 0;
+}
+
+.splatImage {
+	vertical-align: middle;
+}
+
+/* **************************************** controls in general */
+
+/* applies to text boxes, checkboxes, radios, sliders, ... */
+input {
+	background-color: transparent;
+	color: #eee;
+}
+
+input[type=range] {
+	//height: 4em;
+// 	background-color: #4cf;
+// 	color: #fc4
+}
+
+button {
+	cursor: pointer;
+}
+
+.LogSlider {
+	position: relative;
+
+	// bar on the top that shows numerical setting & min & max
+	aside {
+		display: flex;
+		padding: .2px;
+
+		.left {
+			flex: 1 0 1em;
+			text-align: left;  // does it do anything?
+			flex: 1 0 4em;
+			text-align: left;
+		}
+
+		.middle {
+			flex: 2 0 1em;
+			text-align: center;  // does it do anything?
+
+			flex: 2 0 10em;
+			text-align: center;
+		}
+
+		.right {
+			flex: 1 0 1em;
+			text-align: right;  // does it do anything?
+			flex: 1 0 4em;
+			text-align: right;
+		}
+    }
+
+	input[type=range]{
+		margin: 0;
+		width: 100%;
+		accent-color: lime;
+	}
+}
+
+.TextNSlider {
+	span {
+		line-height: 2em;
+	}
+	input[type=number] {
+		background-color: #222;
+		height: 2em;
+	// 	background-color: #4cf;
+		color: #fc4;
+		margin: 0 .5em;
+		text-align: right;
+	}
+	input[type=range] {
+		display: block;
+		margin-bottom: -.5em;
+		accent-color: #f80;
+		height: 2em;
+	// 	background-color: #4cf;
+	// 	color: #fc4
+	}
+}
+
+
+button.round {
+	font-size: 100%;
+	padding: .2em 1em;
+	margin: .2em;
+	background-color: #112;
+	color: #eef;
+	border-radius: .5em;
+}
+
+/* **************************************** CommonDialog */
+
+.backdrop {
+	z-index: 20;
+	display: flex;
+	background-color: #8888;
+	position: fixed;
+	left: 0;
+	top: 0;
+	width: 100%;
+	height: 100%;
+
+	padding-top: 10%;
+}
+
+.dialogSpacer {
+	flex: 1 1;
+}
+
+.dialog {
+	flex: 0 0 50em;
+	padding: 2em;
+	line-height: 1.5em;
+	height: 30em;
+
+	border: 5px ridge #888;
+	background-color: #111;
+	color: #eee;
+	box-shadow: 5px 5px 5px 5px #0008;
+
+	label {
+		display: block;
+		margin: 0;
+	}
+
+	input[type=radio] {
+		margin: 0 1em 0 0;
+	}
+
+	input[type=number] {
+		color: #ddf;
+		margin: 0;
+	}
+
+	input[type=range] {
+		color: #8cf;
+		background-color: #888;
+		margin: 0;
+	}
+
+	button {
+		margin: 2em;
+	}
+
+	tr td:first {
+		text-align: right;
+	}
+
+	.dialogSection {
+		margin: 1em 0 0 0;
+	}
+
+}
+.runningOneCycle {
+	float: right;
+	margin: 1em;
+	border: outset 3px #ca8;
+	background-color: #468;
+	padding: .5em;
+}
+
+
+
+.SquishPanel {
+	position: relative;
+	z-index: 10;
+}

@@ -1,0 +1,15 @@
+
+# compiled results
+quantumEngine.js
+quantumEngine.wasm
+quantumEngine.wasm.map
+commonConstants.h
+
+# cppu test objects
+cppuTestBin
+cppuTestBin.dSYM
+
+# the old, pre cppu test objects
+quantumTest.js
+quantumTest.wasm
+

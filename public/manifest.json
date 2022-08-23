@@ -1,0 +1,16 @@
+{
+	"short_name": "Squish",
+	"name": "Squishy Electron",
+	"icons": [
+		{
+			"src": "logo|𝒆⟩3.png",
+			"sizes": "256x256",
+			"type": "image/png"
+		}
+	],
+	"lang": "en-US",
+	"start_url": ".",
+	"display": "standalone",
+	"theme_color": "#eee",
+	"background_color": "#111"
+}

@@ -1,0 +1,134 @@
+<style>
+	body {
+		background: linear-gradient(-45deg, #fee, #ffd, #efe, #dff, #eef, #fdf, #fee);
+		font: verdana, helvetica, sans-serif;
+	}
+
+	/* variables */
+	var {
+		font-family: palatino, serif;
+	}
+
+	/* vertical fraction */
+	span {
+		display: inline-block;
+		line-height: 60%;
+		text-align: center;
+		vertical-align: middle;
+	}
+
+	/* color key */
+	table {
+		float: right;
+		border-spacing: 0;
+		border: 1px solid #aaa;
+	}
+	td {
+		border-color: transparent;
+		border-width-right: 0;
+		border-width-left: 0;
+		padding: 2px 5px;
+	}
+	/* color key row */
+	td:first-child {
+		text-align: right;
+	}
+</style>
+
+
+<p>
+I was a physics major in school.
+Like many students, I had trouble grasping quantum mechanics.
+The way the particles behaved just seemed so unintuitive.
+
+<p>
+Then, I realized, maybe this is not a physics problem; it's a psychology problem.
+I don't have an intuitive idea of how quantum works, because I didn't have any quantum toys.
+Like any other child, I had toys made of metal, plastic, fabric, wood.
+My life also involved food, porcelain, glass, water, linoleum, carpet, grass, and other macroscopic materials and things.
+And, like any other child, I fingered them and put them in my mouth, because I was curious about them.
+As an adult, I can intuitively visualize how they'll behave.
+I know that if I grab at some grass, and pull, I'll pull out some shreds of grass;
+whereas, if I try that with carpeting, it won't rip out.
+
+<p>
+But, I never had a chance to play with microscopic particles.
+And I'm trying to understand what they're like; what they "feel" like,
+how they behave when you push them around with your fingers.
+That's what I'm trying to do with this project.
+I called it "Squishy Electron".
+
+<p>
+This project is barely at alpha-level.
+But, here's a screen recording of a wave packet trying to move to the right.
+The colors show you the complex phase of ψ.
+The height tells you the probability of the electron being at that location.
+It's upside down intentionally.
+
+<p>
+<table>
+<caption>key to phase</caption>
+<tr  style=background-color:#f40><td>0°<td>red
+<tr  style=background-color:#cf0><td>90°<td>chartreuse
+<tr  style=background-color:#0ee><td>180°<td>aqua
+<tr  style=background-color:#c4f><td>-90°<td>violet
+</table>
+
+<video width=879 height=440 controls loop >
+	<source src=squishyElectron.webm >
+	<source src=squishyElectron.mp4 >
+	Sorry!  No video on this browser!
+</video>
+
+<p>
+It is correct that a wave packet will  spread out as it travels across.
+(So much for the idea that an electron is like a tiny marble.)
+As <a href=https://en.wikipedia.org/wiki/Uncertainty_principle>Heisenberg</a> said,
+
+<p>
+𝚫<var>x</var> 𝚫<var>p</var> ≥ <span>ℏ<br>&mdash;<br>2</span>
+
+<p>
+If you nail down the <var>x</var> coordinate to a narrow span, then the momentum <var>p</var>,
+and therefore velocity, ends up being very uncertain, so the wave packet spreads out as it travels
+(or even if it stands still).
+Normally, these electrons are caught in the electric field of a nucleus,
+which keeps them in one place (within a nanometer).
+In this case, the electron is in free space, so it stretches out like a crowd of children.
+
+<p>You can see that the rainbow pattern advances to the right,
+this is the <a href=https://en.wikipedia.org/wiki/Phase_velocity>phase velocity</a>
+The packet itself also moves to the right, more quickly.
+This is called the <a href=https://en.wikipedia.org/wiki/Group_velocity>group velocity</a>
+
+<p>
+The space wraps around,
+so all wavelengths are integer fractions of the length of the space.
+I've got some problems with harmonics, and it's pretty low resolution now.
+
+<p>
+The integration is done in C++, on the browser side, with <a href=https://emscripten.org>emscripten</a>,
+which is based on WebAssembly, a system that can run compiled languages in the browser.
+It can do thousands of integration steps per second.
+This stuff happens behind the scenes,
+and I don't have a good debugger into the running emscripten code working yet.
+When I started this project,
+I didn't realize how much C++ and numerical programming I'd have to do;
+haven't had much time to work on the JS and ui.
+I've got quite a few unit tests in there;
+they run as native C++, so debugging is much easier.
+
+<p>
+The graphics is done with WebGL, partly because it's so easy to get a gradient,
+also because I plan to do some 3d, like with the Ant project.
+Right now it's in WebGL 1, planning on migrating to WebGL 2.
+
+<script>
+let vid = document.querySelector('video');
+vid.addEventListener('onmousedown', ev => {
+	if (vid.paused)
+		vid.play();
+	else
+		vid.pause();
+});
+</script>
