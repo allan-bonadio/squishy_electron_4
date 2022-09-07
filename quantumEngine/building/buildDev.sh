@@ -31,7 +31,7 @@ emcc -o quantumEngine.js -sLLD_REPORT_UNDEFINED \
 	-DLABEL_LEN=$LABEL_LEN \
 	-I/dvl/emscripten/emsdk/upstream/emscripten/cache/sysroot/include \
 	-include emscripten.h \
-	-ffast-math \
+	-ffast-math  -lembind \
 	main.cpp $allCpp || exit $?
 # changed -g to -g4 to -gsource-map --source-map-base / ; debugger can see into c++
 

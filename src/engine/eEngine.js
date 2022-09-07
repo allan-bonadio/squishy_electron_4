@@ -1,5 +1,5 @@
 /*
-** q Engine - main interface in JS to the quantumEngine in C++ and Emscripten
+** e Engine - main interface in JS to the quantumEngine in C++ and Emscripten
 ** Copyright (C) 2021-2022 Tactile Interactive, all rights reserved
 */
 
@@ -41,4 +41,6 @@ export const qeStartPromise = new Promise((succeed, fail) => {
 	qeStartPromiseSucceed = succeed;
 	console.info(`qeStartPromise created:`, succeed, fail);
 });
+
+
 
