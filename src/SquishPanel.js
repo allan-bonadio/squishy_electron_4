@@ -16,6 +16,7 @@ import ControlPanel from './controlPanel/ControlPanel';
 import {qeBasicSpace, eSpace} from './engine/eSpace';
 // import eWave from './engine/eWave';
 import {qeStartPromise} from './engine/eEngine';
+import {interpretCppException, dumpJsStack} from './utils/errors';
 import qe from './engine/qe';
 
 import WaveView from './view/WaveView';
@@ -39,7 +40,6 @@ const DEFAULT_VIEW_CLASS_NAME = 'flatDrawingViewDef';
 // const DEFAULT_CONTINUUM = qe.contENDLESS;
 
 
-let SquishPanelCreated = 0;
 
 
 export class SquishPanel extends React.Component {
@@ -51,12 +51,16 @@ export class SquishPanel extends React.Component {
 
 	/* ************************************************ construction & reconstruction */
 
+	static created = 0;
+
 	constructor(props) {
 		super(props);
 
 		// why is this called so many times!?!?!?!?!
-		SquishPanelCreated += 1;
-		console.info(`*** SquishPanel.created:`, SquishPanelCreated);////
+		SquishPanel.created++;
+		this.myInstance = SquishPanel.created;
+		console.info(`😡 😡  SquishPanel.created: ${SquishPanel.created}    instance ${this.myInstance}`);////
+		dumpJsStack('SquishPanel constructor');
 		// console.info((new Error()).stack);
 		// debugger;
 
@@ -102,7 +106,7 @@ export class SquishPanel extends React.Component {
 		// will be resolved when the space has been created; result will be eSpace
 		this.createdSpacePromise = new Promise((succeed, fail) => {
 			this.createdSpace = succeed;
-			console.info(`qeStartPromise created:`, succeed, fail);
+			console.info(`spanel  instance ${this.myInstance}: qeStartPromise created:`, succeed, fail);
 		});
 
 		// ticks and benchmarks
@@ -115,7 +119,7 @@ export class SquishPanel extends React.Component {
 		// eslint-disable-next-line
 		this.allowRunningOneCycle = /allowRunningOneCycle/.test(location.search);
 
-		console.log(`SquishPanel constructor done`);
+		console.log(`SquishPanel  instance ${this.myInstance} constructor done`);
 	}
 
 	/* ******************************************************* space & wave creation */
@@ -139,10 +143,11 @@ export class SquishPanel extends React.Component {
 
 			this.createdSpace(space);
 
-			console.info(`SquishPanel.compDidMount promise done`);
+			console.info(`SquishPanel.compDidMount  instance ${this.myInstance} promise done`);
 
 		}).catch(ex => {
-			console.error(`error in SquishPanel.didMount.then():`, ex.stack || ex.message || ex);
+			ex = interpretCppException(ex);
+			console.error(`error in  instance ${this.myInstance} SquishPanel.didMount.then():`, ex.stack || ex.message || ex);
 			debugger;
 		});
 
@@ -569,7 +574,7 @@ export class SquishPanel extends React.Component {
 	static rendered = 0;
 	render() {
 		SquishPanel.rendered++;
-		console.info(`SquishPanel rendered ${SquishPanel.rendered} times`);
+		console.info(`SquishPanel  instance ${this.myInstance  } 🤢 🤢 rendered ${SquishPanel.rendered} times`);
 
 		const p = this.props;
 		const s = this.state;

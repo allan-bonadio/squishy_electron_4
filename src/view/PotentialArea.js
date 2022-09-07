@@ -186,7 +186,7 @@ export class PotentialArea extends React.Component {
 	static rendered = 0;
 	render() {
 		PotentialArea.rendered++;
-		console.info(`PotentialArea rendered ${PotentialArea.rendered} times`);
+		console.info(`PotentialArea 🤢 🤢 rendered ${PotentialArea.rendered} times`);
 
 		const p = this.props;
 		if (! p.space)

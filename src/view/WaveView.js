@@ -73,8 +73,8 @@ export class WaveView extends React.Component {
 		const p = this.props;
 		if (this.state.space && this.canvas)
 			return;  // already done
-		this.setGLCanvasAgain++;
-		console.log(`for the ${this.setGLCanvasAgain}th time, WaveView.setGLCanvas(...`, canvas);
+		WaveView.setGLCanvasAgain++;
+		console.log(`for the ${WaveView.setGLCanvasAgain}th time, WaveView.setGLCanvas(...`, canvas);
 
 		// why do i have to do this?  Old version of CHrome??!?!?!  preposterous
 		if (canvas) {
@@ -181,7 +181,7 @@ export class WaveView extends React.Component {
 		const s = this.state;
 
 		WaveView.rendered++;
-		console.info(`WaveView rendered ${WaveView.rendered} times`);
+		console.info(`WaveView 🤢 🤢 rendered ${WaveView.rendered} times`);
 
 		let wholeRect = null;  // if null, not ready (first render, etc)
 		if (this.element) {
