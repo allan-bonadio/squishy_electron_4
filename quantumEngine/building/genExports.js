@@ -31,6 +31,8 @@ exportsSrc  = [
 	// gets
 // 	{name: 'Avatar_getWaveBuffer', retType: 'number', args: []},
 // 	{name: 'qSpace_getPotentialBuffer', retType: 'number', args: []},
+	{name: 'getCppExceptionMessage', retType: 'number', args: ['number']},
+
 
 	// the Avatar ones act on theAvatar in the c++ code
 	{name: 'Avatar_getElapsedTime', retType: 'number', args: []},

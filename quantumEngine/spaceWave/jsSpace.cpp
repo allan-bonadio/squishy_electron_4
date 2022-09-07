@@ -3,7 +3,8 @@
 ** Copyright (C) 2021-2022 Tactile Interactive, all rights reserved
 */
 
-
+#include <string>
+#include <emscripten/bind.h>
 #include "qSpace.h"
 #include "../schrodinger/Avatar.h"
 #include "qWave.h"
@@ -197,6 +198,15 @@ void deleteTheSpace() {
 	theSpace = NULL;
 	//printf("    deleteTheSpace(): done\n");
 }
+
+
+// Given the mysterious number thrown when C++ bartfs, get a real error message.  this is loosely from
+// https://emscripten.org/docs/porting/Debugging.html#handling-c-exceptions-from-javascript
+const char *getCppExceptionMessage(intptr_t exceptionPtr) {
+	// what() returns a C string; pass pointer back to JS as integer
+	return reinterpret_cast<std::exception *>(exceptionPtr)->what();
+}
+
 
 // end of extern "C"
 }
