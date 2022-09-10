@@ -32,10 +32,10 @@ cd ..
 echo "CppUTest Test runner: arg db=debugger; all others are assumed to be test name segments"
 
 # https://cpputest.github.io
-export CPPUTEST_HOME=/dvl/cpputest/cpputest-3.8
+export CPPUTEST_HOME=/opt/dvl/cpputest/cpputest-3.8
 
 # no enscriptm here!  just native C++.
-#. /dvl/emscripten/emsdk-main/emsdk_env.sh
+#. /opt/dvl/emscripten/emsdk-main/emsdk_env.sh
 
 # create a space-sep list of ALL the runtime cpp files (almost all)
 allCpp=`cat building/allCpp.list`
@@ -89,7 +89,7 @@ if $debug
 then
 	# it's a real C++ program and I can use gdb!
 	#  well, lldb at least.
-	lldb  -f /dvl/squishyElectron/SquishyElectron/quantumEngine/cppuTestBin -- -v -c $moreArgs
+	lldb  -f /opt/dvl/squishyElectron/SquishyElectron/quantumEngine/cppuTestBin -- -v -c $moreArgs
 else
 	./cppuTestBin -v -c  $moreArgs
 fi

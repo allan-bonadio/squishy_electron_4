@@ -1,6 +1,11 @@
 This project is like, pre-alpha quality.  sorry.
 It has hardwired file paths that I've created identically on my machines.
 
+
+====================================================== Sep 2022
+While it's running, try surfing here:
+http://localhost:4444/webpack-dev-server
+
 ====================================================== Aug 2022
 original, mid-2021
 
@@ -97,7 +102,7 @@ For one particle in 2D, the potential is a 2d map.
 
 ================================================================ emscripten
 
-Follow the directions on this page to install it, into /dvl/emscripten:
+Follow the directions on this page to install it, into /opt/dvl/emscripten:
 
 https://emscripten.org/docs/getting_started/downloads.html
 
@@ -123,7 +128,7 @@ get the installed version numbers:
 
 this is automatically done in the build scripts so you don't have to put them into your .profile or whatever files:
 
-. /dvl/emscripten/emsdk/emsdk_env.sh
+. /opt/dvl/emscripten/emsdk/emsdk_env.sh
 
 
 ================================================================ Dec 2021
