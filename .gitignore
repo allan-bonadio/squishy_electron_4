@@ -2,7 +2,7 @@
 
 .DS_Store
 
-# dependencies
+# dependencies.  Sorry we don't chek in the lock file.
 /node_modules
 package-lock.json
 
