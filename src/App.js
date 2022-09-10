@@ -10,16 +10,10 @@ import SquishPanel from './SquishPanel';
 import CommonDialog from './widgets/CommonDialog';
 import {dumpJsStack} from './utils/errors';
 
-class App extends React.Component {
-	static created = 0;
 
+class App extends React.Component {
 	constructor(props) {
 		super(props);
-
-		App.created++;
-		this.myInstance = App.created;
-		console.log(`App.created: ${App.created} times ...  instance ${this.myInstance}`);
-		dumpJsStack('App constructor');
 
 		this.state = {
 			innerWindowWidth: window.innerWidth,
@@ -28,8 +22,6 @@ class App extends React.Component {
 		};
 
 		App.me = this;
-
-		console.log(`App constructor done`);
 	}
 
 
@@ -57,11 +49,7 @@ class App extends React.Component {
 
 
 	//static whyDidYouRender = true;
-	static rendered = 0;
 	render() {
-		App.rendered++;
-		console.info(`App 🤢 🤢 instance ${this.myInstance} rendered ${App.rendered} times`);
-
 		const s = this.state;
 
 		//const stateParams = sParams || s.stateParams;

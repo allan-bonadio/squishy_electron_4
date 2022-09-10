@@ -22,6 +22,12 @@ import PotentialArea from './PotentialArea';
 //const listOfViewClasses = import('./listOfViewClasses');
 import {listOfViewClasses} from './listOfViewClasses';
 
+import {dumpJsStack} from '../utils/errors';
+
+let traceWaveView = false;
+let traceDragCanvasHeight = false;
+
+
 /* **************************************** actual canvas wrapper */
 
 
@@ -43,14 +49,9 @@ export class WaveView extends React.Component {
 		setUpdatePotentialArea: PropTypes.func,
 	};
 
-	static created = 0;
 	constructor(props) {
 		super(props);
 
-		WaveView.created++;
-		console.info(`WaveView created ${WaveView.created} times`);
-
-		// why is this called so many times!?!?!?!?!  console.log(`WaveView(...`, props, (new Error()).stack);
 		this.state = {
 			height: getASetting('miscParams', 'viewHeight'),
 			space: null,  // set when promise comes in
@@ -59,7 +60,7 @@ export class WaveView extends React.Component {
 		// will be resolved when the canvas has been nailed down; result will be canvas dom obj
 		this.createdCanvasPromise = new Promise((succeed, fail) => {
 			this.createdCanvas = succeed;
-			console.info(`qeStartPromise created:`, succeed, fail);
+			if (traceWaveView) console.info(`qeStartPromise created:`, succeed, fail);
 		});
 
 		this.formerWidth = props.width;
@@ -74,7 +75,9 @@ export class WaveView extends React.Component {
 		if (this.state.space && this.canvas)
 			return;  // already done
 		WaveView.setGLCanvasAgain++;
-		console.log(`for the ${WaveView.setGLCanvasAgain}th time, WaveView.setGLCanvas(...`, canvas);
+		if (traceWaveView) {
+			console.log(`for the ${WaveView.setGLCanvasAgain}th time, WaveView.setGLCanvas(...`, canvas);
+		}
 
 		// why do i have to do this?  Old version of CHrome??!?!?!  preposterous
 		if (canvas) {
@@ -87,9 +90,10 @@ export class WaveView extends React.Component {
 			// now create the draw view class instance as described by the space
 			// this is the flatDrawingViewDef class for webgl, not a CSS class or React class component
 			// do we do this EVERY RENDER?  probably not needed.
-			console.log(`setGLCanvas.then(...`, space);
+			if (traceWaveView) console.log(`setGLCanvas.then(...`, space);
 
-			this.setState({space});
+			if (this.state.space !== space)
+				this.setState({space});
 
 			let vClass = listOfViewClasses[p.viewClassName];
 			this.effectiveView = new vClass(p.viewName, this.canvas, space);
@@ -103,7 +107,7 @@ export class WaveView extends React.Component {
 			// thsi will kick the WaveView to render.  Is this too intricate?
 			p.setEffectiveView(this.effectiveView);
 
-			console.info(`WaveView.compDidMount promise done`);
+			if (traceWaveView) console.info(`WaveView.compDidMount promise done`);
 
 		}).catch(ex => {
 			console.error(`error in WaveView createdSpacePromise.then():`, ex.stack || ex.message || ex);
@@ -119,7 +123,8 @@ export class WaveView extends React.Component {
 	ev => {
 		this.resizing = true;
 		this.yOffset = this.state.height - ev.pageY;
-		console.info(`mouse down ${ev.pageX} ${ev.pageY} offset=${this.yOffset}`);
+		if (traceDragCanvasHeight)
+			console.info(`mouse down ${ev.pageX} ${ev.pageY} offset=${this.yOffset}`);
 		const b = document.body;
 		b.addEventListener('mousemove', this.mouseMove);
 		b.addEventListener('mouseup', this.mouseUp);
@@ -134,9 +139,11 @@ export class WaveView extends React.Component {
 		//if (this.resizing) {
 
 			const viewHeight = ev.pageY + this.yOffset;
-			this.setState({height: viewHeight});
+			if (this.state.height != viewHeight)
+				this.setState({height: viewHeight});
 			storeASetting('miscParams', 'viewHeight', viewHeight);
-			// console.info(`mouse drag ${ev.pageX} ${ev.pageY}  newheight=${ev.pageY + this.yOffset}`);
+			if (traceDragCanvasHeight)
+				console.info(`mouse drag ${ev.pageX} ${ev.pageY}  newheight=${ev.pageY + this.yOffset}`);
 
 			ev.preventDefault();
 			ev.stopPropagation();
@@ -146,7 +153,8 @@ export class WaveView extends React.Component {
 	mouseUp =
 	ev => {
 		//if (this.resizing) {
-			console.info(`mouse up ${ev.pageX} ${ev.pageY}`);
+			if (traceDragCanvasHeight)
+				console.info(`mouse up ${ev.pageX} ${ev.pageY}`);
 			this.resizing = false;
 
 			const b = document.body;
@@ -174,14 +182,10 @@ export class WaveView extends React.Component {
 		}
 	}
 
-	static whyDidYouRender = true;
-	static rendered = 0;
+	//static whyDidYouRender = true;
 	render() {
 		const p = this.props;
 		const s = this.state;
-
-		WaveView.rendered++;
-		console.info(`WaveView 🤢 🤢 rendered ${WaveView.rendered} times`);
 
 		let wholeRect = null;  // if null, not ready (first render, etc)
 		if (this.element) {

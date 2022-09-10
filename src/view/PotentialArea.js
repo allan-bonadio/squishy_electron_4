@@ -29,8 +29,6 @@ export class PotentialArea extends React.Component {
 
 	constructor(props) {
 		super(props);
-		// why is this called so many times!?!?!?!?!  console.log(`PotentialArea(...`, props, (new Error()).stack);
-
 		this.state = {
 			// should just use forceUpdate on our comp obj instead!
 			changeSerial: 0,
@@ -38,6 +36,8 @@ export class PotentialArea extends React.Component {
 
 		// should just use forceUpdate on our comp obj instead!
 		props.setUpdatePotentialArea(this.updatePotentialArea);
+
+		//console.log(`PotentialArea  constructor done`);
 	}
 
 	/* ***************************************************  click & drag */
@@ -182,12 +182,8 @@ export class PotentialArea extends React.Component {
 		return paths
 	}
 
-	static whyDidYouRender = true;
-	static rendered = 0;
+	//static whyDidYouRender = true;
 	render() {
-		PotentialArea.rendered++;
-		console.info(`PotentialArea 🤢 🤢 rendered ${PotentialArea.rendered} times`);
-
 		const p = this.props;
 		if (! p.space)
 			return '';  // too early

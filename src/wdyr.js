@@ -1,3 +1,5 @@
+// only used with WDYR diagnostic package.
+
 import React from 'react';
 
 if (process.env.NODE_ENV === 'development') {

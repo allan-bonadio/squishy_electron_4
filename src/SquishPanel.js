@@ -31,7 +31,9 @@ import {getASetting, storeASetting} from './utils/storeSettings';
 // runtime debugging flags - you can change in the debugger or here
 let areBenchmarking = false;
 let dumpingTheViewBuffer = false;
-//debugger;
+let traceSetPanels = false;
+let tracePromises = false;
+
 if (typeof storeSettings == 'undefined') debugger;
 
 const DEFAULT_VIEW_CLASS_NAME = 'flatDrawingViewDef';
@@ -51,18 +53,8 @@ export class SquishPanel extends React.Component {
 
 	/* ************************************************ construction & reconstruction */
 
-	static created = 0;
-
 	constructor(props) {
 		super(props);
-
-		// why is this called so many times!?!?!?!?!
-		SquishPanel.created++;
-		this.myInstance = SquishPanel.created;
-		console.info(`😡 😡  SquishPanel.created: ${SquishPanel.created}    instance ${this.myInstance}`);////
-		dumpJsStack('SquishPanel constructor');
-		// console.info((new Error()).stack);
-		// debugger;
 
 		this.state = {
 			// Many of these things should be in a lower component;
@@ -106,7 +98,7 @@ export class SquishPanel extends React.Component {
 		// will be resolved when the space has been created; result will be eSpace
 		this.createdSpacePromise = new Promise((succeed, fail) => {
 			this.createdSpace = succeed;
-			console.info(`spanel  instance ${this.myInstance}: qeStartPromise created:`, succeed, fail);
+			if (tracePromises) console.info(`SquishPanel:  qeStartPromise created:`, succeed, fail);
 		});
 
 		// ticks and benchmarks
@@ -119,7 +111,7 @@ export class SquishPanel extends React.Component {
 		// eslint-disable-next-line
 		this.allowRunningOneCycle = /allowRunningOneCycle/.test(location.search);
 
-		console.log(`SquishPanel  instance ${this.myInstance} constructor done`);
+		//console.log(`SquishPanel constructor done`);
 	}
 
 	/* ******************************************************* space & wave creation */
@@ -143,11 +135,11 @@ export class SquishPanel extends React.Component {
 
 			this.createdSpace(space);
 
-			console.info(`SquishPanel.compDidMount  instance ${this.myInstance} promise done`);
+			if (tracePromises) console.info(`SquishPanel.compDidMount promise done`);
 
 		}).catch(ex => {
 			ex = interpretCppException(ex);
-			console.error(`error in  instance ${this.myInstance} SquishPanel.didMount.then():`, ex.stack || ex.message || ex);
+			console.error(`error  SquishPanel.didMount.then():`, ex.stack || ex.message || ex);
 			debugger;
 		});
 
@@ -162,6 +154,8 @@ export class SquishPanel extends React.Component {
 
 	// init or re-init the space and the panel
 	setNew1DResolution(N, continuum) {
+
+		// usually this is the initial space created
 		qe.space = new eSpace([{N, continuum, label: 'x'}]);
 		this.setState({space: qe.space});
 		return qe.space;
@@ -433,17 +427,9 @@ export class SquishPanel extends React.Component {
 
 	// set the frequency of iteration frames.  Does not control whether iterating or not.
 	setIterateFrequency(newFreq) {
-
-
 		this.setState({iteratePeriod:
-
-
 			storeASetting('iterationParams', 'iteratePeriod', 1000. / +newFreq)
-
-
 		});
-
-
 	}
 
 	startIterating() {
@@ -493,7 +479,7 @@ export class SquishPanel extends React.Component {
 
 	setStepsPerIteration =
 	stepsPerIteration => {
-		console.info(`js setStepsPerIteration(${stepsPerIteration})`)
+		if (traceSetPanels) console.info(`js setStepsPerIteration(${stepsPerIteration})`);
 		//if (typeof storeSettings != 'undefined' && storeSettings.iterationParams)  // goddamned bug in importing works in constructor
 		let spi = storeASetting('iterationParams', 'stepsPerIteration', stepsPerIteration);
 		this.setState({stepsPerIteration: spi});
@@ -503,7 +489,7 @@ export class SquishPanel extends React.Component {
 	// sets the LPF in both SPanel state AND in the C++ area
 	setLowPassFilter =
 	lowPassFilter => {
-		console.info(`js setLowPassFilter(${lowPassFilter})`)
+		if (traceSetPanels) console.info(`js setLowPassFilter(${lowPassFilter})`)
 		//this.setState({lowPassFilter});
 		//qe.Avatar_setLowPassFilter(lowPassFilter);
 // 		if (typeof storeSettings != 'undefined' && storeSettings.iterationParams)  //  goddamned bug in importing works in constructor
@@ -570,12 +556,8 @@ export class SquishPanel extends React.Component {
 
 	/* ******************************************************* rendering */
 
-	static whyDidYouRender = true;
-	static rendered = 0;
+	//static whyDidYouRender = true;
 	render() {
-		SquishPanel.rendered++;
-		console.info(`SquishPanel  instance ${this.myInstance  } 🤢 🤢 rendered ${SquishPanel.rendered} times`);
-
 		const p = this.props;
 		const s = this.state;
 
