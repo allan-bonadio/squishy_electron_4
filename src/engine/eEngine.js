@@ -7,6 +7,8 @@ import {qe, defineQEngineFuncs} from './qe';
 
 // all of these must be attached to window to  get called by c++
 
+let tracePromises = false;
+
 /* ****************************************************** app startup */
 
 // c++ main() calls us to tell us that it's up, and to pass the sizes of different data structures.
@@ -27,7 +29,7 @@ function quantumEngineHasStarted(mDimensions, mLabel) {
 
 	qe.cppLoaded = true;
 
-	console.log(`quantumEngineHasStarted:  resolving qeStartPromise`);
+	if (tracePromises) console.log(`quantumEngineHasStarted:  resolving qeStartPromise`);
 	qeStartPromiseSucceed({mDimensions, mLabel});
 };
 
@@ -39,7 +41,7 @@ window.quantumEngineHasStarted = quantumEngineHasStarted;
 // Also, importing this (in SquishPanel) guarantees this file is included in the build!
 export const qeStartPromise = new Promise((succeed, fail) => {
 	qeStartPromiseSucceed = succeed;
-	console.info(`qeStartPromise created:`, succeed, fail);
+	if (tracePromises) console.info(`qeStartPromise created:`, succeed, fail);
 });
 
 

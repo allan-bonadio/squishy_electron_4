@@ -7,7 +7,7 @@
 import {qe} from './qe';
 import cxToRgb from '../view/cxToRgb';
 
-let traceSetWave = true;
+let traceSetWave = false;
 
 // emscripten sabotages this?  the log & info, but not error & warn?
 //const consoleLog = console.log.bind(console);
@@ -226,7 +226,8 @@ class eWave {
 		let offset = offsetUi * N / 100;  // now in units of X
 		const nSideFreqs = Math.round(pulseWidthUi / 100 * N)
 		const freq = Math.round(freqUi);
-		console.log(`🌊  setPulseWave freq=${freqUi} => ${freq}  nSideFreqs=${nSideFreqs}`+
+		if (traceSetWave)
+			console.log(`🌊  setChordWave freq=${freqUi} => ${freq}  nSideFreqs=${nSideFreqs}`+
 			`  offset=${offsetUi}% => ${offset}`)
 
 		//const dAngle = 4 * Math.PI / N;

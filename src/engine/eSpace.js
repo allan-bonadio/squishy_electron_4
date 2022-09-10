@@ -8,7 +8,7 @@ import {setFamiliarPotential} from '../utils/potentialUtils';
 import storeSettings from '../utils/storeSettings';
 import salientBuffersFactory from './salientBuffersFactory';
 
-let debugSpace = true;
+let debugSpace = false;
 
 
 const _ = num => num.toFixed(4).padStart(9);

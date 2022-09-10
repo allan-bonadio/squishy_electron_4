@@ -17,7 +17,7 @@
 
 static bool useFourierFilter = true;
 
-static bool traceIteration = true;
+static bool traceIteration = false;
 static bool traceIterSteps = false;
 
 static bool traceJustWave = false;
