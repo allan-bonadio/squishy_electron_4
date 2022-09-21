@@ -22,15 +22,12 @@ class salientBuffersFactory {
 		// a patch of memory returned from C++ with addresses of some important buffers.
 		const struct = new Uint32Array(window.Module.HEAPU32.buffer, salientPointersPointer);
 
-		// now make the JS-usable versions.  Someday: pass in the length of each?
-		//np = this.nPoints * 8;  // 8 = four floats for first row, four for second row
-
 		// eWave figures out the right buffer length
 		this.mainQeWave = new eWave(space, struct[1]);
 
 		// one double per point
 		this.potentialBuffer = new Float64Array(window.Module.HEAPF64.buffer, struct[2],
-			space.nPoints * 2);
+			space.nPoints);
 
 		// display also the boundary points?  if not, use nStates instead
 		this.vBuffer = new Float32Array(window.Module.HEAPF64.buffer, struct[3],
