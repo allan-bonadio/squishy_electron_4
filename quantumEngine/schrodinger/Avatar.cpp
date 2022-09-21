@@ -27,7 +27,7 @@ static bool traceFourierFilter = false;
 
 static bool dumpFFHiResSpectums = false;
 
-
+static bool traceSpace = true;
 
 // only do some traces if we're past where it's a problem
 static int dangerousSerial = 4000;  // for the chord pulse
@@ -57,7 +57,18 @@ Avatar::Avatar(qSpace *sp)
 	// we always need a view buffer; that's the whole idea behind an avatar
 	qvBuffer = new qViewBuffer(space, this);
 
-	//dumpOffsets();
+	if (traceSpace) {
+		printf("the qSpace just created:   magic=%c label=%s nDimesions=%d nStates=%d nPoints=%d "
+			"potential=%p potentialFactor=%lf spectrumLength=%d  \n",
+			space->magic, space->label, space->nDimensions, space->nStates, space->nPoints,
+			space->potential, space->potentialFactor, space->spectrumLength);
+		qDimension *dims = space->dimensions;
+		printf("      its qDimension:   N=%d start=%d end=%d ",
+			dims->N, dims->start, dims->end);
+		printf("      nStates=%d nPoints=%d\n", dims->nStates, dims->nPoints);
+		printf("      its continuum=%d spectrumLength=%d label=%s\n",
+			dims->continuum, dims->spectrumLength, dims->label);
+	}
 };
 
 // some uses never need these so wait till they do
