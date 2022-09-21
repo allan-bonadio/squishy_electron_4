@@ -162,25 +162,25 @@ class SetWaveTab extends React.Component {
 			<label>
 				circular
 				<input type='radio' checked={'circular' == breed}
-					onChange={ev => p.setCPState({waveBreed: 'circular'})} />
+					onChange={ev => this.setBreed('circular')} />
 			</label>
 
 			<label>
 				standing
 				<input type='radio'  checked={'standing' == breed}
-					onChange={ev => p.setCPState({waveBreed: 'standing'})} />
+					onChange={ev => this.setBreed('standing')} />
 			</label>
 
 			<label>
 				gauss pulse
 				<input type='radio'  checked={'gaussian' == breed}
-					onChange={ev => p.setCPState({waveBreed: 'gaussian'})} />
+					onChange={ev => this.setBreed('gaussian')} />
 			</label>
 
 			<label>
 				chord pulse
 				<input type='radio'  checked={'chord' == breed}
-					onChange={ev => p.setCPState({waveBreed: 'chord'})} />
+					onChange={ev => this.setBreed('chord')} />
 			</label>
 		</div>;
 
