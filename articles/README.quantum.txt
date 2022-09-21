@@ -184,7 +184,8 @@ total for iteration:  41.00ms
 
 period:  67.00ms
 
--------------------------------------------------- blurb by vman
+-------------------------------------------------- Bogdonoff Affair
+blurb by vman
 
 You see, many years ago, I had a stint as a Mathematical Physicist, and because of that I was a regular reader of the Mathematical Physicist John Baez's blog "This week's finds in Mathematical Physics".  I remember being very interested in an intriguing article he wrote where he discussed the "Bogdonoff Affair" where in 2002 it was discovered that each of these two brothers earned their PhDs in the 90s by fraudulently by publishing articles in journals and defending theses that were complete gibberish. Their work was simply nonsensical strings of research physics buzzwords. All of this caused quite a stir in the world Physics community as it was shocking that this could even happen. In fact, it caused much tighter review processes to be instituted by journals and Universities alike.  I discovered that the Bogdanoffs published a book In 1991, called Dieu et la Science (God and Science), which became a French bestseller. However, they were sued by Astronomy Professor Trinh Xuan They settled out of court, and the Bogdanovs later denied plagiarism.  It's been suggested that the plagiarism suit pressed the brothers to obtain doctorates as fast as possible, since the back cover of the book claimed that the Bogdanoff's held doctorates but they didn't.
 
@@ -196,6 +197,23 @@ You see, many years ago, I had a stint as a Mathematical Physicist, and because 
 Great discussion of how to integrate Schrodinger.
 https://physics.stackexchange.com/questions/259134/schrodinger-equation-for-a-hamiltonian-with-explicit-time-dependence
 
+
+--------------------------------------------------
+9/19,2022
+Maybe I should think of waves WRT an atom size.  H atom sized 1Å.
+
+--------------------------------------------------
+--------------------------------------------------
+--------------------------------------------------
+--------------------------------------------------
+--------------------------------------------------
+
+--------------------------------------------------
+--------------------------------------------------
+--------------------------------------------------
+--------------------------------------------------
+--------------------------------------------------
+--------------------------------------------------
 
 --------------------------------------------------
 --------------------------------------------------
