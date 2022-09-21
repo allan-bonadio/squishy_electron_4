@@ -8,7 +8,7 @@ import PropTypes from 'prop-types';
 //import {scaleLinear} from 'd3-scale';
 //import {path as d3path} from 'd3-path';
 
-import {eSpace, qeBasicSpace} from '../engine/eSpace';
+import {eSpace} from '../engine/eSpace';
 
 //const π = Math.PI;
 //const radsPerDeg = π / 180;
@@ -106,8 +106,8 @@ export class MiniGraph extends React.Component {
 		// construct a copy of the origSpace, but with no more resolution than the minigraph
 		const proxyDim = {...p.origSpace.dimensions[0]};
 		proxyDim.N = Math.min(proxyDim.N, p.width);
-		this.miniSpace = new qeBasicSpace([proxyDim]);
-		if (miniDebug) console.log('this.miniSpace: ', this.miniSpace);
+		//this.miniSpace = new qeBasicSpace([proxyDim]);
+		//if (miniDebug) console.log('this.miniSpace: ', this.miniSpace);
 
 		// these never change for the life of the component (?)
 		this.viewBox = `0 0 ${+p.width} ${+p.height}`;

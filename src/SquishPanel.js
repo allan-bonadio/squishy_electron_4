@@ -13,10 +13,14 @@ import PropTypes from 'prop-types';
 import ControlPanel from './controlPanel/ControlPanel';
 
 // eslint-disable-next-line no-unused-vars
-import {qeBasicSpace, eSpace} from './engine/eSpace';
+import {eSpace} from './engine/eSpace';
 // import eWave from './engine/eWave';
 import {qeStartPromise} from './engine/eEngine';
-import {interpretCppException, dumpJsStack} from './utils/errors';
+
+
+import {interpretCppException} from './utils/errors';
+//import {interpretCppException, dumpJsStack} from './utils/errors';
+
 import qe from './engine/qe';
 
 import WaveView from './view/WaveView';
