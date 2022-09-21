@@ -40,21 +40,3 @@ int main() {
 }
 
 
-
-
-/* ************************************************* error handling */
-
-// wasm-ld: error: /var/folders/th/9674h0fx4hx2d7y751ln3g1r0000gn/T/emscripten_temp_nx3ony_i/main_0.o: undefined symbol: _embind_register_function
-
-// now see exceptions.cpp
-//#include "/dvl/emscripten/emsdk-main/upstream/emscripten/system/include/emscripten/bind.h"
-//
-//std::string getExceptionMessage(intptr_t exceptionPtr) {
-//  return std::string(reinterpret_cast<std::exception *>(exceptionPtr)->what());
-//}
-//
-//EMSCRIPTEN_BINDINGS(Bindings) {
-//  emscripten::function("getExceptionMessage", &getExceptionMessage);
-//};
-
-

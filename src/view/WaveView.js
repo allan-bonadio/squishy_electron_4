@@ -22,7 +22,7 @@ import PotentialArea from './PotentialArea';
 //const listOfViewClasses = import('./listOfViewClasses');
 import {listOfViewClasses} from './listOfViewClasses';
 
-import {dumpJsStack} from '../utils/errors';
+//import {dumpJsStack} from '../utils/errors';
 
 let traceWaveView = false;
 let traceDragCanvasHeight = false;
@@ -228,7 +228,6 @@ export class WaveView extends React.Component {
 
 				{spinner}
 			</aside>
-
 
 			<PotentialArea width={p.width} height={s.height}
 				space={s.space} wholeRect={wholeRect}

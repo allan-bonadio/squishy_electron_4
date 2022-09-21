@@ -19,12 +19,14 @@ class cppError extends Error {
 		super('from C++: ' + window.UTF8ToString(qe.getCppExceptionMessage(exNumber)));
 
 // 		name = 'cppError';
-		this.code = exNumber;  // nobody uses this yet
+		this.code = exNumber;
 	}
 
 	name = 'cppError';
 }
 
+// every time you catch an exception, take the message or whatever and send it through this
+// THEN the result (returned) is an Error as normal.  C++ can throw, but only integers.
 export function interpretCppException(ex) {
 	if (typeof ex != 'number')
 		return ex;

@@ -118,7 +118,7 @@ export default class ResolutionDialog extends React.Component {
 						(this.props.continuum == qe.contENDLESS)
 						? 'bold'
 						: 'normal'}}/>
-				Endless, repeating left-right</label>
+				Endless, wrapping around</label>
 			<label  key='contWELL'><input type='radio' name='continuum'  value={qe.contWELL}
 					checked={s.continuum == qe.contWELL}
 					onChange={onChange}
@@ -135,7 +135,7 @@ export default class ResolutionDialog extends React.Component {
 						? 'bold'
 						: 'normal'}}
 						disabled />
-				Discreet Quanta (not recommended)</label>
+				Discreet Quanta (not developed yet)</label>
 		</>;
 	}
 
