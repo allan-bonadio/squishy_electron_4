@@ -28,8 +28,8 @@
 			text-shadow: 1px 1px 3px #000f;
 		}
 
-		.northWestWrapper { left: .5em; }
-		.northEastWrapper { right: .5em; }
+		.northWestWrapper { left: 2em; }
+		.northEastWrapper { right: 2em; }
 
 		.sizeBox {
 			position: absolute;
@@ -57,14 +57,12 @@
 		path.visibleLine {
 			stroke: $potentialColor;
 			stroke-width: 3;
-			//fill: blue;
 			pointer-events: none;
 		}
 
 		path.tactileLine {
 			stroke: none;
-			stroke-width: 9;
-			//fill: red;
+			stroke-width: 15;
 			pointer-events: stroke;
 			cursor: pointer;
 		}
