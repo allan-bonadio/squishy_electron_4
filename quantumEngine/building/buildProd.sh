@@ -9,7 +9,7 @@
 
 cd `dirname $0`
 
-. /dvl/emscripten/emsdk-main/emsdk_env.sh
+. $qEMSCRIPTEN/emsdk-main/emsdk_env.sh
 # also try emsdk without the -main or make a symlink
 
 allCpp=`cat allCpp.list`

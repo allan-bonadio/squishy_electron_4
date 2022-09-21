@@ -14,7 +14,7 @@ echo "Add in argument of --inspect or --inspect-brk or any other "
 echo "node args; they will be passed through."
 
 # source this to run MscriptN stuff:
-. /dvl/emscripten/emsdk-main/emsdk_env.sh
+. $qEMSCRIPTEN/emsdk-main/emsdk_env.sh
 
 # create a space-sep list of ALL the cpp files (almost all)
 allCpp=`cat building/allCpp.list`

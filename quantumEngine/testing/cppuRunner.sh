@@ -29,24 +29,23 @@
 cd `dirname $0`
 cd ..
 
-echo "CppUTest Test runner: arg db=debugger; all others are assumed to be test name segments"
+echo "CppUTest Test runner args: db=debugger; all others are assumed to be test name segments"
 
 # https://cpputest.github.io
 export CPPUTEST_HOME=/opt/dvl/cpputest/cpputest-3.8
 
 # no enscriptm here!  just native C++.
-#. /opt/dvl/emscripten/emsdk-main/emsdk_env.sh
+#. $qEMSCRIPTEN/emsdk/emsdk_env.sh
 
 # create a space-sep list of ALL the runtime cpp files (almost all)
 allCpp=`cat building/allCpp.list`
 
-# keep LABEL_LEN+1 a multiple of 4 or 8 for alignment, eg 7, 15 or 32
+# keep (LABEL_LEN+1) a multiple of 4, 8, 16, 32 or 8 for alignment, eg 7, 15 or 31
 LABEL_LEN=7
 
 # note that main.cpp is NOT included in the .cpp files; that's for web use only
 # and makes all the diff.  cppuMain.cpp is the main instead.
 # Update list of test srcs as needed.
-# keep LABEL_LEN+1 a multiple of 4 or 8 for alignment, eg 7, 15 or 32
 # some of these options - dunno if I need them
 set -x
 g++ -o cppuTestBin -Wno-tautological-undefined-compare  \

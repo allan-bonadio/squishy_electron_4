@@ -4,11 +4,25 @@
 */
 
 #include <string>
-#include <emscripten/bind.h>
 #include "qSpace.h"
 #include "../schrodinger/Avatar.h"
 #include "qWave.h"
 #include "qViewBuffer.h"
+
+
+// turns out bind.h isn't needed; compiles fine
+//error still ... #include "/opt/dvl/emscripten/emsdk/upstream/emscripten/system/include/emscripten/bind.h"
+
+//found but error ... #include "/opt/dvl/emscripten/emsdk/upstream/emscripten/cache/sysroot/include/emscripten/bind.h"
+//found but error ... #include "/opt/dvl/emscripten/emsdk/upstream/emscripten/system/include/emscripten/bind.h"
+
+
+
+
+//not found #include <emscripten/bind.h>
+//not found #include <emscripten/system/include/emscripten/bind.h>
+//not found #include <emscripten/emsdk/upstream/emscripten/system/include/emscripten/bind.h>
+
 
 
 

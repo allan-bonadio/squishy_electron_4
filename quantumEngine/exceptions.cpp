@@ -3,7 +3,10 @@
 ** Copyright (C) 2022-2022 Tactile Interactive, all rights reserved
 */
 
-#include <emscripten/bind.h>
+#include "/opt/dvl/emscripten/emsdk/upstream/emscripten/system/include/emscripten/bind.h"
+
+//#include <emscripten/bind.h>
+//#include <emscripten/bind.h>
 
 
 // this is from https://emscripten.org/docs/porting/Debugging.html#handling-c-exceptions-from-javascript

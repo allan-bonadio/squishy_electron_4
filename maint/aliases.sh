@@ -3,7 +3,7 @@
 ##
 
 # put this in your ~/.profile
-### export SQUISH_ROOT=/dvl/squishyElectron/squishy_electron_4
+### export SQUISH_ROOT=/opt/dvl/squishyElectron/squishy_electron_4
 # or whatever path. Your .bash_profile, .bash_login, or .profile (different for
 # other shells!) files only source (run) when you login, so you put exports in
 # there, and lower shells will inherit them. The different files OVERRIDE each

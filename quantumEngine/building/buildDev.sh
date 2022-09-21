@@ -7,7 +7,7 @@
 
 cd `dirname $0`
 
-. /opt/dvl/emscripten/emsdk/emsdk_env.sh
+. $qEMSCRIPTEN/emsdk/emsdk_env.sh
 # was formerly /emsdk-main/ but should be fixed now
 
 # this has all c++ & h files, except main.cpp and the testing files.
@@ -29,7 +29,7 @@ emcc -o quantumEngine.js -sLLD_REPORT_UNDEFINED \
 	-sEXPORTED_RUNTIME_METHODS='["ccall","cwrap","getValue","setValue"]' \
 	$PROFILING \
 	-DLABEL_LEN=$LABEL_LEN \
-	-I/opt/dvl/emscripten/emsdk/upstream/emscripten/cache/sysroot/include \
+	-I$qEMSCRIPTEN/emsdk/upstream/emscripten/cache/sysroot/include \
 	-include emscripten.h \
 	-ffast-math  -lembind \
 	main.cpp $allCpp || exit $?
