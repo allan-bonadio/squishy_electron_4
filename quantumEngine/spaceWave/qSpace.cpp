@@ -25,7 +25,7 @@ static bool traceFreeBuffer = false;
 // note if you just use the constructor and these functions,
 // NO waves or buffers will be allocated for you
 qSpace::qSpace(const char *lab)
-	: magic('qSpa'), nDimensions(0), potential(NULL), nPoints(0), nStates(0), freeBufferList(NULL), potentialFactor(1.) {
+	: magic('qSpa'), nDimensions(0), potential(NULL), nPoints(0), nStates(0), freeBufferList(NULL), potentialFactor(.1) {
 
 	//printf("🚀 🚀 qSpace::qSpace() constructor starts label:'%s'  this= %p\n", lab, (this));
 
@@ -46,17 +46,13 @@ void qSpace::addDimension(int N, int continuum, const char *label) {
 		throw std::runtime_error("🚀 🚀 too many dimensions");
 	}
 
+	// start of the next dim
 	qDimension *dims = dimensions + nDimensions;
 	dims->N = N;
 	dims->continuum = continuum;
-	if (continuum) {
-		dims->start = 1;
-		dims->end = N + 1;
-	}
-	else {
-		dims->start = 0;
-		dims->end = N;
-	}
+
+	dims->start = continuum ? 1 : 0;
+	dims->end = N + dims->start;
 
 	strncpy(dims->label, label, LABEL_LEN);
 	dims->label[LABEL_LEN] = 0;
