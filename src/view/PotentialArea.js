@@ -6,13 +6,15 @@
 
 import React from 'react';
 import PropTypes from 'prop-types';
+import {scaleLinear} from 'd3-scale';
 
 import qe from '../engine/qe';
 import eSpace from '../engine/eSpace';
 import {dumpPotential} from '../utils/potentialUtils';
 
-
-
+// I dunno but the potentials I'm generating are too strong.
+// So I reduced it by this factor, but still have to magnify it to make it visible.
+export const spongeFactor = 100;
 
 // ultimately, this is a <svg node with a <path inside it
 export class PotentialArea extends React.Component {
@@ -22,6 +24,8 @@ export class PotentialArea extends React.Component {
 
 		// for first couple of renders, space and wholeRect are null
 		space: PropTypes.instanceOf(eSpace),
+
+		// thiis can be null if stuff isn't ready
 		wholeRect: PropTypes.object,
 
 		setUpdatePotentialArea: PropTypes.func,
@@ -33,11 +37,37 @@ export class PotentialArea extends React.Component {
 			// should just use forceUpdate on our comp obj instead!
 			changeSerial: 0,
 		};
+		console.info(` the new PotentialArea:`, this);
 
 		// should just use forceUpdate on our comp obj instead!
-		props.setUpdatePotentialArea(this.updatePotentialArea);
+		if (props.setUpdatePotentialArea)
+			props.setUpdatePotentialArea(this.updatePotentialArea);
 
+		this.setScales();  // usually too early, but later on it's no problems.
 		//console.log(`PotentialArea  constructor done`);
+	}
+
+	// scales to transform coords.  Call whenever the coord systems change
+	// affecting the potential. Returns false if it failed cuz too early.  yScale
+	// is function that transforms from sci units to pixels.  yScale.invert())
+	// goes the other way.  Same for xScale.  Used for clicking and for display.
+	setScales() {
+		const p = this.props;
+		if (!p.wholeRect)
+			return false;
+		console.info(`the whole rect:`, p.wholeRect);
+
+		const {x} = p.wholeRect;
+		//const {x, y} = p.wholeRect;
+		this.yScale = scaleLinear([-2, 8], [0, p.height]);
+		//this.yScale = scaleLinear([-2, 8], [y, y + p.height]);
+		//for (let j = -2; j <= 8; j += .5) console.info(`j=${j} -> ${this.yScale(j)}`)
+		//this.yScale = scaleLinear([0, 3], [y + p.height, y]);
+		// spongeFactor?
+
+		// this'll probably be changed ...
+		this.xScale = scaleLinear([0, 1], [x, x + this.barWidth]);
+		return true;
 	}
 
 	/* ***************************************************  click & drag */
@@ -49,24 +79,54 @@ export class PotentialArea extends React.Component {
 			x, this.potentialBuffer[x]);
 	}
 
-	// every time user changes it
+	// every time user changes it.  Also set points interpolated betweeen.
+	// returns false if it failed and needs to be done again.  True means it succeeded.
 	changePotential(ev, title) {
 		const p = this.props;
 		if (!p.wholeRect)
-			return;
-		let newPotential = p.wholeRect.y + p.wholeRect.height - ev.clientY;
-		newPotential -= 5;  // dunno but this works better
-		let ix = Math.floor((ev.clientX - p.wholeRect.x) / this.barWidth);
-		console.log(`mouse %s on point (%f,%f) potential[%d]=%f`,
+			return false;
+
+		// new situation given new position
+		//let pixPotential = p.wholeRect.y + p.wholeRect.height - ev.clientY;
+		let newPotential = this.yScale.invert(p.height - ev.clientY + p.wholeRect.top);
+		//newPotential -= 5;  // dunno if this works better
+
+		//let ix = Math.round((ev.clientX - p.wholeRect.x) / this.barWidth);
+		let ix = Math.round(this.xScale.invert(ev.clientX));
+		//if (Math.abs(ix - nuIx) > 1e-10)
+		//	console.log(`🍓  ix and nuIx discrepancy!!  ix=${ix}   nuIx=${nuIx}   `);
+
+		console.log(`mouse %s on point (%f,%f) potential[ix=%d] changing from %f to %f`,
 			title,
 			ev.clientX, ev.clientY,
-			ix, this.potentialBuffer[ix]);//,
-			this.mouseReveal(title, ev, ix);
+			ix, this.potentialBuffer[ix], newPotential);
+		//this.mouseReveal(title, ev, ix);
 
-		this.potentialBuffer[ix] = newPotential;
+		if (undefined == this.latestIx) {
+			// the first time, all you can do is the one point
+			this.potentialBuffer[ix] = newPotential;
+		}
+		else {
+			// other times, draw a straight linear line through.  scaleLinear from d3
+			// cuz sometimes mouse skips.
+			let tweenScale = scaleLinear([this.latestIx, ix], [this.latestPotential, newPotential]);
+
+			// do it to each point in between
+			let hi = Math.max(this.latestIx, ix);
+			let lo = Math.min(this.latestIx, ix);
+			for (let ixx = lo; ixx <= hi; ixx++) {
+				console.info(`tweening: set point [${ixx}] to ${tweenScale(ixx).toFixed(4)}`)
+				this.potentialBuffer[ixx] = tweenScale(ixx);
+			}
+			console.info(`tweening done`)
+		}
+
+		this.latestIx = ix;
+		this.latestPotential = newPotential;
 
 		//qe.set1DPotential(ix, p.height + p.y - newPotential);
 		this.updatePotentialArea();
+		return true;
 	}
 
 	mouseDown(ev) {
@@ -74,6 +134,13 @@ export class PotentialArea extends React.Component {
 		this.changePotential(ev, 'M down');
 		this.dragging = true;
 		//debugger;
+
+		// must figure out pointer offset; diff between mousedown pot and the neareest piece of line
+		// remember that clientY is in pix units
+		let potNow = this.latestPotential
+		let chosenPotential = this.yScale.invert(ev.clientY);
+		this.mouseYOffset = chosenPotential - potNow;
+		console.info(`🎯  Y numbers: mouseYOffset(${this.mouseYOffset}) = chosenPotential(${chosenPotential}) - potNow(${potNow})`);
 	}
 
 	mouseMove(ev) {
@@ -84,7 +151,7 @@ export class PotentialArea extends React.Component {
 			//debugger;
 		}
 		else {
-			this.dragging = false;
+			this.mouseUp(ev);
 			//this.mouseReveal('not dragging', ev, 0);
 		}
 	}
@@ -93,7 +160,10 @@ export class PotentialArea extends React.Component {
 		const p = this.props;
 		this.dragging = false;
 
-		this.changePotential(ev, 'mouse UP');
+		// remind everybody that this episode is over.  Tune in next week.
+		this.latestIx = this.latestPotential = undefined;
+
+		//this.changePotential(ev, 'mouse UP');
 		//this.mouseReveal('mouse UP', ev, ix);
 
 		dumpPotential(p.space, this.potentialBuffer, 8);
@@ -107,23 +177,33 @@ export class PotentialArea extends React.Component {
 	}
 
 	// make the sequence of coordinates the white line needs to draw
-	// as compressed as possible
+	// as compressed as possible.  Returns one long string.
 	makePathAttribute(start, end) {
-		//if (! p.space)  won't be called if no spae
-		//	return `M0,0`;  // too early
-
 		const p = this.props;
 
+		// yawn too early
+		if (! p.space) throw new Error(`makePathAttribute(): no functioning space`);
+		if (! this.yScale) {
+			// I still haven't figured out the best time to call setScales()
+			if (!this.setScales())
+				return `M0,0`;  // too early
+		}
+
 		const space = p.space;
-		//let height = p.height;
-		//const dim = space.dimensions[0];
+		//qe.qSpace_dumpPotential(`makePathAttribute(${start}, ${end})`);
 		const potentialBuffer = this.potentialBuffer = space.potentialBuffer;
+		// for (let i = 0; i < this.nPoints; i++)
+		// 	console.log(`potentialBuffer[${i}] = ${potentialBuffer[i]}`);
+
+		// array to collect small snippets of text
 		const points = new Array(this.nPoints);
-		let potential = potentialBuffer[start];  //qe.get1DPotential(dim.start);
-		points[start] = `M0,${potential}L `;
+		let y = this.yScale(potentialBuffer[start]);  //qe.get1DPotential(dim.start);
+		let x = 0;
+		points[start] = `M${x},${y.toFixed(1)}L `;
 		for (let ix = start+1; ix < end; ix++) {
-			potential = potentialBuffer[ix];
-			points[ix] = `${(ix * this.barWidth).toFixed(1)},${(potential).toFixed(1)} `;
+			y = this.yScale(potentialBuffer[ix]);
+			x = this.xScale(ix);
+			points[ix] = `${x.toFixed(1)},${y.toFixed(1)} `;
 		}
 		if (start) {
 			points.pop();
@@ -134,14 +214,16 @@ export class PotentialArea extends React.Component {
 
 	renderPaths() {
 		const p = this.props;
+		if (!p.space) return <></>;
 
-		let {start, end} = p.space.startEnd;
+		let {start, end, continuum} = p.space.startEnd;
 		let paths = [];
 
-		switch (p.space.dimensions[0].continuum) {
+		//switch (p.space.dimensions[0].continuum) {
+		switch (continuum) {
 			//case 	qe.contDISCRETE:
 			case qe.contWELL:
-				// stone slabs on each end on the borders
+				// stone slabs on each end on the borders vaguely means 'quantum well'.
 				paths.push(
 					<rect className='left wellSlab' key='left'
 						x={0} y={0} width={this.barWidth} height={p.height}
@@ -163,14 +245,19 @@ export class PotentialArea extends React.Component {
 			default: throw `bad continuum ${p.space.dimensions.continuum}`;
 		}
 
-		// the lines themselves
+		// the lines themselves: exactly overlapping.  tactile wider than visible.
 		const pathAttribute = this.makePathAttribute(start, end);
+		//console.info(`makePathAttribute(${start}, ${end}) returned:`, pathAttribute);
+
+		// this one actually draws the white line
 		paths.push(
 			<path className='visibleLine' key='visible'
 				d={pathAttribute}
 				fill="transparent"
 			/>
 		);
+
+		// you click on thisi one
 		paths.push(
 			<path className='tactileLine' key='tactile'
 				d={pathAttribute}
@@ -184,6 +271,7 @@ export class PotentialArea extends React.Component {
 
 	//static whyDidYouRender = true;
 	render() {
+		//throw "holy smokes!"
 		const p = this.props;
 		if (! p.space)
 			return '';  // too early
