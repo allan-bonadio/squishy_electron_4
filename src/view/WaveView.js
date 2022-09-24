@@ -24,7 +24,7 @@ import {listOfViewClasses} from './listOfViewClasses';
 
 //import {dumpJsStack} from '../utils/errors';
 
-let traceWaveView = false;
+let traceWaveView = true;
 let traceDragCanvasHeight = false;
 
 
@@ -49,8 +49,12 @@ export class WaveView extends React.Component {
 		setUpdatePotentialArea: PropTypes.func,
 	};
 
+	static constructed = 0;
 	constructor(props) {
 		super(props);
+
+		WaveView.constructed++;
+		console.info(`WaveView constructed for the ${WaveView.constructed}th time.`)
 
 		this.state = {
 			height: getASetting('miscParams', 'viewHeight'),
@@ -65,16 +69,20 @@ export class WaveView extends React.Component {
 
 		this.formerWidth = props.width;
 		this.formerHeight = props.defaultHeight;
+console.info(`4  ⛷ this.canvas: ${this.canvas}`);
 	}
 
 	// the canvas per panel, one panel per canvas.
 	// Only called when canvas is created (or recreated, someday)
 	static setGLCanvasAgain = 0;
 	setGLCanvas(canvas) {
+console.info(`3  ⛷ this.canvas: ${this.canvas}`);
 		const p = this.props;
 		if (this.state.space && this.canvas)
 			return;  // already done
+
 		WaveView.setGLCanvasAgain++;
+		if (WaveView.setGLCanvasAgain > 10) debugger;
 		if (traceWaveView) {
 			console.log(`for the ${WaveView.setGLCanvasAgain}th time, WaveView.setGLCanvas(...`, canvas);
 		}
@@ -90,6 +98,7 @@ export class WaveView extends React.Component {
 			// now create the draw view class instance as described by the space
 			// this is the flatDrawingViewDef class for webgl, not a CSS class or React class component
 			// do we do this EVERY RENDER?  probably not needed.
+console.info(`6 ⛷ this.canvas: ${this.canvas}`);
 			if (traceWaveView) console.log(`setGLCanvas.then(...`, space);
 
 			if (this.state.space !== space)
@@ -109,6 +118,7 @@ export class WaveView extends React.Component {
 
 			if (traceWaveView) console.info(`WaveView.compDidMount promise done`);
 
+console.info(`2  ⛷ this.canvas: ${this.canvas}`);
 		}).catch(ex => {
 			console.error(`error in WaveView createdSpacePromise.then():`, ex.stack || ex.message || ex);
 			debugger;
@@ -171,6 +181,7 @@ export class WaveView extends React.Component {
 	/* ************************************************************************ render */
 
 	componentDidUpdate() {
+console.info(`10  ⛷ this.canvas: ${this.canvas}`);
 		const p = this.props;
 		const s = this.state;
 
@@ -180,10 +191,12 @@ export class WaveView extends React.Component {
 			this.formerWidth = p.width;
 			this.formerHeight = s.height;
 		}
+console.info(`11  ⛷ this.canvas: ${this.canvas}`);
 	}
 
 	//static whyDidYouRender = true;
 	render() {
+console.info(`12  ⛷ this.canvas: ${this.canvas}`);
 		const p = this.props;
 		const s = this.state;
 
@@ -207,11 +220,17 @@ export class WaveView extends React.Component {
 		const spinner = qe.cppLoaded ? ''
 			: <img className='spinner' alt='spinner' src='eclipseOnTransparent.gif' />;
 
+console.info(`13  ⛷ this.canvas: ${this.canvas}`);
 		// voNorthWest/East are populated during drawing
 		return (<div className='WaveView'  ref={el => this.element = el}>
 			<canvas className='squishCanvas'
 				width={p.width} height={s.height}
-				ref={canvas => this.setGLCanvas(canvas)}
+				ref={
+					canvas => {
+						if (canvas) {
+							this.setGLCanvas(canvas);
+						}
+					}}
 				style={{width: `${p.width}px`, height: `${s.height}px`}} />
 
 			<aside className='viewOverlay'
@@ -231,6 +250,7 @@ export class WaveView extends React.Component {
 
 			<PotentialArea width={p.width} height={s.height}
 				space={s.space} wholeRect={wholeRect}
+				canvas={this.canvas}
 				setUpdatePotentialArea={p.setUpdatePotentialArea}/>
 		</div>);
 	}
