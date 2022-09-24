@@ -18,8 +18,10 @@ class flatDrawingViewDef extends abstractViewDef {
 		// create relevant drawings
 		if (options.flat)
 			new flatDrawing(this, space);
-		if (options.potential)
-			new potentialDrawing(this, space);
+
+// get rid of this
+//		if (options.potential)
+//			new potentialDrawing(this, space);
 
 		// maybe this is not needed on the instance?  this.name = 'Flat View';
 	}
