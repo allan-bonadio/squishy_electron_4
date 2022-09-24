@@ -3,12 +3,11 @@
 ** Copyright (C) 2021-2022 Tactile Interactive, all rights reserved
 */
 
-//import {qeBasicSpace} from '../engine/eSpace';
 import qe from '../engine/qe';
 
 
-// raw numbers ~ 1 are way too big and throw it all into chaos
-const VALLEY_FACTOR = .001;
+// raw numbers ~ 100 are way too big and throw it all into chaos
+const VALLEY_FACTOR = .000_01;
 
 // Potential is simple array.  No wrapper object needed (not yet)  Just make a typed array from what C++ created
 // um... soon though, call it ePotential.  maybe also on the c++ side
@@ -23,7 +22,8 @@ export function fixPotentialBoundaries(space, potential) {
 	case qe.contWELL:
 		// the points on the end are ∞ potential, but the arithmetic goes bonkers?  no, potential on ends is not really used.
 		// if I actually set the voltage to ∞, really ought to work?  real, not complex
-		potential[0] = potential[end] = Infinity;
+		// sorry, can't draw with SVG to infinity.
+		potential[0] = potential[end] = 1e9;
 		break;
 
 	case qe.contENDLESS:
@@ -39,20 +39,29 @@ export function fixPotentialBoundaries(space, potential) {
 export function setFamiliarPotential(space, potentialArray, potentialParams) {
 	const {start, end, N} = space.startEnd;
 	let {valleyPower, valleyScale, valleyOffset} = potentialParams;
+	console.log(`starting setFamiliarPotential(${space.label}, array of potentialArray.length, potentialParams=`, potentialParams);
 	let pot;
+	const offset = valleyOffset * N / 100;
 	for (let ix = start; ix < end; ix++) {
-			pot = Math.pow(Math.abs(ix - valleyOffset * N / 100), +valleyPower) * +valleyScale * VALLEY_FACTOR;
+		if (valleyScale == 0) {
+			pot = 0;
+		}
+		else {
+			pot = Math.pow(Math.abs(ix - offset), +valleyPower) * (+valleyScale * VALLEY_FACTOR);
 			if (! isFinite(pot)) {
-				console.warn(`potential ${pot} screwed up at x=${ix}`, JSON.stringify(potentialParams));
-				console.warn(`   ix - valleyOffset * N / 100=${ix - valleyOffset * N / 100}`);
-				console.warn(`   Math.pow(ix - valleyOffset * N / 100, +valleyPower)=${Math.pow(ix - valleyOffset * N / 100, +valleyPower)}`);
-				console.warn(`  Math.pow(ix - valleyOffset * N / 100, +valleyPower) * +valleyScale=${Math.pow(ix - valleyOffset * N / 100, +valleyPower) * +valleyScale}`);
+				console.warn(`potential ${pot} not finite at x=${ix}`, JSON.stringify(potentialParams));
+				console.warn(`   ix - offset=${ix - offset}`);
+				console.warn(`   Math.pow(ix - offset, +valleyPower)=${Math.pow(ix - offset, +valleyPower)}`);
+				console.warn(`  Math.pow(ix - offset, +valleyPower) * +valleyScale=${Math.pow(ix - offset, +valleyPower) * +valleyScale}`);
 			}
+		}
 		potentialArray[ix] = pot;
 	}
 
-	// fix boundaries
+	// fix boundaries; the only points we didn't set
 	fixPotentialBoundaries(space, potentialArray);
+
+	dumpPotential(space, potentialArray, 8);
 }
 
 export function dumpPotential(space, potentialArray, nPerRow = 1, skipAllButEvery = 1) {
@@ -62,7 +71,7 @@ export function dumpPotential(space, potentialArray, nPerRow = 1, skipAllButEver
 	if (! nPerRow)
 		nPerRow =  Math.ceil(N / 10);
 
-	let txt = '';
+	let txt = '🗜 The Potential 🎢  ⛰ ';
 	for (let ix = start; ix < end; ix++) {
 		txt += potentialArray[ix].toFixed(6).padStart(10);
 		if (ix % skipAllButEvery == 0)
