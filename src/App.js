@@ -8,7 +8,7 @@ import './App.scss';
 
 import SquishPanel from './SquishPanel';
 import CommonDialog from './widgets/CommonDialog';
-import {dumpJsStack} from './utils/errors';
+//import {dumpJsStack} from './utils/errors';
 
 
 class App extends React.Component {

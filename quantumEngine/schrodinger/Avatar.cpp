@@ -39,7 +39,7 @@ static int dangerousRate = 250;
 // those apply to these tracing flags
 static bool traceEachFFSquelch = false;
 static bool traceEndingFFSpectrum = false;
-static bool traceB4nAfterFFSpectrum = true;
+static bool traceB4nAfterFFSpectrum = false;
 
 
 /* *********************************************************************************** Avatar */

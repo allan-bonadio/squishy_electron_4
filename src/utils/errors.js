@@ -14,6 +14,7 @@ export function dumpJsStack(where = 'somewhere') {
 
 /* ****************************************************** error/exception handling from C++ */
 
+// class of errors that come from inside C++
 class cppError extends Error {
 	constructor(exNumber) {
 		super('from C++: ' + window.UTF8ToString(qe.getCppExceptionMessage(exNumber)));
@@ -27,6 +28,7 @@ class cppError extends Error {
 
 // every time you catch an exception, take the message or whatever and send it through this
 // THEN the result (returned) is an Error as normal.  C++ can throw, but only integers.
+// Normal JS exceptions pass through unchanged.
 export function interpretCppException(ex) {
 	if (typeof ex != 'number')
 		return ex;

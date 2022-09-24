@@ -201,7 +201,7 @@ https://physics.stackexchange.com/questions/259134/schrodinger-equation-for-a-ha
 --------------------------------------------------
 9/19,2022
 Maybe I should think of waves WRT an atom size.  H atom sized 1Å.
-
+actually no, maybe 1/4 Å for hydrogen but about 1Å average for most of the elements
 --------------------------------------------------
 --------------------------------------------------
 --------------------------------------------------
