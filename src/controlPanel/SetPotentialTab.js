@@ -14,7 +14,7 @@ import {setFamiliarPotential, dumpPotential} from '../utils/potentialUtils';
 import MiniGraph from './MiniGraph';
 import eSpace from '../engine/eSpace';
 import TextNSlider from '../widgets/TextNSlider';
-import {alternateMinMaxs} from '../utils/storeSettings';
+import {storeASetting, alternateMinMaxs} from '../utils/storeSettings';
 
 // some typical potential value, so we can get an idea of how to scale in the graph
 //let SOME_POTENTIAL = 0.01;
@@ -109,21 +109,27 @@ class SetPotentialTab extends React.Component {
 	setValleyPower =
 	valleyPower => {
 		this.props.setCPState({valleyPower});
+		storeASetting('potentialParams', 'valleyPower', valleyPower);
 	}
 	setValleyScale =
 	valleyScale => {
 		this.props.setCPState({valleyScale});
+		storeASetting('potentialParams', 'valleyScale', valleyScale);
 	}
 	setValleyOffset =
 	valleyOffset => {
 		this.props.setCPState({valleyOffset});
+		storeASetting('potentialParams', 'valleyOffset', valleyOffset);
 	}
 
 	setFlatPotentialHandler =
 	(ev) => {
 		this.setValleyPower(0);
-		this.setValleyScale(1);
+		this.setValleyScale(0);
 		this.setValleyOffset(50);
+		storeASetting('potentialParams', 'valleyPower', 0);
+		storeASetting('potentialParams', 'valleyScale', 0);
+		storeASetting('potentialParams', 'valleyOffset', 50);
 		this.props.setPotentialHandler();
 	};
 
@@ -175,7 +181,7 @@ class SetPotentialTab extends React.Component {
 				<h3>Set Potential</h3>
 				<button className='zeroVoltageButton round'
 					onClick={this.setFlatPotentialHandler}>
-						Set to Flat Potential
+						Reset Potential
 				</button>
 
 			</div>
