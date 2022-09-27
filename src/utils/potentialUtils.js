@@ -61,7 +61,7 @@ export function setFamiliarPotential(space, potentialArray, potentialParams) {
 	// fix boundaries; the only points we didn't set
 	fixPotentialBoundaries(space, potentialArray);
 
-	dumpPotential(space, potentialArray, 8);
+	//dumpPotential(space, potentialArray, 8);
 }
 
 export function dumpPotential(space, potentialArray, nPerRow = 1, skipAllButEvery = 1) {

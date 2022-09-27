@@ -166,7 +166,7 @@ export class PotentialArea extends React.Component {
 		//this.changePotential(ev, 'mouse UP');
 		//this.mouseReveal('mouse UP', ev, ix);
 
-		dumpPotential(p.space, this.potentialBuffer, 8);
+		//dumpPotential(p.space, this.potentialBuffer, 8);
 	}
 
 	/* *************************************************** drawing */
