@@ -18,17 +18,15 @@ import './view.scss';
 // import flatDrawingViewDef from './flatDrawingViewDef';
 import {getASetting, storeASetting} from '../utils/storeSettings';
 import PotentialArea from './PotentialArea';
+import GLView from './GLView';
 
-//const listOfViewClasses = import('./listOfViewClasses');
-import {listOfViewClasses} from './listOfViewClasses';
+
+//import {listOfViewClasses} from './listOfViewClasses';
 
 //import {dumpJsStack} from '../utils/errors';
 
 let traceWaveView = true;
 let traceDragCanvasHeight = false;
-
-
-/* **************************************** actual canvas wrapper */
 
 
 
@@ -46,6 +44,7 @@ export class WaveView extends React.Component {
 		// tells us when the space exists.  From the SquishPanel, or just pass something resolved.
 		createdSpacePromise: PropTypes.instanceOf(Promise),
 
+		returnGLFuncs: PropTypes.func.isRequired,
 		setUpdatePotentialArea: PropTypes.func,
 	};
 
@@ -62,6 +61,7 @@ export class WaveView extends React.Component {
 		}
 
 		// will be resolved when the canvas has been nailed down; result will be canvas dom obj
+		// this... still useful?
 		this.createdCanvasPromise = new Promise((succeed, fail) => {
 			this.createdCanvas = succeed;
 			if (traceWaveView) console.info(`qeStartPromise created:`, succeed, fail);
@@ -69,62 +69,9 @@ export class WaveView extends React.Component {
 
 		this.formerWidth = props.width;
 		this.formerHeight = props.defaultHeight;
-console.info(`4  ⛷ this.canvas: ${this.canvas}`);
 	}
 
-	// the canvas per panel, one panel per canvas.
-	// Only called when canvas is created (or recreated, someday)
-	static setGLCanvasAgain = 0;
-	setGLCanvas(canvas) {
-console.info(`3  ⛷ this.canvas: ${this.canvas}`);
-		const p = this.props;
-		if (this.state.space && this.canvas)
-			return;  // already done
 
-		WaveView.setGLCanvasAgain++;
-		if (WaveView.setGLCanvasAgain > 10) debugger;
-		if (traceWaveView) {
-			console.log(`for the ${WaveView.setGLCanvasAgain}th time, WaveView.setGLCanvas(...`, canvas);
-		}
-
-		// why do i have to do this?  Old version of CHrome??!?!?!  preposterous
-		if (canvas) {
-			this.canvas = canvas;
-			canvas.WaveView = this;
-		}
-
-		// we need the space AND the canvas to make the views
-		p.createdSpacePromise.then(space => {
-			// now create the draw view class instance as described by the space
-			// this is the flatDrawingViewDef class for webgl, not a CSS class or React class component
-			// do we do this EVERY RENDER?  probably not needed.
-console.info(`6 ⛷ this.canvas: ${this.canvas}`);
-			if (traceWaveView) console.log(`setGLCanvas.then(...`, space);
-
-			if (this.state.space !== space)
-				this.setState({space});
-
-			let vClass = listOfViewClasses[p.viewClassName];
-			this.effectiveView = new vClass(p.viewName, this.canvas, space);
-			this.effectiveView.completeView();
-
-			// ??? use this.currentView rather than state.currentView - we just set it
-			// and it takes a while.
-			// Make sure you call the new view's domSetup method.
-			this.effectiveView.domSetupForAllDrawings(this.canvas);
-
-			// thsi will kick the WaveView to render.  Is this too intricate?
-			p.setEffectiveView(this.effectiveView);
-
-			if (traceWaveView) console.info(`WaveView.compDidMount promise done`);
-
-console.info(`2  ⛷ this.canvas: ${this.canvas}`);
-		}).catch(ex => {
-			console.error(`error in WaveView createdSpacePromise.then():`, ex.stack || ex.message || ex);
-			debugger;
-		});
-
-	}
 
 	/* ************************************************************************ resizing */
 
@@ -181,7 +128,6 @@ console.info(`2  ⛷ this.canvas: ${this.canvas}`);
 	/* ************************************************************************ render */
 
 	componentDidUpdate() {
-console.info(`10  ⛷ this.canvas: ${this.canvas}`);
 		const p = this.props;
 		const s = this.state;
 
@@ -191,12 +137,10 @@ console.info(`10  ⛷ this.canvas: ${this.canvas}`);
 			this.formerWidth = p.width;
 			this.formerHeight = s.height;
 		}
-console.info(`11  ⛷ this.canvas: ${this.canvas}`);
 	}
 
 	//static whyDidYouRender = true;
 	render() {
-console.info(`12  ⛷ this.canvas: ${this.canvas}`);
 		const p = this.props;
 		const s = this.state;
 
@@ -220,18 +164,12 @@ console.info(`12  ⛷ this.canvas: ${this.canvas}`);
 		const spinner = qe.cppLoaded ? ''
 			: <img className='spinner' alt='spinner' src='eclipseOnTransparent.gif' />;
 
-console.info(`13  ⛷ this.canvas: ${this.canvas}`);
-		// voNorthWest/East are populated during drawing
+		// voNorthWest/East are populated during iteration
 		return (<div className='WaveView'  ref={el => this.element = el}>
-			<canvas className='squishCanvas'
-				width={p.width} height={s.height}
-				ref={
-					canvas => {
-						if (canvas) {
-							this.setGLCanvas(canvas);
-						}
-					}}
-				style={{width: `${p.width}px`, height: `${s.height}px`}} />
+
+			<GLView width={p.width} height={s.height}
+				returnGLFuncs={p.returnGLFuncs} createdSpacePromise={p.createdSpacePromise}
+				viewClassName={p.viewClassName} viewName={p.viewName} />
 
 			<aside className='viewOverlay'
 				style={{width: `${p.width}px`, height: `${s.height}px`}}>

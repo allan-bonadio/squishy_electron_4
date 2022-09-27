@@ -99,7 +99,8 @@ export class SquishPanel extends React.Component {
 			runningCycleIterateSerial: 0,
 		};
 
-		// will be resolved when the space has been created; result will be eSpace
+		// will be resolved when the space has been created; result will be eSpace.
+		// this requires C++ to have started up.
 		this.createdSpacePromise = new Promise((succeed, fail) => {
 			this.createdSpace = succeed;
 			if (tracePromises) console.info(`SquishPanel:  qeStartPromise created:`, succeed, fail);
@@ -117,6 +118,14 @@ export class SquishPanel extends React.Component {
 
 		//console.log(`SquishPanel constructor done`);
 	}
+
+	// working with GLView, it'll pass me back some functions
+	// well, right now one
+	returnGLFuncs =
+	(doRepaint) => {
+		this.doRepaint = doRepaint;
+	}
+
 
 	/* ******************************************************* space & wave creation */
 	// constructor runs twice, so do this once here
@@ -289,25 +298,30 @@ export class SquishPanel extends React.Component {
 		// or if this is a one shot step
 		this.iStats.endReloadVarsNBuffer = this.iStats.endReloadInputs = this.iStats.endDraw = performance.now();
 		if (needsRepaint) {
+			this.doRepaint();
+			this.showTimeNIteration();
+
+
 			// this is kinda cheating, but the effectiveView in the state takes some time to
 			// get set; but we need it immediately.  So we also set it as a variable on this.
 			// see similar code below; keep in sync.  Also, early on, it might not be done at all yet.
 			const curView = this.effectiveView || this.state.effectiveView;
 			if (curView) {
-				curView.reloadAllVariables();
-
-				// copy from latest wave to view buffer (c++)
-				qe.qViewBuffer_getViewBuffer();
-				this.iStats.endReloadVarsNBuffer = performance.now();
-
-				// draw
-				curView.setInputsOnDrawings();
-				this.iStats.endReloadInputs = performance.now();
-
-				curView.drawAllDrawings();
-				// populate the frame number and elapsed pseudo-time
-				this.showTimeNIteration();
-				this.iStats.endDraw = performance.now();
+//				curView.reloadAllVariables();
+//
+//				// copy from latest wave to view buffer (c++)
+//				qe.qViewBuffer_getViewBuffer();
+//				this.iStats.endReloadVarsNBuffer = performance.now();
+//
+//				curView.setInputsOnDrawings();
+//				this.iStats.endReloadInputs = performance.now();
+//
+//				// draw
+//				curView.drawAllDrawings();
+//
+//				// populate the frame number and elapsed pseudo-time
+//				this.showTimeNIteration();
+//				this.iStats.endDraw = performance.now();
 			}
 		}
 
@@ -483,11 +497,18 @@ export class SquishPanel extends React.Component {
 
 	setStepsPerIteration =
 	stepsPerIteration => {
-		if (traceSetPanels) console.info(`js setStepsPerIteration(${stepsPerIteration})`);
-		//if (typeof storeSettings != 'undefined' && storeSettings.iterationParams)  // goddamned bug in importing works in constructor
-		let spi = storeASetting('iterationParams', 'stepsPerIteration', stepsPerIteration);
-		this.setState({stepsPerIteration: spi});
-		qe.Avatar_setStepsPerIteration({stepsPerIteration: spi});
+		try {
+			if (traceSetPanels) console.info(`js setStepsPerIteration(${stepsPerIteration})`);
+			//if (typeof storeSettings != 'undefined' && storeSettings.iterationParams)  // goddamned bug in importing works in constructor
+			let spi = storeASetting('iterationParams', 'stepsPerIteration', stepsPerIteration);
+			this.setState({stepsPerIteration: spi});
+			qe.Avatar_setStepsPerIteration(spi);
+		} catch (ex) {
+			let exc = interpretCppException(ex);
+			console.error(`setStepsPerIteration error:`,
+				exc.stack || exc.message || exc);
+			debugger;
+		}
 	}
 
 	// sets the LPF in both SPanel state AND in the C++ area
@@ -575,6 +596,7 @@ export class SquishPanel extends React.Component {
 					createdSpacePromise={this.createdSpacePromise}
 					width={p.width}
 					setUpdatePotentialArea={this.setUpdatePotentialArea}
+					returnGLFuncs={this.returnGLFuncs}
 				/>
 				<ControlPanel
 					openResolutionDialog={() => this.openResolutionDialog()}
