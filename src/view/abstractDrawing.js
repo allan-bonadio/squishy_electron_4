@@ -143,6 +143,7 @@ export class abstractDrawing {
 	/* ************************************************** interactivity */
 	// abstract supermethod: another dummy submethod... write yer  own
 	// supposed to set click/touch/keystroke handlers and stuff
+	// maybe i should get rid of this
 	domSetup() {
 	}
 }

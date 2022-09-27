@@ -95,6 +95,7 @@ export class abstractViewDef {
 		this.drawAllDrawings();
 
 		// and set up interactivity
+		// maybe i should get rid of this
 		this.domSetupForAllDrawings(this.canvas);
 
 
@@ -290,7 +291,7 @@ export class abstractViewDef {
 	// 	}
 
 	/* ************************************************** dom interactivity */
-
+	// maybe i should get rid of this
 	domSetupForAllDrawings(canvas) {
 		this.drawings.forEach(drawing => {
 			drawing.domSetup(canvas);
