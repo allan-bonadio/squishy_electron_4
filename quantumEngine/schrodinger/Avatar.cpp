@@ -112,8 +112,8 @@ Avatar::~Avatar(void) {
 
 
 // need these numbers for the js interface to this object, to figure out the offsets.
-// see jsAvatar.js ;  usually this function isn't called.
-// Paste the output into class jsAvatar, the class itself, to replace the existing ones
+// see eAvatar.js ;  usually this function isn't called.
+// Paste the output into class eAvatar, the class itself, to replace the existing ones
 void Avatar::dumpOffsets(void) {
 	// don't need magic
 

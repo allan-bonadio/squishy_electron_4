@@ -1,10 +1,10 @@
 /*
-** jsAvatar - the JS representations of the c++ Avatar object
+** eAvatar - the JS representations of the c++ Avatar object
 ** Copyright (C) 2022-2022 Tactile Interactive, all rights reserved
 */
 //import qe from './qe';
 
-class jsAvatar {
+class eAvatar {
 	// pointer is an integer pointing into the C++ address space, to the Avatar object.
 	// We can then set and sample each of the member variables if we know the offset
 	constructor(pointer, qewave) {
@@ -51,7 +51,7 @@ class jsAvatar {
 }
 
 
-export default jsAvatar;
+export default eAvatar;
 
 /* just thinking out loud here... about automating this:
 	input to the mapper:

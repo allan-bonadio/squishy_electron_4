@@ -14,7 +14,7 @@ struct Avatar {
 	qSpace *space;
 
 	/* *********************************************** JS accessible */
-	// please keep alignment stable and correct!  See also jsAvatar.js
+	// please keep alignment stable and correct!  See also eAvatar.js
 	// Keep arranged from larger to smaller - doubles, then ints, then bools
 
 	// how much time we've iterated, from creation.  pseudo-seconds.  Since we've eliminated

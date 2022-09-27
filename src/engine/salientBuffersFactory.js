@@ -3,7 +3,7 @@
 ** Copyright (C) 2022-2022 Tactile Interactive, all rights reserved
 */
 import eWave from './eWave';
-import jsAvatar from './jsAvatar';
+import eAvatar from './eAvatar';
 
 // I guess you could have one of these for each space?  No, per avatar?
 // Additional waves and avatars... um...
@@ -33,8 +33,8 @@ class salientBuffersFactory {
 		this.vBuffer = new Float32Array(window.Module.HEAPF64.buffer, struct[3],
 			space.nPoints * 8); // two vec4 s per point
 
-		this.theAvatar = new jsAvatar(struct[4], this.mainQeWave);
-		this.miniGraphAvatar = new jsAvatar(struct[5]);  // not yet implemented or used...
+		this.theAvatar = new eAvatar(struct[4], this.mainQeWave);
+		this.miniGraphAvatar = new eAvatar(struct[5]);  // not yet implemented or used...
 	}
 
 //	get mainWaveBuffer() { return this.struct[1]; }
