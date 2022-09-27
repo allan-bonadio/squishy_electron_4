@@ -133,9 +133,6 @@ class GLView extends React.Component {
 
 		// draw
 		this.effectiveView.drawAllDrawings();
-
-		// populate the frame number and elapsed pseudo-time
-		//this.showTimeNIteration();
 		let endDraw = performance.now();
 
 		return {endReloadVarsNBuffer, endReloadInputs, endDraw};

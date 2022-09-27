@@ -625,6 +625,8 @@ export class SquishPanel extends React.Component {
 
 					iStats={this.iStats}
 					refreshStats={this.refreshStats}
+
+					createdSpacePromise={this.createdSpacePromise}
 				/>
 				{this.renderRunningOneCycle()}
 			</div>

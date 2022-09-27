@@ -9,8 +9,10 @@ import PropTypes from 'prop-types';
 import {scaleLinear} from 'd3-scale';
 
 
-import MiniGraph from './MiniGraph';
+//import MiniGraph from './MiniGraph';
 import eSpace from '../engine/eSpace';
+import GLView from '../view/GLView';
+
 // import eWave from '../engine/eWave';
 // import eCx from '../engine/eCx';
 // import cxToRgb from '../view/cxToRgb';
@@ -36,6 +38,7 @@ function setPT() {
 		// sets it only in the ControlPanel state for subsequent SetWave click
 		setCPState: PropTypes.func,
 
+		createdSpacePromise: PropTypes.instanceOf(Promise).isRequired,
 	};
 }
 
@@ -121,6 +124,11 @@ class SetWaveTab extends React.Component {
 		this.props.setCPState({pulseOffset: storeASetting('waveParams', 'pulseOffset', pulseOffset)});
 	}
 
+	// just like in SsquishPanel
+	returnGLFuncs =
+	(doRepaint) => {
+		this.doRepaint = doRepaint;
+	}
 
 	render() {
 		const p = this.props;
@@ -198,9 +206,12 @@ class SetWaveTab extends React.Component {
 			<div className='waveTabCol'>
 				&nbsp;
 				<div className='waveMiniGraph'>
-					<MiniGraph recipe={this.recipe} width={this.miniWidth} height={this.miniHeight}
-						className='SetWaveGraph'
-						familiarParams={p.waveParams} origSpace={p.origSpace}/>
+					<GLView width={300} height={200}
+						returnGLFuncs={this.returnGLFuncs}
+						createdSpacePromise={p.createdSpacePromise}
+						viewClassName='flatDrawingViewDef' viewName='waveExample' />
+
+
 				</div>
 				<button className='setWaveButton round'
 					onClick={p.setWaveHandler}>
@@ -216,3 +227,6 @@ setPT();
 
 export default SetWaveTab;
 
+//	<MiniGraph recipe={this.recipe} width={this.miniWidth} height={this.miniHeight}
+//		className='SetWaveGraph'
+//		familiarParams={p.waveParams} origSpace={p.origSpace}/>

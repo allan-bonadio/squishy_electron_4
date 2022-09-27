@@ -5,7 +5,8 @@
 //import qe from './qe';
 
 class jsAvatar {
-	// as of this writing, the miniGraph avatar has a null qewave
+	// pointer is an integer pointing into the C++ address space, to the Avatar object.
+	// We can then set and sample each of the member variables if we know the offset
 	constructor(pointer, qewave) {
 		// we directly access fields in this C++ object,
 		// cuz the overhead from each js-C++ call is kindof large

@@ -33,6 +33,8 @@ export class ControlPanel extends React.Component {
 		setWave: PropTypes.func.isRequired,
 		setPotential: PropTypes.func.isRequired,
 
+		createdSpacePromise: PropTypes.instanceOf(Promise).isRequired,
+
 		isTimeAdvancing: PropTypes.bool.isRequired,  // ie is it running?
 
 		iterateFrequency: PropTypes.number.isRequired,  // frames per second
@@ -169,6 +171,7 @@ export class ControlPanel extends React.Component {
 				waveParams={{waveBreed, waveFrequency, pulseWidth, pulseOffset,}}
 				setCPState={this.setCPState}
 				origSpace={p.space}
+				createdSpacePromise={p.createdSpacePromise}
 			/>;
 
 		case 'potential':

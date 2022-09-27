@@ -107,7 +107,7 @@ export class flatDrawing extends abstractDrawing {
 		});
 
 		let barWidthUniform = this.barWidthUniform = new viewUniform('barWidth', this);
-		let nPoints = this.nPoints = this.space.nPoints;  //this.space ? this.space.nPoints : 10;
+		let nPoints = this.nPoints = this.space.nPoints;
 		let barWidth = 1 / (nPoints - 1);
 		barWidthUniform.setValue(barWidth, '1f');
 
