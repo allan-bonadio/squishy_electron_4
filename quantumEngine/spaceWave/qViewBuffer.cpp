@@ -5,7 +5,7 @@
 
 
 #include "qSpace.h"
-#include "../schrodinger/Avatar.h"
+#include "../schrodinger/qAvatar.h"
 #include "qWave.h"
 #include "qViewBuffer.h"
 
@@ -14,7 +14,7 @@ static const bool debugInDetail = false;
 
 // August Ferdinand Möbius invented homogenous coordinates
 
-qViewBuffer::qViewBuffer(qSpace *space, Avatar *av)
+qViewBuffer::qViewBuffer(qSpace *space, qAvatar *av)
 	: magic('View'), space(space), avatar(av) {
 	if (! space)
 		throw std::runtime_error("qViewBuffer::qViewBuffer null space");
@@ -32,7 +32,7 @@ qViewBuffer::~qViewBuffer() {
 	delete[] vBuffer;
 }
 
-// copy the numbers in our Avatar's qWave into vBuffer
+// copy the numbers in our qAvatar's qWave into vBuffer
 // one row per vertex, two rows per wave datapoint.
 // each row of 4 floats looks like this:
 //     real   imaginary    potential    serial

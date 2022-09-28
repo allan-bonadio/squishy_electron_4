@@ -95,7 +95,7 @@ public:
 	int nStates;
 	int nPoints;
 
-	// should this be part of the space or the Avatar?
+	// should this be part of the space or the qAvatar?
 	// the space; it helps to define the lay of the land
 	double *potential;
 	double potentialFactor;
@@ -143,8 +143,8 @@ struct salientPointersType {
 	qCx *mainWaveBuffer;
 	double *potentialBuffer;
 	float *vBuffer;
-	struct Avatar *theAvatar;
-	struct Avatar *miniGraphAvatar;
+	struct qAvatar *theAvatar;
+	struct qAvatar *miniGraphAvatar;
 };
 
 // for JS to call

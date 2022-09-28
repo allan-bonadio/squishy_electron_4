@@ -8,7 +8,7 @@
 //#include <ctime>
 #include <cstring>
 #include "qSpace.h"
-#include "../schrodinger/Avatar.h"
+#include "../schrodinger/qAvatar.h"
 #include "qWave.h"
 #include "qViewBuffer.h"
 #include "../fourier/fftMain.h"
@@ -103,7 +103,7 @@ void qSpace::initSpace() {
 
 
 	// this allocates the qwaves so must call this after sizes have been decided
-	// not there anymore avatar = new Avatar(this);
+	// not there anymore avatar = new qAvatar(this);
 
 //	// try out different formulas here.  Um, this is actually set manually in CP
 //	avatar->dt = 1. / (nStates * nStates);

@@ -7,7 +7,7 @@
 
 #include "../squish.h"
 #include "../spaceWave/qSpace.h"
-#include "../schrodinger/Avatar.h"
+#include "../schrodinger/qAvatar.h"
 #include "../spaceWave/qWave.h"
 #include "../fourier/qSpectrum.h"
 #include "../spaceWave/qViewBuffer.h"
@@ -34,8 +34,8 @@ static void initExperiments(void) {
 
 // for memory leaks that cppu conveniently gives us, some clues:
 static void dumpSizes(void) {
-	printf("byte sizes... sz(qSpace)=%lu  sz(qWave)=%lu  sz(qBuffer)=%lu  sz(qSpectrum)=%lu  sz(qViewBuffer)=%lu  sz(Avatar)=%lu\n\n",
-		sizeof(qSpace), sizeof(qWave), sizeof(qBuffer), sizeof(qSpectrum), sizeof(qViewBuffer), sizeof(Avatar));
+	printf("byte sizes... sz(qSpace)=%lu  sz(qWave)=%lu  sz(qBuffer)=%lu  sz(qSpectrum)=%lu  sz(qViewBuffer)=%lu  sz(qAvatar)=%lu\n\n",
+		sizeof(qSpace), sizeof(qWave), sizeof(qBuffer), sizeof(qSpectrum), sizeof(qViewBuffer), sizeof(qAvatar));
 }
 
 

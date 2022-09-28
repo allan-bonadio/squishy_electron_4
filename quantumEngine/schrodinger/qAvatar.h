@@ -1,13 +1,13 @@
 /*
-** Avatar -- the instance and simulation of a quantum mechanical wave in a space
+** qAvatar -- the instance and simulation of a quantum mechanical wave in a space
 ** Copyright (C) 2021-2022 Tactile Interactive, all rights reserved
 */
 
 // formerly called: Manifestation, Incarnation, Timeline, ... formerly part of qSpace
 
-struct Avatar {
-	Avatar(qSpace *);
-	~Avatar(void);
+struct qAvatar {
+	qAvatar(qSpace *);
+	~qAvatar(void);
 	void dumpOffsets(void);
 
 	int magic;
@@ -83,7 +83,7 @@ struct Avatar {
 	// make sure the subsequent things are aligned!  or iteration is painfully slow.
 };
 
-extern Avatar *theAvatar;
+extern qAvatar *theAvatar;
 
 /* ************************************************************ JS interface */
 

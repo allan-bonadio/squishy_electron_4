@@ -5,7 +5,7 @@
 
 #include <string>
 #include "qSpace.h"
-#include "../schrodinger/Avatar.h"
+#include "../schrodinger/qAvatar.h"
 #include "qWave.h"
 #include "qViewBuffer.h"
 
@@ -34,7 +34,7 @@ static bool traceSpaceCreation = false;
 // important objects.  Someday we'll get the JS to hold these.
 class qSpace *theSpace = NULL;
 double *thePotential = NULL;
-class Avatar *theAvatar = NULL;
+class qAvatar *theAvatar = NULL;
 qViewBuffer *theQViewBuffer = NULL;
 
 
@@ -168,8 +168,8 @@ struct salientPointersType *completeNewSpace(void) {
 	theSpace->initSpace();
 
 	if (theAvatar) throw std::runtime_error("🚀 🚀 🚀 theAvatar exists while trying to create new one");
-	theAvatar = salientPointers.theAvatar = new Avatar(theSpace);
-	salientPointers.miniGraphAvatar = new Avatar(theSpace);
+	theAvatar = salientPointers.theAvatar = new qAvatar(theSpace);
+	salientPointers.miniGraphAvatar = new qAvatar(theSpace);
 	//printf("did initSpace\n");
 
 

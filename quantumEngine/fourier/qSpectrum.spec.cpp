@@ -5,7 +5,7 @@
 
 #include "qSpectrum.h"
 #include "../spaceWave/qSpace.h"
-#include "../schrodinger/Avatar.h"
+#include "../schrodinger/qAvatar.h"
 #include "../testing/cppuMain.h"
 
 #include "CppUTest/TestHarness.h"

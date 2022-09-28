@@ -1,5 +1,5 @@
 /*
-** Avatar -- the instance and simulation of a quantum mechanical wave in a space
+** qAvatar -- the instance and simulation of a quantum mechanical wave in a space
 ** Copyright (C) 2022-2022 Tactile Interactive, all rights reserved
 */
 
@@ -8,7 +8,7 @@
 #include <cfenv>
 
 #include "../spaceWave/qSpace.h"
-#include "../schrodinger/Avatar.h"
+#include "./qAvatar.h"
 #include "../spaceWave/qWave.h"
 #include "../fourier/qSpectrum.h"
 #include "../spaceWave/qViewBuffer.h"
@@ -42,9 +42,11 @@ static bool traceEndingFFSpectrum = false;
 static bool traceB4nAfterFFSpectrum = false;
 
 
-/* *********************************************************************************** Avatar */
+/* *********************************************************************************** qAvatar */
+
+// create new avatar, complete with its own wave and view buffers
 // make sure these values are doable by the sliders' steps
-Avatar::Avatar(qSpace *sp)
+qAvatar::qAvatar(qSpace *sp)
 	: dt(1e-3), stepsPerIteration(100), lowPassFilter(1),
 		space(sp), magic('Avat'), pleaseFFT(false), isIterating(false) {
 
@@ -72,19 +74,19 @@ Avatar::Avatar(qSpace *sp)
 };
 
 // some uses never need these so wait till they do
-qWave *Avatar::getScratchWave(void) {
+qWave *qAvatar::getScratchWave(void) {
 	if (!scratchQWave)
 		scratchQWave = new qWave(space);
 	return scratchQWave;
 };
 
-qSpectrum *Avatar::getSpectrum(void) {
+qSpectrum *qAvatar::getSpectrum(void) {
 	if (!spect)
 		spect = new qSpectrum(space);
 	return spect;
 };
 
-Avatar::~Avatar(void) {
+qAvatar::~qAvatar(void) {
 	delete mainQWave;
 	delete qvBuffer;
 
@@ -114,7 +116,7 @@ Avatar::~Avatar(void) {
 // need these numbers for the js interface to this object, to figure out the offsets.
 // see eAvatar.js ;  usually this function isn't called.
 // Paste the output into class eAvatar, the class itself, to replace the existing ones
-void Avatar::dumpOffsets(void) {
+void qAvatar::dumpOffsets(void) {
 	// don't need magic
 
 	makeIntGetter(space);
@@ -165,10 +167,10 @@ void Avatar::dumpOffsets(void) {
 	makeIntGetter(qvBuffer);
 	makeIntSetter(qvBuffer);
 
-	printf("--------------- done with Avatar --------------");
+	printf("--------------- done with qAvatar --------------");
 }
 
-void Avatar::resetCounters(void) {
+void qAvatar::resetCounters(void) {
 	elapsedTime = 0.;
 	iterateSerial = 0;
 }
@@ -188,7 +190,7 @@ double getTimeDouble()
 // Does several visscher steps (eg 100 or 500). Actually does
 // stepsPerIteration+1 steps; half steps at start and finish to adapt and
 // deadapt to Visscher timing
-void Avatar::oneIteration() {
+void qAvatar::oneIteration() {
 	int tt;
 	bool dangerousTimes = (iterateSerial >= dangerousSerial)
 		&& (((int) iterateSerial % dangerousRate) == 0);
@@ -202,7 +204,7 @@ void Avatar::oneIteration() {
 	potentialFactor = space->potentialFactor;
 
 	if (traceIteration)
-		printf("🚀 🚀 Avatar::oneIteration() - dt=%lf   stepsPerIteration=%d  %s; potentialFactor=%lf  elapsed time: %lf\n",
+		printf("🚀 🚀 qAvatar::oneIteration() - dt=%lf   stepsPerIteration=%d  %s; potentialFactor=%lf  elapsed time: %lf\n",
 			dt, stepsPerIteration, dangerousTimes ? "dangerous times" : "",
 			potentialFactor,
 			getTimeDouble());
@@ -217,7 +219,7 @@ void Avatar::oneIteration() {
 
 	int doubleSteps = stepsPerIteration / 2;
 	if (traceIteration)
-		printf("      Avatar: doubleSteps=%d   stepsPerIteration=%d\n",
+		printf("      qAvatar: doubleSteps=%d   stepsPerIteration=%d\n",
 			doubleSteps, stepsPerIteration);
 
 	for (tt = 0; tt < doubleSteps; tt++) {
@@ -225,7 +227,7 @@ void Avatar::oneIteration() {
 		oneVisscherStep(scratchQWave, mainQWave);
 
 		if (traceIteration && 0 == tt % 32) {
-			printf("       Avatar: step every 64, step %d; elapsed time: %lf\n", tt * 2, getTimeDouble());
+			printf("       qAvatar: step every 64, step %d; elapsed time: %lf\n", tt * 2, getTimeDouble());
 		}
 
 		if (traceIterSteps) {
@@ -234,7 +236,7 @@ void Avatar::oneIteration() {
 	}
 
 	if (traceIteration)
-		printf("      Avatar: %d steps done; elapsed time: %lf \n", stepsPerIteration, getTimeDouble());
+		printf("      qAvatar: %d steps done; elapsed time: %lf \n", stepsPerIteration, getTimeDouble());
 
 	// half step at completion to move Re forward dt/2
 	// and copy back to Main
@@ -278,7 +280,7 @@ void Avatar::oneIteration() {
 // lowPassFilter is .. kinda changes but maybe #frequencies we zero out
 // Can't we eventually find a simple convolution to do this instead of FFT/iFFT?
 // maye after i get more of this working and fine toon it
-void Avatar::fourierFilter(int lowPassFilter) {
+void qAvatar::fourierFilter(int lowPassFilter) {
 	// this is when the wave tends to come apart with high frequencies
 	bool dangerousTimes = (iterateSerial >= dangerousSerial)
 		&& (((int) iterateSerial % dangerousRate) == 0);
@@ -325,7 +327,7 @@ void Avatar::fourierFilter(int lowPassFilter) {
 
 
 // user button to print it out now, or at end of the next iteration
-void Avatar::askForFFT(void) {
+void qAvatar::askForFFT(void) {
 	if (isIterating)
 		this->pleaseFFT = true;
 	else

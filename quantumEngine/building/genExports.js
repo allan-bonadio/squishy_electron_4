@@ -34,7 +34,7 @@ exportsSrc  = [
 	{name: 'getCppExceptionMessage', retType: 'number', args: ['number']},
 
 
-	// the Avatar ones act on theAvatar in the c++ code
+	// the qAvatar ones act on theAvatar in the c++ code
 	{name: 'Avatar_getElapsedTime', retType: 'number', args: []},
 	{name: 'Avatar_getIterateSerial', retType: 'number', args: []},
 

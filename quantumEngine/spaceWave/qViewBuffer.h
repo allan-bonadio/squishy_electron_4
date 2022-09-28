@@ -12,9 +12,9 @@ struct qViewBuffer {
 	float *vBuffer;
 
 	qSpace *space;
-	Avatar *avatar;
+	qAvatar *avatar;
 
-	qViewBuffer(qSpace *space, Avatar *avatar);
+	qViewBuffer(qSpace *space, qAvatar *avatar);
 
 	~qViewBuffer();
 

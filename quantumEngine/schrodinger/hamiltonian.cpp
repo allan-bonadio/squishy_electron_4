@@ -5,7 +5,7 @@
 
 
 #include "../spaceWave/qSpace.h"
-#include "../schrodinger/Avatar.h"
+#include "./qAvatar.h"
 
 // not used right now, hopefullly soon
 

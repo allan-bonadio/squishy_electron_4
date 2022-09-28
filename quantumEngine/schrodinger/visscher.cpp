@@ -5,7 +5,7 @@
 */
 
 #include "../spaceWave/qSpace.h"
-#include "Avatar.h"
+#include "qAvatar.h"
 #include "../spaceWave/qWave.h"
 
 
@@ -87,7 +87,7 @@ other way: 1nm = 1e-9m   square = 1e-18 m^2 times that number = 1.72759854921802
 // newW points to buffer with real = 𝜓r(t + dt)   imag unchanged = 𝜓i(t + dt/2)
 // here we will calculate the 𝜓r(t + dt) values in a new buffer only, and fill them in.
 // the 𝜓i values in buffer 0 are still uncalculated
-void Avatar::stepReal(qCx *newW, qCx *oldW, double dt) {
+void qAvatar::stepReal(qCx *newW, qCx *oldW, double dt) {
 	qDimension *dims = space->dimensions;
 	//printf("⚛️ start of stepReal");
 	//dumpThat(oldW, true);
@@ -112,7 +112,7 @@ void Avatar::stepReal(qCx *newW, qCx *oldW, double dt) {
 
 // second step: advance the Imaginaries of 𝜓 a dt, from dt/2 to 3dt/2
 // given the reals we just generated in stepReal() but don't change them
-void Avatar::stepImaginary(qCx *newW, qCx *oldW, double dt) {
+void qAvatar::stepImaginary(qCx *newW, qCx *oldW, double dt) {
 	qDimension *dims = space->dimensions;
 	//printf("⚛︎ start of stepImaginary(), oldWave=");
 	//dumpThat(oldW, true);
@@ -138,7 +138,7 @@ void Avatar::stepImaginary(qCx *newW, qCx *oldW, double dt) {
 }
 
 // form the new wave from the old wave, in separate buffers, chosen by our caller.
-void Avatar::oneVisscherStep(qWave *newQWave, qWave *oldQWave) {
+void qAvatar::oneVisscherStep(qWave *newQWave, qWave *oldQWave) {
 	qWave *oldQW = oldQWave;
 	qCx *oldW = oldQWave->wave;
 	qWave *newQW = newQWave;

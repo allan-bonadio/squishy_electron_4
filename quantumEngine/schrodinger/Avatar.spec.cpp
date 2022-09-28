@@ -1,11 +1,11 @@
 /*
-** quantum Avatar tests
+** quantum qAvatar tests
 ** Copyright (C) 2022-2022 Tactile Interactive, all rights reserved
 */
 
 
 #include "../spaceWave/qSpace.h"
-#include "../schrodinger/Avatar.h"
+#include "../schrodinger/qAvatar.h"
 #include "../spaceWave/qWave.h"
 #include "../spaceWave/qViewBuffer.h"
 #include "../testing/cppuMain.h"
@@ -14,17 +14,17 @@
 #include "CppUTest/TestHarness.h"
 
 
-TEST_GROUP(Avatar)
+TEST_GROUP(qAvatar)
 {
 };
 
 
 /* ******************************************************************************************** boring constructor tests */
 // just the constructor; it's not even fully created
-TEST(Avatar, CheckConstructor)
+TEST(qAvatar, CheckConstructor)
 {
 	qSpace *space = makeBareSpace(8, contENDLESS);
-	Avatar *avatar = new Avatar(space);
+	qAvatar *avatar = new qAvatar(space);
 
 	LONGS_EQUAL(1, avatar->lowPassFilter);
 
@@ -69,12 +69,12 @@ static void completeNewAvatarGauntlet(int N, int expectedSpectrumLength, int exp
 	deleteTheSpace();
 }
 
-TEST(Avatar, Avatar_completeNewAvatarGauntlet4000) { completeNewAvatarGauntlet(4096, 4096, 4098); }
-TEST(Avatar, Avatar_completeNewAvatarGauntlet254) { completeNewAvatarGauntlet(256, 256, 258); }
-TEST(Avatar, Avatar_completeNewAvatarGauntlet63) { completeNewAvatarGauntlet(64, 64, 66); }
-TEST(Avatar, Avatar_completeNewAvatarGauntlet32) { completeNewAvatarGauntlet(32, 32, 34); }
-TEST(Avatar, Avatar_completeNewAvatarGauntlet32x) { completeNewAvatarGauntlet(32, 32, 34); }
-TEST(Avatar, Avatar_completeNewAvatarGauntlet4) { completeNewAvatarGauntlet(4, 4, 6); }
+TEST(qAvatar, Avatar_completeNewAvatarGauntlet4000) { completeNewAvatarGauntlet(4096, 4096, 4098); }
+TEST(qAvatar, Avatar_completeNewAvatarGauntlet254) { completeNewAvatarGauntlet(256, 256, 258); }
+TEST(qAvatar, Avatar_completeNewAvatarGauntlet63) { completeNewAvatarGauntlet(64, 64, 66); }
+TEST(qAvatar, Avatar_completeNewAvatarGauntlet32) { completeNewAvatarGauntlet(32, 32, 34); }
+TEST(qAvatar, Avatar_completeNewAvatarGauntlet32x) { completeNewAvatarGauntlet(32, 32, 34); }
+TEST(qAvatar, Avatar_completeNewAvatarGauntlet4) { completeNewAvatarGauntlet(4, 4, 6); }
 
 
 
@@ -90,7 +90,7 @@ static void tryFourierFilter(int N, int goodFreq, int badFreq, int lowPassFilter
 		 N,  goodFreq, badFreq,  lowPassFilter);
 
 	qSpace *space = makeBareSpace(N, contENDLESS);
-	Avatar *avatar = new Avatar(space);
+	qAvatar *avatar = new qAvatar(space);
 	qWave *qw = avatar->mainQWave;
 	qWave *addOn = avatar->getScratchWave();
 	qSpectrum *rainbow = avatar->getSpectrum();
@@ -124,31 +124,31 @@ static void tryFourierFilter(int N, int goodFreq, int badFreq, int lowPassFilter
 // example: 16 states.  Initially has waves of frequencies 3 & 6.
 // filter out frequencies 5, 6, 7, ... *8* ... 9, 10, 11.   8 is the nyquist freq
 // So expect only freq 3 left, value=4 on fft.
-//TEST(Avatar, fourierFilter16_3_6) { tryFourierFilter(16, 3, 6, 3); }
+//TEST(qAvatar, fourierFilter16_3_6) { tryFourierFilter(16, 3, 6, 3); }
 //
-//TEST(Avatar, fourierFilter16_1_8) { tryFourierFilter(16, 1, 8, 1); }
+//TEST(qAvatar, fourierFilter16_1_8) { tryFourierFilter(16, 1, 8, 1); }
 //
-//TEST(Avatar, fourierFilter16_2_7) { tryFourierFilter(16, 2, 7, 3); }
+//TEST(qAvatar, fourierFilter16_2_7) { tryFourierFilter(16, 2, 7, 3); }
 
 
 // ok we have a freq 1 carrier.  We stick in a freq 5 noise.  When does it cut off?
-TEST(Avatar, fourierFilter16_1_LPFscan2) { tryFourierFilter(16, 1, 5, 2); }
-TEST(Avatar, fourierFilter16_1_LPFscan3) { tryFourierFilter(16, 1, 5, 3); }
-TEST(Avatar, fourierFilter16_1_LPFscan4) { tryFourierFilter(16, 1, 5, 4); }
-TEST(Avatar, fourierFilter16_1_LPFscan5) { tryFourierFilter(16, 1, 5, 5); }
-TEST(Avatar, fourierFilter16_1_LPFscan6) { tryFourierFilter(16, 1, 5, 6); }
-TEST(Avatar, fourierFilter16_1_LPFscan7) { tryFourierFilter(16, 1, 5, 7); }
+TEST(qAvatar, fourierFilter16_1_LPFscan2) { tryFourierFilter(16, 1, 5, 2); }
+TEST(qAvatar, fourierFilter16_1_LPFscan3) { tryFourierFilter(16, 1, 5, 3); }
+TEST(qAvatar, fourierFilter16_1_LPFscan4) { tryFourierFilter(16, 1, 5, 4); }
+TEST(qAvatar, fourierFilter16_1_LPFscan5) { tryFourierFilter(16, 1, 5, 5); }
+TEST(qAvatar, fourierFilter16_1_LPFscan6) { tryFourierFilter(16, 1, 5, 6); }
+TEST(qAvatar, fourierFilter16_1_LPFscan7) { tryFourierFilter(16, 1, 5, 7); }
 
-//TEST(Avatar, fourierFilter16_1_3_LPFscan7) { tryFourierFilter(16, 1, 3, 7); }
+//TEST(qAvatar, fourierFilter16_1_3_LPFscan7) { tryFourierFilter(16, 1, 3, 7); }
 
-//TEST(Avatar, fourierFilter64_5_22) { tryFourierFilter(64, 5, 22, 16); }
+//TEST(qAvatar, fourierFilter64_5_22) { tryFourierFilter(64, 5, 22, 16); }
 
 
 /* ********************************************************************** random experimentatiojn */
 
 static void fourierExperiments(int N) {
 	qSpace *space = makeBareSpace(N, contENDLESS);
-	Avatar *avatar = new Avatar(space);
+	qAvatar *avatar = new qAvatar(space);
 
 	qSpectrum *allOnes = new qSpectrum(space);
 	allOnes->fill();
@@ -172,7 +172,7 @@ static void fourierExperiments(int N) {
 	delete space;
 }
 
-TEST(Avatar, fourierExperiments)
+TEST(qAvatar, fourierExperiments)
 {
 	fourierExperiments(16);
 
