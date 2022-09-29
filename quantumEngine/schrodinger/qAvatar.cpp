@@ -8,11 +8,12 @@
 #include <cfenv>
 
 #include "../spaceWave/qSpace.h"
-#include "./qAvatar.h"
+#include "qAvatar.h"
 #include "../spaceWave/qWave.h"
 #include "../fourier/qSpectrum.h"
 #include "../spaceWave/qViewBuffer.h"
 #include "../fourier/fftMain.h"
+#include "../directAccessors.h"
 
 
 static bool useFourierFilter = true;
@@ -71,6 +72,8 @@ qAvatar::qAvatar(qSpace *sp)
 		printf("      its continuum=%d spectrumLength=%d label=%s\n",
 			dims->continuum, dims->spectrumLength, dims->label);
 	}
+
+	//dumpOffsets();
 };
 
 // some uses never need these so wait till they do
@@ -97,27 +100,13 @@ qAvatar::~qAvatar(void) {
 		delete spect;
 };
 
-// use for int field, or anything 1 byte
-#define makeBoolOffset(field)  (int) ((bool *) &this->field - (bool *) this)
-#define makeBoolGetter(field)  printf("get " #field  "() { return this.bools[%d]; }\n", makeBoolOffset(field));
-#define makeBoolSetter(field)  printf("set " #field  "(a) { this.bools[%d] = a; }\n", makeBoolOffset(field));
-
-// use for int field, or anything 32 bits, like a pointer
-#define makeIntOffset(field)  (int) ((int *) &this->field - (int *) this)
-#define makeIntGetter(field)  printf("get " #field  "() { return this.ints[%d]; }\n", makeIntOffset(field));
-#define makeIntSetter(field)  printf("set " #field  "(a) { this.ints[%d] = a; }\n", makeIntOffset(field));
-
-// use for int field, or anything 64 bits
-#define makeDoubleOffset(field)  (int) ((double *) &this->field - (double *) this)
-#define makeDoubleGetter(field)  printf("get " #field  "() { return this.doubles[%d]; }\n", makeDoubleOffset(field));
-#define makeDoubleSetter(field)  printf("set " #field  "(a) { this.doubles[%d] = a; }\n", makeDoubleOffset(field));
-
-
 // need these numbers for the js interface to this object, to figure out the offsets.
 // see eAvatar.js ;  usually this function isn't called.
+// Insert this into the constructor and run this once.  Copy text output.
 // Paste the output into class eAvatar, the class itself, to replace the existing ones
 void qAvatar::dumpOffsets(void) {
 	// don't need magic
+	printf("🚦 🚦 --------------- starting qAvatar direct access --------------\n");
 
 	makeIntGetter(space);
 	makeIntSetter(space);
@@ -167,7 +156,7 @@ void qAvatar::dumpOffsets(void) {
 	makeIntGetter(qvBuffer);
 	makeIntSetter(qvBuffer);
 
-	printf("--------------- done with qAvatar --------------");
+	printf("🚦 🚦 --------------- done with qAvatar direct access --------------\n");
 }
 
 void qAvatar::resetCounters(void) {

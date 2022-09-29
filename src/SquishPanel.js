@@ -37,6 +37,7 @@ let areBenchmarking = false;
 let dumpingTheViewBuffer = false;
 let traceSetPanels = false;
 let tracePromises = false;
+//let traceConstructor = false;
 
 if (typeof storeSettings == 'undefined') debugger;
 
@@ -46,7 +47,7 @@ const DEFAULT_VIEW_CLASS_NAME = 'flatDrawingViewDef';
 // const DEFAULT_CONTINUUM = qe.contENDLESS;
 
 
-
+window.squishPanelConstructed = 0;
 
 export class SquishPanel extends React.Component {
 	static propTypes = {
@@ -59,6 +60,13 @@ export class SquishPanel extends React.Component {
 
 	constructor(props) {
 		super(props);
+
+		if (window.squishPanelConstructed) {
+			console.log(`annoying hot reload; continue to really reload page...`);
+			debugger;
+			location = location;  // eslint-disable-line no-restricted-globals
+		}
+		window.squishPanelConstructed++;
 
 		this.state = {
 			// Many of these things should be in a lower component;
@@ -90,7 +98,6 @@ export class SquishPanel extends React.Component {
 			// defaults for sliders for dt & spi
 			dt: getASetting('iterationParams', 'dt'),
 			stepsPerIteration: getASetting('iterationParams', 'stepsPerIteration'),
-			//lowPassFilter: lpf,
 			lowPassFilter: getASetting('iterationParams', 'lowPassFilter'),
 
 			// advance forward with each iter
@@ -112,7 +119,7 @@ export class SquishPanel extends React.Component {
 		this.timeForNextTic = now + 10;  // default so we can get rolling
 		this.lastAniIteration = now;
 
-		// stick ?allowRunningOneCycle at teh endnof URL to show runningONeCycle panel
+		// stick ?allowRunningOneCycle at the end of URL to show runningOneCycle panel
 		// eslint-disable-next-line
 		this.allowRunningOneCycle = /allowRunningOneCycle/.test(location.search);
 
@@ -169,8 +176,10 @@ export class SquishPanel extends React.Component {
 	setNew1DResolution(N, continuum) {
 
 		// usually this is the initial space created
-		qe.space = new eSpace([{N, continuum, label: 'x'}]);
-		this.setState({space: qe.space});
+		const space = qe.space = new eSpace([{N, continuum, label: 'x'}]);
+		this.setState({space});
+		this.space = space;
+		this.avatar = space.theAvatar;
 		return qe.space;
 	}
 
@@ -224,8 +233,10 @@ export class SquishPanel extends React.Component {
 	// the upper left and right numbers
 	showTimeNIteration() {
 		// need them instantaneously - react is too slow
-		document.querySelector('.voNorthWest').innerHTML = qe.Avatar_getElapsedTime().toFixed(2);
-		document.querySelector('.voNorthEast').innerHTML = qe.Avatar_getIterateSerial();
+		document.querySelector('.voNorthWest').innerHTML = this.avatar.elapsedTime.toFixed(2);
+		document.querySelector('.voNorthEast').innerHTML =  this.avatar.iterateSerial;
+		//document.querySelector('.voNorthWest').innerHTML = qe.Avatar_getElapsedTime().toFixed(2);
+		//document.querySelector('.voNorthEast').innerHTML = qe.Avatar_getIterateSerial();
 	}
 
 	// constructor only calls this (?)
@@ -305,27 +316,27 @@ export class SquishPanel extends React.Component {
 			// this is kinda cheating, but the effectiveView in the state takes some time to
 			// get set; but we need it immediately.  So we also set it as a variable on this.
 			// see similar code below; keep in sync.  Also, early on, it might not be done at all yet.
-			const curView = this.effectiveView || this.state.effectiveView;
-			if (curView) {
-//				curView.reloadAllVariables();
-//
-//				// copy from latest wave to view buffer (c++)
-//				qe.qViewBuffer_getViewBuffer();
-//				this.iStats.endReloadVarsNBuffer = performance.now();
-//
-//				curView.setInputsOnDrawings();
-//				this.iStats.endReloadInputs = performance.now();
-//
-//				// draw
-//				curView.drawAllDrawings();
-//
-//				// populate the frame number and elapsed pseudo-time
-//				this.showTimeNIteration();
-//				this.iStats.endDraw = performance.now();
-			}
+//			const curView = this.effectiveView || this.state.effectiveView;
+//			if (curView) {
+////				curView.reloadAllVariables();
+////
+////				// copy from latest wave to view buffer (c++)
+////				qe.qViewBuffer_getViewBuffer();
+////				this.iStats.endReloadVarsNBuffer = performance.now();
+////
+////				curView.setInputsOnDrawings();
+////				this.iStats.endReloadInputs = performance.now();
+////
+////				// draw
+////				curView.drawAllDrawings();
+////
+////				// populate the frame number and elapsed pseudo-time
+////				this.showTimeNIteration();
+////				this.iStats.endDraw = performance.now();
+//			}
 		}
 
-		// print out per-iteration benchmarks
+		// print out per-iteration benchmarks.  This is now displayed in the Iterate tab.
 		if (areBenchmarking) {
 			console.log(`times:\n`+
 				`iteration calc time:     ${(this.iStats.endCalc - this.iStats.startIteration).toFixed(2)}ms\n`+
