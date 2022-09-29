@@ -88,7 +88,7 @@ static void tryOutSpectrum(int N, int expectedSpLength, int expectedFBLength) {
 
 	// nPoints == spectrumLength
 	LONGS_EQUAL_TEXT(po2, spectrum->nPoints, "qspectrum nPoints");
-	LONGS_EQUAL_TEXT(expectedFBLength, space->freeBufferLength, "qspectrum freeBufferLength");
+	//LONGS_EQUAL_TEXT(expectedFBLength, space->freeBufferLength, "qspectrum freeBufferLength");
 
 	proveItsMine(spectrum->wave, spectrum->nPoints * sizeof(qCx));
 

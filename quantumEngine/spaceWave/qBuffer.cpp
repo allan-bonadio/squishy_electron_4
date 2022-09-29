@@ -47,10 +47,7 @@ void freeWave(qCx *wave) {
 // make one, the right size for this buffer's space, or nPoints long if no space
 qCx *qBuffer::allocateWave(int nPoints) {
 	if (nPoints <= 0) {
-		if (space)
-			nPoints = space->freeBufferLength;
-		else
-			throw std::runtime_error("qBuffer::allocateWave() - no nPoints and no space");
+		throw std::runtime_error("qBuffer::allocateWave() - no nPoints");
 	}
 
 	// ?? this is weird  this->nPoints = nPoints;
@@ -103,32 +100,14 @@ void qBuffer::initBuffer(int length, qCx *useThisBuffer) {
 qBuffer::~qBuffer() {
 	if (traceAllocate)
 		printf("🍕  start the qBuffer instance destructor...space=%p\n", space);
-//	if (space && (qSpace *) 0xcdcdcdcdcdcdcdcd != space)
-//		printf("🧨 🧨    start of qBuffer::~qBuffer, %s:%d  freeBufferList=%p  qBuf=%p\n",
-//			__FILE__, __LINE__, space->freeBufferList, this);
-//	if (space)
-//		printf("🧨 🧨    start of qBuffer::~qBuffer, %s:%d  freeBufferList=%p  qBuf=%p\n",
-//			__FILE__, __LINE__, space->freeBufferList, this);
 	if (dynamicallyAllocated) {
 		freeWave(wave);
-
-//		printf("🧨 🧨     qBuffer::~qBuffer just after freeWave, %s:%d  space=%p freeBufferList=%p\n",
-//		__FILE__, __LINE__, space, ((space && (qSpace *) 0xcdcdcdcdcdcdcdcd != space)) ? space->freeBufferList : (FreeBuffer *) 0x99);
-
-
-		//space->returnBuffer(wave);
-//		printf("   🍕  freed buffer...\n");
+//		printf("   🍕  freed qBuffer...\n");
 	}
 
 	space = NULL;
 	//wave = NULL;
 	if (traceAllocate) printf("   🍕  setted buffer to null; done with qBuffer destructor.\n");
-
-	if (space) {
-		// ahem we just set space to null...
-		printf("🧨 🧨    end of qBuffer::~qBuffer, %s:%d  freeBufferList=%p\n",
-			__FILE__, __LINE__, space->freeBufferList);
-	}
 }
 
 

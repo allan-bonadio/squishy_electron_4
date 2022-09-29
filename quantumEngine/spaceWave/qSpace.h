@@ -115,17 +115,17 @@ public:
 
 	// the linked list of blocks available for rental.
 	// All contain (freeBufferLength) complex number slots.
-	FreeBuffer *freeBufferList;
+	//FreeBuffer *freeBufferList;
 
 	// number of qCx-s that'll be enough for both spectrums and waves
 	// so waves that are cache-able have exactly this length.
-	int freeBufferLength;
+	//int freeBufferLength;
 
 	// if you take one, return it.  If it isn't the right length,
 	// returning might lead to it being used as if it was.
-	qCx *borrowBuffer(void);
-	void returnBuffer(qCx *abuffer);
-	void clearFreeBuffers(void);  // delete them all
+	//qCx *borrowBuffer(void);
+	//void returnBuffer(qCx *abuffer);
+	//void clearFreeBuffers(void);  // delete them all
 
 	/* *********************************************** potential */
 	void dumpPotential(const char *title);

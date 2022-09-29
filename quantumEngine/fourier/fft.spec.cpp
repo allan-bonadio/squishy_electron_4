@@ -31,8 +31,7 @@ static void tryOutFFT(int N, double freq) {
 
 	// this also tests contDISCRETE a little
 	qSpace *space = makeBareSpace(N, contDISCRETE);
-	//printf("     tryOutFFT:%d freeBufferList: %p\n", __LINE__, space->freeBufferList);
-
+\
 	qWave *original = new qWave(space);
 	original->setCircularWave(freq);
 	if (traceDumpWaves) original->dump("    tryOutFFT:  orignal wave set", true);
@@ -93,7 +92,6 @@ static void trySquareWaveFFT(int N) {
 
 	// this also tests contDISCRETE a little
 	qSpace *space = makeBareSpace(N, contDISCRETE);
-	//printf("     tryOutFFT:%d freeBufferList: %p\n", __LINE__, space->freeBufferList);
 
 	qWave *original = new qWave(space);
 

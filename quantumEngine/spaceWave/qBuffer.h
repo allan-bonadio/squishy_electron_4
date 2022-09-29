@@ -36,6 +36,7 @@ struct qBuffer {
 	qCx *allocateWave(int nPoints = -1);
 
 	// constructor for qWave and qSpectrum calls this to finish up & alloc buffer
+	// length is length in qCxs
 	void initBuffer(int length, qCx *useThisBuffer = NULL);
 
 	// the actual data, hopefully in the right size allocated block

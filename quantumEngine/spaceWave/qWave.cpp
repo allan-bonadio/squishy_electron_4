@@ -35,7 +35,7 @@ qWave::qWave(qSpace *sp, qCx *useThisBuffer)
 		printf("      🌊🌊        qWave: %p\n", (this));
 	}
 
-	initBuffer(space->freeBufferLength, useThisBuffer);
+	initBuffer(space->nPoints, useThisBuffer);
 
 	if (traceConstDeconst)
 		printf("      🌊🌊  allocated wave: %p\n", (wave));

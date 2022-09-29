@@ -143,8 +143,8 @@ qSpace *startNewSpace(const char *label) {
 	//theAvatar = NULL;
 
 	if (traceSpaceCreation) {
-		printf("🚀 🚀 🚀  JS startNewSpace   done (%s == %s)   theSpace=%p, freeBufferList: %p\n",
-			theSpace->label, label, theSpace, theSpace->freeBufferList);
+		printf("🚀 🚀 🚀  JS startNewSpace   done (%s == %s)   theSpace=%p\n",
+			theSpace->label, label, theSpace);
 	}
 
 	return theSpace;
@@ -153,16 +153,15 @@ qSpace *startNewSpace(const char *label) {
 // call this from JS to add one or more dimensions
 // nobody uses this return value either.
 void addSpaceDimension(int N, int continuum, const char *label) {
-	if (traceSpaceCreation) printf("addSpaceDimension(%d, %d, %s)   %p\n", N, continuum, label, theSpace->freeBufferList);
+	if (traceSpaceCreation) printf("addSpaceDimension(%d, %d, %s)\n", N, continuum, label);
 	theSpace->addDimension(N, continuum, label);
-	if (traceSpaceCreation) printf("🚀 🚀 🚀  addSpaceDimension(): freeBufferList: %p\n", theSpace->freeBufferList);
 }
 
 // call this from JS to finish the process
 struct salientPointersType *completeNewSpace(void) {
 	//printf("completeNewSpace starts\n");
-	if (traceSpaceCreation) printf("🚀 🚀 🚀  JS completeNewSpace starts(%s)   theSpace=%p, freeBufferList: %p\n",
-		theSpace->label, theSpace, theSpace->freeBufferList);
+	if (traceSpaceCreation) printf("🚀 🚀 🚀  JS completeNewSpace starts(%s)   theSpace=%p\n",
+		theSpace->label, theSpace);
 
 	// finish up all the dimensions now that we know them all
 	theSpace->initSpace();
@@ -180,10 +179,8 @@ struct salientPointersType *completeNewSpace(void) {
 	salientPointers.vBuffer = theQViewBuffer->vBuffer;
 
 	if (traceSpaceCreation) printf("   🚀 🚀 🚀 completeNewSpace After Creation but BEFORE loadViewBuffer  "
-		"theQViewBuffer=%p  theQViewBuffer->vBuffer=%p  freeBufferList=%p\n",
-		theQViewBuffer, theQViewBuffer ?  theQViewBuffer->vBuffer : NULL,
-		theSpace->freeBufferList
-	);
+		"theQViewBuffer=%p   vBuffer=%p  \n",
+		theQViewBuffer, theQViewBuffer ?  theQViewBuffer->vBuffer : NULL);
 
 	salientPointers.mainWaveBuffer = theAvatar->mainQWave->wave;
 

@@ -40,11 +40,8 @@ TEST(qAvatar, CheckConstructor)
 // boring, just copied from the space test script
 
 // this tests the whole shebang, as created from JS
-static void completeNewAvatarGauntlet(int N, int expectedSpectrumLength, int expectedFreeBufferLength) {
-//	printf("🧨 🧨 starting completeNewAvatarGauntlet(N=%d, sl=%d, fbl=%d)\n",
-//		N, expectedSpectrumLength, expectedFreeBufferLength);
+static void completeNewAvatarGauntlet(int N, int expectedSpectrumLength) {
 	qSpace *space = makeFullSpace(N);
-//	printf("🧨 🧨       created the space and all the buffers; freeBufferList=%p\n", space->freeBufferList);
 	int nPoints = space->nPoints;
 
 	LONGS_EQUAL(0, theAvatar->elapsedTime);
@@ -56,7 +53,6 @@ static void completeNewAvatarGauntlet(int N, int expectedSpectrumLength, int exp
 
 
 	// lets see if the buffers are all large enough
-//	printf("🧨 🧨       lets see if the buffers are all large enough freeBufferList=%p\n", space->freeBufferList);
 	proveItsMine(theAvatar->mainQWave->wave	, nPoints * sizeof(qCx));
 
 	theAvatar->getScratchWave();
@@ -69,12 +65,12 @@ static void completeNewAvatarGauntlet(int N, int expectedSpectrumLength, int exp
 	deleteTheSpace();
 }
 
-TEST(qAvatar, Avatar_completeNewAvatarGauntlet4000) { completeNewAvatarGauntlet(4096, 4096, 4098); }
-TEST(qAvatar, Avatar_completeNewAvatarGauntlet254) { completeNewAvatarGauntlet(256, 256, 258); }
-TEST(qAvatar, Avatar_completeNewAvatarGauntlet63) { completeNewAvatarGauntlet(64, 64, 66); }
-TEST(qAvatar, Avatar_completeNewAvatarGauntlet32) { completeNewAvatarGauntlet(32, 32, 34); }
-TEST(qAvatar, Avatar_completeNewAvatarGauntlet32x) { completeNewAvatarGauntlet(32, 32, 34); }
-TEST(qAvatar, Avatar_completeNewAvatarGauntlet4) { completeNewAvatarGauntlet(4, 4, 6); }
+TEST(qAvatar, Avatar_completeNewAvatarGauntlet4000) { completeNewAvatarGauntlet(4096, 4096); }
+TEST(qAvatar, Avatar_completeNewAvatarGauntlet254) { completeNewAvatarGauntlet(256, 256); }
+TEST(qAvatar, Avatar_completeNewAvatarGauntlet63) { completeNewAvatarGauntlet(64, 64); }
+TEST(qAvatar, Avatar_completeNewAvatarGauntlet32) { completeNewAvatarGauntlet(32, 32); }
+TEST(qAvatar, Avatar_completeNewAvatarGauntlet32x) { completeNewAvatarGauntlet(32, 32); }
+TEST(qAvatar, Avatar_completeNewAvatarGauntlet4) { completeNewAvatarGauntlet(4, 4); }
 
 
 
