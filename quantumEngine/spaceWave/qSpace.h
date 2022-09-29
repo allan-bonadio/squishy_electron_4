@@ -138,12 +138,18 @@ public:
 
 // this gets passed back to the JS after the space is created, so it can construct stuff
 // just a one-off struct; JS will access it via Uint32Array
+// Note: the vBuffer and wave buffer fields should be eliminated cuz
+// JS can get to them from the eAvatar
 struct salientPointersType {
 	qSpace *space;
-	qCx *mainWaveBuffer;
 	double *potentialBuffer;
+
+	qCx *mainWaveBuffer;
 	float *vBuffer;
 	struct qAvatar *theAvatar;
+
+	qCx *miniGraphWaveBuffer;
+	float *miniGraphVBuffer;
 	struct qAvatar *miniGraphAvatar;
 };
 

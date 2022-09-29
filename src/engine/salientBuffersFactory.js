@@ -20,28 +20,29 @@ class salientBuffersFactory {
 			throw `falsy salientPointersPointer!`;
 
 		// a patch of memory returned from C++ with addresses of some important buffers.
-		const struct = new Uint32Array(window.Module.HEAPU32.buffer, salientPointersPointer);
+		const struct = new Uint32Array(window.Module.HEAPU32.buffer, salientPointersPointer, 20);
 
-		// eWave figures out the right buffer length
-		this.mainQeWave = new eWave(space, struct[1]);
+		this.space = struct[0];  // maybe not hooked up yet
 
 		// one double per point
-		this.potentialBuffer = new Float64Array(window.Module.HEAPF64.buffer, struct[2],
+		this.potentialBuffer = new Float64Array(window.Module.HEAPF64.buffer, struct[1],
 			space.nPoints);
 
+		// eWave figures out the right buffer length
+		this.mainQeWave = new eWave(space, struct[2]);
+
 		// display also the boundary points?  if not, use nStates instead
-		this.vBuffer = new Float32Array(window.Module.HEAPF64.buffer, struct[3],
+		this.vBuffer = new Float32Array(window.Module.HEAPF32.buffer, struct[3],
 			space.nPoints * 8); // two vec4 s per point
 
 		this.theAvatar = new eAvatar(struct[4], this.mainQeWave);
-		this.miniGraphAvatar = new eAvatar(struct[5]);  // not yet implemented or used...
-	}
 
-//	get mainWaveBuffer() { return this.struct[1]; }
-//	get potentialBuffer() { return this.struct[2]; }
-//	get vBuffer() { return this.struct[3]; }
-//	get theAvatar() { return this.struct[4]; }
-//	get miniGraphAvatar() { return this.struct[5]; }
+
+		this.miniGraphWaveBuffer = new eWave(space, struct[5]);
+		this.miniGraphVBuffer = new Float32Array(window.Module.HEAPF32.buffer, struct[6],
+			space.nPoints * 8); // two vec4 s per point
+		this.miniGraphAvatar = new eAvatar(struct[7]);
+	}
 }
 
 export default salientBuffersFactory;
