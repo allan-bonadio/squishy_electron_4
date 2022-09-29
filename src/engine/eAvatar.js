@@ -18,9 +18,7 @@ class eAvatar {
 	// Note these are all scalars; buffers are passed by pointer and you need to allocate them in JS
 	get space() { return this.ints[1]; }
 	set space(a) { this.ints[1] = a; }
-	get elapsedTime() {
-		return this.doubles[1];
-		}
+	get elapsedTime() { return this.doubles[1]; }
 	set elapsedTime(a) { this.doubles[1] = a; }
 	get iterateSerial() { return this.doubles[2]; }
 	set iterateSerial(a) { this.doubles[2] = a; }

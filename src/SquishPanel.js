@@ -145,9 +145,12 @@ export class SquishPanel extends React.Component {
 			const space = this.setNew1DResolution(s.N, s.continuum, s.mainViewClassName);
 
 			// vital properties of the space
-			qe.Avatar_setDt(this.state.dt);
-			qe.Avatar_setStepsPerIteration(this.state.stepsPerIteration);
-			//qe.Avatar_askForFFT();
+			if (this.avatar) {
+				this.avatar.dt = this.state.dt;
+				this.avatar.stepsPerIteration = this.state.stepsPerIteration;
+			}
+			//qe.Avatar_setDt(this.state.dt);
+			//qe.Avatar_setStepsPerIteration(this.state.stepsPerIteration);
 
 			// this should be the only place animateHeartbeat() should be called
 			// except for inside the function itself
@@ -492,7 +495,9 @@ export class SquishPanel extends React.Component {
 
 	resetCounters =
 	(ev) => {
-		qe.Avatar_resetCounters();
+		this.avatar.elapsedTime = 0;
+		this.avatar.iterateSerial = 0;
+		//qe.Avatar_resetCounters();
 		this.showTimeNIteration();
 	}
 
@@ -526,16 +531,13 @@ export class SquishPanel extends React.Component {
 	setLowPassFilter =
 	lowPassFilter => {
 		if (traceSetPanels) console.info(`js setLowPassFilter(${lowPassFilter})`)
-		//this.setState({lowPassFilter});
-		//qe.Avatar_setLowPassFilter(lowPassFilter);
-// 		if (typeof storeSettings != 'undefined' && storeSettings.iterationParams)  //  goddamned bug in importing works in constructor
-// 			storeASetting('iterationParams', 'lowPassFilter', (lowPassFilter - 1) / this.state.N);
 
 		let lpf = storeASetting('iterationParams', 'lowPassFilter', lowPassFilter);
 		this.setState({lowPassFilter: lpf});
 
 		// here's where it converts from percent to the C++ style integer number of freqs
-		qe.Avatar_setLowPassFilter(Math.round(lpf / 200 * this.state.N));
+		this.avatar.lowPassFilter = Math.round(lpf / 200 * this.state.N);
+		//qe.Avatar_setLowPassFilter(Math.round(lpf / 200 * this.state.N));
 	}
 
 	// completely wipe out the 𝜓 wavefunction and replace it with one of our canned waveforms.
@@ -549,7 +551,9 @@ export class SquishPanel extends React.Component {
 		//this.iterateOneIteration(false, true);
 		//qe.qViewBuffer_getViewBuffer();
 		//qe.createQEWaveFromCBuf();
-		qe.Avatar_resetCounters();
+		//qe.Avatar_resetCounters();
+		this.avatar.elapsedTime = 0;
+		this.avatar.iterateSerial = 0;
 
 		// see similar code above; keep in sync
 		console.info(`see similar code above; keep in this.ev${this.effectiveView} this.state.ev${this.state.effectiveView}`);
@@ -608,6 +612,7 @@ export class SquishPanel extends React.Component {
 					width={p.width}
 					setUpdatePotentialArea={this.setUpdatePotentialArea}
 					returnGLFuncs={this.returnGLFuncs}
+					avatar={this.avatar}
 				/>
 				<ControlPanel
 					openResolutionDialog={() => this.openResolutionDialog()}

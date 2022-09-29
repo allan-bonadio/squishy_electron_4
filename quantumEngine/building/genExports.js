@@ -29,14 +29,12 @@ exportsSrc  = [
 
 
 	// gets
-// 	{name: 'Avatar_getWaveBuffer', retType: 'number', args: []},
-// 	{name: 'qSpace_getPotentialBuffer', retType: 'number', args: []},
 	{name: 'getCppExceptionMessage', retType: 'number', args: ['number']},
 
 
 	// the qAvatar ones act on theAvatar in the c++ code
-	{name: 'Avatar_getElapsedTime', retType: 'number', args: []},
-	{name: 'Avatar_getIterateSerial', retType: 'number', args: []},
+//converted to direct{name: 'Avatar_getElapsedTime', retType: 'number', args: []},
+//converted to direct{name: 'Avatar_getIterateSerial', retType: 'number', args: []},
 
 	// the potential
 	{name: 'qSpace_dumpPotential', retType: 'number', args: ['string']},
@@ -44,12 +42,12 @@ exportsSrc  = [
 	// now done in js {name: 'qSpace_setValleyPotential', retType: 'number', args: ['number', 'number', 'number']},
 
 	// params
-	{name: 'Avatar_setDt', retType: null, args: ['number']},
-	{name: 'Avatar_setStepsPerIteration', retType: null, args: ['number']},
-	{name: 'Avatar_setLowPassFilter', retType: null, args: ['number']},
+//converted to direct{name: 'Avatar_setDt', retType: null, args: ['number']},
+//converted to direct{name: 'Avatar_setStepsPerIteration', retType: null, args: ['number']},
+//converted to direct{name: 'Avatar_setLowPassFilter', retType: null, args: ['number']},
 
 	{name: 'Avatar_oneIteration', retType: 'number', args: []},
-	{name: 'Avatar_resetCounters', retType: null, args: []},
+	//{name: 'Avatar_resetCounters', retType: null, args: []},
 
 	// views
 	{name: 'qViewBuffer_getViewBuffer', retType: 'number', args: []},

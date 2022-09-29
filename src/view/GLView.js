@@ -30,6 +30,8 @@ class GLView extends React.Component {
 
 		width: PropTypes.number.isRequired,
 		height: PropTypes.number.isRequired,
+
+		avatar: PropTypes.object,
 	}
 	static defaultProps = {
 		viewName: 'gl view',

@@ -46,6 +46,8 @@ export class WaveView extends React.Component {
 
 		returnGLFuncs: PropTypes.func.isRequired,
 		setUpdatePotentialArea: PropTypes.func,
+
+		avatar: PropTypes.object,
 	};
 
 	static constructed = 0;
@@ -169,7 +171,8 @@ export class WaveView extends React.Component {
 
 			<GLView width={p.width} height={s.height}
 				returnGLFuncs={p.returnGLFuncs} createdSpacePromise={p.createdSpacePromise}
-				viewClassName={p.viewClassName} viewName={p.viewName} />
+				viewClassName={p.viewClassName} viewName={p.viewName}
+				avatar={p.avatar}/>
 
 			<aside className='viewOverlay'
 				style={{width: `${p.width}px`, height: `${s.height}px`}}>
