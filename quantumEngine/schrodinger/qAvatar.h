@@ -49,7 +49,7 @@ struct qAvatar {
 	struct qSpectrum *spect;
 	qSpectrum *getSpectrum(void);
 
-	// the qViewBuffer to be passed to webgl.  This is a visual thing after all.
+	// the qViewBuffer to be passed to webgl.  qAvatar is a visual thing after all.
 	struct qViewBuffer *qvBuffer;
 	// aligned by 4, not 8
 
@@ -75,7 +75,7 @@ struct qAvatar {
 	// set pleaseFFt from JS (only if in the middle of an iteration)
 	void askForFFT(void);
 
-	// for alignment, but these last
+	// for alignment, put these last
 	bool isIterating;
 
 	// please do an FFT after the current iteration ends

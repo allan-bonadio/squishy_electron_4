@@ -43,6 +43,3 @@ export const qeStartPromise = new Promise((succeed, fail) => {
 	qeStartPromiseSucceed = succeed;
 	if (tracePromises) console.info(`qeStartPromise created:`, succeed, fail);
 });
-
-
-

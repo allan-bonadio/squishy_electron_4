@@ -9,9 +9,9 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import qe from '../engine/qe';
-// import {abstractViewDef} from './abstractViewDef';
-// import flatDrawingViewDef from './flatDrawingViewDef';
-import {getASetting, storeASetting} from '../utils/storeSettings';
+//import {abstractViewDef} from './abstractViewDef';
+//import flatDrawingViewDef from './flatDrawingViewDef';
+//import {getASetting, storeASetting} from '../utils/storeSettings';
 
 //const listOfViewClasses = import('./listOfViewClasses');
 import {listOfViewClasses} from './listOfViewClasses';
@@ -43,18 +43,16 @@ class GLView extends React.Component {
 
 	// the canvas per panel, one panel per canvas.
 	// Only called when canvas is created (or recreated, someday)
-	static setGLCanvasAgain = 0;
+	//static setGLCanvasAgain = 0;
 	setGLCanvas =
 	(canvas) => {
 		const p = this.props;
 		if (this.space && this.canvas === canvas)
 			return;  // already done
 
-		GLView.setGLCanvasAgain++;
-		if (GLView.setGLCanvasAgain > 10) debugger;
-		if (traceGLView) {
-			console.log(`for the ${GLView.setGLCanvasAgain}th time, GLView.setGLCanvas(...`, canvas);
-		}
+		//GLView.setGLCanvasAgain++;
+		//if (GLView.setGLCanvasAgain > 10) debugger;
+		//console.log(`for the ${GLView.setGLCanvasAgain}th time, GLView.setGLCanvas(...`, canvas);
 
 		if (canvas) {
 			this.canvas = canvas;
@@ -141,7 +139,7 @@ class GLView extends React.Component {
 	// this just creates the canvas
 	render() {
 		const p = this.props;
-		const s = this.state;
+		//const s = this.state;
 
 		return (
 			<canvas className='squishCanvas'

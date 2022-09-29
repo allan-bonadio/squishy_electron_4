@@ -162,6 +162,7 @@ export class eSpace {
 		// this actually does it over on the C++ side
 		qe.startNewSpace("a eSpace");
 
+		// make each dimension (someday there'll be more than 1)
 		let nPoints = 1, nStates = 1;
 		this.dimensions = dims.map(d => {
 				qe.addSpaceDimension(d.N, d.continuum, d.label);  // c++

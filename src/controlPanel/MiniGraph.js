@@ -167,10 +167,6 @@ export class MiniGraph extends React.Component {
 		const p = this.props;
 		//const {N} = this.miniSpace.startEnd;
 
-		// this should not be in a render method cuz it has side effects
-		// no shit!  this was causing bigtime problems!
-		//this.gElement = p.recipe(this.miniSpace, p.familiarParams);
-
 		return <svg className={`MiniGraph ${p.className}`}
 							viewBox={this.viewBox}
 							width={p.width} height={p.height}
