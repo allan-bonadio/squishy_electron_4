@@ -37,7 +37,7 @@ qWave *expectedWave4 = new qWave(space4, ex4Wave);
 TEST(Visscher, VisscherOneStep)
 {
 	oldWave4->setCircularWave(1.);
-	qAvatar *avatar = new qAvatar(space4);
+	qAvatar *avatar = new qAvatar(space4, "VisscherOneStep");
 
 	avatar->dt = 0.01;
 	avatar->oneVisscherStep(oldWave4, newWave4);

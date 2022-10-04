@@ -4,20 +4,40 @@
 */
 //import qe from './qe';
 import {prepForDirectAccessors} from '../utils/directAccessors';
+import eWave from './eWave';
+//import eSpace from './eSpace';
 
+
+// a qAvatar manages iteration of a wave, and display on a GLView. I keep
+// thinking that I should separate the functions, but what will you do with an itration
+// if you're not going to view it in GL?
 class eAvatar {
+	// space is the eSpace we're in (note eSpace constructor constructs 2 Avatars
+	// and they're the only ones who know nPoints etc)
 	// pointer is an integer pointing into the C++ address space, to the Avatar object.
 	// We can then set and sample each of the member variables if we know the offset
-	constructor(pointer, qewave) {
+	// Give us the pointer, we'll reach in and make an eWave from mainQWave, and
+	// a vBuffer from _qvBuffer. the q objects must be in place.
+	// this way we can't get the wrong wave in the wrong avatar.
+	constructor(space, label, pointer) {
 		prepForDirectAccessors(this, pointer);
-		this.qewave = qewave;
+		this.space = space;
+		this.label = label;
+		this.eWave = new eWave(this.space, null, this.mainQWave);
+		this.vBuffer = new Float32Array(window.Module.HEAPF32.buffer, this._qvBuffer,
+			this.space.nPoints * 8); // two vec4 s per point
+
+		this.label = window.Module.UTF8ArrayToString(this._label);
+
 	}
 
-	/* ************************************************************************* Accessors */
-	// see qAvatar.cpp to regenerate this.
-	// Note these are all scalars; buffers are passed by pointer and you need to allocate them in JS
-	get space() { return this.ints[1]; }
-	set space(a) { this.ints[1] = a; }
+	/* ************************************************************************* Direct Accessors */
+	// see qAvatar.cpp to regenerate this. Note these are all scalars; buffers
+	// are passed by pointer and you need to allocate them in JS (eg see
+	// eAvatar.constructor)
+
+	get _space() { return this.ints[1]; }
+
 	get elapsedTime() { return this.doubles[1]; }
 	set elapsedTime(a) { this.doubles[1] = a; }
 	get iterateSerial() { return this.doubles[2]; }
@@ -38,36 +58,20 @@ class eAvatar {
 	get mainQWave() { return this.ints[10]; }
 	set mainQWave(a) { this.ints[10] = a; }
 
-	get potential() { return this.ints[11]; }
-	set potential(a) { this.ints[11] = a; }
+	get _potential() { return this.ints[11]; }
 	get potentialFactor() { return this.doubles[6]; }
 	set potentialFactor(a) { this.doubles[6] = a; }
 
-	get scratchQWave() { return this.ints[14]; }
-	set scratchQWave(a) { this.ints[14] = a; }
+	get _scratchQWave() { return this.ints[14]; }
 
-	get spect() { return this.ints[15]; }
-	set spect(a) { this.ints[15] = a; }
-
-	get qvBuffer() { return this.ints[16]; }
-	set qvBuffer(a) { this.ints[16] = a; }}
+	get _spect() { return this.ints[15]; }
+	get _qvBuffer() { return this.ints[16]; }
+	get _label() { return this.pointer + 70; }
 
 
+}
+
+
+window.eAvatar = eAvatar;  // debugging
 export default eAvatar;
 
-/* just thinking out loud here... about automating this:
-	input to the mapper:
-	{name: 'elapsedTime', type: 'double', offset: 8},
-	{name: 'stepsPerIteration', type: 'int', offset: 40},
-	{name: 'pleaseFFT', type: 'bool', offset: 45},
-
-	or even better, hand in to JS:
-	['elapsedTime',  'stepsPerIteration',  'pleaseFFT', ...]
-	that gets compiled to C++ code that generates:
-	{name: 'elapsedTime', type: 'double', size: 8, offset: 8},
-	{name: 'stepsPerIteration', type: 'int', size: 4, offset: 40},
-	{name: 'pleaseFFT', type: 'bool', size: 1, offset: 45},
-	that goes thru some JS that does Object.defineOwnProperty() calls to make the JS objects with accessors.
-
-	cool.  Maybe after I become independently wealthy...
-*/

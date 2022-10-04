@@ -167,8 +167,8 @@ struct salientPointersType *completeNewSpace(void) {
 	theSpace->initSpace();
 
 	if (theAvatar) throw std::runtime_error("🚀 🚀 🚀 theAvatar exists while trying to create new one");
-	theAvatar = salientPointers.theAvatar = new qAvatar(theSpace);
-	salientPointers.miniGraphAvatar = new qAvatar(theSpace);
+	theAvatar = salientPointers.theAvatar = new qAvatar(theSpace, "VisscherOneS");
+	salientPointers.miniGraphAvatar = new qAvatar(theSpace, "miniGraph");
 	//printf("did initSpace\n");
 
 

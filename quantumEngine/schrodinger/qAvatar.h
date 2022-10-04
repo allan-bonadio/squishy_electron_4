@@ -6,7 +6,7 @@
 // formerly called: Manifestation, Incarnation, Timeline, ... formerly part of qSpace
 
 struct qAvatar {
-	qAvatar(qSpace *);
+	qAvatar(qSpace *, const char *label);
 	~qAvatar(void);
 	void dumpOffsets(void);
 
@@ -81,6 +81,9 @@ struct qAvatar {
 	// please do an FFT after the current iteration ends
 	bool pleaseFFT;
 	// make sure the subsequent things are aligned!  or iteration is painfully slow.
+
+	// mostly for debugging
+	char label[LABEL_LEN + 1];
 };
 
 extern qAvatar *theAvatar;

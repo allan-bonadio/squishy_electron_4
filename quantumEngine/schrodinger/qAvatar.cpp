@@ -3,6 +3,7 @@
 ** Copyright (C) 2022-2022 Tactile Interactive, all rights reserved
 */
 
+#include <string>
 #include <ctime>
 #include <limits>
 #include <cfenv>
@@ -47,14 +48,14 @@ static bool traceB4nAfterFFSpectrum = false;
 
 // create new avatar, complete with its own wave and view buffers
 // make sure these values are doable by the sliders' steps
-qAvatar::qAvatar(qSpace *sp)
+qAvatar::qAvatar(qSpace *sp, const char *lab)
 	: dt(1e-3), stepsPerIteration(100), lowPassFilter(1),
 		space(sp), magic('Avat'), pleaseFFT(false), isIterating(false) {
 
 	mainQWave = new qWave(space);
 	scratchQWave = NULL;  // until used
 	spect = NULL;  // until used
-
+	strncpy(label, lab, LABEL_LEN);
 	resetCounters();
 
 	// we always need a view buffer; that's the whole idea behind an avatar
@@ -73,7 +74,19 @@ qAvatar::qAvatar(qSpace *sp)
 			dims->continuum, dims->spectrumLength, dims->label);
 	}
 
-	//dumpOffsets();
+	// enable this when qAvatar.h fields change
+	dumpOffsets();
+};
+
+qAvatar::~qAvatar(void) {
+	delete mainQWave;
+	delete qvBuffer;
+
+	// these may or may not have been allocated, depending on whether they were needed
+	if (scratchQWave)
+		delete scratchQWave;
+	if (spect)
+		delete spect;
 };
 
 // some uses never need these so wait till they do
@@ -89,27 +102,16 @@ qSpectrum *qAvatar::getSpectrum(void) {
 	return spect;
 };
 
-qAvatar::~qAvatar(void) {
-	delete mainQWave;
-	delete qvBuffer;
-
-	// these may or may not have been allocated, depending on whether they were needed
-	if (scratchQWave)
-		delete scratchQWave;
-	if (spect)
-		delete spect;
-};
-
 // need these numbers for the js interface to this object, to figure out the offsets.
 // see eAvatar.js ;  usually this function isn't called.
 // Insert this into the constructor and run this once.  Copy text output.
 // Paste the output into class eAvatar, the class itself, to replace the existing ones
 void qAvatar::dumpOffsets(void) {
 	// don't need magic
-	printf("🚦 🚦 --------------- starting qAvatar direct access --------------\n");
+	printf("🚦 🚦 --------------- starting qAvatar direct access JS getters & setters--------------\n\n");
 
-	makeIntGetter(space);
-	makeIntSetter(space);
+	makePointerGetter(space);
+	printf("\n");
 
 	/* *********************************************** scalars */
 
@@ -137,26 +139,23 @@ void qAvatar::dumpOffsets(void) {
 	makeIntSetter(mainQWave);
 
 	printf("\n");
-	makeIntGetter(potential);
-	makeIntSetter(potential);
+	makePointerGetter(potential);
 	makeDoubleGetter(potentialFactor);
 	makeDoubleSetter(potentialFactor);
 
 	printf("\n");
-	makeIntGetter(scratchQWave);
-	makeIntSetter(scratchQWave);
+	makePointerGetter(scratchQWave);
 
 	// for the fourier filter.  Call the function first time you need it.
 	printf("\n");
-	makeIntGetter(spect);
-	makeIntSetter(spect);
+	makePointerGetter(spect);
 
 	// the qViewBuffer to be passed to webgl.  This is a visual thing after all.
-	printf("\n");
-	makeIntGetter(qvBuffer);
-	makeIntSetter(qvBuffer);
+	makePointerGetter(qvBuffer);
 
-	printf("🚦 🚦 --------------- done with qAvatar direct access --------------\n");
+	makeStringPointer(label);
+
+	printf("\n🚦 🚦 --------------- done with qAvatar direct access --------------\n");
 }
 
 void qAvatar::resetCounters(void) {

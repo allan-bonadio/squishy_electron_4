@@ -24,7 +24,7 @@ TEST_GROUP(qAvatar)
 TEST(qAvatar, CheckConstructor)
 {
 	qSpace *space = makeBareSpace(8, contENDLESS);
-	qAvatar *avatar = new qAvatar(space);
+	qAvatar *avatar = new qAvatar(space, "CheckConst");
 
 	LONGS_EQUAL(1, avatar->lowPassFilter);
 
@@ -86,7 +86,7 @@ static void tryFourierFilter(int N, int goodFreq, int badFreq, int lowPassFilter
 		 N,  goodFreq, badFreq,  lowPassFilter);
 
 	qSpace *space = makeBareSpace(N, contENDLESS);
-	qAvatar *avatar = new qAvatar(space);
+	qAvatar *avatar = new qAvatar(space, "tryFourierFil");
 	qWave *qw = avatar->mainQWave;
 	qWave *addOn = avatar->getScratchWave();
 	qSpectrum *rainbow = avatar->getSpectrum();
@@ -144,7 +144,7 @@ TEST(qAvatar, fourierFilter16_1_LPFscan7) { tryFourierFilter(16, 1, 5, 7); }
 
 static void fourierExperiments(int N) {
 	qSpace *space = makeBareSpace(N, contENDLESS);
-	qAvatar *avatar = new qAvatar(space);
+	qAvatar *avatar = new qAvatar(space, "fourierExp");
 
 	qSpectrum *allOnes = new qSpectrum(space);
 	allOnes->fill();
