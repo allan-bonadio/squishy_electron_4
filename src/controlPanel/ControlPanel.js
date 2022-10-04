@@ -14,7 +14,7 @@ import SetResolutionTab from './SetResolutionTab';
 import SetIterationTab from './SetIterationTab';
 import eSpace from '../engine/eSpace';
 import {storeASetting} from '../utils/storeSettings';
-// import {qeStartPromise} from '../engine/eEngine';
+//import {eSpaceCreatedPromise} from '../engine/eEngine';
 // import qe from '../engine/qe';
 
 import {getASetting} from '../utils/storeSettings';
@@ -32,8 +32,6 @@ export class ControlPanel extends React.Component {
 		// when user chooses 'set wave'
 		setWave: PropTypes.func.isRequired,
 		setPotential: PropTypes.func.isRequired,
-
-		createdSpacePromise: PropTypes.instanceOf(Promise).isRequired,
 
 		isTimeAdvancing: PropTypes.bool.isRequired,  // ie is it running?
 
@@ -127,6 +125,12 @@ export class ControlPanel extends React.Component {
 	ev => {
 		const {waveBreed, waveFrequency, pulseWidth, pulseOffset} = this.state;
 		this.props.setWave({waveBreed, waveFrequency, pulseWidth, pulseOffset});
+
+		// and now's the time to remember what the user set it at for next time
+		storeASetting('waveParams', 'waveBreed', waveBreed);
+		storeASetting('waveParams', 'waveFrequency', waveFrequency);
+		storeASetting('waveParams', 'pulseWidth', pulseWidth);
+		storeASetting('waveParams', 'pulseOffset', pulseOffset);
 	}
 
 	// fills in the potential buffer with values according to the potentialParams
@@ -171,7 +175,6 @@ export class ControlPanel extends React.Component {
 				waveParams={{waveBreed, waveFrequency, pulseWidth, pulseOffset,}}
 				setCPState={this.setCPState}
 				origSpace={p.space}
-				createdSpacePromise={p.createdSpacePromise}
 			/>;
 
 		case 'potential':
@@ -210,7 +213,7 @@ export class ControlPanel extends React.Component {
 		const s = this.state;
 
 		// before the mount event on SquishPanel
-		if (!p.space) return '';
+		// why?  this just shows panels and buttons if (!p.space) return '';
 
 		let showingTabHtml = this.createShowingTab();
 
@@ -222,7 +225,7 @@ export class ControlPanel extends React.Component {
 				resetCounters={p.resetCounters}
 
 				iterateFrequency={p.iterateFrequency}
-				setIterateFrequency={this.setIterateFrequency}
+				setIterateFrequency={this.setIterateFrequency}Ï
 
 				N={this.props.N}
 			/>
