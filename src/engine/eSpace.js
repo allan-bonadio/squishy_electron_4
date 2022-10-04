@@ -7,6 +7,7 @@ import qe from './qe';
 import {setFamiliarPotential} from '../utils/potentialUtils';
 import storeSettings from '../utils/storeSettings';
 import salientBuffersFactory from './salientBuffersFactory';
+import eAvatar from './eAvatar';
 
 let debugSpace = false;
 
@@ -156,11 +157,11 @@ export class eDimension {
 export class eSpace {
 	//unused static contCodeToText = code => ['Discrete', 'Well', 'Endless'][code];
 
-	constructor(dims) {
+	constructor(dims, spaceLabel) {
 		console.info(`eSpace constructor just starting`);
 
 		// this actually does it over on the C++ side
-		qe.startNewSpace("a eSpace");
+		qe.startNewSpace(spaceLabel);
 
 		// make each dimension (someday there'll be more than 1)
 		let nPoints = 1, nStates = 1;
@@ -193,29 +194,39 @@ export class eSpace {
 
 		// salientPointers will give us pointers to buffers and stuff we need
 		let sp = qe.completeNewSpace();
-		const salientBuffers = this.salientBuffers = new salientBuffersFactory(this, sp);
+		let salientBuffers = this.salientBuffers = new salientBuffersFactory(this, sp);
+
+		// remember that eSpace.salientBuffers doesn't work for multiple spaces
+		eSpace.salientBuffers = this.salientBuffers;
 
 		// this reaches into C++ space and accesses the main wave buffer of this space
 		// hmmm space shouldn't point to this - just avatar?
-		this.qewave = salientBuffers.mainQeWave;  // new eWave(this, salientPointers.mainWaveBuffer);
-		this.wave = this.qewave.wave;
+		//this.eWave = salientBuffers.mainEWave;
+		//this.wave = this.eWave.wave;
 
-		// by default it's set to 1s, or zeroes?  but we want something good.
-		this.qewave.setFamiliarWave(storeSettings.waveParams);  // wait - SquishPanel does this too
+		this.pointer = salientBuffers.spacePointer;
+		eSpace.addToList(this.pointer, this);  // so everybody else can find you by pointer value
+
 
 		// direct access into the potential buffer
 		this.potentialBuffer = salientBuffers.potentialBuffer;
+		setFamiliarPotential(this, this.potentialBuffer, storeSettings.potentialParams);
 			//new Float64Array(window.Module.HEAPF64.buffer,
 			//salientPointers.potentialBuffer, this.nPoints);
-		setFamiliarPotential(this, this.potentialBuffer, storeSettings.potentialParams);
 
-		this.theAvatar = salientBuffers.theAvatar;
+		this.mainEAvatar = new eAvatar(this, salientBuffers.mainAvatarPointer);
+		//this.mainEAvatar = salientBuffers.mainEAvatar;
+		this.mainVBuffer = this.mainEAvatar.vBuffer;
+		this.mainEWave = this.mainEAvatar.eWave;
+
+		// by default it's set to 1s, or zeroes?  but we want something good.
+		this.mainEWave.setFamiliarWave(storeSettings.waveParams);  //  SquishPanel does this for SetWave
 
 		//let emscriptenMemory = window.Module.HEAPF32.buffer;
 		//let address = qe.qViewBuffer_getViewBuffer();
 
+		this.miniGraphAvatar = new eAvatar(this, salientBuffers.miniGraphAvatarPointer);
 
-		this.vBuffer = salientBuffers.vBuffer;
 			// new Float32Array(emscriptenMemory, address, np);
 
 		if (debugSpace) console.log(`🚀  done creating eSpace:`, this);
@@ -293,4 +304,16 @@ export class eSpace {
 }
 
 
+/* ************************************************************************ space lookup */
+
+eSpace.spaces = {};
+
+eSpace.lookup =
+(pointer) => eSpace.spaces[pointer];
+
+eSpace.addToList =
+(pointer, espace) => eSpace.spaces[pointer] = espace;
+
+
+window.eSpace = eSpace;  // debugging
 export default eSpace;
