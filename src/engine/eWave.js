@@ -6,6 +6,7 @@
 // import {qeBasicSpace} from './eSpace';
 import {qe} from './qe';
 import cxToRgb from '../view/cxToRgb';
+import {prepForDirectAccessors} from '../utils/directAccessors';
 
 let traceSetWave = false;
 
@@ -15,7 +16,7 @@ let traceSetWave = false;
 // Dump a wave buffer as a colored bargraph in the JS console
 // this is also called by C++ so it's easier as a standalone function
 // see also eWave method by same name (but different args)
-function rainbowDump(wave, start, end, nPoints) {
+export function rainbowDump(wave, start, end, nPoints) {
 	let title = "temporary title eWave.js:17";
 	start *= 2;
 	end *= 2;
@@ -42,6 +43,7 @@ function rainbowDump(wave, start, end, nPoints) {
 		tot += mag;
 		color = cxToRgb({re: wave[ix], im: wave[ix + 1]});
 
+		// is this redundant!?!?!?
 		//console.log doesn't work here, dunnowhy, unless you stick in either extra console.log()
 // 		console.log(`%c rich `, "font-family: palatino");
 // 		console.log(`%c🌊  `, `background-color: ${color}; padding-right: ${mag+5}px; `);
@@ -50,9 +52,9 @@ function rainbowDump(wave, start, end, nPoints) {
 	}
 	return tot;
 }
-window.rainbowDump = rainbowDump;
+window.rainbowDump = rainbowDump;  // so c++ can get to it
 
-/* **************************************************************** qewave */
+/* **************************************************************** eWave */
 
 // this is just a 1D wave.  someday...
 class eWave {
@@ -62,12 +64,28 @@ class eWave {
 	//       From any source, C++ or JS.
 	// 	   (I bet you could pass it a JS array and some stuff would work)
 	// • Or absent/null, in which case it's dynamially allocated to space.nPoints; JS only
-	constructor(space, waveArg) {
+	// pointer should be pointer to qWave in C++, otherwise leave it falsy.
+	// If you use pointer, leave the waveArg null; it's ignpored
+	constructor(space, waveArg, pointer) {
+		prepForDirectAccessors(this, pointer);
+
 		this.space = space;
-		let {start, end, nPoints} = this.space.startEnd;
-		this.start = start;
-		this.end = end;
-		this.nPoints = nPoints;
+
+		if (pointer) {
+			this.pointer = pointer;  // a qWave
+			waveArg = this._wave;
+		}
+		else {
+			// a home brew wave, not from C++.  make a place for those ints to be
+			this.pointer = new Int32Array(20);
+
+//			// there MUST be a space  NO!  getters into C++
+//			let {start, end, nPoints, continuum} = this.space.startEnd;
+//			this.start = start;
+//			this.end = end;
+//			this.nPoints = nPoints;
+//			this.continuum = continuum;
+		}
 
 		// now for the buffer
 		if (!waveArg) {
@@ -91,6 +109,18 @@ class eWave {
 		else
 			throw `call to construct eWave failed cuz bad waveArg=${waveArg}`;
 	}
+
+	/* **************************************************************** direct access */
+
+	get _wave() { return this.ints[4]; }
+
+	get nPoints() { return this.ints[5]; }
+	get start() { return this.ints[6]; }
+	get end() { return this.ints[7]; }
+	get continuum() { return this.ints[8]; }
+
+	get dynamicallyAllocated() { return this.bools[40]; }
+
 
 	/* **************************************************************** dumping */
 
@@ -283,5 +313,6 @@ class eWave {
 	}
 }
 
+window.eWave = eWave;  // debugging
 export default eWave;
 

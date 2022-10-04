@@ -9,6 +9,7 @@
 #include "qSpace.h"
 #include "../schrodinger/qAvatar.h"
 #include "qWave.h"
+#include "../directAccessors.h"
 
 // a transitional kind of thing from raw wave arrays to the new qWave buffer obj
 class qWave *laosQWave = NULL, *peruQWave = NULL;
@@ -54,6 +55,9 @@ qWave::qWave(qSpace *sp, qCx *useThisBuffer)
 	//printf("justTesting...about to rainbowDump this from qWave::qWave\n");
 	//this->rainbowDump("my first rinaninboe");
 	//printf("justTesting...done with rainbowDump this from qWave::qWave\n");
+
+	// enable this when qWave.h fields change
+	//dumpOffsets();
 }
 
 qWave::~qWave(void) {
@@ -67,6 +71,32 @@ qWave::~qWave(void) {
 }
 
 
+	/* *********************************************** direct access */
+
+// Insert this into the constructor and run this once.  Copy text output.
+// Paste the output into class eWave, the class itself, to replace the existing ones
+void qWave::dumpOffsets(void) {
+	// don't need magic
+	printf("🚦 🚦 --------------- starting qWave direct access JS getters & setters --------------\n\n");
+
+	makePointerGetter(wave);
+
+	printf("\n");
+	makeIntGetter(nPoints);
+	makeIntGetter(start);
+	makeIntGetter(end);
+	makeIntGetter(continuum);
+	//printf("\n");
+
+	//makeBoolGetter(dynamicallyAllocated);
+
+
+
+	printf("\n🚦 🚦 --------------- done with qWave direct access --------------\n");
+}
+
+
+	/* *********************************************** iterators */
 
 
 /* never tested - might never work  */
@@ -204,32 +234,32 @@ void qWave::prune() {
 //	}
 //
 //}
-
-// this is kindof a notch filter for frequency N/2 .  I'm losing confidence that this makes a diff.
-void qWave::nyquistFilter(void) {
-	if (traceLowPassFilter) printf("🌊🌊 qWave::nyquistFilter()\n");
-
-	if (!scratchBuffer)
-		scratchBuffer = allocateWave(nPoints);  // this won't work if space changes resolution!
-
-//	qCx *wave = wave;
-	qDimension *dims = space->dimensions;
-
-	fixBoundaries();
-
-	// this should zero out the nyquist frequency exactly
-	for (int ix = start; ix < end; ix++) {
-		scratchBuffer[ix] = (wave[ix] + wave[ix] - wave[ix-1] - wave[ix+1]) / 4.;
-
-//		printf("🌊🌊 %d scratchBuf=(%lf %lf) wave-1=(%lf %lf) wave0=(%lf %lf) wave+1=(%lf %lf)\n",
-//		ix,
-//		scratchBuffer[ix].re, scratchBuffer[ix].im,
-//		wave[ix-1].re, wave[ix-1].im, wave[ix].re, wave[ix].im, wave[ix+1].re, wave[ix+1].im);
-	}
-
-
-	copyThatWave(wave, scratchBuffer, nPoints);
-
-//	dump("after nyquist filter");
-}
-
+//
+//// this is kindof a notch filter for frequency N/2 .  I'm losing confidence that this makes a diff.
+//void qWave::nyquistFilter(void) {
+//	if (traceLowPassFilter) printf("🌊🌊 qWave::nyquistFilter()\n");
+//
+//	if (!scratchBuffer)
+//		scratchBuffer = allocateWave(nPoints);  // this won't work if space changes resolution!
+//
+////	qCx *wave = wave;
+//	qDimension *dims = space->dimensions;
+//
+//	fixBoundaries();
+//
+//	// this should zero out the nyquist frequency exactly
+//	for (int ix = start; ix < end; ix++) {
+//		scratchBuffer[ix] = (wave[ix] + wave[ix] - wave[ix-1] - wave[ix+1]) / 4.;
+//
+////		printf("🌊🌊 %d scratchBuf=(%lf %lf) wave-1=(%lf %lf) wave0=(%lf %lf) wave+1=(%lf %lf)\n",
+////		ix,
+////		scratchBuffer[ix].re, scratchBuffer[ix].im,
+////		wave[ix-1].re, wave[ix-1].im, wave[ix].re, wave[ix].im, wave[ix+1].re, wave[ix+1].im);
+//	}
+//
+//
+//	copyThatWave(wave, scratchBuffer, nPoints);
+//
+////	dump("after nyquist filter");
+//}
+//

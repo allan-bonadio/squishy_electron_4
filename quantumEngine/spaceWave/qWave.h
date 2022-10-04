@@ -17,6 +17,7 @@ struct qWave : public virtual qBuffer {
 
 
 	// used for low pass; need general buffer for arithmetic.  obsolete.
+	// and qWave::nyquistFilter().  See scratchQWave in avatar
 	qCx *scratchBuffer;
 
 	// never even tried any of these
@@ -25,7 +26,9 @@ struct qWave : public virtual qBuffer {
 
 	void prune(void);
 	//void lowPassFilter(double dilution = 0.01);
-	void nyquistFilter(void);
+	//void nyquistFilter(void);
+
+	void dumpOffsets(void);
 };
 
 
