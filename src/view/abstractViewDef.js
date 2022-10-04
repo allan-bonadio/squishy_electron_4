@@ -20,7 +20,7 @@ export class abstractViewDef {
 	// viewName: personal name for the viewDef instance, for error msgs
 	// canvas: real <canvas> DOM element, after it's been created by React
 	// class name from instance: vu.constructor.name   from class: vuClass.name
-	constructor(viewName, canvas, space) {
+	constructor(viewName, canvas, space, avatar) {
 		this.viewVariables = [];
 
 		this.viewName = viewName;
@@ -29,6 +29,7 @@ export class abstractViewDef {
 		this.initCanvas();
 
 		this.space = space;
+		this.avatar = avatar;
 
 		// all of the drawings in this view
 		// they get prepared, and drawn, in this same order

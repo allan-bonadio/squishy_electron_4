@@ -25,21 +25,21 @@ export class abstractDrawing {
 	static drawingName: 'abstractDrawing';
 
 	/* ************************************************** construction */
-	// view is eg flatDrawingViewDef.  Here we add ourselves to the ViewDef list of drawings.
-	constructor(view, space) {
-		this.view = view;
+	// viewDef is eg flatDrawingViewDef instance.  Here we add ourselves to the ViewDef list of drawings.
+	constructor(viewDef) {
+		this.viewDef = viewDef;
 		this.viewVariables = [];
 
-		this.gl = view.gl;
-		this.vaoExt = view.vaoExt;
+		this.gl = viewDef.gl;
+		this.vaoExt = viewDef.vaoExt;
 
-		this.bufferDataDrawMode = view.bufferDataDrawMode;
+		this.bufferDataDrawMode = viewDef.bufferDataDrawMode;
 		//bufferDataDrawMode = this.gl.STATIC_DRAW;
 
-		// isn't this passed in as a separate arg?
-		this.space = view.space;
+		this.space = viewDef.space;
+		this.avatar = viewDef.avatar;
 
-		view.drawings.push(this);
+		viewDef.drawings.push(this);
 	}
 
 	/* ************************************************** Shader Creation/Compile */
@@ -86,7 +86,7 @@ export class abstractDrawing {
 
 		const msg = gl.getProgramInfoLog(program);
 		gl.deleteProgram(program);
-		throw `Error linking program abstractDrawing for ${this.view.viewName}: ${msg}`;
+		throw `Error linking program abstractDrawing for ${this.viewDef.viewName}: ${msg}`;
 	}
 
 	/* **************************************************  test drawing */

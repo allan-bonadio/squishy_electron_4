@@ -32,7 +32,49 @@ qViewBuffer::~qViewBuffer() {
 	delete[] vBuffer;
 }
 
-// copy the numbers in our qAvatar's qWave into vBuffer
+// dump the view buffer just before it heads off to webgl.
+void qViewBuffer::dumpViewBuffer(const char *title) {
+//	printf("dumpViewBuffer theSpace %p\n", theSpace);
+//	printf("dumpViewBuffer qViewBuffer ptr %p\n", theSpace->qViewBuffer);
+//	printf("dumpViewBuffer vBuffer %p\n", theSpace->qvBuffer->vBuffer);
+	//float *vBuffer = avatar->qvBuffer->vBuffer;
+	printf("📺 The vBuffer = %p\n", vBuffer);
+	double prevRe = vBuffer[0];
+	double prevIm = vBuffer[1];
+
+	if (!title) title = "";
+	printf("==== 📺 dump vBuffer | %s\n", title);
+	printf("   ix  |    re      im     pot    serial  |   phase    magn\n");
+	for (int i = 0; i < space->nPoints*2; i++) {
+		double re = vBuffer[i*4];
+		double im = vBuffer[i*4+1];
+		if (i & 1) {
+			double dRe = re - prevRe;
+			double dIm = im - prevIm;
+			double phase = 0.;
+			double magn = 0.;
+			phase = atan2(im, re) * 180 / PI;
+			magn = im * im + re * re;
+			printf("%6d |  %6.3f  %6.3f  %6.3f  %6.3f  |  %6.3f  %6.3f\n",
+				i,
+				re, im, vBuffer[i*4+2], vBuffer[i*4+3],
+				phase, magn);
+
+			prevRe = re;
+			prevIm = im;
+		}
+		else {
+			printf("%6d |  %6.3f  %6.3f  %6.3f  %6.3f \n",
+				i,
+				re, im, vBuffer[i*4+2], vBuffer[i*4+3]);
+		}
+	}
+	printf("    qViewBuffer::at end of dumpViewBuffer qViewBuffer=%p  qViewBuffer->vBuffer=%p\n",
+			this, vBuffer);
+}
+
+
+// copy the numbers in our qAvatar's qWave into this vBuffer
 // one row per vertex, two rows per wave datapoint.
 // each row of 4 floats looks like this:
 //     real   imaginary    potential    serial
@@ -41,13 +83,10 @@ qViewBuffer::~qViewBuffer() {
 float qViewBuffer::loadViewBuffer(void) {
 	if (debugViewBuffer) printf("📺 loadViewBuffer() starts: vBuffer = %p \n",
 		vBuffer);
-//	printf("qViewBuffer::loadViewBuffer space ptr %p\n", space);
-//	printf("qViewBuffer::loadViewBuffer mainQWave ptr %p\n", avatar->mainQWave);
 	qWave *mainQWave = avatar->mainQWave;
-//	printf("qViewBuffer::loadViewBuffer latestWave ptr %p\n", avatar->mainQWave->wave);
 	qCx *latestWave = mainQWave->wave;
 
-//	printf("qViewBuffer::loadViewBuffer space->nPoints %d\n", space->nPoints);
+	//	printf("qViewBuffer::loadViewBuffer space->nPoints %d\n", space->nPoints);
 	int nPoints = space->nPoints;
 	double highest = 0;
 	double tiny = 1e-8;
@@ -99,7 +138,7 @@ float qViewBuffer::loadViewBuffer(void) {
 		twoRowPtr[0] = re * tiny;
 		twoRowPtr[1] = im * tiny;
 
-		twoRowPtr[2] = potPtr[0];  // this isn't going to be used yet
+		twoRowPtr[2] = potPtr[0];  // given PotentialArea.js, I don't think this will be used again
 		twoRowPtr[3] = pointNum * 2.;  // vertexSerial: at zero
 
 		twoRowPtr[4] = re;
@@ -127,48 +166,6 @@ float qViewBuffer::loadViewBuffer(void) {
 	return highest;
 }
 
-// dump the view buffer just before it heads off to webgl.
-void qViewBuffer::dumpViewBuffer(const char *title) {
-//	printf("dumpViewBuffer theSpace %p\n", theSpace);
-//	printf("dumpViewBuffer qViewBuffer ptr %p\n", theSpace->qViewBuffer);
-//	printf("dumpViewBuffer vBuffer %p\n", theSpace->qvBuffer->vBuffer);
-	//float *vBuffer = avatar->qvBuffer->vBuffer;
-	printf("📺 The vBuffer = %p\n", vBuffer);
-	double prevRe = vBuffer[0];
-	double prevIm = vBuffer[1];
-
-	if (!title) title = "";
-	printf("==== 📺 dump vBuffer | %s\n", title);
-	printf("   ix  |    re      im     pot    serial  |   phase    magn\n");
-	for (int i = 0; i < space->nPoints*2; i++) {
-		double re = vBuffer[i*4];
-		double im = vBuffer[i*4+1];
-		if (i & 1) {
-			double dRe = re - prevRe;
-			double dIm = im - prevIm;
-			double phase = 0.;
-			double magn = 0.;
-			phase = atan2(im, re) * 180 / PI;
-			magn = im * im + re * re;
-			printf("%6d |  %6.3f  %6.3f  %6.3f  %6.3f  |  %6.3f  %6.3f\n",
-				i,
-				re, im, vBuffer[i*4+2], vBuffer[i*4+3],
-				phase, magn);
-
-			prevRe = re;
-			prevIm = im;
-		}
-		else {
-			printf("%6d |  %6.3f  %6.3f  %6.3f  %6.3f \n",
-				i,
-				re, im, vBuffer[i*4+2], vBuffer[i*4+3]);
-		}
-	}
-	printf("    qViewBuffer::at end of dumpViewBuffer qViewBuffer=%p  qViewBuffer->vBuffer=%p\n",
-			this, vBuffer);
-}
-
-
 // for the JS side
 extern "C" {
 	void qViewBuffer_dumpViewBuffer(const char *title) {
@@ -185,7 +182,13 @@ extern "C" {
 		return theQViewBuffer->vBuffer;
 	}
 
-	// returns the highest height of norm of wave entries
+	// load up the Avatar's view buffer based on the Avatar's wave buffer
+	// returns the highest height of norm of wave entries (old)
+	double qAvatar_loadViewBuffer(qAvatar *avatar) {
+		return avatar->qvBuffer->loadViewBuffer();
+	}
+
+	// returns the highest height of norm of wave entries (old)
 	double qViewBuffer_loadViewBuffer(void) {
 		if (debugViewBuffer)
 			printf("📺 qViewBuffer_getViewBuffer... theQViewBuffer=%p\n", theQViewBuffer);

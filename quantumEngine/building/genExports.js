@@ -52,6 +52,7 @@ exportsSrc  = [
 	// views
 	{name: 'qViewBuffer_getViewBuffer', retType: 'number', args: []},
 	{name: 'qViewBuffer_loadViewBuffer', retType:  'number', args: []},
+	{name: 'qAvatar_loadViewBuffer', retType:  'number', args: ['number']},
 	{name: 'qViewBuffer_dumpViewBuffer', retType: null, args: ['string']},
 
 	// FFT

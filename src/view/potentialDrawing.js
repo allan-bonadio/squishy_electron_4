@@ -7,7 +7,10 @@ import {abstractDrawing} from './abstractDrawing';
 import qe from '../engine/qe';
 import {viewUniform, viewAttribute} from './viewVariable';
 //import SquishPanel from '../SquishPanel';
-//import {qeStartPromise} from '../engine/eEngine';
+//import {eSpaceCreatedPromise} from '../engine/eEngine';
+
+this is obsolete
+!@#$%^&*()
 
 /* ******************************************************* unit height management */
 
@@ -95,14 +98,14 @@ export class potentialDrawing extends abstractDrawing {
 		this.rowAttr = new viewAttribute('row', this);
 		this.vertexCount = nPoints * 2;  // nPoints * vertsPerBar
 		this.rowFloats = 4;
-		this.rowAttr.attachArray(qe.space.vBuffer, this.rowFloats);
+		this.rowAttr.attachArray(qe.space.mainVBuffer, this.rowFloats);
 
 
 
 
 		if (traceGLSLCalc) {
 			// try to recreate what the vertex shader does
-			let vBuffer = qe.space.vBuffer;
+			let vBuffer = qe.space.mainVBuffer;
 			let ix;
 			for (ix = 0; ix < nPoints*2; ix++) {
 

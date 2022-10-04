@@ -8,7 +8,7 @@ import cxToColorGlsl from './cxToColor.glsl';
 import qe from '../engine/qe';
 import {viewUniform, viewAttribute} from './viewVariable';
 //import SquishPanel from '../SquishPanel';
-//import {qeStartPromise} from '../engine/eEngine';
+//import {eSpaceCreatedPromise} from '../engine/eEngine';
 
 let dumpViewBufAfterDrawing = false;
 let traceHighest = false;
@@ -76,6 +76,10 @@ void main() {
 
 // the original display that's worth watching: flat upside down hump graph
 export class flatDrawing extends abstractDrawing {
+	// apparently supplied by default
+	//constructor(viewDef, space, avatar) {
+	//	super(viewDef, space, avatar);
+	//}
 
 	static drawingClassName: 'flatDrawing';
 	drawingClassName: 'flatDrawing';
@@ -90,7 +94,7 @@ export class flatDrawing extends abstractDrawing {
 
 	setInputs() {
 		// loads view buffer from main wave, calculates highest norm, which we use below.
-		const highest = qe.qViewBuffer_loadViewBuffer();
+		const highest = qe.qAvatar_loadViewBuffer(this.avatar.pointer);
 
 		// smooth it out otherwise the wave sortof bounces up and down a little on each step
 		// must find a way to set the avgHighest
@@ -114,7 +118,7 @@ export class flatDrawing extends abstractDrawing {
 		this.rowAttr = new viewAttribute('row', this);
 		this.vertexCount = nPoints * 2;  // nPoints * vertsPerBar
 		this.rowFloats = 4;
-		this.rowAttr.attachArray(qe.space.vBuffer, this.rowFloats);
+		this.rowAttr.attachArray(this.space.mainVBuffer, this.rowFloats);
 	}
 
 	// call this when you reset the wave otherwise the smoothing is surprised
