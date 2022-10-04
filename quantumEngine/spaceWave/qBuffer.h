@@ -44,14 +44,14 @@ struct qBuffer {
 
 	// spectrums don't have wraparounds boundaries so spectrums calculate different numbers from waves.
 	// should be in accord with the space, sortof, depending on whether wave or spectrum.
-	int nPoints; int start; int end, continuum;
+	int nPoints, start, end, continuum;
 
 	// if it used the first constructor
 	// this has, among other things, the count of points and states in all qWave buffers
 	// but for just a bare qBuffer, this can be null, for freelance buffers.
 	qSpace *space;
 
-	bool dynamicallyAllocated: 1;
+	bool dynamicallyAllocated;
 
 	// print one complex number, plus maybe some more calculated metrics for that point,
 	// on a line in the dump on stdout.
