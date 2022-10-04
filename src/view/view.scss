@@ -8,7 +8,7 @@
 	position: relative;
 
 	/* canvas itself: bottom layer */
-	canvas.squishCanvas {
+	canvas.GLView {
 		position: absolute;
 		border: 1px #666 inset;
 		z-index: 10;
@@ -16,7 +16,7 @@
 
 	// overlay with frame count and virtual time, on top of canvas
 	aside.viewOverlay {
-		//position: absolute;
+		position: absolute;
 		z-index: 20;
 		//border: 1px #48c solid;
 
@@ -38,6 +38,7 @@
 			border: 3px transparent;
 			border-style: outset none none outset;
 			z-index: 10;
+			cursor: ns-resize;
 
 			&:hover {
 				border-color: #aaa;
@@ -48,7 +49,6 @@
 
 	svg.PotentialArea {
 		$potentialColor: white;
-
 
 		position: relative;
 		z-index: 30;
