@@ -20,7 +20,7 @@
 EM_JS(void, qeStarted, (int mDimensions, int mLabel),
 {
 	// maybe we can tighten this up a bit someday
-	setTimeout(() => quantumEngineHasStarted(mDimensions, mLabel), 500);
+	setTimeout(() => quantumEngineHasStarted(mDimensions, mLabel), 400);
 }
 );
 
