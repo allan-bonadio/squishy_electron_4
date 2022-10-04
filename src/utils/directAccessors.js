@@ -11,7 +11,9 @@ export function prepForDirectAccessors(_this, pointer) {
 	// we directly access fields in this C++ object,
 	// cuz the overhead from each js-C++ call is kindof large
 	_this.pointer = pointer;
-	_this.doubles = new Float64Array(window.Module.HEAPF64.buffer, pointer);
-	_this.ints = new Uint32Array(window.Module.HEAPU32.buffer, pointer);
-	_this.bools = new Uint8Array(window.Module.HEAPU8.buffer, pointer);
+
+	// these lengths are only for convenience in the debugger; adjust as needed
+	_this.doubles = new Float64Array(window.Module.HEAPF64.buffer, pointer, 10);
+	_this.ints = new Uint32Array(window.Module.HEAPU32.buffer, pointer, 20);
+	_this.bools = new Uint8Array(window.Module.HEAPU8.buffer, pointer, 80);
 }

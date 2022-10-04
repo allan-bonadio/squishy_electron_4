@@ -7,6 +7,14 @@
 
 cd `dirname $0`
 
+if [ -z "$qEMSCRIPTEN" ]
+then
+	echo 'You have to define qEMSCRIPTEN in your login stuff like .profile or .bashrc'
+	echo 'for this whole project'
+	exit 5
+fi
+
+
 . $qEMSCRIPTEN/emsdk/emsdk_env.sh
 # was formerly /emsdk-main/ but should be fixed now
 
@@ -26,7 +34,7 @@ emcc -o quantumEngine.js -sLLD_REPORT_UNDEFINED \
 	-sASSERTIONS=2 -sSAFE_HEAP=1 -sSTACK_OVERFLOW_CHECK=2 \
 	-sDEMANGLE_SUPPORT=1 -sNO_DISABLE_EXCEPTION_CATCHING \
 	-sEXPORTED_FUNCTIONS=@building/exports.json \
-	-sEXPORTED_RUNTIME_METHODS='["ccall","cwrap","getValue","setValue"]' \
+	-sEXPORTED_RUNTIME_METHODS='["ccall","cwrap","UTF8ArrayToString"]' \
 	$PROFILING \
 	-DLABEL_LEN=$LABEL_LEN \
 	-I$qEMSCRIPTEN/emsdk/upstream/emscripten/cache/sysroot/include \
