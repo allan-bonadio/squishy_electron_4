@@ -31,9 +31,9 @@ extern qViewBuffer *theQViewBuffer;
 
 // JS interface
 extern "C" {
-	void qViewBuffer_dumpViewBuffer(const char *title = NULL);
-	float *qViewBuffer_getViewBuffer(void);
-	double qViewBuffer_loadViewBuffer(void);  // deprecated
-	double qAvatar_loadViewBuffer(qAvatar *avatar);
+	void avatar_dumpViewBuffer(qAvatar *avatar, const char *title = NULL);
+	float *avatar_getViewBuffer(qAvatar *avatar);
+	//double qViewBuffer_loadViewBuffer(void);  // deprecated
+	double avatar_loadViewBuffer(qAvatar *avatar);
 }
 
