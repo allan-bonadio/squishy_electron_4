@@ -9,7 +9,8 @@
 #include "../spaceWave/qWave.h"
 
 
-static bool debugVisscher = false;
+static bool traceOneStep = false;
+static bool traceRealStep = false;  // in detail
 static bool debugHalfway = false;  // confusing, not reccommended
 static bool traceVischerBench = false;
 
@@ -89,25 +90,29 @@ other way: 1nm = 1e-9m   square = 1e-18 m^2 times that number = 1.72759854921802
 // the 𝜓i values in buffer 0 are still uncalculated
 void qAvatar::stepReal(qCx *newW, qCx *oldW, double dt) {
 	qDimension *dims = space->dimensions;
-	//printf("⚛️ start of stepReal");
+	if (traceRealStep) printf("⚛️ start of stepReal nStates=%d, nPoints=%d, start=%d, end=%d\n",
+			space->nStates, space->nPoints, dims->start, dims->end);
 	//dumpThat(oldW, true);
 
 	for (int ix = dims->start; ix < dims->end; ix++) {
 		// second deriv wrt x of psi
 		double d2𝜓i = oldW[ix-1].im + oldW[ix+1].im - oldW[ix].im * 2;
+		if (traceRealStep) printf("⚛️ stepReal ix=%d\n", ix);
 
 		// total hamiltonian including potential
 		double H𝜓 = d2𝜓i + potential[ix] * potentialFactor * oldW[ix].re;
 		//double H𝜓 = d2𝜓i;   // without potential
 
 		// note subtraction
+		if (traceRealStep) printf("⚛️ stepReal ix=%d\n", ix);
 		newW[ix].re = oldW[ix].re - dt * H𝜓;
+		if (traceRealStep) printf("⚛️ stepReal ix=%d\n", ix);
 		qCheck("vischer stepReal", newW[ix]);
 	}
 	if (traceVischerBench) printf("      stepReal, on to fix boundaries: time=%lf\n",
 		getTimeDouble());
 	mainQWave->fixThoseBoundaries(newW);
-	//printf("⚛️ end of stepReal:");
+	if (traceRealStep) printf("⚛️ end of stepReal:");
 }
 
 // second step: advance the Imaginaries of 𝜓 a dt, from dt/2 to 3dt/2
@@ -150,28 +155,28 @@ void qAvatar::oneVisscherStep(qWave *newQWave, qWave *oldQWave) {
 
 	qDimension *dims = space->dimensions;
 	oldQW->fixBoundaries();
-	if (debugVisscher) oldQW->dump("starting oneVisscherStep", true);
+	if (traceOneStep) oldQW->dump("starting oneVisscherStep: old wave", true);
 
 	if (traceVischerBench) printf("         oneVisscherStep, about to stepReal: time=%lf\n",
 		getTimeDouble());
-	stepReal(oldW, newW, dt);
+	stepReal(newW, oldW, dt);
 	if (debugHalfway) newQWave->dump("Visscher wave after the Re step", true);
 	// now at an half-odd fraction of dt
 
 	if (traceVischerBench) printf("         oneVisscherStep, about to stepImaginary: time=%lf\n",
 		getTimeDouble());
-	stepImaginary(oldW, newW, dt);
+	stepImaginary(newW, oldW, dt);
 	// now at an integer fraction of dt
 
 	// ok so after this, the time has advanced dt, and real is at elapsedTime and
 	// imaginary is at elapsedTime + dt/2.  Yes the re and the im are not synchronized.
-	// it was Visscher's idea.  I think he got it from someone else.
+	// it was Visscher's idea.  I think he got it from ballistics calculations.
 	elapsedTime += dt;
 
-	if (debugVisscher) {
-		char atVisscher[100];
-		snprintf(atVisscher, 100, "at end of Visscher frame %1.0lf | ", iterateSerial);
-		newQW->dump(atVisscher, true);
+	if (traceOneStep) {
+		char msg[100];
+		snprintf(msg, 100, "at end of Visscher:new, frame %1.0lf | ", iterateSerial);
+		newQW->dump(msg, true);
 	}
 	if (traceVischerBench) printf("         oneVisscherStep, done: time=%lf\n", getTimeDouble());
 }
