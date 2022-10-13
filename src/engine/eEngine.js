@@ -41,13 +41,14 @@ export function create1DMainSpace(params) {
 		// that they've been waiting for
 		eSpaceCreatedSucceed(space);
 	} catch (ex) {
+		// this is called from eSpaceCreatedPromise so trigger its fail
 		eSpaceCreatedFail(ex);
 	}
 }
 
 // do NOT export this; it's global cuz quantumEngine.js, the compiled C++ proxy,
 // has to have access to it early on
-function quantumEngineHasStarted(mDimensions, mLabel) {
+function quantumEngineHasStarted() {
 	//console.log(`quantumEngineHas...Started`, mDimensions, mLabel);
 	defineQEngineFuncs();
 	//qeDefineAccess();

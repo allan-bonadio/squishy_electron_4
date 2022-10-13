@@ -17,26 +17,23 @@
 // call this JS callback so JS knows we're up and ready.
 // Hand it some sizes for the heck of it.
 // somehow there's a race condition where this isn't set soon enough... sometimes
-EM_JS(void, qeStarted, (int mDimensions, int mLabel),
+EM_JS(void, qeStarted, (),
 {
 	// maybe we can tighten this up a bit someday
-	setTimeout(() => quantumEngineHasStarted(mDimensions, mLabel), 400);
+	setTimeout(() => quantumEngineHasStarted(), 400);
 }
 );
 
 
 // emscripten calls main() when the whole C++ is all set up.  Tell the JS guys.
 int main() {
-	printf("bonjour le monde! sizeof(qDimension) = %lx, sizeof(qSpace) = %lx\n",
-		sizeof(qDimension), sizeof(qSpace));
+	printf("bonjour le monde!\n");
 
 	// call the above function with arbitrary numbers to keep everybody amused
-	qeStarted(180, 18);
+	qeStarted();
 
-
-	printf("alignof(double) = %ld, alignof(int) = %ld, alignof(int *) = %ld, alignof(bool) = %ld\n",
-		alignof(double), alignof(int), alignof(int *), alignof(bool));
+	//printf("alignof(double) = %ld, alignof(int) = %ld, alignof(int *) = %ld, alignof(bool) = %ld\n",
+	//	alignof(double), alignof(int), alignof(int *), alignof(bool));
 	return 0;
 }
-
 
