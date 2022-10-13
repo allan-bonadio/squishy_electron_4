@@ -5,6 +5,34 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
+import {interpretCppException} from './utils/errors';
+
+// before ANYTHING happens
+//window.addEventListener("error", ev => {
+//	console.error(`window error handler`, ev);
+//	debugger;
+//
+//	let ex = interpretCppException(ev.error);
+//
+//	let style = "position: fixed; padding: 5em; "
+//		+ "min-width: 25em; left: 30%; right: 30%; "
+//		+ "min-height: 10em; top: 20%; right: 40%; "
+//		+ "border: 3px #aaa outset; color: #000; background-color: #f44; "
+//		+ "text-align: center; z-index: 100; overflow-wrap: break-word; ";
+//
+//	let html = `
+//	<h3>Sorry, Squishy Electron got an error.</h3>
+//	<p>${ex.stack || ex.message || JSON.stringify(ex)}</p>
+//	<p><i><small>:${ev.lineno}:${ev.colno}</small></i></p>
+//	<button onclick='location=location' style='padding: 1em; border-radius: 1em;'>reload</button>`;
+//
+//	let asideEl = document.createElement('aside');
+//	asideEl.setAttribute('style', style);
+//	asideEl.innerHTML = html;
+//	document.body.insertAdjacentElement('beforeend', asideEl);
+//
+//});
+
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(<App />);

@@ -14,12 +14,17 @@ export function dumpJsStack(where = 'somewhere') {
 
 /* ****************************************************** error/exception handling from C++ */
 
+// c++ wiill set this in exceptions.cpp
+window.cppErrorStack = '';
+
 // class of errors that come from inside C++
 class cppError extends Error {
 	constructor(exNumber) {
 		super('from C++: ' + window.UTF8ToString(qe.getCppExceptionMessage(exNumber)));
 
-// 		name = 'cppError';
+		console.info(`cppError(${exNumber}) =>`, window.UTF8ToString(qe.getCppExceptionMessage(exNumber)));
+		//this.stack = this.message + window.cppErrorStack;
+		//window.cppErrorStack = '';
 		this.code = exNumber;
 	}
 
