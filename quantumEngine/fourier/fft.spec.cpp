@@ -1,5 +1,5 @@
 /*
-** fft spec - testing FFT code for Squishy Electron
+** fft spec - testing fft code for Squishy Electron
 ** Copyright (C) 2022-2022 Tactile Interactive, all rights reserved
 */
 
@@ -19,7 +19,7 @@
 bool traceDumpWaves = true;
 bool tracing = false;
 
-TEST_GROUP(FFT)
+TEST_GROUP(fft)
 {
 };
 
@@ -36,9 +36,9 @@ static void tryOutFFT(int N, double freq) {
 	original->setCircularWave(freq);
 	if (traceDumpWaves) original->dump("    tryOutFFT:  orignal wave set", true);
 
-	qSpectrum *spect = new qSpectrum(space);
-	spect->generateSpectrum(original);
-	if (traceDumpWaves) spect->dumpSpectrum("    tryOutFFT: generated spectrum");
+	qSpectrum *qspect = new qSpectrum(space);
+	qspect->generateSpectrum(original);
+	if (traceDumpWaves) qspect->dumpSpectrum("    tryOutFFT: generated spectrum");
 
 	// now there should be 1 number that's nonzero; we should be able to predict what and where
 	// should be real and should be at position freq from whichever end
@@ -51,7 +51,7 @@ static void tryOutFFT(int N, double freq) {
 	if (tracing) printf("     tryOutFFT: ... pos=%d  expected=%lf\n", pos, expected);
 
 	// now verify that
-	qCx *sw = spect->wave;
+	qCx *sw = qspect->wave;
 	for (int ix = 0; ix < N; ix++) {
 		char reBuf[100], imBuf[100];
 		qCx s = sw[ix];
@@ -67,23 +67,23 @@ static void tryOutFFT(int N, double freq) {
 	}
 
 	delete original;
-	delete spect;
+	delete qspect;
 	delete space;
 	if (tracing) printf("     finished tryOutFFT\n");
 }
 
-TEST(FFT, SpectrumFFT8_1) { tryOutFFT(8, 1.); }
-TEST(FFT, SpectrumFFT8_2) { tryOutFFT(8, 2.); }
-TEST(FFT, SpectrumFFT8_3) { tryOutFFT(8, 3.); }
-TEST(FFT, SpectrumFFT8__1) { tryOutFFT(8, -1.); }
-TEST(FFT, SpectrumFFT8__4) { tryOutFFT(8, -4.); }
-TEST(FFT, SpectrumFFT8_0) { tryOutFFT(8, 0.); }
+TEST(fft, SpectrumFFT8_1) { tryOutFFT(8, 1.); }
+TEST(fft, SpectrumFFT8_2) { tryOutFFT(8, 2.); }
+TEST(fft, SpectrumFFT8_3) { tryOutFFT(8, 3.); }
+TEST(fft, SpectrumFFT8__1) { tryOutFFT(8, -1.); }
+TEST(fft, SpectrumFFT8__4) { tryOutFFT(8, -4.); }
+TEST(fft, SpectrumFFT8_0) { tryOutFFT(8, 0.); }
 
-TEST(FFT, SpectrumFFT32_1) { tryOutFFT(32, 1); }
-TEST(FFT, SpectrumFFT32__8) { tryOutFFT(32, -8); }
+TEST(fft, SpectrumFFT32_1) { tryOutFFT(32, 1); }
+TEST(fft, SpectrumFFT32__8) { tryOutFFT(32, -8); }
 
-TEST(FFT, SpectrumFFT64_2) { tryOutFFT(64., 2); }
-//TEST(FFT, SpectrumFFT1024) { tryOutFFT(1024); }
+TEST(fft, SpectrumFFT64_2) { tryOutFFT(64., 2); }
+//TEST(fft, SpectrumFFT1024) { tryOutFFT(1024); }
 
 /* ********************************************************************** Square Wave */
 
@@ -103,9 +103,9 @@ static void trySquareWaveFFT(int N) {
 		o[ix] = qCx(-1);
 
 	// make a spectrum and FFT it
-	qSpectrum *spect = new qSpectrum(space);
-	spect->generateSpectrum(original);
-	if (traceDumpWaves) spect->dumpSpectrum("    trySquareWaveFFT: generated spectrum");
+	qSpectrum *qspect = new qSpectrum(space);
+	qspect->generateSpectrum(original);
+	if (traceDumpWaves) qspect->dumpSpectrum("    trySquareWaveFFT: generated spectrum");
 
 	// resulting spectrum looks like this: alternating 2s (-1...1) and zeroes for the real
 	// imaginary has different values that are mirrored in negative in the complementary point
@@ -115,7 +115,7 @@ static void trySquareWaveFFT(int N) {
 	//	[3] (  2.0000, -6.5931) ...
 
 	// two rows at a time:
-	qCx *sw = spect->wave;
+	qCx *sw = qspect->wave;
 	for (int ix = 0; ix < N; ix += 2) {
 		char reBuf[100], imBuf[100];
 		qCx pt = sw[ix];
@@ -132,16 +132,16 @@ static void trySquareWaveFFT(int N) {
 	}
 
 	delete original;
-	delete spect;
+	delete qspect;
 	delete space;
 	if (tracing) printf("      finished trySquareWaveFFT\n");
 }
 
 
-TEST(FFT, SquareWaveFFT4) {trySquareWaveFFT(4);}
-TEST(FFT, SquareWaveFFT8) {trySquareWaveFFT(8);}
-TEST(FFT, SquareWaveFFT16) {trySquareWaveFFT(16);}
-TEST(FFT, SquareWaveFFT32) {trySquareWaveFFT(32);}
+TEST(fft, SquareWaveFFT4) {trySquareWaveFFT(4);}
+TEST(fft, SquareWaveFFT8) {trySquareWaveFFT(8);}
+TEST(fft, SquareWaveFFT16) {trySquareWaveFFT(16);}
+TEST(fft, SquareWaveFFT32) {trySquareWaveFFT(32);}
 
 
 
@@ -168,13 +168,13 @@ static void tryInverseFFT(int N, double seed) {
 	if (traceDumpWaves) original->dump("    tryInverseFFT:  orignal wave set", true);
 
 	// make a spectrum and FFT it
-	qSpectrum *spect = new qSpectrum(space);
-	spect->generateSpectrum(original);
-	if (traceDumpWaves) spect->dumpSpectrum("    tryInverseFFT: generated spectrum");
+	qSpectrum *qspect = new qSpectrum(space);
+	qspect->generateSpectrum(original);
+	if (traceDumpWaves) qspect->dumpSpectrum("    tryInverseFFT: generated spectrum");
 
 	// now convert it back
 	qWave *result = new qWave(space);
-	spect->generateWave(result);
+	qspect->generateWave(result);
 
 	// make sure it's the same
 	qCx *r = result->wave;
@@ -188,18 +188,18 @@ static void tryInverseFFT(int N, double seed) {
 
 	delete result;
 	delete original;
-	delete spect;
+	delete qspect;
 	delete space;
 	if (tracing) printf("     finished tryInverseFFT\n");
 }
 
 // a variety of situations
-TEST(FFT, InverseFFT8_234) {tryInverseFFT(8, .234);}
-TEST(FFT, InverseFFT16_771) {tryInverseFFT(16, .771);}
-TEST(FFT, InverseFFT32_909) {tryInverseFFT(32, .909);}
-TEST(FFT, InverseFFT64_699) {tryInverseFFT(64, .699);}
-TEST(FFT, InverseFFT256_006) {tryInverseFFT(256, .006);}
-TEST(FFT, InverseFFT2048_500) {tryInverseFFT(2048, .500);}
+TEST(fft, InverseFFT8_234) {tryInverseFFT(8, .234);}
+TEST(fft, InverseFFT16_771) {tryInverseFFT(16, .771);}
+TEST(fft, InverseFFT32_909) {tryInverseFFT(32, .909);}
+TEST(fft, InverseFFT64_699) {tryInverseFFT(64, .699);}
+TEST(fft, InverseFFT256_006) {tryInverseFFT(256, .006);}
+TEST(fft, InverseFFT2048_500) {tryInverseFFT(2048, .500);}
 
 
 
