@@ -18,47 +18,46 @@ const fs = require('fs');
 exportsSrc  = [
 	// args and retType can be 'number', 'string', 'array' (of bytes), or null meaning void.
 	// That's all.  Anything more complex, you have to make up out of those with multiple calls or a typed array.
-	{name: 'main', retType: 'number', args: []},
+	{name: 'main', args: [], retType: 'number'},
 
 	// recreating the space
-	{name: 'startNewSpace', retType: 'number', args: ['string']},
-	{name: 'addSpaceDimension', retType: null,
-		args: ['number', 'number', 'string']},
-	{name: 'completeNewSpace', retType: 'number', args: []},
-	{name: 'deleteTheSpace', retType: null, args: []},
+	{name: 'startNewSpace', args: ['string'], retType: 'number'},
+	{name: 'addSpaceDimension', args: ['number', 'number', 'string'], retType: null},
+	{name: 'completeNewSpace', args: [], retType: 'number'},
+	{name: 'deleteTheSpace', args: [], retType: null},
 
 
 	// gets
-	{name: 'getCppExceptionMessage', retType: 'number', args: ['number']},
+	{name: 'getCppExceptionMessage', args: ['number'], retType: 'number'},
+
+
+	// the potential
+	{name: 'qSpace_dumpPotential', args: ['string'], retType: 'number'},
+	// now done in js {name: 'qSpace_setZeroPotential', args: [], retType: 'number'},
+	// now done in js {name: 'qSpace_setValleyPotential', args: ['number', 'number', 'number'], retType: 'number'},
+
+	// params
+//converted to direct{name: 'Avatar_setDt', args: ['number'], retType: null},
+//converted to direct{name: 'Avatar_setStepsPerIteration', args: ['number'], retType: null},
+//converted to direct{name: 'Avatar_setLowPassFilter', args: ['number'], retType: null},
+
+
+	// views
+	{name: 'avatar_getViewBuffer', args: ['number'], retType: 'number'},
+//converted to direct{name: 'qViewBuffer_loadViewBuffer', args: ['number'], retType:  'number'},
+	{name: 'avatar_dumpViewBuffer', args: ['number', 'string'], retType: null},
+
+	// avatars - all accept an integer pointer to the avatar as first argument
+	{name: 'avatar_loadViewBuffer', args: ['number'], retType:  'number'},
+	{name: 'avatar_oneIteration', args: ['number'], retType: 'number'},
+	{name: 'avatar_askForFFT', args: ['number'], retType: null},
+	{name: 'avatar_normalize', args: ['number'], retType: null},
+	{name: 'avatar_delete', args: ['number'], retType: null},
 
 
 	// the qAvatar ones act on theAvatar in the c++ code
-//converted to direct{name: 'Avatar_getElapsedTime', retType: 'number', args: []},
-//converted to direct{name: 'Avatar_getIterateSerial', retType: 'number', args: []},
-
-	// the potential
-	{name: 'qSpace_dumpPotential', retType: 'number', args: ['string']},
-	// now done in js {name: 'qSpace_setZeroPotential', retType: 'number', args: []},
-	// now done in js {name: 'qSpace_setValleyPotential', retType: 'number', args: ['number', 'number', 'number']},
-
-	// params
-//converted to direct{name: 'Avatar_setDt', retType: null, args: ['number']},
-//converted to direct{name: 'Avatar_setStepsPerIteration', retType: null, args: ['number']},
-//converted to direct{name: 'Avatar_setLowPassFilter', retType: null, args: ['number']},
-
-	{name: 'Avatar_oneIteration', retType: 'number', args: []},
-	//{name: 'Avatar_resetCounters', retType: null, args: []},
-
-	// views
-	{name: 'qViewBuffer_getViewBuffer', retType: 'number', args: []},
-	{name: 'qViewBuffer_loadViewBuffer', retType:  'number', args: []},
-	{name: 'qAvatar_loadViewBuffer', retType:  'number', args: ['number']},
-	{name: 'qViewBuffer_dumpViewBuffer', retType: null, args: ['string']},
-
-	// FFT
- 	//{name: 'testFFT', retType: null, args: []},
-	{name: 'Avatar_askForFFT', retType: null, args: []},
-	{name: 'Avatar_normalize', retType: null, args: []},
+//converted to direct{name: 'Avatar_getElapsedTime', args: [], retType: 'number'},
+//converted to direct{name: 'Avatar_getIterateSerial', args: [], retType: 'number'},
 ];
 
 // remember you don't have to export your func like this, you can do one-offs for testing with ccall():
