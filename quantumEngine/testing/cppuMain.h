@@ -28,7 +28,7 @@ extern void proveItsMine(void *buf, size_t size);
 // make sure they're equal, both the waves and the nPoints, start and end
 extern void compareWaves(struct qBuffer *expected, struct qBuffer *actual);
 
-extern void isAllZeroesExceptFor(qBuffer *qwave,
+extern bool isAllZeroesExceptFor(qBuffer *qwave,
 	int except1 = -1, int except2 = -1);
 
 /* *************************************************** rando generator */

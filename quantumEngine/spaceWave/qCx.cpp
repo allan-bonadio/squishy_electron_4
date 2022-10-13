@@ -6,12 +6,6 @@
 #include "../squish.h"
 
 
-// Tolerance for ==.  Absolute, not relative, we're comparing 𝜓 values here.
-// all values are |𝜓| <1, and typically |𝜓| > roundoff error
-// these are not really the radius, it's more rectangular, but pretty much the same idea
-#define ERROR_RADIUS  1e-12
-
-
 qCx qCx::operator/(qCx b) {
 	double det = b.norm();
 	return qCx(

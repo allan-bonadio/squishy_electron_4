@@ -70,7 +70,7 @@ salientPointersType *fullSpaceSalientPointers = NULL;
 // the way JS does it.  Needed for lots of tests.
 // You are (usually) responsible for deleting it with deleteTheSpace().
 // Space generated in theSpace.  Old theSpace triggers error if you don't deleteTheSpace().
-// frees and reallocates laos, peru, thePotential and the ViewBuffer
+// frees and reallocates thePotential and the ViewBuffer
 qSpace *makeFullSpace(int N) {
 	if (traceMakeSpace) printf("🧨 🧨  starting makeFullSpace(%d), about to startNewSpace\n", N);
 
@@ -85,7 +85,7 @@ qSpace *makeFullSpace(int N) {
 }
 
 // 1d space, not with all the crud from above.
-// qSpace returned; you are responsible for deleting it and allocating buffers.
+// qSpace returned; you are responsible for deleting it and allocating avatars.
 // this space, you should be able to delete it directly with: delete space;
 qSpace *makeBareSpace(int N, int continuum) {
 	if (traceMakeSpace) printf("🧨 🧨 makeBareSpace(%d)\n", N);
@@ -140,17 +140,16 @@ void compareWaves(qBuffer *qexpected, qBuffer *qactual) {
 }
 
 
-#define IAZ_TOLERANCE   1e-12
-
 static void complexEqualText(qCx cx1, qCx cx2, const char *msg) {
 	//printf("checking.   see if (%lf %lf) == (%lf %lf) close enough.\n",
 	//	cx1.re, cx1.im, cx2.re, cx2.im);
-	DOUBLES_EQUAL_TEXT(cx1.re, cx2.re, IAZ_TOLERANCE, msg);
-	DOUBLES_EQUAL_TEXT(cx1.im, cx2.im, IAZ_TOLERANCE, msg);
+	DOUBLES_EQUAL_TEXT(cx1.re, cx2.re, ERROR_RADIUS, msg);
+	DOUBLES_EQUAL_TEXT(cx1.im, cx2.im, ERROR_RADIUS, msg);
 }
 
 // need this to verify waves have a certain specific frequency.  Do this to the spectrum.
-void isAllZeroesExceptFor(qBuffer *qwave, int except1, int except2) {
+// returns TRUE if OK, false if not
+bool isAllZeroesExceptFor(qBuffer *qwave, int except1, int except2) {
 	qCx *wave = qwave->wave;
 	int start = qwave->start;
 	int end = qwave->end;
@@ -162,14 +161,21 @@ void isAllZeroesExceptFor(qBuffer *qwave, int except1, int except2) {
 		sprintf(buf, "wave at [%d]  bad value = %8.8lf %8.8lf",
 			ix, re, im);
 
-		if (ix != except1 && ix != except2)
-			complexEqualText(cx, qCx(0), buf);
-		else
-			CHECK_TEXT(cx.norm() > IAZ_TOLERANCE, buf);
+		if (ix != except1 && ix != except2) {
+			if (cx != 0) {
+				printf("%s", buf);
+				return false;
+			}
+		}
+		else {
+			if (cx.norm() < ERROR_RADIUS) {
+				printf("%s", buf);
+				return false;
+			}
+		}
 	}
+	return true;
 }
-
-
 
 /* ********************************************** my favorite random number generator */
 

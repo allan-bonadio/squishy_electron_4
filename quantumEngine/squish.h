@@ -28,4 +28,9 @@
 // return elapsed time since last page reload, in seconds
 extern double getTimeDouble();
 
+// Tolerance for ==.  Absolute, not relative, we're comparing 𝜓 values here.
+// all values are |𝜓| <1, and typically |𝜓| > roundoff error
+// these are not really the radius, it's more rectangular, but pretty much the same idea
+#define ERROR_RADIUS  1e-12
+
 #endif
