@@ -3,6 +3,7 @@
 ** Copyright (C) 2021-2022 Tactile Interactive, all rights reserved
 */
 
+let traceGLCalls = true;
 
 // attr arrays and uniforms that can change on every frame.
 // you can set a static value or a function that'll return it
@@ -15,10 +16,10 @@ export class viewVariable {
 	constructor(varName, owner) {
 		this.owner = owner;
 		this.gl = owner.gl;
-		this.vaoExt = owner.vaoExt;
+		//this.vaoExt = owner.vaoExt;
 
 		this.varName = varName;
-		if (! varName || ! owner) throw `bad name${!varName} or owner${!owner} used to create a view var`;
+		if (! varName || ! owner) throw new Error(`bad name${!varName} or owner${!owner} used to create a view var`);
 
 		// both views and drawings often have this array, so 'owner' might not be a view
 		let vv = owner.viewVariables;
@@ -29,6 +30,7 @@ export class viewVariable {
 		vv.push(this);
 
 		this.bufferDataDrawMode = owner.bufferDataDrawMode;
+		if (traceGLCalls) console.log(`created viewVariable '${varName}', owner:`, owner);
 	}
 }
 
@@ -48,7 +50,8 @@ export class viewUniform extends viewVariable {
 
 		// this turns out to be an internal magic object
 		this.uniformLoc = this.gl.getUniformLocation(this.owner.program, varName);
-		if (!this.uniformLoc) throw `Cannot find uniform loc for uniform variable ${varName}`;
+		if (!this.uniformLoc) throw new Error(`Cannot find uniform loc for uniform variable ${varName}`);
+		if (traceGLCalls) console.log(`created viewUniform '${varName}'`);
 	}
 
 	// change the value, sortof, by one of these two ways:
@@ -64,11 +67,13 @@ export class viewUniform extends viewVariable {
 		if (typeof valueVar == 'function') {
 			this.getFunc = valueVar;
 			this.staticValue = this.staticType = undefined;
+			if (traceGLCalls) console.log(`set function value on viewUniform '${this.varName}'`);
 		}
 		else {
 			this.staticValue = valueVar;
 			this.staticType = type;
 			this.getFunc = undefined;
+			if (traceGLCalls) console.log(`set static value ${valueVar} on viewUniform '${this.varName}'`);
 		}
 		this.reloadVariable();
 	}
@@ -86,12 +91,12 @@ export class viewUniform extends viewVariable {
 		}
 
 		// you can't pass null or undefined
-		if ((! value && value !== 0 && value !== '' && value !== false) || ! type)
-			throw `uniform variable has no value(${value}) or no type(${type})`;
+		if (null == value || null == type)
+			throw new Error(`uniform variable has no value(${value}) or no type(${type})`);
 		const gl = this.gl;
 		const pgm = this.owner.program;
 
-		gl.useProgram(pgm);  // a Gain?
+		//gl.useProgram(pgm);  // a Gain?
 
 		// do i have to do this again?
 		this.uniformLoc = gl.getUniformLocation(pgm, this.varName);
@@ -107,9 +112,12 @@ export class viewUniform extends viewVariable {
 		//console.log(`reload Uniform variable ${this.varName} with `+
 		//	` method gl.${method}() with these args:`, args);
 
-		gl.useProgram(pgm);  // a Gain?
+		//gl.useProgram(pgm);  // a Gain?
 
 		gl[method].apply(gl, args);  // wish me luck
+
+		if (traceGLCalls) console.log(`viewUniform.reloadVariable '${this.varName}' to:`, args);
+
 		//this.gl.uniform1f(this.uniformLoc, value);
 		//this.gl.uniform1i(this.uniformLoc, value);
 	}
@@ -130,7 +138,8 @@ export class viewAttribute extends viewVariable {
 		const atLo = this.attrLocation = gl.getAttribLocation(owner.program, varName);
 
 		if (atLo < 0)
-			throw `viewAttribute:attr loc for '${varName}' is bad: `+ atLo;
+			throw new Error(`viewAttribute:attr loc for '${varName}' is bad: `+ atLo);
+		if (traceGLCalls) console.log(`created viewAttribute '${varName}'`);
 	}
 
  	// call after construction.  has <float32TypedArray> data input,
@@ -147,9 +156,9 @@ export class viewAttribute extends viewVariable {
 		// magical vao which is apparently a list of cpu-side buffers.
 		// Each is named with some integer in opengl, but I don't think we see these in webgl 1.
 		// you have to dispose of it ultimately
-		const vaoExt = this.vaoExt;
-		let vao = this.vao = vaoExt.createVertexArrayOES();
-		vaoExt.bindVertexArrayOES(vao);
+		//const vaoExt = this.vaoExt;
+		//let vao = this.vao = vaoExt.createVertexArrayOES();
+		//vaoExt.bindVertexArrayOES(vao);
 		// now do calls to bindBuffer() or vertexAttribPointer()
 		// a Record of these will be "recorded" in the VAO
 
@@ -177,6 +186,8 @@ export class viewAttribute extends viewVariable {
 //		gl.enableVertexAttribArray(this.attrLocation);
 //
 //		gl.vertexAttribPointer(this.attrLocation, size, gl.FLOAT, false, stride, offset);
+		if (traceGLCalls) console.log(`viewAttribute '${this.varName}' set to size=${size}, stride=${stride}, offset=${offset} first row:`,
+				float32TypedArray[0], float32TypedArray[1], float32TypedArray[2], float32TypedArray[3]);
 
 		this.reloadVariable();
 	}
@@ -185,12 +196,15 @@ export class viewAttribute extends viewVariable {
 	// No function; the original array must change its values.
 	reloadVariable() {
 		const gl = this.gl;
-		//console.log(`reload Array variable ${this.varName} : `, this.float32TypedArray);
+		//console.log(`reload Array variable ${this.this.varName} : `, this.float32TypedArray);
 		// not sure we have to do this again...
 		gl.bindBuffer(gl.ARRAY_BUFFER, this.glBuffer);
 
 		// do we have to do THIS again?  Does it just slurp it up from the pointer from last time?!?!
 		gl.bufferData(gl.ARRAY_BUFFER, this.float32TypedArray, this.bufferDataDrawMode);
+
+		if (traceGLCalls) console.log(`viewAttribute '${this.varName}' reloaded:`,
+				this.float32TypedArray[0], this.float32TypedArray[1], this.float32TypedArray[2], this.float32TypedArray[3]);
 	}
 
 }

@@ -3,6 +3,8 @@
 ** Copyright (C) 2021-2022 Tactile Interactive, all rights reserved
 */
 
+import {abstractDrawing} from './abstractDrawing';
+
 
 // Each abstractViewDef subclass is a definition of a kind of view; one per each kind of view.
 // (A WaveView owns an instance of the def and is a React component enclosing the canvas.)
@@ -34,6 +36,7 @@ export class abstractViewDef {
 		// all of the drawings in this view
 		// they get prepared, and drawn, in this same order
 		this.drawings = [];
+		//this.drawings = [new abstractDrawing(this)];
 
 		// really a global, for this file and all descenden tviews and drawings
 		// and variables, so this is how you turn this one way
@@ -52,7 +55,7 @@ export class abstractViewDef {
 			gl = this.gl = this.canvas.getContext("experimental-webgl");  // really old
 
 
-		if (!gl) throw `Sorry this browser doesn't do WebGL!  You might be able to turn it on ...`;
+		if (!gl) throw new Error(`Sorry this browser doesn't do WebGL!  You might be able to turn it on ...`);
 		this.gl = gl;
 
 		/*
@@ -79,9 +82,9 @@ export class abstractViewDef {
 		*/
 
 
-		this.vaoExt = gl.getExtension('OES_vertex_array_object');
-		if (! this.vaoExt) throw `Sorry this browser doesn't do OES_vertex_array_object!`+
-				`\nI guess I can't blame you, how would you know.`;
+		//this.vaoExt = gl.getExtension('OES_vertex_array_object');
+		//if (! this.vaoExt) throw `Sorry this browser doesn't do OES_vertex_array_object!`+
+		//		`\nI guess I can't blame you, how would you know.`;
 	}
 
 	// the final call to set it up does all viewClassName-specific stuff
@@ -120,7 +123,7 @@ export class abstractViewDef {
 		const msg = gl.getShaderInfoLog(shader);
 		gl.deleteShader(shader);
 		if (35633 == type) type = 'vertex';
-		throw `Error compiling ${type} shader for ${this.viewName}: ${msg}`;
+		throw new Error(`Error compiling ${type} shader for ${this.viewName}: ${msg}`);
 	}
 
 	// call this with your sources in setShaders().
@@ -149,7 +152,7 @@ export class abstractViewDef {
 
 		const msg = gl.getProgramInfoLog(program);
 		gl.deleteProgram(program);
-		throw `Error linking program for ${this.viewName}: ${msg}`;
+		throw new Error(`Error linking program for ${this.viewName}: ${msg}`);
 	}
 
 	// this does shaders and inputs, iterating thru the list of drawings
@@ -161,29 +164,6 @@ export class abstractViewDef {
 			drawing.setShaders();
 		});
 	}
-
-	//
-	// 	// wrong: abstract supermethod: write your setShaders() function to compile your two GLSL sources
-	// 	originalSetShaders() {
-	// 		this.vertexShaderSrc = `
-	// 		attribute vec4 corner;
-	//
-	// 		void main() {
-	// 			gl_Position = corner;
-	// 		}
-	// 		`;
-	//
-	// 		this.fragmentShaderSrc = `
-	// 		precision highp float;  // does this do anything?
-	// 		uniform int cornerColor;
-	//
-	// 		void main() {
-	// 		  gl_FragColor = vec4(.5, 1, float(cornerColor)/100., 1);
-	// 		}
-	// 		`;
-	//
-	// 		this.compileProgram();
-	// 	}
 
 	/* ************************************************** buffers & variables */
 
@@ -197,30 +177,7 @@ export class abstractViewDef {
 		});
 	}
 
-	//
-	// 	// wrong: abstract supermethod: all subclasses should write their own setInputs() method.
-	// 	// mostly, creating viewVariables that can be dynamically changed
-	// 	originalSetInputs() {
-	// //		const {gl, canvas} = this;
-	//
-	// 		new viewUniform('cornerColor', this,
-	// 			() => ({value: 42, type: '1i'}));
-	//
-	// 		const cornerAttr = this.cornerAttr = new viewAttribute('corner', this);
-	//
-	// 		//const cornerAttributeLocation = gl.getAttribLocation(this.program, 'corner');
-	// //		const cornerBuffer = gl.createBuffer();  // actual ram in GPU chip
-	// //		gl.bindBuffer(gl.ARRAY_BUFFER, cornerBuffer);
-	//
-	// 		const sin = Math.sin;
-	// 		const cos = Math.cos;
-	// 		const corners = new Float32Array([
-	// 			cos(2), sin(2),
-	// 			cos(4), sin(4),
-	// 			cos(6), sin(6),
-	// 		]);
-	// 		cornerAttr.attachArray(corners, 2);
-	//
+
 	// // i think this is for webgl 2:
 	// //		var vao = this.vaoExt.createVertexArrayOES();
 	// //		this.vaoExt.bindVertexArrayOES(vao);
@@ -233,7 +190,6 @@ export class abstractViewDef {
 	// //		const stride = 0;        // 0 = move forward size * sizeof(type) each iteration to get the next position
 	// //		const offset = 0;        // start at the beginning of the vBuffer
 	// //		gl.vertexAttribPointer(cornerAttributeLocation, size, type, normalize, stride, offset);
-	// 	}
 
 	// reload ALL the variables on this view
 	reloadAllVariables() {
@@ -260,6 +216,7 @@ export class abstractViewDef {
 		const gl = this.gl;
 
 		// solid opaque black
+		//gl.clearColor(.8, .6, .4, 1);
 		gl.clearColor(0, 0, 0, 1);
 		gl.clear(gl.COLOR_BUFFER_BIT);
 	}
@@ -449,7 +406,7 @@ export class abstractViewDef {
 		/* ==================  attrs */
 
 //CFTW
-		var positionAttributeLocation, positionBuffer, positions, vao;
+		var positionAttributeLocation, positionBuffer, positions;
 		if (false) {
 
 			positionAttributeLocation = gl.getAttribLocation(program, "corner");
@@ -466,8 +423,8 @@ export class abstractViewDef {
 			];
 			gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(positions), this.bufferDataDrawMode);
 
-			vao = this.vaoExt.createVertexArrayOES();
-			this.vaoExt.bindVertexArrayOES(vao);
+			//vao = this.vaoExt.createVertexArrayOES();
+			//this.vaoExt.bindVertexArrayOES(vao);
 
 			gl.enableVertexAttribArray(positionAttributeLocation);
 
@@ -483,7 +440,7 @@ export class abstractViewDef {
 			this.setInputs();
 			positionAttributeLocation = this.viewVariables[0].attrLocation;
 			positionBuffer = this.viewVariables[0].glBuffer;
-			vao = this.viewVariables[0].vao;
+			//vao = this.viewVariables[0].vao;
 		}
 
 
@@ -509,7 +466,7 @@ export class abstractViewDef {
 			gl.clear(gl.COLOR_BUFFER_BIT);
 
 			// Tell it to use our program (pair of shaders)
-			gl.useProgram(program);
+			//gl.useProgram(program);
 
 			// Bind the attribute/vBuffer set we want. ... again?
 			//this.vaoExt.bindVertexArrayOES(vao);

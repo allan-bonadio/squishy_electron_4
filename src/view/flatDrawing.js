@@ -5,7 +5,7 @@
 
 import {abstractDrawing} from './abstractDrawing';
 import cxToColorGlsl from './cxToColor.glsl';
-import qe from '../engine/qe';
+//import qe from '../engine/qe';
 import {viewUniform, viewAttribute} from './viewVariable';
 //import SquishPanel from '../SquishPanel';
 //import {eSpaceCreatedPromise} from '../engine/eEngine';
@@ -13,20 +13,21 @@ import {viewUniform, viewAttribute} from './viewVariable';
 let dumpViewBufAfterDrawing = false;
 let traceHighest = false;
 
+// diagnostic purposes
+let alsoDrawPoints = true;
+let alsoDrawLines = true;
+//alsoDrawLines =0;
+
+let ps = alsoDrawPoints ? `gl_PointSize = (row.w+1.) * 5.;//10.;` : '';
+
 /* ******************************************************* flat drawing */
 
 /*
 ** data format of attributes:  four column table of floats
-** 𝜓.re  𝜓.im   potential    ...0?...
+** 𝜓.re  𝜓.im   (potential unused)    ...0?...
 ** uses gl_VertexID to figure out whether the y should be re^2+im^2  NO! opengl 2 only
 ** or zero
 */
-
-// diagnostic purposes
-let alsoDrawPoints = false, alsoDrawLines = false;
-//alsoDrawLines =0;
-
-let ps = alsoDrawPoints ? `gl_PointSize = (row.w+1.) * 5.;//10.;` : '';
 
 // make the line number for the start correspond to this JS file line number
 const vertexSrc = `${cxToColorGlsl}
@@ -88,13 +89,15 @@ export class flatDrawing extends abstractDrawing {
 		this.vertexShaderSrc = vertexSrc;
 		this.fragmentShaderSrc = fragmentSrc;
 		this.compileProgram();
-		this.gl.useProgram(this.program);
+		this.gl.useProgram(this.program);  // should be the only time I do useProgram()
 	}
 
 
 	setInputs() {
-		// loads view buffer from main wave, calculates highest norm, which we use below.
-		const highest = qe.qAvatar_loadViewBuffer(this.avatar.pointer);
+		// loads view buffer from corresponding wave, calculates highest norm, which we use below.
+		this.avatar.dumpViewBuffer('before loaded');
+		const highest = this.avatar.loadViewBuffer();
+		this.avatar.dumpViewBuffer('just loaded');
 
 		// smooth it out otherwise the wave sortof bounces up and down a little on each step
 		// must find a way to set the avgHighest
@@ -129,7 +132,7 @@ export class flatDrawing extends abstractDrawing {
 	draw() {
 		const gl = this.gl;
 
-		gl.useProgram(this.program);
+		// should not be necessary!!  gl.useProgram(this.program);
 		//this.rowAttr.reloadVariable()
 
 		//gl.bindVertexArray(this.vao);
@@ -147,7 +150,7 @@ export class flatDrawing extends abstractDrawing {
 
 		// i think this is problematic
 		if (dumpViewBufAfterDrawing)
-			qe.qViewBuffer_dumpViewBuffer(`finished drawing in flatDrawing.js; drew buf:`);
+			this.avatar.dumpViewBuffer(`finished drawing in flatDrawing.js; drew buf:`);
 	}
 }
 

@@ -18,7 +18,8 @@ class flatDrawingViewDef extends abstractViewDef {
 		}
 
 		// create relevant drawings
-		new flatDrawing(this, space);
+		//new flatDrawing(this, space);
+		this.drawings = [new flatDrawing(this, space)];
 	}
 }
 

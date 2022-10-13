@@ -31,7 +31,7 @@ export class abstractDrawing {
 		this.viewVariables = [];
 
 		this.gl = viewDef.gl;
-		this.vaoExt = viewDef.vaoExt;
+		//this.vaoExt = viewDef.vaoExt;
 
 		this.bufferDataDrawMode = viewDef.bufferDataDrawMode;
 		//bufferDataDrawMode = this.gl.STATIC_DRAW;
@@ -39,7 +39,7 @@ export class abstractDrawing {
 		this.space = viewDef.space;
 		this.avatar = viewDef.avatar;
 
-		viewDef.drawings.push(this);
+		// no.  viewDef does this by just setting the drawings array with the drawings it wants.  viewDef.drawings.push(this);
 	}
 
 	/* ************************************************** Shader Creation/Compile */
@@ -57,7 +57,7 @@ export class abstractDrawing {
 		const msg = gl.getShaderInfoLog(shader);
 		gl.deleteShader(shader);
 		if (35633 == type) type = 'vertex';
-		throw `Error compiling ${type} shader for ${this.viewName}: ${msg}`;
+		throw new Error(`Error compiling ${type} shader for ${this.viewName}: ${msg}`);
 	}
 
 	// call this with your sources in setShaders().
@@ -86,7 +86,7 @@ export class abstractDrawing {
 
 		const msg = gl.getProgramInfoLog(program);
 		gl.deleteProgram(program);
-		throw `Error linking program abstractDrawing for ${this.viewDef.viewName}: ${msg}`;
+		throw new Error(`Error linking program abstractDrawing for ${this.viewDef.viewName}: ${msg}`);
 	}
 
 	/* **************************************************  test drawing */
@@ -102,7 +102,7 @@ export class abstractDrawing {
 		`;
 
 		this.fragmentShaderSrc = `
-		precision highp float;  // does this do anything?
+		precision highp float;
 
 		void main() {
 			// bright purple
@@ -133,7 +133,7 @@ export class abstractDrawing {
 		gl.clearColor(.5, 0, .5, 1.);
 		gl.clear(gl.COLOR_BUFFER_BIT);
 
-		gl.useProgram(this.program);
+		//gl.useProgram(this.program);
 
 		// one purple dot
 		gl.drawArrays(gl.POINTS, 0, 1);
