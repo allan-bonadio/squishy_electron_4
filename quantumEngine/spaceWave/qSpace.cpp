@@ -14,6 +14,8 @@
 #include "../fourier/fftMain.h"
 
 
+static bool traceQSpace = false;
+
 /* ********************************************************** qSpace construction */
 
 // note if you just use the constructor and these functions,
@@ -21,7 +23,7 @@
 qSpace::qSpace(const char *lab)
 	: magic('qSpa'), nDimensions(0), potential(NULL), nPoints(0), nStates(0), potentialFactor(.1) {
 
-	//printf("🚀 🚀 qSpace::qSpace() constructor starts label:'%s'  this= %p\n", lab, (this));
+	if (traceQSpace) printf("🚀 🚀 qSpace::qSpace() constructor starts label:'%s'  this= %p\n", lab, (this));
 
 	strncpy(label, lab, LABEL_LEN);
 	label[LABEL_LEN] = 0;
@@ -29,8 +31,8 @@ qSpace::qSpace(const char *lab)
 	if (LABEL_LEN != 7 && LABEL_LEN != 15 && LABEL_LEN != 31)
 		throw std::runtime_error("🚀 🚀 bad value for LABEL_LEN defined at compiler");
 
-	//printf("🚀 🚀 qSpace::qSpace() constructor done this= %p, length %lx\n",
-	//	(this), sizeof(qSpace));
+	if (traceQSpace) printf("🚀 🚀 qSpace::qSpace() constructor done this= %p, length %lx\n",
+			(this), sizeof(qSpace));
 }
 
 // after the contructor, call this to add each dimension up to MAX_DIMENSIONS
@@ -74,16 +76,7 @@ void qSpace::tallyDimensions(void) {
 
 	spectrumLength = dimensions[0].spectrumLength;
 
-	//if (nPoints > spectrumLength)
-	//	freeBufferLength = nPoints;
-	//else
-	//	freeBufferLength = spectrumLength;
-	//if (traceFreeBuffer) {
-	//	printf("🚀 🚀 qSpace::tallyDimensions, nPoints=%d   spectrumLength=%d   freeBufferLength=%d   ",
-	//		nPoints, spectrumLength, freeBufferLength);
-	//}
-
-	//printf("🚀 🚀  got past tallyDimensions; nStates=%d  nPoints=%d\n", nStates, nPoints);
+	if (traceQSpace) printf("🚀 🚀  got past tallyDimensions; nStates=%d  nPoints=%d\n", nStates, nPoints);
 }
 
 // call this After addDIMENSION calls to get it ready to go.
@@ -110,17 +103,13 @@ void qSpace::initSpace() {
 }
 
 qSpace::~qSpace(void) {
-//	printf("🚀 🚀 qSpace destructor starting %s, this= %p  \n", label, (this));
+	if (traceQSpace) printf("🚀 🚀 qSpace destructor starting %s, this= %p  \n", label, (this));
 
 	// not there if initSpace() never called
 	if (potential)
 		delete[] potential;
 
-
-	// these cached buffers need to go free... OBSOLETE
-	//clearFreeBuffers();
-
-//	printf("🚀 🚀 qSpace destructor done this= %p\n", (this));
+	if (traceQSpace) printf("🚀 🚀 qSpace destructor done this= %p\n", (this));
 }
 
 
@@ -145,78 +134,3 @@ void qSpace::dumpPotential(const char *title) {
 	printf("🚀 🚀 == Potential %s, %d...%d\n", title, dims->start, dims->end);
 }
 
-// now done in JS and szero is not a special case anymore
-//void qSpace::setZeroPotential(void) {
-//	qDimension *dims = dimensions;
-//	printf("setZeroPotential\n");
-//	for (int ix = 0; ix < dims->nPoints; ix++)
-//		thePotential[ix] = 0.;
-//
-//	potentialFactor = 1.;
-//}
-
-// obsolete; now done in JS.
-//void qSpace::setValleyPotential(double power = 1, double scale = 1, double offset = 0) {
-//	printf("setValleyPotential power=%10.3lf  scale=%10.3lf  offset=%10.3lf\n", power, scale, offset);
-//	qDimension *dims = dimensions;
-//	double mid = round(dims->nStates * offset / 100) + dims->start;
-//	for (int ix = dims->start; ix < dims->end; ix++) {
-//		thePotential[ix] = pow(abs(ix - mid), power) * scale + offset;
-//	}
-//
-//	potentialFactor = 1.;
-//}
-
-
-
-/* ********************************************************** FreeBuffer - ALL OBSOLETE */
-
-// this is all on the honor system.  If you borrow a buf, you either have to return it
-// with returnBuffer() or you free it with freeWave().
-//qCx *qSpace::borrowBuffer(void) {
-//	FreeBuffer *rentedCache = freeBufferList;
-//	if (rentedCache) {
-//		if (traceFreeBuffer) {
-//			printf("🚀 🚀 qSpace::borrowBuffer() with some cached. freeBufferList: %p\n",
-//			(freeBufferList));
-//		}
-//
-//		// there was one available on the free list, pop it off
-//		freeBufferList = rentedCache->next;
-//		return (qCx *) rentedCache;
-//	}
-//	else {
-//		// must make a new one
-//		if (traceFreeBuffer) {
-//			printf("🚀 🚀 qSpace::borrowBuffer() with none cached. freeBufferList: %p   freeBufferLength: %d\n",
-//				freeBufferList, freeBufferLength);
-//		}
-//		return allocateWave(freeBufferLength);
-//	}
-//}
-
-// return the buffer to the free list.  Potentially endless but probably not.
-// do not return buffers that aren't the right size - freeBufferLength
-//void qSpace::returnBuffer(qCx *rentedBuffer) {
-//	printf("rentedBuffer: %p  freeBufferList=%p",
-//		rentedBuffer, freeBufferList);
-//	FreeBuffer *rented = (FreeBuffer *) rentedBuffer;
-//	rented->next = freeBufferList;
-//	freeBufferList = rented;
-//}
-
-// this is the only way they're freed; otherwise they just collect.
-// shouldn't be too many, though.  Called by destructor.
-//void qSpace::clearFreeBuffers() {
-//	//printf("🚀 🚀 qSpace::clearFreeBuffers() starting. freeBufferList: %p\n",
-//	//freeBufferList);
-////	FreeBuffer *n = freeBufferList;
-////	for (FreeBuffer *f = freeBufferList; f; f = n) {
-////		n = f->next;
-////		printf("           🚀 🚀 about to free this one: f=%p, n=%p\n", f, n);
-////		freeWave((qCx *) f);
-////	}
-////	freeBufferList = NULL;
-//	//printf("              🚀 🚀 qSpace::clearFreeBuffers() done. freeBufferList=%p\n",
-//	//	freeBufferList);
-//}

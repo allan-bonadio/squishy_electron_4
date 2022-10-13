@@ -3,31 +3,15 @@
 ** Copyright (C) 2021-2022 Tactile Interactive, all rights reserved
 */
 
-#include <string>
+//#include <string.h>
 #include "qSpace.h"
 #include "../schrodinger/qAvatar.h"
 #include "qWave.h"
 #include "qViewBuffer.h"
 
-
-// turns out bind.h isn't needed; compiles fine
-//error still ... #include "/opt/dvl/emscripten/emsdk/upstream/emscripten/system/include/emscripten/bind.h"
-
-//found but error ... #include "/opt/dvl/emscripten/emsdk/upstream/emscripten/cache/sysroot/include/emscripten/bind.h"
-//found but error ... #include "/opt/dvl/emscripten/emsdk/upstream/emscripten/system/include/emscripten/bind.h"
-
-
-
-
-//not found #include <emscripten/bind.h>
-//not found #include <emscripten/system/include/emscripten/bind.h>
-//not found #include <emscripten/emsdk/upstream/emscripten/system/include/emscripten/bind.h>
-
-
-
-
 static bool traceSpaceCreation = false;
-
+static bool traceExceptions = false;
+static bool traceAvatarDetail = false;
 
 // 'the' globals are for the one and only SquishPanel being displayed on this
 // curent, preliminary version of SquishyElectron.  Along with various other
@@ -71,15 +55,15 @@ extern "C" {
 //	return theAvatar->mainQWave->wave;
 //}
 
-double Avatar_getElapsedTime(void) {
-	if (!theSpace) throw std::runtime_error("🚀 🚀 🚀 null space in getElapsedTime()");
-	return theAvatar->elapsedTime;
-}
-
-double Avatar_getIterateSerial(void) {
-	if (!theSpace) throw std::runtime_error("🚀 🚀 🚀 null space in getIterateSerial()");
-	return theAvatar->iterateSerial;
-}
+//double Avatar_getElapsedTime(void) {
+//	if (!theSpace) throw std::runtime_error("🚀 🚀 🚀 null space in getElapsedTime()");
+//	return theAvatar->elapsedTime;
+//}
+//
+//double Avatar_getIterateSerial(void) {
+//	if (!theSpace) throw std::runtime_error("🚀 🚀 🚀 null space in getIterateSerial()");
+//	return theAvatar->iterateSerial;
+//}
 
 void qSpace_dumpPotential(char *title) { theSpace->dumpPotential(title); }
 //void qSpace_setZeroPotential(void) { theSpace->setZeroPotential(); }
@@ -87,10 +71,12 @@ void qSpace_dumpPotential(char *title) { theSpace->dumpPotential(title); }
 //	theSpace->setValleyPotential(power, scale, offset);
 //}
 
+// obsolete
 void Avatar_setDt(double dt) {
 	theAvatar->dt = dt;
 }
 
+// obsolete
 // iterations are what the user sees.  steps are what Visscher does repeatedly.
 void Avatar_setStepsPerIteration(int stepsPerIteration) {
 	//printf("🚀 🚀 🚀 Avatar_setStepsPerIteration(%d)\n", stepsPerIteration);
@@ -104,6 +90,7 @@ void Avatar_setStepsPerIteration(int stepsPerIteration) {
 	//	theAvatar->stepsPerIteration, theSpace);
 }
 
+// obsolete
 // low pass filter.
 void Avatar_setLowPassFilter(int lowPassFilter) {
 	//printf("🚀 🚀 🚀 Avatar_setLowPassFilter(%d)\n", dilution);
@@ -112,15 +99,20 @@ void Avatar_setLowPassFilter(int lowPassFilter) {
 	//	theAvatar->lowPassFilter, theSpace);
 }
 
-void Avatar_oneIteration(void) { theAvatar->oneIteration(); }
-void Avatar_resetCounters(void) { theAvatar->resetCounters(); }
+void avatar_oneIteration(qAvatar *pointer) { pointer->oneIteration(); }
+//void Avatar_resetCounters(void) { pointer->resetCounters(); }
 
+// obsolete, i think
 // if iterating, FFT after the current iterate finishes.  If stopped, fft current wave.
-void Avatar_askForFFT(void) { theAvatar->askForFFT(); }
+void avatar_askForFFT(qAvatar *pointer) { pointer->askForFFT(); }
 
 // this will normalize with the C++ normalize which also sets maxNorm
-void Avatar_normalize(void) { theAvatar->mainQWave->normalize(); }
-
+void avatar_normalize(qAvatar *avatar) //{ pointer->mainQWave->normalize(); }
+{
+printf("avatar_normalize(%p) => '%s'\n", avatar, avatar->label);
+avatar->mainQWave->normalize();
+printf("avatar_normalize(%p) done\n", avatar);
+}
 
 /* ******************************************************** space creation from JS */
 
@@ -131,13 +123,12 @@ void Avatar_normalize(void) { theAvatar->mainQWave->normalize(); }
 // testing uses this return value.
 qSpace *startNewSpace(const char *label) {
 	if (traceSpaceCreation)
-		printf("🚀 🚀 🚀  startNewSpace(%s), theSpace=%p (should be zero)\n", label, theSpace);
+		printf("\n🚀 🚀 🚀  startNewSpace(%s), theSpace=%p (should be zero)\n", label, theSpace);
 
 	// use theSpace as a way of detecting if they were freed before.
 	if (theSpace)
 		throw std::runtime_error("Trying to start a new space when one already exists!");
 
-	//printf("🚀 🚀 🚀  startNewSpace: about to construct new space  itself '%s'\n", label);
 	theSpace = salientPointers.space = new qSpace(label);
 
 	//theAvatar = NULL;
@@ -167,9 +158,11 @@ struct salientPointersType *completeNewSpace(void) {
 	theSpace->initSpace();
 
 	if (theAvatar) throw std::runtime_error("🚀 🚀 🚀 theAvatar exists while trying to create new one");
-	theAvatar = salientPointers.theAvatar = new qAvatar(theSpace, "VisscherOneS");
+	if (traceAvatarDetail) printf("about to do avatars\n");
+	theAvatar = salientPointers.theAvatar = new qAvatar(theSpace, "mainAvatar");
+	if (traceAvatarDetail) printf("did mainAvatar\n");
 	salientPointers.miniGraphAvatar = new qAvatar(theSpace, "miniGraph");
-	//printf("did initSpace\n");
+	if (traceAvatarDetail) printf("did miniGraphAvatar\n");
 
 
 	if (thePotential) throw std::runtime_error("🚀 🚀 🚀 thePotential exists while trying to create new one");
@@ -190,7 +183,7 @@ struct salientPointersType *completeNewSpace(void) {
 
 // dispose of ALL of that
 void deleteTheSpace() {
-	//printf("   🚀 🚀 🚀 deleteTheSpace(): starts\n");
+	if (traceSpaceCreation) printf("   🚀 🚀 🚀 deleteTheSpace(): starts\n");
 
 	// not there if completeNewSpace() never called, even if initSpace() called
 	if (theAvatar) {
@@ -203,11 +196,9 @@ void deleteTheSpace() {
 	// going to be deleted cuz it's part of the space
 	thePotential = NULL;
 
-	//printf("    deleteTheSpace(): finished freeWaves\n");
-
 	delete theSpace;
 	theSpace = NULL;
-	//printf("    deleteTheSpace(): done\n");
+	if (traceSpaceCreation) printf("    deleteTheSpace(): done\n");
 }
 
 
@@ -215,9 +206,14 @@ void deleteTheSpace() {
 // https://emscripten.org/docs/porting/Debugging.html#handling-c-exceptions-from-javascript
 const char *getCppExceptionMessage(intptr_t exceptionPtr) {
 	// what() returns a C string; pass pointer back to JS as integer
+	if (traceExceptions) printf("getCppExceptionMessage(%ld) \n",
+		exceptionPtr);
+	//if (exceptionPtr & 3)
+	//	return "bad exc ptr";
+	if (traceExceptions) printf("getCppExceptionMessage = '%s'\n",
+		 reinterpret_cast<std::exception *>(exceptionPtr)->what());
 	return reinterpret_cast<std::exception *>(exceptionPtr)->what();
 }
-
 
 // end of extern "C"
 }

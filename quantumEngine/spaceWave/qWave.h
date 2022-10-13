@@ -28,7 +28,7 @@ struct qWave : public virtual qBuffer {
 	//void lowPassFilter(double dilution = 0.01);
 	//void nyquistFilter(void);
 
-	void dumpOffsets(void);
+	void formatDirectOffsets(void);
 };
 
 

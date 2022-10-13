@@ -3,19 +3,12 @@
 ** Copyright (C) 2021-2022 Tactile Interactive, all rights reserved
 */
 
-
-
 //#include <cmath>
 #include "qSpace.h"
 #include "../schrodinger/qAvatar.h"
 #include "qWave.h"
 #include "../directAccessors.h"
 
-// a transitional kind of thing from raw wave arrays to the new qWave buffer obj
-class qWave *laosQWave = NULL, *peruQWave = NULL;
-class qCx *laosWave = NULL, *peruWave = NULL;
-
-int traceLowPassFilter = false;
 int traceConstDeconst = false;
 
 /* ************************************************************ birth & death & basics */
@@ -57,7 +50,7 @@ qWave::qWave(qSpace *sp, qCx *useThisBuffer)
 	//printf("justTesting...done with rainbowDump this from qWave::qWave\n");
 
 	// enable this when qWave.h fields change
-	//dumpOffsets();
+	//formatDirectOffsets();
 }
 
 qWave::~qWave(void) {
@@ -75,7 +68,7 @@ qWave::~qWave(void) {
 
 // Insert this into the constructor and run this once.  Copy text output.
 // Paste the output into class eWave, the class itself, to replace the existing ones
-void qWave::dumpOffsets(void) {
+void qWave::formatDirectOffsets(void) {
 	// don't need magic
 	printf("🚦 🚦 --------------- starting qWave direct access JS getters & setters --------------\n\n");
 
@@ -168,98 +161,3 @@ void qWave::prune() {
 	}
 }
 
-//#define LOW_PASS_WARMUP	20
-
-// these have to be in C++ cuz they're called during iteration
-
-// OBSOLETE!!
-// average the wave's points (by x) with the closest neighbors to fix the divergence
-// along the x axis I always see.  Since the density of our mesh is finite,
-// you can't expect noise at or near the nyquist frequency to be meaningful.
-// dilution works like this: formerly 1/2, it's the fraction of the next point
-// that comes from the avg of prevous points
-// Changes the wave in-place
-//void qWave::lowPassFilter(double lowPassFilter) {
-//	double concentration = 1. - lowPassFilter;
-//	if (traceLowPassFilter) printf("🌊🌊 qWave::lowPassFilter(%2.6d)\n", lowPassFilter);
-//
-//
-//	if (!scratchBuffer)
-//		scratchBuffer = allocateWave();
-//	qCx *wave = wave;
-//	qDimension *dims = space->dimensions;
-//
-//	// not sure we need this prune();
-//	//fixBoundaries();
-//
-//	qCx average;
-//	qCx temp;
-//
-//	// warm it up, get the average like the end if wraps around
-//	average = qCx(0);
-//	if (dims->continuum) {
-//		for (int ix = dims->end - LOW_PASS_WARMUP; ix < dims->end; ix++)
-//			average = wave[ix] * dilution + average * concentration;
-//		if (traceLowPassFilter) printf("   🌊🌊  quick prep for forward average: %lf %lf\n", average.re, average.im);
-//
-//		////average /= concentration;  // do I need this?  not if normalized after this
-//	}
-//
-//	// the length proper
-//	for (int ix = dims->start; ix < dims->end; ix++) {
-//		temp = wave[ix] * concentration + average * dilution;
-//		average = wave[ix] * dilution + average * concentration;
-//
-//		if (traceLowPassFilter) printf("   🌊🌊  lowPassBuffer %d forward run: %lf %lf\n", ix, temp.re, temp.im);
-//		scratchBuffer[ix] = temp;
-//	}
-//
-//	// now in the other direction - reversed
-//	average = 0;
-//	// the first few points at the start
-//	if (dims->continuum) {
-//		for (int ix = dims->start + LOW_PASS_WARMUP; ix >= dims->start; ix--)
-//			average = wave[ix] * dilution + average * concentration;
-//		if (traceLowPassFilter) printf("   🌊🌊  quick prep for reverse average: %lf %lf\n", average.re, average.im);
-//
-//		////average /= concentration;  // do I need this?
-//	}
-//
-//	// the length proper - remove the /2 if we normalize after this
-//	for (int ix = dims->end-1; ix >= dims->start; ix--) {
-//		temp = wave[ix] * concentration + average * dilution;
-//		average = wave[ix] * dilution + average * concentration;
-//		wave[ix] = (scratchBuffer[ix] + temp) / 2;
-//		if (traceLowPassFilter) printf("    🌊🌊 lowPassBuffer %d reverse run: (%lf %lf)\n", ix, temp.re, temp.im);
-//	}
-//
-//}
-//
-//// this is kindof a notch filter for frequency N/2 .  I'm losing confidence that this makes a diff.
-//void qWave::nyquistFilter(void) {
-//	if (traceLowPassFilter) printf("🌊🌊 qWave::nyquistFilter()\n");
-//
-//	if (!scratchBuffer)
-//		scratchBuffer = allocateWave(nPoints);  // this won't work if space changes resolution!
-//
-////	qCx *wave = wave;
-//	qDimension *dims = space->dimensions;
-//
-//	fixBoundaries();
-//
-//	// this should zero out the nyquist frequency exactly
-//	for (int ix = start; ix < end; ix++) {
-//		scratchBuffer[ix] = (wave[ix] + wave[ix] - wave[ix-1] - wave[ix+1]) / 4.;
-//
-////		printf("🌊🌊 %d scratchBuf=(%lf %lf) wave-1=(%lf %lf) wave0=(%lf %lf) wave+1=(%lf %lf)\n",
-////		ix,
-////		scratchBuffer[ix].re, scratchBuffer[ix].im,
-////		wave[ix-1].re, wave[ix-1].im, wave[ix].re, wave[ix].im, wave[ix+1].re, wave[ix+1].im);
-//	}
-//
-//
-//	copyThatWave(wave, scratchBuffer, nPoints);
-//
-////	dump("after nyquist filter");
-//}
-//
