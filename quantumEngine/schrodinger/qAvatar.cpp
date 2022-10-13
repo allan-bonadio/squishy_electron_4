@@ -3,7 +3,8 @@
 ** Copyright (C) 2022-2022 Tactile Interactive, all rights reserved
 */
 
-#include <string>
+#include <string.h>
+
 #include <ctime>
 #include <limits>
 #include <cfenv>
@@ -17,7 +18,7 @@
 #include "../directAccessors.h"
 
 
-static bool useFourierFilter = true;
+static bool useFourierFilter = false;
 
 static bool traceIteration = false;
 static bool traceIterSteps = false;
@@ -29,7 +30,7 @@ static bool traceFourierFilter = false;
 
 static bool dumpFFHiResSpectums = false;
 
-static bool traceSpace = true;
+static bool traceSpace = false;  // prints info about the space in the avatar constructor
 
 // only do some traces if we're past where it's a problem
 static int dangerousSerial = 4000;  // for the chord pulse
@@ -54,8 +55,12 @@ qAvatar::qAvatar(qSpace *sp, const char *lab)
 
 	mainQWave = new qWave(space);
 	scratchQWave = NULL;  // until used
-	spect = NULL;  // until used
+	qspect = NULL;  // until used
 	strncpy(label, lab, LABEL_LEN);
+	label[LABEL_LEN] = 0;
+	potential = sp->potential;
+	potentialFactor = sp->potentialFactor;
+
 	resetCounters();
 
 	// we always need a view buffer; that's the whole idea behind an avatar
@@ -75,19 +80,28 @@ qAvatar::qAvatar(qSpace *sp, const char *lab)
 	}
 
 	// enable this when qAvatar.h fields change
-	dumpOffsets();
+	//formatDirectOffsets();
 };
 
 qAvatar::~qAvatar(void) {
+	// we delete any buffers hanging off the qAvatar here.
+	// eAvatar will delete the Avatar object and any others needed.
+
+	// always allocated
 	delete mainQWave;
 	delete qvBuffer;
 
 	// these may or may not have been allocated, depending on whether they were needed
 	if (scratchQWave)
 		delete scratchQWave;
-	if (spect)
-		delete spect;
+	if (qspect)
+		delete qspect;
 };
+
+// called from JS
+void avatar_delete(qAvatar *avatar) {
+	delete avatar;
+}
 
 // some uses never need these so wait till they do
 qWave *qAvatar::getScratchWave(void) {
@@ -97,16 +111,16 @@ qWave *qAvatar::getScratchWave(void) {
 };
 
 qSpectrum *qAvatar::getSpectrum(void) {
-	if (!spect)
-		spect = new qSpectrum(space);
-	return spect;
+	if (!qspect)
+		qspect = new qSpectrum(space);
+	return qspect;
 };
 
 // need these numbers for the js interface to this object, to figure out the offsets.
 // see eAvatar.js ;  usually this function isn't called.
 // Insert this into the constructor and run this once.  Copy text output.
 // Paste the output into class eAvatar, the class itself, to replace the existing ones
-void qAvatar::dumpOffsets(void) {
+void qAvatar::formatDirectOffsets(void) {
 	// don't need magic
 	printf("🚦 🚦 --------------- starting qAvatar direct access JS getters & setters--------------\n\n");
 
@@ -135,8 +149,7 @@ void qAvatar::dumpOffsets(void) {
 	/* *********************************************** waves & buffers */
 
 	printf("\n");
-	makeIntGetter(mainQWave);
-	makeIntSetter(mainQWave);
+	makePointerGetter(mainQWave);
 
 	printf("\n");
 	makePointerGetter(potential);
@@ -148,7 +161,7 @@ void qAvatar::dumpOffsets(void) {
 
 	// for the fourier filter.  Call the function first time you need it.
 	printf("\n");
-	makePointerGetter(spect);
+	makePointerGetter(qspect);
 
 	// the qViewBuffer to be passed to webgl.  This is a visual thing after all.
 	makePointerGetter(qvBuffer);
@@ -161,6 +174,24 @@ void qAvatar::dumpOffsets(void) {
 void qAvatar::resetCounters(void) {
 	elapsedTime = 0.;
 	iterateSerial = 0;
+}
+
+/* ********************************************************** dumpObj  */
+
+void qAvatar::dumpObj(const char *title) {
+	printf("\n🌊🌊 ==== qAvatar | %s ", title);
+	printf("        magic: %c%c%c%c   qSpace=%p '%s'   \n",
+		magic>>3, magic>>2, magic>>1, magic, space, label);
+
+	printf("        elapsedTime %lf, iterateSerial  %lf, dt  %lf, lowPassFilter %d, stepsPerIteration %d\n",
+		elapsedTime, iterateSerial, dt, lowPassFilter, stepsPerIteration);
+
+	printf("        mainQWave %p, potential  %p, potentialFactor  %lf, scratchQWave %p, qspect %p, qViewBuffer %p\n",
+		mainQWave, potential, potentialFactor, scratchQWave, qspect, qvBuffer);
+
+	printf("        isIterating: %hhu   pleaseFFT=%hhu \n", isIterating, pleaseFFT);
+
+	printf("        ==== end of qAvatar ====\n\n");
 }
 
 /* ********************************************************** integration */
@@ -263,32 +294,33 @@ void qAvatar::oneIteration() {
 }
 
 
-
 // FFT the wave, cut down the high frequencies, then iFFT it back.
 // lowPassFilter is .. kinda changes but maybe #frequencies we zero out
 // Can't we eventually find a simple convolution to do this instead of FFT/iFFT?
 // maye after i get more of this working and fine toon it
+// lowPassFilter = number of freqs to squelch on BOTH sides, excluding nyquist
+// range 0...N/2-1
 void qAvatar::fourierFilter(int lowPassFilter) {
 	// this is when the wave tends to come apart with high frequencies
 	bool dangerousTimes = (iterateSerial >= dangerousSerial)
 		&& (((int) iterateSerial % dangerousRate) == 0);
 
-	spect = getSpectrum();
-	spect->generateSpectrum(mainQWave);
-	if (dumpFFHiResSpectums) spect->dumpSpectrum("spect right at start of fourierFilter()");
+	qspect = getSpectrum();
+	qspect->generateSpectrum(mainQWave);
+	if (dumpFFHiResSpectums) qspect->dumpSpectrum("qspect right at start of fourierFilter()");
 
 	// the high frequencies are in the middle
-	int nyquist = spect->nPoints/2;
-	qCx *s = spect->wave;
+	int nyquist = qspect->nPoints/2;
+	qCx *s = qspect->wave;
 
 	// the nyquist freq is at N/2, ALWAYS block that!!
 	s[nyquist] = 0;
 
 	if (traceFourierFilter)
 		printf("🌈  fourierFilter: nPoints=%d  nyquist=%d    lowPassFilter=%d\n",
-			spect->nPoints, nyquist, lowPassFilter);
+			qspect->nPoints, nyquist, lowPassFilter);
 
-	for (int k = 0; k < lowPassFilter; k++) {
+	for (int k = 1; k <= lowPassFilter; k++) {
 		s[nyquist + k] = 0;
 		s[nyquist - k] = 0;
 		if (traceEachFFSquelch && dangerousTimes) {
@@ -299,14 +331,14 @@ void qAvatar::fourierFilter(int lowPassFilter) {
 	}
 
 	if (traceEndingFFSpectrum && dangerousTimes) {
-			spect->dumpSpectrum("🐠  finished fourierFilter: spectrum");
+			qspect->dumpSpectrum("🐠  finished fourierFilter: spectrum");
 			//printf("frame iterateSerial=%lf, dangerousSerial=%d,  dangerousRate=%d\n",
 			//	iterateSerial, dangerousSerial, dangerousRate);
 	}
 
 
-	if (dumpFFHiResSpectums) spect->dumpSpectrum("spect right at END of fourierFilter()");
-	spect->generateWave(mainQWave);
+	if (dumpFFHiResSpectums) qspect->dumpSpectrum("qspect right at END of fourierFilter()");
+	qspect->generateWave(mainQWave);
 	if (dumpFFHiResSpectums) mainQWave->dumpHiRes("wave END fourierFilter() b4 normalize");
 	mainQWave->normalize();
 	if (dumpFFHiResSpectums) mainQWave->dumpHiRes("wave END fourierFilter() after normalize");

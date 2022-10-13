@@ -4,11 +4,14 @@
 */
 
 // formerly called: Manifestation, Incarnation, Timeline, ... formerly part of qSpace
+// Although many of these seem to belong to iteration, they also have to display.
+// Hence the Avatar object.  see also JS eAvatar
 
 struct qAvatar {
 	qAvatar(qSpace *, const char *label);
 	~qAvatar(void);
-	void dumpOffsets(void);
+	void formatDirectOffsets(void);
+	void dumpObj(const char *title);
 
 	int magic;
 	qSpace *space;
@@ -27,53 +30,38 @@ struct qAvatar {
 	double iterateSerial;
 
 
-	// params that the user can set
+	// params that the user can set/get
 	double dt;
 	int lowPassFilter;
 	int stepsPerIteration;
 
 	/* *********************************************** iteration */
 
-	// our main qWave
+	// our main qWave, either for the WaveView or the SetWave tab
+	// this OWNS the qWave
 	struct qWave *mainQWave;
 
-	// grabbed from the space upon each iteration start
+	// pointer grabbed from the space, often.  Same buffer as in space.
 	double *potential;
 	double potentialFactor;  // aligned by 8
 
 	//  and a scratch wave for stepping. Call the function first time you need it.
+	// owned if non-null
 	struct qWave *scratchQWave;
 	qWave *getScratchWave(void);
 
 	// for the fourier filter.  Call the function first time you need it.
-	struct qSpectrum *spect;
+	// owned if non-null
+	struct qSpectrum *qspect;
 	qSpectrum *getSpectrum(void);
 
 	// the qViewBuffer to be passed to webgl.  qAvatar is a visual thing after all.
+	// Avatar owns the qViewBuffer
 	struct qViewBuffer *qvBuffer;
 	// aligned by 4, not 8
 
-	// set the elapsedTime and iterateSerial to zero
-	void resetCounters(void);
-
-	// multiple steps; stepsPerIteration+1
-	void oneIteration(void);
-
-	void oneRk2Step(qWave *oldQWave, qWave *newQWave);  // obsolete
-	void oneRk4Step(qWave *oldQWave, qWave *newQWave);  // obsolete
-	void visscherHalfStep(qWave *oldQWave, qWave *newQWave);  // obsolete
-
-	void oneVisscherStep(qWave *newQWave, qWave *oldQWave);
-
-	// visscher
-	void stepReal(qCx *newW, qCx *oldW, double dt);
-	void stepImaginary(qCx *newW, qCx *oldW, double dt);
-
-	// kill high frequencies via FFTs
-	void fourierFilter(int lowPassFilter);
-
-	// set pleaseFFt from JS (only if in the middle of an iteration)
-	void askForFFT(void);
+	// mostly for debugging
+	char label[LABEL_LEN + 1];
 
 	// for alignment, put these last
 	bool isIterating;
@@ -82,8 +70,27 @@ struct qAvatar {
 	bool pleaseFFT;
 	// make sure the subsequent things are aligned!  or iteration is painfully slow.
 
-	// mostly for debugging
-	char label[LABEL_LEN + 1];
+	// set the elapsedTime and iterateSerial to zero
+	// this is obsoleted by DirectAccess
+	void resetCounters(void);
+
+	// multiple steps; ≈ stepsPerIteration
+	void oneIteration(void);
+
+	//void oneRk2Step(qWave *oldQWave, qWave *newQWave);  // obsolete
+	//void oneRk4Step(qWave *oldQWave, qWave *newQWave);  // obsolete
+	//void visscherHalfStep(qWave *oldQWave, qWave *newQWave);  // obsolete
+
+	// visscher
+	void stepReal(qCx *newW, qCx *oldW, double dt);
+	void stepImaginary(qCx *newW, qCx *oldW, double dt);
+	void oneVisscherStep(qWave *newQWave, qWave *oldQWave);
+
+	// kill high frequencies via FFTs
+	void fourierFilter(int lowPassFilter);
+
+	// set pleaseFFt from JS (only if in the middle of an iteration)
+	void askForFFT(void);
 };
 
 extern qAvatar *theAvatar;
@@ -93,18 +100,20 @@ extern qAvatar *theAvatar;
 // for JS to call
 extern "C" {
 
-	float *qViewBuffer_getViewBuffer();
-	double Avatar_getElapsedTime(void);
-	double Avatar_getIterateSerial(void);
+	// obsoleted by DirectAccess
+	//float *avatar_getViewBuffer(qAvatar *avatar);
+	//double Avatar_getElapsedTime(void);
+	//double Avatar_getIterateSerial(void);
 
 
-	void Avatar_oneIteration(void);
+	void avatar_oneIteration(qAvatar *avatar);
 
-	void Avatar_askForFFT(void);
-	void Avatar_normalize(void);
+	void avatar_askForFFT(qAvatar *avatar);
+	void avatar_normalize(qAvatar *avatar);
 
-	int manyRk2Steps(void);
-
+	// a qSpace does not contain any qAvatars
+	// an eSpace DOES contain two eAvatars; this how it deletes them from JS
+	void avatar_delete(qAvatar *avatar);
 }
 
 
