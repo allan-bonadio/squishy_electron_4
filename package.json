@@ -21,7 +21,7 @@
     "start": "craco start",
     "build": "craco build",
     "test": "craco test",
-    "startWOcraco": "PORT=4444 react-scripts start",
+    "startWOcraco": "react-scripts start",
     "buildWOcraco": "react-scripts build",
     "testWOcraco": "react-scripts test",
     "ejectdonteverdothis": "react-scripts eject"
