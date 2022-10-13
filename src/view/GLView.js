@@ -8,13 +8,15 @@
 
 import React from 'react';
 import PropTypes from 'prop-types';
-import qe from '../engine/qe';
+
+//import qe from '../engine/qe';
 //import {abstractViewDef} from './abstractViewDef';
 //import flatDrawingViewDef from './flatDrawingViewDef';
 //import {getASetting, storeASetting} from '../utils/storeSettings';
 
-//const listOfViewClasses = import('./listOfViewClasses');
+import eAvatar from '../engine/eAvatar';
 import {listOfViewClasses} from './listOfViewClasses';
+//import {eSpaceCreatedPromise} from '../engine/eEngine';
 
 let traceGLView = true;
 
@@ -23,15 +25,13 @@ class GLView extends React.Component {
 	static propTypes = {
 		viewClassName: PropTypes.string.isRequired,
 		viewName: PropTypes.string,
-		returnGLFuncs: PropTypes.func.isRequired,
-
-		// tells us when the space exists, and returns eSpace as a result.  From the SquishPanel
-		createdSpacePromise: PropTypes.instanceOf(Promise).isRequired,
+		//returnGLFuncs: PropTypes.func.isRequired,
 
 		width: PropTypes.number.isRequired,
 		height: PropTypes.number.isRequired,
 
-		avatar: PropTypes.object,
+		avatar: PropTypes.instanceOf(eAvatar),  // undefined early on
+		space: PropTypes.object,
 	}
 	static defaultProps = {
 		viewName: 'gl view',
@@ -39,93 +39,95 @@ class GLView extends React.Component {
 
 	constructor(props) {
 		super(props);
-		this.state = {};
-		props.returnGLFuncs(this.doRepaint);
+		this.state = {canvas: null};
+
+		if (traceGLView) console.log(`🖼 🖼 GLView:${props.viewName} : constructor done`);
 	}
 
-	// the canvas per panel, one panel per canvas.
-	// Only called when canvas is created (or recreated, someday)
-	//static setGLCanvasAgain = 0;
+	// When you know <canvas element, pass it here.
+	// Called every time canvas is created (or recreated) in a render
 	setGLCanvas =
 	(canvas) => {
+		if (!canvas) return;  // i have no idea why this happens but we can't use the canvas
+
 		const p = this.props;
-		if (this.space && this.canvas === canvas)
+		//const s = this.state;
+		if (this.canvas === canvas)
 			return;  // already done
 
-		//GLView.setGLCanvasAgain++;
-		//if (GLView.setGLCanvasAgain > 10) debugger;
-		//console.log(`for the ${GLView.setGLCanvasAgain}th time, GLView.setGLCanvas(...`, canvas);
+		this.setState({canvas}, () => console.log(`🖼 🖼 GLView:${p.viewName} : setGLCanvas set state completed`));
+		this.canvas = canvas;  // immediately available
 
-		if (canvas) {
-			this.canvas = canvas;
-			canvas.GLView = this;
-		}
+		canvas.GLView = this;
+		canvas.viewName = p.viewName;
 
-		// we need the space AND the canvas to make the views
-		// space is handed in thru this promise instead of by props
-		p.createdSpacePromise.then(space => {
-			// now create the draw view class instance as described by the space
-			// this is the flatDrawingViewDef class for webgl, not a CSS class or React class component
-			// do we do this EVERY RENDER?  probably not needed.
-
-			if (traceGLView) console.log(`setGLCanvas.then(...`, space);
-
-			this.space = space;
-			this.initViewClass();
-
-//			let vClass = listOfViewClasses[p.viewClassName];
-//			this.effectiveView = new vClass(p.viewName, this.canvas, space);
-//			this.effectiveView.completeView();
-//
-//			// ??? use this.currentView rather than state.currentView - we just set it
-//			// and it takes a while.
-//			// Make sure you call the new view's domSetup method.
-//			// maybe i should get rid of domSetup
-//			this.effectiveView.domSetupForAllDrawings(this.canvas);
-//
-//			// thsi will kick the WaveView to render.  Is this too intricate?
-//			p.setEffectiveView(this.effectiveView);
-
-			if (traceGLView) console.info(`GLView.compDidMount promise done`);
-
-		}).catch(ex => {
-			console.error(`error in GLView createdSpacePromise.then():`, ex.stack || ex.message || ex);
-			debugger;
-		});
-
+		if (traceGLView) console.log(`🖼 🖼 GLView:${p.viewName} : setGLCanvas done`);
 	}
 
 	// must do this after the canvas AND the space exist.
 	initViewClass =
 	() => {
 		const p = this.props;
+		//const s = this.state;
+
+		//let vClass = listOfViewClasses['abstractViewDef'];
 		let vClass = listOfViewClasses[p.viewClassName];
-		this.effectiveView = new vClass(p.viewName, this.canvas, this.space);
+
+		// MUST use the props.avatar!  we can't get it from the space, cuz which one?
+		this.effectiveView = new vClass(p.viewName, this.canvas, p.space, p.avatar);
 		this.effectiveView.completeView();
 
-		// ??? use this.currentView rather than state.currentView - we just set it
-		// and it takes a while.
 		// Make sure you call the new view's domSetup method.
-		// maybe i should get rid of domSetup
+		// i think this is redundant - completeView() also does this...
 		this.effectiveView.domSetupForAllDrawings(this.canvas);
 
-		// this will kick the GLView to render.  Is this too intricate?
-		// the guys upstairs need to know the effective view.
-		// not sure about this... p.setEffectiveView(this.effectiveView);
+		// now that there's an avatar, we can set these functions so everybody can use them.
+		p.avatar.doRepaint = this.doRepaint;
+		p.avatar.resetWave = this.resetWave;
+		p.avatar.setGeometry = this.setGeometry;
+		if (traceGLView) console.log(`🖼 🖼 GLView:${p.viewName} : done with initViewClass`);
+	}
+
+	// Tell the GLView & its view(s) that the wave contents have changed dramatically;
+	// essentiially refilled with different numbers.  In practice, just resets
+	// the avgHighest.  Passed up to a higher Component.
+	resetWave =
+	() => {
+		if (this.effectiveView) {
+			//this.effectiveView.resetAvgHighest();
+			//const curView = this.effectiveView || this.state.effectiveView;
+			this.effectiveView.drawings.forEach(dr =>  dr.resetAvgHighest());
+			if (traceGLView) console.log(`🖼 🖼 GLView:${this.props.viewName} : did resetWave`);
+		}
 	}
 
 	// repaint whole GL image.  This is not 'render' as in React;
-	// this is repainting a canvas.   returns an object with perf stats.
-	// Returns null if it couldn't do it (promise hasn't resolved)
+	// this is repainting a canvas with GL.   returns an object with perf stats.
+	// Returns null if it couldn't do it (eSpace promise hasn't resolved)
+	setGeometry =
+	() => {
+		if (this.effectiveView) {
+			this.effectiveView.setGeometry();
+			if (traceGLView) console.log(`🖼 🖼 GLView:${this.props.viewName} did setGeometry`);
+		}
+	}
+
+	// repaint whole GL image.  This is not 'render' as in React;
+	// this is repainting a canvas with GL.   returns an object with perf stats.
+	// Returns null if it couldn't do it (eSpace promise hasn't resolved)
 	doRepaint =
 	() => {
+		let p = this.props;
+		if (traceGLView) console.log(`🖼 🖼 GLView:${p.viewName} : starting doRepaint`);
 		if (! this.effectiveView)
-			return null;
+			return null;  // at least the render will crate the canvas
 
 		this.effectiveView.reloadAllVariables();
 
-		// copy from latest wave to view buffer (c++)
-		qe.qViewBuffer_getViewBuffer();
+		// copy from latest wave to view buffer (c++)  .. hey where does this go!??!?!?!?!
+		this.highest = p.avatar.loadViewBuffer()
+		//p.avatar.getViewBuffer();
+
 		let endReloadVarsNBuffer = performance.now();
 
 		this.effectiveView.setInputsOnDrawings();
@@ -134,6 +136,7 @@ class GLView extends React.Component {
 		// draw
 		this.effectiveView.drawAllDrawings();
 		let endDraw = performance.now();
+		if (traceGLView) console.log(`🖼 🖼 GLView:${p.viewName} : : doRepaint done`);
 
 		return {endReloadVarsNBuffer, endReloadInputs, endDraw};
 	}
@@ -142,20 +145,32 @@ class GLView extends React.Component {
 	render() {
 		const p = this.props;
 		//const s = this.state;
+		if (traceGLView) console.log(`🖼 🖼 GLView:${p.viewName} : : about to render`);
 
 		return (
-			<canvas className='squishCanvas'
+			<canvas className='GLView'
 				width={p.width} height={p.height}
-				ref={
-					canvas => {  // tighten this up someday
-						if (canvas)
-							this.setGLCanvas(canvas);
-					}
-				}
+				ref={ canvas => this.setGLCanvas(canvas) }
 				style={{width: `${p.width}px`, height: `${p.height}px`}}
 			/>
-		);
+		)
+	}
 
+	componentDidMount() {
+		this.componentDidUpdate();
+	}
+
+	componentDidUpdate() {
+		const p = this.props;
+		//const s = this.state;
+
+		// a one-time initialization.  but upon page load, neither the avatar,
+		// space or canvas are there yet.  Don't worry, when the space comes in,
+		// we'll all initViewClass.
+		if (p.avatar && p.space && this.canvas && !this.effectiveView) {
+			this.initViewClass();
+		}
+		if (traceGLView) console.log(`🖼 🖼 GLView:${p.viewName} : initViewClass done`, this);
 	}
 }
 

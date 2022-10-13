@@ -1,5 +1,5 @@
 /*
-** blah blah -- like a source file for Squishy Electron
+** control panel toolbar -- toolbar immediately below WaveView
 ** Copyright (C) 2021-2022 Tactile Interactive, all rights reserved
 */
 
@@ -16,12 +16,16 @@ function setPT() {
 		iterateFrequency: PropTypes.number.isRequired,
 		setIterateFrequency: PropTypes.func.isRequired,
 		N: PropTypes.number.isRequired,
+		space: PropTypes.object,
 	};
 }
 
 function clickOnFFR()
 {
-	qe.Avatar_askForFFT()
+	// space not there until space promise, but that should happen before anybody clicks on this
+	if (this.props.space)
+		this.props.space.mainEAvatar.askForFFT();
+		//qe.avatar_askForFFT(this.props.space.mainEAvatar);
 }
 
 

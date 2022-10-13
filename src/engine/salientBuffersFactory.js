@@ -18,7 +18,7 @@ class salientBuffersFactory {
 	// hand in a pointer into C++ space for the the buffer pointers, as returned from completeNewSpace()
 	constructor(space, salientPointersPointer) {
 		if (!salientPointersPointer)
-			throw `falsy salientPointersPointer!`;
+			throw new Error(`falsy salientPointersPointer!`);
 
 		// a patch of memory returned from C++ with addresses of some important
 		// buffers and C++ objects.

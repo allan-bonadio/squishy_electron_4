@@ -38,7 +38,7 @@ export class ControlPanel extends React.Component {
 		iterateFrequency: PropTypes.number.isRequired,  // frames per second
 		setIterateFrequency: PropTypes.func.isRequired,
 
-		// early on, there's no space.  Must have SquishPanel mounted first.
+		// early on, there's no space.  Must have SquishPanel mounted first, and the eSpace promise resolved.
 		space: PropTypes.instanceOf(eSpace),
 		N: PropTypes.number.isRequired,
 
@@ -227,7 +227,8 @@ export class ControlPanel extends React.Component {
 				iterateFrequency={p.iterateFrequency}
 				setIterateFrequency={this.setIterateFrequency}Ï
 
-				N={this.props.N}
+				N={p.N}
+				space={p.space}
 			/>
 			<div className='cpSecondRow'>
 				<ul className='TabBar' >

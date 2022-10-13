@@ -5,11 +5,12 @@
 import qe from './qe';
 //import eWave from './eWave';
 import {setFamiliarPotential} from '../utils/potentialUtils';
-import storeSettings from '../utils/storeSettings';
 import salientBuffersFactory from './salientBuffersFactory';
 import eAvatar from './eAvatar';
+import {getAGroup} from '../utils/storeSettings';
+import {cppObjectRegistry} from '../utils/directAccessors';
 
-let debugSpace = false;
+let traceSpace = false;
 
 
 const _ = num => num.toFixed(4).padStart(9);
@@ -32,9 +33,9 @@ function dumpRow(ix, re, im, prev, isBorder) {
 		`${_(phase)} ${_(dPhase)}} ${_(mag)}\n` ;
 }
 
-/* **************************************************************** Basic Space */
+/* **************************************************************** eDimension */
 
-// really the qeBasicSpace was just one qDimension.
+// these days the espace is just one qDimension.
 // So, do it that way, if anybody needs it.  dim={N, continuum, label: 'x'}
 export class eDimension {
 	constructor(dim) {
@@ -50,106 +51,10 @@ export class eDimension {
 
 
 
-
-// stop using qeBasicSpace!!!  Must rewrite minigraph
-// the dimensions part of the space
-// this is enough to contruct a eWave with, so MiniGraph can use it (obsolete,tobe removed)
-// pat of eSpace but also want to use independently (NO!  reunify with eSpace!)
-// maybe not - nmight get rid of this given changes that are coming
-// export class qeBasicSpace {
-// 	// dims is the raw minimal definition of the dimensions for the space to be contructed.
-// 	// here we fill in the details.
-// 	constructor(dims) {
-// console.info(`qeBasicSpace constructor just starting`);
-// 		// this has SIDE EFFECTS!
-// 		let nPoints = 1, nStates = 1;
-// 		this.dimensions = dims.map(dim => {
-// 				nStates *= d.nStates = d.N;
-// 				nPoints *= d.nPoints = d.start + d.end;
-// 				return new eDimension(dim)
-// 			}
-// 		);
-// 		this.nPoints = nPoints;
-// 		this.nStates = nStates;
-//
-// 		if (debugSpace) console.log(`🚀  the resulting qeBasicSpace: `, this);
-// 	}
-//
-// 	// call it like this: const {start, end, N, continuum} = space.startEnd;
-// 	get startEnd() {
-// 		const dim = this.dimensions[0];
-// 		return {start: dim.start, end: dim.end, N: dim.N, nPoints: this.nPoints,
-// 			continuum: dim.continuum};
-// 	}
-//
-// 	// this will return the DOUBLE of start and end so you can just loop thru += 2
-// 	// but NOT N, that's honest
-// 	get startEnd2() {
-// 		const dim = this.dimensions[0];
-// 		return {start: dim.start*2, end: dim.end*2, N: dim.N, nPoints: this.nPoints * 2,
-// 			continuum: dim.continuum};
-// 	}
-//
-// 	// a eSpace method to dump any wave buffer according to that space.
-// 	// RETURNS A STRING of the wave.
-// 	dumpThat(wave) {
-// 		if (this.nPoints <= 0) throw "🚀  qeBasicSpace::dumpThat	() with zero points";
-//
-// 		const {start, end, continuum} = this.startEnd2;
-// 		let ix = 0;
-// 		let prev = {phase: 0, innerProd: 0};
-// 		let output = '';
-//
-// 		if (continuum)
-// 			output += dumpRow(ix, wave[0], wave[1], prev, true);
-//
-// 		for (ix = start; ix < end; ix += 2)
-// 			output += dumpRow(ix/2, wave[ix], wave[ix+1], prev);
-//
-//
-// 		if (continuum)
-// 			output += 'end '+ dumpRow(ix/2, wave[end], wave[end+1], prev, true);
-//
-// 		return output.slice(0, -1) + ' innerProd=' + _(prev.innerProd) +'\n';
-// 	}
-//
-// 	// refresh the wraparound points for ANY WAVE subscribing to this space
-// 	// 'those' or 'that' means some wave other than this.wave
-// 	// modeled after fixThoseBoundaries() in C++ pls keep in sync!
-// 	fixThoseBoundaries(wave) {
-// 		if (this.nPoints <= 0) throw "🚀  qSpace::fixThoseBoundaries() with zero points";
-// 		const {end, continuum} = this.startEnd2;
-//
-// 		switch (continuum) {
-// 		case qe.contDISCRETE:
-// 			// no neighbor-to-neighbor crosstalk, well except...
-// 			// I guess whatever the hamiltonion says.  Everybody's got a hamiltonian.
-// 			break;
-//
-// 		case qe.contWELL:
-// 			// the points on the end are ∞ potential, but the arithmetic goes bonkers
-// 			// if I actually set the voltage to ∞.  Remember complex values 2 doubles
-// 			wave[0] = wave[1] = wave[end] = wave[end+1] = 0;
-// 			break;
-//
-// 		case qe.contENDLESS:
-// 			// the points on the end get set to the opposite side.  Remember this is for complex, 2x floats
-// 			wave[0] = wave[end-2];
-// 			wave[1]  = wave[end-1];
-// 			wave[end] = wave[2];
-// 			wave[end+1] = wave[3];
-// 			break;
-//
-// 		default: throw `🚀  bad continuum '${continuum}' in  eSpace.fixThoseBoundaries()`;
-// 		}
-// 	}
-// }
-
-
-/* **************************************************************** Space */
+/* **************************************************************** eSpace */
 // this is how you create a qSpace - start from JS and call this.
 // call like this:
-// new eSpace([{N: 128, continuum: qe.contENDLESS, label: 'x', coord: 'x'}])
+// new eSpace([{N: 128, continuum: qe.contENDLESS,coord: 'x'}], spaceLabelString)
 // labels must be unique.  Modeled after qSpace in C++,
 // does all dimensions in constructor, at least.
 // Coords are the same if two dims are parallel, eg two particles with x coords.
@@ -158,7 +63,7 @@ export class eSpace {
 	//unused static contCodeToText = code => ['Discrete', 'Well', 'Endless'][code];
 
 	constructor(dims, spaceLabel) {
-		console.info(`eSpace constructor just starting`);
+		if (traceSpace) console.log(`eSpace constructor just starting`);
 
 		// this actually does it over on the C++ side
 		qe.startNewSpace(spaceLabel);
@@ -179,7 +84,7 @@ export class eSpace {
 		this.nPoints = nPoints;
 		this.nStates = nStates;
 
-		if (debugSpace) console.log(`🚀  the resulting eSpace dimensions: `, this);
+		if (traceSpace) console.log(`🚀  the resulting eSpace dimensions: `, this);
 
 
 // 		dims.forEach(dim => {
@@ -196,7 +101,7 @@ export class eSpace {
 		let sp = qe.completeNewSpace();
 		let salientBuffers = this.salientBuffers = new salientBuffersFactory(this, sp);
 
-		// remember that eSpace.salientBuffers doesn't work for multiple spaces
+		// remember that eSpace.salientBuffers doesn't work for multiple spaces or multiple dimensions
 		eSpace.salientBuffers = this.salientBuffers;
 
 		// this reaches into C++ space and accesses the main wave buffer of this space
@@ -205,31 +110,32 @@ export class eSpace {
 		//this.wave = this.eWave.wave;
 
 		this.pointer = salientBuffers.spacePointer;
-		eSpace.addToList(this.pointer, this);  // so everybody else can find you by pointer value
+		cppObjectRegistry[this.pointer] = this;
 
 
 		// direct access into the potential buffer
 		this.potentialBuffer = salientBuffers.potentialBuffer;
-		setFamiliarPotential(this, this.potentialBuffer, storeSettings.potentialParams);
+		let potentialParams = getAGroup('potentialParams');
+		setFamiliarPotential(this, this.potentialBuffer, potentialParams);
 			//new Float64Array(window.Module.HEAPF64.buffer,
 			//salientPointers.potentialBuffer, this.nPoints);
 
-		this.mainEAvatar = new eAvatar(this, salientBuffers.mainAvatarPointer);
+		this.mainEAvatar = new eAvatar(salientBuffers.mainAvatarPointer, this);
 		//this.mainEAvatar = salientBuffers.mainEAvatar;
 		this.mainVBuffer = this.mainEAvatar.vBuffer;
 		this.mainEWave = this.mainEAvatar.eWave;
 
 		// by default it's set to 1s, or zeroes?  but we want something good.
-		this.mainEWave.setFamiliarWave(storeSettings.waveParams);  //  SquishPanel does this for SetWave
+		let waveParams = getAGroup('waveParams');
+		this.mainEWave.setFamiliarWave(waveParams);  //  SquishPanel does this for SetWave
+		if (traceSpace) console.log(`🚀  done with setFamiliarWave():`, JSON.stringify(this.mainEWave.wave));
 
 		//let emscriptenMemory = window.Module.HEAPF32.buffer;
 		//let address = qe.qViewBuffer_getViewBuffer();
 
-		this.miniGraphAvatar = new eAvatar(this, salientBuffers.miniGraphAvatarPointer);
+		this.miniGraphAvatar = new eAvatar(salientBuffers.miniGraphAvatarPointer, this);
 
-			// new Float32Array(emscriptenMemory, address, np);
-
-		if (debugSpace) console.log(`🚀  done creating eSpace:`, this);
+		if (traceSpace) console.log(`🚀  done creating eSpace:`, this);
 	}
 
 	// call it like this: const {start, end, N, continuum} = space.startEnd;
@@ -297,7 +203,7 @@ export class eSpace {
 			wave[end+1] = wave[3];
 			break;
 
-		default: throw `🚀  bad continuum '${continuum}' in  eSpace.fixThoseBoundaries()`;
+		default: throw new Error(`🚀  bad continuum '${continuum}' in  eSpace.fixThoseBoundaries()`);
 		}
 	}
 
@@ -306,13 +212,13 @@ export class eSpace {
 
 /* ************************************************************************ space lookup */
 
-eSpace.spaces = {};
-
-eSpace.lookup =
-(pointer) => eSpace.spaces[pointer];
-
-eSpace.addToList =
-(pointer, espace) => eSpace.spaces[pointer] = espace;
+//eSpace.spaces = {};
+//
+//eSpace.lookup =
+//(pointer) => eSpace.spaces[pointer];
+//
+//eSpace.addToSpaceList =
+//(pointer, espace) => eSpace.spaces[pointer] = espace;
 
 
 window.eSpace = eSpace;  // debugging

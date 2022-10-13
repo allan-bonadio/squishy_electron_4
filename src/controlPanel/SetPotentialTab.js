@@ -11,7 +11,7 @@ import {scaleLinear} from 'd3-scale';
 
 // eslint-disable-next-line no-unused-vars
 import {setFamiliarPotential, dumpPotential} from '../utils/potentialUtils';
-import MiniGraph from './MiniGraph';
+//import MiniGraph from './MiniGraph';
 import eSpace from '../engine/eSpace';
 import TextNSlider from '../widgets/TextNSlider';
 import {storeASetting, alternateMinMaxs} from '../utils/storeSettings';
@@ -47,13 +47,13 @@ class SetPotentialTab extends React.Component {
 	// rendering for the elements of the minitab
 	// Returns a <g element enclosing the juicy stuff
 	// NOT the main display space, but the minigraph space
-	recipe =
-	(miniSpace, potentialParams) => {
-		//const p = this.props;
-		//const {start, end, N, nPoints} = miniSpace.startEnd;
-
-		// temporarily disabled
-		return '';
+//	recipe =
+//	(miniSpace, potentialParams) => {
+//		//const p = this.props;
+//		//const {start, end, N, nPoints} = miniSpace.startEnd;
+//
+//		// temporarily disabled
+//		return '';
 
 		// keep these buffers around for reuse - a bit faster
 		// if (! this.potentialArray || this.potentialArray.length != nPoints)
@@ -92,7 +92,7 @@ class SetPotentialTab extends React.Component {
 		// return <g className='linePaths' >
 		// 	<path d={d} stroke='#fff' fill='none'  key='only' strokeWidth={3} />
 		// </g>;
-	}
+//	}
 
 	/* *************************************************************** short term setters */
 	// they keep the settings before user clicks 'flat' or 'valley'
@@ -173,7 +173,7 @@ class SetPotentialTab extends React.Component {
 
 	render() {
 		const p = this.props;
-		const pp = p.potentialParams;
+		//const pp = p.potentialParams;
 
 		// remember that set*PotentialHandler is an event handler that gets the params from ControlPanel state
 		return <div className='setPotentialTab'>
@@ -195,17 +195,20 @@ class SetPotentialTab extends React.Component {
 						Set to Valley Potential
 				</button>
 			</div>
-			<div className='potentialMiniGraph'>
-				<MiniGraph recipe={this.recipe} width={this.miniWidth} height={this.miniHeight}
-					className='SetPotentialGraph'
-					familiarParams={pp} origSpace={p.origSpace} />
-			</div>
-			<div style={{clear: 'left'}}></div>
-
-
+			<div className='MiniGraph'>pot. mini graph goes here</div>
+			<div style={{clear: 'left'}} />
 		</div>;
 		}
 }
 setPT();
+
+
+//			<div className='potentialMiniGraph'>
+//				<MiniGraph recipe={this.recipe} width={this.miniWidth} height={this.miniHeight}
+//					className='SetPotentialGraph'
+//					familiarParams={pp} origSpace={p.origSpace} />
+//			</div>
+
+
 
 export default SetPotentialTab;

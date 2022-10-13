@@ -3,12 +3,11 @@
 ** Copyright (C) 2021-2022 Tactile Interactive, all rights reserved
 */
 
-// import {qeBasicSpace} from './eSpace';
-import {qe} from './qe';
+//import {qe} from './qe';
 import cxToRgb from '../view/cxToRgb';
-import {prepForDirectAccessors} from '../utils/directAccessors';
+import {cppObjectRegistry, prepForDirectAccessors} from '../utils/directAccessors';
 
-let traceSetWave = false;
+let traceSetWave = true;
 
 // emscripten sabotages this?  the log & info, but not error & warn?
 //const consoleLog = console.log.bind(console);
@@ -18,19 +17,19 @@ let traceSetWave = false;
 // see also eWave method by same name (but different args)
 export function rainbowDump(wave, start, end, nPoints) {
 	let title = "temporary title eWave.js:17";
-	start *= 2;
-	end *= 2;
-	if (isNaN(start) || isNaN(end))
+	let start2 = 2 * start;
+	let end2 = 2 * start;
+	if (isNaN(start2) || isNaN(end2))
 		debugger;
 
 // 	const wave = this.wave;
-// 	const {start, end} = this.space.startEnd2;
+// 	const {start2, end2} = this.space.startEnd2;
 
-	console.log(`%c rainbowDump    🌊   ${title}   ${start/2}...${end/2}  with ${nPoints} pts`,
+	console.log(`%c rainbowDump    🌊   ${title}   ${start2/2}...${end2/2}  with ${nPoints} pts`,
 		`font: times 16px italic; color: #222; background-color: #fff; padding-right: 70%; font: 14px Palatino;`);
 
 	let tot = 0;  // always real
-	for (let ix = start; ix < end; ix += 2) {
+	for (let ix = start2; ix < end2; ix += 2) {
 		let mag = (wave[ix] ** 2 + wave[ix + 1] ** 2) * 10000;
 
 
@@ -101,13 +100,15 @@ class eWave {
 			const wave = new Float64Array(window.Module.HEAPF64.buffer, waveArg, 2 * space.nPoints);
 			//space.waveBuffer = qe.waveBuffer = wave;
 			this.wave = wave;
+			cppObjectRegistry[waveArg] = wave;
 
 			// smoke test
 			for (let j = 0; j < this.nPoints*2; j++)
 				wave[j] = -99.;
 		}
 		else
-			throw `call to construct eWave failed cuz bad waveArg=${waveArg}`;
+			throw new Error(`call to construct eWave failed cuz bad waveArg=${waveArg}`);
+
 	}
 
 	/* **************************************************************** direct access */
@@ -120,7 +121,6 @@ class eWave {
 	get continuum() { return this.ints[8]; }
 
 	get dynamicallyAllocated() { return this.bools[40]; }
-
 
 	/* **************************************************************** dumping */
 
@@ -142,10 +142,10 @@ class eWave {
 	// See also C++ function of same name, that one's official.
 	innerProduct() {
 		const wave = this.wave;
-		const {start, end} = this.space.startEnd2;
+		const {start2, end2} = this.space.startEnd2;
 
 		let tot = 0;
-		for (let ix = start; ix < end; ix += 2) {
+		for (let ix = start2; ix < end2; ix += 2) {
 			let norm = wave[ix] ** 2 + wave[ix + 1] ** 2;
 			tot += norm;
 		}
@@ -177,12 +177,12 @@ class eWave {
 	// the first point here is like x=0 as far as the trig functions, and the last like x=-1
 	setCircularWave(n) {
 		//console.info(`setCircularWave(${n})`);
-		const {start, end, N} = this.space.startEnd2;
+		const {start2, end2, N} = this.space.startEnd2;
 		const dAngle = Math.PI / N * (+n) * 2;
 		const wave = this.wave;
 
-		for (let ix = start; ix < end; ix += 2) {
-			const angle = dAngle * (ix - start) / 2;
+		for (let ix = start2; ix < end2; ix += 2) {
+			const angle = dAngle * (ix - start2) / 2;
 			wave[ix] = Math.cos(angle);
 			wave[ix + 1] = Math.sin(angle);
 		}
@@ -197,18 +197,18 @@ class eWave {
 	// oh yeah, the walls on the sides are nodes in this case so we'll split by N+2 in that case.
 	// pass negative to make it upside down.
 	setStandingWave(n) {
-		const {start, end, N} = this.space.startEnd2;
+		const {start2, end2, N} = this.space.startEnd2;
 		const dAngle = Math.PI / N * (+n);
 		const wave = this.wave;
 
 		// good idea or bad?
 // 		if (this.space.continuum == qe.contWELL) {
-// 			start--;
-// 			end++;
+// 			start2--;
+// 			end2++;
 // 		}
 
-		for (let ix = start; ix < end; ix += 2) {
-			const angle = dAngle * (ix - start);
+		for (let ix = start2; ix < end2; ix += 2) {
+			const angle = dAngle * (ix - start2);
 			wave[ix] = Math.sin(angle);
 			wave[ix + 1] = 0;
 		}
@@ -222,7 +222,7 @@ class eWave {
 	// offset is how far along is the peak, as an integer X value (0...N).
 	setPulseWave(freqUi, pulseWidthUi, offsetUi) {
 		const wave = this.wave;
-		const {start, end, N} = this.space.startEnd2;
+		const {start2, end2, N} = this.space.startEnd2;
 		let offset = offsetUi * N / 100;  // now in units of X
 		let pulseWidth = pulseWidthUi * N / 100;  // now in units of X
 		const freq = Math.round(freqUi);
@@ -235,7 +235,7 @@ class eWave {
 		// modulate with a gaussian, centered at the offset, with pulseWidth
 		// tweak numbers to suit the ui
 		const s2 = pulseWidth ** -2;  // 1/stddev**2 sortof
-		for (let twoix = start; twoix < end; twoix += 2) {
+		for (let twoix = start2; twoix < end2; twoix += 2) {
 			let ix = twoix / 2;
 			const 𝜟 = (ix - offset) % N;
 			const stretch = Math.exp(-𝜟 * 𝜟 * s2);
@@ -252,7 +252,7 @@ class eWave {
 	setChordWave(freqUi, pulseWidthUi, offsetUi) {
 		console.log(`setChordWave(${freqUi}, ${pulseWidthUi}, ${offsetUi})`);
 		const wave = this.wave;
-		const {start, end, N} = this.space.startEnd2;
+		const {start2, end2, N} = this.space.startEnd2;
 		let offset = offsetUi * N / 100;  // now in units of X
 		const nSideFreqs = Math.round(pulseWidthUi / 100 * N)
 		const freq = Math.round(freqUi);
@@ -270,8 +270,8 @@ class eWave {
 		const startFreq = freqUi - nSideFreqs;
 		const lastFreq = startFreq + nSideFreqs
 
-		for (let ix = start; ix < end; ix += 2) {
-			const angle = dAngle * (ix - start - offset);
+		for (let ix = start2; ix < end2; ix += 2) {
+			const angle = dAngle * (ix - start2 - offset);
 			wave[ix] = wave[ix+1] = 0;
 
 			for (let f = startFreq; f <= lastFreq; f++) {
@@ -305,9 +305,12 @@ class eWave {
 		case 'chord':
 			this.setChordWave(+waveParams.waveFrequency, +waveParams.pulseWidth, +waveParams.pulseOffset);
 			break;
+
+		default:
+			throw new Error(`bad waveParams.waveBreed=${waveParams.waveBreed} in setFamiliarWave()`);
 		}
 
-		qe.Avatar_normalize();
+		this.space.mainEAvatar.normalize();
 		//this.normalize();
 		this.space.fixThoseBoundaries(this.wave);
 	}

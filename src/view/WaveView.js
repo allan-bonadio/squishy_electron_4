@@ -11,14 +11,19 @@
 
 import React from 'react';
 import PropTypes from 'prop-types';
+
+//import eSpace from '../engine/eSpace';
+//import eAvatar from '../engine/eAvatar';
 import {thousands} from '../utils/formatNumber';
 import qe from '../engine/qe';
+import {interpretCppException} from '../utils/errors';
 import './view.scss';
 // import {abstractViewDef} from './abstractViewDef';
 // import flatDrawingViewDef from './flatDrawingViewDef';
 import {getASetting, storeASetting} from '../utils/storeSettings';
 import PotentialArea from './PotentialArea';
 import GLView from './GLView';
+import {eSpaceCreatedPromise} from '../engine/eEngine';
 
 
 //import {listOfViewClasses} from './listOfViewClasses';
@@ -33,7 +38,7 @@ let traceDragCanvasHeight = false;
 export class WaveView extends React.Component {
 	static propTypes = {
 		// the class itself.  Not the instance! the class, the type of view, with drawings baked in.
-		// not the class!  just the class name.
+		// not the class!  just the class name.  Not a JS class!
 		viewClassName: PropTypes.string,
 
 		// the title of the view
@@ -41,39 +46,50 @@ export class WaveView extends React.Component {
 
 		width: PropTypes.number,  // handed in, depends on window width
 
-		// tells us when the space exists.  From the SquishPanel, or just pass something resolved.
-		createdSpacePromise: PropTypes.instanceOf(Promise),
-
-		returnGLFuncs: PropTypes.func.isRequired,
+		//returnGLFuncs: PropTypes.func.isRequired,
 		setUpdatePotentialArea: PropTypes.func,
-
-		avatar: PropTypes.object,
 	};
 
 	static constructed = 0;
 	constructor(props) {
 		super(props);
 
-		WaveView.constructed++;
-		console.info(`WaveView constructed for the ${WaveView.constructed}th time.`)
+		if (traceWaveView) {
+			WaveView.constructed++;
+			console.info(`WaveView constructed for the ${WaveView.constructed}th time.`);
+		}
 
 		this.state = {
 			height: getASetting('miscParams', 'viewHeight'),
 			space: null,  // set when promise comes in
 		}
 
-		// will be resolved when the canvas has been nailed down; result will be canvas dom obj
-		// this... still useful?
-		this.createdCanvasPromise = new Promise((succeed, fail) => {
-			this.createdCanvas = succeed;
-			if (traceWaveView) console.info(`qeStartPromise created:`, succeed, fail);
-		});
-
 		this.formerWidth = props.width;
 		this.formerHeight = props.defaultHeight;
+
+		//props.returnGLFuncs(this.doRepaint, this.resetWave, this.setGeometry);
+		//this.doRepaint = doRepaint;
+		//this.resetWave = resetWave;
+		//this.setGeometry = setGeometry;
+
+		eSpaceCreatedPromise
+		.then(space => {
+			// this will kick off a render, now that the avatar is in place
+			this.setState({space});
+
+			// easy access
+			this.space = space;
+			this.mainEAvatar = space.mainEAvatar;
+		})
+		.catch(ex => {
+			ex = interpretCppException(ex);
+			console.error(ex.stack || ex.message || ex);
+			debugger;
+		});
 	}
 
-
+	//setCanvasCreatedPromise =  // unused I guess
+	//canvasCreatedPromise => this.canvasCreatedPromise = canvasCreatedPromise;
 
 	/* ************************************************************************ resizing */
 
@@ -129,18 +145,6 @@ export class WaveView extends React.Component {
 
 	/* ************************************************************************ render */
 
-	componentDidUpdate() {
-		const p = this.props;
-		const s = this.state;
-
-		// only need this when the canvas outer dims change
-		if (this.effectiveView && (this.formerWidth != p.width || this.formerHeight != s.height)) {
-			this.effectiveView.setGeometry();
-			this.formerWidth = p.width;
-			this.formerHeight = s.height;
-		}
-	}
-
 	//static whyDidYouRender = true;
 	render() {
 		const p = this.props;
@@ -152,36 +156,34 @@ export class WaveView extends React.Component {
 		}
 
 		// if c++ isn't initialized yet, we can assume the time and frame serial
-		let et = '0';
-		let iser = '0';
-		if (qe.getElapsedTime) {
+		let elapsedTime = '0';
+		let iterateSerial = '0';
+		if (this.mainEAvatar) {
 			// after qe has been initialized
-			et = thousands(qe.getElapsedTime().toFixed(4));
-			iser = thousands(qe.Avatar_getIterateSerial());
+			elapsedTime = thousands(this.mainEAvatar.elapsedTime.toFixed(4));
+			iterateSerial = thousands(this.mainEAvatar.iterateSerial);
 		}
-
-		//let nPoints = s.space && s.space.nPoints;
-		//debugger;
 
 		const spinner = qe.cppLoaded ? ''
 			: <img className='spinner' alt='spinner' src='eclipseOnTransparent.gif' />;
 
+		// 				returnGLFuncs={p.returnGLFuncs}
+
 		// voNorthWest/East are populated during iteration
-		return (<div className='WaveView'  ref={el => this.element = el}>
+		return (<div className='WaveView'  ref={el => this.element = el} style={{height: s.height + 'px'}}>
 
 			<GLView width={p.width} height={s.height}
-				returnGLFuncs={p.returnGLFuncs} createdSpacePromise={p.createdSpacePromise}
-				viewClassName={p.viewClassName} viewName={p.viewName}
-				avatar={p.avatar}/>
+				space={this.space} avatar={this.mainEAvatar}
+				viewClassName={p.viewClassName} viewName={p.viewName} />
 
 			<aside className='viewOverlay'
 				style={{width: `${p.width}px`, height: `${s.height}px`}}>
 
 				<div className='northWestWrapper'>
-					<span className='voNorthWest'>{et}</span> ps
+					<span className='voNorthWest'>{elapsedTime}</span> ps
 				</div>
 				<div className='northEastWrapper'>
-					iteration <span className='voNorthEast'>{iser}</span>
+					iteration <span className='voNorthEast'>{iterateSerial}</span>
 				</div>
 
 				<div className='sizeBox' onMouseDown={this.mouseDown} />
@@ -195,7 +197,19 @@ export class WaveView extends React.Component {
 				setUpdatePotentialArea={p.setUpdatePotentialArea}/>
 		</div>);
 	}
+
+	componentDidUpdate() {
+		const p = this.props;
+		const s = this.state;
+
+		// only need this when the canvas outer dims change
+		if (this.mainEAvatar && (this.formerWidth != p.width || this.formerHeight != s.height)) {
+			this.mainEAvatar.setGeometry();
+			this.formerWidth = p.width;
+			this.formerHeight = s.height;
+		}
+	}
+
 }
 
 export default WaveView;
-

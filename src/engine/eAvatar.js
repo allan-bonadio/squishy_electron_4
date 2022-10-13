@@ -3,9 +3,11 @@
 ** Copyright (C) 2022-2022 Tactile Interactive, all rights reserved
 */
 //import qe from './qe';
-import {prepForDirectAccessors} from '../utils/directAccessors';
+import {cppObjectRegistry, prepForDirectAccessors} from '../utils/directAccessors';
 import eWave from './eWave';
 //import eSpace from './eSpace';
+import qe from './qe';
+
 
 
 // a qAvatar manages iteration of a wave, and display on a GLView. I keep
@@ -19,13 +21,12 @@ class eAvatar {
 	// Give us the pointer, we'll reach in and make an eWave from mainQWave, and
 	// a vBuffer from _qvBuffer. the q objects must be in place.
 	// this way we can't get the wrong wave in the wrong avatar.
-	constructor(space, label, pointer) {
+	constructor(pointer, space) {
 		prepForDirectAccessors(this, pointer);
 		this.space = space;
-		this.label = label;
 		this.eWave = new eWave(this.space, null, this.mainQWave);
 		this.vBuffer = new Float32Array(window.Module.HEAPF32.buffer, this._qvBuffer,
-			this.space.nPoints * 8); // two vec4 s per point
+				this.space.nPoints * 8); // two vec4 s per point
 
 		this.label = window.Module.UTF8ArrayToString(this._label);
 
@@ -69,6 +70,23 @@ class eAvatar {
 	get _label() { return this.pointer + 70; }
 
 
+	// wire them up
+
+	// wait this just gets the pointer to the view buffer...
+	getViewBuffer() {
+		return cppObjectRegistry[qe.avatar_getViewBuffer(this.pointer)];
+	}
+
+	dumpViewBuffer(title) { qe.avatar_dumpViewBuffer(this.pointer, title) }
+	loadViewBuffer() { return qe.avatar_loadViewBuffer(this.pointer) }
+	oneIteration() { return qe.avatar_oneIteration(this.pointer) }
+	askForFFT() { qe.avatar_askForFFT(this.pointer) }
+	normalize() { qe.avatar_normalize(this.pointer) }
+
+	// delete the eAvatar and qAvatar and its owned buffers
+	deleteAvatar() {
+		qe.avatar_delete(this.pointer);
+	}
 }
 
 
