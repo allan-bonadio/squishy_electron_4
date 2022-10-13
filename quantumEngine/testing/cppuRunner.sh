@@ -30,6 +30,7 @@ cd `dirname $0`
 cd ..
 
 echo "CppUTest Test runner args: db=debugger; all others are assumed to be test name segments"
+echo "Use -g groupname to test a whole group"
 
 # https://cpputest.github.io
 export CPPUTEST_HOME=/opt/dvl/cpputest/cpputest-3.8
@@ -83,9 +84,9 @@ do
 	shift
 done
 
-echo "gonna run: cppuTestBin -v -c $moreArgs"
 if $debug
 then
+	echo "gonna run: cppuTestBin -v -c $moreArgs"
 	# it's a real C++ program and I can use gdb!
 	#  well, lldb at least.
 	lldb  -f /opt/dvl/squishyElectron/SquishyElectron/quantumEngine/cppuTestBin -- -v -c $moreArgs

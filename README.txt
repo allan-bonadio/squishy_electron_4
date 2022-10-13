@@ -1,6 +1,16 @@
 This project is like, pre-alpha quality.  sorry.
 It has hardwired file paths that I've created identically on my machines.
 
+====================================================== Oct 2022
+
+other notes:
+webassembly error handling:
+https://emscripten.org/docs/compiling/WebAssembly.html?highlight=webassembly%20exception#web-server-setup
+for some streamlining; by adding a Mime type and .gz
+more deploy tips:  https://emscripten.org/docs/compiling/Deploying-Pages.html
+some type of error handling I might be able to implement someday:
+https://developer.mozilla.org/en-US/docs/WebAssembly/JavaScript_interface/Exception/stack
+
 
 ====================================================== Sep 2022
 While it's running, try surfing here:

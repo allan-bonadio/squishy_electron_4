@@ -189,7 +189,7 @@ void qBuffer::dump(const char *title, bool withExtras) {
 	printf("\n🌊🌊 ==== Wave | %s ", title);
 	qBuffer::dumpSegment(wave, withExtras, start, end, continuum);
 	//space->dumpThat(wave, withExtras);
-	printf("\n        ==== end of Wave ====\n\n");
+	printf("        ==== end of Wave ====\n\n");
 }
 
 
@@ -267,13 +267,6 @@ void qBuffer::fixThoseBoundaries(qCx *targetWave) {
 	fixSomeBoundaries(targetWave, continuum, start, end);
 }
 
-// get rid of this!
-//void qSpace::fixThoseBoundaries(qCx *targetWave) {
-//	qDimension *dims = dimensions;
-//	fixSomeBoundaries(targetWave, dims->continuum, dims->start, dims->end);
-//}
-
-
 // calculate ⟨𝜓 | 𝜓⟩  'inner product'.  Non-visscher; do not use it during an iteration.
 double qBuffer::innerProduct(void) {
 	qCx *wave = this->wave;
@@ -296,11 +289,9 @@ double qBuffer::innerProduct(void) {
 // enforce ⟨𝜓 | 𝜓⟩ = 1 by dividing out the current magnitude sum.
 // BUffer must be installed as well as nPoints, start and end
 void qBuffer::normalize(void) {
-	// for visscher, we have to make it in a temp wave and copy back to our buffer
-	// huh?  this is never copied back.  normalize here does nothing.
-//	qCx tempWave[space->nPoints];
-//	qWave tqWave(space, tempWave);
-//	qWave *tempQWave = &tqWave;
+	printf("\nqBuffer::normalize buffer(%p)\n", wave);
+	printf("    %lf %lf %lf %lf\n", wave[2].re, wave[2].im, wave[3].re, wave[3].im);
+
 
 	//qCx *wave = tempWave;
 	//qWave *tempQWave = qWave::newQWave(space, tempWave);

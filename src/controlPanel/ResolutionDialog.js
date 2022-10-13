@@ -6,7 +6,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-// import {qeBasicSpace} from '../engine/eSpace';
 import qe from '../engine/qe';
 import CommonDialog from '../widgets/CommonDialog';
 import {powerToIndex} from '../utils/powers';

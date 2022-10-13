@@ -32,7 +32,7 @@ export function fixPotentialBoundaries(space, potential) {
 		potential[end] = potential[1];
 		break;
 
-	default: throw `bad continuum '${continuum}' in  fixPotentialBoundaries()`;
+	default: throw new Error(`bad continuum '${continuum}' in  fixPotentialBoundaries()`);
 	}
 }
 

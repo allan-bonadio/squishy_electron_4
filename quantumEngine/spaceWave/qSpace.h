@@ -15,14 +15,10 @@
 #define MAX_DIMENSIONS  2
 
 extern class qSpace *theSpace;
-//extern class qCx *peruWave, *laosWave;
-
-//extern class qWave *peruQWave, *laosQWave;
-
 extern double *thePotential;
 
 extern qCx hamiltonian(qCx *wave, int x);
-extern void qeStarted(void);
+//extern void qeStarted(void);
 
 /* *************************************** one for each DIMENSION of the wave array */
 struct qDimension {
