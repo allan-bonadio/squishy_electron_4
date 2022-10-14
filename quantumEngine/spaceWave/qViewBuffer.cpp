@@ -9,7 +9,7 @@
 #include "qWave.h"
 #include "qViewBuffer.h"
 
-static const bool debugViewBuffer = false;
+static const bool debugViewBuffer = true;
 static const bool debugInDetail = false;
 
 // August Ferdinand Möbius invented homogenous coordinates
@@ -21,7 +21,7 @@ qViewBuffer::qViewBuffer(qSpace *space, qAvatar *av)
 
 	// 4 floats per vertex, two verts per point
 	vBuffer = new float[space->nPoints * 8];
-	if (debugViewBuffer) printf("📺 qvBuffer(): vBuffer ptr %p \n",
+	if (debugViewBuffer) printf("📺 new qvBuffer(): vBuffer ptr %p \n",
 		vBuffer);
 	//printf("📺 qViewBuffer constructor done: this=%p   vBuffer=%p\n",
 	//this, vBuffer);
@@ -35,11 +35,10 @@ qViewBuffer::~qViewBuffer() {
 // dump the view buffer just before it heads off to webgl.
 void qViewBuffer::dumpViewBuffer(const char *title) {
 	float *vBuffer = avatar->qvBuffer->vBuffer;
-	printf("📺 The vBuffer = %p\n", vBuffer);
 	float prevPhase =0;
 
 	if (!title) title = "";
-	printf("==== 📺 dump vBuffer | %s\n", title);
+	printf("==== 📺 dump vBuffer %p->%p | %s\n", this, vBuffer, title);
 	printf("   ix  |    re      im     ---    serial  |      𝜃        d 𝜃      magn\n");
 	for (int i = 0; i < space->nPoints; i++) {
 
@@ -98,7 +97,7 @@ void qViewBuffer::dumpViewBuffer(const char *title) {
 // Two vertices per datapoint: bottom then top, same data.
 // also converts from doubles to floats for GL.
 float qViewBuffer::loadViewBuffer(void) {
-	if (debugViewBuffer) printf("\n📺 loadViewBuffer(%s) starts: vBuffer = %p \n",
+	if (debugViewBuffer) printf("\n📺 qViewBuffer::loadViewBuffer(%s) starts: vBuffer = %p \n",
 		avatar->label, vBuffer);
 	qWave *mainQWave = avatar->mainQWave;
 	qCx *wave = mainQWave->wave;
@@ -171,7 +170,7 @@ float qViewBuffer::loadViewBuffer(void) {
 		printf("    qViewBuffer::at end of loadViewBuffer this=%p  vBuffer=%p\n\n",
 				this, vBuffer);
 		//printf("  ===  📺  vBuffer.cpp done, as written to view vBuffer:\n");
-		//dumpViewBuffer("loadViewBuffer done");
+		dumpViewBuffer("loadViewBuffer done");
 	}
 
 	return highest;

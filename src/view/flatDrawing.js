@@ -11,7 +11,7 @@ import {viewUniform, viewAttribute} from './viewVariable';
 //import {eSpaceCreatedPromise} from '../engine/eEngine';
 
 let dumpViewBufAfterDrawing = false;
-let traceHighest = false;
+let traceHighest = true;
 
 // diagnostic purposes
 let alsoDrawPoints = true;
@@ -54,6 +54,8 @@ void main() {
 	x = float(int(vertexSerial) / 2) * barWidth * 2. - 1.;
 
 	// and here we are
+	x /= 2.;  ////
+	y /= 2.;  ////
 	gl_Position = vec4(x, y, 0., 1.);
 
 	//  for the color, convert the complex values via this algorithm

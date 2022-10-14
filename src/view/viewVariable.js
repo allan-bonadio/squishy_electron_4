@@ -186,8 +186,8 @@ export class viewAttribute extends viewVariable {
 //		gl.enableVertexAttribArray(this.attrLocation);
 //
 //		gl.vertexAttribPointer(this.attrLocation, size, gl.FLOAT, false, stride, offset);
-		if (traceGLCalls) console.log(`viewAttribute '${this.varName}' set to size=${size}, stride=${stride}, offset=${offset} first row:`,
-				float32TypedArray[0], float32TypedArray[1], float32TypedArray[2], float32TypedArray[3]);
+		if (traceGLCalls) console.log(`viewAttribute '${this.varName}' set to size=${size}, stride=${stride}, offset=${offset}  row [1]:`,
+				float32TypedArray[8], float32TypedArray[9], float32TypedArray[10], float32TypedArray[11]);
 
 		this.reloadVariable();
 	}
@@ -203,8 +203,8 @@ export class viewAttribute extends viewVariable {
 		// do we have to do THIS again?  Does it just slurp it up from the pointer from last time?!?!
 		gl.bufferData(gl.ARRAY_BUFFER, this.float32TypedArray, this.bufferDataDrawMode);
 
-		if (traceGLCalls) console.log(`viewAttribute '${this.varName}' reloaded:`,
-				this.float32TypedArray[0], this.float32TypedArray[1], this.float32TypedArray[2], this.float32TypedArray[3]);
+		if (traceGLCalls) console.log(`viewAttribute '${this.varName}' reloaded row[1]:`,
+				this.float32TypedArray[8], this.float32TypedArray[9], this.float32TypedArray[10], this.float32TypedArray[11]);
 	}
 
 }

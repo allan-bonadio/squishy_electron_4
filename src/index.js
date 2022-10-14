@@ -5,8 +5,8 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
-import {interpretCppException} from './utils/errors';
-
+//import {interpretCppException} from './utils/errors';
+//
 // before ANYTHING happens
 //window.addEventListener("error", ev => {
 //	console.error(`window error handler`, ev);
@@ -36,7 +36,6 @@ import {interpretCppException} from './utils/errors';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(<App />);
-
 
 // wasted so much time on this
 //   <React.StrictMode>

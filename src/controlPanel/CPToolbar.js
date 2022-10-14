@@ -4,7 +4,7 @@
 */
 
 import PropTypes from 'prop-types';
-import qe from '../engine/qe';
+//import qe from '../engine/qe';
 
 function setPT() {
 	CPToolbar.propTypes = {
@@ -27,7 +27,6 @@ function clickOnFFR()
 		this.props.space.mainEAvatar.askForFFT();
 		//qe.avatar_askForFFT(this.props.space.mainEAvatar);
 }
-
 
 function CPToolbar(props) {
 	const {iterateFrequency, setIterateFrequency,
