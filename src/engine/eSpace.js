@@ -106,8 +106,8 @@ export class eSpace {
 
 		// this reaches into C++ space and accesses the main wave buffer of this space
 		// hmmm space shouldn't point to this - just avatar?
-		//this.eWave = salientBuffers.mainEWave;
-		//this.wave = this.eWave.wave;
+		//this.ewave = salientBuffers.mainEWave;
+		//this.wave = this.ewave.wave;
 
 		this.pointer = salientBuffers.spacePointer;
 		cppObjectRegistry[this.pointer] = this;
@@ -123,17 +123,15 @@ export class eSpace {
 		this.mainEAvatar = new eAvatar(salientBuffers.mainAvatarPointer, this);
 		//this.mainEAvatar = salientBuffers.mainEAvatar;
 		this.mainVBuffer = this.mainEAvatar.vBuffer;
-		this.mainEWave = this.mainEAvatar.eWave;
+		this.mainEWave = this.mainEAvatar.ewave;
+		this.miniGraphAvatar = new eAvatar(salientBuffers.miniGraphAvatarPointer, this);
 
 		// by default it's set to 1s, or zeroes?  but we want something good.
 		let waveParams = getAGroup('waveParams');
-		this.mainEWave.setFamiliarWave(waveParams);  //  SquishPanel does this for SetWave
+		this.mainEWave.setFamiliarWave(waveParams);  //  SquishPanel re-does this for SetWave
+		this.miniGraphAvatar.ewave.setFamiliarWave(waveParams);  //  SquishPanel re-does this for SetWave
 		if (traceSpace) console.log(`🚀  done with setFamiliarWave():`, JSON.stringify(this.mainEWave.wave));
 
-		//let emscriptenMemory = window.Module.HEAPF32.buffer;
-		//let address = qe.qViewBuffer_getViewBuffer();
-
-		this.miniGraphAvatar = new eAvatar(salientBuffers.miniGraphAvatarPointer, this);
 
 		if (traceSpace) console.log(`🚀  done creating eSpace:`, this);
 	}
@@ -147,9 +145,11 @@ export class eSpace {
 
 	// this will return the DOUBLE of start and end so you can just loop thru += 2
 	// but NOT N, that's honest
+	// call like this:       const {start2, end2, N} = this.space.startEnd2;
+	// note start2, end2 NEED TO BE SPELLED exactly that way!
 	get startEnd2() {
 		const dim = this.dimensions[0];
-		return {start: dim.start*2, end: dim.end*2, N: dim.N, nPoints: this.nPoints * 2,
+		return {start2: dim.start*2, end2: dim.end*2, N: dim.N, nPoints2: this.nPoints * 2,
 			continuum: dim.continuum};
 	}
 
@@ -158,20 +158,20 @@ export class eSpace {
 	dumpThat(wave) {
 		if (this.nPoints <= 0) throw "🚀  eSpace::dumpThat	() with zero points";
 
-		const {start, end, continuum} = this.startEnd2;
-		let ix = 0;
+		const {start2, end2, continuum} = this.startEnd2;
+		let ix2 = 0;
 		let prev = {phase: 0, innerProd: 0};
 		let output = '';
 
 		if (continuum)
-			output += dumpRow(ix, wave[0], wave[1], prev, true);
+			output += dumpRow(0, wave[0], wave[1], prev, true);
 
-		for (ix = start; ix < end; ix += 2)
-			output += dumpRow(ix/2, wave[ix], wave[ix+1], prev);
+		for (ix2 = start2; ix2 < end2; ix2 += 2)
+			output += dumpRow(ix2/2, wave[ix2], wave[ix2+1], prev);
 
 
 		if (continuum)
-			output += 'end '+ dumpRow(ix/2, wave[end], wave[end+1], prev, true);
+			output += 'end '+ dumpRow(ix2/2, wave[end2], wave[end2+1], prev, true);
 
 		return output.slice(0, -1) + ' innerProd=' + _(prev.innerProd) +'\n';
 	}
@@ -181,7 +181,7 @@ export class eSpace {
 	// modeled after fixThoseBoundaries() in C++ pls keep in sync!
 	fixThoseBoundaries(wave) {
 		if (this.nPoints <= 0) throw "🚀  qSpace::fixThoseBoundaries() with zero points";
-		const {end, continuum} = this.startEnd2;
+		const {end2, continuum} = this.startEnd2;
 
 		switch (continuum) {
 		case qe.contDISCRETE:
@@ -192,15 +192,15 @@ export class eSpace {
 		case qe.contWELL:
 			// the points on the end are ∞ potential, but the arithmetic goes bonkers
 			// if I actually set the voltage to ∞.  Remember complex values 2 doubles
-			wave[0] = wave[1] = wave[end] = wave[end+1] = 0;
+			wave[0] = wave[1] = wave[end2] = wave[end2+1] = 0;
 			break;
 
 		case qe.contENDLESS:
 			// the points on the end get set to the opposite side.  Remember this is for complex, 2x floats
-			wave[0] = wave[end-2];
-			wave[1]  = wave[end-1];
-			wave[end] = wave[2];
-			wave[end+1] = wave[3];
+			wave[0] = wave[end2-2];
+			wave[1]  = wave[end2-1];
+			wave[end2] = wave[2];
+			wave[end2+1] = wave[3];
 			break;
 
 		default: throw new Error(`🚀  bad continuum '${continuum}' in  eSpace.fixThoseBoundaries()`);

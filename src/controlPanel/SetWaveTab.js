@@ -58,7 +58,7 @@ class SetWaveTab extends React.Component {
 			this.setState({space});
 			this.space = space;  // need it now
 			this.miniGraphAvatar = space.miniGraphAvatar;
-			this.miniGraphWaveBuffer = this.miniGraphAvatar.eWave;
+			this.miniGraphWaveBuffer = this.miniGraphAvatar.ewave;
 			//this.miniGraphVBuffer = this.miniGraphAvatar.vBuffer;
 		})
 		.catch(ex => {

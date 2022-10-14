@@ -24,7 +24,7 @@ class eAvatar {
 	constructor(pointer, space) {
 		prepForDirectAccessors(this, pointer);
 		this.space = space;
-		this.eWave = new eWave(this.space, null, this.mainQWave);
+		this.ewave = new eWave(this.space, null, this.mainQWave);
 		this.vBuffer = new Float32Array(window.Module.HEAPF32.buffer, this._qvBuffer,
 				this.space.nPoints * 8); // two vec4 s per point
 
