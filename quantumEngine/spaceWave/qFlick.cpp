@@ -184,7 +184,7 @@ double qFlick::magnitude(int doubleAge, int ix) {
 
 // create a new wave copy, push this copy onto this flick
 //void qFlick::pushCopy(qCx *wave) {
-//	qCx *w = allocateWave();  // starts out zeroed
+//	qCx *w = allocateWave();
 //	if (wave)
 //		copyThatWave(w, wave);
 //	pushWave(w);

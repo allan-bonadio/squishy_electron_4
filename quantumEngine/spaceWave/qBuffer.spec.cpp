@@ -67,8 +67,8 @@ TEST(qBuffer, BufferUseThisBufferMallocTwoAtOnce)
 TEST(qBuffer, BufferUseThisBufferAllocateTwoAtOnce)
 {
 	// make sure there isn't anything shared between them.
-	qCx *buf27 = allocateWave(27);
-	qCx *buf999 = allocateWave(999);
+	qCx *buf27 = allocateZeroedWave(27);
+	qCx *buf999 = allocateZeroedWave(999);
 
 	testABufferLength(999, buf999);
 	testABufferLength(27, buf27);

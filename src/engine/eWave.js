@@ -3,11 +3,14 @@
 ** Copyright (C) 2021-2022 Tactile Interactive, all rights reserved
 */
 
+// There is no eBuffer or eSpectrum; C++ deals with those exclusively
+
 //import {qe} from './qe';
 import cxToRgb from '../view/cxToRgb';
 import {cppObjectRegistry, prepForDirectAccessors} from '../utils/directAccessors';
 
-let traceSetWave = true;
+let traceSetFamiliarWave = true;
+let traceSetFamiliarWaveResult = true;
 
 // emscripten sabotages this?  the log & info, but not error & warn?
 //const consoleLog = console.log.bind(console);
@@ -15,41 +18,34 @@ let traceSetWave = true;
 // Dump a wave buffer as a colored bargraph in the JS console
 // this is also called by C++ so it's easier as a standalone function
 // see also eWave method by same name (but different args)
-export function rainbowDump(wave, start, end, nPoints) {
-	let title = "temporary title eWave.js:17";
+export function rainbowDump(wave, start, end, nPoints, title) {
 	let start2 = 2 * start;
-	let end2 = 2 * start;
+	let end2 = 2 * end;
 	if (isNaN(start2) || isNaN(end2))
 		debugger;
 
 // 	const wave = this.wave;
 // 	const {start2, end2} = this.space.startEnd2;
 
-	console.log(`%c rainbowDump    🌊   ${title}   ${start2/2}...${end2/2}  with ${nPoints} pts`,
-		`font: times 16px italic; color: #222; background-color: #fff; padding-right: 70%; font: 14px Palatino;`);
+	// maybe doesn't work when called from c++?
+	console.log(`%c rainbowDump  🌊 |  ${title} `,
+		`color: #222; background-color: #fff; font: 14px Palatino;`);
+	//console.info(`${start2/2}...${end2/2}  🌊 with ${nPoints} pts`0;
 
-	let tot = 0;  // always real
-	for (let ix = start2; ix < end2; ix += 2) {
-		let mag = (wave[ix] ** 2 + wave[ix + 1] ** 2) * 10000;
+	// autorange
+	let maxi = 0;
+	for (let ix2 = start2; ix2 < end2; ix2 += 2)
+		maxi = Math.max(maxi, wave[ix2] ** 2 + wave[ix2 + 1] ** 2);
+	let correction = 1000 / maxi;  // intended max width in console
+	//console.info(`maxi=${maxi}  corr=${correction}`)
 
+	for (let ix2 = start2; ix2 < end2; ix2 += 2) {
+		let mag = (wave[ix2] ** 2 + wave[ix2 + 1] ** 2) * correction;
+		//console.info(`mag=${mag}  mag pre corr=${mag / correction}`)
 
-		tot += mag;
-		let color = cxToRgb({re: wave[ix], im: wave[ix + 1]});
-
-		console.log(`%c🌊  `, `background-color: ${color}; padding-right: ${mag+5}px; `);
-
-		ix += 2;
-		tot += mag;
-		color = cxToRgb({re: wave[ix], im: wave[ix + 1]});
-
-		// is this redundant!?!?!?
-		//console.log doesn't work here, dunnowhy, unless you stick in either extra console.log()
-// 		console.log(`%c rich `, "font-family: palatino");
-// 		console.log(`%c🌊  `, `background-color: ${color}; padding-right: ${mag+5}px; `);
-		console.log(`%c🌊  `, `background-color: ${color}; padding-right: ${mag+5}px; `);
-		//console.log(`zitgoin purdy good`);
+		let color = cxToRgb({re: wave[ix2], im: wave[ix2 + 1]});
+		console.log(`%c `, `background-color: ${color}; padding-right: ${mag+5}px; `);
 	}
-	return tot;
 }
 window.rainbowDump = rainbowDump;  // so c++ can get to it
 
@@ -102,9 +98,10 @@ class eWave {
 			this.wave = wave;
 			cppObjectRegistry[waveArg] = wave;
 
-			// smoke test
+			// smoke test - the values a raw, freshly created qWave gets
 			for (let j = 0; j < this.nPoints*2; j++)
 				wave[j] = -99.;
+			// qBuffer::allocateWave fills to -77 (if trace turned on); allocateZeroedWave() leaves all zeroes
 		}
 		else
 			throw new Error(`call to construct eWave failed cuz bad waveArg=${waveArg}`);
@@ -145,8 +142,8 @@ class eWave {
 		const {start2, end2} = this.space.startEnd2;
 
 		let tot = 0;
-		for (let ix = start2; ix < end2; ix += 2) {
-			let norm = wave[ix] ** 2 + wave[ix + 1] ** 2;
+		for (let ix2 = start2; ix2 < end2; ix2 += 2) {
+			let norm = wave[ix2] ** 2 + wave[ix2 + 1] ** 2;
 			tot += norm;
 		}
 		return tot;
@@ -162,9 +159,11 @@ class eWave {
 
 		// treat ALL points, including border ones.
 		// And real and imaginary, go by ones
-		let {nPoints} = this.space.startEnd2;
-		for (let ix = 0; ix < nPoints; ix++)
-			wave[ix] *= factor;
+		let {nPoints2} = this.space.startEnd2;
+		for (let ix2 = 0; ix2 < nPoints2; ix2++) {
+			wave[ix2] *= factor;
+			wave[ix2+1] *= factor;
+		}
 
 		return iProd
 	}
@@ -181,10 +180,10 @@ class eWave {
 		const dAngle = Math.PI / N * (+n) * 2;
 		const wave = this.wave;
 
-		for (let ix = start2; ix < end2; ix += 2) {
-			const angle = dAngle * (ix - start2) / 2;
-			wave[ix] = Math.cos(angle);
-			wave[ix + 1] = Math.sin(angle);
+		for (let ix2 = start2; ix2 < end2; ix2 += 2) {
+			const angle = dAngle * (ix2 - start2) / 2;
+			wave[ix2] = Math.cos(angle);
+			wave[ix2 + 1] = Math.sin(angle);
 		}
 
 		//this.dump('eWave.setCircularWave() done');
@@ -207,10 +206,10 @@ class eWave {
 // 			end2++;
 // 		}
 
-		for (let ix = start2; ix < end2; ix += 2) {
-			const angle = dAngle * (ix - start2);
-			wave[ix] = Math.sin(angle);
-			wave[ix + 1] = 0;
+		for (let ix2 = start2; ix2 < end2; ix2 += 2) {
+			const angle = dAngle * (ix2 - start2);
+			wave[ix2] = Math.sin(angle);
+			wave[ix2 + 1] = 0;
 		}
 
 		//this.dump('eWave.setStandingWave() done');
@@ -220,13 +219,13 @@ class eWave {
 	// freq is just like circular, although as a fraction of the pulseWidth instead of N
 	// 2stdDev is width of the packet, as percentage of N (0%...100%).
 	// offset is how far along is the peak, as an integer X value (0...N).
-	setPulseWave(freqUi, pulseWidthUi, offsetUi) {
+	setGaussianWave(freqUi, pulseWidthUi, offsetUi) {
 		const wave = this.wave;
 		const {start2, end2, N} = this.space.startEnd2;
 		let offset = offsetUi * N / 100;  // now in units of X
 		let pulseWidth = pulseWidthUi * N / 100;  // now in units of X
 		const freq = Math.round(freqUi);
-		if (traceSetWave) console.log(`🌊  setPulseWave freq=${freqUi} => ${freq} `+
+		if (traceSetFamiliarWave) console.log(`🌊  setGaussianWave freq=${freqUi} => ${freq} `+
 			`  offset=${offsetUi}% => ${offset}   pulseWidth=${pulseWidthUi}% => ${pulseWidth}`)
 
 		// start with a circular wave
@@ -235,16 +234,16 @@ class eWave {
 		// modulate with a gaussian, centered at the offset, with pulseWidth
 		// tweak numbers to suit the ui
 		const s2 = pulseWidth ** -2;  // 1/stddev**2 sortof
-		for (let twoix = start2; twoix < end2; twoix += 2) {
-			let ix = twoix / 2;
+		for (let ix2 = start2; ix2 < end2; ix2 += 2) {
+			let ix = ix2 / 2;
 			const 𝜟 = (ix - offset) % N;
 			const stretch = Math.exp(-𝜟 * 𝜟 * s2);
-			wave[ix] *= stretch;
-			wave[ix + 1] *= stretch;
+			wave[ix2] *= stretch;
+			wave[ix2 + 1] *= stretch;
 		}
 
-		//this.dump('eWave.setPulseWave() done');
-		//this.rainbowDump('eWave.setPulseWave() done');
+		//this.dump('eWave.setGaussianWave() done');
+		//this.rainbowDump('eWave.setGaussianWave() done');
 	}
 
 	// 2stdDev is width of the packet, as percentage of N (0%...100%).
@@ -253,12 +252,12 @@ class eWave {
 		console.log(`setChordWave(${freqUi}, ${pulseWidthUi}, ${offsetUi})`);
 		const wave = this.wave;
 		const {start2, end2, N} = this.space.startEnd2;
-		let offset = offsetUi * N / 100;  // now in units of X
+		let offset2 = offsetUi * N / 100 * 2;  // now in units of X * 2
 		const nSideFreqs = Math.round(pulseWidthUi / 100 * N)
 		const freq = Math.round(freqUi);
-		if (traceSetWave)
+		if (traceSetFamiliarWave)
 			console.log(`🌊  setChordWave freq=${freqUi} => ${freq}  nSideFreqs=${nSideFreqs}`+
-			`  offset=${offsetUi}% => ${offset}`)
+			`  offset=${offsetUi}% => ${offset2}`);
 
 		//const dAngle = 4 * Math.PI / N;
 		const dAngle = 1.0 * Math.PI / N;
@@ -267,21 +266,21 @@ class eWave {
 // 		let freqHigh = freq + 1.;
 // 		let freqHighHigh = freqHigh + 1.;
 
-		const startFreq = freqUi - nSideFreqs;
+		const startFreq = freq - nSideFreqs;
 		const lastFreq = startFreq + nSideFreqs
 
-		for (let ix = start2; ix < end2; ix += 2) {
-			const angle = dAngle * (ix - start2 - offset);
-			wave[ix] = wave[ix+1] = 0;
+		for (let ix2 = start2; ix2 < end2; ix2 += 2) {
+			const angle = dAngle * (ix2 - start2 - offset2) / 2;
+			wave[ix2] = wave[ix2+1] = 0;
 
 			for (let f = startFreq; f <= lastFreq; f++) {
-				wave[ix] += Math.cos(f * angle);  // r
-				wave[ix+1] += Math.sin(f * angle);  // im
+				wave[ix2] += Math.cos(f * angle);  // r
+				wave[ix2+1] += Math.sin(f * angle);  // im
 			}
 		}
 
-		//		//this.dump('eWave.setPulseWave() done');
-		//this.rainbowDump('eWave.setChordWave() done');
+		//		//this.dump('eWave.setGaussianWave() done');
+		this.rainbowDump('eWave.setChordWave() done');
 	}
 
 	// set one of the above canned waveforms, according to the waveParams object's values
@@ -299,7 +298,7 @@ class eWave {
 			break;
 
 		case 'gaussian':
-			this.setPulseWave(+waveParams.waveFrequency, +waveParams.pulseWidth, +waveParams.pulseOffset);
+			this.setGaussianWave(+waveParams.waveFrequency, +waveParams.pulseWidth, +waveParams.pulseOffset);
 			break;
 
 		case 'chord':
@@ -313,6 +312,11 @@ class eWave {
 		this.space.mainEAvatar.normalize();
 		//this.normalize();
 		this.space.fixThoseBoundaries(this.wave);
+
+		if (traceSetFamiliarWaveResult) {
+			this.dump(`eWave.setFamiliarWave(${waveParams.waveBreed}) done`);
+			this.rainbowDump(`eWave.setFamiliarWave(${waveParams.waveBreed}) done`);
+		}
 	}
 }
 

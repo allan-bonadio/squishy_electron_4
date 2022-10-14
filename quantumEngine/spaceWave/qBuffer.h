@@ -20,7 +20,7 @@
 struct qSpace;
 struct qWave;
 
-extern qCx *allocateWave(int nPoints = -1);
+extern qCx *allocateZeroedWave(int nPoints = -1);
 extern void freeWave(struct qCx *wave);
 
 // a long array of qCx complex numbers, plus some other info

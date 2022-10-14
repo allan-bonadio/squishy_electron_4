@@ -27,12 +27,13 @@ static bool traceAllocate = false;
 
 // just allocate a wave of whatever length
 // buffer is unreliably initialized to zero bytes only first time it's allocated; hence calloc
-qCx *allocateWave(int nPoints) {
+qCx *allocateZeroedWave(int nPoints) {
 	qCx *buf = (qCx *) calloc(nPoints, sizeof(qCx));
 	if (traceAllocate) {
-		printf("🍕 allocateWave()  buf=%p  nPoints: %d bytelength=x%lx\n",
+		printf("🍕 allocateZeroedWave()  buf=%p  nPoints: %d bytelength=x%lx\n",
 			buf, nPoints, nPoints * sizeof(qCx));
 	}
+	// each cell has zeroes
 	return buf;
 }
 
@@ -52,9 +53,12 @@ qCx *qBuffer::allocateWave(int nPoints) {
 
 	// ?? this is weird  this->nPoints = nPoints;
 	qCx *buf =  (qCx *) malloc(nPoints * sizeof(qCx));
-	if (traceAllocate)
-		printf("🍕 qBuffer::allocateWave this=%p  nPoints: %d  buf: %p\n",
+	if (traceAllocate) {
+		printf("🍕 qBuffer::allocateWave this=%p  nPoints: %d  buf: %p, filled with 0x77\n",
 			this, nPoints, buf);
+		for (int j = 0; j < nPoints*2; j++)
+			wave[j] = -77;
+	}
 	return buf;
 }
 
@@ -186,7 +190,7 @@ void qBuffer::dumpThat(qCx *wave, bool withExtras) {
 
 // works on any buffer but originally written for qWaves
 void qBuffer::dump(const char *title, bool withExtras) {
-	printf("\n🌊🌊 ==== Wave | %s ", title);
+	printf("\n🌊🌊 ==== Wave %p->%p | %s ", this, wave, title);
 	qBuffer::dumpSegment(wave, withExtras, start, end, continuum);
 	//space->dumpThat(wave, withExtras);
 	printf("        ==== end of Wave ====\n\n");
@@ -208,22 +212,27 @@ void qBuffer::dumpHiRes(const char *title) {
 }
 
 // calls the JS dumpRainbow method of eWave.  Note we can't compile this for
-// straight C++ specs cuz there's no emscripten or JS.  So the app,
+// straight C++ code (like specs) cuz there's no emscripten or JS.  So the app,
 // or node with emscripten
 void qBuffer::rainbowDump(const char *title) {
 	printf("about to rainbowDump EM_ASM %p %d %d %d %s\n\n", wave, start, end, nPoints, title);
 	// this also has to compile for standard C++ with no emscripten
 	#ifdef EM_ASM
 	EM_ASM({
-		console.log('rainbowDump: starting the inner JS; I received: start=%d end=%d nPoints=%d title=%s\n', $1, $2, $3);
+		// somehow these console msgs never work
+		//console.log('rainbowDump: starting the inner JS; I received: start=%d end=%d nPoints=%d title=%s\n',
+		//$1, $2, $3);
+
+		// temporary
 		let waveJS = new Float64Array(window.Module.HEAPF64.buffer, $0, 2 * $3);
+		let titleJS = UTF8ToString($4);
 
 		//rainbowDump(wave, start, end, nPoints, title);
-		rainbowDump(waveJS, $1, $2, $3);
+		rainbowDump(waveJS, $1, $2, $3, titleJS);
 
-
-		console.log("rainbowDump: done the inner JS; I received: start=%d end=%d nPoints=%d title=%s\n", $1, $2, $3, $4);
-	}, wave, start, end, nPoints);
+		//console.log("rainbowDump: done the inner JS; I received: start=%d end=%d nPoints=%d title=%s\n",
+		//	$1, $2, $3, $4);
+	}, wave, start, end, nPoints, title);
 	#endif
 printf("done with rainbowDump EM_ASM\n\n");
 }
