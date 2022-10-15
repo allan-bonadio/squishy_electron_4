@@ -54,7 +54,7 @@ static void completeNewAvatarGauntlet(int N) {
 
 
 	// lets see if the buffers are all large enough
-	proveItsMine(avatar->mainQWave->wave	, nPoints * sizeof(qCx));
+	proveItsMine(avatar->qwave->wave	, nPoints * sizeof(qCx));
 	proveItsMine(avatar->qvBuffer->vBuffer, nPoints * sizeof(float) * 8);
 
 	qWave *scrWave = avatar->getScratchWave();
@@ -92,7 +92,7 @@ static void tryFourierFilter(int N, int goodFreq, int badFreq, int lowPassFilter
 
 	qSpace *space = makeBareSpace(N, contENDLESS);
 	qAvatar *avatar = new qAvatar(space, "tryFourierFil");
-	qWave *qw = avatar->mainQWave;
+	qWave *qw = avatar->qwave;
 	qWave *addOn = avatar->getScratchWave();
 	qSpectrum *rainbow = avatar->getSpectrum();
 

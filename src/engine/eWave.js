@@ -8,6 +8,7 @@
 //import {qe} from './qe';
 import cxToRgb from '../view/cxToRgb';
 import {cppObjectRegistry, prepForDirectAccessors} from '../utils/directAccessors';
+import eSpace from './eSpace';
 
 let traceSetFamiliarWave = true;
 let traceSetFamiliarWaveResult = true;
@@ -65,6 +66,8 @@ class eWave {
 		prepForDirectAccessors(this, pointer);
 
 		this.space = space;
+		if (!(space instanceof eSpace))
+			throw new Error("new eWave: space is not an eSpace")
 
 		if (pointer) {
 			this.pointer = pointer;  // a qWave

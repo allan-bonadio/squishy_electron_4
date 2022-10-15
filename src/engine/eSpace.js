@@ -5,7 +5,7 @@
 import qe from './qe';
 //import eWave from './eWave';
 import {setFamiliarPotential} from '../utils/potentialUtils';
-import salientBuffersFactory from './salientBuffersFactory';
+import salientPointersFactory from './salientPointersFactory';
 import eAvatar from './eAvatar';
 import {getAGroup} from '../utils/storeSettings';
 import {cppObjectRegistry} from '../utils/directAccessors';
@@ -99,32 +99,38 @@ export class eSpace {
 
 		// salientPointers will give us pointers to buffers and stuff we need
 		let sp = qe.completeNewSpace();
-		let salientBuffers = this.salientBuffers = new salientBuffersFactory(this, sp);
+		let salientPointers = this.salientPointers = new salientPointersFactory(this, sp);
 
-		// remember that eSpace.salientBuffers doesn't work for multiple spaces or multiple dimensions
-		eSpace.salientBuffers = this.salientBuffers;
+		// remember that eSpace.salientPointers doesn't work for multiple spaces or multiple dimensions
+		eSpace.salientPointers = salientPointers;
 
 		// this reaches into C++ space and accesses the main wave buffer of this space
 		// hmmm space shouldn't point to this - just avatar?
-		//this.ewave = salientBuffers.mainEWave;
+		//this.ewave = salientPointers.mainEWavethis.mainEAvatar;
 		//this.wave = this.ewave.wave;
 
-		this.pointer = salientBuffers.spacePointer;
+		this.pointer = salientPointers.spacePointer;
 		cppObjectRegistry[this.pointer] = this;
 
 
 		// direct access into the potential buffer
-		this.potentialBuffer = salientBuffers.potentialBuffer;
+		this.potentialBuffer = new Float64Array(window.Module.HEAPF64.buffer,
+				salientPointers.potentialBufferPointer, this.nPoints);;
 		let potentialParams = getAGroup('potentialParams');
 		setFamiliarPotential(this, this.potentialBuffer, potentialParams);
-			//new Float64Array(window.Module.HEAPF64.buffer,
-			//salientPointers.potentialBuffer, this.nPoints);
+			//
 
-		this.mainEAvatar = new eAvatar(salientBuffers.mainAvatarPointer, this);
-		//this.mainEAvatar = salientBuffers.mainEAvatar;
+		this.mainEAvatar = new eAvatar(this,
+				salientPointers.mainVBufferPointer, salientPointers.mainAvatarPointer);
+		//this.mainEAvatar = salientPointers.mainEAvatarPointer;
 		this.mainVBuffer = this.mainEAvatar.vBuffer;
+		// so wrong!  this.mainVBuffer = this.mainEAvatar.vBuffer;
 		this.mainEWave = this.mainEAvatar.ewave;
-		this.miniGraphAvatar = new eAvatar(salientBuffers.miniGraphAvatarPointer, this);
+
+		this.miniGraphAvatar = new eAvatar(this,
+				salientPointers.miniGraphVBufferPointer, salientPointers.miniGraphAvatarPointer);
+		this.miniGraphVBuffer = this.miniGraphAvatar.vBuffer;
+		this.miniGraphEWave = this.miniGraphAvatar.mainEWave
 
 		// by default it's set to 1s, or zeroes?  but we want something good.
 		let waveParams = getAGroup('waveParams');

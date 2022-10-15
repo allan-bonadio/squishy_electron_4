@@ -16,8 +16,9 @@ const fs = require('fs');
 // in JS: import qe from 'engine/qe', then use qe.funcname()
 // also must call defineQEngineFuncs after C++ is initialized
 exportsSrc  = [
-	// args and retType can be 'number', 'string', 'array' (of bytes), or null meaning void.
-	// That's all.  Anything more complex, you have to make up out of those with multiple calls or a typed array.
+	// args and retType can be 'number', 'string', 'array' (of bytes), or null
+	// meaning void. That's all.  Anything more complex, you have to make up out
+	// of those with multiple calls or a typed array.
 	{name: 'main', args: [], retType: 'number'},
 
 	// recreating the space
@@ -37,15 +38,9 @@ exportsSrc  = [
 	// now done in js {name: 'qSpace_setValleyPotential', args: ['number', 'number', 'number'], retType: 'number'},
 
 	// params
-//converted to direct{name: 'Avatar_setDt', args: ['number'], retType: null},
-//converted to direct{name: 'Avatar_setStepsPerIteration', args: ['number'], retType: null},
-//converted to direct{name: 'Avatar_setLowPassFilter', args: ['number'], retType: null},
-
-
-	// views
-	{name: 'avatar_getViewBuffer', args: ['number'], retType: 'number'},
-//converted to direct{name: 'qViewBuffer_loadViewBuffer', args: ['number'], retType:  'number'},
-	{name: 'avatar_dumpViewBuffer', args: ['number', 'string'], retType: null},
+	//converted to direct{name: 'Avatar_setDt', args: ['number'], retType: null},
+	//converted to direct{name: 'Avatar_setStepsPerIteration', args: ['number'], retType: null},
+	//converted to direct{name: 'Avatar_setLowPassFilter', args: ['number'], retType: null},
 
 	// avatars - all accept an integer pointer to the avatar as first argument
 	{name: 'avatar_loadViewBuffer', args: ['number'], retType:  'number'},
@@ -54,10 +49,12 @@ exportsSrc  = [
 	{name: 'avatar_normalize', args: ['number'], retType: null},
 	{name: 'avatar_delete', args: ['number'], retType: null},
 
+	// views
+	{name: 'avatar_getViewBuffer', args: ['number'], retType: 'number'},
+	//converted to direct{name: 'qViewBuffer_loadViewBuffer', args: ['number'], retType:  'number'},
+	{name: 'avatar_dumpViewBuffer', args: ['number', 'string'], retType: null},
 
-	// the qAvatar ones act on theAvatar in the c++ code
-//converted to direct{name: 'Avatar_getElapsedTime', args: [], retType: 'number'},
-//converted to direct{name: 'Avatar_getIterateSerial', args: [], retType: 'number'},
+
 ];
 
 // remember you don't have to export your func like this, you can do one-offs for testing with ccall():

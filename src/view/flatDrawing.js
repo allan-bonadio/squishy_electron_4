@@ -10,12 +10,12 @@ import {viewUniform, viewAttribute} from './viewVariable';
 //import SquishPanel from '../SquishPanel';
 //import {eSpaceCreatedPromise} from '../engine/eEngine';
 
-let dumpViewBufAfterDrawing = false;
+let dumpViewBufAfterDrawing = true;
 let traceHighest = true;
 
 // diagnostic purposes
-let alsoDrawPoints = true;
-let alsoDrawLines = true;
+let alsoDrawPoints = false;
+let alsoDrawLines = false;
 //alsoDrawLines =0;
 
 let ps = alsoDrawPoints ? `gl_PointSize = (row.w+1.) * 5.;//10.;` : '';
@@ -31,7 +31,7 @@ let ps = alsoDrawPoints ? `gl_PointSize = (row.w+1.) * 5.;//10.;` : '';
 
 // make the line number for the start correspond to this JS file line number
 const vertexSrc = `${cxToColorGlsl}
-#line 33
+#line 34
 varying highp vec4 vColor;
 attribute vec4 row;
 uniform float barWidth;
@@ -53,9 +53,6 @@ void main() {
 	float x;
 	x = float(int(vertexSerial) / 2) * barWidth * 2. - 1.;
 
-	// and here we are
-	x /= 2.;  ////
-	y /= 2.;  ////
 	gl_Position = vec4(x, y, 0., 1.);
 
 	//  for the color, convert the complex values via this algorithm
@@ -151,10 +148,12 @@ export class flatDrawing extends abstractDrawing {
 			gl.drawArrays(gl.POINTS, 0, this.vertexCount);
 
 		// i think this is problematic
-		if (dumpViewBufAfterDrawing)
+		if (dumpViewBufAfterDrawing) {
 			this.avatar.dumpViewBuffer(`finished drawing in flatDrawing.js; drew buf:`);
+			console.log(`barWidthUniform=${this.barWidthUniform.staticValue}    `
+				+`maxHeightUniform=`, this.maxHeightUniform.getFunc());
+		}
 	}
 }
 
 export default flatDrawing;
-

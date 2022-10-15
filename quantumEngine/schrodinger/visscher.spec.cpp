@@ -62,16 +62,17 @@ IGNORE_TEST(visscher, VisscherOneIteration)
 {
 	// simulate the app starting up
 	makeFullSpace(32);
-	theAvatar->mainQWave->setCircularWave(1.);
+	qAvatar *av = fullSpaceSalientPointers.mainAvatar;
+	av->qwave->setCircularWave(1.);
 
 	// simulate the app taking one iter = 100 steps
-	theAvatar->stepsPerIteration = 100;
-	theAvatar->dt = .01;
-	theAvatar->lowPassFilter = 1;
+	av->stepsPerIteration = 100;
+	av->dt = .01;
+	av->lowPassFilter = 1;
 
-	theAvatar->oneIteration();
+	av->oneIteration();
 
-//theAvatar->mainQWave->dumpWave("VisscherOneIteration test");
+//av->qwave->dumpWave("VisscherOneIteration test");
 
 	// simulate the app ... tearing down, although probably not done much in reality
 	deleteTheSpace();

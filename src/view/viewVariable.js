@@ -4,6 +4,7 @@
 */
 
 let traceGLCalls = true;
+let traceVariables = true;
 
 // attr arrays and uniforms that can change on every frame.
 // you can set a static value or a function that'll return it
@@ -22,6 +23,7 @@ export class viewVariable {
 		if (! varName || ! owner) throw new Error(`bad name${!varName} or owner${!owner} used to create a view var`);
 
 		// both views and drawings often have this array, so 'owner' might not be a view
+		// i don't think this does what it's intended to do
 		let vv = owner.viewVariables;
 		if (vv.includes(this)) {
 			console.error(`duplicate variable ${varName}!!`);
@@ -51,13 +53,13 @@ export class viewUniform extends viewVariable {
 		// this turns out to be an internal magic object
 		this.uniformLoc = this.gl.getUniformLocation(this.owner.program, varName);
 		if (!this.uniformLoc) throw new Error(`Cannot find uniform loc for uniform variable ${varName}`);
-		if (traceGLCalls) console.log(`created viewUniform '${varName}'`);
+		if (traceVariables) console.log(`created viewUniform '${varName}'`);
 	}
 
 	// change the value, sortof, by one of these two ways:
 	// - changing the function that returns it.  Pass function in.
-	//         the func should return an object eg {value=1.234, type='1f'}
-	// - just setting the static Value.  Pass in any non-function value, and a type.
+	//         the func should return an object eg {value:1.234, type:'1f'}
+	// - just setting the static Value.  Set any non-function value, and a type.
 	// types you can use: 1f=1 float single.  1i=1 int 32 bit.
 	// 2fv, 3fv, 4fv=vec2, 3, 4; Must pass in an array value if type includes 'v'.
 	// must return in an array value, typed or not.  Same for 2iv, etc.
@@ -67,13 +69,13 @@ export class viewUniform extends viewVariable {
 		if (typeof valueVar == 'function') {
 			this.getFunc = valueVar;
 			this.staticValue = this.staticType = undefined;
-			if (traceGLCalls) console.log(`set function value on viewUniform '${this.varName}'`);
+			if (traceVariables) console.log(`set function value on viewUniform '${this.varName}'`);
 		}
 		else {
 			this.staticValue = valueVar;
 			this.staticType = type;
 			this.getFunc = undefined;
-			if (traceGLCalls) console.log(`set static value ${valueVar} on viewUniform '${this.varName}'`);
+			if (traceVariables) console.log(`set static value ${valueVar} type ${type} on viewUniform '${this.varName}'`);
 		}
 		this.reloadVariable();
 	}
@@ -89,6 +91,8 @@ export class viewUniform extends viewVariable {
 			value = v.value;
 			type = v.type;
 		}
+		if (traceVariables) console.log(
+			`re-loaded uniform ${this.varName} with value=${value} type ${type}`);
 
 		// you can't pass null or undefined
 		if (null == value || null == type)
@@ -116,7 +120,7 @@ export class viewUniform extends viewVariable {
 
 		gl[method].apply(gl, args);  // wish me luck
 
-		if (traceGLCalls) console.log(`viewUniform.reloadVariable '${this.varName}' to:`, args);
+		if (traceVariables) console.log(`viewUniform reloaded Variable '${this.varName}' to:`, args);
 
 		//this.gl.uniform1f(this.uniformLoc, value);
 		//this.gl.uniform1i(this.uniformLoc, value);
@@ -203,8 +207,17 @@ export class viewAttribute extends viewVariable {
 		// do we have to do THIS again?  Does it just slurp it up from the pointer from last time?!?!
 		gl.bufferData(gl.ARRAY_BUFFER, this.float32TypedArray, this.bufferDataDrawMode);
 
-		if (traceGLCalls) console.log(`viewAttribute '${this.varName}' reloaded row[1]:`,
-				this.float32TypedArray[8], this.float32TypedArray[9], this.float32TypedArray[10], this.float32TypedArray[11]);
+		if (traceVariables) {
+			console.log(`viewAttribute '${this.varName}' reloaded:`);
+			let ar = this.float32TypedArray;
+			for (let itemNum = 0; itemNum < ar.length; itemNum += 8) {
+				let line = '';
+				for (let j = 0; j < 8; j++) {
+					line += ar[itemNum + j].toFixed(5) +'   ';
+				}
+				console.log(line);
+			}
+		}
 	}
 
 }

@@ -111,7 +111,7 @@ void qAvatar::stepReal(qCx *newW, qCx *oldW, double dt) {
 	}
 	if (traceVischerBench) printf("      stepReal, on to fix boundaries: time=%lf\n",
 		getTimeDouble());
-	mainQWave->fixThoseBoundaries(newW);
+	qwave->fixThoseBoundaries(newW);
 	if (traceRealStep) printf("⚛️ end of stepReal:");
 }
 
@@ -138,7 +138,7 @@ void qAvatar::stepImaginary(qCx *newW, qCx *oldW, double dt) {
 	if (traceVischerBench) printf("      stepImaginary, on to fix boundaries: time=%lf\n",
 		getTimeDouble());
 
-	mainQWave->fixThoseBoundaries(newW);
+	qwave->fixThoseBoundaries(newW);
 	//printf("⚛️ end of stepImaginary - result wave:");
 }
 

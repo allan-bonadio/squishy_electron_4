@@ -19,7 +19,7 @@ import TextNSlider from '../widgets/TextNSlider';
 import {alternateMinMaxs} from '../utils/storeSettings';
 //import {storeASetting, alternateMinMaxs} from '../utils/storeSettings';
 
-//import salientBuffersFactory from './salientBuffersFactory';
+//import salientPointersFactory from './salientPointersFactory';
 import {eSpaceCreatedPromise} from '../engine/eEngine';
 import {interpretCppException} from '../utils/errors';
 

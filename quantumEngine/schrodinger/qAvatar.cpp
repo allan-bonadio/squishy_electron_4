@@ -53,7 +53,7 @@ qAvatar::qAvatar(qSpace *sp, const char *lab)
 	: dt(1e-3), stepsPerIteration(100), lowPassFilter(1),
 		space(sp), magic('Avat'), pleaseFFT(false), isIterating(false) {
 
-	mainQWave = new qWave(space);
+	qwave = new qWave(space);
 	scratchQWave = NULL;  // until used
 	qspect = NULL;  // until used
 	strncpy(label, lab, LABEL_LEN);
@@ -65,6 +65,7 @@ qAvatar::qAvatar(qSpace *sp, const char *lab)
 
 	// we always need a view buffer; that's the whole idea behind an avatar
 	qvBuffer = new qViewBuffer(space, this);
+	vBuffer = qvBuffer->vBuffer;
 
 	if (traceSpace) {
 		printf("the qSpace just created:   magic=%c label=%s nDimesions=%d nStates=%d nPoints=%d "
@@ -88,7 +89,7 @@ qAvatar::~qAvatar(void) {
 	// eAvatar will delete the Avatar object and any others needed.
 
 	// always allocated
-	delete mainQWave;
+	delete qwave;
 	delete qvBuffer;
 
 	// these may or may not have been allocated, depending on whether they were needed
@@ -149,7 +150,7 @@ void qAvatar::formatDirectOffsets(void) {
 	/* *********************************************** waves & buffers */
 
 	printf("\n");
-	makePointerGetter(mainQWave);
+	makePointerGetter(qwave);
 
 	printf("\n");
 	makePointerGetter(potential);
@@ -163,8 +164,8 @@ void qAvatar::formatDirectOffsets(void) {
 	printf("\n");
 	makePointerGetter(qspect);
 
-	// the qViewBuffer to be passed to webgl.  This is a visual thing after all.
-	makePointerGetter(qvBuffer);
+	// the view Buffer to be passed to webgl.  Just the buffer, not the qViewBuffer
+	makePointerGetter(vBuffer);
 
 	makeStringPointer(label);
 
@@ -186,8 +187,8 @@ void qAvatar::dumpObj(const char *title) {
 	printf("        elapsedTime %lf, iterateSerial  %lf, dt  %lf, lowPassFilter %d, stepsPerIteration %d\n",
 		elapsedTime, iterateSerial, dt, lowPassFilter, stepsPerIteration);
 
-	printf("        mainQWave %p, potential  %p, potentialFactor  %lf, scratchQWave %p, qspect %p, qViewBuffer %p\n",
-		mainQWave, potential, potentialFactor, scratchQWave, qspect, qvBuffer);
+	printf("        qwave %p, potential  %p, potentialFactor  %lf, scratchQWave %p, qspect %p, qViewBuffer %p\n",
+		qwave, potential, potentialFactor, scratchQWave, qspect, qvBuffer);
 
 	printf("        isIterating: %hhu   pleaseFFT=%hhu \n", isIterating, pleaseFFT);
 
@@ -233,8 +234,8 @@ void qAvatar::oneIteration() {
 	// cuz outside of here, re and im are for the same time.
 	// Note here the latest is in scratch; iterate continues this,
 	// and the halfwave at the end moves it back to main.
-	stepReal(scratchQWave->wave, mainQWave->wave, 0);
-	stepImaginary(scratchQWave->wave, mainQWave->wave, dt/2);
+	stepReal(scratchQWave->wave, qwave->wave, 0);
+	stepImaginary(scratchQWave->wave, qwave->wave, dt/2);
 
 	int doubleSteps = stepsPerIteration / 2;
 	if (traceIteration)
@@ -242,8 +243,8 @@ void qAvatar::oneIteration() {
 			doubleSteps, stepsPerIteration);
 
 	for (tt = 0; tt < doubleSteps; tt++) {
-		oneVisscherStep(mainQWave, scratchQWave);
-		oneVisscherStep(scratchQWave, mainQWave);
+		oneVisscherStep(qwave, scratchQWave);
+		oneVisscherStep(scratchQWave, qwave);
 
 		if (traceIteration && 0 == tt % 32) {
 			printf("       qAvatar: step every 64, step %d; elapsed time: %lf\n", tt * 2, getTimeDouble());
@@ -259,8 +260,8 @@ void qAvatar::oneIteration() {
 
 	// half step at completion to move Re forward dt/2
 	// and copy back to Main
-	stepReal(mainQWave->wave, scratchQWave->wave, dt/2);
-	stepImaginary(mainQWave->wave, scratchQWave->wave, 0);
+	stepReal(qwave->wave, scratchQWave->wave, dt/2);
+	stepImaginary(qwave->wave, scratchQWave->wave, 0);
 
 	isIterating = false;
 
@@ -268,24 +269,24 @@ void qAvatar::oneIteration() {
 
 	// ok the algorithm tends to diverge after thousands of iterations.  Hose it down.
 	if (useFourierFilter) {
-		if (traceB4nAfterFFSpectrum && dangerousTimes) analyzeWaveFFT(mainQWave, "before FF");
+		if (traceB4nAfterFFSpectrum && dangerousTimes) analyzeWaveFFT(qwave, "before FF");
 		fourierFilter(lowPassFilter);
-		if (traceB4nAfterFFSpectrum && dangerousTimes) analyzeWaveFFT(mainQWave, "after FF");
+		if (traceB4nAfterFFSpectrum && dangerousTimes) analyzeWaveFFT(qwave, "after FF");
 	}
 
 	// need it; somehow? not done in JS.  YES IT IS!  remove this when you have the oppty
 	//theQViewBuffer->loadViewBuffer();
 
 	if (traceJustWave) {
-		mainQWave->dump("      traceJustWave at end of iteration", true);
+		qwave->dump("      traceJustWave at end of iteration", true);
 	}
 	if (traceJustInnerProduct) {
 		printf("      traceJustInnerProduct: finished one iteration (%d steps, N=%d), iProduct: %lf\n",
-			stepsPerIteration, space->nStates, mainQWave->innerProduct());
+			stepsPerIteration, space->nStates, qwave->innerProduct());
 	}
 
 	if (this->pleaseFFT) {
-		analyzeWaveFFT(mainQWave, "pleaseFFT at end of iteration");
+		analyzeWaveFFT(qwave, "pleaseFFT at end of iteration");
 		this->pleaseFFT = false;
 	}
 
@@ -306,7 +307,7 @@ void qAvatar::fourierFilter(int lowPassFilter) {
 		&& (((int) iterateSerial % dangerousRate) == 0);
 
 	qspect = getSpectrum();
-	qspect->generateSpectrum(mainQWave);
+	qspect->generateSpectrum(qwave);
 	if (dumpFFHiResSpectums) qspect->dumpSpectrum("qspect right at start of fourierFilter()");
 
 	// the high frequencies are in the middle
@@ -338,10 +339,10 @@ void qAvatar::fourierFilter(int lowPassFilter) {
 
 
 	if (dumpFFHiResSpectums) qspect->dumpSpectrum("qspect right at END of fourierFilter()");
-	qspect->generateWave(mainQWave);
-	if (dumpFFHiResSpectums) mainQWave->dumpHiRes("wave END fourierFilter() b4 normalize");
-	mainQWave->normalize();
-	if (dumpFFHiResSpectums) mainQWave->dumpHiRes("wave END fourierFilter() after normalize");
+	qspect->generateWave(qwave);
+	if (dumpFFHiResSpectums) qwave->dumpHiRes("wave END fourierFilter() b4 normalize");
+	qwave->normalize();
+	if (dumpFFHiResSpectums) qwave->dumpHiRes("wave END fourierFilter() after normalize");
 }
 
 
@@ -351,7 +352,7 @@ void qAvatar::askForFFT(void) {
 	if (isIterating)
 		this->pleaseFFT = true;
 	else
-		analyzeWaveFFT(mainQWave, "askForFFT while idle");
+		analyzeWaveFFT(qwave, "askForFFT while idle");
 }
 
 /* **********************************************************  */

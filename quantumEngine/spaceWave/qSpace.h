@@ -90,70 +90,45 @@ public:
 	// totals for all dimensions.  These numbers dominate lots of areas in the code.
 	int nStates;
 	int nPoints;
+	int spectrumLength;  // should == nStates
 
 	// should this be part of the space or the qAvatar?
 	// the space; it helps to define the lay of the land
 	double *potential;
 	double potentialFactor;
 
+	struct qAvatar *mainAvatar;
+	struct qAvatar *miniGraphAvatar;
 
-	/* *********************************************** buffers */
-	int spectrumLength;
-
-	// some of these might go away as the buffers now have the essential numbers
-
-	// will dump any wave that uses this space.  same as in qWave:: (obsolete)
-	//void dumpThatWave(qCx *wave, bool withExtras = false);
-
-	//void fixThoseBoundaries(qCx *targetWave);  // like for qWave but on any wave
-
-	/* *********************************************** FreeBuffers */
-
-	// the linked list of blocks available for rental.
-	// All contain (freeBufferLength) complex number slots.
-	//FreeBuffer *freeBufferList;
-
-	// number of qCx-s that'll be enough for both spectrums and waves
-	// so waves that are cache-able have exactly this length.
-	//int freeBufferLength;
-
-	// if you take one, return it.  If it isn't the right length,
-	// returning might lead to it being used as if it was.
-	//qCx *borrowBuffer(void);
-	//void returnBuffer(qCx *abuffer);
-	//void clearFreeBuffers(void);  // delete them all
-
-	/* *********************************************** potential */
 	void dumpPotential(const char *title);
-//	void setZeroPotential(void);
-//	void setValleyPotential(double power, double scale, double offset);
 
 };
 
 /* ************************************************************ JS interface */
 
-// this gets passed back to the JS after the space is created, so it can construct stuff
-// just a one-off struct; JS will access it via Uint32Array
-// Note: the vBuffer and wave buffer fields should be eliminated cuz
-// JS can get to them from the eAvatar
+//this gets passed back to the JS after the space is created, so it can
+//construct stuff just a one-off struct; JS will access it via Uint32Array Note:
+//the wave buffer fields should be eliminated cuz JS can get to them from the
+//eAvatar
 struct salientPointersType {
 	qSpace *space;
 	double *potentialBuffer;
 
-	qCx *mainWaveBuffer;
-	float *vBuffer;
-	struct qAvatar *theAvatar;
+	float *mainVBuffer;  // raw float[4][2] array
+	struct qAvatar *mainAvatar;
 
-	qCx *miniGraphWaveBuffer;
 	float *miniGraphVBuffer;
 	struct qAvatar *miniGraphAvatar;
 };
 
 // for JS to call
 extern "C" {
+	// create
 	qSpace *startNewSpace(const char *name = "a space");
 	void addSpaceDimension(int N, int continuum, const char *label);
 	struct salientPointersType *completeNewSpace(void);
-	void deleteTheSpace(void);
+
+	// destroy
+	void deleteTheSpace(qSpace *space);
 }
 

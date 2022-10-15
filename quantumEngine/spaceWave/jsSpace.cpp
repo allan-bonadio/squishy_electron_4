@@ -18,8 +18,8 @@ static bool traceAvatarDetail = false;
 // important objects.  Someday we'll get the JS to hold these.
 class qSpace *theSpace = NULL;
 double *thePotential = NULL;
-class qAvatar *theAvatar = NULL;
-qViewBuffer *theQViewBuffer = NULL;
+//class qAvatar *theAvatar = NULL;
+//qViewBuffer *theQViewBuffer = NULL;
 
 
 struct salientPointersType salientPointers;
@@ -44,15 +44,15 @@ extern "C" {
 // i guess it's not used anymore
 //qCx *Avatar_getWaveBuffer(void) {
 //	//printf("🚀 🚀 🚀 Avatar_getWaveBuffer() theSpace: %p\n", (theSpace));
-//	//printf("        🚀 🚀 🚀        the qWave %p\n", (theAvatar->mainQWave));
-//	//printf("        🚀 🚀 🚀        the wave %p\n", (theAvatar->mainQWave->wave));
+//	//printf("        🚀 🚀 🚀        the qWave %p\n", (theAvatar->qwave));
+//	//printf("        🚀 🚀 🚀        the wave %p\n", (theAvatar->qwave->wave));
 ////	printf("        🚀 🚀 🚀     q=w %d   s=w %d   q=s %d\n",
-////		(uintptr_t) (theAvatar->mainQWave) == (uintptr_t)  (theAvatar->mainQWave->wave),
-////		(uintptr_t) (theSpace) == (uintptr_t) (theAvatar->mainQWave->wave),
-////		(uintptr_t) (theAvatar->mainQWave) == (uintptr_t) (theSpace)
+////		(uintptr_t) (theAvatar->qwave) == (uintptr_t)  (theAvatar->qwave->wave),
+////		(uintptr_t) (theSpace) == (uintptr_t) (theAvatar->qwave->wave),
+////		(uintptr_t) (theAvatar->qwave) == (uintptr_t) (theSpace)
 ////	);
 //
-//	return theAvatar->mainQWave->wave;
+//	return theAvatar->qwave->wave;
 //}
 
 //double Avatar_getElapsedTime(void) {
@@ -72,32 +72,32 @@ void qSpace_dumpPotential(char *title) { theSpace->dumpPotential(title); }
 //}
 
 // obsolete
-void Avatar_setDt(double dt) {
-	theAvatar->dt = dt;
-}
+//void Avatar_setDt(double dt) {
+//	theAvatar->dt = dt;
+//}
 
 // obsolete
 // iterations are what the user sees.  steps are what Visscher does repeatedly.
-void Avatar_setStepsPerIteration(int stepsPerIteration) {
-	//printf("🚀 🚀 🚀 Avatar_setStepsPerIteration(%d)\n", stepsPerIteration);
-	if (stepsPerIteration < 1 || stepsPerIteration > 1e8) {
-		char buf[100];
-		snprintf(buf, 100, "Avatar_setStepsPerIteration, %d, is <1 or too big\n", stepsPerIteration);
-		throw std::runtime_error(buf);
-	}
-	theAvatar->stepsPerIteration = stepsPerIteration;
-	//printf("🚀 🚀 🚀 Avatar_setStepsPerIteration result %d in theSpace=%p\n",
-	//	theAvatar->stepsPerIteration, theSpace);
-}
+//void Avatar_setStepsPerIteration(int stepsPerIteration) {
+//	//printf("🚀 🚀 🚀 Avatar_setStepsPerIteration(%d)\n", stepsPerIteration);
+//	if (stepsPerIteration < 1 || stepsPerIteration > 1e8) {
+//		char buf[100];
+//		snprintf(buf, 100, "Avatar_setStepsPerIteration, %d, is <1 or too big\n", stepsPerIteration);
+//		throw std::runtime_error(buf);
+//	}
+//	theAvatar->stepsPerIteration = stepsPerIteration;
+//	//printf("🚀 🚀 🚀 Avatar_setStepsPerIteration result %d in theSpace=%p\n",
+//	//	theAvatar->stepsPerIteration, theSpace);
+//}
 
 // obsolete
 // low pass filter.
-void Avatar_setLowPassFilter(int lowPassFilter) {
-	//printf("🚀 🚀 🚀 Avatar_setLowPassFilter(%d)\n", dilution);
-	theAvatar->lowPassFilter = lowPassFilter;
-	//printf("🚀 🚀 🚀 Avatar_setLowPassFilter result %d in theSpace=%p\n",
-	//	theAvatar->lowPassFilter, theSpace);
-}
+//void Avatar_setLowPassFilter(int lowPassFilter) {
+//	//printf("🚀 🚀 🚀 Avatar_setLowPassFilter(%d)\n", dilution);
+//	theAvatar->lowPassFilter = lowPassFilter;
+//	//printf("🚀 🚀 🚀 Avatar_setLowPassFilter result %d in theSpace=%p\n",
+//	//	theAvatar->lowPassFilter, theSpace);
+//}
 
 void avatar_oneIteration(qAvatar *pointer) { pointer->oneIteration(); }
 //void Avatar_resetCounters(void) { pointer->resetCounters(); }
@@ -107,11 +107,11 @@ void avatar_oneIteration(qAvatar *pointer) { pointer->oneIteration(); }
 void avatar_askForFFT(qAvatar *pointer) { pointer->askForFFT(); }
 
 // this will normalize with the C++ normalize which also sets maxNorm
-void avatar_normalize(qAvatar *avatar) //{ pointer->mainQWave->normalize(); }
+void avatar_normalize(qAvatar *avatar) //{ pointer->qwave->normalize(); }
 {
-printf("avatar_normalize(%p) => '%s'\n", avatar, avatar->label);
-avatar->mainQWave->normalize();
-printf("avatar_normalize(%p) done\n", avatar);
+	printf("avatar_normalize(%p) => '%s'\n", avatar, avatar->label);
+	avatar->qwave->normalize();
+	printf("avatar_normalize(%p) done\n", avatar);
 }
 
 /* ******************************************************** space creation from JS */
@@ -148,7 +148,7 @@ void addSpaceDimension(int N, int continuum, const char *label) {
 	theSpace->addDimension(N, continuum, label);
 }
 
-// call this from JS to finish the process
+// call this from JS to finish the process for the qSpace, create and add the avatars & potential
 struct salientPointersType *completeNewSpace(void) {
 	//printf("completeNewSpace starts\n");
 	if (traceSpaceCreation) printf("🚀 🚀 🚀  JS completeNewSpace starts(%s)   theSpace=%p\n",
@@ -157,47 +157,55 @@ struct salientPointersType *completeNewSpace(void) {
 	// finish up all the dimensions now that we know them all
 	theSpace->initSpace();
 
-	if (theAvatar) throw std::runtime_error("🚀 🚀 🚀 theAvatar exists while trying to create new one");
+//	if (theAvatar) throw std::runtime_error("🚀 🚀 🚀 theAvatar exists while trying to create new one");
 	if (traceAvatarDetail) printf("about to do avatars\n");
-	theAvatar = salientPointers.theAvatar = new qAvatar(theSpace, "mainAvatar");
+
+	qAvatar *mainAvatar = salientPointers.mainAvatar = new qAvatar(theSpace, "mainAvatar");
+	salientPointers.mainVBuffer = mainAvatar->qvBuffer->vBuffer;
 	if (traceAvatarDetail) printf("did mainAvatar\n");
-	salientPointers.miniGraphAvatar = new qAvatar(theSpace, "miniGraph");
+
+	qAvatar *miniGraphAvatar = salientPointers.miniGraphAvatar = new qAvatar(theSpace, "miniGraph");
+	salientPointers.miniGraphVBuffer = miniGraphAvatar->qvBuffer->vBuffer;
 	if (traceAvatarDetail) printf("did miniGraphAvatar\n");
 
+	if (traceSpaceCreation) printf("   🚀 🚀 🚀 completeNewSpace vBuffers After Creation but BEFORE loadViewBuffer  "
+		"salientPointers.mainVBuffer=%p   salientPointers.miniGraphVBuffer=%p  \n",
+		salientPointers.mainVBuffer, salientPointers.miniGraphVBuffer);
 
 	if (thePotential) throw std::runtime_error("🚀 🚀 🚀 thePotential exists while trying to create new one");
 	salientPointers.potentialBuffer = thePotential = theSpace->potential;
 
-	theQViewBuffer = theAvatar->qvBuffer;
-	salientPointers.vBuffer = theQViewBuffer->vBuffer;
+	//theQViewBuffer = theAvatar->qvBuffer;
+	//salientPointers.vBuffer = theQViewBuffer->vBuffer;
 
-	if (traceSpaceCreation) printf("   🚀 🚀 🚀 completeNewSpace After Creation but BEFORE loadViewBuffer  "
-		"theQViewBuffer=%p   vBuffer=%p  \n",
-		theQViewBuffer, theQViewBuffer ?  theQViewBuffer->vBuffer : NULL);
-
-	salientPointers.mainWaveBuffer = theAvatar->mainQWave->wave;
+	//salientPointers.mainWaveBuffer = theAvatar->qwave->wave;
 
 	if (traceSpaceCreation) printf("   🚀 🚀 🚀 qSpace::jsSpace: done\n");
 	return &salientPointers;
 }
 
-// dispose of ALL of that
-void deleteTheSpace() {
+// dispose of ALL of everything attached to the space
+void deleteTheSpace(qSpace *theSpace) {
 	if (traceSpaceCreation) printf("   🚀 🚀 🚀 deleteTheSpace(): starts\n");
 
+	// deleting the avatars will delete their qWaves and qViewBuffers
 	// not there if completeNewSpace() never called, even if initSpace() called
-	if (theAvatar) {
-		delete theAvatar;
-		delete salientPointers.miniGraphAvatar;
+	if (theSpace->mainAvatar) {
+		delete theSpace->mainAvatar;
+		theSpace->mainAvatar = NULL;
+		delete theSpace->miniGraphAvatar;
+		theSpace->miniGraphAvatar = NULL;
 	}
-	theAvatar = NULL;
-	theQViewBuffer = NULL;
+	//theAvatar = NULL;
+	//theQViewBuffer = NULL;
 
 	// going to be deleted cuz it's part of the space
-	thePotential = NULL;
 
+	// deletes its potential
 	delete theSpace;
 	theSpace = NULL;
+	thePotential = NULL;
+
 	if (traceSpaceCreation) printf("    deleteTheSpace(): done\n");
 }
 

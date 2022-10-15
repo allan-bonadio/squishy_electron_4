@@ -39,16 +39,16 @@ struct qAvatar {
 
 	// our main qWave, either for the WaveView or the SetWave tab
 	// this OWNS the qWave
-	struct qWave *mainQWave;
+	struct qWave *qwave;
 
 	// pointer grabbed from the space, often.  Same buffer as in space.
 	double *potential;
 	double potentialFactor;  // aligned by 8
 
-	//  and a scratch wave for stepping. Call the function first time you need it.
+	// and a scratch wave for stepping. Call the function first time you need it.
 	// owned if non-null
 	struct qWave *scratchQWave;
-	qWave *getScratchWave(void);
+	struct qWave *getScratchWave(void);
 
 	// for the fourier filter.  Call the function first time you need it.
 	// owned if non-null
@@ -58,7 +58,7 @@ struct qAvatar {
 	// the qViewBuffer to be passed to webgl.  qAvatar is a visual thing after all.
 	// Avatar owns the qViewBuffer
 	struct qViewBuffer *qvBuffer;
-	// aligned by 4, not 8
+	float *vBuffer;  // aligned by 4, not 8
 
 	// mostly for debugging
 	char label[LABEL_LEN + 1];
@@ -93,7 +93,7 @@ struct qAvatar {
 	void askForFFT(void);
 };
 
-extern qAvatar *theAvatar;
+// obsolete extern qAvatar *theAvatar;
 
 /* ************************************************************ JS interface */
 

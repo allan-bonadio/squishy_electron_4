@@ -18,7 +18,7 @@ struct qViewBuffer {
 
 	~qViewBuffer();
 
-	// copy the numbers in wave or mainQWave into this->viewBuffer
+	// copy the numbers in wave or qwave into this->viewBuffer
 	// also converts from doubles to floats.
 	float loadViewBuffer(void);
 
@@ -27,7 +27,7 @@ struct qViewBuffer {
 };
 
 // 'the' being the only one sometimes
-extern qViewBuffer *theQViewBuffer;
+//extern qViewBuffer *theQViewBuffer;
 
 // JS interface
 extern "C" {

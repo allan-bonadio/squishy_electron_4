@@ -99,8 +99,8 @@ void qViewBuffer::dumpViewBuffer(const char *title) {
 float qViewBuffer::loadViewBuffer(void) {
 	if (debugViewBuffer) printf("\n📺 qViewBuffer::loadViewBuffer(%s) starts: vBuffer = %p \n",
 		avatar->label, vBuffer);
-	qWave *mainQWave = avatar->mainQWave;
-	qCx *wave = mainQWave->wave;
+	qWave *qwave = avatar->qwave;
+	qCx *wave = qwave->wave;
 
 	int nPoints = space->nPoints;
 	double highest = 0;
@@ -110,14 +110,14 @@ float qViewBuffer::loadViewBuffer(void) {
 	if (debugInDetail) {
 		//printf("loadViewBuffer(P): thePotential=%p\n",
 		//thePotential);
-		printf("loadViewBuffer(B): qViewBuffer->avatar->mainQWave->wave=%p->%p->%p->%p\n",
+		printf("loadViewBuffer(B): qViewBuffer->avatar->qwave->wave=%p->%p->%p->%p\n",
 			this,
 			avatar,
-			avatar->mainQWave,
-			avatar->mainQWave->wave);
+			avatar->qwave,
+			avatar->qwave->wave);
 		printf("loadViewBuffer(vb,lqw): qViewBuffer->vBuffer %p\n",
 			vBuffer);
-		mainQWave->dump("📺 at start of loadViewBuffer()");
+		qwave->dump("📺 at start of loadViewBuffer()");
 	}
 
 	// this is index into the complex point, which translates to 2 GL points
@@ -179,7 +179,7 @@ float qViewBuffer::loadViewBuffer(void) {
 // for the JS side
 extern "C" {
 	void avatar_dumpViewBuffer(qAvatar *avatar, const char *title) {
-		theAvatar->qvBuffer->dumpViewBuffer(title);
+		avatar->qvBuffer->dumpViewBuffer(title);
 	}
 
 	// return the vbuffer, raw floats
@@ -193,16 +193,16 @@ extern "C" {
 	}
 
 	// load up the Avatar's view buffer based on the Avatar's wave buffer
-	// returns the highest height of norm of wave entries (old)
+	// returns the highest height of norm of wave entries
 	double avatar_loadViewBuffer(qAvatar *avatar) {
 		return avatar->qvBuffer->loadViewBuffer();
 	}
 
 	// returns the highest height of norm of wave entries (old)
-	double qViewBuffer_loadViewBuffer(void) {
-		if (debugViewBuffer)
-			printf("📺 ggggggg    ... theQViewBuffer=%p\n", theQViewBuffer);
-		return theQViewBuffer->loadViewBuffer();
-	}
+	//double qViewBuffer_loadViewBuffer(void) {
+	//	if (debugViewBuffer)
+	//		printf("📺 ggggggg    ... theQViewBuffer=%p\n", theQViewBuffer);
+	//	return theQViewBuffer->loadViewBuffer();
+	//}
 }
 

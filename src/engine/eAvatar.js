@@ -16,17 +16,17 @@ import qe from './qe';
 class eAvatar {
 	// space is the eSpace we're in (note eSpace constructor constructs 2 Avatars
 	// and they're the only ones who know nPoints etc)
-	// pointer is an integer pointing into the C++ address space, to the Avatar object.
+	// pointer is an integer pointing into the C++ address space, to the qAvatar object.
 	// We can then set and sample each of the member variables if we know the offset
-	// Give us the pointer, we'll reach in and make an eWave from mainQWave, and
-	// a vBuffer from _qvBuffer. the q objects must be in place.
+	// Give us the pointer, we'll reach in and make an eWave from qwave.
+	// the q objects must be in place.
 	// this way we can't get the wrong wave in the wrong avatar.
-	constructor(pointer, space) {
+	constructor(space, vBufferPointer, pointer) {
 		prepForDirectAccessors(this, pointer);
 		this.space = space;
-		this.ewave = new eWave(this.space, null, this.mainQWave);
-		this.vBuffer = new Float32Array(window.Module.HEAPF32.buffer, this._qvBuffer,
-				this.space.nPoints * 8); // two vec4 s per point
+		this.ewave = new eWave(space, null, this.qwave);
+		this.vBuffer = new Float32Array(window.Module.HEAPF32.buffer, vBufferPointer,
+				space.nPoints * 8); // two vec4 s per point
 
 		this.label = window.Module.UTF8ArrayToString(this._label);
 
@@ -56,8 +56,7 @@ class eAvatar {
 	get stepsPerIteration() { return this.ints[9]; }
 	set stepsPerIteration(a) { this.ints[9] = a; }
 
-	get mainQWave() { return this.ints[10]; }
-	set mainQWave(a) { this.ints[10] = a; }
+	get qwave() { return this.ints[10]; }
 
 	get _potential() { return this.ints[11]; }
 	get potentialFactor() { return this.doubles[6]; }
@@ -66,7 +65,7 @@ class eAvatar {
 	get _scratchQWave() { return this.ints[14]; }
 
 	get _spect() { return this.ints[15]; }
-	get _qvBuffer() { return this.ints[16]; }
+	get _qvBuffer() { return this.ints[16]; }  // not that useful cuz it points to qViewBuffer
 	get _label() { return this.pointer + 70; }
 
 
