@@ -69,13 +69,12 @@ class eAvatar {
 	get _label() { return this.pointer + 70; }
 
 
-	// wire them up
-
-	// wait this just gets the pointer to the view buffer...
+	// this just gets the pointer to the view buffer...  the JS array
 	getViewBuffer() {
 		return cppObjectRegistry[qe.avatar_getViewBuffer(this.pointer)];
 	}
 
+	// qAvatar functions run from
 	dumpViewBuffer(title) { qe.avatar_dumpViewBuffer(this.pointer, title) }
 	loadViewBuffer() { return qe.avatar_loadViewBuffer(this.pointer) }
 	oneIteration() { return qe.avatar_oneIteration(this.pointer) }
