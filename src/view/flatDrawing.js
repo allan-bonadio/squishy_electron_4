@@ -10,8 +10,8 @@ import {viewUniform, viewAttribute} from './viewVariable';
 //import SquishPanel from '../SquishPanel';
 //import {eSpaceCreatedPromise} from '../engine/eEngine';
 
-let dumpViewBufAfterDrawing = true;
-let traceHighest = true;
+let dumpViewBufAfterDrawing = false;
+let traceHighest = false;
 
 // diagnostic purposes
 let alsoDrawPoints = false;
@@ -41,7 +41,8 @@ void main() {
 	// figure out y
 	float y;
 	int vertexSerial = int(row.w);
-	if (vertexSerial / 2 * 2 < vertexSerial) {
+	bool odd = int(vertexSerial) / 2 * 2 < vertexSerial;
+	if (odd) {
 		y = (row.x * row.x + row.y * row.y) / maxHeight;
 	}
 	else {
@@ -57,6 +58,8 @@ void main() {
 
 	//  for the color, convert the complex values via this algorithm
 	vColor = vec4(cxToColor(vec2(row.x, row.y)), 1.);
+	if (!odd)
+		vColor = vec4(vColor.r/2., vColor.g/2., vColor.b/2., vColor.a);
 	//vColor = vec4(.9, .9, .1, 1.);
 
 	// dot size, in pixels not clip units.  actually a square.
@@ -94,9 +97,9 @@ export class flatDrawing extends abstractDrawing {
 
 	setInputs() {
 		// loads view buffer from corresponding wave, calculates highest norm, which we use below.
-		this.avatar.dumpViewBuffer('before loaded');
+		//this.avatar.dumpViewBuffer('before loaded');
 		const highest = this.avatar.loadViewBuffer();
-		this.avatar.dumpViewBuffer('just loaded');
+		//this.avatar.dumpViewBuffer('just loaded');
 
 		// smooth it out otherwise the wave sortof bounces up and down a little on each step
 		// must find a way to set the avgHighest

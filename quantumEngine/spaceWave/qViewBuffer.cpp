@@ -9,7 +9,7 @@
 #include "qWave.h"
 #include "qViewBuffer.h"
 
-static const bool debugViewBuffer = true;
+static const bool debugViewBuffer = false;
 static const bool debugInDetail = false;
 
 // August Ferdinand Möbius invented homogenous coordinates
@@ -104,7 +104,8 @@ float qViewBuffer::loadViewBuffer(void) {
 
 	int nPoints = space->nPoints;
 	double highest = 0;
-	double tiny = 0;
+	double tiny = 1;
+	//double tiny = 0;
 	//double tiny = 1e-8;
 
 	if (debugInDetail) {
