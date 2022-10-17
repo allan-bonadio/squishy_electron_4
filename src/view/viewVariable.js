@@ -3,8 +3,8 @@
 ** Copyright (C) 2021-2022 Tactile Interactive, all rights reserved
 */
 
-let traceGLCalls = true;
-let traceVariables = true;
+let traceGLCalls = false;
+let traceVariables = false;
 
 // attr arrays and uniforms that can change on every frame.
 // you can set a static value or a function that'll return it

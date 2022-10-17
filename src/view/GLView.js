@@ -18,7 +18,7 @@ import eAvatar from '../engine/eAvatar';
 import {listOfViewClasses} from './listOfViewClasses';
 //import {eSpaceCreatedPromise} from '../engine/eEngine';
 
-let traceGLView = true;
+let traceGLView = false;
 
 
 class GLView extends React.Component {
@@ -55,7 +55,8 @@ class GLView extends React.Component {
 		if (this.canvas === canvas)
 			return;  // already done
 
-		this.setState({canvas}, () => console.log(`🖼 🖼 GLView:${p.viewName} : setGLCanvas set state completed`));
+		this.setState({canvas}, () => traceGLView &&
+			console.log(`🖼 🖼 GLView:${p.viewName} : setGLCanvas set state completed`));
 		this.canvas = canvas;  // immediately available
 
 		canvas.GLView = this;

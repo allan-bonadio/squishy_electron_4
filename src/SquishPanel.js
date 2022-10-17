@@ -36,7 +36,7 @@ import {getASetting, storeASetting} from './utils/storeSettings';
 let areBenchmarking = false;
 let dumpingTheViewBuffer = false;
 let traceSetPanels = false;
-let tracePromises = true;
+let tracePromises = false;
 let traceSquishPanel = false;
 //let traceConstructor = false;
 

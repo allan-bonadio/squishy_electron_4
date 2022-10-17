@@ -10,8 +10,8 @@ import cxToRgb from '../view/cxToRgb';
 import {cppObjectRegistry, prepForDirectAccessors} from '../utils/directAccessors';
 import eSpace from './eSpace';
 
-let traceSetFamiliarWave = true;
-let traceSetFamiliarWaveResult = true;
+let traceSetFamiliarWave = false;
+let traceSetFamiliarWaveResult = false;
 
 // emscripten sabotages this?  the log & info, but not error & warn?
 //const consoleLog = console.log.bind(console);
