@@ -39,7 +39,8 @@ export function fixPotentialBoundaries(space, potential) {
 export function setFamiliarPotential(space, potentialArray, potentialParams) {
 	const {start, end, N} = space.startEnd;
 	let {valleyPower, valleyScale, valleyOffset} = potentialParams;
-	console.log(`starting setFamiliarPotential(${space.label}, array of potentialArray.length, potentialParams=`, potentialParams);
+	// someday this will work ${space.label},
+	console.log(`starting setFamiliarPOTENTIAL(array of POTENTIALArray.length, POTENTIALParams=`, potentialParams);
 	let pot;
 	const offset = valleyOffset * N / 100;
 	for (let ix = start; ix < end; ix++) {

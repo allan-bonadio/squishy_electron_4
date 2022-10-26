@@ -19,7 +19,7 @@ qWave::qWave(qSpace *sp, qCx *useThisBuffer)
 
 	if (! sp)
 		throw "qWave::qWave null space";
-	magic = 'qWav';
+	magic = 'wave';
 	space = sp;
 
 	if (traceConstDeconst) {

@@ -30,10 +30,7 @@ import {eSpaceCreatedPromise} from '../engine/eEngine';
 
 //import {dumpJsStack} from '../utils/errors';
 
-let traceWaveView = true;
 let traceDragCanvasHeight = false;
-
-
 
 export class WaveView extends React.Component {
 	static propTypes = {
@@ -50,14 +47,8 @@ export class WaveView extends React.Component {
 		setUpdatePotentialArea: PropTypes.func,
 	};
 
-	static constructed = 0;
 	constructor(props) {
 		super(props);
-
-		if (traceWaveView) {
-			WaveView.constructed++;
-			console.info(`WaveView constructed for the ${WaveView.constructed}th time.`);
-		}
 
 		this.state = {
 			height: getASetting('miscParams', 'viewHeight'),
@@ -84,7 +75,7 @@ export class WaveView extends React.Component {
 		.catch(ex => {
 			ex = interpretCppException(ex);
 			console.error(ex.stack || ex.message || ex);
-			debugger;
+			//debugger;
 		});
 	}
 

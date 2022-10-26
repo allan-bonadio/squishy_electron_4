@@ -22,7 +22,7 @@ import {storeASetting, alternateMinMaxs} from '../utils/storeSettings';
 // set prop types
 function setPT() {
 	SetPotentialTab.propTypes = {
-		origSpace: PropTypes.instanceOf(eSpace),
+		space: PropTypes.instanceOf(eSpace),
 
 		// actually sets the one in use by the algorithm
 		//setFlatPotentialHandler: PropTypes.func.isRequired,
@@ -206,7 +206,7 @@ setPT();
 //			<div className='potentialMiniGraph'>
 //				<MiniGraph recipe={this.recipe} width={this.miniWidth} height={this.miniHeight}
 //					className='SetPotentialGraph'
-//					familiarParams={pp} origSpace={p.origSpace} />
+//					familiarParams={pp} space={p.space} />
 //			</div>
 
 

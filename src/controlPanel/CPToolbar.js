@@ -5,27 +5,31 @@
 
 import PropTypes from 'prop-types';
 //import qe from '../engine/qe';
+import eSpace from '../engine/eSpace';
 
 function setPT() {
 	CPToolbar.propTypes = {
+		// clicks on start/stop/single buttons
 		startStop: PropTypes.func.isRequired,
 		singleIteration: PropTypes.func.isRequired,
+
+		// tells if simulation is iterating
 		isTimeAdvancing: PropTypes.bool.isRequired,
 		resetCounters: PropTypes.func.isRequired,
 
 		iterateFrequency: PropTypes.number.isRequired,
 		setIterateFrequency: PropTypes.func.isRequired,
 		N: PropTypes.number.isRequired,
-		space: PropTypes.object,
+		space: PropTypes.instanceOf(eSpace),
 	};
 }
 
-function clickOnFFR()
+function clickOnFFT(space)
 {
 	// space not there until space promise, but that should happen before anybody clicks on this
-	if (this.props.space)
-		this.props.space.mainEAvatar.askForFFT();
-		//qe.avatar_askForFFT(this.props.space.mainEAvatar);
+	if (space)
+		space.mainEAvatar.askForFFT();
+		//qe.avatar_askForFFT(space.mainEAvatar);
 }
 
 function CPToolbar(props) {
@@ -84,7 +88,7 @@ function CPToolbar(props) {
 			{props.N} states &nbsp;
 		</div>
 
-		<button onClick={clickOnFFR}>
+		<button onClick={ev => clickOnFFT(props.space)}>
 			FFT
 		</button>
 		<button onClick={props.resetCounters}>Reset Counters</button>

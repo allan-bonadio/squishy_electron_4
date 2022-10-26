@@ -25,7 +25,7 @@ class cppError extends Error {
 		console.info(`cppError(${exNumber}) =>`, window.UTF8ToString(qe.getCppExceptionMessage(exNumber)));
 		//this.stack = this.message + window.cppErrorStack;
 		//window.cppErrorStack = '';
-		this.code = exNumber;
+		this.exPointer = exNumber;
 	}
 
 	name = 'cppError';

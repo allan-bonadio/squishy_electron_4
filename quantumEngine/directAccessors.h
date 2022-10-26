@@ -10,7 +10,7 @@
 // Include or omit fields and setters as appropriate when you use these macros in a
 
 // use for bool field, or anything 1 byte
-#define byteOffset(field)  (int) ((bool *) &this->field - (bool *) this)
+#define byteOffset(field)  (int) ((byte *) &this->field - (byte *) this)
 #define makeBoolGetter(field)  printf("get " #field  "() { return this.bools[%d]; }\n", byteOffset(field));
 #define makeBoolSetter(field)  printf("set " #field  "(a) { this.bools[%d] = a; }\n", byteOffset(field));
 
