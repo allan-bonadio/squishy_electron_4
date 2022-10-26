@@ -120,11 +120,11 @@ export class eSpace {
 		setFamiliarPotential(this, this.potentialBuffer, potentialParams);
 			//
 
+		// the avatars create their vbufs and waves, and we make a copy for ourselves
 		this.mainEAvatar = new eAvatar(this,
 				salientPointers.mainVBufferPointer, salientPointers.mainAvatarPointer);
 		//this.mainEAvatar = salientPointers.mainEAvatarPointer;
 		this.mainVBuffer = this.mainEAvatar.vBuffer;
-		// so wrong!  this.mainVBuffer = this.mainEAvatar.vBuffer;
 		this.mainEWave = this.mainEAvatar.ewave;
 
 		this.miniGraphAvatar = new eAvatar(this,
@@ -185,33 +185,33 @@ export class eSpace {
 	// refresh the wraparound points for ANY WAVE subscribing to this space
 	// 'those' or 'that' means some wave other than this.wave
 	// modeled after fixThoseBoundaries() in C++ pls keep in sync!
-	fixThoseBoundaries(wave) {
-		if (this.nPoints <= 0) throw "🚀  qSpace::fixThoseBoundaries() with zero points";
-		const {end2, continuum} = this.startEnd2;
-
-		switch (continuum) {
-		case qe.contDISCRETE:
-			// no neighbor-to-neighbor crosstalk, well except...
-			// I guess whatever the hamiltonion says.  Everybody's got a hamiltonian.
-			break;
-
-		case qe.contWELL:
-			// the points on the end are ∞ potential, but the arithmetic goes bonkers
-			// if I actually set the voltage to ∞.  Remember complex values 2 doubles
-			wave[0] = wave[1] = wave[end2] = wave[end2+1] = 0;
-			break;
-
-		case qe.contENDLESS:
-			// the points on the end get set to the opposite side.  Remember this is for complex, 2x floats
-			wave[0] = wave[end2-2];
-			wave[1]  = wave[end2-1];
-			wave[end2] = wave[2];
-			wave[end2+1] = wave[3];
-			break;
-
-		default: throw new Error(`🚀  bad continuum '${continuum}' in  eSpace.fixThoseBoundaries()`);
-		}
-	}
+	//fixThoseBoundaries(wave) {
+	//	if (this.nPoints <= 0) throw "🚀  qSpace::fixThoseBoundaries() with zero points";
+	//	const {end2, continuum} = this.startEnd2;
+	//
+	//	switch (continuum) {
+	//	case qe.contDISCRETE:
+	//		// no neighbor-to-neighbor crosstalk, well except...
+	//		// I guess whatever the hamiltonion says.  Everybody's got a hamiltonian.
+	//		break;
+	//
+	//	case qe.contWELL:
+	//		// the points on the end are ∞ potential, but the arithmetic goes bonkers
+	//		// if I actually set the voltage to ∞.  Remember complex values 2 doubles
+	//		wave[0] = wave[1] = wave[end2] = wave[end2+1] = 0;
+	//		break;
+	//
+	//	case qe.contENDLESS:
+	//		// the points on the end get set to the opposite side.  Remember this is for complex, 2x floats
+	//		wave[0] = wave[end2-2];
+	//		wave[1]  = wave[end2-1];
+	//		wave[end2] = wave[2];
+	//		wave[end2+1] = wave[3];
+	//		break;
+	//
+	//	default: throw new Error(`🚀  bad continuum '${continuum}' in  eSpace.fixThoseBoundaries()`);
+	//	}
+	//}
 
 }
 

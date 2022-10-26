@@ -5,13 +5,13 @@
 
 // There is no eBuffer or eSpectrum; C++ deals with those exclusively
 
-//import {qe} from './qe';
+import {qe} from './qe';
 import cxToRgb from '../view/cxToRgb';
 import {cppObjectRegistry, prepForDirectAccessors} from '../utils/directAccessors';
 import eSpace from './eSpace';
 
 let traceSetFamiliarWave = false;
-let traceSetFamiliarWaveResult = false;
+let traceSetFamiliarWaveResult = true;
 
 // emscripten sabotages this?  the log & info, but not error & warn?
 //const consoleLog = console.log.bind(console);
@@ -74,7 +74,7 @@ class eWave {
 			waveArg = this._wave;
 		}
 		else {
-			// a home brew wave, not from C++.  make a place for those ints to be
+			// a home brew wave, not from C++.  make a phony qWave for those ints to be
 			this.pointer = new Int32Array(20);
 
 //			// there MUST be a space  NO!  getters into C++
@@ -120,13 +120,12 @@ class eWave {
 	get end() { return this.ints[7]; }
 	get continuum() { return this.ints[8]; }
 
-	get dynamicallyAllocated() { return this.bools[40]; }
-
 	/* **************************************************************** dumping */
 
 	// dump out wave content.
 	dump(title) {
-		console.log(`\n🌊 ==== Wave | ${title} `+
+		const avatarLabel = this.avatarLabel || '';
+		console.log(`\n🌊 ==== Wave ${avatarLabel} | ${title} `+
 			this.space.dumpThat(this.wave) +
 			`\n🌊 ==== end of Wave ====\n\n`);
 	}
@@ -140,6 +139,7 @@ class eWave {
 
 	// calculate ⟨𝜓 | 𝜓⟩  'inner product'.
 	// See also C++ function of same name, that one's official.
+	// is this calculating right?  I don't think so.
 	innerProduct() {
 		const wave = this.wave;
 		const {start2, end2} = this.space.startEnd2;
@@ -152,6 +152,7 @@ class eWave {
 		return tot;
 	}
 
+	// now done in C++ so there's just 1 implementation
 	// enforce ⟨𝜓 | 𝜓⟩ = 1 by dividing out the current value.  See also C++ func of same name.
 	normalize() {
 		const wave = this.wave;
@@ -161,14 +162,49 @@ class eWave {
 		let factor = Math.pow(iProd, -.5);
 
 		// treat ALL points, including border ones.
-		// And real and imaginary, go by ones
 		let {nPoints2} = this.space.startEnd2;
-		for (let ix2 = 0; ix2 < nPoints2; ix2++) {
+		for (let ix2 = 0; ix2 < nPoints2; ix2 += 2) {
 			wave[ix2] *= factor;
 			wave[ix2+1] *= factor;
 		}
 
-		return iProd
+		return iProd;  // unused
+	}
+
+	// I can't get this one to work...
+	//normalize() {
+	//	qe.wave_normalize(this.pointer);
+	//}
+
+	// refresh the wraparound points
+	// modeled after fixThoseBoundaries() in C++ pls keep in sync!
+	fixBoundaries() {
+		if ( this.space.nPoints <= 0) throw "🚀  eWave::fixThoseBoundaries() with zero points";
+		const {end2, continuum} = this.space.startEnd2;
+		const w = this.wave;
+
+		switch (continuum) {
+		case qe.contDISCRETE:
+			// no neighbor-to-neighbor crosstalk, well except...
+			// I guess whatever the hamiltonion says.  Everybody's got a hamiltonian.
+			break;
+
+		case qe.contWELL:
+			// the points on the end are ∞ potential, but the arithmetic goes bonkers
+			// if I actually set the voltage to ∞.  Remember complex values 2 doubles
+			w[0] = w[1] = w[end2] = w[end2+1] = 0;
+			break;
+
+		case qe.contENDLESS:
+			// the points on the end get set to the opposite side.  Remember this is for complex, 2x floats
+			w[0] = w[end2-2];
+			w[1]  = w[end2-1];
+			w[end2] = w[2];
+			w[end2+1] = w[3];
+			break;
+
+		default: throw new Error(`🚀  bad continuum '${continuum}' in  eSpace.fixThoseBoundaries()`);
+		}
 	}
 
 	/* ********************************************************************** set wave */
@@ -188,9 +224,6 @@ class eWave {
 			wave[ix2] = Math.cos(angle);
 			wave[ix2 + 1] = Math.sin(angle);
 		}
-
-		//this.dump('eWave.setCircularWave() done');
-		//this.rainbowDump('🌊  eWave.setCircularWave() done');
 	}
 
 
@@ -199,24 +232,21 @@ class eWave {
 	// oh yeah, the walls on the sides are nodes in this case so we'll split by N+2 in that case.
 	// pass negative to make it upside down.
 	setStandingWave(n) {
-		const {start2, end2, N} = this.space.startEnd2;
+		let {start2, end2, N} = this.space.startEnd2;
 		const dAngle = Math.PI / N * (+n);
 		const wave = this.wave;
 
-		// good idea or bad?
-// 		if (this.space.continuum == qe.contWELL) {
-// 			start2--;
-// 			end2++;
-// 		}
+		// For a well, the boundary points ARE part of the wave, so do the whole thinig
+		if (this.space.continuum == qe.contWELL) {
+			start2 = 0;
+			end2 += 2;
+		}
 
 		for (let ix2 = start2; ix2 < end2; ix2 += 2) {
 			const angle = dAngle * (ix2 - start2);
 			wave[ix2] = Math.sin(angle);
 			wave[ix2 + 1] = 0;
 		}
-
-		//this.dump('eWave.setStandingWave() done');
-		//this.rainbowDump('🌊  eWave.setStandingWave() done');
 	}
 
 	// freq is just like circular, although as a fraction of the pulseWidth instead of N
@@ -244,20 +274,22 @@ class eWave {
 			wave[ix2] *= stretch;
 			wave[ix2 + 1] *= stretch;
 		}
-
-		//this.dump('eWave.setGaussianWave() done');
-		//this.rainbowDump('eWave.setGaussianWave() done');
 	}
 
 	// 2stdDev is width of the packet, as percentage of N (0%...100%).
 	// offset is how far along is the peak, as an integer X value (0...N).
 	setChordWave(freqUi, pulseWidthUi, offsetUi) {
-		console.log(`setChordWave(${freqUi}, ${pulseWidthUi}, ${offsetUi})`);
 		const wave = this.wave;
 		const {start2, end2, N} = this.space.startEnd2;
 		let offset2 = offsetUi * N / 100 * 2;  // now in units of X * 2
-		const nSideFreqs = Math.round(pulseWidthUi / 100 * N)
-		const freq = Math.round(freqUi);
+
+		let freq = Math.round(freqUi);
+
+		// convert pulsewidth into fraction of half wave (cuz it;s on both sides)
+		// but you can't have side freqs that go down to zero!
+		let nSideFreqs = Math.round(100 / pulseWidthUi * N / 2);
+		nSideFreqs = Math.min(nSideFreqs, Math.abs(freq) - 1)
+
 		if (traceSetFamiliarWave)
 			console.log(`🌊  setChordWave freq=${freqUi} => ${freq}  nSideFreqs=${nSideFreqs}`+
 			`  offset=${offsetUi}% => ${offset2}`);
@@ -281,16 +313,19 @@ class eWave {
 				wave[ix2+1] += Math.sin(f * angle);  // im
 			}
 		}
-
-		//		//this.dump('eWave.setGaussianWave() done');
-		this.rainbowDump('eWave.setChordWave() done');
 	}
 
 	// set one of the above canned waveforms, according to the waveParams object's values
 	setFamiliarWave(waveParams) {
 		waveParams.pulseWidth = Math.max(1, waveParams.pulseWidth);  // emergency!!  this gets really slow
+		if (traceSetFamiliarWaveResult) {
+			console.log(`setFamiliarWave() starts, wave params: `+
+			`waveBreed=${waveParams.waveBreed}   `+
+			`waveFrequency=${waveParams.waveFrequency.toFixed(2)}   `+
+			`pulseWidth=${waveParams.pulseWidth.toFixed(2)}   `+
+			`pulseOffset=${waveParams.pulseOffset.toFixed(2)}`);
+		}
 
-		// should the boundaries, normalize and dump be moved to the end of here?
 		switch (waveParams.waveBreed) {
 		case 'circular':
 			this.setCircularWave(+waveParams.waveFrequency);
@@ -312,13 +347,12 @@ class eWave {
 			throw new Error(`bad waveParams.waveBreed=${waveParams.waveBreed} in setFamiliarWave()`);
 		}
 
-		this.space.mainEAvatar.normalize();
-		//this.normalize();
-		this.space.fixThoseBoundaries(this.wave);
+		this.normalize();
+		this.fixBoundaries();
 
 		if (traceSetFamiliarWaveResult) {
 			this.dump(`eWave.setFamiliarWave(${waveParams.waveBreed}) done`);
-			this.rainbowDump(`eWave.setFamiliarWave(${waveParams.waveBreed}) done`);
+			//this.rainbowDump(`eWave.setFamiliarWave(${waveParams.waveBreed}) done`);
 		}
 	}
 }
