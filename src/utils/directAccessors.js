@@ -19,6 +19,10 @@ export function prepForDirectAccessors(_this, pointer) {
 	// cuz the overhead from each js-C++ call is kindof large
 	_this.pointer = pointer;
 
+	// forget the rest if there's no C++ version of this (see qWave)
+	if (!pointer)
+		return;
+
 	// these lengths are only for convenience in the debugger; adjust as needed
 	_this.doubles = new Float64Array(window.Module.HEAPF64.buffer, pointer, 10);
 	_this.ints = new Uint32Array(window.Module.HEAPU32.buffer, pointer, 20);
