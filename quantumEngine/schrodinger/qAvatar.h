@@ -109,7 +109,6 @@ extern "C" {
 	void avatar_oneIteration(qAvatar *avatar);
 
 	void avatar_askForFFT(qAvatar *avatar);
-	void avatar_normalize(qAvatar *avatar);
 
 	// a qSpace does not contain any qAvatars
 	// an eSpace DOES contain two eAvatars; this how it deletes them from JS

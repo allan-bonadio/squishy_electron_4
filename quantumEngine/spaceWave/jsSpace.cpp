@@ -40,64 +40,7 @@ static void freeWaves(void) {
 // these are for JS only; they're all extern "C"
 extern "C" {
 
-// return a pointer to just the main wave for theSpace
-// i guess it's not used anymore
-//qCx *Avatar_getWaveBuffer(void) {
-//	//printf("🚀 🚀 🚀 Avatar_getWaveBuffer() theSpace: %p\n", (theSpace));
-//	//printf("        🚀 🚀 🚀        the qWave %p\n", (theAvatar->qwave));
-//	//printf("        🚀 🚀 🚀        the wave %p\n", (theAvatar->qwave->wave));
-////	printf("        🚀 🚀 🚀     q=w %d   s=w %d   q=s %d\n",
-////		(uintptr_t) (theAvatar->qwave) == (uintptr_t)  (theAvatar->qwave->wave),
-////		(uintptr_t) (theSpace) == (uintptr_t) (theAvatar->qwave->wave),
-////		(uintptr_t) (theAvatar->qwave) == (uintptr_t) (theSpace)
-////	);
-//
-//	return theAvatar->qwave->wave;
-//}
-
-//double Avatar_getElapsedTime(void) {
-//	if (!theSpace) throw std::runtime_error("🚀 🚀 🚀 null space in getElapsedTime()");
-//	return theAvatar->elapsedTime;
-//}
-//
-//double Avatar_getIterateSerial(void) {
-//	if (!theSpace) throw std::runtime_error("🚀 🚀 🚀 null space in getIterateSerial()");
-//	return theAvatar->iterateSerial;
-//}
-
 void qSpace_dumpPotential(char *title) { theSpace->dumpPotential(title); }
-//void qSpace_setZeroPotential(void) { theSpace->setZeroPotential(); }
-//void qSpace_setValleyPotential(double power, double scale, double offset) {
-//	theSpace->setValleyPotential(power, scale, offset);
-//}
-
-// obsolete
-//void Avatar_setDt(double dt) {
-//	theAvatar->dt = dt;
-//}
-
-// obsolete
-// iterations are what the user sees.  steps are what Visscher does repeatedly.
-//void Avatar_setStepsPerIteration(int stepsPerIteration) {
-//	//printf("🚀 🚀 🚀 Avatar_setStepsPerIteration(%d)\n", stepsPerIteration);
-//	if (stepsPerIteration < 1 || stepsPerIteration > 1e8) {
-//		char buf[100];
-//		snprintf(buf, 100, "Avatar_setStepsPerIteration, %d, is <1 or too big\n", stepsPerIteration);
-//		throw std::runtime_error(buf);
-//	}
-//	theAvatar->stepsPerIteration = stepsPerIteration;
-//	//printf("🚀 🚀 🚀 Avatar_setStepsPerIteration result %d in theSpace=%p\n",
-//	//	theAvatar->stepsPerIteration, theSpace);
-//}
-
-// obsolete
-// low pass filter.
-//void Avatar_setLowPassFilter(int lowPassFilter) {
-//	//printf("🚀 🚀 🚀 Avatar_setLowPassFilter(%d)\n", dilution);
-//	theAvatar->lowPassFilter = lowPassFilter;
-//	//printf("🚀 🚀 🚀 Avatar_setLowPassFilter result %d in theSpace=%p\n",
-//	//	theAvatar->lowPassFilter, theSpace);
-//}
 
 void avatar_oneIteration(qAvatar *pointer) { pointer->oneIteration(); }
 //void Avatar_resetCounters(void) { pointer->resetCounters(); }
@@ -106,12 +49,12 @@ void avatar_oneIteration(qAvatar *pointer) { pointer->oneIteration(); }
 // if iterating, FFT after the current iterate finishes.  If stopped, fft current wave.
 void avatar_askForFFT(qAvatar *pointer) { pointer->askForFFT(); }
 
-// this will normalize with the C++ normalize which also sets maxNorm
-void avatar_normalize(qAvatar *avatar) //{ pointer->qwave->normalize(); }
+// this will normalize with the C++ normalize
+void wave_normalize(qWave *qwave) //{ pointer->normalize(); }
 {
-	printf("avatar_normalize(%p) => '%s'\n", avatar, avatar->label);
-	avatar->qwave->normalize();
-	printf("avatar_normalize(%p) done\n", avatar);
+	printf("wave_normalize(%p) before\n", qwave);
+	qwave->normalize();
+	printf("wave_normalize(%p) done\n", qwave);
 }
 
 /* ******************************************************** space creation from JS */

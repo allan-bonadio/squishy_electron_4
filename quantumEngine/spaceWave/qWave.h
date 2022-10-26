@@ -77,5 +77,10 @@ struct qFlick : public qWave {
 	void fixBoundaries(void);  // on latest two buffers
 };
 
-
+// for JS to call
+extern "C" {
+	// js thinks it's a qWave but we know it's really a qBuf cuz that's where
+	// the method is.  Maybe I shouldn't be doing this?
+	void wave_normalize(qWave *qw);
+}
 

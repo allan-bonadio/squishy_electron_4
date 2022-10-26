@@ -42,18 +42,19 @@ exportsSrc  = [
 	//converted to direct{name: 'Avatar_setStepsPerIteration', args: ['number'], retType: null},
 	//converted to direct{name: 'Avatar_setLowPassFilter', args: ['number'], retType: null},
 
+	// accept an integer pointer to the qWave as first arg
+	{name: 'wave_normalize', args: ['number'], retType: null},
+
 	// avatars - all accept an integer pointer to the avatar as first argument
 	{name: 'avatar_loadViewBuffer', args: ['number'], retType:  'number'},
 	{name: 'avatar_oneIteration', args: ['number'], retType: 'number'},
 	{name: 'avatar_askForFFT', args: ['number'], retType: null},
-	{name: 'avatar_normalize', args: ['number'], retType: null},
 	{name: 'avatar_delete', args: ['number'], retType: null},
 
 	// views
 	{name: 'avatar_getViewBuffer', args: ['number'], retType: 'number'},
 	//converted to direct{name: 'qViewBuffer_loadViewBuffer', args: ['number'], retType:  'number'},
 	{name: 'avatar_dumpViewBuffer', args: ['number', 'string'], retType: null},
-
 
 ];
 
