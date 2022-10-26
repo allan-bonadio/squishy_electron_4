@@ -125,6 +125,7 @@ export class ControlPanel extends React.Component {
 			let mainEAvatar = this.props.space.mainEAvatar;
 			mainEAvatar.elapsedTime = 0;
 			mainEAvatar.iterateSerial = 0;
+			mainEAvatar.doRepaint();
 		}
 
 		// and now's the time to remember what the user set it at for next time

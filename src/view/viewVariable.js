@@ -201,10 +201,11 @@ export class viewAttribute extends viewVariable {
 	reloadVariable() {
 		const gl = this.gl;
 		//console.log(`reload Array variable ${this.this.varName} : `, this.float32TypedArray);
-		// not sure we have to do this again...
-		gl.bindBuffer(gl.ARRAY_BUFFER, this.glBuffer);
+		// not sure we have to do this again...  seems we don't.
+		//gl.bindBuffer(gl.ARRAY_BUFFER, this.glBuffer);
 
 		// do we have to do THIS again?  Does it just slurp it up from the pointer from last time?!?!
+		// YES we do have to do this again!!!
 		gl.bufferData(gl.ARRAY_BUFFER, this.float32TypedArray, this.bufferDataDrawMode);
 
 		if (traceVariables) {
