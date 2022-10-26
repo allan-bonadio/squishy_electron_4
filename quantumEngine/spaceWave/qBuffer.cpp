@@ -22,7 +22,7 @@ qFlick - object that owns a list of waves, and points to its space
 #include "qSpace.h"
 #include "qBuffer.h"
 
-static bool traceNormalize = false;
+static bool traceNormalize = true;
 static bool traceAllocate = false;
 
 // just allocate a wave of whatever length
@@ -66,7 +66,7 @@ qCx *qBuffer::allocateWave(int nPoints) {
 
 // create one
 qBuffer::qBuffer(void)
-	: magic('qBuf'), wave(NULL),
+	: magic('buff'), wave(NULL),
 		nPoints(0), start(0), end(0), continuum(contDISCRETE),
 		space(NULL) {
 }
@@ -134,12 +134,14 @@ double qBuffer::dumpRow(char buf[200], int ix, qCx w, double *pPrevPhase, bool w
 		if (abs(im) + abs(re) > 1e-9)
 			phase = atan2(im, re) * 180. / PI;  // pos or neg OR NAN
 
-		double dPhase = phase - *pPrevPhase + 360.;  // so now its positive, right?
-		if (dPhase >= 360.) dPhase -= 360.;
+		// adjust it to -180...+180
+		double dPhase = fmod(phase - *pPrevPhase + 180, 360) - 180.;
+		//double dPhase = phase - *pPrevPhase + 360.;  // so now its positive, right?
+		//if (dPhase >= 360.) dPhase -= 360.;
 
 		// if this or the previous point was (0,0) then the phase and dPhase will be NAN, and they print that way
-		snprintf(buf, 200, "[%3d] (%8.4lf,%8.4lf) | %8.3lf %8.3lf %8.4lf",
-			ix, re, im, phase, dPhase, mag);
+		snprintf(buf, 200, "[%3d] (%8.4lf,%8.4lf) | %8.3lf %9.3lf %8.4lf  m𝜓",
+			ix, re, im, phase, dPhase, mag * 1000);
 		*pPrevPhase = phase;
 	}
 	else {
@@ -153,8 +155,11 @@ void qBuffer::dumpSegment(qCx *wave, bool withExtras, int start, int end, int co
 	//printf("qBuffer::dumpSegment(%p, %s)\n", wave, withExtras ? "with extras" : "without extras");
 	//printf("      start:%d  end:%d  continuum: %d\n", start, end, continuum);
 
-	if (start >= end)
+	if (start >= end) {
+		printf("qBuffer::dumpSegment(%p, %d, %d, %d)\n",
+			wave, start, end, continuum);
 		throw std::runtime_error("qBuffer::dumpSegment() start >= end");
+	}
 
 	int ix = 0;
 	char buf[200];
@@ -190,7 +195,8 @@ void qBuffer::dumpThat(qCx *wave, bool withExtras) {
 
 // works on any buffer but originally written for qWaves
 void qBuffer::dump(const char *title, bool withExtras) {
-	printf("\n🌊🌊 ==== Wave %p->%p | %s ", this, wave, title);
+	printf("\n🌊🌊 ==== %c%c%c%c  %p->%p | %s ",
+		magic >> 24, magic >> 16, magic >> 8, magic, this, wave, title);
 	qBuffer::dumpSegment(wave, withExtras, start, end, continuum);
 	//space->dumpThat(wave, withExtras);
 	printf("        ==== end of Wave ====\n\n");
@@ -285,9 +291,10 @@ double qBuffer::innerProduct(void) {
 		qCx point = wave[ix];
 		double norm = point.norm();
 		sum += norm;
-		//sum += wave[ix].re * wave[ix].re + wave[ix].im * wave[ix].im;
-		//printf("innerProduct point %d (%lf,%lf) %lf\n", ix, wave[ix].re, wave[ix].im,
-		//	wave[ix].re * wave[ix].re + wave[ix].im * wave[ix].im);
+		if (traceNormalize) {
+			printf("innerProduct point %d (%lf,%lf) norm--> %lf\n", ix, wave[ix].re, wave[ix].im,
+			wave[ix].re * wave[ix].re + wave[ix].im * wave[ix].im);
+		}
 	}
 
 	return sum;
@@ -298,19 +305,15 @@ double qBuffer::innerProduct(void) {
 // enforce ⟨𝜓 | 𝜓⟩ = 1 by dividing out the current magnitude sum.
 // BUffer must be installed as well as nPoints, start and end
 void qBuffer::normalize(void) {
-	printf("\nqBuffer::normalize buffer(%p)\n", wave);
-	printf("    %lf %lf %lf %lf\n", wave[2].re, wave[2].im, wave[3].re, wave[3].im);
+	if (traceNormalize) {
+		printf("qBuffer:: 🍕starting normalize, this=%p --> %p\n", this, wave);
+		dump("qBuffer:: 🍕what we're dealing with", true);
+	}
 
-
-	//qCx *wave = tempWave;
-	//qWave *tempQWave = qWave::newQWave(space, tempWave);
-	//qCx *wave = this->wave;
-	//qDimension *dims = space->dimensions;
 	double mag = innerProduct();
-	if (traceNormalize)
-		printf("🍕 normalizing qBuffer.  magnitude=%lf\n", mag);
-	//tempQWave->dumpWave("The wave,before normalize", true);
-
+	if (traceNormalize) {
+		printf("🍕 normalizing qBuffer.  innerProduct=%lf\n", mag);
+	}
 	if (mag == 0. || ! isfinite(mag)) {
 		// ALL ZEROES!??! this is bogus, shouldn't be happening.
 		// Well, except that brand new buffers are initialized to zeroes.
