@@ -115,16 +115,16 @@ export class ControlPanel extends React.Component {
 	// SetWave button
 	// this one is an event handler in the wave tab for the SetWave button
 	setMainWave =
-	ev => {
-		const {waveBreed, waveFrequency, pulseWidth, pulseOffset} = this.state;
-		const waveParams = {waveBreed, waveFrequency, pulseWidth, pulseOffset};
+	waveParams => {
+		const {waveBreed, waveFrequency, pulseWidth, pulseOffset} = waveParams;
 
 		// even if there's no space yet, let them store settings.  huh?
 		if (this.props.space) {
 			const mainEWave = this.props.space.mainEWave;
 			mainEWave.setFamiliarWave(waveParams);  // eSpace does this initially
-			this.mainEAvatar.elapsedTime = 0;
-			this.mainEAvatar.iterateSerial = 0;
+			let mainEAvatar = this.props.space.mainEAvatar;
+			mainEAvatar.elapsedTime = 0;
+			mainEAvatar.iterateSerial = 0;
 		}
 
 		// and now's the time to remember what the user set it at for next time
