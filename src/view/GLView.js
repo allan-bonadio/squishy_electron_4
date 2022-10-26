@@ -41,7 +41,7 @@ class GLView extends React.Component {
 		super(props);
 		this.state = {canvas: null};
 
-		if (traceGLView) console.log(`🖼 🖼 GLView:${props.viewName} : constructor done`);
+		if (traceGLView) console.log(`🖼 🖼 GLView:${props.viewName}: constructor done`);
 	}
 
 	// When you know <canvas element, pass it here.
@@ -56,13 +56,13 @@ class GLView extends React.Component {
 			return;  // already done
 
 		this.setState({canvas}, () => traceGLView &&
-			console.log(`🖼 🖼 GLView:${p.viewName} : setGLCanvas set state completed`));
+			console.log(`🖼 🖼 GLView ${p.viewName}: setGLCanvas set state completed`));
 		this.canvas = canvas;  // immediately available
 
 		canvas.GLView = this;
 		canvas.viewName = p.viewName;
 
-		if (traceGLView) console.log(`🖼 🖼 GLView:${p.viewName} : setGLCanvas done`);
+		if (traceGLView) console.log(`🖼 🖼 GLView ${p.viewName}: setGLCanvas done`);
 	}
 
 	// must do this after the canvas AND the space exist.
@@ -84,21 +84,21 @@ class GLView extends React.Component {
 
 		// now that there's an avatar, we can set these functions so everybody can use them.
 		p.avatar.doRepaint = this.doRepaint;
-		p.avatar.resetWave = this.resetWave;
+		p.avatar.reStartWave = this.reStartWave;
 		p.avatar.setGeometry = this.setGeometry;
-		if (traceGLView) console.log(`🖼 🖼 GLView:${p.viewName} : done with initViewClass`);
+		if (traceGLView) console.log(`🖼 🖼 GLView ${p.viewName} ${p.avatar.label}: done with initViewClass`);
 	}
 
 	// Tell the GLView & its view(s) that the wave contents have changed dramatically;
 	// essentiially refilled with different numbers.  In practice, just resets
 	// the avgHighest.  Passed up to a higher Component.
-	resetWave =
+	reStartWave =
 	() => {
 		if (this.effectiveView) {
 			//this.effectiveView.resetAvgHighest();
 			//const curView = this.effectiveView || this.state.effectiveView;
 			this.effectiveView.drawings.forEach(dr =>  dr.resetAvgHighest());
-			if (traceGLView) console.log(`🖼 🖼 GLView:${this.props.viewName} : did resetWave`);
+			if (traceGLView) console.log(`🖼 🖼 GLView:${this.props.viewName} ${this.props.avatar.label}: did reStartWave`);
 		}
 	}
 
@@ -109,7 +109,7 @@ class GLView extends React.Component {
 	() => {
 		if (this.effectiveView) {
 			this.effectiveView.setGeometry();
-			if (traceGLView) console.log(`🖼 🖼 GLView:${this.props.viewName} did setGeometry`);
+			if (traceGLView) console.log(`🖼 🖼 GLView:${this.props.viewName}  ${this.props.avatar.label} did setGeometry`);
 		}
 	}
 
@@ -119,34 +119,37 @@ class GLView extends React.Component {
 	doRepaint =
 	() => {
 		let p = this.props;
-		if (traceGLView) console.log(`🖼 🖼 GLView:${p.viewName} : starting doRepaint`);
+		if (traceGLView) console.log(`🖼 🖼 GLView ${p.viewName} ${p.avatar.label}  ${p.avatar.nAvatar}: starting doRepaint`);
 		if (! this.effectiveView)
-			return null;  // at least the render will crate the canvas
+			return null;  // too early
 
-		this.effectiveView.reloadAllVariables();
+		if (traceGLView) p.avatar.ewave.dump(`🖼 🖼 GLView ${p.viewName}: got the ewave buffer straight`);
 
 		// copy from latest wave to view buffer (c++)  .. hey where does this go!??!?!?!?!
 		this.highest = p.avatar.loadViewBuffer()
-		//p.avatar.getViewBuffer();
+
+		if (traceGLView) p.avatar.ewave.dump(`🖼 🖼 GLView ${p.viewName}: loaded view buf`);
+
+		this.effectiveView.reloadAllVariables();
 
 		let endReloadVarsNBuffer = performance.now();
 
-		this.effectiveView.setInputsOnDrawings();
-		let endReloadInputs = performance.now();
+		if (traceGLView) p.avatar.dumpViewBuffer(`🖼 🖼 GLView ${p.viewName}: filled the vbuffer`);
 
 		// draw
 		this.effectiveView.drawAllDrawings();
 		let endDraw = performance.now();
-		if (traceGLView) console.log(`🖼 🖼 GLView:${p.viewName} : : doRepaint done`);
+		if (traceGLView) console.log(`🖼 🖼 GLView ${p.viewName} ${p.avatar.label}: doRepaint done drawing`);
 
-		return {endReloadVarsNBuffer, endReloadInputs, endDraw};
+		return {endReloadVarsNBuffer, endDraw};
+		//return {endReloadVarsNBuffer, endReloadInputs, endDraw};
 	}
 
 	// this just creates the canvas
 	render() {
 		const p = this.props;
 		//const s = this.state;
-		if (traceGLView) console.log(`🖼 🖼 GLView:${p.viewName} : : about to render`);
+		if (traceGLView) console.log(`🖼 🖼 GLView ${p.viewName}  ${p.avatar?.label}: about to render`);
 
 		return (
 			<canvas className='GLView'
@@ -171,7 +174,7 @@ class GLView extends React.Component {
 		if (p.avatar && p.space && this.canvas && !this.effectiveView) {
 			this.initViewClass();
 		}
-		if (traceGLView) console.log(`🖼 🖼 GLView:${p.viewName} : initViewClass done`, this);
+		if (traceGLView) console.log(`🖼 🖼 GLView ${p.viewName}: initViewClass done`, this);
 	}
 }
 
