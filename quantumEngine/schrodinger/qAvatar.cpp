@@ -56,10 +56,11 @@ qAvatar::qAvatar(qSpace *sp, const char *lab)
 	qwave = new qWave(space);
 	scratchQWave = NULL;  // until used
 	qspect = NULL;  // until used
-	strncpy(label, lab, LABEL_LEN);
-	label[LABEL_LEN] = 0;
 	potential = sp->potential;
 	potentialFactor = sp->potentialFactor;
+
+	strncpy(label, lab, LABEL_LEN);
+	label[LABEL_LEN] = 0;
 
 	resetCounters();
 
@@ -68,9 +69,11 @@ qAvatar::qAvatar(qSpace *sp, const char *lab)
 	vBuffer = qvBuffer->vBuffer;
 
 	if (traceSpace) {
-		printf("the qSpace just created:   magic=%c label=%s nDimesions=%d nStates=%d nPoints=%d "
-			"potential=%p potentialFactor=%lf spectrumLength=%d  \n",
-			space->magic, space->label, space->nDimensions, space->nStates, space->nPoints,
+		printf("the qSpace for avatar %s:   magic=%c%c%c%c label=%s nDimesions=%d  "
+			"nStates=%d nPoints=%d potential=%p potentialFactor=%lf spectrumLength=%d  \n",
+			label,
+			space->magic >> 24,  space->magic >> 16, space->magic >> 8, space->magic,
+			space->label, space->nDimensions, space->nStates, space->nPoints,
 			space->potential, space->potentialFactor, space->spectrumLength);
 		qDimension *dims = space->dimensions;
 		printf("      its qDimension:   N=%d start=%d end=%d ",
@@ -197,7 +200,7 @@ void qAvatar::dumpObj(const char *title) {
 
 /* ********************************************************** integration */
 
-// return elapsed time siince last page reload, in seconds,
+// return elapsed real time siince last page reload, in seconds, only for tracing
 // seems like it's down to miliseconds
 double getTimeDouble()
 {
