@@ -64,11 +64,12 @@ class SetWaveTab extends React.Component {
 		eSpaceCreatedPromise
 		.then(space => {
 			// if the space has been created, so has all the stuff hanging off it
-			this.setState({space});
-			this.space = space;  // need it now
 			this.miniGraphAvatar = space.miniGraphAvatar;
 			this.miniGraphEWave = this.miniGraphAvatar.ewave;
 			//this.miniGraphVBuffer = this.miniGraphAvatar.vBuffer;
+
+			// space in the state will allow the GLView to start showing, therefore initializing
+			this.setState({space});
 		})
 		.catch(ex => {
 			ex = interpretCppException(ex);
@@ -81,27 +82,25 @@ class SetWaveTab extends React.Component {
 	yScale = scaleLinear().range([0, this.miniHeight]);
 
 	// set the captive minGraph wave to the new settings, after user changed one.
-	// Since the state was also changed, this'll do a render, which will do a GL draw.
-	setMiniGraphWave() {
+	// Since the state was also changed, we'll do a render.  but this will do a GL draw.
+	regenerateMiniGraphWave() {
+		if (!this.state.space) return;  // too soon
 		this.miniGraphEWave.setFamiliarWave(this.state);
+		this.miniGraphAvatar.doRepaint?.();
 	}
 
 	// the local state is just the temporary settings before user clicks Set Wave
 	setBreed = waveBreed => {
-		this.setState({waveBreed});
-		this.setMiniGraphWave();
+		this.setState({waveBreed}, () => this.regenerateMiniGraphWave());
 	}
 	setWaveFrequency = waveFrequency => {
-		this.setState({waveFrequency});
-		this.setMiniGraphWave();
+		this.setState({waveFrequency}, () => this.regenerateMiniGraphWave());
 	}
 	setPulseWidth = pulseWidth => {
-		this.setState({pulseWidth});
-		this.setMiniGraphWave();
+		this.setState({pulseWidth}, () => this.regenerateMiniGraphWave());
 	}
 	setPulseOffset = pulseOffset => {
-		this.setState({pulseOffset});
-		this.setMiniGraphWave();
+		this.setState({pulseOffset}, () => this.regenerateMiniGraphWave());
 	}
 
 	render() {
@@ -147,6 +146,13 @@ class SetWaveTab extends React.Component {
 
 		</>;
 
+		let glView = '';
+		if (s.space) {
+			glView = <GLView width={this.miniWidth} height={this.miniHeight}
+						space={s.space} avatar={this.miniGraphAvatar}
+						viewClassName='flatDrawingViewDef' viewName='waveMiniGraph'
+					/>
+		}
 
 		const radios = <div className='waveTabCol middle'>
 			<label>
@@ -174,9 +180,6 @@ class SetWaveTab extends React.Component {
 			</label>
 		</div>;
 
-		// unlike the main wave, this gets repainted along with the render
-		this.miniGraphAvatar?.doRepaint?.();
-
 		//debugger;
 		return <div className='SetWaveTab'>
 
@@ -190,13 +193,10 @@ class SetWaveTab extends React.Component {
 			<div className='waveTabCol'>
 				&nbsp;
 				<div className='waveMiniGraph'>
-					<GLView width={this.miniWidth} height={this.miniHeight}
-						space={this.space} avatar={this.miniGraphAvatar}
-						viewClassName='flatDrawingViewDef' viewName='waveMiniGraph'
-					/>
+					{glView}
 				</div>
 
-				<button className='setWaveButton round' onClick={p.setMainWave}>
+				<button className='setWaveButton round' onClick={ev => p.setMainWave(this.state)}>
 						Set Wave
 				</button>
 
