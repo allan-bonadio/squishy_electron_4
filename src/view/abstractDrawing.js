@@ -16,7 +16,8 @@ drawings must include:
 - a class which extends abstractDrawing and has methods:
 	- class and instance names
 	- setShaders() to prep the shaders
-	- setInputs() to prep the variables, uniform and attr; see viewVariable.js
+	- createVariables() to prep the variables, uniform and attr; see viewVariable.js
+		reloadVariables in abs viewDef should call reloadVariable on each without drawing have to intervene
 	- draw() to issue actual drawing commands
 */
 
@@ -28,6 +29,7 @@ export class abstractDrawing {
 	// viewDef is eg flatDrawingViewDef instance.  Here we add ourselves to the ViewDef list of drawings.
 	constructor(viewDef) {
 		this.viewDef = viewDef;
+		this.viewName = viewDef.viewName;
 		this.viewVariables = [];
 
 		this.gl = viewDef.gl;
@@ -38,6 +40,8 @@ export class abstractDrawing {
 
 		this.space = viewDef.space;
 		this.avatar = viewDef.avatar;
+		this.avatarLabel = viewDef.avatar.label;
+		this.nAvatar = viewDef.avatar.nAvatar;
 
 		// no.  viewDef does this by just setting the drawings array with the drawings it wants.  viewDef.drawings.push(this);
 	}
@@ -81,7 +85,7 @@ export class abstractDrawing {
 		if (success) {
 			this.program = program;
 			return
-			// after this, you'll attach your viewVariables with your subclassed setInputs() method.
+			// after this, you'll attach your viewVariables with your subclassed createVariables() method.
 		}
 
 		const msg = gl.getProgramInfoLog(program);
@@ -113,9 +117,9 @@ export class abstractDrawing {
 		this.compileProgram();
 	}
 
-	// abstract supermethod: all drawings should write their own setInputs() method.
+	// abstract supermethod: all drawings should write their own createVariables() method.
 	// mostly, creating viewVariables that can be dynamically changed
-	setInputs() {
+	createVariables() {
 		// gotta have at least one attr?  this is just a dummy.
 		this.aPointAttr = new viewAttribute('aPoint', this);
 		this.aPoint = new Float32Array([0, 0, 0., 1.]);

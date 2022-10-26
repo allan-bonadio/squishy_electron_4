@@ -23,6 +23,8 @@ export class abstractViewDef {
 	// canvas: real <canvas> DOM element, after it's been created by React
 	// class name from instance: vu.constructor.name   from class: vuClass.name
 	constructor(viewName, canvas, space, avatar) {
+		// what does this do?  Variables shared between drawings?  I don't think so.////
+		//  part of the whole variable 'Owner' concept I guess
 		this.viewVariables = [];
 
 		this.viewName = viewName;
@@ -58,7 +60,8 @@ export class abstractViewDef {
 		if (!gl) throw new Error(`Sorry this browser doesn't do WebGL!  You might be able to turn it on ...`);
 		this.gl = gl;
 
-		/*
+		/* If your browser doesn't do GL at first glance:
+
 		Can be enabled in Firefox by setting the about:config preference
 		webgl.enable-prototype-webgl2 to true
 
@@ -80,18 +83,13 @@ export class abstractViewDef {
 			__proto__: Array(0)
 			mobile: false
 		*/
-
-
-		//this.vaoExt = gl.getExtension('OES_vertex_array_object');
-		//if (! this.vaoExt) throw `Sorry this browser doesn't do OES_vertex_array_object!`+
-		//		`\nI guess I can't blame you, how would you know.`;
 	}
 
 	// the final call to set it up does all viewClassName-specific stuff
 	// other subclassers override what they want
 	completeView() {
 		this.setShadersOnDrawings();
-		this.setInputsOnDrawings();
+		this.createVariablesOnDrawings();
 
 		this.setGeometry();  // call again if canvas outer dimensions change
 
@@ -147,7 +145,7 @@ export class abstractViewDef {
 		if (success) {
 			this.program = program;
 			return
-			// after this, you'll attach your viewVariables with your subclassed setInputs() method.
+			// after this, you'll attach your viewVariables with your subclassed createVariables() method.
 		}
 
 		const msg = gl.getProgramInfoLog(program);
@@ -167,13 +165,15 @@ export class abstractViewDef {
 
 	/* ************************************************** buffers & variables */
 
-	// go and call setInputs on each of the drawings
-	setInputsOnDrawings() {
-		//console.log('setInputsOnDrawings drawings', this.drawings);
+	// go and call createVariables on each of the drawings.
+	// Should be done ONCE when canvas & avatar are created, or recreated.
+	// NOT upon every repaint!!
+	createVariablesOnDrawings() {
+		//console.log('createVariablesOnDrawings drawings', this.drawings);
 		//console.dir(this.drawings);
 
 		this.drawings.forEach(drawing => {
-			drawing.setInputs();
+			drawing.createVariables();
 		});
 	}
 
@@ -192,8 +192,9 @@ export class abstractViewDef {
 	// //		gl.vertexAttribPointer(cornerAttributeLocation, size, type, normalize, stride, offset);
 
 	// reload ALL the variables on this view
+	// should be done once on every repaint
 	reloadAllVariables() {
-		this.viewVariables.forEach(v => v.reloadVariable());
+		// shouldn't need this; viewDefs shouldnt have vars  this.viewVariables.forEach(v => v.reloadVariable());
 		this.drawings.forEach(dr => {
 				dr.viewVariables.forEach(v => v.reloadVariable());
 		});
@@ -437,7 +438,7 @@ export class abstractViewDef {
 				positionAttributeLocation, size, type, normalize, stride, offset)
 		}
 		else {
-			this.setInputs();
+			this.createVariables();
 			positionAttributeLocation = this.viewVariables[0].attrLocation;
 			positionBuffer = this.viewVariables[0].glBuffer;
 			//vao = this.viewVariables[0].vao;

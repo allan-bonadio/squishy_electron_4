@@ -46,7 +46,7 @@ export class starDrawing extends abstractDrawing {
 	}
 
 	// all to do this one differently
-	setInputs() {
+	createVariables() {
 		//const gl = this.gl;
 
 		let cornerColorUni;
@@ -81,7 +81,7 @@ export class starDrawing extends abstractDrawing {
 
 	}
 
-//	setInputs() {
+//	createVariables() {
 //		// loads view buffer from corresponding wave, calculates highest norm, which we use below.
 //		const highest = this.avatar.loadViewBuffer();
 //

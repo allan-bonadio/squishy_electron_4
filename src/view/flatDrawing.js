@@ -12,13 +12,14 @@ import {viewUniform, viewAttribute} from './viewVariable';
 
 let dumpViewBufAfterDrawing = false;
 let traceHighest = false;
+let traceFlatDrawing = true;
 
 // diagnostic purposes
 let alsoDrawPoints = false;
 let alsoDrawLines = false;
 //alsoDrawLines =0;
 
-let ps = alsoDrawPoints ? `gl_PointSize = (row.w+1.) * 5.;//10.;` : '';
+let pointSize = alsoDrawPoints ? `gl_PointSize = (row.w+1.) * 5.;//10.;` : '';
 
 /* ******************************************************* flat drawing */
 
@@ -63,7 +64,7 @@ void main() {
 	//vColor = vec4(.9, .9, .1, 1.);
 
 	// dot size, in pixels not clip units.  actually a square.
-	${ps}
+	${pointSize}
 }
 `;
 
@@ -79,10 +80,7 @@ void main() {
 
 // the original display that's worth watching: flat upside down hump graph
 export class flatDrawing extends abstractDrawing {
-	// apparently supplied by default
-	//constructor(viewDef, space, avatar) {
-	//	super(viewDef, space, avatar);
-	//}
+	// inherited from abstractDrawing
 
 	static drawingClassName: 'flatDrawing';
 	drawingClassName: 'flatDrawing';
@@ -94,21 +92,24 @@ export class flatDrawing extends abstractDrawing {
 		this.gl.useProgram(this.program);  // should be the only time I do useProgram()
 	}
 
-
-	setInputs() {
+	// one time set up of variables for this drawing, every time canvas and viewDef is recreated
+	createVariables() {
+		if (traceFlatDrawing) console.log(`flatDrawing ${this.viewName}: creatingVariables`);
 		// loads view buffer from corresponding wave, calculates highest norm, which we use below.
+		// this only needs to happen once right?  viewBuffer just sits ini the same place in memory,
+		// getting refilled from a qWave, but never moves, right>
 		//this.avatar.dumpViewBuffer('before loaded');
 		const highest = this.avatar.loadViewBuffer();
 		//this.avatar.dumpViewBuffer('just loaded');
 
 		// smooth it out otherwise the wave sortof bounces up and down a little on each step
-		// must find a way to set the avgHighest
-		if (!this.avgHighest)
-			this.avgHighest = highest;
-		else
-			this.avgHighest = (highest + 3*this.avgHighest) / 4;
+		// set like this only upon recreation
+		//if (!this.avgHighest)
+		this.avgHighest = highest;
+		//else
+		//	this.avgHighest = (highest + 3*this.avgHighest) / 4;
 		if (traceHighest)
-			console.log(`flatDrawing: highest=${highest.toFixed(5)}  avgHighest=${this.avgHighest.toFixed(5)}`);
+			console.log(`flatDrawing ${this.viewName}: highest=${highest.toFixed(5)}  avgHighest=${this.avgHighest.toFixed(5)}`);
 
 		let maxHeightUniform = this.maxHeightUniform = new viewUniform('maxHeight', this);
 		maxHeightUniform.setValue(() => {
@@ -123,7 +124,7 @@ export class flatDrawing extends abstractDrawing {
 		this.rowAttr = new viewAttribute('row', this);
 		this.vertexCount = nPoints * 2;  // nPoints * vertsPerBar
 		this.rowFloats = 4;
-		this.rowAttr.attachArray(this.space.mainVBuffer, this.rowFloats);
+		this.rowAttr.attachArray(this.avatar.vBuffer, this.rowFloats);
 	}
 
 	// call this when you reset the wave otherwise the smoothing is surprised
@@ -133,9 +134,11 @@ export class flatDrawing extends abstractDrawing {
 
 	draw() {
 		const gl = this.gl;
+		if (traceFlatDrawing) console.log(`flatDrawing ${this.viewName}, ${this.avatarLabel} ${this.nAvatar}: drawing`);
 
-		// should not be necessary!!  gl.useProgram(this.program);
-		//this.rowAttr.reloadVariable()
+		// are these two necessary?  seems to work without em
+		gl.useProgram(this.program);////
+		this.rowAttr.reloadVariable();////
 
 		//gl.bindVertexArray(this.vao);
 		gl.drawArrays(gl.TRIANGLE_STRIP, 0, this.vertexCount);
@@ -152,7 +155,7 @@ export class flatDrawing extends abstractDrawing {
 
 		// i think this is problematic
 		if (dumpViewBufAfterDrawing) {
-			this.avatar.dumpViewBuffer(`finished drawing in flatDrawing.js; drew buf:`);
+			this.avatar.dumpViewBuffer(`finished drawing ${this.viewName} in flatDrawing.js; drew buf:`);
 			console.log(`barWidthUniform=${this.barWidthUniform.staticValue}    `
 				+`maxHeightUniform=`, this.maxHeightUniform.getFunc());
 		}
