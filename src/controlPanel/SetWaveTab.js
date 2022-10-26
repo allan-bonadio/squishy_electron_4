@@ -30,16 +30,21 @@ function setPT() {
 	// variables from on high, and the funcs needed to change them
 	SetWaveTab.propTypes = {
 		// actually sets the one in use by the algorithm
-		setWaveHandler: PropTypes.func.isRequired,
+		setMainWave: PropTypes.func.isRequired,
 
 		waveParams: PropTypes.shape({
-			frequency: PropTypes.number,
+			// defaults handed in
 			waveBreed: PropTypes.oneOf(['circular', 'standing', 'gaussian', 'chord', ]),
-			// plus others, ignore for this check
+			waveFrequency: PropTypes.number,
+			pulseWidth: PropTypes.number,
+			pulseOffset: PropTypes.number,
 		}).isRequired,
 
 		// sets it only in the ControlPanel state for subsequent SetWave click
 		setCPState: PropTypes.func,
+
+		// no big deal if it's not constructed yet; we fake it
+		space: PropTypes.object,
 	};
 }
 
@@ -49,7 +54,11 @@ class SetWaveTab extends React.Component {
 		super(props);
 		this.state = {
 			space: null,
+			// also wave params
 		};
+
+		// these change  as user changes stuff, so often differs from props
+		Object.assign(this.state, props.waveParams);
 
 		// nobody will set the wave before the space is created!!
 		eSpaceCreatedPromise
@@ -58,76 +67,69 @@ class SetWaveTab extends React.Component {
 			this.setState({space});
 			this.space = space;  // need it now
 			this.miniGraphAvatar = space.miniGraphAvatar;
-			this.miniGraphWaveBuffer = this.miniGraphAvatar.ewave;
+			this.miniGraphEWave = this.miniGraphAvatar.ewave;
 			//this.miniGraphVBuffer = this.miniGraphAvatar.vBuffer;
 		})
 		.catch(ex => {
 			ex = interpretCppException(ex);
 			console.error(ex.stack || ex.message || ex);
-			debugger;
+			//debugger;
 		});
 	}
 	miniWidth = 300;
 	miniHeight = 150;
 	yScale = scaleLinear().range([0, this.miniHeight]);
 
-	// set the captive minGraph wave to the new settings, after user changed one
+	// set the captive minGraph wave to the new settings, after user changed one.
+	// Since the state was also changed, this'll do a render, which will do a GL draw.
 	setMiniGraphWave() {
-		this.miniGraphWaveBuffer.setFamiliarWave(this.props.waveParams);
+		this.miniGraphEWave.setFamiliarWave(this.state);
 	}
 
-	// the CP state is just the temporary settings before user clicks Set Wave
+	// the local state is just the temporary settings before user clicks Set Wave
 	setBreed = waveBreed => {
-		this.props.setCPState({waveBreed});
+		this.setState({waveBreed});
 		this.setMiniGraphWave();
 	}
 	setWaveFrequency = waveFrequency => {
-		// set it first so it's limited
-		this.props.setCPState({waveFrequency});
+		this.setState({waveFrequency});
 		this.setMiniGraphWave();
 	}
 	setPulseWidth = pulseWidth => {
-		this.props.setCPState({pulseWidth});
+		this.setState({pulseWidth});
 		this.setMiniGraphWave();
 	}
 	setPulseOffset = pulseOffset => {
-		this.props.setCPState({pulseOffset});
+		this.setState({pulseOffset});
 		this.setMiniGraphWave();
 	}
 
-	// Get these from the avatar
-	//returnGLFuncs =
-	//(doRepaint, resetWave, setGeometry) => {
-	//	this.doRepaint = doRepaint;
-	//	this.resetWave = resetWave;
-	//	this.setGeometry = setGeometry;
-	//}
-
-	// don't think we need this - when the canvas is created, GLView will rerender
-	//setCanvasCreatedPromise =  // unused I guess
-	//canvasCreatedPromise => this.canvasCreatedPromise = canvasCreatedPromise;
-
 	render() {
 		const p = this.props;
-		//const s = this.state;
+		const s = this.state;
 
 		// some sliders disappear for some breeds
-		const breed = p.waveParams.waveBreed;
+		const breed = s.waveBreed;
 		const needPulseWidth = breed == 'gaussian' || breed == 'chord';
 		const needOffset = (breed == 'gaussian' || breed == 'chord');
 
+		// don't let them set a freq to Nyquist or beyond
+		let highestFrequency = p.space ? p.space.nStates / 2 - 1 : Infinity;
+		highestFrequency = Math.min(
+			alternateMinMaxs.waveParams.waveFrequency.max, highestFrequency);
+
 		const sliders = <>
-			<TextNSlider className='frequency' label='frequency'
-				value={+p.waveParams.waveFrequency}
-				min={alternateMinMaxs.waveParams.waveFrequency.min}
-				max={alternateMinMaxs.waveParams.waveFrequency.max}
+			<TextNSlider className='waveFrequency' label='frequency'
+				value={+s.waveFrequency}
+				min={-highestFrequency}
+				max={highestFrequency}
 				step={'standing' == breed ? .5 : 1}
 				handleChange={this.setWaveFrequency}
 			/>
 
 			<TextNSlider className='pulseWidth' label='pulse width, %'
 				style={{display: needPulseWidth ? 'block' :  'none'}}
-				value={+p.waveParams.pulseWidth}
+				value={+s.pulseWidth}
 				min={alternateMinMaxs.waveParams.pulseWidth.min}
 				max={alternateMinMaxs.waveParams.pulseWidth.max}
 				step={.1}
@@ -136,7 +138,7 @@ class SetWaveTab extends React.Component {
 
 			<TextNSlider className='offset' label='offset, %'
 				style={{display: needOffset ? 'block' :  'none'}}
-				value={+p.waveParams.pulseOffset}
+				value={+s.pulseOffset}
 				min={alternateMinMaxs.waveParams.pulseOffset.min}
 				max={alternateMinMaxs.waveParams.pulseOffset.max}
 				step={2}
@@ -173,8 +175,7 @@ class SetWaveTab extends React.Component {
 		</div>;
 
 		// unlike the main wave, this gets repainted along with the render
-		////if (this.miniGraphAvatar && this.miniGraphAvatar.doRepaint)
-			this.miniGraphAvatar?.doRepaint?.();
+		this.miniGraphAvatar?.doRepaint?.();
 
 		//debugger;
 		return <div className='SetWaveTab'>
@@ -195,8 +196,7 @@ class SetWaveTab extends React.Component {
 					/>
 				</div>
 
-				<button className='setWaveButton round'
-					onClick={p.setWaveHandler}>
+				<button className='setWaveButton round' onClick={p.setMainWave}>
 						Set Wave
 				</button>
 

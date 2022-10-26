@@ -168,7 +168,7 @@ makeParam('spaceParams', 'continuum', 2, [0, 1, 2]);
 // THis also defines slider mins and maxes!  One source of truth.
 
 makeParam('waveParams', 'waveBreed', 'chord', ['circular', 'standing', 'gaussian', 'chord']);
-makeParam('waveParams', 'waveFrequency', 16, {min: -50, max: 50, step: 0.5});
+makeParam('waveParams', 'waveFrequency', 16, {min: -100, max: 100, step: 0.5});
 makeParam('waveParams', 'pulseWidth', 20, {min: 1, max: 100});
 makeParam('waveParams', 'pulseOffset', 30, {min: 0, max: 100});
 

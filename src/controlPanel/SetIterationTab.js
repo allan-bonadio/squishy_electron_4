@@ -99,7 +99,6 @@ function SetIterationTab(props) {
 			<table><tbody>
 				<tr><td>iteration calc time:     </td><td><span  className='iterationCalcTime'>-</span> ms</td></tr>
 				<tr><td>reload view variables:     </td><td><span  className='reloadVarsNBuffer'>-</span> ms</td></tr>
-				<tr><td>reload GL variables:     </td><td><span  className='reloadGlInputs'>-</span> ms</td></tr>
 				<tr><td>draw:                      </td><td><span  className='drawTime'>-</span> ms</td></tr>
 				<tr><td>total for iteration:  </td><td><span  className='totalForIteration'>-</span> ms</td></tr>
 				<tr><td>iteration period:  </td><td><span  className='iterationPeriod'>-</span> ms</td></tr>
@@ -108,6 +107,9 @@ function SetIterationTab(props) {
 		</div>
 	</div>);
 }
+
+// 				<tr><td>reload GL variables:     </td><td><span  className='reloadGlInputs'>-</span> ms</td></tr>
+
 setPT();
 
 export default SetIterationTab;

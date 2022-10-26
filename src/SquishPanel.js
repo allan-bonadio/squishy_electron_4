@@ -174,7 +174,7 @@ export class SquishPanel extends React.Component {
 			//if (typeof ex == 'object')
 			console.error(`error  SquishPanel.didMount.then():`, ex.stack || ex.message || ex);
 			//else console.error(`error  SquishPanel.raw:`, ex);
-			debugger;
+			//debugger;
 		});
 
 	}
@@ -259,7 +259,7 @@ export class SquishPanel extends React.Component {
 			startIteration: now,
 			endCalc: now,
 			endReloadVarsNBuffer: now,
-			endReloadInputs: now,
+			//endReloadInputs: now,
 			endDraw: now,
 			prevStart: now,
 		}
@@ -285,8 +285,9 @@ export class SquishPanel extends React.Component {
 		const st = this.iStats;
 		show('iterationCalcTime', st.endCalc - st.startIteration);
 		show('reloadVarsNBuffer', st.endReloadVarsNBuffer - st.endCalc);
-		show('reloadGlInputs', st.endReloadInputs - st.endReloadVarsNBuffer);
-		show('drawTime', st.endDraw - st.endReloadInputs);
+		show('drawTime', st.endDraw - st.endReloadVarsNBuffer);
+//		show('reloadGlInputs', st.endReloadInputs - st.endReloadVarsNBuffer);
+//		show('drawTime', st.endDraw - st.endReloadInputs);
 		show('totalForIteration', st.endDraw - st.startIteration);
 		const period = st.startIteration - st.prevStart;
 		show('iterationPeriod', period);
@@ -327,7 +328,8 @@ export class SquishPanel extends React.Component {
 
 		// if we need to repaint... if we're iterating, if the view says we have to,
 		// or if this is a one shot step
-		this.iStats.endReloadVarsNBuffer = this.iStats.endReloadInputs = this.iStats.endDraw = performance.now();
+		this.iStats.endReloadVarsNBuffer = this.iStats.endDraw = performance.now();
+		//this.iStats.endReloadVarsNBuffer = this.iStats.endReloadInputs = this.iStats.endDraw = performance.now();
 		if (needsRepaint) {
 			this.mainEAvatar.doRepaint();
 			this.showTimeNIteration();
@@ -344,8 +346,8 @@ export class SquishPanel extends React.Component {
 ////				qe.qViewBuffer_getViewBuffer();
 ////				this.iStats.endReloadVarsNBuffer = performance.now();
 ////
-////				curView.setInputsOnDrawings();
-////				this.iStats.endReloadInputs = performance.now();
+////				curView.createVariablesOnDrawings();
+////				//this.iStats.endReloadInputs = performance.now();
 ////
 ////				// draw
 ////				curView.drawAllDrawings();
@@ -361,8 +363,8 @@ export class SquishPanel extends React.Component {
 			console.log(`times:\n`+
 				`iteration calc time:     ${(this.iStats.endCalc - this.iStats.startIteration).toFixed(2)}ms\n`+
 				`reloadVarsNBuffer:     ${(this.iStats.endReloadVarsNBuffer - this.iStats.endCalc).toFixed(2)}ms\n`+
-				`reload GL variables:     ${(this.iStats.endReloadInputs - this.iStats.endReloadVarsNBuffer).toFixed(2)}ms\n`+
-				`draw:   ${(this.iStats.endDraw - this.iStats.endReloadInputs).toFixed(2)}ms\n`+
+				//`reload GL variables:     ${(this.iStats.endReloadInputs - this.iStats.endReloadVarsNBuffer).toFixed(2)}ms\n`+
+				`draw:   ${(this.iStats.endDraw - this.iStats.endReloadVarsNBuffer).toFixed(2)}ms\n`+
 				`total for iteration:  ${(this.iStats.endDraw - this.iStats.startIteration).toFixed(2)}ms\n` +
 				`period since last:  ${(this.iStats.startIteration - this.iStats.prevStart).toFixed(2)}ms\n`);
 		}
@@ -540,7 +542,7 @@ export class SquishPanel extends React.Component {
 			let exc = interpretCppException(ex);
 			console.error(`setStepsPerIteration error:`,
 				exc.stack || exc.message || exc);
-			debugger;
+			////debugger;
 		}
 	}
 
@@ -557,28 +559,29 @@ export class SquishPanel extends React.Component {
 		//qe.Avatar_setLowPassFilter(Math.round(lpf / 200 * this.state.N));
 	}
 
-	// completely wipe out the 𝜓 wavefunction and replace it with one of our canned waveforms.
+	// obsolete
+	// completely wipe out the 𝜓 wavefunction and replace it with one of our familiar waveforms.
 	// (but do not change N or anything in the state)  Called upon setWave in wave tab
-	setWave =
-	waveParams => {
-// 		const wave = qe.Avatar_getWaveBuffer();
-		const mainEWave = this.state.space.mainEWave;
-		mainEWave.setFamiliarWave(waveParams);  // eSpace does this initially
-		//this.iterateOneIteration(true, true);  // ?? take  this out this was to kick to display it....
-		//this.iterateOneIteration(false, true);
-		//qe.qViewBuffer_getViewBuffer();
-		//qe.createQEWaveFromCBuf();
-		//qe.Avatar_resetCounters();
-		this.mainEAvatar.elapsedTime = 0;
-		this.mainEAvatar.iterateSerial = 0;
-
-		// this is wired into the GLView and its drawers
-		this.mainEAvatar.resetWave();
-		//const curView = this.effectiveView || this.state.effectiveView;
-		//curView.drawings.forEach(dr =>  dr.resetAvgHighest && dr.resetAvgHighest());
-
-		// don't have to set storeSettings cuz already done in CP
-	}
+//	setWave =
+//	waveParams => {
+//// 		const wave = qe.Avatar_getWaveBuffer();
+//		const mainEWave = this.state.space.mainEWave;
+//		mainEWave.setFamiliarWave(waveParams);  // eSpace does this initially
+//		//this.iterateOneIteration(true, true);  // ?? take  this out this was to kick to display it....
+//		//this.iterateOneIteration(false, true);
+//		//qe.qViewBuffer_getViewBuffer();
+//		//qe.createQEWaveFromCBuf();
+//		//qe.Avatar_resetCounters();
+//		this.mainEAvatar.elapsedTime = 0;
+//		this.mainEAvatar.iterateSerial = 0;
+//
+//		// this is wired into the GLView and its drawers
+//		this.mainEAvatar.resetWave();
+//		//const curView = this.effectiveView || this.state.effectiveView;
+//		//curView.drawings.forEach(dr =>  dr.resetAvgHighest && dr.resetAvgHighest());
+//
+//		// don't have to set storeSettings cuz already done in CP
+//	}
 
 	// completely wipe out the quantum potential and replace it with one of our canned waveforms.
 	// (but do not change N or anything in the state)  Called upon set potential in potential tab
@@ -618,14 +621,12 @@ export class SquishPanel extends React.Component {
 		const p = this.props;
 		const s = this.state;
 
-		// 					returnGLFuncs={this.returnGLFuncs}
-
 		return (
 			<div id={this.props.id} className="SquishPanel">
 				{/*innerWindowWidth={s.innerWindowWidth}/>*/}
 				<WaveView
 					viewClassName={s.mainViewClassName}
-					viewName='main'
+					viewName='mainView'
 					width={p.width}
 					setUpdatePotentialArea={this.setUpdatePotentialArea}
 				/>
@@ -639,8 +640,6 @@ export class SquishPanel extends React.Component {
 					startStop={this.startStop}
 					singleIteration={this.singleIteration}
 					resetCounters={this.resetCounters}
-
-					setWave={this.setWave}
 
 					setPotential={this.setPotential}
 
