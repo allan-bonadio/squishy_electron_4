@@ -8,7 +8,7 @@
 #include "../squish.h"
 #include "../spaceWave/qSpace.h"
 #include "../schrodinger/qAvatar.h"
-#include "../spaceWave/qWave.h"
+#include "../debroglie/qWave.h"
 #include "../fourier/qSpectrum.h"
 #include "../spaceWave/qViewBuffer.h"
 
@@ -17,6 +17,11 @@
 #include "CppUTest/SimpleString.h"
 
 #include "./cppuMain.h"
+
+
+static bool traceRando = false;
+
+
 
 // how do initializers in C++ work?
 static void initExperiments(void) {
@@ -28,8 +33,12 @@ static void initExperiments(void) {
 //	int nn2 = {1, 2};
 
 	qCx zombie[2] = {qCx(1.0, 2.0)};
-	printf("n0:%d n1:%d nn0: %d   nn1: %d   zombie: %lf, %lf  ... %lf, %lf\n",
-		n0, n1, nn0, nn1, zombie[0].re, zombie[0].im, zombie[1].re, zombie[1].im);
+	qCx zoot[2] = {qCx(6.0, 7.0), qCx(3.0, 4.0)};
+	printf("n0:%d n1:%d nn0: %d   nn1: %d   zombie: %lf, %lf  ... %lf, %lf   zoot: %lf, %lf  ... %lf, %lf\n",
+		n0, n1, nn0, nn1,
+		zombie[0].re, zombie[0].im, zombie[1].re, zombie[1].im,
+		zoot[0].re, zoot[0].im, zoot[1].re, zoot[1].im
+		);
 }
 
 // for memory leaks that cppu conveniently gives us, some clues:
@@ -41,7 +50,7 @@ static void dumpSizes(void) {
 
 int main(int ac, char** av)
 {
-	//initExperiments();
+	initExperiments();
 	dumpSizes();
 
     return CommandLineTestRunner::RunAllTests(ac, av);
@@ -68,7 +77,7 @@ salientPointersType *fullSpaceSalientPointers = NULL;
 
 // make a new 1d space with N state locations along x, in theSpace, along with whatever else
 // the way JS does it.  Needed for lots of tests.
-// You are (usually) responsible for deleting it with deleteTheSpace().
+// You are (usually) responsible for deleting it with deleteTheSpace(space).
 // Space generated in theSpace.  Old theSpace triggers error if you don't deleteTheSpace().
 // frees and reallocates thePotential and the ViewBuffer
 qSpace *makeFullSpace(int N) {
@@ -123,6 +132,8 @@ void proveItsMine(void *buf, size_t size) {
 		buffer[i] = 0xAB ^ buffer[i];  // read And write
 }
 
+// make sure these two qBuffers have the same values (within ERROR_RADIUS absolute)
+// if not, test fails
 void compareWaves(qBuffer *qexpected, qBuffer *qactual) {
 	qCx *expected = qexpected->wave;
 	qCx *actual = qactual -> wave;
@@ -179,7 +190,6 @@ bool isAllZeroesExceptFor(qBuffer *qwave, int except1, int except2) {
 
 /* ********************************************** my favorite random number generator */
 
-static bool traceRando = true;
 
 // set this any time you need a predictable sequence.  Probably a number -.5 to .5,
 // or I dunno -10 to 10 or 100x or 100÷ that
@@ -190,7 +200,7 @@ double rando = PI - 3;
 double nextRando(void) {
 	double xxx;
 	rando = modf(exp(rando + 7.4), &xxx);
-	if (traceRando) printf("next num: %lf\n", rando);
+	if (traceRando) printf("🎲 next rando num: %lf\n", rando);
 	return rando - .5;
 }
 

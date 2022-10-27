@@ -6,7 +6,7 @@
 
 #include "../spaceWave/qSpace.h"
 #include "qAvatar.h"
-#include "../spaceWave/qWave.h"
+#include "../debroglie/qWave.h"
 
 
 static bool traceOneStep = false;

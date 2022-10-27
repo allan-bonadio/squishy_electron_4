@@ -6,7 +6,7 @@
 
 #include "qSpace.h"
 #include "../schrodinger/qAvatar.h"
-#include "qWave.h"
+#include "../debroglie/qWave.h"
 #include "qViewBuffer.h"
 #include "../testing/cppuMain.h"
 
@@ -49,6 +49,8 @@ TEST(qSpace, qSpace_ConstructorGauntlet)
 
 	LONGS_EQUAL(0, space->nDimensions);
 	// hmm must be something else to test...
+	LONGS_EQUAL_TEXT('qSpa', space->magic, "qSpace magic");
+
 
 	// should change one of these to discrete someday or
 	// make a func to try combinations
@@ -87,11 +89,11 @@ TEST(qSpace, qSpace_ConstructorGauntlet)
 }
 
 // this tests the whole shebang, as created from JS
-void completeNewSpaceGauntlet(int N, int expectedSpectrumLength, int expectedFreeBufferLength) {
-//	printf("🧨 🧨 starting completeNewSpaceGauntlet(N=%d, sl=%d, fbl=%d)\n",
-//		N, expectedSpectrumLength, expectedFreeBufferLength);
+void completeNewSpaceGauntlet(int N) {
+//	printf("🧨 🧨 starting completeNewSpaceGauntlet(N=%d)\n",
+//		N);
+
 	qSpace *space = makeFullSpace(N);
-//	printf("🧨 🧨       created the space and all the buffers; freeBufferList=%p\n", space->freeBufferList);
 	int nPoints = space->nPoints;
 
 	STRCMP_EQUAL_TEXT(MAKEFULLSPACE_LABEL, space->label, "space label");
@@ -103,29 +105,29 @@ void completeNewSpaceGauntlet(int N, int expectedSpectrumLength, int expectedFre
 	LONGS_EQUAL_TEXT(contENDLESS, space->dimensions->continuum, "space continuum");
 	LONGS_EQUAL_TEXT(N+2, space->dimensions->nPoints, "space nPoints");
 	LONGS_EQUAL_TEXT(N, space->dimensions->nStates, "space nStates");
+	LONGS_EQUAL_TEXT(N, space->dimensions->spectrumLength, "space spectrumLength");
 	STRCMP_EQUAL_TEXT("x", space->dimensions->label, "space label");
-	LONGS_EQUAL_TEXT(expectedSpectrumLength, space->dimensions->spectrumLength, "space spectrumLength");
-
-	//LONGS_EQUAL_TEXT(expectedFreeBufferLength, space->freeBufferLength, "space freeBufferLength");
 
 	LONGS_EQUAL_TEXT(1, space->nDimensions, "space nDimensions");
 
 	// lets see if the buffers are all large enough
-//	printf("🧨 🧨       lets see if the buffers are all large enough freeBufferList=%p\n", space->freeBufferList);
 	proveItsMine(theSpace->potential, nPoints * sizeof(double));
 
-//	printf("🧨 🧨       we're done, deleting freeBufferList=%p\n", space->freeBufferList);
+	// and the avatars' waves and vbufs
+	proveItsMine(theSpace->mainAvatar->qwave->wave, nPoints * sizeof(qCx));
+	proveItsMine(theSpace->mainAvatar->vBuffer, nPoints * 8 * sizeof(float));
+	proveItsMine(theSpace->miniGraphAvatar->qwave->wave, nPoints * sizeof(qCx));
+	proveItsMine(theSpace->miniGraphAvatar->vBuffer, nPoints * 8 * sizeof(float));
 
-	deleteTheSpace();
+	deleteTheSpace(space);
 
 //	printf("🧨 🧨       completeNewSpaceGauntlet() completed\n");
 }
 
-TEST(qSpace, qSpace_CompleteNewSpaceGauntlet4000) { completeNewSpaceGauntlet(4000, 4096, 4096); }
-TEST(qSpace, qSpace_CompleteNewSpaceGauntlet254) { completeNewSpaceGauntlet(254, 256, 256); }
-TEST(qSpace, qSpace_CompleteNewSpaceGauntlet63) { completeNewSpaceGauntlet(63, 64, 65); }
-TEST(qSpace, qSpace_CompleteNewSpaceGauntlet48) { completeNewSpaceGauntlet(48, 64, 64); }
-TEST(qSpace, qSpace_CompleteNewSpaceGauntlet32) { completeNewSpaceGauntlet(32, 32, 34); }
-TEST(qSpace, qSpace_CompleteNewSpaceGauntlet32x) { completeNewSpaceGauntlet(32, 32, 34); }
-TEST(qSpace, qSpace_CompleteNewSpaceGauntlet4) { completeNewSpaceGauntlet(4, 4, 6); }
+TEST(qSpace, qSpace_CompleteNewSpaceGauntlet4000) { completeNewSpaceGauntlet(4096); }
+TEST(qSpace, qSpace_CompleteNewSpaceGauntlet254) { completeNewSpaceGauntlet(256); }
+TEST(qSpace, qSpace_CompleteNewSpaceGauntlet63) { completeNewSpaceGauntlet(64); }
+TEST(qSpace, qSpace_CompleteNewSpaceGauntlet32) { completeNewSpaceGauntlet(32); }
+TEST(qSpace, qSpace_CompleteNewSpaceGauntlet32again) { completeNewSpaceGauntlet(32); }
+TEST(qSpace, qSpace_CompleteNewSpaceGauntlet4) { completeNewSpaceGauntlet(4); }
 

@@ -50,7 +50,8 @@ LABEL_LEN=7
 # some of these options - dunno if I need them
 set -x
 g++ -o cppuTestBin -Wno-tautological-undefined-compare  \
-	-std=c++11 -fexceptions -g  -O0 \
+	-g -O0 \
+	-std=c++11 -fexceptions  \
 	-DLABEL_LEN=$LABEL_LEN \
 	-I$CPPUTEST_HOME/include \
 	-include $CPPUTEST_HOME/include/CppUTest/MemoryLeakDetectorNewMacros.h \

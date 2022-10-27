@@ -6,7 +6,7 @@
 #include <string.h>
 #include "../spaceWave/qSpace.h"
 #include "../schrodinger/qAvatar.h"
-#include "../spaceWave/qWave.h"
+#include "../debroglie/qWave.h"
 #include "qSpectrum.h"
 #include "fftMain.h"
 

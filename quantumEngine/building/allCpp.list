@@ -5,8 +5,8 @@ schrodinger/hamiltonian.cpp
 schrodinger/qAvatar.cpp
 schrodinger/visscher.cpp
 spaceWave/jsSpace.cpp
-spaceWave/qCx.cpp
+debroglie/qCx.cpp
 spaceWave/qSpace.cpp
-spaceWave/qBuffer.cpp
-spaceWave/qWave.cpp
+debroglie/qBuffer.cpp
+debroglie/qWave.cpp
 spaceWave/qViewBuffer.cpp

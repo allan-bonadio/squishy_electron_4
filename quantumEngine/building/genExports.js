@@ -25,7 +25,7 @@ exportsSrc  = [
 	{name: 'startNewSpace', args: ['string'], retType: 'number'},
 	{name: 'addSpaceDimension', args: ['number', 'number', 'string'], retType: null},
 	{name: 'completeNewSpace', args: [], retType: 'number'},
-	{name: 'deleteTheSpace', args: [], retType: null},
+	{name: 'deleteTheSpace', args: ['number'], retType: null},
 
 
 	// gets

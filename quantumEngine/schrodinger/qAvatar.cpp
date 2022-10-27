@@ -11,7 +11,7 @@
 
 #include "../spaceWave/qSpace.h"
 #include "qAvatar.h"
-#include "../spaceWave/qWave.h"
+#include "../debroglie/qWave.h"
 #include "../fourier/qSpectrum.h"
 #include "../spaceWave/qViewBuffer.h"
 #include "../fourier/fftMain.h"
@@ -26,7 +26,7 @@ static bool traceIterSteps = false;
 static bool traceJustWave = false;
 static bool traceJustInnerProduct = false;
 
-static bool traceFourierFilter = false;
+static bool traceFourierFilter = true;
 
 static bool dumpFFHiResSpectums = false;
 
@@ -93,13 +93,19 @@ qAvatar::~qAvatar(void) {
 
 	// always allocated
 	delete qwave;
+	qwave = NULL;
 	delete qvBuffer;
+	qvBuffer = NULL;
 
 	// these may or may not have been allocated, depending on whether they were needed
 	if (scratchQWave)
 		delete scratchQWave;
+	scratchQWave = NULL;
 	if (qspect)
 		delete qspect;
+	qspect = NULL;
+
+
 };
 
 // called from JS

@@ -6,7 +6,7 @@
 
 #include "../spaceWave/qSpace.h"
 #include "../schrodinger/qAvatar.h"
-#include "../spaceWave/qWave.h"
+#include "../debroglie/qWave.h"
 #include "../spaceWave/qViewBuffer.h"
 #include "../testing/cppuMain.h"
 #include "../fourier/qSpectrum.h"
@@ -21,7 +21,7 @@ TEST_GROUP(qAvatar)
 
 /* ******************************************************************************************** boring constructor tests */
 // just the constructor; it's not even fully created
-TEST(qAvatar, qAvatar_CheckConstructor)
+TEST(qAvatar, CheckConstructor)
 {
 	qSpace *space = makeBareSpace(8, contENDLESS);
 	qAvatar *avatar = new qAvatar(space, "CheckConst");
@@ -70,18 +70,18 @@ static void completeNewAvatarGauntlet(int N) {
 	delete space;
 }
 
-TEST(qAvatar, qAvatar_completeNewAvatarGauntlet4096) { completeNewAvatarGauntlet(4096); }
-TEST(qAvatar, qAvatar_completeNewAvatarGauntlet256) { completeNewAvatarGauntlet(256); }
-TEST(qAvatar, qAvatar_completeNewAvatarGauntlet64) { completeNewAvatarGauntlet(64); }
-TEST(qAvatar, qAvatar_completeNewAvatarGauntlet32) { completeNewAvatarGauntlet(32); }
-TEST(qAvatar, qAvatar_completeNewAvatarGauntlet32x) { completeNewAvatarGauntlet(32); }
-TEST(qAvatar, qAvatar_completeNewAvatarGauntlet4) { completeNewAvatarGauntlet(4); }
+TEST(qAvatar, completeNewAvatarGauntlet4096) { completeNewAvatarGauntlet(4096); }
+TEST(qAvatar, completeNewAvatarGauntlet256) { completeNewAvatarGauntlet(256); }
+TEST(qAvatar, completeNewAvatarGauntlet64) { completeNewAvatarGauntlet(64); }
+TEST(qAvatar, completeNewAvatarGauntlet32) { completeNewAvatarGauntlet(32); }
+TEST(qAvatar, completeNewAvatarGauntlet32x) { completeNewAvatarGauntlet(32); }
+TEST(qAvatar, completeNewAvatarGauntlet4) { completeNewAvatarGauntlet(4); }
 
 
 
 
 /* ******************************************************************************************** FourierFilter */
-static bool traceFourierFilter = true;
+static bool traceFourierFilter = false;
 
 // try out FF on a mix of frequencies; should filter out
 // goodFreq should stay there, while badFreq should be filtered out.
@@ -101,13 +101,18 @@ static void tryFourierFilter(int N, int goodFreq, int badFreq, int lowPassFilter
 
 	qw->add(qw, 1., addOn, 1.);
 	rainbow->generateSpectrum(qw);
-	rainbow->dumpSpectrum("before FourierFilter(), input wave:");
+	if (traceFourierFilter)
+		rainbow->dumpSpectrum("spectrum before FourierFilter(), input wave:");
 	//qw->dump("avatar wave BEFORE fourierFilter()", true);
 
+	// now the actual filter, do it!
 	avatar->fourierFilter(lowPassFilter);
 
+	// now take a look at what we got
 	rainbow->generateSpectrum(qw);
-	rainbow->dumpSpectrum("tryFourierFilter() done");
+	if (traceFourierFilter)
+		rainbow->dumpSpectrum("after fourierFilter()");
+	//qw->dump("")
 	//rainbow->dumpHiRes("tryFourierFilter() done");
 
 	CHECK(shouldFail ^ isAllZeroesExceptFor(rainbow, goodFreq));
@@ -123,31 +128,31 @@ static void tryFourierFilter(int N, int goodFreq, int badFreq, int lowPassFilter
 // example: 16 states.  Initially has waves of frequencies 3 & 6.
 // filter out frequencies 5, 6, 7, ... *8* ... 9, 10, 11.   8 is the nyquist freq
 // So expect only freq 3 left, value=4 on fft.
-//TEST(qAvatar, qAvatar_foFi16_3_6) { tryFourierFilter(16, 3, 6, 3); }
+//TEST(qAvatar, foFi16_3_6) { tryFourierFilter(16, 3, 6, 3); }
 //
-//TEST(qAvatar, qAvatar_foFi16_1_8) { tryFourierFilter(16, 1, 8, 1); }
+//TEST(qAvatar, foFi16_1_8) { tryFourierFilter(16, 1, 8, 1); }
 //
-//TEST(qAvatar, qAvatar_foFi16_2_7) { tryFourierFilter(16, 2, 7, 3); }
+//TEST(qAvatar, foFi16_2_7) { tryFourierFilter(16, 2, 7, 3); }
 
 
 // ok we have a freq 1 carrier.  We stick in a freq 5 noise.  When does it cut off?
 // these are not cut off
-TEST(qAvatar, qAvatar_foFi16_1_LPFscan0) { tryFourierFilter(16, 1, 5, 0, true); }
-TEST(qAvatar, qAvatar_foFi16_1_LPFscan1) { tryFourierFilter(16, 1, 5, 1, true); }
-TEST(qAvatar, qAvatar_foFi16_1_LPFscan2) { tryFourierFilter(16, 1, 5, 2, true); }
+TEST(qAvatar, foFi16_1_LPFscan0) { tryFourierFilter(16, 1, 5, 0, true); }
+TEST(qAvatar, foFi16_1_LPFscan1) { tryFourierFilter(16, 1, 5, 1, true); }
+TEST(qAvatar, foFi16_1_LPFscan2) { tryFourierFilter(16, 1, 5, 2, true); }
 
 // these ARE cut off
-TEST(qAvatar, qAvatar_foFi16_1_LPFscan3) { tryFourierFilter(16, 1, 5, 3, false); }
-TEST(qAvatar, qAvatar_foFi16_1_LPFscan4) { tryFourierFilter(16, 1, 5, 4, false); }
-TEST(qAvatar, qAvatar_foFi16_1_LPFscan5) { tryFourierFilter(16, 1, 5, 5, false); }
-TEST(qAvatar, qAvatar_foFi16_1_LPFscan6) { tryFourierFilter(16, 1, 5, 6, false); }
+TEST(qAvatar, foFi16_1_LPFscan3) { tryFourierFilter(16, 1, 5, 3, false); }
+TEST(qAvatar, foFi16_1_LPFscan4) { tryFourierFilter(16, 1, 5, 4, false); }
+TEST(qAvatar, foFi16_1_LPFscan5) { tryFourierFilter(16, 1, 5, 5, false); }
+TEST(qAvatar, foFi16_1_LPFscan6) { tryFourierFilter(16, 1, 5, 6, false); }
 
 // also wipes out freq 1 so should fail the test
-TEST(qAvatar, qAvatar_foFi16_1_LPFscan7) { tryFourierFilter(16, 1, 5, 7, true); }
+TEST(qAvatar, foFi16_1_LPFscan7) { tryFourierFilter(16, 1, 5, 7, true); }
 
-//TEST(qAvatar, qAvatar_foFi16_1_3_LPFscan7) { tryFourierFilter(16, 1, 3, 7); }
+//TEST(qAvatar, foFi16_1_3_LPFscan7) { tryFourierFilter(16, 1, 3, 7); }
 
-//TEST(qAvatar, qAvatar_foFi64_5_22) { tryFourierFilter(64, 5, 22, 16); }
+//TEST(qAvatar, foFi64_5_22) { tryFourierFilter(64, 5, 22, 16); }
 
 
 /* ********************************************************************** random experimentatiojn */

@@ -15,7 +15,7 @@
 //?#include <string>
 //?
 
-#include "spaceWave/qCx.h"
+#include "debroglie/qCx.h"
 
 // continuum values - same as in eSpace.js; pls synchronize them!
 // also used in qBuffers and subclasses

@@ -93,7 +93,6 @@ struct qAvatar {
 	void askForFFT(void);
 };
 
-// obsolete extern qAvatar *theAvatar;
 
 /* ************************************************************ JS interface */
 

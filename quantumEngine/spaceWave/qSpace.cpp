@@ -9,7 +9,7 @@
 #include <cstring>
 #include "qSpace.h"
 #include "../schrodinger/qAvatar.h"
-#include "qWave.h"
+#include "../debroglie/qWave.h"
 #include "qViewBuffer.h"
 #include "../fourier/fftMain.h"
 

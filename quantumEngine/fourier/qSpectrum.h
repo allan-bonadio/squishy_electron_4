@@ -3,7 +3,7 @@
 ** Copyright (C) 2022-2022 Tactile Interactive, all rights reserved
 */
 
-#include "../spaceWave/qBuffer.h"
+#include "../debroglie/qBuffer.h"
 
 struct qSpectrum : public virtual  qBuffer {
 

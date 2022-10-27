@@ -82,18 +82,17 @@ static void tryOutSpectrum(int N, int expectedSpLength, int expectedFBLength) {
 	// from the software
 	int po2 = pow(2., ceil(log2(N)) );
 
-	LONGS_EQUAL_TEXT('qSpe', spectrum->magic, "qspectrum magic");
+	LONGS_EQUAL_TEXT('spec', spectrum->magic, "qspectrum magic");
 	CHECK_TEXT(!!spectrum->wave, "qspectrum wave");
 	CHECK_TEXT(spectrum->dynamicallyAllocated, "qspectrum dynamicallyAllocated");
 
 	// nPoints == spectrumLength
 	LONGS_EQUAL_TEXT(po2, spectrum->nPoints, "qspectrum nPoints");
-	//LONGS_EQUAL_TEXT(expectedFBLength, space->freeBufferLength, "qspectrum freeBufferLength");
 
 	proveItsMine(spectrum->wave, spectrum->nPoints * sizeof(qCx));
 
 	delete spectrum;
-	deleteTheSpace();
+	deleteTheSpace(theSpace);
 }
 
 // test out multiple cases.  For endless waves the bufsize is +2; for spectra, the next power of 2
