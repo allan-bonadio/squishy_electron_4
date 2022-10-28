@@ -10,6 +10,7 @@
 #include "qViewBuffer.h"
 
 static const bool debugViewBuffer = false;
+static const bool debugHighest = false;
 static const bool debugInDetail = false;
 
 // August Ferdinand Möbius invented homogenous coordinates
@@ -169,10 +170,11 @@ float qViewBuffer::loadViewBuffer(void) {
 			highest = height;
 	}
 
+	if (debugHighest)
+		printf("    qViewBuffer::at end of loadViewBuffer this=%p  vBuffer=%p highest=%12.6lf\n\n",
+				this, vBuffer, highest);
+
 	if (debugViewBuffer) {
-		printf("    qViewBuffer::at end of loadViewBuffer this=%p  vBuffer=%p\n\n",
-				this, vBuffer);
-		//printf("  ===  📺  vBuffer.cpp done, as written to view vBuffer:\n");
 		dumpViewBuffer("loadViewBuffer done");
 	}
 

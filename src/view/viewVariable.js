@@ -4,7 +4,8 @@
 */
 
 let traceGLCalls = false;
-let traceVariables = false;
+let traceUniforms = true;
+let traceAttributes = false;
 
 // attr arrays and uniforms that can change on every frame.
 // you can set a static value or a function that'll return it
@@ -53,7 +54,7 @@ export class viewUniform extends viewVariable {
 		// this turns out to be an internal magic object
 		this.uniformLoc = this.gl.getUniformLocation(this.owner.program, varName);
 		if (!this.uniformLoc) throw new Error(`Cannot find uniform loc for uniform variable ${varName}`);
-		if (traceVariables) console.log(`created viewUniform '${varName}'`);
+		if (traceUniforms) console.log(`created viewUniform '${varName}'`);
 	}
 
 	// change the value, sortof, by one of these two ways:
@@ -69,13 +70,13 @@ export class viewUniform extends viewVariable {
 		if (typeof valueVar == 'function') {
 			this.getFunc = valueVar;
 			this.staticValue = this.staticType = undefined;
-			if (traceVariables) console.log(`set function value on viewUniform '${this.varName}'`);
+			if (traceUniforms) console.log(`set function value on viewUniform '${this.varName}'`);
 		}
 		else {
 			this.staticValue = valueVar;
 			this.staticType = type;
 			this.getFunc = undefined;
-			if (traceVariables) console.log(`set static value ${valueVar} type ${type} on viewUniform '${this.varName}'`);
+			if (traceUniforms) console.log(`set static value ${valueVar} type ${type} on viewUniform '${this.varName}'`);
 		}
 		this.reloadVariable();
 	}
@@ -91,7 +92,7 @@ export class viewUniform extends viewVariable {
 			value = v.value;
 			type = v.type;
 		}
-		if (traceVariables) console.log(
+		if (traceUniforms) console.log(
 			`re-loaded uniform ${this.varName} with value=${value} type ${type}`);
 
 		// you can't pass null or undefined
@@ -120,7 +121,7 @@ export class viewUniform extends viewVariable {
 
 		gl[method].apply(gl, args);  // wish me luck
 
-		if (traceVariables) console.log(`viewUniform reloaded Variable '${this.varName}' to:`, args);
+		if (traceUniforms) console.log(`viewUniform reloaded Variable '${this.varName}' to:`, args);
 
 		//this.gl.uniform1f(this.uniformLoc, value);
 		//this.gl.uniform1i(this.uniformLoc, value);
@@ -208,16 +209,8 @@ export class viewAttribute extends viewVariable {
 		// YES we do have to do this again!!!
 		gl.bufferData(gl.ARRAY_BUFFER, this.float32TypedArray, this.bufferDataDrawMode);
 
-		if (traceVariables) {
-			console.log(`viewAttribute '${this.varName}' reloaded:`);
-			let ar = this.float32TypedArray;
-			for (let itemNum = 0; itemNum < ar.length; itemNum += 8) {
-				let line = '';
-				for (let j = 0; j < 8; j++) {
-					line += ar[itemNum + j].toFixed(5) +'   ';
-				}
-				console.log(line);
-			}
+		if (traceAttributes) {
+			this.owner.avatar.dumpViewBuffer(`viewAttribute '${this.varName}' reloaded:`)
 		}
 	}
 

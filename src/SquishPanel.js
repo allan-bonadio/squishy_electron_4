@@ -331,7 +331,7 @@ export class SquishPanel extends React.Component {
 		this.iStats.endReloadVarsNBuffer = this.iStats.endDraw = performance.now();
 		//this.iStats.endReloadVarsNBuffer = this.iStats.endReloadInputs = this.iStats.endDraw = performance.now();
 		if (needsRepaint) {
-			this.mainEAvatar.doRepaint();
+			this.mainEAvatar.doRepaint?.();
 			this.showTimeNIteration();
 
 
@@ -559,32 +559,8 @@ export class SquishPanel extends React.Component {
 		//qe.Avatar_setLowPassFilter(Math.round(lpf / 200 * this.state.N));
 	}
 
-	// obsolete
-	// completely wipe out the 𝜓 wavefunction and replace it with one of our familiar waveforms.
-	// (but do not change N or anything in the state)  Called upon setWave in wave tab
-//	setWave =
-//	waveParams => {
-//// 		const wave = qe.Avatar_getWaveBuffer();
-//		const mainEWave = this.state.space.mainEWave;
-//		mainEWave.setFamiliarWave(waveParams);  // eSpace does this initially
-//		//this.iterateOneIteration(true, true);  // ?? take  this out this was to kick to display it....
-//		//this.iterateOneIteration(false, true);
-//		//qe.qViewBuffer_getViewBuffer();
-//		//qe.createQEWaveFromCBuf();
-//		//qe.Avatar_resetCounters();
-//		this.mainEAvatar.elapsedTime = 0;
-//		this.mainEAvatar.iterateSerial = 0;
-//
-//		// this is wired into the GLView and its drawers
-//		this.mainEAvatar.resetWave();
-//		//const curView = this.effectiveView || this.state.effectiveView;
-//		//curView.drawings.forEach(dr =>  dr.resetAvgHighest && dr.resetAvgHighest());
-//
-//		// don't have to set storeSettings cuz already done in CP
-//	}
-
-	// completely wipe out the quantum potential and replace it with one of our canned waveforms.
-	// (but do not change N or anything in the state)  Called upon set potential in potential tab
+	// completely wipe out the quantum potential and replace it with one of our canned patterns.
+	// (but do not change N or anything else in the state)  Called upon set potential in potential tab
 	setPotential =
 	(potentialParams) => {
 		// sets the numbers
