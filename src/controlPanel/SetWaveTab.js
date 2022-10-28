@@ -86,6 +86,7 @@ class SetWaveTab extends React.Component {
 	regenerateMiniGraphWave() {
 		if (!this.state.space) return;  // too soon
 		this.miniGraphEWave.setFamiliarWave(this.state);
+		this.miniGraphAvatar.reStartDrawing();
 		this.miniGraphAvatar.doRepaint?.();
 	}
 

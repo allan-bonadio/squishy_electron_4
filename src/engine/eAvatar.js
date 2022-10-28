@@ -85,7 +85,10 @@ class eAvatar {
 
 	// qAvatar functions run from here
 	dumpViewBuffer(title) { qe.avatar_dumpViewBuffer(this.pointer, title) }
-	loadViewBuffer() { return qe.avatar_loadViewBuffer(this.pointer) }
+	loadViewBuffer() {
+		// flatDrawing will use this for tweaking the highest uniform
+		this.highest = qe.avatar_loadViewBuffer(this.pointer);
+	}
 	oneIteration() { return qe.avatar_oneIteration(this.pointer) }
 	askForFFT() { qe.avatar_askForFFT(this.pointer) }
 

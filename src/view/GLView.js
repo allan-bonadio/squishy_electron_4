@@ -20,7 +20,7 @@ import {listOfViewClasses} from './listOfViewClasses';
 
 //let traceGLView = false;
 let traceSetup = true;
-let tracePainting = true;
+let tracePainting = false;
 
 
 class GLView extends React.Component {
@@ -86,7 +86,7 @@ class GLView extends React.Component {
 
 		// now that there's an avatar, we can set these functions so everybody can use them.
 		p.avatar.doRepaint = this.doRepaint;
-		p.avatar.reStartWave = this.reStartWave;
+		p.avatar.reStartDrawing = this.reStartDrawing;
 		p.avatar.setGeometry = this.setGeometry;
 		if (traceSetup) console.log(`🖼 🖼 GLView ${p.viewName} ${p.avatar.label}: done with initViewClass`);
 
@@ -97,13 +97,13 @@ class GLView extends React.Component {
 	// Tell the GLView & its view(s) that the wave contents have changed dramatically;
 	// essentiially refilled with different numbers.  In practice, just resets
 	// the avgHighest.  Passed up to a higher Component.
-	reStartWave =
+	reStartDrawing =
 	() => {
 		if (this.effectiveView) {
-			//this.effectiveView.resetAvgHighest();
+			//this.effectiveView.reStartDrawing();
 			//const curView = this.effectiveView || this.state.effectiveView;
-			this.effectiveView.drawings.forEach(dr =>  dr.resetAvgHighest());
-			if (tracePainting) console.log(`🖼 🖼 GLView:${this.props.viewName} ${this.props.avatar.label}: did reStartWave`);
+			this.effectiveView.drawings.forEach(dr => dr.reStartDrawing());
+			if (tracePainting) console.log(`🖼 🖼 GLView:${this.props.viewName} ${this.props.avatar.label}: did reStartDrawing`);
 		}
 	}
 
@@ -130,8 +130,8 @@ class GLView extends React.Component {
 
 		if (tracePainting) p.avatar.ewave.dump(`🖼 🖼 GLView ${p.viewName}: got the ewave buffer straight`);
 
-		// copy from latest wave to view buffer (c++)  .. hey where does this go!??!?!?!?!
-		this.highest = p.avatar.loadViewBuffer()
+		// copy from latest wave to view buffer (c++) & pick up highest
+		p.avatar.loadViewBuffer()
 
 		if (tracePainting) p.avatar.ewave.dump(`🖼 🖼 GLView ${p.viewName}: loaded view buf`);
 

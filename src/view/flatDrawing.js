@@ -12,7 +12,7 @@ import {viewUniform, viewAttribute} from './viewVariable';
 
 let dumpViewBufAfterDrawing = false;
 let traceHighest = false;
-let traceFlatDrawing = true;
+let traceFlatDrawing = false;
 
 // diagnostic purposes
 let alsoDrawPoints = false;
@@ -99,20 +99,22 @@ export class flatDrawing extends abstractDrawing {
 		// this only needs to happen once right?  viewBuffer just sits ini the same place in memory,
 		// getting refilled from a qWave, but never moves, right>
 		//this.avatar.dumpViewBuffer('before loaded');
-		const highest = this.avatar.loadViewBuffer();
+		this.avatar.loadViewBuffer();
 		//this.avatar.dumpViewBuffer('just loaded');
 
-		// smooth it out otherwise the wave sortof bounces up and down a little on each step
-		// set like this only upon recreation
-		//if (!this.avgHighest)
-		this.avgHighest = highest;
-		//else
-		//	this.avgHighest = (highest + 3*this.avgHighest) / 4;
-		if (traceHighest)
-			console.log(`flatDrawing ${this.viewName}: highest=${highest.toFixed(5)}  avgHighest=${this.avgHighest.toFixed(5)}`);
 
 		let maxHeightUniform = this.maxHeightUniform = new viewUniform('maxHeight', this);
 		maxHeightUniform.setValue(() => {
+			// this gets called every redrawing (every reloadAllVariables() -> reloadVariable())
+			// smooth it out otherwise the wave sortof bounces up and down a little on each step
+			// set like this only upon reStartDrawing()
+			if (!this.avgHighest)
+				this.avgHighest = this.avatar.highest;
+			else
+				this.avgHighest = (this.avatar.highest + 3*this.avgHighest) / 4;
+			if (traceHighest)
+				console.log(`flatDrawing reloading ${this.viewName}: highest=${this.avatar.highest.toFixed(5)}  avgHighest=${this.avgHighest.toFixed(5)}`);
+
 			return {value: this.avgHighest, type: '1f'};
 		});
 
@@ -128,7 +130,7 @@ export class flatDrawing extends abstractDrawing {
 	}
 
 	// call this when you reset the wave otherwise the smoothing is surprised
-	resetAvgHighest() {
+	reStartDrawing() {
 		this.avgHighest = 0;
 	}
 
@@ -138,7 +140,7 @@ export class flatDrawing extends abstractDrawing {
 
 		// are these two necessary?  seems to work without em
 		gl.useProgram(this.program);////
-		this.rowAttr.reloadVariable();////
+		// already done in doRepaint()    this.rowAttr.reloadVariable();////
 
 		//gl.bindVertexArray(this.vao);
 		gl.drawArrays(gl.TRIANGLE_STRIP, 0, this.vertexCount);
