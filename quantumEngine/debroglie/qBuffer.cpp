@@ -19,10 +19,11 @@ qFlick - object that owns a list of waves, and points to its space
 */
 
 #include "../squish.h"
-#include "qSpace.h"
+#include "../spaceWave/qSpace.h"
 #include "qBuffer.h"
 
-static bool traceNormalize = true;
+static bool traceInnerProduct = false;
+static bool traceNormalize = false;
 static bool traceAllocate = false;
 
 // just allocate a wave of whatever length
@@ -202,9 +203,6 @@ void qBuffer::dump(const char *title, bool withExtras) {
 	printf("        ==== end of Wave ====\n\n");
 }
 
-
-
-
 // use this if roundoff is a problem
 void qBuffer::dumpHiRes(const char *title) {
 	printf("🍕 🍕  HIRES %s: s=%d e=%d continuum:%d nPoints:%d\n", title, start, end, continuum, nPoints);
@@ -214,7 +212,7 @@ void qBuffer::dumpHiRes(const char *title) {
 		if (ix >= start && ix < end)
 			iProd += wave[ix].norm();
 	}
-	printf("🍕 🍕  HIRES innerProduct: %8.4lf\n", iProd);
+	printf("🍕 🍕  HIRES innerProduct: %22.16lg\n", iProd);
 }
 
 // calls the JS dumpRainbow method of eWave.  Note we can't compile this for
@@ -292,8 +290,9 @@ double qBuffer::innerProduct(void) {
 		double norm = point.norm();
 		sum += norm;
 		if (traceNormalize) {
-			printf("innerProduct point %d (%lf,%lf) norm--> %lf\n", ix, wave[ix].re, wave[ix].im,
-			wave[ix].re * wave[ix].re + wave[ix].im * wave[ix].im);
+			if (traceInnerProduct)
+				printf("innerProduct point %d (%lf,%lf) norm--> %lf\n",
+					ix, wave[ix].re, wave[ix].im, norm);
 		}
 	}
 

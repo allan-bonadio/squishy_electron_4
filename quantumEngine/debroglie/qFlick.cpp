@@ -6,7 +6,7 @@
 // not used much anymore...
 
 #include <cstring>
-#include "qSpace.h"
+#include "../spaceWave/qSpace.h"
 #include "qWave.h"
 
 // how big the delay between re and im, in radians kindof.  see code.

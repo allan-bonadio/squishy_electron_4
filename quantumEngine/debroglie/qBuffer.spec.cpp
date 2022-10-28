@@ -20,20 +20,20 @@ static void testABufferLength(int length, qCx *useThisBuffer = NULL) {
 	//printf("🧨: testing %d point buffer with %p\n", length, useThisBuffer);
 
 	qBuffer *qBuf = new qBuffer();
-	LONGS_EQUAL_TEXT('qBuf', qBuf->magic, "qbuffer magic");
-	POINTERS_EQUAL_TEXT(NULL, qBuf->wave, "qbuffer wave null");
+	LONGS_EQUAL_TEXT('buff', qBuf->magic, "qBuffer magic");
+	POINTERS_EQUAL_TEXT(NULL, qBuf->wave, "qBuffer wave null");
 
 	qBuf->initBuffer(length, useThisBuffer);
-	LONGS_EQUAL_TEXT(length, qBuf->nPoints, "qbuffer nPoints");
+	LONGS_EQUAL_TEXT(length, qBuf->nPoints, "qBuffer nPoints");
 
 	if (useThisBuffer){
-		CHECK_TEXT(! qBuf->dynamicallyAllocated, "qbuffer !dynamicallyAllocated");
+		CHECK_TEXT(! qBuf->dynamicallyAllocated, "qBuffer !dynamicallyAllocated");
 	}
 	else {
-		CHECK_TEXT(qBuf->dynamicallyAllocated, "qbuffer dynamicallyAllocated");
+		CHECK_TEXT(qBuf->dynamicallyAllocated, "qBuffer dynamicallyAllocated");
 	}
 
-	CHECK_TEXT(qBuf->wave, "qbuffer wave nonnull");
+	CHECK_TEXT(qBuf->wave, "qBuffer wave nonnull");
 
 	proveItsMine(qBuf->wave, length * sizeof(qCx));
 

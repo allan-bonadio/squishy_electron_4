@@ -4,12 +4,12 @@
 */
 
 //#include <cmath>
-#include "qSpace.h"
+#include "../spaceWave/qSpace.h"
 #include "../schrodinger/qAvatar.h"
 #include "qWave.h"
 #include "../directAccessors.h"
 
-int traceConstDeconst = false;
+int traceCreate = false;
 
 /* ************************************************************ birth & death & basics */
 
@@ -22,7 +22,7 @@ qWave::qWave(qSpace *sp, qCx *useThisBuffer)
 	magic = 'wave';
 	space = sp;
 
-	if (traceConstDeconst) {
+	if (traceCreate) {
 		printf("🌊🌊 qWave::qWave(%s)  utb=%p => this=%p\n", space->label,
 			useThisBuffer, this);
 		printf("🌊🌊 qWave::qWave() wave's Space: %p  nPoints:%d\n", (space), space->nPoints);
@@ -31,7 +31,7 @@ qWave::qWave(qSpace *sp, qCx *useThisBuffer)
 
 	initBuffer(space->nPoints, useThisBuffer);
 
-	if (traceConstDeconst)
+	if (traceCreate)
 		printf("      🌊🌊  allocated wave: %p\n", (wave));
 	qDimension *dim = space->dimensions;
 	nPoints = dim->nPoints;
@@ -39,7 +39,7 @@ qWave::qWave(qSpace *sp, qCx *useThisBuffer)
 	end = dim->end;
 	continuum = dim->continuum;
 
-	if (traceConstDeconst) {
+	if (traceCreate) {
 		printf("🌊🌊 allocated qWave::qWave resulting qWave obj: %p   sizeof qWave = x%lx\n",
 			this, (long) sizeof(qWave));
 		printf("        sizeof(int):%ld   sizeof(void *):%ld\n", sizeof(int), sizeof(void *));
@@ -56,7 +56,7 @@ qWave::qWave(qSpace *sp, qCx *useThisBuffer)
 qWave::~qWave(void) {
 	// the qBuffer superclass frees the wave just like it allocates it
 
-	if (traceConstDeconst) {
+	if (traceCreate) {
 		printf("🌊🌊 qWave::~qWave resulting qWave obj: %p \n",
 			this);
 		printf("        sizeof(int):%ld   sizeof(void *):%ld\n", sizeof(int), sizeof(void *));
