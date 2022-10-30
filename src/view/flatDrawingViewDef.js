@@ -5,6 +5,7 @@
 
 import {abstractViewDef} from './abstractViewDef';
 import {flatDrawing} from './flatDrawing';
+import {ticDrawing} from './ticDrawing';
 
 class flatDrawingViewDef extends abstractViewDef {
 	static displayName = 'Flat View';
@@ -19,7 +20,7 @@ class flatDrawingViewDef extends abstractViewDef {
 
 		// create relevant drawings
 		//new flatDrawing(this, space);
-		this.drawings = [new flatDrawing(this, space)];
+		this.drawings = [new flatDrawing(this), new ticDrawing(this)];
 	}
 }
 
