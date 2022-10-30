@@ -17,10 +17,10 @@ let includeUniform = true;
 
 
 export class starDrawing extends abstractDrawing {
-	static drawingClassName: 'starDrawing';
-	drawingClassName: 'starDrawing';
 
-	setShaders() {
+	constructor(viewDef) {
+		super(viewDef, 'starDrawing');
+
 		this.vertexShaderSrc = `
 		attribute vec4 corner;
 		void main() {
@@ -41,8 +41,6 @@ export class starDrawing extends abstractDrawing {
 			gl_FragColor = ${cornerColorUni};
 		}
 		`;
-
-		this.compileProgram();
 	}
 
 	// all to do this one differently
@@ -50,16 +48,18 @@ export class starDrawing extends abstractDrawing {
 		//const gl = this.gl;
 
 		let cornerColorUni;
-		if (includeUniform)
+		if (includeUniform) {
 			cornerColorUni = this.cornerColorUni =
 				new viewUniform('cornerColorUni', this);
-			cornerColorUni.setValue([0, 1, .5, 1], '4fv');
+			cornerColorUni.setValue([0, 1, .5, 1], '4fv');  // teal
 			//() => ({value: [0, 1, .5, 1], type: '4fv'});
+		}
 
 //		const cornerAttributeLocation = gl.getAttribLocation(this.program, 'corner');
 //		const cornerBuffer = gl.createBuffer();  // actual ram in GPU chip
 //		gl.bindBuffer(gl.ARRAY_BUFFER, cornerBuffer);
 
+		// create the data for the corners attribute
 		const sin = Math.sin;
 		const cos = Math.cos;
 		const corners = new Float32Array([
@@ -76,9 +76,8 @@ export class starDrawing extends abstractDrawing {
 			cos(8), sin(8),
 			cos(10), sin(10),
 		]);
-		const cornerAttr = this.cornerAttr = new viewAttribute('corner', this);
-		cornerAttr.attachArray(corners, 2);
-
+		this.cornerAttr = new viewAttribute('corner', this);
+		this.cornerAttr.attachArray(corners, 2);
 	}
 
 //	createVariables() {
