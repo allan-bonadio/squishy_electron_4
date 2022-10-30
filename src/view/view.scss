@@ -17,7 +17,8 @@
 	// overlay with frame count and virtual time, on top of canvas
 	aside.viewOverlay {
 		position: absolute;
-		z-index: 20;
+		pointer-events: none;  // need to click through for potential
+		z-index: 40;
 		//border: 1px #48c solid;
 
 		// numbers in upper corners
@@ -33,6 +34,7 @@
 
 		.sizeBox {
 			position: absolute;
+			pointer-events: auto;
 			bottom: 0; right: 0;
 			width: 1em; height: 1em;
 			border: 3px transparent;
@@ -49,6 +51,7 @@
 
 	svg.PotentialArea {
 		$potentialColor: white;
+		pointer-events: none;  // need to click through for size box
 
 		position: relative;
 		z-index: 30;
@@ -63,7 +66,7 @@
 		path.tactileLine {
 			stroke: none;
 			stroke-width: 15;
-			pointer-events: stroke;
+			pointer-events: stroke;  // but this is sensitive
 			cursor: pointer;
 		}
 
