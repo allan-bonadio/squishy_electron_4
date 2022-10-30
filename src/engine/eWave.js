@@ -11,7 +11,7 @@ import {cppObjectRegistry, prepForDirectAccessors} from '../utils/directAccessor
 import eSpace from './eSpace';
 
 let traceSetFamiliarWave = false;
-let traceSetFamiliarWaveResult = true;
+let traceSetFamiliarWaveResult = false;
 
 // emscripten sabotages this?  the log & info, but not error & warn?
 //const consoleLog = console.log.bind(console);

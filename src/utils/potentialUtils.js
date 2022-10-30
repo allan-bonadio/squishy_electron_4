@@ -72,7 +72,7 @@ export function dumpPotential(space, potentialArray, nPerRow = 1, skipAllButEver
 	if (! nPerRow)
 		nPerRow =  Math.ceil(N / 10);
 
-	let txt = '🗜 The Potential 🎢  ⛰ ';
+	let txt = '🎢 The Potential  ';
 	for (let ix = start; ix < end; ix++) {
 		txt += potentialArray[ix].toFixed(6).padStart(10);
 		if (ix % skipAllButEvery == 0)

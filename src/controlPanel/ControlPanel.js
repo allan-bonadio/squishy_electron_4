@@ -42,20 +42,6 @@ export class ControlPanel extends React.Component {
 		space: PropTypes.instanceOf(eSpace),
 		N: PropTypes.number.isRequired,
 
-		// waveParams: PropTypes.shape({
-		// 	waveBreed: PropTypes.string.isRequired,
-		// 	waveFrequency: PropTypes.number.isRequired,
-		// 	pulseWidth: PropTypes.number.isRequired,
-		// 	pulseOffset: PropTypes.number.isRequired,
-		// }).isRequired,
-		//
-		// potentialParams: PropTypes.shape({
-		// 	potentialBreed: PropTypes.string.isRequired,
-		// 	valleyPower: PropTypes.number.isRequired,
-		// 	valleyScale: PropTypes.number.isRequired,
-		// 	valleyOffset: PropTypes.number.isRequired,
-		// }),
-
 		openResolutionDialog: PropTypes.func.isRequired,
 
 		iStats: PropTypes.shape({
@@ -67,12 +53,6 @@ export class ControlPanel extends React.Component {
 
 	constructor(props) {
 		super(props);
-
-// 		const controls0 = storeSettings.retrieveSettings('controls0');
-
-// 		const rat = storeSettings.retrieveRatify;
-// 		const wp = controls0.waveParams || {};
-// 		const pp = controls0.potentialParams || {};
 
 		// most of the state is kept here.  But, also, in the store settings
 		this.state = {
@@ -140,9 +120,6 @@ export class ControlPanel extends React.Component {
 	setPotentialHandler =
 	() => {
 		const {valleyPower, valleyScale, valleyOffset} = this.state;
-// 		this.setCPState({
-// 			potentialBreed: storeASetting('potentialParams', 'potentialBreed', 'valley')
-// 		});
 
 		// actually sets buffer
 		this.props.setPotential({valleyPower, valleyScale, valleyOffset});

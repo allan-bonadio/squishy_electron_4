@@ -17,6 +17,7 @@ import {dumpPotential} from '../utils/potentialUtils';
 export const spongeFactor = 100;
 
 let tracePotentialArea = false;
+let traceRendering = false;
 let traceDragging = false;
 let tracePathAttribute = false;  // big output from one line
 
@@ -95,10 +96,11 @@ export class PotentialArea extends React.Component {
 		//if (Math.abs(ix - nuIx) > 1e-10)
 		//	console.log(`👆 👆 🍓  ix and nuIx discrepancy!!  ix=${ix}   nuIx=${nuIx}   `);
 
-		if (traceDragging) console.log(`👆 👆 mouse %s on point (%f,%f) potential[ix=%d] changing from %f to %f`,
-			title,
-			ev.clientX, ev.clientY,
-			ix, this.potentialBuffer[ix], newPotential);
+		if (traceDragging)
+			console.log(`👆 👆 mouse %s on point (%f,%f) potential[ix=%d] changing from %f to %f`,
+				title,
+				ev.clientX, ev.clientY,
+				ix, this.potentialBuffer[ix], newPotential);
 
 		if (undefined == this.latestIx) {
 			// the first time, all you can do is the one point
@@ -113,7 +115,8 @@ export class PotentialArea extends React.Component {
 			let hi = Math.max(this.latestIx, ix);
 			let lo = Math.min(this.latestIx, ix);
 			for (let ixx = lo; ixx <= hi; ixx++) {
-				if (traceDragging) console.log(`👆 👆 tweening: set point [${ixx}] to ${tweenScale(ixx).toFixed(4)}`)
+				if (traceDragging)
+					console.log(`👆 👆 tweening: set point [${ixx}] to ${tweenScale(ixx).toFixed(4)}`)
 				this.potentialBuffer[ixx] = tweenScale(ixx);
 			}
 			if (traceDragging) console.log(`👆 👆 tweening done`)
@@ -217,7 +220,8 @@ export class PotentialArea extends React.Component {
 			points.pop();
 			points.shift();
 		}
-		if (tracePotentialArea) console.log(`👆 👆 PotentialArea.makePathAttribute: done`);
+		if (tracePotentialArea)
+			console.log(`👆 👆 PotentialArea.makePathAttribute: done`);
 		//console.log(`👆 👆 PotentialArea.makePathAttribute: result`, points);
 		return points.join('');
 	}
@@ -257,7 +261,8 @@ export class PotentialArea extends React.Component {
 
 		// the lines themselves: exactly overlapping.  tactile wider than visible.
 		const pathAttribute = this.makePathAttribute(start, end);
-		if (tracePathAttribute) console.log(`👆 👆 makePathAttribute(${start}, ${end}) returned:`, pathAttribute);
+		if (tracePathAttribute)
+			console.log(`👆 👆 makePathAttribute(${start}, ${end}) returned:`, pathAttribute);
 
 		// this one actually draws the white line
 		paths.push(
@@ -282,7 +287,8 @@ export class PotentialArea extends React.Component {
 	//static whyDidYouRender = true;
 	render() {
 		//throw "holy smokes!"
-		console.log(`👆 👆 PotentialArea.render()`);
+		if (traceRendering)
+			console.log(`👆 👆 PotentialArea.render()`);
 		const p = this.props;
 		if (! p.space)
 			return '';  // too early
@@ -301,7 +307,8 @@ export class PotentialArea extends React.Component {
 				{this.renderPaths()}
 			</svg>
 		);
-		console.log(`👆 👆 PotentialArea render done`);
+		if (traceRendering)
+			console.log(`👆 👆 PotentialArea render done`);
 
 		return returnV;
 	}

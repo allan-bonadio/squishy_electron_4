@@ -11,7 +11,6 @@ import {scaleLinear} from 'd3-scale';
 
 // eslint-disable-next-line no-unused-vars
 import {setFamiliarPotential, dumpPotential} from '../utils/potentialUtils';
-//import MiniGraph from './MiniGraph';
 import eSpace from '../engine/eSpace';
 import TextNSlider from '../widgets/TextNSlider';
 import {storeASetting, alternateMinMaxs} from '../utils/storeSettings';
@@ -96,16 +95,6 @@ class SetPotentialTab extends React.Component {
 
 	/* *************************************************************** short term setters */
 	// they keep the settings before user clicks 'flat' or 'valley'
-// 	setFlat =
-// 	() => {
-// // 		this.props.setCPState({potentialBreed:
-// // 			storeASetting('potentialParams', 'potentialBreed', 'flat')});
-// 	}
-// 	setValley =
-// 	() => {
-// // 		this.props.setCPState({potentialBreed:
-// // 			storeASetting('potentialParams', 'potentialBreed', 'valley')});
-// 	}
 	setValleyPower =
 	valleyPower => {
 		this.props.setCPState({valleyPower});
@@ -195,20 +184,11 @@ class SetPotentialTab extends React.Component {
 						Set to Valley Potential
 				</button>
 			</div>
-			<div className='MiniGraph'>pot. mini graph goes here</div>
+			<div className='MiniGraph' style={{marginLeft: '500px', color: 'yellow'}}>pot. mini graph goes here</div>
 			<div style={{clear: 'left'}} />
 		</div>;
 		}
 }
 setPT();
-
-
-//			<div className='potentialMiniGraph'>
-//				<MiniGraph recipe={this.recipe} width={this.miniWidth} height={this.miniHeight}
-//					className='SetPotentialGraph'
-//					familiarParams={pp} space={p.space} />
-//			</div>
-
-
 
 export default SetPotentialTab;

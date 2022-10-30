@@ -124,27 +124,29 @@ class GLView extends React.Component {
 	doRepaint =
 	() => {
 		let p = this.props;
-		if (tracePainting) console.log(`🖼 🖼 GLView ${p.viewName} ${p.avatar.label}  ${p.avatar.nAvatar}: starting doRepaint`);
+		if (tracePainting)
+			console.log(`🖼 🖼 GLView ${p.viewName} ${p.avatar.label}: starting doRepaint`);
 		if (! this.effectiveView)
 			return null;  // too early
 
-		if (tracePainting) p.avatar.ewave.dump(`🖼 🖼 GLView ${p.viewName}: got the ewave buffer straight`);
+		if (tracePainting)
+			p.avatar.ewave.dump(`🖼 🖼 GLView ${p.viewName}: got the ewave buffer straight`);
 
 		// copy from latest wave to view buffer (c++) & pick up highest
 		p.avatar.loadViewBuffer()
-
-		if (tracePainting) p.avatar.ewave.dump(`🖼 🖼 GLView ${p.viewName}: loaded view buf`);
+		if (tracePainting)
+			p.avatar.ewave.dump(`🖼 🖼 GLView ${p.viewName}: loaded ViewBuffer`);
 
 		this.effectiveView.reloadAllVariables();
-
 		let endReloadVarsNBuffer = performance.now();
-
-		if (tracePainting) p.avatar.dumpViewBuffer(`🖼 🖼 GLView ${p.viewName}: filled the vbuffer`);
+		if (tracePainting)
+			p.avatar.dumpViewBuffer(`🖼 🖼 GLView ${p.viewName}: reloaded AllVariables`);
 
 		// draw
 		this.effectiveView.drawAllDrawings();
 		let endDraw = performance.now();
-		if (tracePainting) console.log(`🖼 🖼 GLView ${p.viewName} ${p.avatar.label}: doRepaint done drawing`);
+		if (tracePainting)
+			console.log(`🖼 🖼 GLView ${p.viewName} ${p.avatar.label}: doRepaint done drawing`);
 
 		return {endReloadVarsNBuffer, endDraw};
 		//return {endReloadVarsNBuffer, endReloadInputs, endDraw};
@@ -176,7 +178,9 @@ class GLView extends React.Component {
 		// a one-time initialization.  but upon page load, neither the avatar,
 		// space or canvas are there yet.  Don't worry, when the space comes in,
 		// we'll all initViewClass.
-		if (traceSetup) console.log(`🖼 🖼 GLView:${p.viewName}: time to init?  avatar=${p.avatar}  space=${p.space}  canvas=${this.canvas}  effectiveView=${this.effectiveView}`);
+		if (traceSetup && !this.effectiveView)
+			console.log(`🖼 🖼 GLView:${p.viewName}: time to init?  avatar=${p.avatar}  `+
+				`space=${p.space}  canvas=${this.canvas}  effectiveView=${this.effectiveView}`);
 		if (p.avatar && p.space && this.canvas && !this.effectiveView) {
 			this.initViewClass();
 		}

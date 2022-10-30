@@ -5,7 +5,7 @@
 
 // line numbers should correspond!  Be careful how many lines this is!
 const cxToColorGlsl = `
-#line 8
+#line 9
 float sqrtOneThird = sqrt(1. / 3.);  // 0.57735..
 float sqrtThreeOver2 = sqrt(3.) / 2.;  // .8660...
 
@@ -85,9 +85,10 @@ vec3 cxToColor(vec2 psi) {
 }
 
 
-`;  // should be exactly 80 lines long
-// add extra blank lines to the end of it to make it an even multiple of 10
-// so I don't go crazy debugging it
+`;
+// should be exactly 80 lines long  . I don't think so... just use #line everywhere
+// NO add extra blank lines to the end of it to make it an even multiple of 10
+// NO so I don't go crazy debugging it
 
 // actual glsl string exported so all webgl code can reuse it
 // temp removed during testing
