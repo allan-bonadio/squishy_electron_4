@@ -24,8 +24,7 @@ export class abstractViewDef {
 	// class name from instance: vu.constructor.name   from class: vuClass.name
 	constructor(viewName, canvas, space, avatar) {
 		// what does this do?  Variables shared between drawings?  I don't think so.////
-		//  part of the whole variable 'Owner' concept I guess
-		this.viewVariables = [];
+		//No!! none  this.viewVariables = [];
 
 		this.viewName = viewName;
 		if (! canvas) throw new Error(`abstractViewDef: being created without canvas`);
@@ -43,7 +42,7 @@ export class abstractViewDef {
 		// really a global, for this file and all descenden tviews and drawings
 		// and variables, so this is how you turn this one way
 		// or another, if it makes a diff
-		this.bufferDataDrawMode = this.gl.DYNAMIC_DRAW;
+		//this.bufferDataDrawMode = this.gl.DYNAMIC_DRAW;
 		//bufferDataDrawMode = this.gl.STATIC_DRAW;
 
 		// subclasses: override this!
@@ -120,8 +119,12 @@ export class abstractViewDef {
 
 		const msg = gl.getShaderInfoLog(shader);
 		gl.deleteShader(shader);
-		if (35633 == type) type = 'vertex';
-		throw new Error(`Error compiling ${type} shader for ${this.viewName}: ${msg}`);
+		let ty = (gl.VERTEX_SHADER == type)
+			? 'vertex'
+			: (gl.FRAGMENT_SHADER == type)
+				? 'fragment'
+				: 'unknown type of';
+		throw new Error(`Error compiling ${ty} shader for ${this.viewName}: ${msg}`);
 	}
 
 	// call this with your sources in setShaders().
@@ -159,7 +162,9 @@ export class abstractViewDef {
 		//console.dir(this.drawings);
 
 		this.drawings.forEach(drawing => {
-			drawing.setShaders();
+			//drawing.setShaders();
+			drawing.compileProgram();
+			//this.gl.useProgram(this.program);  // should be the only time I do useProgram()?
 		});
 	}
 
@@ -169,10 +174,9 @@ export class abstractViewDef {
 	// Should be done ONCE when canvas & avatar are created, or recreated.
 	// NOT upon every repaint!!
 	createVariablesOnDrawings() {
-		//console.log('createVariablesOnDrawings drawings', this.drawings);
-		//console.dir(this.drawings);
 
 		this.drawings.forEach(drawing => {
+			this.gl.useProgram(drawing.program);
 			drawing.createVariables();
 		});
 	}
@@ -192,11 +196,11 @@ export class abstractViewDef {
 	// //		gl.vertexAttribPointer(cornerAttributeLocation, size, type, normalize, stride, offset);
 
 	// reload ALL the variables on this view
-	// should be done once on every repaint
+	// should be done once before every repaint
 	reloadAllVariables() {
-		// shouldn't need this; viewDefs shouldnt have vars  this.viewVariables.forEach(v => v.reloadVariable());
 		this.drawings.forEach(dr => {
-				dr.viewVariables.forEach(v => v.reloadVariable());
+			this.gl.useProgram(dr.program);
+			dr.viewVariables.forEach(v => v.reloadVariable());
 		});
 	}
 
@@ -206,7 +210,7 @@ export class abstractViewDef {
 	// no, call this every time the canvas resizes
 	setGeometry() {
 
-		// yeah i think it automatically defaults to this...
+		// yeah i think it automatically defaults to all these so we can remove this...?
 		this.gl.viewport(0, 0, this.canvas.width, this.canvas.height);
 	}
 
@@ -223,9 +227,12 @@ export class abstractViewDef {
 	}
 
 	drawAllDrawings() {
+		// reloadAllVariables() done in GLView
+		// not specific to any drawing; I guess it's kindof a drawing itself
 		this.drawBackground();
 
 		this.drawings.forEach(drawing => {
+			this.gl.useProgram(drawing.program);
 			drawing.draw();
 		});
 	}
@@ -422,7 +429,7 @@ export class abstractViewDef {
 			  0, 0.5,
 			  0.7, 0,
 			];
-			gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(positions), this.bufferDataDrawMode);
+			gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(positions), this.gl.DYNAMIC_DRAW);
 
 			//vao = this.vaoExt.createVertexArrayOES();
 			//this.vaoExt.bindVertexArrayOES(vao);

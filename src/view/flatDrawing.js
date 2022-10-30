@@ -19,7 +19,8 @@ let alsoDrawPoints = false;
 let alsoDrawLines = false;
 //alsoDrawLines =0;
 
-let pointSize = alsoDrawPoints ? `gl_PointSize = (row.w+1.) * 5.;//10.;` : '';
+//let pointSize = alsoDrawPoints ? `gl_PointSize = (row.w+1.) * 5.;` : '';
+let pointSize = alsoDrawPoints ? `gl_PointSize = 10.;` : '';
 
 /* ******************************************************* flat drawing */
 
@@ -30,9 +31,9 @@ let pointSize = alsoDrawPoints ? `gl_PointSize = (row.w+1.) * 5.;//10.;` : '';
 ** or zero
 */
 
-// make the line number for the start correspond to this JS file line number
+// make the line number for the start correspond to this JS file line number - the NEXT line
 const vertexSrc = `${cxToColorGlsl}
-#line 34
+#line 37
 varying highp vec4 vColor;
 attribute vec4 row;
 uniform float barWidth;
@@ -69,7 +70,7 @@ void main() {
 `;
 
 const fragmentSrc = `
-#line 68
+#line 74
 precision highp float;
 varying highp vec4 vColor;
 
@@ -80,27 +81,20 @@ void main() {
 
 // the original display that's worth watching: flat upside down hump graph
 export class flatDrawing extends abstractDrawing {
-	// inherited from abstractDrawing
+	constructor(viewDef) {
+		super(viewDef, 'flatDrawing');
 
-	static drawingClassName: 'flatDrawing';
-	drawingClassName: 'flatDrawing';
-
-	setShaders() {
 		this.vertexShaderSrc = vertexSrc;
 		this.fragmentShaderSrc = fragmentSrc;
-		this.compileProgram();
-		this.gl.useProgram(this.program);  // should be the only time I do useProgram()
 	}
 
 	// one time set up of variables for this drawing, every time canvas and viewDef is recreated
 	createVariables() {
-		if (traceFlatDrawing) console.log(`flatDrawing ${this.viewName}: creatingVariables`);
+		if (traceFlatDrawing)
+			console.log(`flatDrawing ${this.viewName}: creatingVariables`);
+
 		// loads view buffer from corresponding wave, calculates highest norm, which we use below.
-		// this only needs to happen once right?  viewBuffer just sits ini the same place in memory,
-		// getting refilled from a qWave, but never moves, right>
-		//this.avatar.dumpViewBuffer('before loaded');
 		this.avatar.loadViewBuffer();
-		//this.avatar.dumpViewBuffer('just loaded');
 
 
 		let maxHeightUniform = this.maxHeightUniform = new viewUniform('maxHeight', this);
@@ -136,13 +130,10 @@ export class flatDrawing extends abstractDrawing {
 
 	draw() {
 		const gl = this.gl;
-		if (traceFlatDrawing) console.log(`flatDrawing ${this.viewName}, ${this.avatarLabel} ${this.nAvatar}: drawing`);
+		if (traceFlatDrawing) console.log(`flatDrawing ${this.viewName}, ${this.avatarLabel}: drawing`);
 
-		// are these two necessary?  seems to work without em
 		gl.useProgram(this.program);////
-		// already done in doRepaint()    this.rowAttr.reloadVariable();////
 
-		//gl.bindVertexArray(this.vao);
 		gl.drawArrays(gl.TRIANGLE_STRIP, 0, this.vertexCount);
 
 		if (alsoDrawLines) {
