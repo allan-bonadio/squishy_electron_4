@@ -8,11 +8,6 @@ import eWave from './eWave';
 //import eSpace from './eSpace';
 import qe from './qe';
 
-
-//// get rid of this someday
-let nAvatar = 0;
-
-
 // a qAvatar manages iteration of a wave, and display on a GLView. I keep
 // thinking that I should separate the functions, but what will you do with an itration
 // if you're not going to view it in GL?
@@ -27,7 +22,6 @@ class eAvatar {
 	constructor(space, vBufferPointer, pointer) {
 		prepForDirectAccessors(this, pointer);
 		this.label = window.Module.AsciiToString(this._label);
-		this.nAvatar = nAvatar++;
 
 		this.space = space;
 		this.ewave = new eWave(space, null, this._qwave);
