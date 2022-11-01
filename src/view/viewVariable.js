@@ -5,35 +5,37 @@
 
 let traceGLCalls = false;
 let traceUniforms = true;
-let traceAttributes = false;
+let traceAttributes = true;
 
 // attr arrays and uniforms that can change on every frame.
 // you can set a static value or a function that'll return it
 
 // superclass for all of these.
 export class viewVariable {
-	// the owner is the view or the drawing it's used in.  Must have a:
-	// gl, vaoExt, viewVariables array, bufferDataDrawMode enum
-	// program,
-	constructor(varName, owner) {
-		this.owner = owner;
-		this.gl = owner.gl;
-		//this.vaoExt = owner.vaoExt;
+	// the drawing is the view or the drawing it's used in.  Must have a:
+	// gl, viewVariables array, program,
+	// getFunc will be called before each frame to refresh the value
+	constructor(varName, drawing, getFunc) {
+		this.drawing = drawing;
+		this.gl = drawing.gl;
+		this.getFunc = getFunc;
 
 		this.varName = varName;
-		if (! varName || ! owner) throw new Error(`bad name${!varName} or owner${!owner} used to create a view var`);
+		if (! varName || ! drawing) throw new Error(`bad name ${varName} or drawing ${drawing} used to create a view var`);
 
-		// both views and drawings often have this array, so 'owner' might not be a view
-		// i don't think this does what it's intended to do
-		let vv = owner.viewVariables;
+		let vv = drawing.viewVariables;
 		if (vv.includes(this)) {
-			console.error(`duplicate variable ${varName}!!`);
-			return null;  // thisis a duplicate, why?
+			console.error(`𒐿 duplicate variable ${varName}!!`);
+			return null;
 		}
 		vv.push(this);
 
-		this.bufferDataDrawMode = owner.bufferDataDrawMode;
-		if (traceGLCalls) console.log(`created viewVariable '${varName}', owner:`, owner);
+		//this.bufferDataDrawMode = drawing.bufferDataDrawMode;
+
+		// whichever variable this is a subclass of, constructors will need this
+		this.gl.useProgram(drawing.program);
+
+		if (traceGLCalls) console.log(`𒐿 created viewVariable '${varName}', drawing:`, drawing);
 	}
 }
 
@@ -43,18 +45,15 @@ export class viewVariable {
 // uniforms don't vary from one vertex to another
 // create this as many times as you have uniforms as input to either or both shaders
 export class viewUniform extends viewVariable {
-	constructor(varName, owner) {
-		super(varName, owner);
-
-		//function that will get value
-		//from wherever and return it.
-		//if (typeof getFunc == 'function')
-		//this.valueVar = getFunc;
+	constructor(varName, drawing, getFunc) {
+		super(varName, drawing, getFunc);
 
 		// this turns out to be an internal magic object
-		this.uniformLoc = this.gl.getUniformLocation(this.owner.program, varName);
+		this.uniformLoc = this.gl.getUniformLocation(this.drawing.program, varName);
 		if (!this.uniformLoc) throw new Error(`Cannot find uniform loc for uniform variable ${varName}`);
-		if (traceUniforms) console.log(`created viewUniform '${varName}'`);
+		if (traceUniforms) console.log(`𒐿 created viewUniform '${varName}'`);
+
+		this.reloadVariable();
 	}
 
 	// change the value, sortof, by one of these two ways:
@@ -66,45 +65,38 @@ export class viewUniform extends viewVariable {
 	// must return in an array value, typed or not.  Same for 2iv, etc.
 	// Matrix2fv, 3, 4: square matrices, col major order.  must be typed!
 	// there are non-square variants, but only in webgl2
-	setValue(valueVar, type) {
-		if (typeof valueVar == 'function') {
-			this.getFunc = valueVar;
-			this.staticValue = this.staticType = undefined;
-			if (traceUniforms) console.log(`set function value on viewUniform '${this.varName}'`);
-		}
-		else {
-			this.staticValue = valueVar;
-			this.staticType = type;
-			this.getFunc = undefined;
-			if (traceUniforms) console.log(`set static value ${valueVar} type ${type} on viewUniform '${this.varName}'`);
-		}
-		this.reloadVariable();
-	}
+//	setValue(valueVar, type) {
+//		if (typeof valueVar == 'function') {
+//			this.getFunc = valueVar;
+//			this.staticValue = this.staticType = undefined;
+//			if (traceUniforms) console.log(`𒐿 set function value on viewUniform '${this.varName}'`);
+//		}
+//		else {
+//			this.staticValue = valueVar;
+//			this.staticType = type;
+//			this.getFunc = undefined;
+//			if (traceUniforms) console.log(`𒐿 set static value ${valueVar} type ${type} on viewUniform '${this.varName}'`);
+//		}
+//		this.reloadVariable();
+//	}
 
 	// set the uniform to it - upload latest value to GPU
 	// call this when the uniform's value changes, to reload it into the GPU
 	// call abstractViewDef::reloadAllVariables() for all
 	reloadVariable() {
-		let value = this.staticValue;
-		let type = this.staticType;
-		if (this.getFunc) {
-			const v = this.getFunc();
-			value = v.value;
-			type = v.type;
-		}
+debugger;
+		// is passed the previous value
+		const {value, type} =  this.getFunc(this.value);
 		if (traceUniforms) console.log(
-			`re-loaded uniform ${this.varName} with value=${value} type ${type}`);
+			`𒐿 re-loaded uniform ${this.varName} with value=${value} type ${type}`);
 
 		// you can't pass null or undefined
 		if (null == value || null == type)
-			throw new Error(`uniform variable has no value(${value}) or no type(${type})`);
+			throw new Error(`𒐿 uniform variable has no value(${value}) or no type(${type})`);
+		this.value = value;
+
 		const gl = this.gl;
-		const pgm = this.owner.program;
-
-		//gl.useProgram(pgm);  // a Gain?
-
-		// do i have to do this again?
-		this.uniformLoc = gl.getUniformLocation(pgm, this.varName);
+		this.uniformLoc = gl.getUniformLocation(this.drawing.program, this.varName);
 
 		const method = `uniform${type}`;
 
@@ -114,17 +106,13 @@ export class viewUniform extends viewVariable {
 			args.push(false);
 		args.push(value);
 
-		//console.log(`reload Uniform variable ${this.varName} with `+
-		//	` method gl.${method}() with these args:`, args);
+		// like gl.uniform4f(this.uniformLoc, value)
+		gl[method].apply(gl, args);
 
-		//gl.useProgram(pgm);  // a Gain?
-
-		gl[method].apply(gl, args);  // wish me luck
-
-		if (traceUniforms) console.log(`viewUniform reloaded Variable '${this.varName}' to:`, args);
-
-		//this.gl.uniform1f(this.uniformLoc, value);
-		//this.gl.uniform1i(this.uniformLoc, value);
+		if (traceUniforms) {
+			console.log(`𒐿 viewUniform reloaded U variable '${this.varName}' in `+
+				`${this.drawing.avatarLabel} like:   gl.${method}(${args.map(a => a + ', ')})`);
+		}
 	}
 }
 
@@ -133,54 +121,46 @@ export class viewUniform extends viewVariable {
 // is given to the vertex shader, which crunches whatever and decides upon the
 // coordinates and color for that point
 
-// create this as many times as you have buffers as input to either shader
+// create this as many times as you have buffers as input to vec shader
+// always float32.  getFunc must return a Float32TypedArray with a property
+// 'nTuples' that gives the number of rows used, each tupleWidth number of floats
 export class viewAttribute extends viewVariable {
-	constructor(varName, owner) {
-		super(varName, owner);
+	constructor(varName, drawing, tupleWidth, getFunc = () => {}) {
+		super(varName, drawing, getFunc);
+		this.tupleWidth = tupleWidth;  // num of float32s in each row/tuple
+debugger;
+		// small integer indicating which attr this is.  Chosen by GL.
+		const attrLocation = this.attrLocation = this.gl.getAttribLocation(drawing.program, varName);
+
+		if (attrLocation < 0)
+			throw new Error(`𒐿 viewAttribute:attr loc for '${varName}' is bad: `+ attrLocation);
+//	}
+//
+// 	// call after construction.  has <floatArray> data input,
+//	// broken into rows of <stride> Bytes,
+//	// but we only use the <tupleWidth> number of Floats from each row,
+//	// <offset> from the start of each row.  tupleWidth=1,2,3 or 4,
+//	// to make an attr that's a scalar, vec2, vec3 or vec4
+//	attachArray(floatArray, tupleWidth, stride = tupleWidth * 4, offset = 0) {
 		const gl = this.gl;
-
-		// small integer indicating which attr this is
-		const atLo = this.attrLocation = gl.getAttribLocation(owner.program, varName);
-
-		if (atLo < 0)
-			throw new Error(`viewAttribute:attr loc for '${varName}' is bad: `+ atLo);
-		if (traceGLCalls) console.log(`created viewAttribute '${varName}'`);
-	}
-
- 	// call after construction.  has <float32TypedArray> data input,
-	// broken into rows of <stride> Bytes,
-	// but we only use the <size> number of Floats from each row,
-	// <offset> from the start of each row.  size=1,2,3 or 4,
-	// to make an attr that's a scalar, vec2, vec3 or vec4
-	attachArray(float32TypedArray, size, stride = size * 4, offset = 0) {
-		const gl = this.gl;
-
-		// allocate actual ram in GPU chip
-		const gBuf = this.glBuffer = gl.createBuffer();
-
-		// magical vao which is apparently a list of cpu-side buffers.
-		// Each is named with some integer in opengl, but I don't think we see these in webgl 1.
-		// you have to dispose of it ultimately
-		//const vaoExt = this.vaoExt;
-		//let vao = this.vao = vaoExt.createVertexArrayOES();
-		//vaoExt.bindVertexArrayOES(vao);
-		// now do calls to bindBuffer() or vertexAttribPointer()
-		// a Record of these will be "recorded" in the VAO
 
 		// attach GPU buffer to our GL
-		gl.bindBuffer(gl.ARRAY_BUFFER, gBuf);
+		const glBuffer = this.glBuffer = gl.createBuffer();
+		gl.bindBuffer(gl.ARRAY_BUFFER, glBuffer);
 
-		// now attach some data to it, with CPU-side arrays
-		this.float32TypedArray = this.owner.float32TypedArray = float32TypedArray;
-		gl.bufferData(gl.ARRAY_BUFFER, float32TypedArray, this.bufferDataDrawMode);
+		// now attach some data to it, with CPU-side arrays.  Siince we have to do bufferData
+		// before each frame, maybe bag that rigth now
+//		this.floatArray = this.drawing.floatArray = floatArray;
+//		gl.bufferData(gl.ARRAY_BUFFER, floatArray, gl.DYNAMIC_DRAW);
 
 		gl.enableVertexAttribArray(this.attrLocation);
 
-		// // row is 4 floats: real, imag, potential, vertex index/serial
 		gl.vertexAttribPointer(
 				this.attrLocation,
-				size, gl.FLOAT,
-				false, stride, offset);  // don't normalize
+				tupleWidth, gl.FLOAT,
+
+				// normalize, stride, offset
+				false, tupleWidth * 4, 0);
 
 
 		// again?  gl.enableVertexAttribArray(this.attrLocation);
@@ -190,27 +170,37 @@ export class viewAttribute extends viewVariable {
 //		vao;
 //		gl.enableVertexAttribArray(this.attrLocation);
 //
-//		gl.vertexAttribPointer(this.attrLocation, size, gl.FLOAT, false, stride, offset);
-		if (traceGLCalls) console.log(`viewAttribute '${this.varName}' set to size=${size}, stride=${stride}, offset=${offset}  row [1]:`,
-				float32TypedArray[8], float32TypedArray[9], float32TypedArray[10], float32TypedArray[11]);
+//		gl.vertexAttribPointer(this.attrLocation, tupleWidth, gl.FLOAT, false, stride, offset);
+		if (traceGLCalls) console.log(`𒐿  viewAttribute '${this.varName}' set to tupleWidth=${tupleWidth}`);
 
 		this.reloadVariable();
 	}
 
 	// call this when the array's values change, to reload them into the GPU.
-	// No function; the original array must change its values.
+	// getFunc() gets past the previous array (or undefined first time)
+	// must return another Float32Array (or same) with JS property 'nTuples'
 	reloadVariable() {
 		const gl = this.gl;
-		//console.log(`reload Array variable ${this.this.varName} : `, this.float32TypedArray);
+		//console.log(`reload Array variable ${this.this.varName} : `, this.floatArray);
 		// not sure we have to do this again...  seems we don't.
 		//gl.bindBuffer(gl.ARRAY_BUFFER, this.glBuffer);
+debugger;
 
-		// do we have to do THIS again?  Does it just slurp it up from the pointer from last time?!?!
-		// YES we do have to do this again!!!
-		gl.bufferData(gl.ARRAY_BUFFER, this.float32TypedArray, this.bufferDataDrawMode);
+
+		let floatArray = this.floatArray = this.getFunc(this.floatArray);
+		this.nTuples = floatArray.nTuples
+
+		// must do a bufferData() every frame
+		gl.bufferData(gl.ARRAY_BUFFER, floatArray, gl.DYNAMIC_DRAW);
 
 		if (traceAttributes) {
-			this.owner.avatar.dumpViewBuffer(`viewAttribute '${this.varName}' reloaded:`)
+			console.log(`𒐿 viewAttribute '${this.varName}' reloaded, ${this.nTuples} tuples of ${this.tupleWidth} floats each:`);
+			for (let t = 0; t < this.nTuples; t++) {
+				let line = `[${t}]  `;
+				for (let f = 0; f < this.tupleWidth; f++)
+					line += `  ${floatArray[t * this.tupleWidth + f].toFixed(6)}`;
+				console.log(line);
+			}
 		}
 	}
 

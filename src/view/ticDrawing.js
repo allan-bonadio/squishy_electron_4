@@ -80,18 +80,24 @@ export class ticDrawing extends abstractDrawing {
 
 	// one time set up of variables for this drawing, every time canvas and viewDef is recreated
 	createVariables() {
-		if (traceTicDrawing) console.log(`ticDrawing ${this.viewName}: creatingVariables`);
+		if (traceTicDrawing) console.log(`➤ ➤ ➤ ticDrawing ${this.viewName}: creatingVariables`);
 
-		let maxHeightUniform = this.maxHeightUniform = new viewUniform('maxHeight', this);
-		maxHeightUniform.setValue(() => {
-			// this gets called every redrawing (every reloadAllVariables() -> reloadVariable())
-			// isn't smoothed out as with flatDrawing - see if that's good or bad
-			return {value: this.avatar.highest, type: '1f'};
+debugger;
+		let maxHeightUniform = this.maxHeightUniform =
+			new viewUniform('maxHeight', this,
+				() => {
+					// this gets called every redrawing (every reloadAllVariables() -> reloadVariable())
+					// isn't smoothed out as with flatDrawing - see if that's good or bad
+					return {value: this.avatar.highest, type: '1f'};
+				}
+			);
+
+		this.cornerFloats = 2;
+		this.cornerAttr = new viewAttribute('corner', this, this.cornerFloats, () => {
+
+			return this.generateTics();
 		});
-
-		this.cornerAttr = new viewAttribute('corner', this);
-		this.cornerFloats = 4;
-		this.cornerAttr.attachArray(this.avatar.vBuffer, this.cornerFloats);
+		//this.cornerAttr.attachArray(this.avatar.vBuffer, this.cornerFloats);
 	}
 
 	// call this when you reset all the data, otherwise the smoothing is surprised
@@ -103,7 +109,7 @@ export class ticDrawing extends abstractDrawing {
 		// number of tics on each side
 		let nTics = this.nTics = Math.floor(this.avatar.highest * this.avatar.space.nStates * TICS_PER_AVG_ψ);
 		if (this.ticsBufferSize < nTics) {
-			console.warn(`exceeded this.ticsBufferSize=${this.ticsBufferSize}, `+
+			console.warn(`➤ ➤ ➤ exceeded this.ticsBufferSize=${this.ticsBufferSize}, `+
 				` nTics was ${nTics}.  Expanding...`);
 			this.ticsBufferSize = Math.ceil(nTics * 1.3 + 1);  // room for some more but not too many
 			this.coordBuffer = new Float32Array(this.ticsBufferSize * FLOATS_PER_TIC);
@@ -123,23 +129,26 @@ export class ticDrawing extends abstractDrawing {
 		}
 
 		this.vertexCount = nTics * 3;  // 3 verts per tic
+		this.coordBuffer.nTuples = this.vertexCount;
 		if (traceDumpVertices) {
-			console.log(`' ' ' ticDrawing '${this.viewName}, ${this.avatarLabel}': created ${nTics} tics for ${nTics*3} vertices`);
+			console.log(`➤ ➤ ➤ ticDrawing '${this.viewName}, ${this.avatarLabel}':`+
+				` created ${nTics} tics for ${nTics*3} vertices`);
 			let cb = this.coordBuffer;
 			for (let t = 0; t < nTics; t++) {
 				let f = t * FLOATS_PER_TIC;
-				let dump = `    ' ' ' tic [${t}] `;
+				let dump = `    ➤ ➤ ➤ tic [${t}] `;
 				for (let j = 0; j < 6; j += 2)
 					dump += `    ${cb[f + j].toFixed(2)} @ ${cb[f + j + 1].toFixed(2)}`;
 				console.log(dump);
 			}
 		}
+		return this.coordBuffer;
 	}
 
 	draw() {
 		const gl = this.gl;
 		if (traceTicDrawing)
-			console.log(`ticDrawing '${this.viewName}, ${this.avatarLabel}': start draw`);
+			console.log(`➤ ➤ ➤ ticDrawing '${this.viewName}, ${this.avatarLabel}': start draw`);
 
 		this.generateTics();  // wrong time!!!
 

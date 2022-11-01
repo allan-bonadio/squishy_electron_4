@@ -92,35 +92,44 @@ export class flatDrawing extends abstractDrawing {
 	createVariables() {
 		if (traceFlatDrawing)
 			console.log(`flatDrawing ${this.viewName}: creatingVariables`);
+debugger;
 
 		// loads view buffer from corresponding wave, calculates highest norm, which we use below.
 		this.avatar.loadViewBuffer();
 
 
-		let maxHeightUniform = this.maxHeightUniform = new viewUniform('maxHeight', this);
-		maxHeightUniform.setValue(() => {
-			// this gets called every redrawing (every reloadAllVariables() -> reloadVariable())
-			// smooth it out otherwise the wave sortof bounces up and down a little on each step
-			// set like this only upon reStartDrawing()
-			if (!this.avgHighest)
-				this.avgHighest = this.avatar.highest;
-			else
-				this.avgHighest = (this.avatar.highest + 3*this.avgHighest) / 4;
-			if (traceHighest)
-				console.log(`flatDrawing reloading ${this.viewName}: highest=${this.avatar.highest.toFixed(5)}  avgHighest=${this.avgHighest.toFixed(5)}`);
+		//let maxHeightUniform =
+		this.maxHeightUniform = new viewUniform('maxHeight', this,
+			() => {
+debugger;
+				// this gets called every redrawing (every reloadAllVariables() -> reloadVariable())
+				// smooth it out otherwise the wave sortof bounces up and down a little on each step
+				// set like this only upon reStartDrawing()
+				if (!this.avgHighest)
+					this.avgHighest = this.avatar.highest;
+				else
+					this.avgHighest = (this.avatar.highest + 3*this.avgHighest) / 4;
+				if (traceHighest)
+					console.log(`flatDrawing reloading ${this.viewName}: highest=${this.avatar.highest.toFixed(5)}  avgHighest=${this.avgHighest.toFixed(5)}`);
 
-			return {value: this.avgHighest, type: '1f'};
-		});
+				return {value: this.avgHighest, type: '1f'};
+			}
+		);
 
-		let barWidthUniform = this.barWidthUniform = new viewUniform('barWidth', this);
 		let nPoints = this.nPoints = this.space.nPoints;
 		let barWidth = 1 / (nPoints - 1);
-		barWidthUniform.setValue(barWidth, '1f');
+		//let barWidthUniform =
+		this.barWidthUniform = new viewUniform('barWidth', this,
+			() => ({value: barWidth, type: '1f'}) );
 
-		this.rowAttr = new viewAttribute('row', this);
 		this.vertexCount = nPoints * 2;  // nPoints * vertsPerBar
 		this.rowFloats = 4;
-		this.rowAttr.attachArray(this.avatar.vBuffer, this.rowFloats);
+		this.rowAttr = new viewAttribute('row', this, this.rowFloats, (oldVal) => {
+debugger;
+			this.avatar.vBuffer.nTuples = this.vertexCount;
+			return this.avatar.vBuffer;
+		});
+		//this.rowAttr.attachArray(this.avatar.vBuffer, this.rowFloats);
 	}
 
 	// call this when you reset the wave otherwise the smoothing is surprised
@@ -156,3 +165,4 @@ export class flatDrawing extends abstractDrawing {
 }
 
 export default flatDrawing;
+

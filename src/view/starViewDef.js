@@ -47,12 +47,13 @@ export class starDrawing extends abstractDrawing {
 	createVariables() {
 		//const gl = this.gl;
 
-		let cornerColorUni;
+		//let cornerColorUni;
 		if (includeUniform) {
-			cornerColorUni = this.cornerColorUni =
-				new viewUniform('cornerColorUni', this);
-			cornerColorUni.setValue([0, 1, .5, 1], '4fv');  // teal
-			//() => ({value: [0, 1, .5, 1], type: '4fv'});
+			//cornerColorUni =
+			this.cornerColorUni =
+				new viewUniform('cornerColorUni', this,
+					() => ({value: [0, 1, .5, 1],   // teal
+						type: '4fv'}) );
 		}
 
 //		const cornerAttributeLocation = gl.getAttribLocation(this.program, 'corner');
@@ -76,8 +77,9 @@ export class starDrawing extends abstractDrawing {
 			cos(8), sin(8),
 			cos(10), sin(10),
 		]);
-		this.cornerAttr = new viewAttribute('corner', this);
-		this.cornerAttr.attachArray(corners, 2);
+
+		this.cornerAttr = new viewAttribute('corner', this, 2, () => corners);
+		//this.cornerAttr.attachArray(corners, 2);
 	}
 
 //	createVariables() {
