@@ -135,7 +135,7 @@ double qBuffer::dumpRow(char buf[200], int ix, qCx w, double *pPrevPhase, bool w
 		if (abs(im) + abs(re) > 1e-9)
 			phase = atan2(im, re) * 180. / PI;  // pos or neg OR NAN
 
-		// adjust it to -180...+180
+		// difference, then adjust it to -180...+180
 		double dPhase = fmod(phase - *pPrevPhase + 180, 360) - 180.;
 		//double dPhase = phase - *pPrevPhase + 360.;  // so now its positive, right?
 		//if (dPhase >= 360.) dPhase -= 360.;
@@ -196,7 +196,7 @@ void qBuffer::dumpThat(qCx *wave, bool withExtras) {
 
 // works on any buffer but originally written for qWaves
 void qBuffer::dump(const char *title, bool withExtras) {
-	printf("\n🌊🌊 ==== %c%c%c%c  %p->%p | %s ",
+	printf("\n🌊🌊 qWave ==== %c%c%c%c  %p->%p | %s ",
 		magic >> 24, magic >> 16, magic >> 8, magic, this, wave, title);
 	qBuffer::dumpSegment(wave, withExtras, start, end, continuum);
 	//space->dumpThat(wave, withExtras);

@@ -9,9 +9,9 @@
 #include "../debroglie/qWave.h"
 #include "qViewBuffer.h"
 
-static const bool debugViewBuffer = false;
-static const bool debugHighest = false;
-static const bool debugInDetail = false;
+static const bool traceViewBuffer = false;
+static const bool traceHighest = false;
+static const bool traceInDetail = false;
 
 // August Ferdinand Möbius invented homogenous coordinates
 
@@ -22,7 +22,7 @@ qViewBuffer::qViewBuffer(qSpace *space, qAvatar *av)
 
 	// 4 floats per vertex, two verts per point
 	vBuffer = new float[space->nPoints * 8];
-	if (debugViewBuffer) printf("📺 new qvBuffer(): vBuffer ptr %p \n",
+	if (traceViewBuffer) printf("📺 new qvBuffer(): vBuffer ptr %p \n",
 		vBuffer);
 	//printf("📺 qViewBuffer constructor done: this=%p   vBuffer=%p\n",
 	//this, vBuffer);
@@ -37,11 +37,11 @@ qViewBuffer::~qViewBuffer() {
 void qViewBuffer::dumpViewBuffer(const char *title) {
 	float *vBuffer = avatar->qvBuffer->vBuffer;
 	float prevPhase =0;
-	#define FORMAT_BASE      "%6d.1 |  %6.3f  %6.3f  %6.3g  %6.3g"
+	#define FORMAT_BASE      "%6d |  %6.3f  %6.3f  %6.3g  %6.3g"
 	#define FORMAT_SUFFIX  " |  %6.3f  %6.3f  %6.3f  m𝜓\n"
 
 	if (!title) title = "";
-	printf("==== 📺 dump vBuffer %p->%p | %s\n", this, vBuffer, title);
+	printf("==== 📺 dump qVBuffer %p->%p | %s\n", this, vBuffer, title);
 	printf("   ix  |    re      im     ---    serial  |      𝜃        d 𝜃      magn\n");
 	for (int i = 0; i < space->nPoints; i++) {
 
@@ -100,7 +100,7 @@ void qViewBuffer::dumpViewBuffer(const char *title) {
 // Two vertices per datapoint: bottom then top, same data.
 // also converts from doubles to floats for GL.
 float qViewBuffer::loadViewBuffer(void) {
-	if (debugViewBuffer) printf("\n📺 qViewBuffer::loadViewBuffer(%s) starts: vBuffer = %p \n",
+	if (traceViewBuffer) printf("\n📺 qViewBuffer::loadViewBuffer(%s) starts: vBuffer = %p \n",
 		avatar->label, vBuffer);
 	qWave *qwave = avatar->qwave;
 	qCx *wave = qwave->wave;
@@ -111,7 +111,7 @@ float qViewBuffer::loadViewBuffer(void) {
 	//double tiny = 0;
 	//double tiny = 1e-8;
 
-	if (debugInDetail) {
+	if (traceInDetail) {
 		//printf("loadViewBuffer(P): thePotential=%p\n",
 		//thePotential);
 		printf("loadViewBuffer(B): qViewBuffer->avatar->qwave->wave=%p->%p->%p->%p\n",
@@ -127,26 +127,26 @@ float qViewBuffer::loadViewBuffer(void) {
 	// this is index into the complex point, which translates to 2 GL points
 //	printf("qViewBuffer::loadViewBuffer about to do all the pts\n");
 	for (int pointNum = 0; pointNum < nPoints; pointNum++) {
-		if (debugInDetail) {
+		if (traceInDetail) {
 			printf("📺 qViewBuffer::loadViewBuffer vBuffer %p\n",
 				vBuffer);
 			printf("📺 qViewBuffer::loadViewBuffer vBuffer + pointNum * 8=%p\n",
 				vBuffer + pointNum * 8);
 		}
 		float *twoRowPtr = vBuffer + pointNum * 8;
-		if (debugInDetail)
+		if (traceInDetail)
 			printf("📺 qViewBuffer::loadViewBuffer twoRowPtr =%p\n", twoRowPtr);
 		qCx *wavePtr = wave + pointNum;
-		if (debugInDetail)
+		if (traceInDetail)
 			printf("📺 qViewBuffer::loadViewBuffer wavePtr =%p\n", wavePtr);
 
-		if (debugInDetail) printf("📺 loadViewBuffer(pointNum=%d): twoRowPtr =%p and wavePtr=%p\n",
+		if (traceInDetail) printf("📺 loadViewBuffer(pointNum=%d): twoRowPtr =%p and wavePtr=%p\n",
 			pointNum, twoRowPtr, wavePtr);
 
 		double re = wavePtr->re;
 		double im = wavePtr->im;
 
-		if (debugInDetail) printf("📺 loadViewBuffer(pointNum:%d): re=%lf im=%lf tiny=%lf\n",
+		if (traceInDetail) printf("📺 loadViewBuffer(pointNum:%d): re=%lf im=%lf tiny=%lf\n",
 			pointNum, re, im, tiny);
 
 		twoRowPtr[0] = re * tiny;
@@ -160,7 +160,7 @@ float qViewBuffer::loadViewBuffer(void) {
 		twoRowPtr[6] = 0;
 		twoRowPtr[7] = pointNum * 2. + 1.;  // at magnitude, top
 
-		if (debugInDetail) printf("📺 loadViewBuffer(8:%d): %lf %lf %lf %lf %lf %lf %lf %lf\n",
+		if (traceInDetail) printf("📺 loadViewBuffer(8:%d): %lf %lf %lf %lf %lf %lf %lf %lf\n",
 			pointNum, twoRowPtr[0], twoRowPtr[1], twoRowPtr[2], twoRowPtr[3],
 				twoRowPtr[4], twoRowPtr[5], twoRowPtr[6], twoRowPtr[7]);
 
@@ -170,11 +170,11 @@ float qViewBuffer::loadViewBuffer(void) {
 			highest = height;
 	}
 
-	if (debugHighest)
+	if (traceHighest)
 		printf("    qViewBuffer::at end of loadViewBuffer this=%p  vBuffer=%p highest=%12.6lf\n\n",
 				this, vBuffer, highest);
 
-	if (debugViewBuffer) {
+	if (traceViewBuffer) {
 		dumpViewBuffer("loadViewBuffer done");
 	}
 
@@ -189,11 +189,6 @@ extern "C" {
 
 	// return the vbuffer, raw floats
 	float *avatar_getViewBuffer(qAvatar *avatar) {
-//		printf("📺 avatar_getViewBuffer: theQViewBuffer=%p \n",
-//			theQViewBuffer);
-//		printf("📺                    theQViewBuffer->vBuffer=%p\n",
-//			theQViewBuffer ? theQViewBuffer->vBuffer : 0);
-		//if (avatar->) return NULL;
 		return avatar->qvBuffer->vBuffer;
 	}
 
@@ -202,12 +197,5 @@ extern "C" {
 	double avatar_loadViewBuffer(qAvatar *avatar) {
 		return avatar->qvBuffer->loadViewBuffer();
 	}
-
-	// returns the highest height of norm of wave entries (old)
-	//double qViewBuffer_loadViewBuffer(void) {
-	//	if (debugViewBuffer)
-	//		printf("📺 ggggggg    ... theQViewBuffer=%p\n", theQViewBuffer);
-	//	return theQViewBuffer->loadViewBuffer();
-	//}
 }
 
