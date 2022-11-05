@@ -167,8 +167,8 @@ export class starDrawing extends abstractDrawing {
 export class starViewDef extends abstractViewDef {
 	static displayName: 'star';
 
-	constructor(viewName, canvas, space, avatar) {
-		super(viewName, canvas, space, avatar);
+	constructor(viewName, glview, space, avatar) {
+		super(viewName, glview, space, avatar);
 
 		if (! this.space || !this.avatar) {
 			debugger;

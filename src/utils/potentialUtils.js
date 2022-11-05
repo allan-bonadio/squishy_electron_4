@@ -5,6 +5,7 @@
 
 import qe from '../engine/qe';
 
+let traceFamiliar = false;
 
 // raw numbers ~ 100 are way too big and throw it all into chaos
 const VALLEY_FACTOR = .000_01;
@@ -40,7 +41,9 @@ export function setFamiliarPotential(space, potentialArray, potentialParams) {
 	const {start, end, N} = space.startEnd;
 	let {valleyPower, valleyScale, valleyOffset} = potentialParams;
 	// someday this will work ${space.label},
-	console.log(`starting setFamiliarPOTENTIAL(array of POTENTIALArray.length, POTENTIALParams=`, potentialParams);
+	if (traceFamiliar)
+		console.log(`starting setFamiliarPOTENTIAL(array of POTENTIALArray.length,`+
+			` POTENTIALParams=`, potentialParams);
 	let pot;
 	const offset = valleyOffset * N / 100;
 	for (let ix = start; ix < end; ix++) {
