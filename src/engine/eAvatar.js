@@ -8,6 +8,9 @@ import eWave from './eWave';
 //import eSpace from './eSpace';
 import qe from './qe';
 
+let traceHighest = false;
+let traceVBuffer = false;
+
 // a qAvatar manages iteration of a wave, and display on a GLView. I keep
 // thinking that I should separate the functions, but what will you do with an itration
 // if you're not going to view it in GL?
@@ -79,9 +82,23 @@ class eAvatar {
 
 	// qAvatar functions run from here
 	dumpViewBuffer(title) { qe.avatar_dumpViewBuffer(this.pointer, title) }
+
+	reStartDrawing() {
+		// start the averaging over again
+		this.smoothHighest = 0;
+	}
+
 	loadViewBuffer() {
 		// flatDrawing will use this for tweaking the highest uniform
 		this.highest = qe.avatar_loadViewBuffer(this.pointer);
+		if (!this.smoothHighest)
+			this.smoothHighest = this.highest;
+		else
+			this.smoothHighest = (this.highest + 3*this.smoothHighest) / 4;
+		if (traceHighest) console.log(`🚦 eAvatar ${this.label}: highest=${this.highest}  `+
+			`smoothHighest=${this.smoothHighest}`);
+		if (traceVBuffer)
+			this.dumpViewBuffer(`afterLoadViewBuffer`);
 	}
 	oneIteration() { return qe.avatar_oneIteration(this.pointer) }
 	askForFFT() { qe.avatar_askForFFT(this.pointer) }
