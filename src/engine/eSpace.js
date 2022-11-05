@@ -13,26 +13,6 @@ import {cppObjectRegistry} from '../utils/directAccessors';
 let traceSpace = false;
 
 
-const _ = num => num.toFixed(4).padStart(9);
-
-// generate string for this one cx value, w, at location ix
-// rewritten from the c++ version in qBuffer::dumpRow()
-// pls keep in sync!
-function dumpRow(ix, re, im, prev, isBorder) {
-	const mag = re * re + im * im;
-
-	let phase = 0;
-	if (im || re) phase = Math.atan2(im, re) * 180 / Math.PI;  // pos or neg
-	let dPhase = phase - prev.phase + 360;  // so now its positive, right?
-	while (dPhase >= 360) dPhase -= 360;
-	prev.phase = phase;
-
-	if (!isBorder) prev.innerProd += mag;
-
-	return`[${ix}] (${_(re)} , ${_(im)}) | `+
-		`${_(phase)} ${_(dPhase)}} ${_(mag)}\n` ;
-}
-
 /* **************************************************************** eDimension */
 
 // these days the espace is just one qDimension.
@@ -157,29 +137,6 @@ export class eSpace {
 		const dim = this.dimensions[0];
 		return {start2: dim.start*2, end2: dim.end*2, N: dim.N, nPoints2: this.nPoints * 2,
 			continuum: dim.continuum};
-	}
-
-	// a eSpace method to dump any wave buffer according to that space.
-	// RETURNS A STRING of the wave.
-	dumpThat(wave) {
-		if (this.nPoints <= 0) throw "🚀  eSpace::dumpThat	() with zero points";
-
-		const {start2, end2, continuum} = this.startEnd2;
-		let ix2 = 0;
-		let prev = {phase: 0, innerProd: 0};
-		let output = '';
-
-		if (continuum)
-			output += dumpRow(0, wave[0], wave[1], prev, true);
-
-		for (ix2 = start2; ix2 < end2; ix2 += 2)
-			output += dumpRow(ix2/2, wave[ix2], wave[ix2+1], prev);
-
-
-		if (continuum)
-			output += 'end '+ dumpRow(ix2/2, wave[end2], wave[end2+1], prev, true);
-
-		return output.slice(0, -1) + ' innerProd=' + _(prev.innerProd) +'\n';
 	}
 
 	// refresh the wraparound points for ANY WAVE subscribing to this space

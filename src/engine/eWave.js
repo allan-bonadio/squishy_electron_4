@@ -16,6 +16,39 @@ let traceSetFamiliarWaveResult = false;
 // emscripten sabotages this?  the log & info, but not error & warn?
 //const consoleLog = console.log.bind(console);
 
+const _ = num => num.toFixed(4).padStart(9);
+const atan2 = Math.atan2;
+const abs = Math.abs;
+const floor = Math.floor;
+const π = Math.PI;
+
+// generate string for this one cx value, w, at location ix
+// rewritten from the c++ version in qBuffer::dumpRow()
+// pls keep in sync!
+// this should be moved to eWave!
+function dumpRow(ix, re, im, prev, isBorder) {
+	const mag = re * re + im * im;
+
+	let phase = NaN;
+	if (abs(im) + abs(re) > 1e-9)
+		phase = atan2(im, re) * 180 / π;  // pos or neg
+
+	// make sure diff is -180 ... +180
+	let dPhase = (phase - prev.phase + 180) / 360;
+	dPhase = (dPhase - floor(dPhase)) * 360 - 180;
+	//let dPhase = phase - prev.phase + 360;  // so now its positive, right?
+	//while (dPhase >= 360) dPhase -= 360;
+
+	prev.phase = phase;
+
+	// calculate inner product while we're at it, displayed on last line
+	if (!isBorder) prev.innerProd += mag;
+
+	return`[${ix}] (${_(re)} , ${_(im)}) | `+
+		`${_(phase)} ${_(dPhase)}} ${_(mag * 1000)} m𝜓\n` ;
+}
+
+
 // Dump a wave buffer as a colored bargraph in the JS console
 // this is also called by C++ so it's easier as a standalone function
 // see also eWave method by same name (but different args)
@@ -122,11 +155,34 @@ class eWave {
 
 	/* **************************************************************** dumping */
 
+	// dump any wave buffer according to that space.
+	// RETURNS A STRING of the wave.
+	dumpThat(wave) {
+		if (this.nPoints <= 0) throw "🚀  eSpace::dumpThat	() with zero points";
+
+		const {start2, end2, continuum} = this.space.startEnd2;
+		let ix2 = 0;
+		let prev = {phase: 0, innerProd: 0};
+		let output = '';
+
+		if (continuum)
+			output += dumpRow(0, wave[0], wave[1], prev, true);
+
+		for (ix2 = start2; ix2 < end2; ix2 += 2)
+			output += dumpRow(ix2/2, wave[ix2], wave[ix2+1], prev);
+
+
+		if (continuum)
+			output += 'end '+ dumpRow(ix2/2, wave[end2], wave[end2+1], prev, true);
+
+		return output.slice(0, -1) + ' innerProd=' + _(prev.innerProd) +'\n';
+	}
+
 	// dump out wave content.
 	dump(title) {
 		const avatarLabel = this.avatarLabel || '';
-		console.log(`\n🌊 ==== Wave ${avatarLabel} | ${title} `+
-			this.space.dumpThat(this.wave) +
+		console.log(`\n🌊 ==== eWave ${avatarLabel} | ${title} `+
+			this.dumpThat(this.wave) +
 			`\n🌊 ==== end of Wave ====\n\n`);
 	}
 
@@ -233,13 +289,17 @@ class eWave {
 	// pass negative to make it upside down.
 	setStandingWave(n) {
 		let {start2, end2, N} = this.space.startEnd2;
-		const dAngle = Math.PI / N * (+n);
 		const wave = this.wave;
 
-		// For a well, the boundary points ARE part of the wave, so do the whole thinig
+		// For a well, the boundary points ARE part of the wave, so do the whole thing
+		let dAngle;
 		if (this.space.continuum == qe.contWELL) {
+			end2 += start2;
 			start2 = 0;
-			end2 += 2;
+			dAngle = Math.PI / (N + 2) * (+n);
+		}
+		else {
+			dAngle = Math.PI / N * (+n);
 		}
 
 		for (let ix2 = start2; ix2 < end2; ix2 += 2) {
