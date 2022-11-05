@@ -22,7 +22,10 @@ drawings must include:
 	- draw() to issue actual drawing commands
 */
 
-// in addition to being a superclass for other drawings, you can use it straight, to draw a triangle for testing.
+let traceAttrNames = false;
+
+// a superclass for  drawings,
+// handles some common tasks.  For every drawing, there's a program and a vao
 export class abstractDrawing {
 
 	/* ************************************************** construction */
@@ -50,6 +53,13 @@ export class abstractDrawing {
 
 	/* ************************************************** Shader Creation/Compile */
 
+	// tell GL that this is the vao and program to use
+	setDrawing() {
+		const gl = this.gl;
+		gl.useProgram(this.program);////
+		gl.bindVertexArray(this.vao);
+	}
+
 	// used only by compileProgram()
 	compileShader(type, srcString) {
 		const {gl} = this;
@@ -62,7 +72,11 @@ export class abstractDrawing {
 
 		const msg = gl.getShaderInfoLog(shader);
 		gl.deleteShader(shader);
-		if (35633 == type) type = 'vertex';
+		type = (gl.VERTEX_SHADER == type)
+			? 'vertex'
+			: gl.FRAGMENT_SHADER == type
+				? 'fragment'
+				: 'unknown type ';
 		throw new Error(`Error compiling ${type} shader for ${this.viewName}: ${msg}`);
 	}
 
@@ -73,8 +87,15 @@ export class abstractDrawing {
 	compileProgram() {
 		const {gl} = this;
 
+		// create program and vao for this drawing, and put them into use
 		const program = gl.createProgram();
+		this.vao = this.gl.createVertexArray();
+		this.setDrawing();
 
+		//if (traceAttrNames) {
+		//	this.program = program;
+		//	this.dumpAttrNames('before compile');
+		//}
 		const vertexShader = this.compileShader(gl.VERTEX_SHADER, this.vertexShaderSrc);
 		gl.attachShader(program, vertexShader);
 		this.vertexShader = vertexShader;
@@ -83,11 +104,17 @@ export class abstractDrawing {
 		gl.attachShader(program, fragmentShader);
 		this.fragmentShader = fragmentShader;
 
+		// before linking, we have to nail down attr ids.  Get stored in the vao.  Am I doing thisi right?
+		//this.viewDef.attrVariableNames.forEach((name, ix) => gl.bindAttribLocation(program, ix+1, name));
 
 		gl.linkProgram(program);
 		var success = gl.getProgramParameter(program, gl.LINK_STATUS);
+
 		if (success) {
 			this.program = program;
+
+			if (traceAttrNames)
+				this.dumpAttrNames('right after link');
 			return
 			// after this, you'll attach your viewVariables with your subclassed createVariables() method.
 		}
@@ -95,7 +122,63 @@ export class abstractDrawing {
 		// somehow failed compile.  So, no program
 		const msg = gl.getProgramInfoLog(program);
 		gl.deleteProgram(program);
-		throw new Error(`Error linking program abstractDrawing for ${this.viewDef.viewName}: ${msg}`);
+		throw new Error(`Error linking program abstractDrawing for`+
+			` ${this.viewDef.viewName} ${this.drawingName}: ${msg}`);
+	}
+
+	/* ********************************************************************************* dumping */
+	// this sure doesn't enlighten any.
+
+	// used for dump below
+	static atInfos = ['ARRAY_BUFFER_BINDING', 'ARRAY_ENABLED', 'ARRAY_SIZE', 'ARRAY_STRIDE',
+		'ARRAY_TYPE', 'ARRAY_NORMALIZED', ];
+	static atTypes = null;
+
+	// this works on the current vao, or the static thing if none
+	dumpOneAttr(id, name = '') {
+		const gl = this.gl;
+		console.log(`    𒑐attr ${id} ${name}`);
+		abstractDrawing.atInfos.forEach(ai => {
+			let res = gl.getVertexAttrib(id, gl[`VERTEX_ATTRIB_${ai}`]);
+			if ('ARRAY_TYPE' == ai)
+				res = abstractDrawing.atTypes[res] ?? res;
+			console.log(`        𒑐${ai} = `, res);
+		});
+
+		console.log(`        𒑐CURRENT_VERTEX_ATTRIB = `,
+			gl.getVertexAttrib(id, gl.CURRENT_VERTEX_ATTRIB));
+	}
+
+	// this works on the current vao, or the static thing if none
+	dumpAttrNames(title) {
+		const gl = this.gl;
+
+		// need a real GL to do this
+		if (!abstractDrawing.atTypes)
+			abstractDrawing.atTypes = {[gl.BYTE]: 'Byte', [gl.UNSIGNED_BYTE]: 'Unsigned_Byte', [gl.SHORT]: 'Short',
+					[gl.UNSIGNED_SHORT]: 'Unsigned_Short', [gl.FLOAT]: 'Float',};
+		console.log(`abstractDrawing.atTypes=`, abstractDrawing.atTypes);
+
+		console.log(`𒑐 dumpAttrNames for viewdef ${this.viewName} drawing ${this.drawingName}: ${title}`);
+		//this.viewDef.attrVariableNames
+		//this.this.gl.getAttribLocation(drawing.program, varName);
+
+		// go thru all the names that should be there
+//		this.viewDef.attrVariableNames.forEach(name => {
+//			let id = gl.getAttribLocation(this.program, name);
+//			if (id < 0)
+//				console.log(`    𒑐dumpAttrNames: sorry, attr '${name}' not found`);
+//			else
+//				this.dumpOneAttr(id, name);
+//		});
+
+		console.log(`    𒑐 dumpAttrNames each id:`);
+		// try the first several ids that should be there
+		for (let id = 0; id < 5; id++) {
+			this.dumpOneAttr(id);
+			//gl.CURRENT_VERTEX_ATTRIB
+			//Returns a Float32Array (with 4 elements) representing the current value of the vertex attribute at the given index.
+		}
 	}
 
 	/* **************************************************  old examples */

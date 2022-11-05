@@ -90,9 +90,11 @@ export class flatDrawing extends abstractDrawing {
 
 	// one time set up of variables for this drawing, every time canvas and viewDef is recreated
 	createVariables() {
+//		this.vao = this.gl.createVertexArray();
+//		done in abstract drawing compileProgram  this.gl.bindVertexArray(this.vao);
+
 		if (traceFlatDrawing)
 			console.log(`flatDrawing ${this.viewName}: creatingVariables`);
-debugger;
 
 		// loads view buffer from corresponding wave, calculates highest norm, which we use below.
 		this.avatar.loadViewBuffer();
@@ -101,18 +103,17 @@ debugger;
 		//let maxHeightUniform =
 		this.maxHeightUniform = new viewUniform('maxHeight', this,
 			() => {
-debugger;
 				// this gets called every redrawing (every reloadAllVariables() -> reloadVariable())
 				// smooth it out otherwise the wave sortof bounces up and down a little on each step
 				// set like this only upon reStartDrawing()
-				if (!this.avgHighest)
-					this.avgHighest = this.avatar.highest;
-				else
-					this.avgHighest = (this.avatar.highest + 3*this.avgHighest) / 4;
+				//if (!this.avgHighest)
+				//	this.avgHighest = this.avatar.highest;
+				//else
+				//	this.avgHighest = (this.avatar.highest + 3*this.avgHighest) / 4;
 				if (traceHighest)
-					console.log(`flatDrawing reloading ${this.viewName}: highest=${this.avatar.highest.toFixed(5)}  avgHighest=${this.avgHighest.toFixed(5)}`);
+					console.log(`flatDrawing reloading ${this.viewName}: highest=${this.avatar.highest.toFixed(5)}  smoothHighest=${this.smoothHighest.toFixed(5)}`);
 
-				return {value: this.avgHighest, type: '1f'};
+				return {value: this.avatar.smoothHighest, type: '1f'};
 			}
 		);
 
@@ -124,24 +125,32 @@ debugger;
 
 		this.vertexCount = nPoints * 2;  // nPoints * vertsPerBar
 		this.rowFloats = 4;
-		this.rowAttr = new viewAttribute('row', this, this.rowFloats, (oldVal) => {
-debugger;
+		this.rowAttr = new viewAttribute('row', this, this.rowFloats, () => {
 			this.avatar.vBuffer.nTuples = this.vertexCount;
 			return this.avatar.vBuffer;
 		});
 		//this.rowAttr.attachArray(this.avatar.vBuffer, this.rowFloats);
+
+		//this.dumpAttrNames('end of createVariables');
+
+		this.gl.bindVertexArray(null);
 	}
 
 	// call this when you reset the wave otherwise the smoothing is surprised
-	reStartDrawing() {
-		this.avgHighest = 0;
-	}
+	// thisi is now done in eAvatar.smoothHighest
+	//reStartDrawing() {
+	//	this.avgHighest = 0;
+	//}
 
 	draw() {
 		const gl = this.gl;
 		if (traceFlatDrawing) console.log(`flatDrawing ${this.viewName}, ${this.avatarLabel}: drawing`);
 
-		gl.useProgram(this.program);////
+		this.setDrawing();
+//		gl.useProgram(this.program);////
+//		gl.bindVertexArray(this.vao);
+
+		//this.dumpAttrNames('beginning of flat draw');
 
 		gl.drawArrays(gl.TRIANGLE_STRIP, 0, this.vertexCount);
 
@@ -161,6 +170,7 @@ debugger;
 			console.log(`barWidthUniform=${this.barWidthUniform.staticValue}    `
 				+`maxHeightUniform=`, this.maxHeightUniform.getFunc());
 		}
+		// ?? this.gl.bindVertexArray(null);
 	}
 }
 

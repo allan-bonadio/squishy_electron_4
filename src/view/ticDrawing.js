@@ -6,21 +6,22 @@
 import {abstractDrawing} from './abstractDrawing';
 import {viewUniform, viewAttribute} from './viewVariable';
 
-let traceDumpVertices = true;
-let traceTicDrawing = true;
+let traceDumpVertices = false;
+let traceTicDrawing = false;
+let traceHighest = false;
 
 // diagnostic purposes
-let alsoDrawPoints = true;
-let alsoDrawLines = true;
+let alsoDrawPoints = false;
+let alsoDrawLines = false;
 
 // buffer size starts at this
 const INITIAL_BUFFER_NTICS = 5;  // always too small; for testing ////
 
-// x & y, * 3 vertices per tic
+// buffer: x & y, * 3 vertices per tic
 const FLOATS_PER_TIC = 6;
 
 // AVG_ψ is 1/N, the height of a circular wave
-const TICS_PER_AVG_ψ  = 10;
+const TICS_PER_AVG_ψ  = 2;
 
 
 let pointSize = alsoDrawPoints ? `gl_PointSize = 10.;` : '';
@@ -29,7 +30,7 @@ let pointSize = alsoDrawPoints ? `gl_PointSize = 10.;` : '';
 
 /*
 ** data format of attributes:  2 column table of floats
-** x and y coords of 3 coords in sequence, each a triangle
+** x and y coords x 3 pairs in sequence, each a triangle
 */
 
 // make the line number for the start correspond to this JS file line number - the NEXT line
@@ -37,17 +38,12 @@ const vertexSrc = `
 #line 38
 attribute vec2 corner;
 uniform float maxHeight;
+varying highp vec4 vColor;
 
 void main() {
-	// figure out y
-	float y;
-	y = 1. - 2. * (corner.y / maxHeight);
+	gl_Position = vec4(corner.x, corner.y, 0., 1.);
 
-	// figure out x
-	float x;
-	x = 1. - 2. * corner.x;
-
-	gl_Position = vec4(x/4., y/4., 0., 1.);////
+	vColor = vec4(.5, .5, .5, (corner.x == -1.) ? 1. : .5);
 
 	// dot size, in pixels not clip units
 	${pointSize}
@@ -57,10 +53,12 @@ void main() {
 const fragmentSrc = `
 #line 59
 precision highp float;
+varying highp vec4 vColor;
 
 void main() {
-	gl_FragColor = vec4(1., .5, .2, 1.);
-	//gl_FragColor = vec4(.5, .5, .5, .5);
+	gl_FragColor = vColor;
+	//gl_FragColor = vec4(1., .5, .2, 1.);
+	//gl_FragColor = vec4(1.0, 1.0, .8, .5);
 }
 `;
 
@@ -71,8 +69,8 @@ export class ticDrawing extends abstractDrawing {
 
 		// we always use this for our coordinates, generated on the fly
 		// dynamically expanded as needed
-		this.ticsBufferSize = INITIAL_BUFFER_NTICS
-		this.coordBuffer = new Float32Array(this.ticsBufferSize * FLOATS_PER_TIC);  // n of floats
+		this.roomForNTics = INITIAL_BUFFER_NTICS
+		this.coordBuffer = new Float32Array(this.roomForNTics * FLOATS_PER_TIC);  // n of floats
 
 		this.vertexShaderSrc = vertexSrc;
 		this.fragmentShaderSrc = fragmentSrc;
@@ -82,67 +80,80 @@ export class ticDrawing extends abstractDrawing {
 	createVariables() {
 		if (traceTicDrawing) console.log(`➤ ➤ ➤ ticDrawing ${this.viewName}: creatingVariables`);
 
-debugger;
-		let maxHeightUniform = this.maxHeightUniform =
-			new viewUniform('maxHeight', this,
-				() => {
-					// this gets called every redrawing (every reloadAllVariables() -> reloadVariable())
-					// isn't smoothed out as with flatDrawing - see if that's good or bad
-					return {value: this.avatar.highest, type: '1f'};
-				}
-			);
+		this.vao = this.gl.createVertexArray();
+
+		//let maxHeightUniform = this.maxHeightUniform =
+		//	new viewUniform('maxHeight', this,
+		//		() => {
+		//			// this gets called every redrawing (every reloadAllVariables() -> reloadVariable())
+		//			// isn't smoothed out as with flatDrawing - see if that's good or bad
+		//			return {value: this.avatar.highest, type: '1f'};
+		//		}
+		//	);
 
 		this.cornerFloats = 2;
 		this.cornerAttr = new viewAttribute('corner', this, this.cornerFloats, () => {
-
 			return this.generateTics();
 		});
 		//this.cornerAttr.attachArray(this.avatar.vBuffer, this.cornerFloats);
 	}
 
-	// call this when you reset all the data, otherwise the smoothing is surprised
-	reStartDrawing = () => {}
+	//reStartDrawing = () => {}
 
 	generateTics() {
-		debugger;
+		// how big should the tics be?
+		let ticHalfHeight = 20 / this.gl.drawingBufferWidth;  // fixed number of pixels
+		//let ticHalfHeight = .01;  // proportional to graph height
+		//let ticHalfHeight = .003;  // proportional to graph height
+		let ticWidth = 20 / this.gl.drawingBufferWidth;  // fixed number of pixels
 
-		// number of tics on each side
-		let nTics = this.nTics = Math.floor(this.avatar.highest * this.avatar.space.nStates * TICS_PER_AVG_ψ);
-		if (this.ticsBufferSize < nTics) {
-			console.warn(`➤ ➤ ➤ exceeded this.ticsBufferSize=${this.ticsBufferSize}, `+
-				` nTics was ${nTics}.  Expanding...`);
-			this.ticsBufferSize = Math.ceil(nTics * 1.3 + 1);  // room for some more but not too many
-			this.coordBuffer = new Float32Array(this.ticsBufferSize * FLOATS_PER_TIC);
+		if (traceHighest)
+			console.log(`➤ ➤ ➤ ticDrawing '${this.viewName}, ${this.avatarLabel}':`+
+				` highest is ${this.avatar.highest.toFixed(6)}`);
+
+
+		// number of tics on left side, coomes from the flatDrawing but handle it if it isn't drawing
+		let highest = this.avatar.smoothHighest ?? 1/ this.avatar.space.nStates;
+		let nTics = Math.floor(highest * this.avatar.space.nStates * TICS_PER_AVG_ψ - .1);
+		nTics = this.nTics = Math.min(nTics, 40);
+		if (this.roomForNTics <= nTics) {
+			let nuTics = Math.ceil(nTics * 1.3 + 1);  // room for some more but not too many
+			console.warn(`➤ ➤ ➤ highest=${highest.toFixed(4)}, nTics=${nTics}  `+
+				`  exceeds roomForNTics=${this.roomForNTics} . `+
+				` Expanding buffer... new roomForNTics=${nuTics}`);
+			this.roomForNTics = nuTics;
+			this.coordBuffer = new Float32Array(this.roomForNTics * FLOATS_PER_TIC);
 		}
+		let cb = this.coordBuffer;
 
-		// now fill it in
-		for (let t = 0; t <= nTics; t++) {
+		// now fill it in.  avoid tic 0 cuz it's always at the edge.
+		for (let t = 1; t <= nTics; t++) {
 			let offset = t * FLOATS_PER_TIC;
-			let y = t / TICS_PER_AVG_ψ;
+			let y = 1 - 2 * t * this.avatar.smoothHighest / TICS_PER_AVG_ψ;
+			let extraWidth = t % TICS_PER_AVG_ψ == 0 ? ticWidth : 0;
 
-			// ok, top x, y, point x, y, bottom x, y
-			this.coordBuffer.set([
-				0, y-.1,
-				1, y,
-				0, y+.1,
+			// ok, top x, y, point x, y, bottom x, y, in clip coords (-1...1)
+			cb.set([
+				-1, y - ticHalfHeight,
+				ticWidth + extraWidth - 1, y,
+				-1, y + ticHalfHeight,
 			], offset);
 		}
 
 		this.vertexCount = nTics * 3;  // 3 verts per tic
-		this.coordBuffer.nTuples = this.vertexCount;
 		if (traceDumpVertices) {
 			console.log(`➤ ➤ ➤ ticDrawing '${this.viewName}, ${this.avatarLabel}':`+
-				` created ${nTics} tics for ${nTics*3} vertices`);
-			let cb = this.coordBuffer;
+				` created ${nTics*3} vertices for ${nTics} tics`);
 			for (let t = 0; t < nTics; t++) {
 				let f = t * FLOATS_PER_TIC;
 				let dump = `    ➤ ➤ ➤ tic [${t}] `;
 				for (let j = 0; j < 6; j += 2)
-					dump += `    ${cb[f + j].toFixed(2)} @ ${cb[f + j + 1].toFixed(2)}`;
+					dump += `    ${cb[f + j].toFixed(4)} @ ${cb[f + j + 1].toFixed(4)}`;
 				console.log(dump);
 			}
 		}
-		return this.coordBuffer;
+		cb.nTuples = this.vertexCount;
+		return cb;
 	}
 
 	draw() {
@@ -150,22 +161,25 @@ debugger;
 		if (traceTicDrawing)
 			console.log(`➤ ➤ ➤ ticDrawing '${this.viewName}, ${this.avatarLabel}': start draw`);
 
-		this.generateTics();  // wrong time!!!
+		this.setDrawing();
+//		gl.useProgram(this.program);////
+//		gl.bindVertexArray(this.vao);
 
-		gl.useProgram(this.program);////
-		// already done in doRepaint()    this.cornerAttr.reloadVariable();////
+		//this.dumpAttrNames('start of tic drawing');
 
-		gl.drawArrays(gl.TRIANGLES, 0, this.vertexCount);
+		let start = 3;
+		let len = this.vertexCount - start;
+
+		gl.drawArrays(gl.TRIANGLES, start, len);
 
 		if (alsoDrawLines) {
 			gl.lineWidth(1);  // it's the only option anyway
 
-			gl.drawArrays(gl.LINES, 0, this.vertexCount);
-			//gl.drawArrays(gl.LINE_STRIP, 0, this.vertexCount);
+			gl.drawArrays(gl.LINE_STRIP, start, len);  // gl.LINE_STRIP, gl.LINES, gl.LINE_LOOP
 		}
 
 		if (alsoDrawPoints)
-			gl.drawArrays(gl.POINTS, 0, this.vertexCount);
+			gl.drawArrays(gl.POINTS, start, len);
 
 		// i think this is problematic
 		//if (dumpViewBufAfterDrawing) {

@@ -4,8 +4,8 @@
 */
 
 let traceGLCalls = false;
-let traceUniforms = true;
-let traceAttributes = true;
+let traceUniforms = false;
+let traceAttributes = false;
 
 // attr arrays and uniforms that can change on every frame.
 // you can set a static value or a function that'll return it
@@ -17,11 +17,12 @@ export class viewVariable {
 	// getFunc will be called before each frame to refresh the value
 	constructor(varName, drawing, getFunc) {
 		this.drawing = drawing;
-		this.gl = drawing.gl;
+		const gl = this.gl = drawing.gl;
 		this.getFunc = getFunc;
 
 		this.varName = varName;
-		if (! varName || ! drawing) throw new Error(`bad name ${varName} or drawing ${drawing} used to create a view var`);
+		if (! varName || ! drawing)
+			throw new Error(`bad name ${varName} or drawing ${drawing} used to create a view var`);
 
 		let vv = drawing.viewVariables;
 		if (vv.includes(this)) {
@@ -33,7 +34,10 @@ export class viewVariable {
 		//this.bufferDataDrawMode = drawing.bufferDataDrawMode;
 
 		// whichever variable this is a subclass of, constructors will need this
-		this.gl.useProgram(drawing.program);
+		// or maybe this is already done and so this is superflous?
+		drawing.setDrawing();
+//		gl.useProgram(drawing.program);
+//		gl.bindVertexArray(drawing.vao);
 
 		if (traceGLCalls) console.log(`𒐿 created viewVariable '${varName}', drawing:`, drawing);
 	}
@@ -84,11 +88,11 @@ export class viewUniform extends viewVariable {
 	// call this when the uniform's value changes, to reload it into the GPU
 	// call abstractViewDef::reloadAllVariables() for all
 	reloadVariable() {
-debugger;
+		//debugger;
 		// is passed the previous value
 		const {value, type} =  this.getFunc(this.value);
 		if (traceUniforms) console.log(
-			`𒐿 re-loaded uniform ${this.varName} with value=${value} type ${type}`);
+			`𒐿 re-loading uniform ${this.varName} with value=${value} type ${type}`);
 
 		// you can't pass null or undefined
 		if (null == value || null == type)
@@ -128,8 +132,9 @@ export class viewAttribute extends viewVariable {
 	constructor(varName, drawing, tupleWidth, getFunc = () => {}) {
 		super(varName, drawing, getFunc);
 		this.tupleWidth = tupleWidth;  // num of float32s in each row/tuple
-debugger;
-		// small integer indicating which attr this is.  Chosen by GL.
+		//debugger;
+
+		// small integer indicating which attr this is.  Set by compileProgram() for each drawing in the view def
 		const attrLocation = this.attrLocation = this.gl.getAttribLocation(drawing.program, varName);
 
 		if (attrLocation < 0)
@@ -184,13 +189,16 @@ debugger;
 		//console.log(`reload Array variable ${this.this.varName} : `, this.floatArray);
 		// not sure we have to do this again...  seems we don't.
 		//gl.bindBuffer(gl.ARRAY_BUFFER, this.glBuffer);
-debugger;
+		//debugger;
 
-
-		let floatArray = this.floatArray = this.getFunc(this.floatArray);
+		// get the latest
+		let floatArray = this.floatArray = this.getFunc();
 		this.nTuples = floatArray.nTuples
 
-		// must do a bufferData() every frame
+		//this.gl.bindVertexArray(this.drawing.vao);
+		this.drawing.setDrawing();
+
+		// must do a bufferData() every frame now with our own personal vao?
 		gl.bufferData(gl.ARRAY_BUFFER, floatArray, gl.DYNAMIC_DRAW);
 
 		if (traceAttributes) {
