@@ -27,33 +27,26 @@ exportsSrc  = [
 	{name: 'completeNewSpace', args: [], retType: 'number'},
 	{name: 'deleteTheSpace', args: ['number'], retType: null},
 
-
 	// gets
 	{name: 'getCppExceptionMessage', args: ['number'], retType: 'number'},
 
-
 	// the potential
 	{name: 'qSpace_dumpPotential', args: ['string'], retType: 'number'},
-	// now done in js {name: 'qSpace_setZeroPotential', args: [], retType: 'number'},
-	// now done in js {name: 'qSpace_setValleyPotential', args: ['number', 'number', 'number'], retType: 'number'},
-
-	// params
-	//converted to direct{name: 'Avatar_setDt', args: ['number'], retType: null},
-	//converted to direct{name: 'Avatar_setStepsPerIteration', args: ['number'], retType: null},
-	//converted to direct{name: 'Avatar_setLowPassFilter', args: ['number'], retType: null},
 
 	// accept an integer pointer to the qWave as first arg
 	{name: 'wave_normalize', args: ['number'], retType: null},
 
 	// avatars - all accept an integer pointer to the avatar as first argument
 	{name: 'avatar_loadViewBuffer', args: ['number'], retType:  'number'},
+
+	// ?? this really has no return value ??
 	{name: 'avatar_oneIteration', args: ['number'], retType: 'number'},
+
 	{name: 'avatar_askForFFT', args: ['number'], retType: null},
 	{name: 'avatar_delete', args: ['number'], retType: null},
 
 	// views
 	{name: 'avatar_getViewBuffer', args: ['number'], retType: 'number'},
-	//converted to direct{name: 'qViewBuffer_loadViewBuffer', args: ['number'], retType:  'number'},
 	{name: 'avatar_dumpViewBuffer', args: ['number', 'string'], retType: null},
 
 ];

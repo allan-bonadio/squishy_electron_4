@@ -4,6 +4,7 @@
 */
 
 import {abstractDrawing} from './abstractDrawing';
+// eslint-disable-next-line no-unused-vars
 import {viewUniform, viewAttribute} from './viewVariable';
 
 let traceDumpVertices = false;

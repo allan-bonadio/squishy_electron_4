@@ -285,6 +285,7 @@ double qFlick::innerProduct(void) {
 }
 
 // normalize the top of the stack of waves; needs at least two waves in the flick
+// does a VISSCHER normalize!
 // Normalize (should be) always idempotent;
 // anything else you wana do, make your own function
 void qFlick::normalize(void) {

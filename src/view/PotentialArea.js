@@ -18,7 +18,7 @@ export const spongeFactor = 100;
 
 let tracePotentialArea = false;
 let traceRendering = false;
-let traceDragging = false;
+let traceDragging = true;
 let tracePathAttribute = false;  // big output from one line
 
 // ultimately, this is a <svg node with a <path inside it

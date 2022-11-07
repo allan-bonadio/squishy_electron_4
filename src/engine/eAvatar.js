@@ -100,8 +100,15 @@ class eAvatar {
 		if (traceVBuffer)
 			this.dumpViewBuffer(`afterLoadViewBuffer`);
 	}
-	oneIteration() { return qe.avatar_oneIteration(this.pointer) }
-	askForFFT() { qe.avatar_askForFFT(this.pointer) }
+
+	// can throw std::runtime_error("divergence")
+	oneIteration() {
+		qe.avatar_oneIteration(this.pointer);
+	}
+
+	askForFFT() {
+		qe.avatar_askForFFT(this.pointer);
+	}
 
 	// delete the eAvatar and qAvatar and its owned buffers
 	deleteAvatar() {

@@ -17,7 +17,7 @@ export class viewVariable {
 	// getFunc will be called before each frame to refresh the value
 	constructor(varName, drawing, getFunc) {
 		this.drawing = drawing;
-		const gl = this.gl = drawing.gl;
+		this.gl = drawing.gl;
 		this.getFunc = getFunc;
 
 		this.varName = varName;
@@ -211,7 +211,6 @@ export class viewAttribute extends viewVariable {
 			}
 		}
 	}
-
 }
 
 

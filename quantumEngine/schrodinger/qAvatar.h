@@ -63,7 +63,10 @@ struct qAvatar {
 	// mostly for debugging
 	char label[LABEL_LEN + 1];
 
-	// for alignment, put these last
+	// for alignment: put these last
+
+	// true if an iteration is running; set/unset in ::oneIteration()
+	// For interactive simulation switch, see isTimeAdvancing in JS.
 	bool isIterating;
 
 	// please do an FFT after the current iteration ends

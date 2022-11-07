@@ -73,6 +73,7 @@ export class WaveView extends React.Component {
 			this.mainEAvatar = space.mainEAvatar;
 		})
 		.catch(ex => {
+			// eslint-disable-next-line no-ex-assign
 			ex = interpretCppException(ex);
 			console.error(ex.stack || ex.message || ex);
 			//debugger;

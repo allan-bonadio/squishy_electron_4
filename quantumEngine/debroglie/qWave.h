@@ -32,7 +32,7 @@ struct qWave : public virtual qBuffer {
 
 
 
-// (maybe obsolete...)
+// (maybe obsolete...  might use this for MP)
 // a flick is a sequence of Wave buffers.  Used for visscher waves.
 // Multiple complex buffers; they all share the same characteristics in the qWave fields.
 // Acts like a qWave that only points to the 'current' buffer.

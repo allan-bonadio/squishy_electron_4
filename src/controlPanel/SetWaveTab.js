@@ -72,6 +72,7 @@ class SetWaveTab extends React.Component {
 			this.setState({space});
 		})
 		.catch(ex => {
+			// eslint-disable-next-line no-ex-assign
 			ex = interpretCppException(ex);
 			console.error(ex.stack || ex.message || ex);
 			//debugger;

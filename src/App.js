@@ -10,6 +10,7 @@ import SquishPanel from './SquishPanel';
 import CommonDialog from './widgets/CommonDialog';
 //import {dumpJsStack} from './utils/errors';
 
+let traceResize = false;
 
 class App extends React.Component {
 	constructor(props) {
@@ -37,12 +38,12 @@ class App extends React.Component {
 
 	/* ************************************************ App */
 
-	// constructor runs twice, so do this once here
 	componentDidMount() {
-		// keep track of any window width changes, to reset the svg
+		// keep track of any window width changes, to reset the canvas and svg
 		// add listener only executed once
 		window.addEventListener('resize', ev => {
-			console.log(` window resize to ${ev.currentTarget.innerWidth}==> `, ev);
+			if (traceResize)
+				console.log(` window resize to ${ev.currentTarget.innerWidth}==> `, ev);
 			this.setState({innerWindowWidth: ev.currentTarget.innerWidth})
 		});
 	}

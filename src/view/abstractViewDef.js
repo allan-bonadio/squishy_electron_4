@@ -165,35 +165,15 @@ export class abstractViewDef {
 	// Should be done ONCE when canvas & avatar are created, or recreated.
 	// NOT upon every repaint!!
 	createVariablesOnDrawings() {
-		const gl = this.gl;
-
 		this.drawings.forEach(drawing => {
 			drawing.setDrawing();
-//			gl.useProgram(drawing.program);
-//			gl.bindVertexArray(drawing.vao);
-
 			drawing.createVariables();
 		});
 	}
 
-
-	// // i think this is for webgl 2:
-	// //		var vao = this.vaoExt.createVertexArrayOES();
-	// //		this.vaoExt.bindVertexArrayOES(vao);
-	// //		this.vao = vao;
-	// //		gl.enableVertexAttribArray(cornerAttributeLocation);
-	// //
-	// //		const size = 2;          // 2 components per iteration
-	// //		const type = gl.FLOAT;   // the data is 32bit floats
-	// //		const normalize = false; // don't normalize the data
-	// //		const stride = 0;        // 0 = move forward size * sizeof(type) each iteration to get the next position
-	// //		const offset = 0;        // start at the beginning of the vBuffer
-	// //		gl.vertexAttribPointer(cornerAttributeLocation, size, type, normalize, stride, offset);
-
 	// reload ALL the variables on this view
 	// should be done once before every repaint
 	reloadAllVariables() {
-		const gl = this.gl;
 		this.drawings.forEach(drawing => {
 			drawing.setDrawing();
 //			gl.useProgram(drawing.program);
@@ -227,13 +207,10 @@ export class abstractViewDef {
 	drawAllDrawings() {
 		// reloadAllVariables() done in GLView
 		// not specific to any drawing; I guess it's kindof a drawing itself
-		const gl = this.gl;
 		this.drawBackground();
 
 		this.drawings.forEach(drawing => {
 			drawing.setDrawing();
-//			gl.useProgram(drawing.program);
-//			gl.bindVertexArray(drawing.vao);
 			drawing.draw();
 		});
 	}

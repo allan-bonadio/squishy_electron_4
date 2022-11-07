@@ -5,6 +5,7 @@
 
 import {abstractViewDef} from './abstractViewDef';
 import {flatDrawing} from './flatDrawing';
+// eslint-disable-next-line no-unused-vars
 import {ticDrawing} from './ticDrawing';
 
 class flatDrawingViewDef extends abstractViewDef {
@@ -40,3 +41,4 @@ class flatDrawingViewDef extends abstractViewDef {
 }
 
 export default flatDrawingViewDef;
+
