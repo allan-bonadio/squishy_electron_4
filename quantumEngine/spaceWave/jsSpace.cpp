@@ -48,11 +48,8 @@ void avatar_oneIteration(qAvatar *pointer) { pointer->oneIteration(); }
 void avatar_askForFFT(qAvatar *pointer) { pointer->askForFFT(); }
 
 // this will normalize with the C++ normalize
-void wave_normalize(qWave *qwave) //{ pointer->normalize(); }
-{
-	//printf("wave_normalize(%p) before\n", qwave);
+void wave_normalize(qWave *qwave) {
 	qwave->normalize();
-	//printf("wave_normalize(%p) done\n", qwave);
 }
 
 /* ******************************************************** space creation from JS */
