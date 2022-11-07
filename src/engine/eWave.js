@@ -224,7 +224,7 @@ class eWave {
 			wave[ix2+1] *= factor;
 		}
 
-		return iProd;  // unused
+		return iProd;
 	}
 
 	// I can't get this one to work...
@@ -310,29 +310,53 @@ class eWave {
 	}
 
 	// freq is just like circular, although as a fraction of the pulseWidth instead of N
-	// 2stdDev is width of the packet, as percentage of N (0%...100%).
+	// pulseWidthUi is width of the packet, as percentage of N (0%...100%).
 	// offset is how far along is the peak, as an integer X value (0...N).
 	setGaussianWave(freqUi, pulseWidthUi, offsetUi) {
-		const wave = this.wave;
-		const {start2, end2, N} = this.space.startEnd2;
-		let offset = offsetUi * N / 100;  // now in units of X
-		let pulseWidth = pulseWidthUi * N / 100;  // now in units of X
-		const freq = Math.round(freqUi);
-		if (traceSetFamiliarWave) console.log(`🌊  setGaussianWave freq=${freqUi} => ${freq} `+
-			`  offset=${offsetUi}% => ${offset}   pulseWidth=${pulseWidthUi}% => ${pulseWidth}`)
+		const {start, end, N} = this.space.startEnd;
+		let pulseWidth = pulseWidthUi * N / 100;  // now in units of X; needn't be an integer
+		let freq = freqUi;
+		if (this.continuum == qe.contENDLESS)
+			freq = Math.round(freq);  // must be an integer if endless
 
-		// start with a circular wave
+		// must be half-odd-integer cuz the peak is between two integers..
+		// EXCEPT make it point to the right side of the peak to keep it an int.
+		let offset = Math.round(offsetUi * N / 100 + .5);  // now in units of X
+		if (traceSetFamiliarWave) console.log(`🌊  setGaussianWave freq=${freqUi} => ${freq} `+
+			`  offset=${offsetUi}% => ${offset}   pulseWidth=${pulseWidthUi}% => ${pulseWidth.toFixed(4)}`)
+
+		// first, make the gaussian.  For Endless, need to wrap it around.
+		// Either way, make it 2 x nStates long, with the peak in the middle (at
+		// edge between first N and second N).  But, real.
+		let gaussian = new Float64Array(2 * N);
+		const s2 = pulseWidth ** -2;  // 1/stddev**2 sortof
+		for (let ix = 0; ix < 2 * N; ix++) {
+			const 𝜟 = ix - N;
+			gaussian[ix] = Math.exp(-𝜟 * 𝜟 * s2);
+		}
+
+		// there's a problem when you chop it off at the ends for Endless.  You
+		// don't want to leave a sharp corner as that will dominate the whole
+		// thing and mess it up.  For Well, it's OK.
+		// I fitted a quadradic to hit points 1 and 2 at ±3/2 and ±5/2, then plugged in ±1/2.
+		let first = (4 * gaussian[1] - gaussian[2]) / 3;
+		gaussian[0] = first;
+
+		// wrap it around; we have 2N points right now
+		for (let ix = 0; ix < N; ix++)
+			gaussian[ix] += gaussian[ix + N];
+
+		// then, take a circular wave
 		this.setCircularWave(freq);
 
-		// modulate with a gaussian, centered at the offset, with pulseWidth
-		// tweak numbers to suit the ui
-		const s2 = pulseWidth ** -2;  // 1/stddev**2 sortof
-		for (let ix2 = start2; ix2 < end2; ix2 += 2) {
-			let ix = ix2 / 2;
-			const 𝜟 = (ix - offset) % N;
-			const stretch = Math.exp(-𝜟 * 𝜟 * s2);
-			wave[ix2] *= stretch;
-			wave[ix2 + 1] *= stretch;
+		// and modulate it by the gaussian, as offsetted
+		const start2 = start * 2;
+		let end2 = end * 2;
+		const wave = this.wave;
+		for (let ix2 = start2, ix = 0; ix2 < end2; ix2 += 2, ix++) {
+			let oix = (ix - offset + N) % N;  // +N to avoid mod of a negative number problems
+			wave[ix2] *= gaussian[oix];
+			wave[ix2 + 1] *= gaussian[oix];
 		}
 	}
 
