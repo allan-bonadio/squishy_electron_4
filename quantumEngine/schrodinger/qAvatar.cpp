@@ -186,6 +186,7 @@ void qAvatar::resetCounters(void) {
 	iterateSerial = 0;
 }
 
+
 /* ********************************************************** dumpObj  */
 
 void qAvatar::dumpObj(const char *title) {
@@ -283,8 +284,17 @@ void qAvatar::oneIteration() {
 		if (traceB4nAfterFFSpectrum && dangerousTimes) analyzeWaveFFT(qwave, "after FF");
 	}
 
-	// need it; somehow? not done in JS.  YES IT IS!  remove this when you have the oppty
-	//theQViewBuffer->loadViewBuffer();
+	double iProd = qwave->normalize();
+	if (dumpFFHiResSpectums) qwave->dumpHiRes("wave END fourierFilter() after normalize");
+	if (iProd > 1.1) {
+		char buf[64];
+		sprintf(buf, "🔥 🧨 wave is diverging, iProd=%10.4g 🔥 🧨", iProd);
+		if (iProd > 3) {
+			qwave->dump(buf);
+			throw std::runtime_error("diverged");  // js code intercepts this exact spelling
+		}
+	}
+
 
 	if (traceJustWave) {
 		qwave->dump("      traceJustWave at end of iteration", true);
@@ -350,8 +360,6 @@ void qAvatar::fourierFilter(int lowPassFilter) {
 	if (dumpFFHiResSpectums) qspect->dumpSpectrum("qspect right at END of fourierFilter()");
 	qspect->generateWave(qwave);
 	if (dumpFFHiResSpectums) qwave->dumpHiRes("wave END fourierFilter() b4 normalize");
-	qwave->normalize();
-	if (dumpFFHiResSpectums) qwave->dumpHiRes("wave END fourierFilter() after normalize");
 }
 
 

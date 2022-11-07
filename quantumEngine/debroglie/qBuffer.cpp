@@ -126,9 +126,9 @@ qBuffer::~qBuffer() {
 double qBuffer::dumpRow(char buf[200], int ix, qCx w, double *pPrevPhase, bool withExtras) {
 	double re = w.re;
 	double im = w.im;
-	double mag = 0;
+	double norm = 0;
 	if (withExtras) {
-		mag = re * re + im * im;
+		norm = w.norm();
 
 		// if re and im are zero (or close) then the angle is undefined.  Use NaN.
 		double phase = NAN;
@@ -142,13 +142,14 @@ double qBuffer::dumpRow(char buf[200], int ix, qCx w, double *pPrevPhase, bool w
 
 		// if this or the previous point was (0,0) then the phase and dPhase will be NAN, and they print that way
 		snprintf(buf, 200, "[%3d] (%8.4lf,%8.4lf) | %8.3lf %9.3lf %8.4lf  m𝜓",
-			ix, re, im, phase, dPhase, mag * 1000);
+			ix, re, im, phase, dPhase, norm * 1000);
 		*pPrevPhase = phase;
 	}
 	else {
-		snprintf(buf,200, "[%3d] (%8.4lf,%8.4lf)", ix, re, im);
+		snprintf(buf,200, "[%3d] (%8.4lf,%8.4lf)    ... norm=%lg", ix, re, im, norm);
+		//snprintf(buf,200, "[%3d] (%8.4lf,%8.4lf)", ix, re, im);
 	}
-	return mag;
+	return norm;
 }
 
 // you can use this on waves or spectrums; for the latter, leave off the start and the rest
@@ -176,8 +177,8 @@ void qBuffer::dumpSegment(qCx *wave, bool withExtras, int start, int end, int co
 	}
 
 	for (ix = start; ix < end; ix++) {
-		innerProd += qBuffer::dumpRow(buf, ix, wave[ix], &prevPhase, withExtras);
-		printf("\n%s", buf);
+		innerProd += dumpRow(buf, ix, wave[ix], &prevPhase, withExtras);
+		printf(" \n%s", buf);
 	}
 
 	if (continuum) {
@@ -185,7 +186,7 @@ void qBuffer::dumpSegment(qCx *wave, bool withExtras, int start, int end, int co
 		printf("\nend %s", buf);
 	}
 
-	printf("    inner product=%11.8lf\n", innerProd);
+	printf("    inner product=%11.8lg\n", innerProd);
 }
 
 // any wave, probably shouldn't call this
@@ -196,7 +197,7 @@ void qBuffer::dumpThat(qCx *wave, bool withExtras) {
 
 // works on any buffer but originally written for qWaves
 void qBuffer::dump(const char *title, bool withExtras) {
-	printf("\n🌊🌊 qWave ==== %c%c%c%c  %p->%p | %s ",
+	printf(" \n🌊🌊 qBuffer ==== a '%c%c%c%c'  %p->%p | %s ",
 		magic >> 24, magic >> 16, magic >> 8, magic, this, wave, title);
 	qBuffer::dumpSegment(wave, withExtras, start, end, continuum);
 	//space->dumpThat(wave, withExtras);
@@ -299,37 +300,37 @@ double qBuffer::innerProduct(void) {
 	return sum;
 }
 
-
-
 // enforce ⟨𝜓 | 𝜓⟩ = 1 by dividing out the current magnitude sum.
-// BUffer must be installed as well as nPoints, start and end
-void qBuffer::normalize(void) {
+// Buffer must be installed as well as nPoints, start and end
+double qBuffer::normalize(void) {
 	if (traceNormalize) {
 		printf("qBuffer:: 🍕starting normalize, this=%p --> %p\n", this, wave);
-		dump("qBuffer:: 🍕what we're dealing with", true);
+		dump("qBuffer::    🍕what we're dealing with", true);
 	}
 
-	double mag = innerProduct();
+	double iProd = innerProduct();
 	if (traceNormalize) {
-		printf("🍕 normalizing qBuffer.  innerProduct=%lf\n", mag);
+		printf("🍕 normalizing qBuffer.  innerProduct=%lf\n", iProd);
 	}
-	if (mag == 0. || ! isfinite(mag)) {
+	if (iProd == 0. || ! isfinite(iProd)) {
 		// ALL ZEROES!??! this is bogus, shouldn't be happening.
 		// Well, except that brand new buffers are initialized to zeroes.
 		throw std::runtime_error("tried to normalize a buffer with all zeroes!");
 	}
-	else {
-		// normal functioning
-		const double factor = pow(mag, -0.5);
-		if (traceNormalize) {
-			printf("🍕 normalizing qBuffer.  factor=%lf, start=%d, end=%d, N=%d\n",
-				factor, start, end, end - start);
-		}
 
-		for (int ix = start; ix < end; ix++)
-			wave[ix] *= factor;
+	// normal functioning
+	const double factor = pow(iProd, -0.5);
+	if (traceNormalize) {
+		printf("🍕 normalizing qBuffer.  factor=%lf, start=%d, end=%d, N=%d\n",
+			factor, start, end, end - start);
 	}
+
+	for (int ix = start; ix < end; ix++)
+		wave[ix] *= factor;
+
 	fixBoundaries();
+
+	return iProd;
 }
 
 /* ****************************************************************************  setting */
@@ -391,13 +392,13 @@ void qBuffer::setCircularWave(double frequency, int first) {
 	}
 
 	normalize();
-	fixBoundaries();
+	// done in normalize fixBoundaries();
 }
 
-// just for C++ testing
-// previous contents of target gone.  Must be the size you want.
-// Is value height starting at ix=first, switches to -height after wavelength/2
-// then repeats.  If wavelength is odd, inbetween psi is 0
+// just for C++ testing.  first=> phase.  most values ±height.
+// previous contents of target gone.  Buffer must be the size you want.
+// [ix=first] = +height, switches to -height after wavelength/2
+// then repeats.  If wavelength is odd, in between psi is 0
 void qBuffer::setSquareWave(int wavelength, int first, qCx height) {
 	int N = end - start;
 
@@ -424,7 +425,7 @@ void qBuffer::setSquareWave(int wavelength, int first, qCx height) {
 
 
 // add these two waves, modulated by the coefficients, leaving result in this->wave
-// un-normalized, un-fixed boundaries.  Either can be this if you want, no probs
+// UN-normalized, UN-fixed boundaries.  Either can be this if you want, no probs
 void qBuffer::add(qBuffer *qwave1, double coeff1, qBuffer *qwave2, double coeff2) {
 	int N = end - start;
 	qCx *wave1 = qwave1->wave + qwave1->start;
