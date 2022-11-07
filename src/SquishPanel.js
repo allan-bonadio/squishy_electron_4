@@ -320,7 +320,7 @@ export class SquishPanel extends React.Component {
 			// eslint-disable-next-line no-ex-assign
 			ex = interpretCppException(ex);
 			CommonDialog.openErrorDialog(
-				ex.message == 'diverged' ? SquishPanel.divergedBlurb || ex, 'while iterating');
+				ex.message == 'diverged' ? SquishPanel.divergedBlurb : ex, 'while iterating');
 		}
 
 		if (traceSquishPanel) console.log(`SquishPanel. did iterate`);
