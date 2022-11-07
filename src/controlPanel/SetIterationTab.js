@@ -1,5 +1,5 @@
 /*
-** SetIterationTab -- tab for adjusting dt, stepsPerIteration, etc
+** SetIterationTab -- tab for adjusting deltaT, stepsPerIteration, etc
 ** Copyright (C) 2022-2022 Tactile Interactive, all rights reserved
 */
 
@@ -7,11 +7,14 @@ import PropTypes from 'prop-types';
 import LogSlider from '../widgets/LogSlider';
 import TextNSlider from '../widgets/TextNSlider';
 import {alternateMinMaxs} from '../utils/storeSettings';
+
+let traceSliderChanges = true;
+
 // set prop types
 function setPT() {
 	SetIterationTab.propTypes = {
-		dt: PropTypes.number.isRequired,
-		setDt: PropTypes.func.isRequired,
+		deltaT: PropTypes.number.isRequired,
+		setDeltaT: PropTypes.func.isRequired,
 		stepsPerIteration: PropTypes.number.isRequired,
 		setStepsPerIteration: PropTypes.func.isRequired,
 		lowPassFilter: PropTypes.number.isRequired,
@@ -46,20 +49,21 @@ function SetIterationTab(props) {
 			<h3>Iteration Controls</h3>
 
 			<LogSlider
-				unique='dtSlider'
-				className='dtSlider cpSlider'
-				label='dt'
-				minLabel='.00001'
-				maxLabel='1.0'
+				unique='deltaTSlider'
+				className='deltaTSlider cpSlider'
+				label='𝚫t each iteration'
+				minLabel='0.01'
+				maxLabel='100.0'
 
-				current={props.dt}
-				sliderMin={alternateMinMaxs.iterationParams.dt.min}
-				sliderMax={alternateMinMaxs.iterationParams.dt.max}
+				current={props.deltaT}
+				sliderMin={alternateMinMaxs.iterationParams.deltaT.min}
+				sliderMax={alternateMinMaxs.iterationParams.deltaT.max}
 				stepsPerDecade={6}
 
 				handleChange={(power, ix) => {
-					console.info(`handleChange dt   ix=${ix}  power=${power}`);
-					props.setDt(power);
+					if (traceSliderChanges)
+						console.log(`🏃🏽 🏃🏽 ch 𝚫t   ix=${ix}  power=${power}`);
+					props.setDeltaT(power);
 				}}
 			/>
 			<LogSlider
@@ -75,7 +79,8 @@ function SetIterationTab(props) {
 				stepsPerDecade={6}
 
 				handleChange={(power, ix) => {
-					console.info(`handleChange stepsPerIteration::  ix=${ix}  power=${power}`);
+					if (traceSliderChanges)
+						console.log(`🏃🏽 🏃🏽 ch stepsPerIteration::  ix=${ix}  power=${power}`);
 					props.setStepsPerIteration(power);
 				}}
 			/>
@@ -88,7 +93,8 @@ function SetIterationTab(props) {
 				step={aStep}
 				style={{width: '80%'}}
 				handleChange={newValue => {
-						console.info(`handleChange Low Pass Filter:: ${newValue}  `);
+						if (traceSliderChanges)
+						console.log(`🏃🏽 🏃🏽 ch Low Pass Filter:: ${newValue}  `);
 						props.setLowPassFilter(+newValue);
 					}}
 			/>

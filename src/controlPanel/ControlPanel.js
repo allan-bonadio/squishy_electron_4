@@ -31,6 +31,7 @@ export class ControlPanel extends React.Component {
 		// the WaveView on the screen
 		// when user chooses 'set wave'
 		//setMainWave: PropTypes.func.isRequired,
+		//// this should move into controlPanel from squishPanel
 		setPotential: PropTypes.func.isRequired,
 
 		isTimeAdvancing: PropTypes.bool.isRequired,  // ie is it running?
@@ -169,8 +170,8 @@ export class ControlPanel extends React.Component {
 
 		case 'iteration':
 			return <SetIterationTab
-				dt={p.dt}
-				setDt={p.setDt}
+				deltaT={p.deltaT}
+				setDeltaT={p.setDeltaT}
 				stepsPerIteration={p.stepsPerIteration}
 				setStepsPerIteration={p.setStepsPerIteration}
 				lowPassFilter={p.lowPassFilter}

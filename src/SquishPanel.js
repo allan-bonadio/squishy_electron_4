@@ -17,7 +17,6 @@ import {eSpace} from './engine/eSpace';
 // import eWave from './engine/eWave';
 import {create1DMainSpace, eSpaceCreatedPromise} from './engine/eEngine';
 
-
 import {interpretCppException} from './utils/errors';
 //import {interpretCppException, dumpJsStack} from './utils/errors';
 
@@ -25,11 +24,9 @@ import qe from './engine/qe';
 
 import WaveView from './view/WaveView';
 import ResolutionDialog from './controlPanel/ResolutionDialog';
+import CommonDialog from './widgets/CommonDialog';
 import {setFamiliarPotential} from './utils/potentialUtils';
 
-// why doesn't this work?!?!!?
-//import {storeSettings} from './utils/storeSettings';
-//import storeSettings from './utils/storeSettings';
 import {getASetting, storeASetting} from './utils/storeSettings';
 
 // runtime debugging flags - you can change in the debugger or here
@@ -44,7 +41,21 @@ if (typeof storeSettings == 'undefined') debugger;
 
 const DEFAULT_VIEW_CLASS_NAME = 'flatDrawingViewDef';
 
+const N_EXTRA_STEPS = 1;
+
 window.squishPanelConstructed = 0;
+
+// figure out how long requestAnimationFrame()'s period is
+let rafPeriod;
+setTimeout(() => {
+	requestAnimationFrame(time => {
+		let firstTime = time;
+		requestAnimationFrame(time => {
+			rafPeriod = time - firstTime;
+			console.log(`⏱ rafPeriod = ${rafPeriod}`);
+		});
+	});
+}, 5000);
 
 export class SquishPanel extends React.Component {
 	static propTypes = {
@@ -54,7 +65,6 @@ export class SquishPanel extends React.Component {
 	};
 
 	/* ************************************************ construction & reconstruction */
-
 	constructor(props) {
 		super(props);
 
@@ -80,9 +90,6 @@ export class SquishPanel extends React.Component {
 			// the eSpace
 			space: null,
 
-			// see the view dir, this is for the viewDef instance.  Created in GLView
-			//effectiveView: null,
-
 			// this is controlled by the user (start/stop/step buttons)
 			// does not really influence the rendering of the canvas... (other than running)
 			isTimeAdvancing: getASetting('iterationParams', 'isTimeAdvancing'),
@@ -92,8 +99,8 @@ export class SquishPanel extends React.Component {
 			// eg the menu on the CPToolbar says 10/sec, so this becomes 100
 			iteratePeriod: getASetting('iterationParams', 'iteratePeriod'),
 
-			// defaults for sliders for dt & spi
-			dt: getASetting('iterationParams', 'dt'),
+			// defaults for sliders for deltaT & spi
+			deltaT: getASetting('iterationParams', 'deltaT'),
 			stepsPerIteration: getASetting('iterationParams', 'stepsPerIteration'),
 			lowPassFilter: getASetting('iterationParams', 'lowPassFilter'),
 
@@ -148,8 +155,10 @@ export class SquishPanel extends React.Component {
 			this.setState({space});
 
 			this.mainEAvatar = space.mainEAvatar;
-			this.mainEAvatar.dt = s.dt;
-			this.mainEAvatar.stepsPerIteration = s.stepsPerIteration;
+			this.setDeltaT(s.deltaT);
+			//this.mainEAvatar.dt = s.deltaT / (s.stepsPerIteration + N_EXTRA_STEPS);  // always one more!
+			this.setStepsPerIteration(s.stepsPerIteration);
+			//this.mainEAvatar.stepsPerIteration = s.stepsPerIteration;
 
 			if (tracePromises) console.log(`SquishPanel.compDidMount about to animateHeartbeat`);
 
@@ -163,13 +172,14 @@ export class SquishPanel extends React.Component {
 		})
 		.catch(ex => {
 			//stackTrace();
+			// eslint-disable-next-line no-ex-assign
 			ex = interpretCppException(ex);
 			if ('from C++: Trying to start a new space when one already exists!' == ex.message) {
-				// obnoxious hot reloading
+				// obnoxious hot reloading; always end up here, so let me reload the right way
 				debugger;
 				location = location;  // eslint-disable-line no-restricted-globals
 				debugger;
-				return;  // needed?
+				return;  // needed?  no.
 			}
 			//if (typeof ex == 'object')
 			console.error(`error  SquishPanel.didMount.then():`, ex.stack || ex.message || ex);
@@ -296,16 +306,24 @@ export class SquishPanel extends React.Component {
 
 	/* ******************************************************* iteration & animation */
 
+	static divergedBlurb = `Sorry, but your quantum wave diverged!  This isn't your fault; it's a bug or limitation of the mathematical engine - it's just not as accurate as the real thing, and sometimes it just runs off the rails.  Unfortunately, you'll have to start over with a new wave.  Click on the Wave tab below and click Set Wave.`;
+
 	// do one integration iteration
 	crunchOneIteration() {
 		if (traceSquishPanel) console.log(`SquishPanel. about to iterate`);
 
-		// (actually many visscher steps)
-		this.mainEAvatar.oneIteration();
+		try {
+			// hundreds of visscher steps
+			this.mainEAvatar.oneIteration();
+		} catch (ex) {
+			this.setState({isTimeAdvancing: false});
+			// eslint-disable-next-line no-ex-assign
+			ex = interpretCppException(ex);
+			CommonDialog.openErrorDialog(
+				ex.message == 'diverged' ? SquishPanel.divergedBlurb || ex, 'while iterating');
+		}
 
 		if (traceSquishPanel) console.log(`SquishPanel. did iterate`);
-
-
 
 		if (dumpingTheViewBuffer)
 			this.dumpViewBuffer('SquishPanel. did iterate()');
@@ -379,23 +397,30 @@ export class SquishPanel extends React.Component {
 	// and maintaining that as long as the website is running.  Even if there's no apparent motion.
 	// it will advance one heartbeat in animation time, which every so often calls iterateOneIteration()
 	animateHeartbeat =
-	now => {
+	iterationStart => {
 		const s = this.state;
 
 		// no matter how often animateHeartbeat() is called, it'll only iterate once in the iteratePeriod
-		if (now >= this.timeForNextTic) {
+		if (iterationStart >= this.timeForNextTic) {
 			// no point in calling it continuously if it's not doing anything
 			if (s.isTimeAdvancing)
 				this.iterateOneIteration(true, true);
 			//this.iterateOneIteration(s.isTimeAdvancing, false);
 
-			// remember (now) is the one passed in, before iterateOneIteration(),
-			// so periods are exactly timed (unless it's so slow that we get behind)
-			this.timeForNextTic = now + s.iteratePeriod;
+			// remember (iterationStart) is the one passed in, before
+			// iterateOneIteration(), so periods are exactly timed (unless it's so slow
+			// that we get behind).  Speaking of which, how far behind are we?
+			let rightNow = 	performance.now();
+			let itReallyTook = (rightNow - iterationStart) / s.iteratePeriod;
+
+			//// FOR NOW, avoid overlapping heartbeats.  They become recursive and the
+			//// browser really slows down, and sometimes crashes
+			this.timeForNextTic = rightNow + s.iteratePeriod;
+			//this.timeForNextTic = iterationStart + s.iteratePeriod;
 		}
 
 		// this is in milliseconds
-		const timeSince = now - this.lastAniIteration;
+		const timeSince = iterationStart - this.lastAniIteration;
 //		if (timeSince < 8) {
 //			console.log(` skipping an ani frame cuz we got too much: ${timeSince} ms`)
 //			return;  // we might have more than one cycle in here... this should fix it
@@ -403,12 +428,12 @@ export class SquishPanel extends React.Component {
 
 		if (isNaN(timeSince)) debugger;
 		//console.log(` maintaining the ReqAniFra cycle: ${timeSince.toFixed(1)} ms`)
-		this.lastAniIteration = now;
+		this.lastAniIteration = iterationStart;
 
 		requestAnimationFrame(this.animateHeartbeat);
 	}
 
-	/* ******************************************************* runningOneCycle */
+	/* ******************************************************* runningOneCycle of circular wave*/
 
 	// use for benchmarking with a circular wave.  Will start iteration, and stop after
 	// the leftmost state is at its peak.  Then display stats.
@@ -434,7 +459,7 @@ export class SquishPanel extends React.Component {
 			if (real0 < this.prevReal0) {
 				// we're going down - first half of the cycle
 				if (this.goingUp) {
-					// if we were going up, we've gone just 1 dt past the peak.  Good time to stop.
+					// if we were going up, we've gone just 1 deltaT past the peak.  Good time to stop.
 					this.runningOneCycle = false;
 
 					this.stopIterating();
@@ -520,14 +545,17 @@ export class SquishPanel extends React.Component {
 	}
 
 	/* ******************************************************* user settings */
+	// iteration params managed from SquishPanel; others managed from ControlPanel
+	// can i move these to the control panel?
 
-	setDt = dt => {
-		this.setState({dt});
-		this.mainEAvatar.dt = dt;
+	// dt is time per step, for the algorithm; deltaT is time per iteration, the user/UI control)
+	setDeltaT = deltaT => {
+		deltaT = storeASetting('iterationParams', 'deltaT', deltaT);
+		this.setState({deltaT});
+		//this.mainEAvatar.dt = deltaT;
+		this.mainEAvatar.dt = deltaT / (this.state.stepsPerIteration + N_EXTRA_STEPS);  // always one more!
 		//qe.Avatar_setDt(dt);
 		//if (typeof storeSettings != 'undefined' && storeSettings.iterationParams)  // goddamned bug in importing works in constructor
-		let ddtt = storeASetting('iterationParams', 'dt', dt);
-		this.setState({dt: ddtt});
 	}
 
 	setStepsPerIteration =
@@ -539,9 +567,10 @@ export class SquishPanel extends React.Component {
 			this.setState({stepsPerIteration});
 			this.mainEAvatar.stepsPerIteration = stepsPerIteration;
 		} catch (ex) {
-			let exc = interpretCppException(ex);
+			// eslint-disable-next-line no-ex-assign
+			ex = interpretCppException(ex);
 			console.error(`setStepsPerIteration error:`,
-				exc.stack || exc.message || exc);
+				ex.stack || ex.message || ex);
 			////debugger;
 		}
 	}
@@ -622,8 +651,8 @@ export class SquishPanel extends React.Component {
 					iterateFrequency={1000 / s.iteratePeriod}
 					setIterateFrequency={freq => this.setIterateFrequency(freq)}
 
-					dt={s.dt}
-					setDt={this.setDt}
+					deltaT={s.deltaT}
+					setDeltaT={this.setDeltaT}
 					stepsPerIteration={s.stepsPerIteration}
 					setStepsPerIteration={this.setStepsPerIteration}
 					lowPassFilter={s.lowPassFilter}

@@ -181,7 +181,7 @@ makeParam('potentialParams', 'valleyOffset', 50, {min: 0, max: 100});
 /* ************************************ iterationParams */
 makeParam('iterationParams', 'isTimeAdvancing', false,  [false, true]);
 makeParam('iterationParams', 'iteratePeriod', 50, {min: 16, max: 60_001});
-makeParam('iterationParams', 'dt', 0.002, {min: 1e-6, max: 1.0, });
+makeParam('iterationParams', 'deltaT', 1, {min: .01, max: 100.0, });
 makeParam('iterationParams', 'stepsPerIteration', 100, {min: 10, max: 1e5});
 makeParam('iterationParams', 'lowPassFilter', 50, {min: 0, max: 75});
 
@@ -218,7 +218,7 @@ export function storeASetting(groupName, varName, newValue) {
 	|| !alternateStoreVerifiers[groupName]
 	|| !alternateStoreVerifiers[groupName][varName]) debugger;
 
-	// if bad value, just set to default
+	// if bad value, just set to default.  ////Should clamp continuum variables to min or max!
 	if (newValue === undefined || !alternateStoreVerifiers[groupName][varName](newValue))
 		newValue = alternateStoreDefaults[groupName][varName];
 
