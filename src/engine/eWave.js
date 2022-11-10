@@ -139,9 +139,10 @@ class eWave {
 				wave[j] = -99.;
 			// qBuffer::allocateWave fills to -77 (if trace turned on); allocateZeroedWave() leaves all zeroes
 		}
-		else
+		else {
+			debugger;
 			throw new Error(`call to construct eWave failed cuz bad waveArg=${waveArg}`);
-
+		}
 	}
 
 	/* **************************************************************** direct access */
@@ -259,7 +260,9 @@ class eWave {
 			w[end2+1] = w[3];
 			break;
 
-		default: throw new Error(`🚀  bad continuum '${continuum}' in  eSpace.fixThoseBoundaries()`);
+		default:
+			debugger;
+			throw new Error(`🚀  bad continuum '${continuum}' in  eSpace.fixThoseBoundaries()`);
 		}
 	}
 
@@ -428,6 +431,7 @@ class eWave {
 			break;
 
 		default:
+			debugger;
 			throw new Error(`bad waveParams.waveBreed=${waveParams.waveBreed} in setFamiliarWave()`);
 		}
 
