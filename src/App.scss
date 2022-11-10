@@ -185,8 +185,8 @@ button.round {
 #SimpleDialog, #ErrorDialog {
 	margin: 5em 25%;
 	padding: 2em;
-	border: 1px black solid;
-	box-shadow: 10px 5px 5px #0000;
+	border: 1px white solid;
+	box-shadow: 10px 5px 5px #0007;
 
 	p {
 		min-width: 30em;
@@ -205,8 +205,8 @@ button.round {
 	color: #fff;
 }
 #ErrorDialog {
-	background: #fa8;
-	color: #700;
+	background: #f88;
+	color: #000;
 }
 
 
