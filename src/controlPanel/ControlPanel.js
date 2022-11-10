@@ -13,24 +13,19 @@ import SetPotentialTab from './SetPotentialTab';
 import SetResolutionTab from './SetResolutionTab';
 import SetIterationTab from './SetIterationTab';
 import eSpace from '../engine/eSpace';
-import {storeASetting} from '../utils/storeSettings';
+import {getASetting, storeASetting, getAGroup, storeAGroup} from '../utils/storeSettings';
 //import {eSpaceCreatedPromise} from '../engine/eEngine';
 // import qe from '../engine/qe';
-
-import {getASetting} from '../utils/storeSettings';
-
 
 export class ControlPanel extends React.Component {
 	static propTypes = {
 		iterateAnimate: PropTypes.func.isRequired,
 		startStop: PropTypes.func.isRequired,
 		singleIteration: PropTypes.func.isRequired,
-		resetCounters: PropTypes.func.isRequired,
 
 		// these are the actual functions that change the main qWave and ultimately
 		// the WaveView on the screen
 		// when user chooses 'set wave'
-		//setMainWave: PropTypes.func.isRequired,
 		//// this should move into controlPanel from squishPanel
 		setPotential: PropTypes.func.isRequired,
 
@@ -61,10 +56,10 @@ export class ControlPanel extends React.Component {
 			// waveParams - Only change if user clicks setWave
 
 			// the wave params have to be analogous when the N changes
-			waveBreed: getASetting('waveParams', 'waveBreed'),
-			waveFrequency: getASetting('waveParams', 'waveFrequency'),  // an integer (but a well can have halfs?)
-			pulseWidth: getASetting('waveParams', 'pulseWidth'),  // a percentage
-			pulseOffset: getASetting('waveParams', 'pulseOffset'),  // also a percentage
+			//waveBreed: getASetting('waveParams', 'waveBreed'),
+			//waveFrequency: getASetting('waveParams', 'waveFrequency'),  // an integer (but a well can have halfs?)
+			//pulseWidth: getASetting('waveParams', 'pulseWidth'),  // a percentage
+			//pulseOffset: getASetting('waveParams', 'pulseOffset'),  // also a percentage
 
 			// state for potential resets - control panel only, setPotential()
 			//potentialBreed: getASetting('potentialParams', 'potentialBreed'),
@@ -74,6 +69,11 @@ export class ControlPanel extends React.Component {
 
 			showingTab: getASetting('miscParams', 'showingTab'),
 		}
+
+		// pour these directly into the initial state
+		let waveParams = getAGroup('waveParams');
+		let potentialParams = getAGroup('potentialParams');
+		Object.assign(this.state, waveParams, potentialParams);
 	}
 
 	/* *********************************** params */
@@ -88,33 +88,40 @@ export class ControlPanel extends React.Component {
 
 	// used to set any familiarParam value, pass eg {pulseWidth: 40}
 	// Sets state in control panel only, eg setWave panel settings
+	// obsolete; get rid of this someday////
 	setCPState =
 	(obj) => {
 		this.setState(obj);
 	}
 
-	// SetWave button
-	// this one is an event handler in the wave tab for the SetWave button
-	setMainWave =
+	// given these params, put it into effect and display it
+	displayMainWave =
 	waveParams => {
-		const {waveBreed, waveFrequency, pulseWidth, pulseOffset} = waveParams;
+		if (!this.props.space)
+			return;
 
-		// even if there's no space yet, let them store settings.  huh?
-		if (this.props.space) {
-			const mainEWave = this.props.space.mainEWave;
-			mainEWave.setFamiliarWave(waveParams);  // eSpace does this initially
-			let mainEAvatar = this.props.space.mainEAvatar;
-			mainEAvatar.elapsedTime = 0;
-			mainEAvatar.iterateSerial = 0;
-			mainEAvatar.doRepaint();
-		}
-
-		// and now's the time to remember what the user set it at for next time
-		storeASetting('waveParams', 'waveBreed', waveBreed);
-		storeASetting('waveParams', 'waveFrequency', waveFrequency);
-		storeASetting('waveParams', 'pulseWidth', pulseWidth);
-		storeASetting('waveParams', 'pulseOffset', pulseOffset);
+		const mainEWave = this.props.space.mainEWave;
+		mainEWave.setFamiliarWave(waveParams);  // eSpace does this initially
+		let mainEAvatar = this.props.space.mainEAvatar;
+		mainEAvatar.elapsedTime = 0;
+		mainEAvatar.iterateSerial = 0;
+		mainEAvatar.doRepaint();
 	}
+
+	// toolbar: reset wave button.  Display it from saved params
+	resetMainWave =
+	() => {
+		let waveParams = getAGroup('waveParams');
+		this.displayMainWave(waveParams);
+	}
+
+	// SetWave button in SetWaveTab: set it from passed in params, and save it
+	saveMainWave =
+	waveParams => {
+		this.displayMainWave(waveParams);
+		storeAGroup('waveParams', waveParams);
+	}
+
 
 	// fills in the potential buffer with values according to the potentialParams
 	// called when user clicks Valley potential or Flat potential
@@ -129,6 +136,16 @@ export class ControlPanel extends React.Component {
 		storeASetting('potentialParams', 'valleyPower', valleyPower);
 		storeASetting('potentialParams', 'valleyScale', valleyScale);
 		storeASetting('potentialParams', 'valleyOffset', valleyOffset);
+	}
+
+	toggleShowPotential =
+	ev => {
+		console.info(`toggleShowPotential `, ev)
+	}
+
+	slideWave =
+	ev => {
+		console.info(`slide wave `, ev)
 	}
 
 	setShowingTab =
@@ -151,7 +168,7 @@ export class ControlPanel extends React.Component {
 			// setMainWave() called when user clicks SetWave, fills the main wave
 			// waveParams handed in are the defaults as stored in storeSettings
 			return <SetWaveTab
-				setMainWave={this.setMainWave}
+				saveMainWave={this.saveMainWave}
 				waveParams={{waveBreed, waveFrequency, pulseWidth, pulseOffset,}}
 				setCPState={this.setCPState}
 				space={p.space}
@@ -202,10 +219,14 @@ export class ControlPanel extends React.Component {
 				isTimeAdvancing={p.isTimeAdvancing}
 				startStop={p.startStop}
 				singleIteration={p.singleIteration}
-				resetCounters={p.resetCounters}
 
 				iterateFrequency={p.iterateFrequency}
-				setIterateFrequency={this.setIterateFrequency}Ï
+				setIterateFrequency={this.setIterateFrequency}
+
+				resetMainWave={this.resetMainWave}
+				setPotentialHandler={this.setPotentialHandler}
+				toggleShowPotentiial={this.toggleShowPotentiial}
+				slideWave={this.slideWave}
 
 				N={p.N}
 				space={p.space}

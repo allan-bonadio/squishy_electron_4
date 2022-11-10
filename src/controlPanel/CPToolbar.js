@@ -15,12 +15,13 @@ function setPT() {
 
 		// tells if simulation is iterating
 		isTimeAdvancing: PropTypes.bool.isRequired,
-		resetCounters: PropTypes.func.isRequired,
 
 		iterateFrequency: PropTypes.number.isRequired,
 		setIterateFrequency: PropTypes.func.isRequired,
 		N: PropTypes.number.isRequired,
 		space: PropTypes.instanceOf(eSpace),
+
+		resetMainWave: PropTypes.func,
 	};
 }
 
@@ -85,14 +86,33 @@ function CPToolbar(props) {
 		</button>
 
 		<div className='toolbarThing'>
-			{props.N} states &nbsp;
+			<div className='toolbarThing'>
+				<div className='toolbarThing'>
+					resolution {props.N} &nbsp;
+				</div>
+
+				<button onClick={props.resetMainWave}>Reset Wave</button>
+				&nbsp;
+
+				<button onClick={props.setPotentialHandler}>Reset Potential</button>
+				&nbsp;
+			</div>
+
+			<div className='toolbarThing'>
+				<button onClick={ev => clickOnFFT(props.space)}>
+					FFT
+				</button>
+				&nbsp;
+
+				<label>
+					<input type='checkbox' selected onClick={props.toggleShowPotentiial} />
+					Show Potential
+				</label>
+				&nbsp;
+
+				➩ ↪︎ ↻ <input type='range' onClick={props.slideWave} /> ↺ ↩︎ ⇔ ⟺ ↔︎ ⬌ ➪
+			</div>
 		</div>
-
-		<button onClick={ev => clickOnFFT(props.space)}>
-			FFT
-		</button>
-		<button onClick={props.resetCounters}>Reset Counters</button>
-
 	</div>;
 }
 

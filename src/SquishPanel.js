@@ -37,7 +37,7 @@ let tracePromises = false;
 let traceSquishPanel = false;
 //let traceConstructor = false;
 
-if (typeof storeSettings == 'undefined') debugger;
+//if (typeof storeSettings == 'undefined') debugger;
 
 const DEFAULT_VIEW_CLASS_NAME = 'flatDrawingViewDef';
 
@@ -52,7 +52,7 @@ setTimeout(() => {
 		let firstTime = time;
 		requestAnimationFrame(time => {
 			rafPeriod = time - firstTime;
-			console.log(`⏱ rafPeriod = ${rafPeriod}`);
+			console.log(`⏱ rafPeriod = ${rafPeriod}  rate=${Math.round(1000/rafPeriod)}`);
 		});
 	});
 }, 5000);
@@ -314,7 +314,7 @@ export class SquishPanel extends React.Component {
 
 		try {
 			// hundreds of visscher steps
-			this.mainEAvatar.oneIteration();
+			this.mainEAvatar?.oneIteration();
 		} catch (ex) {
 			this.setState({isTimeAdvancing: false});
 			// eslint-disable-next-line no-ex-assign
@@ -509,17 +509,11 @@ export class SquishPanel extends React.Component {
 	}
 
 	startIterating() {
-		if (this.state.isTimeAdvancing)
-			return;
-
 		storeASetting('iterationParams', 'isTimeAdvancing', true);
 		this.setState({isTimeAdvancing: true});
 	}
 
 	stopIterating() {
-		if (!this.state.isTimeAdvancing)
-			return;
-
 		storeASetting('iterationParams', 'isTimeAdvancing', false);
 		this.setState({isTimeAdvancing: false});
 	}
@@ -535,13 +529,6 @@ export class SquishPanel extends React.Component {
 	singleIteration =
 	() => {
 		this.iterateOneIteration(true);
-	}
-
-	resetCounters =
-	(ev) => {
-		this.mainEAvatar.elapsedTime = 0;
-		this.mainEAvatar.iterateSerial = 0;
-		this.showTimeNIteration();
 	}
 
 	/* ******************************************************* user settings */
@@ -644,7 +631,6 @@ export class SquishPanel extends React.Component {
 					isTimeAdvancing={s.isTimeAdvancing}
 					startStop={this.startStop}
 					singleIteration={this.singleIteration}
-					resetCounters={this.resetCounters}
 
 					setPotential={this.setPotential}
 

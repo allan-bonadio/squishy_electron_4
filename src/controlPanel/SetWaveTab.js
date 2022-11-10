@@ -16,7 +16,8 @@ import GLView from '../view/GLView';
 // import eCx from '../engine/eCx';
 // import cxToRgb from '../view/cxToRgb';
 import TextNSlider from '../widgets/TextNSlider';
-import {alternateMinMaxs} from '../utils/storeSettings';
+import {} from '../utils/storeSettings';
+import {getASetting, storeASetting, getAGroup, storeAGroup, alternateMinMaxs} from '../utils/storeSettings';
 //import {storeASetting, alternateMinMaxs} from '../utils/storeSettings';
 
 //import salientPointersFactory from './salientPointersFactory';
@@ -30,7 +31,7 @@ function setPT() {
 	// variables from on high, and the funcs needed to change them
 	SetWaveTab.propTypes = {
 		// actually sets the one in use by the algorithm
-		setMainWave: PropTypes.func.isRequired,
+		saveMainWave: PropTypes.func.isRequired,
 
 		waveParams: PropTypes.shape({
 			// defaults handed in
@@ -57,8 +58,9 @@ class SetWaveTab extends React.Component {
 			// also wave params
 		};
 
-		// these change  as user changes stuff, so often differs from props
-		Object.assign(this.state, props.waveParams);
+		// pour these directly into the initial state
+		let waveParams = getAGroup('waveParams');
+		Object.assign(this.state, waveParams);
 
 		// nobody will set the wave before the space is created!!
 		eSpaceCreatedPromise
@@ -198,7 +200,7 @@ class SetWaveTab extends React.Component {
 					{glView}
 				</div>
 
-				<button className='setWaveButton round' onClick={ev => p.setMainWave(this.state)}>
+				<button className='setWaveButton round' onClick={ev => p.saveMainWave(this.state)}>
 						Set Wave
 				</button>
 
