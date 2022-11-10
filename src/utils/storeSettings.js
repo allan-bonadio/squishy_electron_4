@@ -28,23 +28,23 @@
 //debugger;
 
 // these'll be filled in below, dynamically created.  but none of them work.
-export const storeSettings =  {};
+//export const storeSettings =  {};
+//
+//if (typeof storeSettings == 'undefined') debugger;  // webpack fuckups
 
-if (typeof storeSettings == 'undefined') debugger;  // webpack fuckups
-
-// this is such a pile of shit
+// these will work
 let alternateStoreDefaults = {};
 let alternateStoreVerifiers = {};
 export let alternateMinMaxs = {};
 
 // somehow webpack fumbles this if it's extern, in SquishPanel
 // no doesn't seem to make a diff
-window.storeSettings = storeSettings;
+//window.storeSettings = storeSettings;
 
 // save in the localSettings
-function saveGroup(groupName) {
-	localStorage.setItem(groupName, JSON.stringify(storeSettings[groupName]));
-}
+//function saveGroup(groupName) {
+//	localStorage.setItem(groupName, JSON.stringify(storeSettings[groupName]));
+//}
 
 // figure out a function that can validate this param quickly
 function makeCriterionFunction(criterion) {
@@ -77,10 +77,12 @@ function makeCriterionFunction(criterion) {
 				return value => (value >= criterion.min && value <= criterion.max);
 
 		default:
+			debugger;
 			throw new Error(`bad criterion class ${criterion.constructor.name}`);
 		}
 
 	default:
+		debugger;
 		throw new Error(`bad criterion type ${typeof criterion})`);
 	}
 }
@@ -93,48 +95,48 @@ function makeParam(groupName, varName, defaultValue, criterion) {
 
 
 	// retrieve from localStorage and set this var, or set to default if not there yet.
-	storeSettings[groupName] = storeSettings[groupName] || {};
-	let group = storeSettings[groupName];
-	let savedGroup = localStorage.getItem(groupName) || '{}';
-	savedGroup = JSON.parse(savedGroup);
-	let value = savedGroup[varName];
-	if (value === undefined || !criterionFunction(value)) {
-		savedGroup[varName] = value = defaultValue;
-		localStorage.setItem(groupName,  JSON.stringify(savedGroup));
-	}
-	else {
-		value = savedGroup[varName];
-	}
+//storeSettings[groupName] = storeSettings[groupName] || {};
+//let group = storeSettings[groupName];
+//let savedGroup = localStorage.getItem(groupName) || '{}';
+//savedGroup = JSON.parse(savedGroup);
+//let value = savedGroup[varName];
+//if (value === undefined || !criterionFunction(value)) {
+//	savedGroup[varName] = value = defaultValue;
+//	localStorage.setItem(groupName,  JSON.stringify(savedGroup));
+//}
+//else {
+//	value = savedGroup[varName];
+//}
 
-	alternateStoreDefaults[groupName] = alternateStoreDefaults[groupName] || {};
+	alternateStoreDefaults[groupName] ??= {};
 	alternateStoreDefaults[groupName][varName] = defaultValue;
-	alternateStoreVerifiers[groupName] = alternateStoreVerifiers[groupName] || {};
+	alternateStoreVerifiers[groupName] ??= {};
 	alternateStoreVerifiers[groupName][varName] = criterionFunction;
-	alternateMinMaxs[groupName] = alternateMinMaxs[groupName] || {};
+	alternateMinMaxs[groupName] ??= {};
 	if (typeof criterion == 'object' && criterion.max !== undefined)
 		alternateMinMaxs[groupName][varName] = criterion;
 
 
 
 	// now for the shit that doesn't work
-	Object.defineProperty(group, varName, {
-		get: function() {
-			return value
-		},
-
-		set: function(newVal) {
-			if (newVal === undefined || ! criterionFunction(newVal))
-				value = defaultValue;
-			else
-				value = newVal;
-
-			saveGroup(group);
-		},
-
-		configurable: true,
-		//configurable: false,
-		enumerable: true,
-	});
+//	Object.defineProperty(group, varName, {
+//		get: function() {
+//			return value
+//		},
+//
+//		set: function(newVal) {
+//			if (newVal === undefined || ! criterionFunction(newVal))
+//				value = defaultValue;
+//			else
+//				value = newVal;
+//
+//			saveGroup(group);
+//		},
+//
+//		configurable: true,
+//		//configurable: false,
+//		enumerable: true,
+//	});
 }
 
 /* ************************************ spaceParams */
@@ -208,8 +210,18 @@ export function getAGroup(groupName) {
 	if (!alternateStoreVerifiers
 	|| !alternateStoreVerifiers[groupName]) debugger;
 
-	let savedGroup = localStorage.getItem(groupName) || '{}';
-	return JSON.parse(savedGroup);
+	try {
+		let savedGroup = localStorage.getItem(groupName) || '{}';
+		return JSON.parse(savedGroup);
+	} catch (ex) {
+		// in hte event that some bogus value gets stored in the localStorage, revert to default.
+		return alternateStoreDefaults[groupName];
+	}
+}
+
+// cuz of some magical bad ju-ju, this shit just doesn't owrk and i have to do it by hand.
+export function storeAGroup(groupName, newGroup) {
+	localStorage.setItem(groupName,  JSON.stringify(newGroup));
 }
 
 // cuz of some magical bad ju-ju, this shit just doesn't owrk and i have to do it by hand.
@@ -223,9 +235,8 @@ export function storeASetting(groupName, varName, newValue) {
 		newValue = alternateStoreDefaults[groupName][varName];
 
 	let savedGroup = getAGroup(groupName);
-
 	savedGroup[varName] = newValue;
-	localStorage.setItem(groupName,  JSON.stringify(savedGroup));
+	storeAGroup(groupName, savedGroup);
 
 	// also return the new, validated value; input could be weird!
 	return newValue;
@@ -251,6 +262,6 @@ export function getASetting(groupName, varName) {
 
 
 // useless
-export default storeSettings;
+//export default storeSettings;
 
 
