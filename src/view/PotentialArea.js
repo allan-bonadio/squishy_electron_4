@@ -18,7 +18,7 @@ export const spongeFactor = 100;
 
 let tracePotentialArea = false;
 let traceRendering = false;
-let traceDragging = true;
+let traceDragging = false;
 let tracePathAttribute = false;  // big output from one line
 
 // ultimately, this is a <svg node with a <path inside it
@@ -79,7 +79,7 @@ export class PotentialArea extends React.Component {
 
 	/* ***************************************************  click & drag */
 
-	// every time user changes it.  Also set points interpolated betweeen.
+	// every time user changes it.  Also set points interpolated between.
 	// returns false if it failed and needs to be done again.  True means it succeeded.
 	changePotential(ev, title) {
 		const p = this.props;
@@ -93,11 +93,12 @@ export class PotentialArea extends React.Component {
 
 		//let ix = Math.round((ev.clientX - p.wholeRect.x) / this.barWidth);
 		let ix = Math.round(this.xScale.invert(ev.clientX));
-		//if (Math.abs(ix - nuIx) > 1e-10)
-		//	console.log(`👆 👆 🍓  ix and nuIx discrepancy!!  ix=${ix}   nuIx=${nuIx}   `);
+
+		if (ix == this.latestIx && newPotential == this.latestPotential)
+			return;  // same old same old; these events come too fast
 
 		if (traceDragging)
-			console.log(`👆 👆 mouse %s on point (%f,%f) potential[ix=%d] changing from %f to %f`,
+			console.log(`👆 👆 mouse %s on point (%f,%f) potential @ ix=%d changing from %f to %f`,
 				title,
 				ev.clientX, ev.clientY,
 				ix, this.potentialBuffer[ix], newPotential);
@@ -133,9 +134,11 @@ export class PotentialArea extends React.Component {
 	mouseDown =
 	(ev) => {
 		// a hit! otherwise we wouldn't be calling the event handler.
-		this.changePotential(ev, 'M down');
+		this.changePotential(ev, 'Mouse Down');
 		this.dragging = true;
-		//debugger;
+
+		// must also switch the svg to catch mouse events otherwise you can't drag far
+		this.svgElement.style.pointerEvents = 'visible';  // auto all none
 
 		// must figure out pointer offset; diff between mousedown pot and the neareest piece of line
 		// remember that clientY is in pix units
@@ -151,9 +154,10 @@ export class PotentialArea extends React.Component {
 
 	mouseMove =
 	(ev) => {
-		if (ev.buttons && this.dragging) {
+		if (! this.dragging) return;
+
+		if (ev.buttons) {
 			this.changePotential(ev, 'move DRAGGING');
-			// ??this.dragging = true;
 			//debugger;
 			ev.preventDefault();
 			ev.stopPropagation();
@@ -161,17 +165,26 @@ export class PotentialArea extends React.Component {
 		else {
 			this.mouseUp(ev);
 		}
+		ev.preventDefault();
+		ev.stopPropagation();
 	}
 
+	// called upon mouseup or a move without mouse dow
 	mouseUp =
 	(ev) => {
 		const p = this.props;
-		this.dragging = false;
+		this.dragging = false;  // the ONLY place this can be set false
+
+		// must also switch the svg to pass thru mouse events otherwise other stuff can't get clicks
+		this.svgElement.style.pointerEvents = 'none';
+
+		console.log(`👆 👆 mouse UP on point (%f,%f) potential @ ix=%d stopped at %f`,
+			ev.clientX, ev.clientY,
+			this.latestIx, this.potentialBuffer[this.latestIx]);
+		//this.changePotential(ev, 'mouse UP');
 
 		// remind everybody that this episode is over.  Tune in next week.
 		this.latestIx = this.latestPotential = undefined;
-
-		//this.changePotential(ev, 'mouse UP');
 
 		if (traceDragging)
 			dumpPotential(p.space, this.potentialBuffer, 8);
@@ -315,4 +328,3 @@ export class PotentialArea extends React.Component {
 }
 
 export default PotentialArea;
-
