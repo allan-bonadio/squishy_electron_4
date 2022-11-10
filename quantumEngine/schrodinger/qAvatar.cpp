@@ -29,6 +29,7 @@ static bool traceJustInnerProduct = false;
 static bool traceFourierFilter = true;
 
 static bool dumpFFHiResSpectums = false;
+static bool traceIProd = true;
 
 static bool traceSpace = false;  // prints info about the space in the avatar constructor
 
@@ -286,7 +287,10 @@ void qAvatar::oneIteration() {
 
 	double iProd = qwave->normalize();
 	if (dumpFFHiResSpectums) qwave->dumpHiRes("wave END fourierFilter() after normalize");
-	if (iProd > 1.1) {
+	if (traceIProd && (iterateSerial & 0xf) == 0)
+		printf("      qAvatar: iProd= %lf \n", iProd);
+
+	if (iProd > 1.01) {
 		char buf[64];
 		sprintf(buf, "🔥 🧨 wave is diverging, iProd=%10.4g 🔥 🧨", iProd);
 		if (iProd > 3) {
