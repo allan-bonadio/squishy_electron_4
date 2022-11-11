@@ -21,7 +21,9 @@ function setPT() {
 		N: PropTypes.number.isRequired,
 		space: PropTypes.instanceOf(eSpace),
 
-		resetMainWave: PropTypes.func,
+		resetMainWave: PropTypes.func.isRequired,
+		toggleShowPotential: PropTypes.func.isRequired,
+		showPotential: PropTypes.bool.isRequired,
 	};
 }
 
@@ -32,6 +34,7 @@ function clickOnFFT(space)
 		space.mainEAvatar.askForFFT();
 		//qe.avatar_askForFFT(space.mainEAvatar);
 }
+
 
 function CPToolbar(props) {
 	const {iterateFrequency, setIterateFrequency,
@@ -86,7 +89,7 @@ function CPToolbar(props) {
 		</button>
 
 		<div className='toolbarThing'>
-			<div className='toolbarThing'>
+			<div className='toolbarRow'>
 				<div className='toolbarThing'>
 					resolution {props.N} &nbsp;
 				</div>
@@ -98,14 +101,14 @@ function CPToolbar(props) {
 				&nbsp;
 			</div>
 
-			<div className='toolbarThing'>
+			<div className='toolbarRow'>
 				<button onClick={ev => clickOnFFT(props.space)}>
 					FFT
 				</button>
 				&nbsp;
 
 				<label>
-					<input type='checkbox' selected onClick={props.toggleShowPotentiial} />
+					<input type='checkbox' checked={props.showPotential} onChange={props.toggleShowPotential} />
 					Show Potential
 				</label>
 				&nbsp;

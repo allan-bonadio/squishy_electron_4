@@ -28,6 +28,8 @@ export class ControlPanel extends React.Component {
 		// when user chooses 'set wave'
 		//// this should move into controlPanel from squishPanel
 		setPotential: PropTypes.func.isRequired,
+		toggleShowPotential: PropTypes.func.isRequired,
+		showPotential: PropTypes.bool.isRequired,
 
 		isTimeAdvancing: PropTypes.bool.isRequired,  // ie is it running?
 
@@ -138,11 +140,6 @@ export class ControlPanel extends React.Component {
 		storeASetting('potentialParams', 'valleyOffset', valleyOffset);
 	}
 
-	toggleShowPotential =
-	ev => {
-		console.info(`toggleShowPotential `, ev)
-	}
-
 	slideWave =
 	ev => {
 		console.info(`slide wave `, ev)
@@ -180,6 +177,8 @@ export class ControlPanel extends React.Component {
 				potentialParams={{ valleyPower, valleyScale, valleyOffset,}}
 				setCPState={this.setCPState}
 				space={p.space}
+				toggleShowPotential={p.toggleShowPotential}
+				showPotential={p.showPotential}
 			/>;
 
 		case 'space':
@@ -204,7 +203,6 @@ export class ControlPanel extends React.Component {
 	}
 
 	/* ********************************************** render */
-
 	render() {
 		const p = this.props;
 		const s = this.state;
@@ -225,7 +223,8 @@ export class ControlPanel extends React.Component {
 
 				resetMainWave={this.resetMainWave}
 				setPotentialHandler={this.setPotentialHandler}
-				toggleShowPotentiial={this.toggleShowPotentiial}
+				toggleShowPotential={p.toggleShowPotential}
+				showPotential={p.showPotential}
 				slideWave={this.slideWave}
 
 				N={p.N}

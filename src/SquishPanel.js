@@ -108,6 +108,9 @@ export class SquishPanel extends React.Component {
 			// NOT SAME as shown on WaveView!
 			runningCycleElapsedTime: 0,
 			runningCycleIterateSerial: 0,
+
+			showPotential:  getASetting('potentialParams', 'showPotential'),
+
 		};
 
 		// will be resolved when the space has been created; result will be eSpace.
@@ -411,7 +414,7 @@ export class SquishPanel extends React.Component {
 			// iterateOneIteration(), so periods are exactly timed (unless it's so slow
 			// that we get behind).  Speaking of which, how far behind are we?
 			let rightNow = 	performance.now();
-			let itReallyTook = (rightNow - iterationStart) / s.iteratePeriod;
+			//let itReallyTook = (rightNow - iterationStart) / s.iteratePeriod;
 
 			//// FOR NOW, avoid overlapping heartbeats.  They become recursive and the
 			//// browser really slows down, and sometimes crashes
@@ -529,6 +532,7 @@ export class SquishPanel extends React.Component {
 	singleIteration =
 	() => {
 		this.iterateOneIteration(true);
+		this.setState({isTimeAdvancing: false});
 	}
 
 	/* ******************************************************* user settings */
@@ -594,6 +598,12 @@ export class SquishPanel extends React.Component {
 		this.updatePotentialArea = updatePotentialArea;
 	};
 
+	toggleShowPotential =
+	ev => {
+		this.setState({showPotential: ev.target.checked});
+		storeASetting('potentialParams', 'showPotential', ev.target.checked);
+	}
+
 	// dump the view buffer, from the JS side.  Why not use the C++ version?
 	dumpViewBuffer(title = '') {
 		const s = this.state;
@@ -621,6 +631,7 @@ export class SquishPanel extends React.Component {
 					viewName='mainView'
 					width={p.width}
 					setUpdatePotentialArea={this.setUpdatePotentialArea}
+					showPotential={s.showPotential}
 				/>
 				<ControlPanel
 					openResolutionDialog={() => this.openResolutionDialog()}
@@ -633,6 +644,9 @@ export class SquishPanel extends React.Component {
 					singleIteration={this.singleIteration}
 
 					setPotential={this.setPotential}
+					toggleShowPotential={this.toggleShowPotential}
+					showPotential={s.showPotential}
+
 
 					iterateFrequency={1000 / s.iteratePeriod}
 					setIterateFrequency={freq => this.setIterateFrequency(freq)}
@@ -654,4 +668,3 @@ export class SquishPanel extends React.Component {
 }
 
 export default SquishPanel;
-

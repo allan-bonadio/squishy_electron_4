@@ -34,6 +34,10 @@ export class PotentialArea extends React.Component {
 		wholeRect: PropTypes.object,
 
 		setUpdatePotentialArea: PropTypes.func,
+
+		// this component is always rendered so it retains its state,
+		// but won't draw anything if the checkbox is off
+		showPotential: PropTypes.bool.isRequired,
 	};
 
 	constructor(props) {
@@ -152,6 +156,7 @@ export class PotentialArea extends React.Component {
 		ev.stopPropagation();
 	}
 
+	// this one and mouseUp are attached to the whole SVG cuz user can drag all over
 	mouseMove =
 	(ev) => {
 		if (! this.dragging) return;
@@ -203,7 +208,8 @@ export class PotentialArea extends React.Component {
 	// as compressed as possible.  Returns one long string.
 	makePathAttribute(start, end) {
 		const p = this.props;
-		if (tracePotentialArea) console.log(`👆 👆 PotentialArea.makePathAttribute(${start}, ${end})`);
+		if (tracePotentialArea)
+			console.log(`👆 👆 PotentialArea.makePathAttribute(${start}, ${end})`);
 
 		// yawn too early
 		if (! p.space) throw new Error(`makePathAttribute(): no functioning space`);
@@ -212,6 +218,11 @@ export class PotentialArea extends React.Component {
 			if (!this.setScales())
 				return `M0,0`;  // too early
 		}
+
+		if (tracePotentialArea)
+			console.log(`         xScale(d&r) & yScale(d&r):`,
+				this.xScale.domain(), this.xScale.range(), this.yScale.domain(), this.yScale.range(), );
+
 
 		const space = p.space;
 		//qe.qSpace_dumpPotential(`makePathAttribute(${start}, ${end})`);
@@ -264,7 +275,7 @@ export class PotentialArea extends React.Component {
 				break;
 
 			case qe.contENDLESS:
-				//full width including boundaries
+				//full width including boundaries.  can you drag the boundaries?!?!
 				start = 0;
 				end += 1;
 				break;
@@ -277,23 +288,25 @@ export class PotentialArea extends React.Component {
 		if (tracePathAttribute)
 			console.log(`👆 👆 makePathAttribute(${start}, ${end}) returned:`, pathAttribute);
 
-		// this one actually draws the white line
-		paths.push(
-			<path className='visibleLine' key='visible'
-				d={pathAttribute}
-				fill="transparent"
-			/>
-		);
+		if (p.showPotential) {
+			// this one actually draws the white line
+			paths.push(
+				<path className='visibleLine' key='visible'
+					d={pathAttribute}
+					fill="transparent"
+				/>
+			);
 
-		// you click on this one
-		paths.push(
-			<path className='tactileLine' key='tactile'
-				d={pathAttribute}
-				stroke='#fff4'
-				fill="transparent"
-				onMouseDown={ev => this.mouseDown(ev)}
-			/>
-		);
+			// you click on this one
+			paths.push(
+				<path className='tactileLine' key='tactile'
+					d={pathAttribute}
+					stroke='#fff4'
+					fill="transparent"
+					onMouseDown={ev => this.mouseDown(ev)}
+				/>
+			);
+		}
 		return paths
 	}
 

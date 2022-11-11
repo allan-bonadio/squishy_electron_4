@@ -179,6 +179,7 @@ makeParam('waveParams', 'pulseOffset', 30, {min: 0, max: 100});
 makeParam('potentialParams', 'valleyPower', 0, {min: -4, max: 4});
 makeParam('potentialParams', 'valleyScale', 0, {min: -10, max: 10});
 makeParam('potentialParams', 'valleyOffset', 50, {min: 0, max: 100});
+makeParam('potentialParams', 'showPotential', true, [true, false]);  // not really the same as the rest...
 
 /* ************************************ iterationParams */
 makeParam('iterationParams', 'isTimeAdvancing', false,  [false, true]);

@@ -26,6 +26,8 @@ function setPT() {
 		// actually sets the one in use by the algorithm
 		//setFlatPotentialHandler: PropTypes.func.isRequired,
 		setPotentialHandler: PropTypes.func.isRequired,
+		toggleShowPotential: PropTypes.func.isRequired,
+		showPotential: PropTypes.bool.isRequired,
 
 		potentialParams: PropTypes.shape({
 			//potentialBreed: PropTypes.oneOf(['flat', 'valley',]),
@@ -186,6 +188,12 @@ class SetPotentialTab extends React.Component {
 			</div>
 			<div className='MiniGraph' style={{marginLeft: '500px', color: 'yellow'}}>pot. mini graph goes here</div>
 			<div style={{clear: 'left'}} />
+
+			<label style={{float:'right'}}>
+				<input type='checkbox' checked={p.showPotential} onChange={p.toggleShowPotential} />
+				Show Potential
+			</label>
+
 		</div>;
 		}
 }

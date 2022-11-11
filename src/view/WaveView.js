@@ -45,6 +45,8 @@ export class WaveView extends React.Component {
 
 		//returnGLFuncs: PropTypes.func.isRequired,
 		setUpdatePotentialArea: PropTypes.func,
+
+		showPotential: PropTypes.bool.isRequired,
 	};
 
 	constructor(props) {
@@ -159,9 +161,8 @@ export class WaveView extends React.Component {
 		const spinner = qe.cppLoaded ? ''
 			: <img className='spinner' alt='spinner' src='eclipseOnTransparent.gif' />;
 
-		// 				returnGLFuncs={p.returnGLFuncs}
-
 		// voNorthWest/East are populated during iteration
+		// Always generate the PotentialArea so it keeps its state, but it won't always draw
 		return (<div className='WaveView'  ref={el => this.element = el} style={{height: s.height + 'px'}}>
 
 			<GLView width={p.width} height={s.height}
@@ -186,7 +187,8 @@ export class WaveView extends React.Component {
 			<PotentialArea width={p.width} height={s.height}
 				space={s.space} wholeRect={wholeRect}
 				canvas={this.canvas}
-				setUpdatePotentialArea={p.setUpdatePotentialArea}/>
+				setUpdatePotentialArea={p.setUpdatePotentialArea}
+				showPotential={p.showPotential}/>
 		</div>);
 	}
 
