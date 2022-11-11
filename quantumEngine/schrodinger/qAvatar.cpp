@@ -18,7 +18,6 @@
 #include "../directAccessors.h"
 
 
-static bool useFourierFilter = false;
 
 static bool traceIteration = false;
 static bool traceIterSteps = false;
@@ -26,14 +25,15 @@ static bool traceIterSteps = false;
 static bool traceJustWave = false;
 static bool traceJustInnerProduct = false;
 
-static bool traceFourierFilter = true;
+static bool traceFourierFilter = false;
 
 static bool dumpFFHiResSpectums = false;
-static bool traceIProd = true;
+static bool traceIProd = false;
 
 static bool traceSpace = false;  // prints info about the space in the avatar constructor
 
 // only do some traces if we're past where it's a problem
+// i don't think this is useful anyore...
 static int dangerousSerial = 4000;  // for the chord pulse
 static int dangerousRate = 250;
 
@@ -43,7 +43,6 @@ static int dangerousRate = 250;
 // those apply to these tracing flags
 static bool traceEachFFSquelch = false;
 static bool traceEndingFFSpectrum = false;
-static bool traceB4nAfterFFSpectrum = false;
 
 
 /* *********************************************************************************** qAvatar */
@@ -217,7 +216,6 @@ double getTimeDouble()
     return ts.tv_sec + ts.tv_nsec / 1e9;
 }
 
-
 // Does several visscher steps (eg 100 or 500). Actually does
 // stepsPerIteration+1 steps; half steps at start and finish to adapt and
 // deadapt to Visscher timing
@@ -279,15 +277,16 @@ void qAvatar::oneIteration() {
 	iterateSerial++;
 
 	// ok the algorithm tends to diverge after thousands of iterations.  Hose it down.
-	if (useFourierFilter) {
-		if (traceB4nAfterFFSpectrum && dangerousTimes) analyzeWaveFFT(qwave, "before FF");
-		fourierFilter(lowPassFilter);
-		if (traceB4nAfterFFSpectrum && dangerousTimes) analyzeWaveFFT(qwave, "after FF");
-	}
+
+	if (this->pleaseFFT) analyzeWaveFFT(qwave, "before FF");
+	fourierFilter(lowPassFilter);
+	if (this->pleaseFFT) analyzeWaveFFT(qwave, "after FF");
+	this->pleaseFFT = false;
+
 
 	double iProd = qwave->normalize();
 	if (dumpFFHiResSpectums) qwave->dumpHiRes("wave END fourierFilter() after normalize");
-	if (traceIProd && (iterateSerial & 0xf) == 0)
+	if (traceIProd && ((int) iterateSerial & 0xf) == 0)
 		printf("      qAvatar: iProd= %lf \n", iProd);
 
 	if (iProd > 1.01) {
@@ -308,10 +307,10 @@ void qAvatar::oneIteration() {
 			stepsPerIteration, space->nStates, qwave->innerProduct());
 	}
 
-	if (this->pleaseFFT) {
-		analyzeWaveFFT(qwave, "pleaseFFT at end of iteration");
-		this->pleaseFFT = false;
-	}
+//	if (this->pleaseFFT) {
+//		analyzeWaveFFT(qwave, "pleaseFFT at end of iteration");
+//		this->pleaseFFT = false;
+//	}
 
 	if (traceIteration)
 		printf("      iteration done; elapsed time: %lf \n", getTimeDouble());
@@ -370,10 +369,11 @@ void qAvatar::fourierFilter(int lowPassFilter) {
 
 // user button to print it out now, or at end of the next iteration
 void qAvatar::askForFFT(void) {
-	if (isIterating)
+//	if (isIterating)
 		this->pleaseFFT = true;
-	else
-		analyzeWaveFFT(qwave, "askForFFT while idle");
+		printf("asked for fft\n");
+	//else
+	//	analyzeWaveFFT(qwave, "askForFFT while idle");
 }
 
 /* **********************************************************  */
