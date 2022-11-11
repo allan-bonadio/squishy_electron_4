@@ -108,6 +108,15 @@ class SetWaveTab extends React.Component {
 		this.setState({pulseOffset}, () => this.regenerateMiniGraphWave());
 	}
 
+	saveMainWave =
+	() => {
+		const s = this.state;
+
+		// take other stuff out of the state.  just want the wave params.
+		const {waveBreed, waveFrequency, pulseWidth, pulseOffset} = s;
+		this.props.saveMainWave({waveBreed, waveFrequency, pulseWidth, pulseOffset});
+	}
+
 	render() {
 		const p = this.props;
 		const s = this.state;
@@ -201,7 +210,7 @@ class SetWaveTab extends React.Component {
 					{glView}
 				</div>
 
-				<button className='setWaveButton round' onClick={ev => p.saveMainWave(this.state)}>
+				<button className='setWaveButton round' onClick={ev => this.saveMainWave(this.state)}>
 						Set Wave
 				</button>
 
