@@ -4,7 +4,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import App from './App';
-import reportWebVitals from './reportWebVitals';
+//import reportWebVitals from './reportWebVitals';
 //import {interpretCppException} from './utils/errors';
 //
 // before ANYTHING happens

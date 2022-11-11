@@ -17,7 +17,8 @@ import GLView from '../view/GLView';
 // import cxToRgb from '../view/cxToRgb';
 import TextNSlider from '../widgets/TextNSlider';
 import {} from '../utils/storeSettings';
-import {getASetting, storeASetting, getAGroup, storeAGroup, alternateMinMaxs} from '../utils/storeSettings';
+//import {getASetting, storeASetting, getAGroup, storeAGroup, alternateMinMaxs} from '../utils/storeSettings';
+import {getAGroup, alternateMinMaxs} from '../utils/storeSettings';
 //import {storeASetting, alternateMinMaxs} from '../utils/storeSettings';
 
 //import salientPointersFactory from './salientPointersFactory';

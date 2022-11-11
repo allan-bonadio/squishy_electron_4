@@ -8,7 +8,7 @@ import LogSlider from '../widgets/LogSlider';
 import TextNSlider from '../widgets/TextNSlider';
 import {alternateMinMaxs} from '../utils/storeSettings';
 
-let traceSliderChanges = true;
+let traceSliderChanges = false;
 
 // set prop types
 function setPT() {
@@ -94,7 +94,7 @@ function SetIterationTab(props) {
 				style={{width: '80%'}}
 				handleChange={newValue => {
 						if (traceSliderChanges)
-						console.log(`🏃🏽 🏃🏽 ch Low Pass Filter:: ${newValue}  `);
+							console.log(`🏃🏽 🏃🏽 ch Low Pass Filter:: ${newValue}  `);
 						props.setLowPassFilter(+newValue);
 					}}
 			/>

@@ -31,8 +31,6 @@ export class viewVariable {
 		}
 		vv.push(this);
 
-		//this.bufferDataDrawMode = drawing.bufferDataDrawMode;
-
 		// whichever variable this is a subclass of, constructors will need this
 		// or maybe this is already done and so this is superflous?
 		drawing.setDrawing();
