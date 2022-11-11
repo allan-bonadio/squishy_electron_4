@@ -73,20 +73,21 @@ function CPToolbar(props) {
 			</select>
 		</div>
 
+		<span className='toolSpacer' style={{width: '.3em'}}></span>
 
-		<button className={`startStopToggle toolbarButton toolbarGradient`}
+		<button className={`startStopToggle startStopTool`}
 			onClick={props.startStop}>
 			{ isTimeAdvancing
 				? <span><big>&nbsp;</big>▐▐ <big>&nbsp;</big></span>
 				: <big>►</big> }
 		</button>
 
-
-
-		<button className={`stepButton toolbarButton toolbarGradient `}
+		<button className={`stepButton startStopTool`}
 			onClick={props.singleIteration}>
 			<big>►</big> ▌
 		</button>
+
+		<span className='toolSpacer' style={{width: '.3em'}}></span>
 
 		<div className='toolbarThing'>
 			<div className='toolbarRow'>

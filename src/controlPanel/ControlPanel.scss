@@ -51,23 +51,19 @@
 
 		/* **************************************** toolbar buttons */
 
-		.toolbarGradient {
-			background: linear-gradient(#889, #dcd 20%, #ccd 25%, #cdd 30%, #223);
+		.startStopTool {
 			display: inline-block;
 			font-size: 2em;
 			padding: .1em .5em .2em;
-			margin: .1em .3em;
-			line-height: 1.3em;
-			border: none;
-		}
+			margin: .1em .05em;
 
-		button.toolbarButton {
-			cursor: pointer;
+			background: linear-gradient(#889, #dcd 20%, #ccd 25%, #cdd 30%, #223);
+			border: none;
 			color: #fff;
 		}
 
-		button.toolbarButton:active {
-			color: #000;
+		button.startStopTool:active {
+			background: linear-gradient(#223, #cdd 70%, #ccd 75%, #dcd 80%, #889);
 		}
 
 		.startStopToggle {
@@ -79,52 +75,8 @@
 		}
 
 
-		.goButton, .stopButton {
-			display: block;
-			text-align: center;
-			line-height: 1em;
-			padding: 0;
-			border: none;
-			background-color: transparent;
-			margin: 0;
-			position: relative;
-		}
 
-		button.goButton {
-			color: #040;
-			font-size: 4em;
-			margin-left: -.065em;
-
-			&:hover {
-				color: #262;
-			}
-
-			&.on {
-				color: #4f4;
-			}
-		}
-
-
-		button.stopButton {
-			color: #400;
-			font-size: 5em;
-			margin-left: -.125em;
-
-			&:hover {
-				color: #411;
-			}
-
-			&.on {
-				color: #f44;
-			}
-
-			div {
-				position: relative;
-				top: .125em
-			}
-		}
-
-		/* **************************************** sliders */
+		/* **************************************** other */
 
 		.cpSlider {
 			display: inline-block;
@@ -132,7 +84,10 @@
 			padding: 0 .5em 0 .5em;
 		}
 
-
+		// set the with inline
+		.toolSpacer {
+			display: inline-block;
+		}
 	}
 
 
