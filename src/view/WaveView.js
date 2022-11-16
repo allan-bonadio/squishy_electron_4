@@ -43,6 +43,9 @@ export class WaveView extends React.Component {
 
 		width: PropTypes.number,  // handed in, depends on window width
 
+		elapsedTime: PropTypes.number,  // redraws when these change
+		iterateSerial: PropTypes.number,
+
 		//returnGLFuncs: PropTypes.func.isRequired,
 		setUpdatePotentialArea: PropTypes.func,
 
@@ -154,8 +157,8 @@ export class WaveView extends React.Component {
 		let iterateSerial = '0';
 		if (this.mainEAvatar) {
 			// after qe has been initialized
-			elapsedTime = thousands(this.mainEAvatar.elapsedTime.toFixed(4));
-			iterateSerial = thousands(this.mainEAvatar.iterateSerial);
+			elapsedTime = thousands(p.elapsedTime.toFixed(4));
+			iterateSerial = thousands(p.iterateSerial);
 		}
 
 		const spinner = qe.cppLoaded ? ''

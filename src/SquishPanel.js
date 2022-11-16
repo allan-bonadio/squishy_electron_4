@@ -617,11 +617,26 @@ export class SquishPanel extends React.Component {
 
 
 	/* ******************************************************* rendering */
+	// call this when you change both the GL and iter and elapsed time
+	// we need it here in SquishPanel cuz it's often called in ControlPanel but affects WaveView
+	redrawWholeMainWave =
+	() => {
+		let avatar = this.mainEAvatar;
+
+		// trigger redrawing of WaveView cuz they're passed in via props
+		avatar.elapsedTime = 0;
+		avatar.iterateSerial = 0;
+
+		// directly redraw the GL
+		avatar.reStartDrawing();
+		avatar.doRepaint();
+	}
 
 	//static whyDidYouRender = true;
 	render() {
 		const p = this.props;
 		const s = this.state;
+		let avatar = this.mainEAvatar;
 
 		return (
 			<div id={this.props.id} className="SquishPanel">
@@ -630,6 +645,8 @@ export class SquishPanel extends React.Component {
 					viewClassName={s.mainViewClassName}
 					viewName='mainView'
 					width={p.width}
+					elapsedTime={avatar?.elapsedTime ?? 0}
+					iterateSerial={avatar?.iterateSerial ?? 0}
 					setUpdatePotentialArea={this.setUpdatePotentialArea}
 					showPotential={s.showPotential}
 				/>
@@ -647,6 +664,7 @@ export class SquishPanel extends React.Component {
 					toggleShowPotential={this.toggleShowPotential}
 					showPotential={s.showPotential}
 
+					redrawWholeMainWave={this.redrawWholeMainWave}
 
 					iterateFrequency={1000 / s.iteratePeriod}
 					setIterateFrequency={freq => this.setIterateFrequency(freq)}
