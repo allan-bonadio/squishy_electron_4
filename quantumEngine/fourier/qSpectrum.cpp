@@ -60,8 +60,8 @@ void qSpectrum::dumpThatSpectrum(qCx *wave, bool withExtras) {
 	// N/2-th entry is nyquist freq, same both sides
 	norm = wave[halfN].norm() / N;
 	totalNorm += norm;
-	printf("[%3d]                      (%8.4lf,%8.4lf)     %8.4lf m𝜓  total: %8.4lf m𝜓\n",
-		halfN, wave[halfN].re, wave[halfN].im, norm * 1000, totalNorm * 1000);
+	printf("[%3d]                      (%8.4lf,%8.4lf)     %8.4lf m𝜓  total: %8.4lf 𝜓\n",
+		halfN, wave[halfN].re, wave[halfN].im, norm * 1000, totalNorm);
 }
 
 // this is the member function that dumps its own Spectrum and space
