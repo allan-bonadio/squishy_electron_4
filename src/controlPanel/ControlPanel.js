@@ -42,6 +42,8 @@ export class ControlPanel extends React.Component {
 
 		openResolutionDialog: PropTypes.func.isRequired,
 
+		redrawWholeMainWave: PropTypes.func.isRequired,
+
 		iStats: PropTypes.shape({
 			startIteration: PropTypes.number.isRequired,
 			endDraw: PropTypes.number.isRequired,
@@ -99,15 +101,18 @@ export class ControlPanel extends React.Component {
 	// given these params, put it into effect and display it
 	displayMainWave =
 	waveParams => {
-		if (!this.props.space)
+		const p = this.props;
+		if (!p.space)
 			return;
 
-		const mainEWave = this.props.space.mainEWave;
+		const mainEWave = p.space.mainEWave;
 		mainEWave.setFamiliarWave(waveParams);  // eSpace does this initially
-		let mainEAvatar = this.props.space.mainEAvatar;
-		mainEAvatar.elapsedTime = 0;
-		mainEAvatar.iterateSerial = 0;
-		mainEAvatar.doRepaint();
+		p.redrawWholeMainWave();
+		//let mainEAvatar = p.space.mainEAvatar;
+		//mainEAvatar.reStartDrawing();
+		//mainEAvatar.elapsedTime = 0;
+		//mainEAvatar.iterateSerial = 0;
+		//mainEAvatar.doRepaint();  // only does the GL
 	}
 
 	// toolbar: reset wave button.  Display it from saved params
