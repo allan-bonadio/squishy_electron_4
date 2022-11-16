@@ -14,6 +14,11 @@ let dumpViewBufAfterDrawing = false;
 let traceHighest = false;
 let traceFlatDrawing = false;
 
+// normally autoranging would put the highest peak at the exact bottom.
+// but we want some extra space.  not much.
+let PADDING_ON_BOTTOM = 1.02;
+
+
 // diagnostic purposes
 let alsoDrawPoints = false;
 let alsoDrawLines = false;
@@ -113,7 +118,8 @@ export class flatDrawing extends abstractDrawing {
 				if (traceHighest)
 					console.log(`flatDrawing reloading ${this.viewName}: highest=${this.avatar.highest.toFixed(5)}  smoothHighest=${this.smoothHighest.toFixed(5)}`);
 
-				return {value: this.avatar.smoothHighest, type: '1f'};
+				// add in a few percent
+				return {value: this.avatar.smoothHighest * PADDING_ON_BOTTOM, type: '1f'};
 			}
 		);
 
