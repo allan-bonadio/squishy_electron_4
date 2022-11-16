@@ -1,6 +1,6 @@
 {
   "name": "squishy_electron_4",
-  "version": "0.1.0",
+  "version": "0.4.0",
   "author": "Allan Bonadio <abonadio@tactileint.org> (http://portfolio.tactileint.org)",
   "private": true,
   "dependencies": {
