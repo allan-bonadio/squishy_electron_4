@@ -17,16 +17,14 @@ import {dumpPotential} from '../utils/potentialUtils';
 export const spongeFactor = 100;
 
 let tracePotentialArea = false;
+let tracePathAttribute = false;
+
 let traceRendering = false;
 let traceDragging = false;
-let tracePathAttribute = false;  // big output from one line
 
 // ultimately, this is a <svg node with a <path inside it
 export class PotentialArea extends React.Component {
 	static propTypes = {
-		width: PropTypes.number.isRequired,
-		height: PropTypes.number.isRequired,
-
 		// for first couple of renders, space and wholeRect are null
 		space: PropTypes.instanceOf(eSpace),
 
@@ -52,7 +50,6 @@ export class PotentialArea extends React.Component {
 		if (props.setUpdatePotentialArea)
 			props.setUpdatePotentialArea(this.updatePotentialArea);
 
-		this.setScales();  // usually too early, but later on it's no problems.
 		if (tracePotentialArea) console.log(`👆 👆 PotentialArea  constructor done`);
 	}
 
@@ -62,24 +59,174 @@ export class PotentialArea extends React.Component {
 	// goes the other way.  Same for xScale.  Used for clicking and for display.
 	setScales() {
 		const p = this.props;
-		if (tracePotentialArea) console.log(`👆 👆 PotentialArea.setScales(): the whole rect:`, p.wholeRect);
+		const w = p.wholeRect;
+		if (tracePotentialArea) console.log('👆 👆 PotentialArea.setScales(): on window= '
+			+`(${window.innerWidth},${window.innerHeight}) the wholeRect:`,
+			p.wholeRect);
 		if (!p.wholeRect)
 			return false;
 
-		const {x} = p.wholeRect;
-		//const {x, y} = p.wholeRect;
-		this.yScale = scaleLinear([-2, 8], [0, p.height]);
-		//this.yScale = scaleLinear([-2, 8], [y, y + p.height]);
+		this.yScale = scaleLinear([-2, 8], [0, w.height]);
+		//this.yScale = scaleLinear([-2, 8], [y, y + w.height]);
 		//for (let j = -2; j <= 8; j += .5) console.log(`j=${j} -> ${this.yScale(j)}`)
-		//this.yScale = scaleLinear([0, 3], [y + p.height, y]);
+		//this.yScale = scaleLinear([0, 3], [y + w.height, y]);
 		// spongeFactor?
 
-		// this'll probably be changed ...
-		this.xScale = scaleLinear([0, 1], [x, x + this.barWidth]);
-		if (tracePotentialArea) console.log(`👆 👆 PotentialArea.setScales():done, xScale(d&r) & yScale(d&r):`,
+		this.nPoints = p.space.nPoints;
+		this.xScale = scaleLinear([0, this.nPoints-1], [0, w.width]);
+
+		if (tracePotentialArea) console.log(
+			`👆 👆 PotentialArea.setScales():done, xScale(d&r) & yScale(d&r):`,
 			this.xScale.domain(), this.xScale.range(), this.yScale.domain(), this.yScale.range(), );
 		return true;
 	}
+
+	/* *************************************************** drawing */
+
+	updatePotentialArea =
+	() => {
+		this.forceUpdate();
+	}
+
+	// make the sequence of coordinates the white line needs to draw
+	// as compressed as possible.  Returns one long string.
+	makePathAttribute(start, end) {
+		const p = this.props;
+		if (tracePathAttribute)
+			console.log(`👆 👆 PotentialArea.makePathAttribute(${start}, ${end})`);
+
+		// yawn too early
+		if (! p.space) throw new Error(`makePathAttribute(): no functioning space`);
+		if (! this.yScale) {
+			// I still haven't figured out the best time to call setScales()
+			if (!this.setScales())
+				return `M0,0`;  // too early
+		}
+
+		//if (tracePathAttribute)
+		//	console.log(`         xScale(d&r) & yScale(d&r):`,
+		//		this.xScale.domain(), this.xScale.range(), this.yScale.domain(), this.yScale.range(), );
+
+		const space = p.space;
+		//qe.qSpace_dumpPotential(`makePathAttribute(${start}, ${end})`);
+		const potentialBuffer = this.potentialBuffer = space.potentialBuffer;
+		//for (let i = 0; i < this.nPoints; i++)
+		//	console.log(`👆 👆 potentialBuffer[${i}] = ${potentialBuffer[i]}`);
+
+		// array to collect small snippets of text
+		const points = new Array(this.nPoints);
+		let y = this.yScale(potentialBuffer[start]);  //qe.get1DPotential(dim.start);
+		let x = this.xScale(start);
+		points[start] = `M${x},${y.toFixed(1)}L `;
+
+		for (let ix = start+1; ix < end; ix++) {
+			y = this.yScale(potentialBuffer[ix]);
+			x = this.xScale(ix);
+			points[ix] = `${x.toFixed(1)},${y.toFixed(1)} `;
+		}
+
+		// if this is a continuum, chop off the ends
+		if (start) {
+			points.pop();
+			points.shift();
+		}
+		if (tracePathAttribute)
+			console.log(`👆 👆 PotentialArea.makePathAttribute: done`, points.join(''));
+		return points.join('');
+	}
+
+	renderPaths() {
+		const p = this.props;
+		if (!p.space) return <></>;
+		const w = p.wholeRect;
+
+		let {start, end, continuum} = p.space.startEnd;
+		let paths = [];
+
+		//switch (p.space.dimensions[0].continuum) {
+		switch (continuum) {
+			//case 	qe.contDISCRETE:
+			case qe.contWELL:
+				// stone slabs on each end on the borders vaguely means 'quantum well'.
+				paths.push(
+					<rect className='left wellSlab' key='left'
+						x={0} y={0} width={this.barWidth} height={w.height}
+					/>
+				);
+				paths.push(
+					<rect className='right wellSlab' key='right'
+						x={w.width - this.barWidth} y={0} width={this.barWidth} height={w.height}
+					/>
+				);
+				break;
+
+			case qe.contENDLESS:
+				// full width including boundaries?  can you drag the boundaries?!?!  no.
+				//start = 0;
+				//end += 1;
+				break;
+
+			default: throw new Error(`bad continuum ${p.space.dimensions.continuum}`);
+		}
+
+		// the lines themselves: exactly overlapping.  tactile wider than visible.
+		if (p.showPotential) {
+			const pathAttribute = this.makePathAttribute(start, end);
+
+			// this one actually draws the white line
+			paths.push(
+				<path className='visibleLine' key='visible'
+					d={pathAttribute}
+					fill="transparent"
+				/>
+			);
+
+			// you click on this one
+			paths.push(
+				<path className='tactileLine' key='tactile'
+					d={pathAttribute}
+					stroke='#fff4'
+					fill="transparent"
+					onMouseDown={ev => this.mouseDown(ev)}
+				/>
+			);
+		}
+		return paths
+	}
+
+	//static whyDidYouRender = true;
+	render() {
+		//throw "holy smokes!"
+		if (traceRendering)
+			console.log(`👆 👆 PotentialArea.render()`);
+
+		// some of the math we do can be eliminated if we just do this
+		this.setScales();
+
+		const p = this.props;
+		const w = p.wholeRect;
+		if (! p.space)
+			return '';  // too early
+		this.barWidth = w.width / this.nPoints;
+		//debugger;
+
+		let returnV = (
+			<svg className='PotentialArea' viewBox={`0 0 ${w.width} ${w.height}`}
+					width={w.width} height={w.height}
+					onMouseMove={ev => this.mouseMove(ev)}
+					onMouseUp={ev => this.mouseUp(ev)}
+					ref={el => this.svgElement = el}
+			 	>
+
+				{this.renderPaths()}
+			</svg>
+		);
+		if (traceRendering)
+			console.log(`👆 👆 PotentialArea render done`);
+
+		return returnV;
+	}
+
 
 	/* ***************************************************  click & drag */
 
@@ -89,10 +236,11 @@ export class PotentialArea extends React.Component {
 		const p = this.props;
 		if (!p.wholeRect)
 			return false;
+		const w = p.wholeRect;
 
 		// new situation given new position
 		//let pixPotential = p.wholeRect.y + p.wholeRect.height - ev.clientY;
-		let newPotential = this.yScale.invert(p.height - ev.clientY + p.wholeRect.top);
+		let newPotential = this.yScale.invert(w.height - ev.clientY + p.wholeRect.top);
 		//newPotential -= 5;  // dunno if this works better
 
 		//let ix = Math.round((ev.clientX - p.wholeRect.x) / this.barWidth);
@@ -130,7 +278,7 @@ export class PotentialArea extends React.Component {
 		this.latestIx = ix;
 		this.latestPotential = newPotential;
 
-		//qe.set1DPotential(ix, p.height + p.y - newPotential);
+		//qe.set1DPotential(ix, w.height + p.y - newPotential);
 		this.updatePotentialArea();
 		return true;
 	}
@@ -197,147 +345,6 @@ export class PotentialArea extends React.Component {
 		ev.stopPropagation();
 	}
 
-	/* *************************************************** drawing */
-
-	updatePotentialArea =
-	() => {
-		this.forceUpdate();
-	}
-
-	// make the sequence of coordinates the white line needs to draw
-	// as compressed as possible.  Returns one long string.
-	makePathAttribute(start, end) {
-		const p = this.props;
-		if (tracePotentialArea)
-			console.log(`👆 👆 PotentialArea.makePathAttribute(${start}, ${end})`);
-
-		// yawn too early
-		if (! p.space) throw new Error(`makePathAttribute(): no functioning space`);
-		if (! this.yScale) {
-			// I still haven't figured out the best time to call setScales()
-			if (!this.setScales())
-				return `M0,0`;  // too early
-		}
-
-		if (tracePotentialArea)
-			console.log(`         xScale(d&r) & yScale(d&r):`,
-				this.xScale.domain(), this.xScale.range(), this.yScale.domain(), this.yScale.range(), );
-
-
-		const space = p.space;
-		//qe.qSpace_dumpPotential(`makePathAttribute(${start}, ${end})`);
-		const potentialBuffer = this.potentialBuffer = space.potentialBuffer;
-		//for (let i = 0; i < this.nPoints; i++)
-		//	console.log(`👆 👆 potentialBuffer[${i}] = ${potentialBuffer[i]}`);
-
-		// array to collect small snippets of text
-		const points = new Array(this.nPoints);
-		let y = this.yScale(potentialBuffer[start]);  //qe.get1DPotential(dim.start);
-		let x = 0;
-		points[start] = `M${x},${y.toFixed(1)}L `;
-		for (let ix = start+1; ix < end; ix++) {
-			y = this.yScale(potentialBuffer[ix]);
-			x = this.xScale(ix);
-			points[ix] = `${x.toFixed(1)},${y.toFixed(1)} `;
-		}
-		if (start) {
-			points.pop();
-			points.shift();
-		}
-		if (tracePotentialArea)
-			console.log(`👆 👆 PotentialArea.makePathAttribute: done`);
-		//console.log(`👆 👆 PotentialArea.makePathAttribute: result`, points);
-		return points.join('');
-	}
-
-	renderPaths() {
-		const p = this.props;
-		if (!p.space) return <></>;
-
-		let {start, end, continuum} = p.space.startEnd;
-		let paths = [];
-
-		//switch (p.space.dimensions[0].continuum) {
-		switch (continuum) {
-			//case 	qe.contDISCRETE:
-			case qe.contWELL:
-				// stone slabs on each end on the borders vaguely means 'quantum well'.
-				paths.push(
-					<rect className='left wellSlab' key='left'
-						x={0} y={0} width={this.barWidth} height={p.height}
-					/>
-				);
-				paths.push(
-					<rect className='right wellSlab' key='right'
-						x={p.width - this.barWidth} y={0} width={this.barWidth} height={p.height}
-					/>
-				);
-				break;
-
-			case qe.contENDLESS:
-				//full width including boundaries.  can you drag the boundaries?!?!
-				start = 0;
-				end += 1;
-				break;
-
-			default: throw new Error(`bad continuum ${p.space.dimensions.continuum}`);
-		}
-
-		// the lines themselves: exactly overlapping.  tactile wider than visible.
-		const pathAttribute = this.makePathAttribute(start, end);
-		if (tracePathAttribute)
-			console.log(`👆 👆 makePathAttribute(${start}, ${end}) returned:`, pathAttribute);
-
-		if (p.showPotential) {
-			// this one actually draws the white line
-			paths.push(
-				<path className='visibleLine' key='visible'
-					d={pathAttribute}
-					fill="transparent"
-				/>
-			);
-
-			// you click on this one
-			paths.push(
-				<path className='tactileLine' key='tactile'
-					d={pathAttribute}
-					stroke='#fff4'
-					fill="transparent"
-					onMouseDown={ev => this.mouseDown(ev)}
-				/>
-			);
-		}
-		return paths
-	}
-
-	//static whyDidYouRender = true;
-	render() {
-		//throw "holy smokes!"
-		if (traceRendering)
-			console.log(`👆 👆 PotentialArea.render()`);
-		const p = this.props;
-		if (! p.space)
-			return '';  // too early
-		this.nPoints = p.space.nPoints;
-		this.barWidth = p.width / this.nPoints;
-		//debugger;
-
-		let returnV = (
-			<svg className='PotentialArea' viewBox={`0 0 ${p.width} ${p.height}`}
-					width={p.width} height={p.height}
-					onMouseMove={ev => this.mouseMove(ev)}
-					onMouseUp={ev => this.mouseUp(ev)}
-					ref={el => this.svgElement = el}
-			 	>
-
-				{this.renderPaths()}
-			</svg>
-		);
-		if (traceRendering)
-			console.log(`👆 👆 PotentialArea render done`);
-
-		return returnV;
-	}
 }
 
 export default PotentialArea;

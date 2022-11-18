@@ -187,7 +187,7 @@ export class WaveView extends React.Component {
 				{spinner}
 			</aside>
 
-			<PotentialArea width={p.width} height={s.height}
+			<PotentialArea
 				space={s.space} wholeRect={wholeRect}
 				canvas={this.canvas}
 				setUpdatePotentialArea={p.setUpdatePotentialArea}
