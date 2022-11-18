@@ -109,13 +109,6 @@ class eWave {
 		else {
 			// a home brew wave, not from C++.  make a phony qWave for those ints to be
 			this.pointer = new Int32Array(20);
-
-//			// there MUST be a space  NO!  getters into C++
-//			let {start, end, nPoints, continuum} = this.space.startEnd;
-//			this.start = start;
-//			this.end = end;
-//			this.nPoints = nPoints;
-//			this.continuum = continuum;
 		}
 
 		// now for the buffer
@@ -137,12 +130,19 @@ class eWave {
 			// smoke test - the values a raw, freshly created qWave gets
 			for (let j = 0; j < this.nPoints*2; j++)
 				wave[j] = -99.;
-			// qBuffer::allocateWave fills to -77 (if trace turned on); allocateZeroedWave() leaves all zeroes
+			// qBuffer::allocateWave() fills to -77 (if trace turned on); allocateZeroedWave() leaves all zeroes
 		}
 		else {
 			debugger;
 			throw new Error(`call to construct eWave failed cuz bad waveArg=${waveArg}`);
 		}
+	}
+
+	// delete, except 'delete' is a reserved word.  Turn everything off.
+	// null out all other JS objects and buffers it points to, so ref counting can recycle it all
+	liquidate() {
+		this.space = this.wave = null;
+		// qAvatar frees its own qBuffer(s)
 	}
 
 	/* **************************************************************** direct access */

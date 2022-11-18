@@ -8,6 +8,7 @@ import eWave from './eWave';
 //import eSpace from './eSpace';
 import qe from './qe';
 
+let traceCreation = true;
 let traceHighest = false;
 let traceVBuffer = false;
 
@@ -28,15 +29,26 @@ class eAvatar {
 
 		this.space = space;
 		this.ewave = new eWave(space, null, this._qwave);
-		this.vBuffer = new Float32Array(window.Module.HEAPF32.buffer, vBufferPointer,
+		this.vBuffer = new Float32Array(
+			window.Module.HEAPF32.buffer, vBufferPointer,
 				space.nPoints * 8); // two vec4 s per point
 
 		// label everything for better traces
 		this.ewave.avatarLabel = this.label;
 		this.vBuffer.avatarLabel = this.label;  // yes this works on typedarraybuffers
+
+		if (traceCreation)
+			console.log(`eAvatar constructed:`, this);
 	}
 
-	/* ************************************************************************* Direct Accessors */
+	// delete, except 'delete' is a reserved word.  Turn everything off.
+	// null out all other JS objects and buffers it points to, so ref counting can recycle it all
+	liquidate() {
+		this.ewave.liquidate();
+		this.space = this.ewave = this.vBuffer = null;
+	}
+
+	/* *************************************************************** Direct Accessors */
 	// see qAvatar.cpp to regenerate this. Note these are all scalars; buffers
 	// are passed by pointer and you need to allocate them in JS (eg see
 	// eAvatar.constructor)

@@ -9,9 +9,11 @@ import salientPointersFactory from './salientPointersFactory';
 import eAvatar from './eAvatar';
 import {getAGroup} from '../utils/storeSettings';
 import {cppObjectRegistry} from '../utils/directAccessors';
+import {interpretCppException} from '../utils/errors';
+import {MAX_DIMENSIONS} from './eEngine';
 
-let traceSpace = false;
-
+let traceSpace = true;
+let traceFamiliarWave = false;
 
 /* **************************************************************** eDimension */
 
@@ -43,7 +45,9 @@ export class eSpace {
 	//unused static contCodeToText = code => ['Discrete', 'Well', 'Endless'][code];
 
 	constructor(dims, spaceLabel) {
-		if (traceSpace) console.log(`eSpace constructor just starting`);
+		if (traceSpace) console.log(`eSpace constructor just starting`, dims, spaceLabel);
+		if (dims.length > MAX_DIMENSIONS)
+			throw new Error(`Too many dimensions for space: ${dims.length} given but max is ${MAX_DIMENSIONS}`);
 
 		// this actually does it over on the C++ side
 		qe.startNewSpace(spaceLabel);
@@ -116,12 +120,44 @@ export class eSpace {
 		let waveParams = getAGroup('waveParams');
 		this.mainEWave.setFamiliarWave(waveParams);  //  SquishPanel re-does this for SetWave
 		this.miniGraphAvatar.ewave.setFamiliarWave(waveParams);  //  SquishPanel re-does this for SetWave
-		if (traceSpace) console.log(`🚀  done with setFamiliarWave():`, JSON.stringify(this.mainEWave.wave));
+		if (traceFamiliarWave) console.log(`🚀  done with setFamiliarWave():`, JSON.stringify(this.mainEWave.wave));
 
 
 		if (traceSpace) console.log(`🚀  done creating eSpace:`, this);
 	}
 
+	// delete, except 'delete' is a reserved word.  Turn everything off.
+	// null out all other JS objects and buffers it points to, so ref counting can recycle it all
+	liquidate() {
+		// delete stuff that this object's creator created, in reverse order
+		try {
+			if (traceSpace) {
+				// trace msgs in C++ should agree with these
+				let mgAv =  '0x'+ this.miniGraphAvatar.pointer.toString(16);
+				let mainAv = '0x'+  this.mainEAvatar.pointer.toString(16);
+				let spP = '0x'+ this.pointer.toString(16);
+				console.log(`🚀  liquidating mg avatar=${mgAv}  main avatar=${mainAv}  space=${spP} `,
+					this);
+			}
+			this.miniGraphAvatar.liquidate();
+			this.miniGraphAvatar = this.miniGraphVBuffer = this.miniGraphEWave = null;
+
+			this.mainEAvatar.liquidate();
+			this.mainEAvatar = this.mainVBuffer = this.mainEWave = null;
+
+			this.potentialBuffer = this.dimensions = null;
+
+			// finally, get rid of the C++ object
+			if (traceSpace) console.log(`🚀  done liquidating eSpace:`, this);
+			qe.deleteTheSpace(this.pointer);
+		} catch (ex) {
+			// eslint-disable-next-line no-ex-assign
+			ex = interpretCppException(ex);
+			console.error(ex.stack ?? ex.message ?? ex);
+		}
+	}
+
+	/* ******************************************************************************************* arithmetic */
 	// call it like this: const {start, end, N, continuum} = space.startEnd;
 	get startEnd() {
 		const dim = this.dimensions[0];
@@ -172,17 +208,5 @@ export class eSpace {
 
 }
 
-
-/* ************************************************************************ space lookup */
-
-//eSpace.spaces = {};
-//
-//eSpace.lookup =
-//(pointer) => eSpace.spaces[pointer];
-//
-//eSpace.addToSpaceList =
-//(pointer, espace) => eSpace.spaces[pointer] = espace;
-
-
-window.eSpace = eSpace;  // debugging
 export default eSpace;
+
