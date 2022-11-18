@@ -9,9 +9,9 @@
 #include "../debroglie/qWave.h"
 #include "qViewBuffer.h"
 
-static bool traceSpaceCreation = false;
+static bool traceSpaceCreation = true;
 static bool traceAvatarDetail = false;
-static bool traceExceptions = false;
+static bool traceExceptions = true;
 
 // 'the' globals are for the one and only SquishPanel being displayed on this
 // curent, preliminary version of SquishyElectron.  Along with various other
@@ -116,7 +116,8 @@ struct salientPointersType *completeNewSpace(void) {
 
 // dispose of ALL of everything attached to the space
 void deleteTheSpace(qSpace *space) {
-	if (traceSpaceCreation) printf("   🚀 🚀 🚀 deleteTheSpace(): starts\n");
+	if (traceSpaceCreation) printf("   🚀 🚀 🚀 deleteTheSpace(): starts, theSpace:%p, space to delete=%p\n",
+		theSpace, space);
 	if (theSpace != space)
 		throw std::runtime_error("Trying to delete a space other than theSpace!");
 
@@ -145,15 +146,14 @@ void deleteTheSpace(qSpace *space) {
 
 // Given the mysterious number thrown when C++ barfs, get a real error message.  this is loosely from
 // https://emscripten.org/docs/porting/Debugging.html#handling-c-exceptions-from-javascript
-const char *getCppExceptionMessage(intptr_t exceptionPtr) {
+const char *getCppExceptionMessage(intptr_t exceptionPtrInt) {
 	// what() returns a C string; pass pointer back to JS as integer
-	if (traceExceptions) printf("getCppExceptionMessage(%ld) \n",
-		exceptionPtr);
-	//if (exceptionPtr & 3)
-	//	return "bad exc ptr";
+	if (traceExceptions) printf("getCppExceptionMessage(%ld) \n", exceptionPtrInt);
+	if (exceptionPtrInt & 3)
+		return "bad exc ptr";
 	if (traceExceptions) printf("getCppExceptionMessage = '%s'\n",
-		 reinterpret_cast<std::exception *>(exceptionPtr)->what());
-	return reinterpret_cast<std::exception *>(exceptionPtr)->what();
+		 reinterpret_cast<std::exception *>(exceptionPtrInt)->what());
+	return reinterpret_cast<std::exception *>(exceptionPtrInt)->what();
 }
 
 // end of extern "C"
