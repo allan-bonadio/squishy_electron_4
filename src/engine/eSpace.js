@@ -12,7 +12,7 @@ import {cppObjectRegistry} from '../utils/directAccessors';
 import {interpretCppException} from '../utils/errors';
 import {MAX_DIMENSIONS} from './eEngine';
 
-let traceSpace = true;
+let traceSpace = false;
 let traceFamiliarWave = false;
 
 /* **************************************************************** eDimension */
@@ -148,7 +148,7 @@ export class eSpace {
 			this.potentialBuffer = this.dimensions = null;
 
 			// finally, get rid of the C++ object
-			if (traceSpace) console.log(`🚀  done liquidating eSpace:`, this);
+			if (traceSpace) console.log(`🚀  done  eSpace:`, this);
 			qe.deleteTheSpace(this.pointer);
 		} catch (ex) {
 			// eslint-disable-next-line no-ex-assign

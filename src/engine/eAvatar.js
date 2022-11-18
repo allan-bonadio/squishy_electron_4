@@ -8,7 +8,7 @@ import eWave from './eWave';
 //import eSpace from './eSpace';
 import qe from './qe';
 
-let traceCreation = true;
+let traceCreation = false;
 let traceHighest = false;
 let traceVBuffer = false;
 

@@ -13,7 +13,7 @@ import {storeASetting} from '../utils/storeSettings';
 
 // all of these must be attached to window to  get called by c++
 
-let tracePromises = true;
+let tracePromises = false;
 
 /* ****************************************************** app startup */
 

@@ -34,8 +34,8 @@ import {getASetting, storeASetting} from './utils/storeSettings';
 let areBenchmarking = false;
 let traceTheViewBuffer = false;
 let traceSetPanels = false;
-let tracePromises = true;
-let traceSquishPanel = true;
+let tracePromises = false;
+let traceSquishPanel = false;
 let traceIteration = false;
 //let traceConstructor = false;
 
@@ -61,7 +61,6 @@ setTimeout(() => {
 
 export class SquishPanel extends React.Component {
 	static propTypes = {
-		//token: PropTypes.number,
 		id: PropTypes.string.isRequired,
 		width: PropTypes.number,
 	};
@@ -607,7 +606,6 @@ export class SquishPanel extends React.Component {
 
 		return (
 			<div id={this.props.id} className="SquishPanel">
-				{/*innerWindowWidth={s.innerWindowWidth}/>*/}
 				<WaveView
 					viewClassName={s.mainViewClassName}
 					viewName='mainView'
