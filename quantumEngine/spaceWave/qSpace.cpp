@@ -25,11 +25,11 @@ qSpace::qSpace(const char *lab)
 
 	if (traceQSpace) printf("🚀 🚀 qSpace::qSpace() constructor starts label:'%s'  this= %p\n", lab, (this));
 
-	strncpy(label, lab, LABEL_LEN);
-	label[LABEL_LEN] = 0;
+	strncpy(label, lab, MAX_LABEL_LEN);
+	label[MAX_LABEL_LEN] = 0;
 
-	if (LABEL_LEN != 7 && LABEL_LEN != 15 && LABEL_LEN != 31)
-		throw std::runtime_error("🚀 🚀 bad value for LABEL_LEN defined at compiler");
+	if (MAX_LABEL_LEN != 7 && MAX_LABEL_LEN != 15 && MAX_LABEL_LEN != 31)
+		throw std::runtime_error("🚀 🚀 bad value for MAX_LABEL_LEN defined at compiler");
 
 	if (traceQSpace) printf("🚀 🚀 qSpace::qSpace() constructor done this= %p, length %lx\n",
 			(this), sizeof(qSpace));
@@ -50,8 +50,8 @@ void qSpace::addDimension(int N, int continuum, const char *label) {
 	dims->start = continuum ? 1 : 0;
 	dims->end = N + dims->start;
 
-	strncpy(dims->label, label, LABEL_LEN);
-	dims->label[LABEL_LEN] = 0;
+	strncpy(dims->label, label, MAX_LABEL_LEN);
+	dims->label[MAX_LABEL_LEN] = 0;
 
 	nDimensions++;
 }

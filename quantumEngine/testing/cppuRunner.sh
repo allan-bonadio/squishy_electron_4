@@ -41,8 +41,8 @@ export CPPUTEST_HOME=/opt/dvl/cpputest/cpputest-3.8
 # create a space-sep list of ALL the runtime cpp files (almost all)
 allCpp=`cat building/allCpp.list`
 
-# keep (LABEL_LEN+1) a multiple of 4, 8, 16, 32 or 8 for alignment, eg 7, 15 or 31
-LABEL_LEN=7
+# keep (MAX_LABEL_LEN+1) a multiple of 4, 8, 16, 32 or 8 for alignment, eg 7, 15 or 31
+MAX_LABEL_LEN=7
 
 # note that main.cpp is NOT included in the .cpp files; that's for web use only
 # and makes all the diff.  cppuMain.cpp is the main instead.
@@ -52,7 +52,7 @@ set -x
 g++ -o cppuTestBin -Wno-tautological-undefined-compare  \
 	-g -O0 \
 	-std=c++11 -fexceptions  \
-	-DLABEL_LEN=$LABEL_LEN \
+	-DMAX_LABEL_LEN=$MAX_LABEL_LEN \
 	-I$CPPUTEST_HOME/include \
 	-include $CPPUTEST_HOME/include/CppUTest/MemoryLeakDetectorNewMacros.h \
 	-L$CPPUTEST_HOME/lib -lCppUTest -lCppUTestExt \

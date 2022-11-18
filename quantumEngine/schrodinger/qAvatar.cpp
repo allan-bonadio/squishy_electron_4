@@ -59,8 +59,8 @@ qAvatar::qAvatar(qSpace *sp, const char *lab)
 	potential = sp->potential;
 	potentialFactor = sp->potentialFactor;
 
-	strncpy(label, lab, LABEL_LEN);
-	label[LABEL_LEN] = 0;
+	strncpy(label, lab, MAX_LABEL_LEN);
+	label[MAX_LABEL_LEN] = 0;
 
 	resetCounters();
 

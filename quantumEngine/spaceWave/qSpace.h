@@ -6,14 +6,6 @@
 
 #include "../squish.h"
 
-// do not exceed these!  they are open ended arrays.
-// keep LABEL_LEN+1 a multiple of 4 or 8 for alignment.
-// now defined in buildDev.sh, buildProd.sh or cppuRunner.sh
-//#define LABEL_LEN  7
-//#define LABEL_LEN  31
-
-#define MAX_DIMENSIONS  2
-
 extern class qSpace *theSpace;
 extern double *thePotential;
 
@@ -51,7 +43,7 @@ public:
 	// variable total angular mom: L combines Lz and Ltot so: state ix = 0...Lmax^2
 	// Ltot = floor(sqrt(ix))   Lz = ix - L(L+1) and you have to choose a Lmax sorry
 	// Also could have Energy dimensions...
-	char label[LABEL_LEN+1];
+	char label[MAX_LABEL_LEN+1];
 
 };
 
@@ -61,6 +53,8 @@ struct FreeBuffer {
 };
 
 /* ************************************************************ the space */
+
+// MAX_LABEL_LEN and MAX_DIMENSIONS defined in whichever build script
 
 struct qSpace {
 public:
@@ -76,7 +70,7 @@ public:
 
 	int magic;
 
-	char label[LABEL_LEN+1];
+	char label[MAX_LABEL_LEN+1];
 
 	// Dimensions are listed from outer to inner as with the resulting 𝜓 array:
 	// 𝜓[outermost-dim][dim][dim][innermost-dim]
@@ -88,20 +82,18 @@ public:
 	int nDimensions;
 
 	// totals for all dimensions.  These numbers dominate lots of areas in the code.
-	int nStates;
-	int nPoints;
+	int nStates;  // active datapoinits
+	int nPoints;  // allocated size
 	int spectrumLength;  // should == nStates
 
-	// should this be part of the space or the qAvatar?
-	// the space; it helps to define the lay of the land
+	// part of the space; it helps to define the lay of the land
 	double *potential;
-	double potentialFactor;
+	double potentialFactor;  // tweak this
 
 	struct qAvatar *mainAvatar;
 	struct qAvatar *miniGraphAvatar;
 
 	void dumpPotential(const char *title);
-
 };
 
 /* ************************************************************ JS interface */

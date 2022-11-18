@@ -22,8 +22,9 @@ fi
 # omit those, so testing can also use this and compile & run itself (see testing/cppu*).
 allCpp=`cat allCpp.list`
 
-# keep LABEL_LEN+1 a multiple of 4 or 8 for alignment, eg 7, 15 or 32
-LABEL_LEN=15
+# keep MAX_LABEL_LEN+1 a multiple of 4 or 8 for alignment, eg 7, 15 or 32
+MAX_LABEL_LEN=15
+MAX_DIMENSIONS=2
 
 cd ..
 
@@ -36,7 +37,7 @@ emcc -o quantumEngine.js -sLLD_REPORT_UNDEFINED \
 	-sEXPORTED_FUNCTIONS=@building/exports.json \
 	-sEXPORTED_RUNTIME_METHODS='["ccall","cwrap","UTF8ArrayToString", "AsciiToString"]' \
 	$PROFILING \
-	-DLABEL_LEN=$LABEL_LEN \
+	-DMAX_LABEL_LEN=$MAX_LABEL_LEN -DMAX_DIMENSIONS=$MAX_DIMENSIONS \
 	-I$qEMSCRIPTEN/emsdk/upstream/emscripten/cache/sysroot/include \
 	-include emscripten.h \
 	-ffast-math  -lembind \

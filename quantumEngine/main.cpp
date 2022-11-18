@@ -17,10 +17,10 @@
 // call this JS callback so JS knows we're up and ready.
 // Hand it some sizes for the heck of it.
 // somehow there's a race condition where this isn't set soon enough... sometimes
-EM_JS(void, qeStarted, (),
+EM_JS(void, qeStarted, (int max_dimensions, int max_label_len),
 {
 	// maybe we can tighten this up a bit someday
-	setTimeout(() => quantumEngineHasStarted(), 400);
+	setTimeout(() => quantumEngineHasStarted(max_dimensions, max_label_len), 400);
 }
 );
 
@@ -30,7 +30,7 @@ int main() {
 	printf("bonjour le monde!\n");
 
 	// call the above function with arbitrary numbers to keep everybody amused
-	qeStarted();
+	qeStarted(MAX_DIMENSIONS, MAX_LABEL_LEN);
 
 	//printf("alignof(double) = %ld, alignof(int) = %ld, alignof(int *) = %ld, alignof(bool) = %ld\n",
 	//	alignof(double), alignof(int), alignof(int *), alignof(bool));

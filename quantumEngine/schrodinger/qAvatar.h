@@ -61,7 +61,7 @@ struct qAvatar {
 	float *vBuffer;  // aligned by 4, not 8
 
 	// mostly for debugging
-	char label[LABEL_LEN + 1];
+	char label[MAX_LABEL_LEN + 1];
 
 	// for alignment: put these last
 
