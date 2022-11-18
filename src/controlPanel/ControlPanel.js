@@ -20,8 +20,6 @@ import {getASetting, storeASetting, getAGroup, storeAGroup} from '../utils/store
 export class ControlPanel extends React.Component {
 	static propTypes = {
 		iterateAnimate: PropTypes.func.isRequired,
-		startStop: PropTypes.func.isRequired,
-		singleIteration: PropTypes.func.isRequired,
 
 		// these are the actual functions that change the main qWave and ultimately
 		// the WaveView on the screen
@@ -31,16 +29,12 @@ export class ControlPanel extends React.Component {
 		toggleShowPotential: PropTypes.func.isRequired,
 		showPotential: PropTypes.bool.isRequired,
 
-		isTimeAdvancing: PropTypes.bool.isRequired,  // ie is it running?
-
 		iterateFrequency: PropTypes.number.isRequired,  // frames per second
 		setIterateFrequency: PropTypes.func.isRequired,
 
 		// early on, there's no space.  Must have SquishPanel mounted first, and the eSpace promise resolved.
 		space: PropTypes.instanceOf(eSpace),
 		N: PropTypes.number.isRequired,
-
-		openResolutionDialog: PropTypes.func.isRequired,
 
 		redrawWholeMainWave: PropTypes.func.isRequired,
 
@@ -187,7 +181,7 @@ export class ControlPanel extends React.Component {
 			/>;
 
 		case 'space':
-			return <SetResolutionTab openResolutionDialog={p.openResolutionDialog} />;
+			return <SetResolutionTab />;
 
 		case 'iteration':
 			return <SetIterationTab
@@ -219,10 +213,6 @@ export class ControlPanel extends React.Component {
 
 		return <div className='ControlPanel'>
 			<CPToolbar
-				isTimeAdvancing={p.isTimeAdvancing}
-				startStop={p.startStop}
-				singleIteration={p.singleIteration}
-
 				iterateFrequency={p.iterateFrequency}
 				setIterateFrequency={this.setIterateFrequency}
 

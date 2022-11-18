@@ -6,16 +6,11 @@
 import PropTypes from 'prop-types';
 //import qe from '../engine/qe';
 import eSpace from '../engine/eSpace';
+import SquishPanel from '../SquishPanel';
+
 
 function setPT() {
 	CPToolbar.propTypes = {
-		// clicks on start/stop/single buttons
-		startStop: PropTypes.func.isRequired,
-		singleIteration: PropTypes.func.isRequired,
-
-		// tells if simulation is iterating
-		isTimeAdvancing: PropTypes.bool.isRequired,
-
 		iterateFrequency: PropTypes.number.isRequired,
 		setIterateFrequency: PropTypes.func.isRequired,
 		N: PropTypes.number.isRequired,
@@ -37,8 +32,7 @@ function clickOnFFT(space)
 
 
 function CPToolbar(props) {
-	const {iterateFrequency, setIterateFrequency,
-		isTimeAdvancing} = props;
+	const {iterateFrequency, setIterateFrequency} = props;
 
 	const repRates = <>
 		<option key='60' value='60'>60 per sec</option>
@@ -76,14 +70,14 @@ function CPToolbar(props) {
 		<span className='toolSpacer' style={{width: '.3em'}}></span>
 
 		<button className={`startStopToggle startStopTool`}
-			onClick={props.startStop}>
-			{ isTimeAdvancing
+			onClick={SquishPanel.startStop}>
+			{ SquishPanel.isTimeAdvancing
 				? <span><big>&nbsp;</big>▐▐ <big>&nbsp;</big></span>
 				: <big>►</big> }
 		</button>
 
 		<button className={`stepButton startStopTool`}
-			onClick={props.singleIteration}>
+			onClick={SquishPanel.singleIteration}>
 			<big>►</big> ▌
 		</button>
 

@@ -18,8 +18,8 @@ class App extends React.Component {
 
 		this.state = {
 			innerWindowWidth: window.innerWidth,
-
 			isDialogShowing: false,
+			squishPanelExists: true,
 		};
 
 		App.me = this;
@@ -36,6 +36,25 @@ class App extends React.Component {
 		CommonDialog.finishClosingDialog();
 	}
 
+	/* ************************************************ recreation */
+	// called when user changes dimensions (or maybe other cases?)
+	static blinkSquishPanel(createAgain) {
+		this.me.createAgain = createAgain
+		this.me.setState({squishPanelExists: false})
+	}
+
+	componentDidUpdate() {
+		if (!this.state.squishPanelExists) {
+			// after SquishPanel has been excluded from one render,
+			// that guarantees that all the other components have been freed.
+			// So now we can start over.  big hack, maybe after I figure out how to kill hot reload I can get rid of this crap.
+			SquishPanel.anticipateConstruction();
+
+			this.createAgain();
+			this.setState({squishPanelExists: true});
+		}
+	}
+
 	/* ************************************************ App */
 
 	componentDidMount() {
@@ -48,10 +67,13 @@ class App extends React.Component {
 		});
 	}
 
-
 	//static whyDidYouRender = true;
 	render() {
 		const s = this.state;
+
+		let sqPanel = null;
+		if (s.squishPanelExists)
+			sqPanel = <SquishPanel id='theSquishPanel' width={s.innerWindowWidth}/>;
 
 		//const stateParams = sParams || s.stateParams;
 		const sqDialog = s.isDialogShowing ? <CommonDialog  /> : null;
@@ -66,12 +88,13 @@ class App extends React.Component {
 					&nbsp; &nbsp;
 					Squishy Electron
 				</h2>
-				<SquishPanel id='theSquishPanel' width={s.innerWindowWidth}/>
 
+				{sqPanel}
 				{sqDialog}
 			</div>
 		);
 	}
+
 }
 
 export default App;

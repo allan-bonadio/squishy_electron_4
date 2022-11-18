@@ -4,55 +4,56 @@
 */
 
 import React from 'react';
-import PropTypes from 'prop-types';
+//import PropTypes from 'prop-types';
 
 import qe from '../engine/qe';
 import CommonDialog from '../widgets/CommonDialog';
 import {powerToIndex} from '../utils/powers';
 import LogSlider from '../widgets/LogSlider';
-import listOfViewClasses from '../view/listOfViewClasses';
+//import listOfViewClasses from '../view/listOfViewClasses';
+import SquishPanel from '../SquishPanel';
+import {recreateMainSpace, eSpaceCreatedPromise} from '../engine/eEngine';
+import {getASetting} from '../utils/storeSettings';
 
-
+// yeah, these are IN ADDITION TO the storeSettings criteria, cuz that's only powers of 2
 const MIN_2SLIDER_RES = process.env.NODE_ENV == 'development' ? 4 : 16;
 const MAX_2SLIDER_RES = 1024;
 
 export default class ResolutionDialog extends React.Component {
 	static propTypes = {
-		N: PropTypes.number.isRequired,
-		continuum: PropTypes.number.isRequired,
-		mainViewClassName: PropTypes.string.isRequired,
 	};
 
-	// this is the state in the dialog; doesn't become real until OK().
-	// Therefore, initial values set from props.
-	state = {
-		N: this.props.N,  // same as power
-		index: powerToIndex(16, this.props.N),
-		continuum: this.props.continuum,
-		mainViewClassName: this.props.mainViewClassName,
-		origN: this.props.N,
-	};
+	constructor(props) {
+		super(props);
 
+		// this is the state in the dialog; will be used to recreate space upon OK().
+		// Therefore, initial values set from storage = current settings.
+		let N = getASetting('spaceParams', 'N');
+		this.state = {
+			N,
+			powerIndex: powerToIndex(16, N),
+			continuum: getASetting('spaceParams', 'continuum'),
+			origN: N,
+		};
+	}
 
 	/* ******************************************************************* open/close */
 
 	static initialParams;
 	static me = this;
 
-	// open the Resolution dialog specifically
-	static openResDialog(initialParams, okCallback, cancelCallback) {
+	// open the Resolution dialog specifically, passing in the callbacks
+	static openResDialog(okCallback, cancelCallback) {
 		// there is no more than 1 resolution dialog open at a time so I can store this stuff here
-		ResolutionDialog.initialParams = initialParams;
 		ResolutionDialog.okCallback = okCallback;
 		ResolutionDialog.cancelCallback = cancelCallback;
 
+		//let initialParams = {N: getASetting('spaceParams', 'N'), continiuum: getASetting('spaceParams', 'continiuum')}]
+		//this.me.setState(initialParams);
+
 		// open the general dialog with resolutionDialog as the main component
 		CommonDialog.openDialog(
-			<ResolutionDialog
-				N={initialParams.N}
-				continuum={initialParams.continuum}
-				mainViewClassName={initialParams.mainViewClassName}
-			/>
+			<ResolutionDialog />
 		);
 	}
 
@@ -71,6 +72,54 @@ export default class ResolutionDialog extends React.Component {
 	}
 
 
+	// puts up the resolution dialog, starting with the values from the state
+	static openResolutionDialog() {
+		// freeze the iteration while this is going on ...
+		const timeWasAdvancing = SquishPanel.isTimeAdvancing;
+		SquishPanel.isTimeAdvancing = false;
+		//?? ResolutionDialog.me.setState()
+
+		// pass our state upward to load into the dialog
+		ResolutionDialog.openResDialog(
+			// this is the initialParams
+			//{N: s.N, continuum: s.continuum, mainViewClassName: s.mainViewClassName},
+
+			// OK callback
+			finalParams => {
+				//let prevLowPassFilter = s.lowPassFilter;
+				//let prevN = s.N;
+				//this.setState({mainViewClassName: finalParams.mainViewClassName});
+
+//				qe.deleteTheSpace();
+//
+//				create1DMainSpace({N: finalParams.N, continuum: finalParams.continuum, label: 'main'});
+
+				// this is the 0-th dimension of the space, the x axis
+				finalParams.label = 'x';
+				recreateMainSpace(finalParams);
+
+				// do i really have to wait?  I thiink the promise only works the first time.
+				eSpaceCreatedPromise
+				.then(space => {
+					//this.setState({: ,
+					//N: finalParams.N, continuum: finalParams.continuum});
+					SquishPanel.isTimeAdvancing = timeWasAdvancing;
+				});
+
+				//storeASetting('spaceParams', 'N', finalParams.N);
+				//localStorage.space0 = JSON.stringify({N: finalParams.N, continuum: finalParams.continuum});
+				// should also work storeSettings.setSetting('space0.N, finalParams.N);
+				// and storeSettings.setSetting('space0.continuum, finalParams.continuum);
+
+			},  // end of OK callback
+
+			// cancel callback
+			() => {
+				SquishPanel.isTimeAdvancing = timeWasAdvancing;
+			}
+		);
+	}
+
 	/* ******************************************************************* rendering */
 
 	renderNSlider() {
@@ -84,7 +133,7 @@ export default class ResolutionDialog extends React.Component {
 				maxLabel='more accurate'
 
 				current={s.N}
-				original={this.origN}
+				original={s.origN}
 				sliderMin={MIN_2SLIDER_RES}
 				sliderMax={MAX_2SLIDER_RES}
 
@@ -97,12 +146,12 @@ export default class ResolutionDialog extends React.Component {
 	}
 
 	handleResChange =
-	(N, ix) => {
+	(N, powerIndex) => {
 		this.setState({
-			ix: +ix,
+			powerIndex: +powerIndex,
 			N: +N,
 		});
-		console.info(`handleResChange(N=${N}, ix=$ix) `)
+		console.info(`handleResChange(N=${N}, powerIndex=$powerIndex) `)
 	}
 
 	renderContinuum() {
@@ -126,7 +175,7 @@ export default class ResolutionDialog extends React.Component {
 						? 'bold'
 						: 'normal'}}/>
 				Well with Walls</label>
-			<label  key='contDISCRETE'><input type='radio' name='continuum'  value={qe.contDISCRETE}
+			{/* <label  key='contDISCRETE'><input type='radio' name='continuum'  value={qe.contDISCRETE}
 					checked={s.continuum == qe.contDISCRETE}
 					onChange={onChange}
 					style={{fontWeight:
@@ -134,34 +183,33 @@ export default class ResolutionDialog extends React.Component {
 						? 'bold'
 						: 'normal'}}
 						disabled />
-				Discreet Quanta (not developed yet)</label>
+				Discreet Quanta (not developed yet)</label> */}
 		</>;
 	}
 
-	renderViewRadios() {
-		const onChange = ev => this.setState({mainViewClassName: ev.target.value});
-
-		// the one that theoreticallyt should work
-		const radioz = [];
-		for (let vuClassName in listOfViewClasses) {
-			const vuClass = listOfViewClasses[vuClassName];
-			//console.log(`doin this vuClass:`, vuClass.displayName);
-			//console.dir(vuClass);
-			//console.log(`   typeof:`, typeof vuClassName, typeof vuClass);
-			//console.log(`   names:`, vuClass.displayName, vuClass.displayName, vuClass.displayName);
-			radioz.push(<label key={vuClass.displayName}>
-				<input type='radio' key={vuClass.displayName} name='mainViewClassName'
-					value={vuClass.displayName}
-					checked={vuClass.displayName == this.state.mainViewClassName}
-					onChange={onChange}/>
-				{vuClass.displayName}</label>);
-		}
-
-		return radioz;
-
-	}
-
-// 				<datalist id='GoodPowersOf10' >{GoodPowersOf10}</datalist>
+	//renderViewRadios() {
+	//	//const onChange = ev => this.setState({mainViewClassName: ev.target.value});
+	//	// the one that theoreticallyt should work
+	//	const radioz = [];
+	//	for (let vuClassName in listOfViewClasses) {
+	//		const vuClass = listOfViewClasses[vuClassName];
+	//		//console.log(`doin this vuClass:`, vuClass.displayName);
+	//		//console.dir(vuClass);
+	//		//console.log(`   typeof:`, typeof vuClassName, typeof vuClass);
+	//		//console.log(`   names:`, vuClass.displayName, vuClass.displayName, vuClass.displayName);
+	//		radioz.push(<label key={vuClass.displayName}>
+	//			<input type='radio' key={vuClass.displayName} name='mainViewClassName'
+	//				value={vuClass.displayName}
+	//				checked={vuClass.displayName == this.state.mainViewClassName}
+	//				onChange={onChange}/>
+	//			{vuClass.displayName}</label>);
+	//	}
+	//	return radioz;
+	//}
+			//<section className='dialogSection' key='viewRadios'
+			//style={{float: 'left', width: '45%'}}>
+			//{this.renderViewRadios()}
+			//</section>
 
 	render() {
 		//const s = this.state;
@@ -178,11 +226,6 @@ export default class ResolutionDialog extends React.Component {
 				<section className='dialogSection'  key='continuumRadios'
 					style={{float: 'left', width: '45%', paddingRight: '2em'}} >
 					{this.renderContinuum()}
-				</section>
-
-				<section className='dialogSection' key='viewRadios'
-					style={{float: 'left', width: '45%'}}>
-					{this.renderViewRadios()}
 				</section>
 
 				<section className='dialogSection' key='setButton'

@@ -15,15 +15,16 @@ import ControlPanel from './controlPanel/ControlPanel';
 // eslint-disable-next-line no-unused-vars
 import {eSpace} from './engine/eSpace';
 // import eWave from './engine/eWave';
-import {create1DMainSpace, eSpaceCreatedPromise} from './engine/eEngine';
+import {eSpaceCreatedPromise} from './engine/eEngine';
+//import {create1DMainSpace, eSpaceCreatedPromise} from './engine/eEngine';
 
 import {interpretCppException} from './utils/errors';
 //import {interpretCppException, dumpJsStack} from './utils/errors';
 
-import qe from './engine/qe';
+//import qe from './engine/qe';
 
 import WaveView from './view/WaveView';
-import ResolutionDialog from './controlPanel/ResolutionDialog';
+//import ResolutionDialog from './controlPanel/ResolutionDialog';
 import CommonDialog from './widgets/CommonDialog';
 import {setFamiliarPotential} from './utils/potentialUtils';
 
@@ -31,19 +32,20 @@ import {getASetting, storeASetting} from './utils/storeSettings';
 
 // runtime debugging flags - you can change in the debugger or here
 let areBenchmarking = false;
-let dumpingTheViewBuffer = false;
+let traceTheViewBuffer = false;
 let traceSetPanels = false;
-let tracePromises = false;
-let traceSquishPanel = false;
+let tracePromises = true;
+let traceSquishPanel = true;
+let traceIteration = false;
 //let traceConstructor = false;
 
 //if (typeof storeSettings == 'undefined') debugger;
 
 const DEFAULT_VIEW_CLASS_NAME = 'flatDrawingViewDef';
 
+// iterations always need specific numbers of steps.
 const N_EXTRA_STEPS = 1;
 
-window.squishPanelConstructed = 0;
 
 // figure out how long requestAnimationFrame()'s period is
 let rafPeriod;
@@ -65,16 +67,19 @@ export class SquishPanel extends React.Component {
 	};
 
 	/* ************************************************ construction & reconstruction */
+	static squishPanelConstructed = 0;
+
 	constructor(props) {
 		super(props);
+		SquishPanel.me = this;
 
-		if (window.squishPanelConstructed) {
+		if (SquishPanel.squishPanelConstructed) {
 			// should not be called twice!
 			console.log(`annoying hot reload; continue to really reload page...`);
 			debugger;
 			location = location;  // eslint-disable-line no-restricted-globals
 		}
-		window.squishPanelConstructed++;
+		SquishPanel.squishPanelConstructed++;
 
 		this.state = {
 			// Many of these things should be in a lower component;
@@ -92,7 +97,7 @@ export class SquishPanel extends React.Component {
 
 			// this is controlled by the user (start/stop/step buttons)
 			// does not really influence the rendering of the canvas... (other than running)
-			isTimeAdvancing: getASetting('iterationParams', 'isTimeAdvancing'),
+			//isTimeAdvancing: getASetting('iterationParams', 'isTimeAdvancing'),
 
 			// this is the actual 'frequency' in actual milliseconds, as set by that menu.
 			// convert between like 1000/n
@@ -113,13 +118,6 @@ export class SquishPanel extends React.Component {
 
 		};
 
-		// will be resolved when the space has been created; result will be eSpace.
-		// this requires C++ to have started up.
-		//this.createdSpacePromise = new Promise((succeed, fail) => {
-		//	//this.createdSpace = succeed;
-		//	if (tracePromises) console.log(`SquishPanel:  eSpaceCreatedPromise created:`, succeed, fail);
-		//});
-
 		// ticks and benchmarks
 		const now = performance.now();
 		this.initStats(now);
@@ -131,6 +129,12 @@ export class SquishPanel extends React.Component {
 		this.allowRunningOneCycle = /allowRunningOneCycle/.test(location.search);
 
 		if (traceSquishPanel) console.log(`SquishPanel constructor done`);
+	}
+
+	// this squishPanelConstructed count will detect hot reloading screwing up the app,
+	// but the space dialog also wants to do this.  sigh.
+	static anticipateConstruction() {
+		SquishPanel.squishPanelConstructed = 0;
 	}
 
 	// NO!  get these from the avatar  working with GLView, it'll pass me back some functions
@@ -185,7 +189,7 @@ export class SquishPanel extends React.Component {
 				return;  // needed?  no.
 			}
 			//if (typeof ex == 'object')
-			console.error(`error  SquishPanel.didMount.then():`, ex.stack || ex.message || ex);
+			console.error(`error  SquishPanel.didMount.then():`, ex.stack ?? ex.message ?? ex);
 			//else console.error(`error  SquishPanel.raw:`, ex);
 			//debugger;
 		});
@@ -193,70 +197,52 @@ export class SquishPanel extends React.Component {
 	}
 
 
-	//setEffectiveView =
-	//view => {
-	//	this.effectiveView = view;
-	//	this.setState({effectiveView: view})
-	//}
-
-	// init or re-init the space and the panel
-	//setNew1DResolution(N, continuum) {
-	//
-	//	// usually this is the initial space created
-	//	const space = new eSpace([{N, continuum, label: 'x'}]);
-	//	this.setState({space});
-	//	this.space = space;
-	//
-	//	this.mainEAvatar = space.mainEAvatar;
-	//	return space;
-	//}
-
-	// puts up the resolution dialog, starting with the values from this.state
-	openResolutionDialog() {
-		const s = this.state;
-
-		// freeze the iteration while this is going on ... but not if relaxing
-		const timeWasAdvancing = s.isTimeAdvancing;
-		this.setState({isTimeAdvancing: false});
-
-		// pass our state upward to load into the dialog
-		ResolutionDialog.openResDialog(
-			// this is the initialParams
-			{N: s.N, continuum: s.continuum, mainViewClassName: s.mainViewClassName},
-
-			// OK callback
-			finalParams => {
-				// let prevLowPassFilter = s.lowPassFilter;
-				// let prevN = s.N;
-				this.setState({mainViewClassName: finalParams.mainViewClassName});
-
-				qe.deleteTheSpace();
-
-				create1DMainSpace({N: finalParams.N, continuum: finalParams.continuum, label: 'main'});
-
-				// do i really have to wait?  I thiink the promise only works the first time.
-				eSpaceCreatedPromise
-				.then(space => {
-					this.setState({isTimeAdvancing: timeWasAdvancing,
-						N: finalParams.N, continuum: finalParams.continuum});
-					storeASetting('spaceParams', 'N', finalParams.N);
-					storeASetting('spaceParams', 'continuum', finalParams.continuum);
-				});
-
-				//storeASetting('spaceParams', 'N', finalParams.N);
-				//localStorage.space0 = JSON.stringify({N: finalParams.N, continuum: finalParams.continuum});
-				// should also work storeSettings.setSetting('space0.N, finalParams.N);
-				// and storeSettings.setSetting('space0.continuum, finalParams.continuum);
-
-			},  // end of OK callback
-
-			// cancel callback
-			() => {
-				this.setState({isTimeAdvancing: timeWasAdvancing});
-			}
-		);
-	}
-
+//	// puts up the resolution dialog, starting with the values from this.state
+//	openResolutionDialog() {
+//		const s = this.state;
+//
+//		// freeze the iteration while this is going on ... but not if relaxing
+//		const timeWasAdvancing = s.isTimeAdvancing;
+//		this.setState({isTimeAdvancing: false});
+//
+//		// pass our state upward to load into the dialog
+//		ResolutionDialog.openResDialog(
+//			// this is the initialParams
+//			{N: s.N, continuum: s.continuum, mainViewClassName: s.mainViewClassName},
+//
+//			// OK callback
+//			finalParams => {
+//				// let prevLowPassFilter = s.lowPassFilter;
+//				// let prevN = s.N;
+//				this.setState({mainViewClassName: finalParams.mainViewClassName});
+//
+//				qe.deleteTheSpace();
+//
+//				create1DMainSpace({N: finalParams.N, continuum: finalParams.continuum, label: 'main'});
+//
+//				// do i really have to wait?  I thiink the promise only works the first time.
+//				eSpaceCreatedPromise
+//				.then(space => {
+//					this.setState({isTimeAdvancing: timeWasAdvancing,
+//						N: finalParams.N, continuum: finalParams.continuum});
+//					storeASetting('spaceParams', 'N', finalParams.N);
+//					storeASetting('spaceParams', 'continuum', finalParams.continuum);
+//				});
+//
+//				//storeASetting('spaceParams', 'N', finalParams.N);
+//				//localStorage.space0 = JSON.stringify({N: finalParams.N, continuum: finalParams.continuum});
+//				// should also work storeSettings.setSetting('space0.N, finalParams.N);
+//				// and storeSettings.setSetting('space0.continuum, finalParams.continuum);
+//
+//			},  // end of OK callback
+//
+//			// cancel callback
+//			() => {
+//				this.setState({isTimeAdvancing: timeWasAdvancing});
+//			}
+//		);
+//	}
+//
 	/* ******************************************************* stats */
 
 	// the upper left and right numbers
@@ -313,7 +299,7 @@ export class SquishPanel extends React.Component {
 
 	// do one integration iteration
 	crunchOneIteration() {
-		if (traceSquishPanel) console.log(`SquishPanel. about to iterate`);
+		if (traceIteration) console.log(`SquishPanel. about to iterate`);
 
 		try {
 			// hundreds of visscher steps
@@ -326,22 +312,23 @@ export class SquishPanel extends React.Component {
 				ex.message == 'diverged' ? SquishPanel.divergedBlurb : ex, 'while iterating');
 		}
 
-		if (traceSquishPanel) console.log(`SquishPanel. did iterate`);
+		if (traceIteration) console.log(`SquishPanel. did iterate`);
 
-		if (dumpingTheViewBuffer)
+		if (traceTheViewBuffer)
 			this.dumpViewBuffer('SquishPanel. did iterate()');
 	}
 
-	// Integrate the ODEs by one 'iteration', or not.  and then display.
+	// Integrate the ODEs by one 'iteration', or not.  and then display.  or not.
 	// called every so often in animateHeartbeat() so it's called as often as the menu setting says
 	// so if needsRepaint false or absent, it'll only repaint if an iteration has been done.
-	iterateOneIteration(isTimeAdvancing, needsRepaint) {
-		if (traceSquishPanel) console.log(`time since last tic: ${performance.now() - this.iStats.startIteration}ms`)
+	// shouldIterate is often set to isTimeAdvancing, or you can pass in whatever eg for single iteration
+	iterateOneIteration(shouldIterate, needsRepaint) {
+		if (traceIteration) console.log(`time since last tic: ${performance.now() - this.iStats.startIteration}ms`)
 // 		this.endCalc = this.startReloadViewBuffer = this.endReloadVarsNBuffer =
 // 			this.endIteration = 0;
 		this.iStats.startIteration = performance.now();  // absolute beginning of integrate iteration
 		// could be slow.
-		if (isTimeAdvancing) {
+		if (shouldIterate) {
 			this.crunchOneIteration();
 			needsRepaint = true;
 		}
@@ -349,34 +336,12 @@ export class SquishPanel extends React.Component {
 
 		// if we need to repaint... if we're iterating, if the view says we have to,
 		// or if this is a one shot step
-		this.iStats.endReloadVarsNBuffer = this.iStats.endDraw = performance.now();
-		//this.iStats.endReloadVarsNBuffer = this.iStats.endReloadInputs = this.iStats.endDraw = performance.now();
 		if (needsRepaint) {
 			this.mainEAvatar.doRepaint?.();
 			this.showTimeNIteration();
 
-
-			// this is kinda cheating, but the effectiveView in the state takes some time to
-			// get set; but we need it immediately.  So we also set it as a variable on this.
-			// see similar code below; keep in sync.  Also, early on, it might not be done at all yet.
-//			const curView = this.effectiveView || this.state.effectiveView;
-//			if (curView) {
-////				curView.reloadAllVariables();
-////
-////				// copy from latest wave to view buffer (c++)
-////				qe.qViewBuffer_getViewBuffer();
-////				this.iStats.endReloadVarsNBuffer = performance.now();
-////
-////				curView.createVariablesOnDrawings();
-////				//this.iStats.endReloadInputs = performance.now();
-////
-////				// draw
-////				curView.drawAllDrawings();
-////
-////				// populate the frame number and elapsed pseudo-time
-////				this.showTimeNIteration();
-////				this.iStats.endDraw = performance.now();
-//			}
+			this.iStats.endReloadVarsNBuffer = this.iStats.endDraw = performance.now();
+			//this.iStats.endReloadVarsNBuffer = this.iStats.endReloadInputs = this.iStats.endDraw = performance.now();
 		}
 
 		// print out per-iteration benchmarks.  This is now displayed in the Iterate tab.
@@ -406,7 +371,7 @@ export class SquishPanel extends React.Component {
 		// no matter how often animateHeartbeat() is called, it'll only iterate once in the iteratePeriod
 		if (iterationStart >= this.timeForNextTic) {
 			// no point in calling it continuously if it's not doing anything
-			if (s.isTimeAdvancing)
+			if (SquishPanel.isTimeAdvancing)
 				this.iterateOneIteration(true, true);
 			//this.iterateOneIteration(s.isTimeAdvancing, false);
 
@@ -440,6 +405,7 @@ export class SquishPanel extends React.Component {
 
 	// use for benchmarking with a circular wave.  Will start iteration, and stop after
 	// the leftmost state is at its peak.  Then display stats.
+	// not used for several months so probably broken somehow.
 
 	// button handler
 	startRunningOneCycle =
@@ -448,7 +414,7 @@ export class SquishPanel extends React.Component {
 		this.runningOneCycle = true;
 		this.runningCycleStartingTime = this.mainEAvatar.elapsedTime;
 		this.runningCycleStartingSerial = this.mainEAvatar.iterateSerial;
-		this.startIterating();
+		SquishPanel.startIterating();
 	}
 
 	// manage runningOneCycle - called each iteration
@@ -465,7 +431,7 @@ export class SquishPanel extends React.Component {
 					// if we were going up, we've gone just 1 deltaT past the peak.  Good time to stop.
 					this.runningOneCycle = false;
 
-					this.stopIterating();
+					SquishPanel.stopIterating();
 
 					this.setState({
 						runningCycleElapsedTime: this.mainEAvatar.elapsedTime - this.runningCycleStartingTime,
@@ -511,28 +477,29 @@ export class SquishPanel extends React.Component {
 		});
 	}
 
-	startIterating() {
+	// the first time, we get iit from the settiings.
+	static isTimeAdvancing = getASetting('iterationParams', 'isTimeAdvancing');
+
+	static startIterating() {
 		storeASetting('iterationParams', 'isTimeAdvancing', true);
-		this.setState({isTimeAdvancing: true});
+		SquishPanel.isTimeAdvancing = true;
 	}
 
-	stopIterating() {
+	static stopIterating() {
 		storeASetting('iterationParams', 'isTimeAdvancing', false);
-		this.setState({isTimeAdvancing: false});
+		SquishPanel.isTimeAdvancing = false;
 	}
 
-	startStop =
-	() => {
-		if (this.state.isTimeAdvancing)
-			this.stopIterating();
+	static startStop() {
+		if (SquishPanel.isTimeAdvancing)
+			SquishPanel.stopIterating();
 		else
-			this.startIterating();
+			SquishPanel.startIterating();
 	}
 
-	singleIteration =
-	() => {
-		this.iterateOneIteration(true);
-		this.setState({isTimeAdvancing: false});
+	static singleIteration() {
+		SquishPanel.me.iterateOneIteration(true);
+		SquishPanel.stopIterating();
 	}
 
 	/* ******************************************************* user settings */
@@ -561,7 +528,7 @@ export class SquishPanel extends React.Component {
 			// eslint-disable-next-line no-ex-assign
 			ex = interpretCppException(ex);
 			console.error(`setStepsPerIteration error:`,
-				ex.stack || ex.message || ex);
+				ex.stack ?? ex.message ?? ex);
 			////debugger;
 		}
 	}
@@ -651,14 +618,10 @@ export class SquishPanel extends React.Component {
 					showPotential={s.showPotential}
 				/>
 				<ControlPanel
-					openResolutionDialog={() => this.openResolutionDialog()}
 					space={s.space}
 					N={this.state.N}
 
 					iterateAnimate={(shouldAnimate, freq) => this.iterateAnimate(shouldAnimate, freq)}
-					isTimeAdvancing={s.isTimeAdvancing}
-					startStop={this.startStop}
-					singleIteration={this.singleIteration}
 
 					setPotential={this.setPotential}
 					toggleShowPotential={this.toggleShowPotential}

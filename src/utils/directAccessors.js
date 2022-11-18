@@ -3,12 +3,13 @@
 ** Copyright (C) 2022-2022 Tactile Interactive, all rights reserved
 */
 
-// lookup table from pointer to qObject in C++ space, to JS eObject it
-// represents.  Cuz c++ can only return the pointer, take it here and find the
-// obj it corresponds to.  (I would have made separate registries for each
-// object class, but there'll be no collisions this way.)
-// like this:     cppObjectRegistry[qe.avatar_getViewBuffer(this.pointer)];
-export const cppObjectRegistry = {};
+// lookup table from qObject pointer in C++, to JS eObject or TypedArray
+// that it wraps.  Cuz c++ can only return the pointer, take it here and find the
+// obj it corresponds to.  there'll be no collisions)
+// Object constuctores generally do this automatically in prepForDirectAccessors()
+// but for typed array you have to do this by hand.
+// like this:     cppObjectRegistry[blah.pointer] = blah;
+export let cppObjectRegistry = {};
 
 // Use this to directly access C++ fields in a JS class that sortof mirrors the C++ class.
 // In your JS constructor, call prepForDirectAccessors(this, pointer).
@@ -31,4 +32,9 @@ export function prepForDirectAccessors(_this, pointer) {
 	cppObjectRegistry[pointer] = _this;
 }
 
-
+// call this after all your spaces and avatars and buffers have been freed
+// cuz you're recreating everything
+export function resetObjectRegistry() {
+	cppObjectRegistry = {};
+}
+resetObjectRegistry();
