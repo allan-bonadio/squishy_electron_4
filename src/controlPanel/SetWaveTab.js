@@ -77,7 +77,7 @@ class SetWaveTab extends React.Component {
 		.catch(ex => {
 			// eslint-disable-next-line no-ex-assign
 			ex = interpretCppException(ex);
-			console.error(ex.stack || ex.message || ex);
+			console.error(ex.stack ?? ex.message ?? ex);
 			//debugger;
 		});
 	}

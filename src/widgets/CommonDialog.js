@@ -40,6 +40,9 @@ function ErrorDialog(props) {
 // Makes a complex dialog given that component... must have an outer frame!  cuz
 // that's the whole dialog!  Call CommonDialog.startClosingDialog() when it
 // should dismiss itself.  You're responsible for everything else.
+
+// Hey!  this should use <dialog>  https://developer.mozilla.org/en-US/docs/Web/HTML/Element/dialog
+// along with  autofocus  https://developer.mozilla.org/en-US/docs/Web/HTML/Global_attributes/autofocus
 export default class CommonDialog extends React.Component {
 
 	static propTypes = {

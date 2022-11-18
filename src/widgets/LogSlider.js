@@ -161,7 +161,7 @@ class LogSlider extends React.Component {
 				<datalist id={uniqueId} >{createGoodPowers(spd, p.sliderMin, p.sliderMax)}</datalist>
 			</div>;
 		} catch (ex) {
-			console.error(`LogSlider.render() Crash: `, ex.stack || ex.message || ex);
+			console.error(`LogSlider.render() Crash: `, ex.stack ?? ex.message ?? ex);
 		}
 	}
 }

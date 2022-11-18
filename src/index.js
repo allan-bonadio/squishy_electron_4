@@ -12,6 +12,7 @@ import App from './App';
 //	console.error(`window error handler`, ev);
 //	debugger;
 //
+			// eslint-disable-next-line no-ex-assign
 //	let ex = interpretCppException(ev.error);
 //
 //	let style = "position: fixed; padding: 5em; "
