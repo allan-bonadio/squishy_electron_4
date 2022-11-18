@@ -208,8 +208,7 @@ makeParam('miscParams', 'viewHeight', 400, {min: 50, max: 1e4});
 //checkAllSettingData();
 
 export function getAGroup(groupName) {
-	if (!alternateStoreVerifiers
-	|| !alternateStoreVerifiers[groupName]) debugger;
+	if (!alternateStoreVerifiers?.[groupName]) debugger;
 
 	try {
 		let savedGroup = localStorage.getItem(groupName) || '{}';
@@ -254,9 +253,10 @@ export function getASetting(groupName, varName) {
 	|| !alternateStoreVerifiers[groupName]
 	|| !alternateStoreVerifiers[groupName][varName]) debugger;
 
+	// this can still return undefined if the groupName or varName isn't there
 	if (setting === undefined
-	|| !alternateStoreVerifiers[groupName][varName](setting)) {
-		return alternateStoreDefaults[groupName][varName];
+			|| !alternateStoreVerifiers?.[groupName]?.[varName]?.(setting)) {
+		return alternateStoreDefaults?.[groupName]?.[varName];
 	}
 	return setting;
 }
