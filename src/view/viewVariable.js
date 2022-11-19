@@ -84,7 +84,7 @@ export class viewUniform extends viewVariable {
 
 	// set the uniform to it - upload latest value to GPU
 	// call this when the uniform's value changes, to reload it into the GPU
-	// call abstractViewDef::reloadAllVariables() for all
+	// actually, calls before each draw, always
 	reloadVariable() {
 		//debugger;
 		// is passed the previous value
