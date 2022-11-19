@@ -18,8 +18,7 @@ drawings must include:
 	- contructor sets shaders sources
 	- createVariables() to prep the variables, uniform and attr; see viewVariable.js
 		Some of those automatically reload on each frame
-	- reloadAllVariables()  in abs viewDef should call reloadVariable() on each without drawing have to intervene
-	- draw() to issue actual drawing commands
+	- draw() to issue actual drawing commands after reloading variables
 */
 
 let traceAttrNames = false;

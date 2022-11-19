@@ -173,14 +173,14 @@ export class abstractViewDef {
 
 	// reload ALL the variables on this view
 	// should be done once before every repaint
-	reloadAllVariables() {
-		this.drawings.forEach(drawing => {
-			drawing.setDrawing();
-//			gl.useProgram(drawing.program);
-//			gl.bindVertexArray(drawing.vao);
-			drawing.viewVariables.forEach(v => v.reloadVariable());
-		});
-	}
+//	reloadAllVariables() {
+//		this.drawings.forEach(drawing => {
+//			drawing.setDrawing();
+////			gl.useProgram(drawing.program);
+////			gl.bindVertexArray(drawing.vao);
+//			drawing.viewVariables.forEach(v => v.reloadVariable());
+//		});
+//	}
 
 	/* ************************************************** Geometry and transformations */
 	// abstract supermethod: another dummy submethod... write yer  own
@@ -205,12 +205,12 @@ export class abstractViewDef {
 	}
 
 	drawAllDrawings() {
-		// reloadAllVariables() done in GLView
 		// not specific to any drawing; I guess it's kindof a drawing itself
 		this.drawBackground();
 
 		this.drawings.forEach(drawing => {
 			drawing.setDrawing();
+			drawing.viewVariables.forEach(v => v.reloadVariable());
 			drawing.draw();
 		});
 	}

@@ -101,22 +101,16 @@ export class flatDrawing extends abstractDrawing {
 		if (traceFlatDrawing)
 			console.log(`flatDrawing ${this.viewName}: creatingVariables`);
 
-		// loads view buffer from corresponding wave, calculates highest norm, which we use below.
+		// loads view buffer from corresponding wave, calculates highest norm.
+		// Need this for starting values for highest & smoothHighest
 		this.avatar.loadViewBuffer();
 
 
 		//let maxHeightUniform =
 		this.maxHeightUniform = new viewUniform('maxHeight', this,
 			() => {
-				// this gets called every redrawing (every reloadAllVariables() -> reloadVariable())
-				// smooth it out otherwise the wave sortof bounces up and down a little on each step
-				// set like this only upon reStartDrawing()
-				//if (!this.avgHighest)
-				//	this.avgHighest = this.avatar.highest;
-				//else
-				//	this.avgHighest = (this.avatar.highest + 3*this.avgHighest) / 4;
 				if (traceHighest)
-					console.log(`flatDrawing reloading ${this.viewName}: highest=${this.avatar.highest.toFixed(5)}  smoothHighest=${this.smoothHighest.toFixed(5)}`);
+					console.log(`flatDrawing reloading ${this.viewName}: highest=${this.avatar.highest.toFixed(5)}  smoothHighest=${this.avatar.smoothHighest.toFixed(5)}`);
 
 				// add in a few percent
 				return {value: this.avatar.smoothHighest * PADDING_ON_BOTTOM, type: '1f'};
@@ -152,9 +146,8 @@ export class flatDrawing extends abstractDrawing {
 		const gl = this.gl;
 		if (traceFlatDrawing) console.log(`flatDrawing ${this.viewName}, ${this.avatarLabel}: drawing`);
 
-		this.setDrawing();
-//		gl.useProgram(this.program);////
-//		gl.bindVertexArray(this.vao);
+		//this.setDrawing();  should be already done!
+		//this.viewVariables.forEach(v => v.reloadVariable());
 
 		//this.dumpAttrNames('beginning of flat draw');
 

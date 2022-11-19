@@ -103,20 +103,21 @@ export class ticDrawing extends abstractDrawing {
 
 	generateTics() {
 		// how big should the tics be?
-		let ticHalfHeight = 20 / this.gl.drawingBufferWidth;  // fixed number of pixels
+		let ticHalfHeight = 2 / this.gl.drawingBufferHeight;  // fixed number of pixels
 		//let ticHalfHeight = .01;  // proportional to graph height
 		//let ticHalfHeight = .003;  // proportional to graph height
 		let ticWidth = 20 / this.gl.drawingBufferWidth;  // fixed number of pixels
+		let ticOrigin = -1 - ticWidth/2;
 
 		if (traceHighest)
 			console.log(`➤ ➤ ➤ ticDrawing '${this.viewName}, ${this.avatarLabel}':`+
 				` highest is ${this.avatar.highest.toFixed(6)}`);
 
 
-		// number of tics on left side, coomes from the flatDrawing but handle it if it isn't drawing
+		// number of tics on left side, comes from the flatDrawing but handle it if it isn't drawing
 		let highest = this.avatar.smoothHighest ?? 1/ this.avatar.space.nStates;
 		let nTics = Math.floor(highest * this.avatar.space.nStates * TICS_PER_AVG_ψ - .1);
-		nTics = this.nTics = Math.min(nTics, 40);
+		nTics = this.nTics = Math.min(nTics, 100);
 		if (this.roomForNTics <= nTics) {
 			let nuTics = Math.ceil(nTics * 1.3 + 1);  // room for some more but not too many
 			console.warn(`➤ ➤ ➤ highest=${highest.toFixed(4)}, nTics=${nTics}  `+
@@ -135,9 +136,9 @@ export class ticDrawing extends abstractDrawing {
 
 			// ok, top x, y, point x, y, bottom x, y, in clip coords (-1...1)
 			cb.set([
-				-1, y - ticHalfHeight,
+				ticOrigin, y - ticHalfHeight,
 				ticWidth + extraWidth - 1, y,
-				-1, y + ticHalfHeight,
+				ticOrigin, y + ticHalfHeight,
 			], offset);
 		}
 
@@ -163,8 +164,7 @@ export class ticDrawing extends abstractDrawing {
 			console.log(`➤ ➤ ➤ ticDrawing '${this.viewName}, ${this.avatarLabel}': start draw`);
 
 		this.setDrawing();
-//		gl.useProgram(this.program);////
-//		gl.bindVertexArray(this.vao);
+		this.viewVariables.forEach(v => v.reloadVariable());
 
 		//this.dumpAttrNames('start of tic drawing');
 
