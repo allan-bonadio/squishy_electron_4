@@ -37,8 +37,8 @@ qViewBuffer::~qViewBuffer() {
 void qViewBuffer::dumpViewBuffer(const char *title) {
 	float *vBuffer = avatar->qvBuffer->vBuffer;
 	float prevPhase =0;
-	#define FORMAT_BASE      "%6d |  %6.3f  %6.3f  %6.3g  %6.3g"
-	#define FORMAT_SUFFIX  " |  %6.3f  %6.3f  %6.3f  m𝜓\n"
+	#define FORMAT_BASE      "%6d |  %6.5f  %6.5f  %6.5g  %6.5g"
+	#define FORMAT_SUFFIX  " |  %6.5f  %6.5f  %6.5f  m𝜓\n"
 
 	if (!title) title = "";
 	printf("==== 📺 dump qVBuffer %p->%p | %s\n", this, vBuffer, title);
@@ -65,28 +65,6 @@ void qViewBuffer::dumpViewBuffer(const char *title) {
 			phase, dPhase, magn);
 
 		prevPhase = phase;
-
-		//double re = vBuffer[i*4];
-		//double im = vBuffer[i*4+1];
-		//if (i & 1) {
-		//	double dRe = re - prevRe;
-		//	double dIm = im - prevIm;
-		//	double phase = 0.;
-		//	double magn = 0.;
-		//	phase = atan2(im, re) * 180 / PI;
-		//	magn = im * im + re * re;
-		//	printf("%6d |  %6.3f  %6.3f  %6.3f  %6.3f  |  %6.3f  %6.3f\n",
-		//		i,
-		//		re, im, vBuffer[i*4+2], vBuffer[i*4+3],
-		//		phase, magn);
-		//
-		//	prevRe = re;
-		//	prevIm = im;
-		//}
-		//else {
-		//	printf("%6d |  %6.3f  %6.3f  %6.3f  %6.3f \n",
-		//		i,
-		//		re, im, vBuffer[i*4+2], vBuffer[i*4+3]);
 	}
 	printf("    📺  qViewBuffer::at end of dumpViewBuffer qViewBuffer=%p  qViewBuffer->vBuffer=%p\n\n",
 			this, vBuffer);
