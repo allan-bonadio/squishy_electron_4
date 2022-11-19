@@ -90,10 +90,10 @@ Also must have in C++; not sure if JS cares:
 
 ------------------------------------------------ equations
 
-ih ∂ψ / ∂t  =  [V - (h^2/2m) (∂^2/∂x^2)] ψ
+iħ ∂ψ / ∂t  =  [V - (ħ^2/2m) (∂^2/∂x^2)] ψ
 
 
-ih ∂psi / ∂t  =  V psi - (h^2/2m) (∂^2/∂x^2) psi
+iħ ∂psi / ∂t  =  V psi - (ħ^2/2m) (∂^2/∂x^2) psi
 
 where t=time, x=location (potentially scalar, 2-vec or 3-vec)
 h=hbar ħ plank's constant / 2π   m=particle mass
@@ -202,7 +202,81 @@ https://physics.stackexchange.com/questions/259134/schrodinger-equation-for-a-ha
 9/19,2022
 Maybe I should think of waves WRT an atom size.  H atom sized 1Å.
 actually no, maybe 1/4 Å for hydrogen but about 1Å average for most of the elements
---------------------------------------------------
+-------------------------------------------------- Nov 18, 2022
+
+In order to deal properly with units, I have to shift from MKS units to more commensurate units, but I want to stick to SI prefixes.  So, for instance, picoseconds and picometers.
+
+1 s = 1e12 ps
+1 s = 1e9 ns
+1 s = 1e6 µs
+1 m = 1e12 pm
+1 m = 1e9 nm
+1 kg = 1000g = 1e+30 kilo-quectograms = 1e+33 quectograms
+  = 1e21 kilo-zepto grams = 1e24 zeptograms
+1 g = 1e+30 quectograms
+ℏ = 1.054571817e-34 kg m^2 / s
+= 1.054571817e-34 kg (1e12 pm)^2 / 1e12 ps
+= 1.054571817e-22 kg pm^2 / ps
+
+m_e = 9.1093837015e-31 kg = 9.1e-28 g
+= 9.1093837015e-31 * 1e24 zeptograms
+= 9.1093837015e-7 zeptograms
+
+1 eV = 1.602176634e-19 J , kg m^2 / s^2
+
+ħ^2/2m_e =
+
+1.054571817e-34 ** 2 / 9.1093837015e-31
+= 6.10426431498079e-39 kg^2 m^4 / s^2 / kg
+= 6.10426431498079e-39 kg m^4 / s^2
+= 6.10426431498079e-39 kg (1e12 pm)^4 / (1e12 ps)^2
+= 6.10426431498079e-39 kg 1e48 pm^4 / 1e24 ps^2
+= 6.10426431498079e-15 kg pm^4 / ps^2
+
+= 6.10426431498079e-39 kg (1e9 nm)^4 / (1e12 ps)^2
+= 6.10426431498079e-39 kg 1e36 nm^4 / 1e24 ps^2
+= 6.10426431498079e-27 kg nm^4 / ps^2
+
+= 6.10426431498079e-39 kg (1e12 pm)^4 / (1e9 ns)^2
+= 6.10426431498079e-39 kg 1e48 pm^4 / 1e18 ns^2
+= 6.10426431498079e-9 kg pm^4 / ns^2
+
+= 6.10426431498079e-39 kg (1e12 pm)^4 / (1e6 µs)^2
+= 6.10426431498079e-39 kg 1e48 pm^4 / 1e12 µs^2
+= 6.10426431498079e-3 kg pm^4 / µs^2
+
+but wait, iħ ∂ψ / ∂t  =  [V - (ħ^2/2m) (∂^2/∂x^2)] ψ
+so really we want ħ / 2m_e to be an easy number.  sigh.
+
+ħ / 2m_e = (1.054571817e-34 kg m^2 / s) / 2(9.1093837015e-31 kg)
+=0.000057883818025271484 m^2 / s
+= 57.883818025271484 e-6 m^2 / s
+= 57.883818025271484 e-6 (1e9 nm)^2 / 1e12 ps
+= 57.883818025271484 e-6 1e18 nm^2 / 1e12 ps
+= 57.883818025271484 nm^2 / ps
+
+so we use nanometers and picoseconds, so
+
+ℏ = 1.054571817e-34 kg (1e9 nm)^2 / (1e12 ps)
+= (1.054571817e-34 * 1e18 / 1e12) kg nm^2 / ps
+= (1.054571817e-34 * 1e18 / 1e12) kg nm^2 / ps
+= 1.054571817e-28 kg nm^2 / ps
+
+ħ^2/2m_e = 6.10426431498079e-39 kg m^4 / s^2
+= 6.10426431498079e-39 kg (1e9 nm)^4 / (1e12 ps)^2
+= (6.10426431498079e-39 * 1e36 / 1e24) kg nm^4 / ps^2
+= 6.10426431498079e-27 kg nm^4 / ps^2
+
+and potential energy would be in units:
+1eV = 1.602176634e-19 kg m^2 / s^2
+1eV = 1.602176634e-19 kg (1e9 nm)^2 / (1e12 ps)^2
+1eV = (1.602176634e-19 * 1e18 / 1e24) kg nm^2 / ps^2
+= 1.602176634e-25 kg nm^2 / ps^2
+= 1.602176634e-25 * 1e+33 quectograms nm^2 / ps^2
+= 1.6021766341e+8 quectogram nm^2 / ps^2
+= 1.602176634e-25 1e24 zeptograms nm^2 / ps^2
+= .1602176634 zeptograms nm^2 / ps^2
+
 --------------------------------------------------
 --------------------------------------------------
 --------------------------------------------------
