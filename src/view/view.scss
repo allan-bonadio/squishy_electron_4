@@ -36,16 +36,26 @@
 			position: absolute;
 			pointer-events: auto;
 			bottom: 0; right: 0;
-			width: 1em; height: 1em;
-			border: 3px transparent;
+			width: 1.5em; height: 1.5em;
+			border: 1px transparent solid;
 			border-style: outset none none outset;
 			z-index: 10;
 			cursor: ns-resize;
+			//border-radius: 20em 0 0 0;
 
 			&:hover {
 				border-color: #aaa;
-				background-color: #222;
+				//background-color: #22c;
+
+				div {
+					width: 60%;
+					height: 60%;
+					margin: 30% 0% 0% 30%;
+					border: 1px #666 solid;
+					//border-radius: .5em 0 0 0;
+				}
 			}
+
 		}
 	}
 

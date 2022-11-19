@@ -61,12 +61,7 @@ export class WaveView extends React.Component {
 		}
 
 		this.formerWidth = props.width;
-		this.formerHeight = props.defaultHeight;
-
-		//props.returnGLFuncs(this.doRepaint, this.resetWave, this.setGeometry);
-		//this.doRepaint = doRepaint;
-		//this.resetWave = resetWave;
-		//this.setGeometry = setGeometry;
+		this.formerHeight = this.state.height;
 
 		eSpaceCreatedPromise
 		.then(space => {
@@ -85,9 +80,6 @@ export class WaveView extends React.Component {
 		});
 	}
 
-	//setCanvasCreatedPromise =  // unused I guess
-	//canvasCreatedPromise => this.canvasCreatedPromise = canvasCreatedPromise;
-
 	/* ************************************************************************ resizing */
 
 	// these are for resizing the WaveView ONLY.
@@ -102,6 +94,7 @@ export class WaveView extends React.Component {
 		b.addEventListener('mouseup', this.mouseUp);
 		b.addEventListener('mouseleave', this.mouseUp);
 
+		this.sizeBox.style.borderColor = '#aaa';
 		ev.preventDefault();
 		ev.stopPropagation();
 	}
@@ -134,6 +127,7 @@ export class WaveView extends React.Component {
 			b.removeEventListener('mouseup', this.mouseUp);
 			b.removeEventListener('mouseleave', this.mouseUp);
 
+			this.sizeBox.style.borderColor = 'transparent';
 
 			ev.preventDefault();
 			ev.stopPropagation();
@@ -182,7 +176,9 @@ export class WaveView extends React.Component {
 					iteration <span className='voNorthEast'>{iterateSerial}</span>
 				</div>
 
-				<div className='sizeBox' onMouseDown={this.mouseDown} />
+				<div className='sizeBox' onMouseDown={this.mouseDown} ref={el => this.sizeBox = el}>
+					<div />
+				</div>
 
 				{spinner}
 			</aside>
