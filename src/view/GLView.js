@@ -190,9 +190,6 @@ class GLView extends React.Component {
 	//	}
 	//}
 
-	// repaint whole GL image.  This is not 'render' as in React;
-	// this is repainting a canvas with GL.   returns an object with perf stats.
-	// Returns null if it couldn't do it (eSpace promise hasn't resolved)
 	setGeometry =
 	() => {
 		if (this.effectiveView) {
@@ -213,17 +210,17 @@ class GLView extends React.Component {
 			return null;  // too early
 
 		if (tracePainting)
-			p.avatar.ewave.dump(`🖼 🖼 GLView ${p.viewName}: got the ewave buffer straight`);
+			p.avatar.ewave.dump(`🖼 🖼 GLView ${p.viewName}: got the ewave right here`);
 
 		// copy from latest wave to view buffer (c++) & pick up highest
 		p.avatar.loadViewBuffer()
 		if (tracePainting)
-			p.avatar.ewave.dump(`🖼 🖼 GLView ${p.viewName}: loaded ViewBuffer`);
+			p.avatar.dumpViewBuffer(`🖼 🖼 GLView ${p.viewName}: loaded ViewBuffer`);
 
-		this.effectiveView.reloadAllVariables();
+		// NO!  now done before drawing each drawing indiviidually this.effectiveView.reloadAllVariables();
 		let endReloadVarsNBuffer = performance.now();
-		if (tracePainting)
-			p.avatar.dumpViewBuffer(`🖼 🖼 GLView ${p.viewName}: reloaded AllVariables`);
+		//if (tracePainting)
+		//	p.avatar.dumpViewBuffer(`🖼 🖼 GLView ${p.viewName}: reloaded AllVariables`);
 
 		// draw
 		this.effectiveView.drawAllDrawings();

@@ -25,6 +25,7 @@ class App extends React.Component {
 		App.me = this;
 	}
 
+	/* ************************************************ CommonDialog */
 
 	// this is called before the ResolutionDialog has been instantiated
 	static showDialog() {
@@ -36,7 +37,7 @@ class App extends React.Component {
 		CommonDialog.finishClosingDialog();
 	}
 
-	/* ************************************************ recreation */
+	/* ************************************************ re-creation */
 	// called when user changes dimensions (or maybe other cases?)
 	static blinkSquishPanel(createAgain) {
 		this.me.createAgain = createAgain
@@ -57,6 +58,7 @@ class App extends React.Component {
 
 	/* ************************************************ App */
 
+	// once at startup
 	componentDidMount() {
 		// keep track of any window width changes, to reset the canvas and svg
 		// add listener only executed once

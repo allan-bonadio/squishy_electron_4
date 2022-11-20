@@ -53,7 +53,6 @@ class eAvatar {
 	// are passed by pointer and you need to allocate them in JS (eg see
 	// eAvatar.constructor)
 
-
 	get _space() { return this.ints[1]; }
 
 	get elapsedTime() { return this.doubles[1]; }
@@ -84,8 +83,7 @@ class eAvatar {
 	get _qspect() { return this.ints[15]; }
 	get _vBuffer() { return this.ints[17]; }
 	get _label() { return this.pointer + 72; }
-
-
+	get pleaseFFT() { return this.bools[89]; }
 
 	// this just gets the pointer to the view buffer...  the JS array
 	getViewBuffer() {
