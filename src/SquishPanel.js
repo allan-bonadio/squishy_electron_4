@@ -136,16 +136,6 @@ export class SquishPanel extends React.Component {
 		SquishPanel.squishPanelConstructed = 0;
 	}
 
-	// NO!  get these from the avatar  working with GLView, it'll pass me back some functions
-	// Just for the main avatar
-	//returnGLFuncs =
-	//(doRepaint, resetWave, setGeometry) => {
-	//	this.doRepaint = doRepaint;
-	//	this.resetWave = resetWave;
-	//	this.setGeometry = setGeometry;
-	//}
-
-
 	/* ******************************************************* space & wave creation */
 
 	componentDidMount() {
@@ -304,7 +294,7 @@ export class SquishPanel extends React.Component {
 			// hundreds of visscher steps
 			this.mainEAvatar?.oneIteration();
 		} catch (ex) {
-			this.setState({isTimeAdvancing: false});
+			ControlPanel.stopIterating();
 			// eslint-disable-next-line no-ex-assign
 			ex = interpretCppException(ex);
 			CommonDialog.openErrorDialog(
@@ -370,7 +360,7 @@ export class SquishPanel extends React.Component {
 		// no matter how often animateHeartbeat() is called, it'll only iterate once in the iteratePeriod
 		if (iterationStart >= this.timeForNextTic) {
 			// no point in calling it continuously if it's not doing anything
-			if (SquishPanel.isTimeAdvancing)
+			if (ControlPanel.isTimeAdvancing)
 				this.iterateOneIteration(true, true);
 			//this.iterateOneIteration(s.isTimeAdvancing, false);
 
@@ -413,7 +403,7 @@ export class SquishPanel extends React.Component {
 		this.runningOneCycle = true;
 		this.runningCycleStartingTime = this.mainEAvatar.elapsedTime;
 		this.runningCycleStartingSerial = this.mainEAvatar.iterateSerial;
-		SquishPanel.startIterating();
+		ControlPanel.startIterating();
 	}
 
 	// manage runningOneCycle - called each iteration
@@ -430,7 +420,7 @@ export class SquishPanel extends React.Component {
 					// if we were going up, we've gone just 1 deltaT past the peak.  Good time to stop.
 					this.runningOneCycle = false;
 
-					SquishPanel.stopIterating();
+					ControlPanel.stopIterating();
 
 					this.setState({
 						runningCycleElapsedTime: this.mainEAvatar.elapsedTime - this.runningCycleStartingTime,
@@ -465,40 +455,6 @@ export class SquishPanel extends React.Component {
 				elapsed vtime: {s.runningCycleElapsedTime.toFixed(3)} &nbsp;</span>
 			<button onClick={this.startRunningOneCycle}>start running 1 cycle</button>
 		</div>
-	}
-
-	/* ******************************************************* control panel settings */
-
-	// set the frequency of iteration frames.  Does not control whether iterating or not.
-	setIterateFrequency(newFreq) {
-		this.setState({iteratePeriod:
-			storeASetting('iterationParams', 'iteratePeriod', 1000. / +newFreq)
-		});
-	}
-
-	// the first time, we get iit from the settiings.
-	static isTimeAdvancing = getASetting('iterationParams', 'isTimeAdvancing');
-
-	static startIterating() {
-		storeASetting('iterationParams', 'isTimeAdvancing', true);
-		SquishPanel.isTimeAdvancing = true;
-	}
-
-	static stopIterating() {
-		storeASetting('iterationParams', 'isTimeAdvancing', false);
-		SquishPanel.isTimeAdvancing = false;
-	}
-
-	static startStop() {
-		if (SquishPanel.isTimeAdvancing)
-			SquishPanel.stopIterating();
-		else
-			SquishPanel.startIterating();
-	}
-
-	static singleIteration() {
-		SquishPanel.me.iterateOneIteration(true);
-		SquishPanel.stopIterating();
 	}
 
 	/* ******************************************************* user settings */

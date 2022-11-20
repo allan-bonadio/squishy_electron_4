@@ -7,6 +7,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 
 import './ControlPanel.scss';
+import SquishPanel from '../SquishPanel';
 import CPToolbar from './CPToolbar';
 import SetWaveTab from './SetWaveTab';
 import SetPotentialTab from './SetPotentialTab';
@@ -47,6 +48,7 @@ export class ControlPanel extends React.Component {
 
 	constructor(props) {
 		super(props);
+		ControlPanel.me = this;
 
 		// most of the state is kept here.  But, also, in the store settings
 		this.state = {
@@ -74,13 +76,46 @@ export class ControlPanel extends React.Component {
 		Object.assign(this.state, waveParams, potentialParams);
 	}
 
-	/* *********************************** params */
+	/* ******************************************************* start/stop */
 
 	// set rate, which is 1, 2, 4, 8, ... some float number of times per second you want frames.
 	// can't combine this with 'isRunning' cuz want to remember rate even when stopped
 	setIterateFrequency =
 	freq => this.props.setIterateFrequency(freq);
 
+
+
+	// set the frequency of iteration frames.  Does not control whether iterating or not.
+	setIterateFrequency(newFreq) {
+		this.setState({iteratePeriod:
+			storeASetting('iterationParams', 'iteratePeriod', 1000. / +newFreq)
+		});
+	}
+
+	// the first time, we get it from the settings.
+	static isTimeAdvancing = getASetting('iterationParams', 'isTimeAdvancing');
+
+	static startIterating() {
+		ControlPanel.isTimeAdvancing = storeASetting('iterationParams', 'isTimeAdvancing', true);;
+		ControlPanel.me.setState({isTimeAdvancing: true});
+	}
+
+	static stopIterating() {
+		ControlPanel.isTimeAdvancing = storeASetting('iterationParams', 'isTimeAdvancing', false);
+		ControlPanel.me.setState({isTimeAdvancing: false});
+	}
+
+	static startStop() {
+		if (ControlPanel.isTimeAdvancing)
+			ControlPanel.stopIterating();
+		else
+			ControlPanel.startIterating();
+	}
+
+	static singleIteration() {
+		SquishPanel.me.iterateOneIteration(true);
+		ControlPanel.stopIterating();
+	}
 
 	/* ********************************************** wave & pot */
 
@@ -215,6 +250,7 @@ export class ControlPanel extends React.Component {
 			<CPToolbar
 				iterateFrequency={p.iterateFrequency}
 				setIterateFrequency={this.setIterateFrequency}
+				isTimeAdvancing={ControlPanel.isTimeAdvancing}
 
 				resetMainWave={this.resetMainWave}
 				setPotentialHandler={this.setPotentialHandler}

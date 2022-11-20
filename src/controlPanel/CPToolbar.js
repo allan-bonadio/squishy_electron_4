@@ -4,9 +4,10 @@
 */
 
 import PropTypes from 'prop-types';
-//import qe from '../engine/qe';
+import qe from '../engine/qe';
 import eSpace from '../engine/eSpace';
-import SquishPanel from '../SquishPanel';
+//import SquishPanel from '../SquishPanel';
+import ControlPanel from './ControlPanel';
 
 
 function setPT() {
@@ -19,15 +20,20 @@ function setPT() {
 		resetMainWave: PropTypes.func.isRequired,
 		toggleShowPotential: PropTypes.func.isRequired,
 		showPotential: PropTypes.bool.isRequired,
+
+		isTimeAdvancing: PropTypes.bool.isRequired,  // make sure start/stop button updates
 	};
 }
 
 function clickOnFFT(space)
 {
 	// space not there until space promise, but that should happen before anybody clicks on this
-	if (space)
-		space.mainEAvatar.askForFFT();
-		//qe.avatar_askForFFT(space.mainEAvatar);
+	if (space) {
+		if (ControlPanel.isTimeAdvancing)
+			space.mainEAvatar.pleaseFFT = true;  // start and finiiish
+		else
+			qe.avatar_askForFFT(space.mainEAvatar);
+	}
 }
 
 
@@ -70,14 +76,14 @@ function CPToolbar(props) {
 		<span className='toolSpacer' style={{width: '.3em'}}></span>
 
 		<button className={`startStopToggle startStopTool`}
-			onClick={SquishPanel.startStop}>
-			{ SquishPanel.isTimeAdvancing
+			onClick={ControlPanel.startStop}>
+			{ ControlPanel.isTimeAdvancing
 				? <span><big>&nbsp;</big>▐▐ <big>&nbsp;</big></span>
 				: <big>►</big> }
 		</button>
 
 		<button className={`stepButton startStopTool`}
-			onClick={SquishPanel.singleIteration}>
+			onClick={ControlPanel.singleIteration}>
 			<big>►</big> ▌
 		</button>
 

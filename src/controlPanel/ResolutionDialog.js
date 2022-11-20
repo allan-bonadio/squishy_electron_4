@@ -11,12 +11,14 @@ import CommonDialog from '../widgets/CommonDialog';
 import {powerToIndex} from '../utils/powers';
 import LogSlider from '../widgets/LogSlider';
 //import listOfViewClasses from '../view/listOfViewClasses';
-import SquishPanel from '../SquishPanel';
+//import SquishPanel from '../SquishPanel';
 import {recreateMainSpace, eSpaceCreatedPromise} from '../engine/eEngine';
 import {getASetting} from '../utils/storeSettings';
+import ControlPanel from './ControlPanel';
+
 
 // yeah, these are IN ADDITION TO the storeSettings criteria, cuz that's only powers of 2
-const MIN_2SLIDER_RES = process.env.NODE_ENV == 'development' ? 4 : 16;
+const MIN_2SLIDER_RES = process.env.NODE_ENV == 'development' ? 4 : 32;
 const MAX_2SLIDER_RES = 1024;
 
 export default class ResolutionDialog extends React.Component {
@@ -75,8 +77,8 @@ export default class ResolutionDialog extends React.Component {
 	// puts up the resolution dialog, starting with the values from the state
 	static openResolutionDialog() {
 		// freeze the iteration while this is going on ...
-		const timeWasAdvancing = SquishPanel.isTimeAdvancing;
-		SquishPanel.isTimeAdvancing = false;
+		const timeWasAdvancing = ControlPanel.isTimeAdvancing;
+		ControlPanel.isTimeAdvancing = false;
 		//?? ResolutionDialog.me.setState()
 
 		// pass our state upward to load into the dialog
@@ -103,7 +105,7 @@ export default class ResolutionDialog extends React.Component {
 				.then(space => {
 					//this.setState({: ,
 					//N: finalParams.N, continuum: finalParams.continuum});
-					SquishPanel.isTimeAdvancing = timeWasAdvancing;
+					ControlPanel.isTimeAdvancing = timeWasAdvancing;
 				});
 
 				//storeASetting('spaceParams', 'N', finalParams.N);
@@ -115,7 +117,7 @@ export default class ResolutionDialog extends React.Component {
 
 			// cancel callback
 			() => {
-				SquishPanel.isTimeAdvancing = timeWasAdvancing;
+				ControlPanel.isTimeAdvancing = timeWasAdvancing;
 			}
 		);
 	}

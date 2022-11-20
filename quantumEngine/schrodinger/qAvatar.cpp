@@ -178,6 +178,8 @@ void qAvatar::formatDirectOffsets(void) {
 
 	makeStringPointer(label);
 
+	makeBoolGetter(pleaseFFT);
+
 	printf("\n🚦 🚦 --------------- done with qAvatar direct access --------------\n");
 }
 
@@ -367,13 +369,9 @@ void qAvatar::fourierFilter(int lowPassFilter) {
 
 
 
-// user button to print it out now, or at end of the next iteration
+// user button to print it out now, while not running.  See also pleaseFFT for when it is
 void qAvatar::askForFFT(void) {
-//	if (isIterating)
-		this->pleaseFFT = true;
-		printf("asked for fft\n");
-	//else
-	//	analyzeWaveFFT(qwave, "askForFFT while idle");
+	analyzeWaveFFT(qwave, "askForFFT while idle");
 }
 
 /* **********************************************************  */
