@@ -15,14 +15,13 @@ let traceResize = false;
 class App extends React.Component {
 	constructor(props) {
 		super(props);
+		App.me = this;
 
 		this.state = {
 			innerWindowWidth: window.innerWidth,
-			isDialogShowing: false,
 			squishPanelExists: true,
+			isDialogShowing: false,
 		};
-
-		App.me = this;
 	}
 
 	/* ************************************************ CommonDialog */

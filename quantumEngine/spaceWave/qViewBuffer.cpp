@@ -16,7 +16,7 @@ static const bool traceInDetail = false;
 // August Ferdinand Möbius invented homogenous coordinates
 
 qViewBuffer::qViewBuffer(qSpace *space, qAvatar *av)
-	: magic('View'), space(space), avatar(av) {
+	: magic('VBuf'), space(space), avatar(av) {
 	if (! space)
 		throw std::runtime_error("qViewBuffer::qViewBuffer null space");
 
