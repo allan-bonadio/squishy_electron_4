@@ -21,7 +21,7 @@ static bool traceQSpace = false;
 // note if you just use the constructor and these functions,
 // NO waves or buffers will be allocated for you
 qSpace::qSpace(const char *lab)
-	: magic('qSpa'), nDimensions(0), potential(NULL), nPoints(0), nStates(0), potentialFactor(-.3) {
+	: magic('Spac'), nDimensions(0), potential(NULL), nPoints(0), nStates(0), potentialFactor(+.03) {
 
 	if (traceQSpace) printf("🚀 🚀 qSpace::qSpace() constructor starts label:'%s'  this= %p\n", lab, (this));
 
