@@ -10,10 +10,10 @@ import {scaleLinear} from 'd3-scale';
 //import {path as d3path} from 'd3-path';
 
 // eslint-disable-next-line no-unused-vars
-import {setFamiliarPotential, dumpPotential} from '../utils/potentialUtils';
-import eSpace from '../engine/eSpace';
-import TextNSlider from '../widgets/TextNSlider';
-import {storeASetting, alternateMinMaxs} from '../utils/storeSettings';
+import {setFamiliarPotential, dumpPotential} from '../utils/potentialUtils.js';
+import eSpace from '../engine/eSpace.js';
+import TextNSlider from '../widgets/TextNSlider.js';
+import {storeASetting, alternateMinMaxs} from '../utils/storeSettings.js';
 
 // some typical potential value, so we can get an idea of how to scale in the graph
 //let SOME_POTENTIAL = 0.01;

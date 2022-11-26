@@ -3,13 +3,13 @@
 ** Copyright (C) 2021-2022 Tactile Interactive, all rights reserved
 */
 
-import {qe, defineQEngineFuncs} from './qe';
-import eSpace from './eSpace';
-import App from '../App';
-import {getASetting} from '../utils/storeSettings';
-import {interpretCppException} from '../utils/errors';
-import {resetObjectRegistry} from '../utils/directAccessors';
-import {storeASetting} from '../utils/storeSettings';
+import {qe, defineQEngineFuncs} from './qe.js';
+import App from '../App.js';
+import {getASetting} from '../utils/storeSettings.js';
+import {interpretCppException} from '../utils/errors.js';
+import {resetObjectRegistry} from '../utils/directAccessors.js';
+import {storeASetting} from '../utils/storeSettings.js';
+import eSpace from './eSpace.js';
 
 // all of these must be attached to window to  get called by c++
 

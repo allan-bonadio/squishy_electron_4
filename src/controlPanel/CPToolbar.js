@@ -3,12 +3,13 @@
 ** Copyright (C) 2021-2022 Tactile Interactive, all rights reserved
 */
 
+import React from 'react';
 import PropTypes from 'prop-types';
-import qe from '../engine/qe';
-import eSpace from '../engine/eSpace';
-//import SquishPanel from '../SquishPanel';
-import ControlPanel from './ControlPanel';
-import {catchEx} from '../utils/errors';
+import qe from '../engine/qe.js';
+import eSpace from '../engine/eSpace.js';
+//import SquishPanel from '../SquishPanel.js';
+import ControlPanel from './ControlPanel.js';
+import {catchEx} from '../utils/errors.js';
 
 
 function setPT() {

@@ -10,25 +10,25 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-import ControlPanel from './controlPanel/ControlPanel';
+import ControlPanel from './controlPanel/ControlPanel.js';
 
 // eslint-disable-next-line no-unused-vars
-import {eSpace} from './engine/eSpace';
-// import eWave from './engine/eWave';
-import {eSpaceCreatedPromise} from './engine/eEngine';
-//import {create1DMainSpace, eSpaceCreatedPromise} from './engine/eEngine';
+import {eSpace} from './engine/eSpace.js';
+// import eWave from './engine/eWave.js';
+import {eSpaceCreatedPromise} from './engine/eEngine.js';
+//import {create1DMainSpace, eSpaceCreatedPromise} from './engine/eEngine.js';
 
-import {interpretCppException} from './utils/errors';
-//import {interpretCppException, dumpJsStack} from './utils/errors';
+import {interpretCppException} from './utils/errors.js';
+//import {interpretCppException, dumpJsStack} from './utils/errors.js';
 
-//import qe from './engine/qe';
+//import qe from './engine/qe.js';
 
-import WaveView from './view/WaveView';
-//import ResolutionDialog from './controlPanel/ResolutionDialog';
-import CommonDialog from './widgets/CommonDialog';
-import {setFamiliarPotential} from './utils/potentialUtils';
+import WaveView from './view/WaveView.js';
+//import ResolutionDialog from './controlPanel/ResolutionDialog.js';
+import CommonDialog from './widgets/CommonDialog.js';
+import {setFamiliarPotential} from './utils/potentialUtils.js';
 
-import {getASetting, storeASetting} from './utils/storeSettings';
+import {getASetting, storeASetting} from './utils/storeSettings.js';
 
 // runtime debugging flags - you can change in the debugger or here
 let areBenchmarking = false;

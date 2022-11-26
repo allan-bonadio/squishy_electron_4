@@ -4,9 +4,9 @@
 */
 
 import PropTypes from 'prop-types';
-import LogSlider from '../widgets/LogSlider';
-import TextNSlider from '../widgets/TextNSlider';
-import {alternateMinMaxs} from '../utils/storeSettings';
+import LogSlider from '../widgets/LogSlider.js';
+import TextNSlider from '../widgets/TextNSlider.js';
+import {alternateMinMaxs} from '../utils/storeSettings.js';
 
 let traceSliderChanges = false;
 

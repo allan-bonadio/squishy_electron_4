@@ -3,12 +3,12 @@
 
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-import App from './App';
-import ErrorBoundary from './widgets/ErrorBoundary';
+import App from './App.js';
+import ErrorBoundary from './widgets/ErrorBoundary.js';
 
 
-//import reportWebVitals from './reportWebVitals';
-//import {interpretCppException} from './utils/errors';
+//import reportWebVitals from './reportWebVitals.js';
+//import {interpretCppException} from './utils/errors.js';
 //
 // before ANYTHING happens
 //window.addEventListener("error", ev => {

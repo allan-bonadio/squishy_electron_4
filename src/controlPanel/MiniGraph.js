@@ -8,7 +8,7 @@ import PropTypes from 'prop-types';
 //import {scaleLinear} from 'd3-scale';
 //import {path as d3path} from 'd3-path';
 
-import {eSpace} from '../engine/eSpace';
+import {eSpace} from '../engine/eSpace.js';
 
 //const π = Math.PI;
 //const radsPerDeg = π / 180;

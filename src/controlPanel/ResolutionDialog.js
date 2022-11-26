@@ -6,15 +6,15 @@
 import React from 'react';
 //import PropTypes from 'prop-types';
 
-import qe from '../engine/qe';
-import CommonDialog from '../widgets/CommonDialog';
-import {powerToIndex} from '../utils/powers';
-import LogSlider from '../widgets/LogSlider';
-//import listOfViewClasses from '../view/listOfViewClasses';
-//import SquishPanel from '../SquishPanel';
-import {recreateMainSpace, eSpaceCreatedPromise} from '../engine/eEngine';
-import {getASetting} from '../utils/storeSettings';
-import ControlPanel from './ControlPanel';
+import qe from '../engine/qe.js';
+import CommonDialog from '../widgets/CommonDialog.js';
+import {powerToIndex} from '../utils/powers.js';
+import LogSlider from '../widgets/LogSlider.js';
+//import listOfViewClasses from '../view/listOfViewClasses.js';
+//import SquishPanel from '../SquishPanel.js';
+import {recreateMainSpace, eSpaceCreatedPromise} from '../engine/eEngine.js';
+import {getASetting} from '../utils/storeSettings.js';
+import ControlPanel from './ControlPanel.js';
 
 
 // yeah, these are IN ADDITION TO the storeSettings criteria, cuz that's only powers of 2

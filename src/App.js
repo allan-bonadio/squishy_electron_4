@@ -6,9 +6,9 @@
 import React from 'react';
 import './App.scss';
 
-import SquishPanel from './SquishPanel';
-import CommonDialog from './widgets/CommonDialog';
-//import {dumpJsStack} from './utils/errors';
+import SquishPanel from './SquishPanel.js';
+import CommonDialog from './widgets/CommonDialog.js';
+//import {dumpJsStack} from './utils/errors.js';
 
 let traceResize = false;
 

@@ -12,23 +12,23 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-//import eSpace from '../engine/eSpace';
-//import eAvatar from '../engine/eAvatar';
-import {thousands} from '../utils/formatNumber';
-import qe from '../engine/qe';
-import {interpretCppException} from '../utils/errors';
+//import eSpace from '../engine/eSpace.js';
+//import eAvatar from '../engine/eAvatar.js';
+import {thousands} from '../utils/formatNumber.js';
+import qe from '../engine/qe.js';
+import {interpretCppException} from '../utils/errors.js';
 import './view.scss';
-// import {abstractViewDef} from './abstractViewDef';
-// import flatDrawingViewDef from './flatDrawingViewDef';
-import {getASetting, storeASetting} from '../utils/storeSettings';
-import PotentialArea from './PotentialArea';
-import GLView from './GLView';
-import {eSpaceCreatedPromise} from '../engine/eEngine';
+// import {abstractViewDef} from './abstractViewDef.js';
+// import flatDrawingViewDef from './flatDrawingViewDef.js';
+import {getASetting, storeASetting} from '../utils/storeSettings.js';
+import PotentialArea from './PotentialArea.js';
+import GLView from './GLView.js';
+import {eSpaceCreatedPromise} from '../engine/eEngine.js';
 
 
-//import {listOfViewClasses} from './listOfViewClasses';
+//import {listOfViewClasses} from './listOfViewClasses.js';
 
-//import {dumpJsStack} from '../utils/errors';
+//import {dumpJsStack} from '../utils/errors.js';
 
 let traceDragCanvasHeight = false;
 

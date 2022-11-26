@@ -4,7 +4,7 @@
 */
 
 //import PropTypes from 'prop-types';
-import ResolutionDialog from './ResolutionDialog';
+import ResolutionDialog from './ResolutionDialog.js';
 
 //function setPT() {
 //	SetResolutionTab.propTypes = {

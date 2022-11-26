@@ -3,8 +3,8 @@
 ** Copyright (C) 2021-2022 Tactile Interactive, all rights reserved
 */
 
-//import {viewUniform, viewAttribute} from './viewVariable';
-//import {abstractViewDef} from './abstractViewDef';
+//import {viewUniform, viewAttribute} from './viewVariable.js';
+//import {abstractViewDef} from './abstractViewDef.js';
 
 /* superclass of all drawings.  A drawing is a piece of code that draws one thing on
 a GL canvas.  It's got v&f shaders, a source of data, and a Draw function.

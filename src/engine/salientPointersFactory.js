@@ -2,8 +2,8 @@
 ** salientPointers - the JS mapping to c++ buffers
 ** Copyright (C) 2022-2022 Tactile Interactive, all rights reserved
 */
-//import eWave from './eWave';
-//import eAvatar from './eAvatar';
+//import eWave from './eWave.js';
+//import eAvatar from './eAvatar.js';
 
 // I guess you could have one of these for each space?  No, per avatar?
 // Additional waves and avatars... um...

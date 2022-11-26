@@ -2,11 +2,11 @@
 ** eAvatar - the JS representations of the c++ Avatar object
 ** Copyright (C) 2022-2022 Tactile Interactive, all rights reserved
 */
-//import qe from './qe';
-import {cppObjectRegistry, prepForDirectAccessors} from '../utils/directAccessors';
-import eWave from './eWave';
-//import eSpace from './eSpace';
-import qe from './qe';
+//import qe from './qe.js';
+import {cppObjectRegistry, prepForDirectAccessors} from '../utils/directAccessors.js';
+import eWave from './eWave.js';
+//import eSpace from './eSpace.js';
+import qe from './qe.js';
 
 let traceCreation = false;
 let traceHighest = false;
@@ -83,7 +83,6 @@ class eAvatar {
 	get _qspect() { return this.ints[15]; }
 	get _vBuffer() { return this.ints[17]; }
 	get _label() { return this.pointer + 72; }
-	get pleaseFFT() { return this.bools[89]; }
 
 	// this just gets the pointer to the view buffer...  the JS array
 	getViewBuffer() {

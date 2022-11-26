@@ -3,12 +3,12 @@
 ** Copyright (C) 2021-2022 Tactile Interactive, all rights reserved
 */
 
-import {abstractDrawing} from './abstractDrawing';
-import cxToColorGlsl from './cxToColor/cxToColor.glsl';
-//import qe from '../engine/qe';
-import {viewUniform, viewAttribute} from './viewVariable';
-//import SquishPanel from '../SquishPanel';
-//import {eSpaceCreatedPromise} from '../engine/eEngine';
+import {abstractDrawing} from './abstractDrawing.js';
+import cxToColorGlsl from './cxToColor/cxToColor.glsl.js';
+//import qe from '../engine/qe.js';
+import {viewUniform, viewAttribute} from './viewVariable.js';
+//import SquishPanel from '../SquishPanel.js';
+//import {eSpaceCreatedPromise} from '../engine/eEngine.js';
 
 let dumpViewBufAfterDrawing = false;
 let traceHighest = false;

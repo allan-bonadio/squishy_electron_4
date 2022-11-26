@@ -9,14 +9,14 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-//import qe from '../engine/qe';
-//import {abstractViewDef} from './abstractViewDef';
-//import flatDrawingViewDef from './flatDrawingViewDef';
-//import {getASetting, storeASetting} from '../utils/storeSettings';
+//import qe from '../engine/qe.js';
+//import {abstractViewDef} from './abstractViewDef.js';
+//import flatDrawingViewDef from './flatDrawingViewDef.js';
+//import {getASetting, storeASetting} from '../utils/storeSettings.js';
 
-import eAvatar from '../engine/eAvatar';
-import {listOfViewClasses} from './listOfViewClasses';
-//import {eSpaceCreatedPromise} from '../engine/eEngine';
+import eAvatar from '../engine/eAvatar.js';
+import {listOfViewClasses} from './listOfViewClasses.js';
+//import {eSpaceCreatedPromise} from '../engine/eEngine.js';
 
 let traceSetup = false;
 let tracePainting = false;

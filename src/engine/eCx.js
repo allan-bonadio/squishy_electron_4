@@ -4,7 +4,7 @@
 */
 
 //import complex from 'complex';
-import cxToRgb from '../view/cxToRgb';
+import cxToRgb from '../view/cxToRgb.js';
 
 // do this old school class so  i can use the constructor without new
 // very handy - either arg can be a complex obj, or a real, and the im arg can be absent

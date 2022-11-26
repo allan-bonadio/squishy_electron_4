@@ -8,8 +8,8 @@ import React from 'react';
 //import {scaleLinear} from 'd3-scale';
 //import {path as d3path} from 'd3-path';
 
-import {stepsPerDecadeStepFactors, indexToPower, powerToIndex} from '../utils/powers';
-import {thousands} from '../utils/formatNumber';
+import {stepsPerDecadeStepFactors, indexToPower, powerToIndex} from '../utils/powers.js';
+import {thousands} from '../utils/formatNumber.js';
 
 // set a particular unique in this regex to trace its renders and stuff or use the second one to turn off
 //let traceThisSlider = /stepsPerIterationSlider/;

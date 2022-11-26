@@ -5,10 +5,10 @@
 
 // There is no eBuffer or eSpectrum; C++ deals with those exclusively
 
-import {qe} from './qe';
-import cxToRgb from '../view/cxToRgb';
-import {cppObjectRegistry, prepForDirectAccessors} from '../utils/directAccessors';
-import eSpace from './eSpace';
+import {qe} from './qe.js';
+import cxToRgb from '../view/cxToRgb.js';
+import {cppObjectRegistry, prepForDirectAccessors} from '../utils/directAccessors.js';
+import eSpace from './eSpace.js';
 
 let traceSetFamiliarWave = false;
 let traceSetFamiliarWaveResult = false;

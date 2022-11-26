@@ -3,10 +3,10 @@
 ** Copyright (C) 2021-2022 Tactile Interactive, all rights reserved
 */
 
-import {abstractViewDef} from './abstractViewDef';
-import {flatDrawing} from './flatDrawing';
+import {abstractViewDef} from './abstractViewDef.js';
+import {flatDrawing} from './flatDrawing.js';
 // eslint-disable-next-line no-unused-vars
-import {ticDrawing} from './ticDrawing';
+import {ticDrawing} from './ticDrawing.js';
 
 class flatDrawingViewDef extends abstractViewDef {
 	static displayName = 'Flat View';

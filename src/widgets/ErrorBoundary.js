@@ -280,6 +280,12 @@ class ErrorBoundary extends React.Component {
 			ermsgs = devMode ? this.renderDev(terminalErrorObj) : this.renderProd(terminalErrorObj);
 		if (errorObj)
 			ermsgs += devMode ? this.renderDev(errorObj) : this.renderProd(errorObj);
+		if (infoObj)
+			ermsgs += JSON.stringify(infoObj, NULL, '\t');
+
+		if (ermsgs) {
+			return <pre>{ermsgs}</pre>;
+		}
 
 		// normal: act like nothing happened
 		return this.props.children;

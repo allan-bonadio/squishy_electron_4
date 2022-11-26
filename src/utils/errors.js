@@ -3,7 +3,7 @@
 ** Copyright (C) 2022-2022 Tactile Interactive, all rights reserved
 */
 
-import qe from '../engine/qe';
+import qe from '../engine/qe.js';
 
 /* ****************************************************** diagnostics */
 

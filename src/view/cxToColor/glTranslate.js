@@ -6,7 +6,6 @@
 
 import fs from 'fs';
 
-//import cxToColorGlsl from '/opt/dvl/squishyElectron/squishy_electron_4/src/view/cxToColor/cxToColor.glsl.js';
 import cxToColorGlsl from './cxToColor.glsl.js';
 
 // This does NOT translate all of glsl; just the stuff used in cxToColor file.

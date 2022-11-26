@@ -8,22 +8,22 @@ import PropTypes from 'prop-types';
 import {scaleLinear} from 'd3-scale';
 
 
-//import MiniGraph from './MiniGraph';
-//import eSpace from '../engine/eSpace';
-import GLView from '../view/GLView';
+//import MiniGraph from './MiniGraph.js';
+//import eSpace from '../engine/eSpace.js';
+import GLView from '../view/GLView.js';
 
-// import eWave from '../engine/eWave';
-// import eCx from '../engine/eCx';
-// import cxToRgb from '../view/cxToRgb';
-import TextNSlider from '../widgets/TextNSlider';
-import {} from '../utils/storeSettings';
-//import {getASetting, storeASetting, getAGroup, storeAGroup, alternateMinMaxs} from '../utils/storeSettings';
-import {getAGroup, alternateMinMaxs} from '../utils/storeSettings';
-//import {storeASetting, alternateMinMaxs} from '../utils/storeSettings';
+// import eWave from '../engine/eWave.js';
+// import eCx from '../engine/eCx.js';
+// import cxToRgb from '../view/cxToRgb.js';
+import TextNSlider from '../widgets/TextNSlider.js';
+import {} from '../utils/storeSettings.js';
+//import {getASetting, storeASetting, getAGroup, storeAGroup, alternateMinMaxs} from '../utils/storeSettings.js';
+import {getAGroup, alternateMinMaxs} from '../utils/storeSettings.js';
+//import {storeASetting, alternateMinMaxs} from '../utils/storeSettings.js';
 
-//import salientPointersFactory from './salientPointersFactory';
-import {eSpaceCreatedPromise} from '../engine/eEngine';
-import {interpretCppException} from '../utils/errors';
+//import salientPointersFactory from './salientPointersFactory.js';
+import {eSpaceCreatedPromise} from '../engine/eEngine.js';
+import {interpretCppException} from '../utils/errors.js';
 
 
 //let debugWaveTab = false;

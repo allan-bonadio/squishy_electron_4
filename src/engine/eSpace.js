@@ -2,15 +2,15 @@
 ** eSpace - the JS representations of the c++ qSpace object
 ** Copyright (C) 2021-2022 Tactile Interactive, all rights reserved
 */
-import qe from './qe';
-//import eWave from './eWave';
-import {setFamiliarPotential} from '../utils/potentialUtils';
-import salientPointersFactory from './salientPointersFactory';
-import eAvatar from './eAvatar';
-import {getAGroup} from '../utils/storeSettings';
-import {cppObjectRegistry} from '../utils/directAccessors';
-import {interpretCppException} from '../utils/errors';
-import {MAX_DIMENSIONS} from './eEngine';
+import qe from './qe.js';
+//import eWave from './eWave.js';
+import {setFamiliarPotential} from '../utils/potentialUtils.js';
+import salientPointersFactory from './salientPointersFactory.js';
+import eAvatar from './eAvatar.js';
+import {getAGroup} from '../utils/storeSettings.js';
+import {cppObjectRegistry} from '../utils/directAccessors.js';
+import {interpretCppException} from '../utils/errors.js';
+import {MAX_DIMENSIONS} from './eEngine.js';
 
 let traceSpace = false;
 let traceFamiliarWave = false;

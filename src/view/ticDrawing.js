@@ -3,9 +3,9 @@
 ** Copyright (C) 2022-2022 Tactile Interactive, all rights reserved
 */
 
-import {abstractDrawing} from './abstractDrawing';
+import {abstractDrawing} from './abstractDrawing.js';
 // eslint-disable-next-line no-unused-vars
-import {viewUniform, viewAttribute} from './viewVariable';
+import {viewUniform, viewAttribute} from './viewVariable.js';
 
 let traceDumpVertices = false;
 let traceTicDrawing = false;

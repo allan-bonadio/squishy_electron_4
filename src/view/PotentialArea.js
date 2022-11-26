@@ -8,9 +8,9 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import {scaleLinear} from 'd3-scale';
 
-import qe from '../engine/qe';
-import eSpace from '../engine/eSpace';
-import {dumpPotential} from '../utils/potentialUtils';
+import qe from '../engine/qe.js';
+import eSpace from '../engine/eSpace.js';
+import {dumpPotential} from '../utils/potentialUtils.js';
 
 // I dunno but the potentials I'm generating are too strong.
 // So I reduced it by this factor, but still have to magnify it to make it visible.

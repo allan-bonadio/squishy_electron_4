@@ -7,16 +7,16 @@ import React from 'react';
 import PropTypes from 'prop-types';
 
 import './ControlPanel.scss';
-import SquishPanel from '../SquishPanel';
-import CPToolbar from './CPToolbar';
-import SetWaveTab from './SetWaveTab';
-import SetPotentialTab from './SetPotentialTab';
-import SetResolutionTab from './SetResolutionTab';
-import SetIterationTab from './SetIterationTab';
-import eSpace from '../engine/eSpace';
-import {getASetting, storeASetting, getAGroup, storeAGroup} from '../utils/storeSettings';
-//import {eSpaceCreatedPromise} from '../engine/eEngine';
-// import qe from '../engine/qe';
+import CPToolbar from './CPToolbar.js';
+import SetWaveTab from './SetWaveTab.js';
+import SetPotentialTab from './SetPotentialTab.js';
+import SetResolutionTab from './SetResolutionTab.js';
+import SetIterationTab from './SetIterationTab.js';
+import eSpace from '../engine/eSpace.js';
+import SquishPanel from '../SquishPanel.js';
+import {getASetting, storeASetting, getAGroup, storeAGroup} from '../utils/storeSettings.js';
+//import {eSpaceCreatedPromise} from '../engine/eEngine.js';
+// import qe from '../engine/qe.js';
 
 export class ControlPanel extends React.Component {
 	static propTypes = {

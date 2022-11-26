@@ -3,9 +3,9 @@
 ** Copyright (C) 2021-2022 Tactile Interactive, all rights reserved
 */
 
-import {abstractViewDef} from './abstractViewDef';
-import {abstractDrawing} from './abstractDrawing';
-import {viewUniform, viewAttribute} from './viewVariable';
+import {abstractViewDef} from './abstractViewDef.js';
+import {abstractDrawing} from './abstractDrawing.js';
+import {viewUniform, viewAttribute} from './viewVariable.js';
 
 
 // NOT DEBUGGED YET!!!
