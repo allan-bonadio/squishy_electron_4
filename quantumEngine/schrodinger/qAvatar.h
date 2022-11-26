@@ -38,7 +38,7 @@ struct qAvatar {
 	/* *********************************************** iteration */
 
 	// our main qWave, either for the WaveView or the SetWave tab
-	// this OWNS the qWave
+	// this avatar OWNS the qWave & is responsible for deleting it
 	struct qWave *qwave;
 
 	// pointer grabbed from the space, often.  Same buffer as in space.

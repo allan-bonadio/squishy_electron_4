@@ -277,7 +277,6 @@ void qAvatar::oneIteration() {
 	iterateSerial++;
 
 	// ok the algorithm tends to diverge after thousands of iterations.  Hose it down.
-printf("pleaseFFT: %hhd qwave=%p wave=%p \n", this->pleaseFFT, qwave, qwave->wave);////
 	if (this->pleaseFFT) analyzeWaveFFT(qwave, "before fourierFilter()");
 	fourierFilter(lowPassFilter);
 	if (this->pleaseFFT) analyzeWaveFFT(qwave, "after fourierFilter()");
