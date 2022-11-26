@@ -8,6 +8,7 @@ import qe from '../engine/qe';
 import eSpace from '../engine/eSpace';
 //import SquishPanel from '../SquishPanel';
 import ControlPanel from './ControlPanel';
+import {catchEx} from '../utils/errors';
 
 
 function setPT() {
@@ -27,13 +28,15 @@ function setPT() {
 
 function clickOnFFT(space)
 {
-	// space not there until space promise, but that should happen before anybody clicks on this
-	if (space) {
-		if (ControlPanel.isTimeAdvancing)
-			space.mainEAvatar.pleaseFFT = true;  // start and finiiish
-		else
-			qe.avatar_askForFFT(space.mainEAvatar);
-	}
+	catchEx(() => {
+		// space not there until space promise, but that should happen before anybody clicks on this
+		if (space) {
+			if (ControlPanel.isTimeAdvancing)
+				space.mainEAvatar.pleaseFFT = true;  // start and finish
+			else
+				qe.avatar_askForFFT(space.mainEAvatar);
+		}
+	});
 }
 
 

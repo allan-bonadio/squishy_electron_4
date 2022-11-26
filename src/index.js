@@ -4,6 +4,9 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import App from './App';
+import ErrorBoundary from './widgets/ErrorBoundary';
+
+
 //import reportWebVitals from './reportWebVitals';
 //import {interpretCppException} from './utils/errors';
 //
@@ -36,7 +39,11 @@ import App from './App';
 
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
-root.render(<App />);
+root.render(
+	<ErrorBoundary>
+		<App />
+	</ErrorBoundary>
+);
 
 // wasted so much time on this
 //   <React.StrictMode>

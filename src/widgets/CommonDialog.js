@@ -27,6 +27,16 @@ function ErrorDialog(props) {
 	</div>;
 }
 
+// similar but for an error, comes out in Red
+function ErrorBoundaryDialog(props) {
+	let err = props.error;
+	let msg = `${props.where} : ${err.stack ?? err.message ?? err.toString()}`;
+	return <div id='ErrorDialog' >
+		<p>{msg}</p>
+		<nav><button onClick={CommonDialog.startClosingDialog} >OK</button></nav>
+	</div>;
+}
+
 // HEY!  this can be a function component - no state, no props.  App has all the state.
 
 // how to use:
@@ -64,6 +74,12 @@ export default class CommonDialog extends React.Component {
 
 	static openErrorDialog(err, where) {
 		CommonDialog.openDialog(<ErrorDialog error={err} where={where} />);
+	}
+
+	static openErrorBoundaryDialog(content) {
+		CommonDialog.openDialog(<ErrorBoundaryDialog >
+			{content}
+		</ErrorBoundaryDialog>);
 	}
 
 	// called by client sw (whoever called us) after user clicks OK or Cancel
