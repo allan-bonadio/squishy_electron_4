@@ -24,10 +24,12 @@ export function prepForDirectAccessors(_this, pointer) {
 	if (!pointer)
 		return;
 
-	// these lengths are only for convenience in the debugger; adjust as needed
-	_this.doubles = new Float64Array(window.Module.HEAPF64.buffer, pointer, 10);
-	_this.ints = new Uint32Array(window.Module.HEAPU32.buffer, pointer, 20);
-	_this.bools = new Uint8Array(window.Module.HEAPU8.buffer, pointer, 80);
+	// these lengths must be big enough to reach to all local variables on your objects
+	// otherwise you can't set or retrieve them; adjust as needed
+	// (these are not used for arrays or buffers)
+	_this.doubles = new Float64Array(window.Module.HEAPF64.buffer, pointer, 40);
+	_this.ints = new Uint32Array(window.Module.HEAPU32.buffer, pointer, 80);
+	_this.bools = new Uint8Array(window.Module.HEAPU8.buffer, pointer, 320);
 
 	cppObjectRegistry[pointer] = _this;
 }
