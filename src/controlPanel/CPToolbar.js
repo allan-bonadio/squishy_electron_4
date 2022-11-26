@@ -33,9 +33,9 @@ function clickOnFFT(space)
 		// space not there until space promise, but that should happen before anybody clicks on this
 		if (space) {
 			if (ControlPanel.isTimeAdvancing)
-				space.mainEAvatar.pleaseFFT = true;  // start and finish
+				space.mainEAvatar.pleaseFFT = true;  // remind me after next iter
 			else
-				qe.avatar_askForFFT(space.mainEAvatar);
+				qe.avatar_askForFFT(space.mainEAvatar.pointer);  // do it now
 		}
 	});
 }
