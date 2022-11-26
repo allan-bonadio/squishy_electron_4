@@ -178,8 +178,6 @@ void qAvatar::formatDirectOffsets(void) {
 
 	makeStringPointer(label);
 
-	makeBoolGetter(pleaseFFT);
-
 	printf("\n🚦 🚦 --------------- done with qAvatar direct access --------------\n");
 }
 
