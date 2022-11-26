@@ -32,6 +32,7 @@
       "react-app/jest"
     ],
     "rules": {
+      "no-ex-assign": 0,
       "eqeqeq": 0,
       "no-throw-literal": 0,
       "default-case": 0,
