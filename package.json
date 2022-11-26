@@ -3,6 +3,7 @@
   "version": "0.4.0",
   "author": "Allan Bonadio <abonadio@tactileint.org> (http://portfolio.tactileint.org)",
   "private": true,
+  "type": "module",
   "dependencies": {
     "@craco/craco": "^6.4.5",
     "@testing-library/jest-dom": "^5.16.5",
@@ -13,14 +14,13 @@
     "d3": "^6.6.2",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "react-scripts": "5.0.1",
-    "sass-loader": "^10.0.5",
     "web-vitals": "^2.1.4"
   },
   "scripts": {
     "start": "craco start",
     "build": "craco build",
-    "test": "craco test",
+    "test": "node --experimental-vm-modules node_modules/.bin/jest --runInBand",
+    "testdb": "node --experimental-vm-modules npx jest --runInBand",
     "startWOcraco": "react-scripts start",
     "buildWOcraco": "react-scripts build",
     "testWOcraco": "react-scripts test",
@@ -65,7 +65,7 @@
     "eslint-plugin-react-hooks": "^4.2.0",
     "eslint-plugin-testing-library": "^3.9.2",
     "eslint-webpack-plugin": "^2.5.2",
-    "jest": "26.6.0",
+    "jest": "^26.6.0",
     "jest-circus": "26.6.0",
     "jest-resolve": "26.6.0",
     "jest-watch-typeahead": "0.6.1",
@@ -74,6 +74,10 @@
     "postcss-normalize": "8.0.1",
     "postcss-preset-env": "6.7.0",
     "postcss-safe-parser": "5.0.2",
-    "sass": "^1.45.1"
-  }
+    "react-scripts": "5.0.1",
+    "react-test-renderer": "^18.2.0",
+    "sass": "^1.45.1",
+    "sass-loader": "^10.0.5"
+  },
+  "extraPackagesIMightNeed": "'@babel/preset-env': '<current-version>', '@babel/preset-react': '<current-version>', 'babel-jest': '<current-version>',"
 }
