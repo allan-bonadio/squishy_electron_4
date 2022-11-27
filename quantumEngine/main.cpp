@@ -15,12 +15,12 @@
 
 // Emscripten magic: this c++ function will end up executing the JS enclosed.
 // call this JS callback so JS knows we're up and ready.
-// Hand it some sizes for the heck of it.
+// Hand it some numbers from the builder script.
 // somehow there's a race condition where this isn't set soon enough... sometimes
 EM_JS(void, qeStarted, (int max_dimensions, int max_label_len),
 {
 	// maybe we can tighten this up a bit someday
-	setTimeout(() => quantumEngineHasStarted(max_dimensions, max_label_len), 400);
+	setTimeout(() => quantumEngineHasStarted(max_dimensions, max_label_len), 50);
 }
 );
 
