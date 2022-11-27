@@ -2,6 +2,7 @@
   "name": "squishy_electron_4",
   "version": "0.4.0",
   "author": "Allan Bonadio <abonadio@tactileint.org> (http://portfolio.tactileint.org)",
+  "description": "An interactive simulator for a quantum mechanical electron",
   "private": true,
   "type": "module",
   "dependencies": {
@@ -16,10 +17,12 @@
     "web-vitals": "^2.1.4"
   },
   "scripts": {
-    "startCraco": "craco start",
-    "buildCraco": "craco build",
-    "test": "node --experimental-vm-modules node_modules/.bin/jest --runInBand",
-    "testdb": "node --experimental-vm-modules npx jest --runInBand",
+  	"test": "maint/testAll.sh",
+    "testjs": "node --experimental-vm-modules node_modules/.bin/jest --runInBand",
+    "testjsdb": "node --experimental-vm-modules node_modules/.bin/jest --runInBand",
+    "testcpp": "quantumEngine/testing/cppuRunner.sh \"$@\" ",
+    "testcppdb": "quantumEngine/testing/cppuRunner.sh db \"$@\" ",
+
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
