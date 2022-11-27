@@ -5,6 +5,7 @@
 
 //import complex from 'complex';
 import cxToRgb from '../view/cxToRgb.js';
+import cxToColor from '../view/cxToColor/cxToColor.txlated.js';
 
 // do this old school class so  i can use the constructor without new
 // very handy - either arg can be a complex obj, or a real, and the im arg can be absent
@@ -36,6 +37,7 @@ function eCx(re, im) {
 
 // aint workin
 eCx.prototype.color = function color() {
+	// should siwtch this over to cxToRgb////
 	return cxToRgb(this);
 };
 

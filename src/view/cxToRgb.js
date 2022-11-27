@@ -5,7 +5,7 @@
 
 // this is rewritten from cxToColor.glsl to be the JS implementation.
 // (I tried to automatically translate it but it was too hard.)
-
+// fiinally got it working
 
 const sqrtOneThird = Math.sqrt(1. / 3.);  // 0.57735..
 //const sqrtThreeOver2 = Math.sqrt(3.) / 2.;  // .8660...
@@ -23,6 +23,7 @@ const vec3 = (r, b, g) => `rgb(${(r*256).toFixed(0)},${(g*256).toFixed(0)},${(b*
 // Each gun is a float 0...1.  300° == -60° as you would expect.
 // This returns a CSS color value like rgb(...)
 function cxToRgb(psi) {
+	console.warn("cxToRgb() is deprecated")
 	let slope;
 	if (psi.im == 0.) {
 		// real numbers.  Get rid of y=0 cases  that screw up division by y.

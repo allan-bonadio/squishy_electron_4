@@ -6,6 +6,7 @@
 // There is no eBuffer or eSpectrum; C++ deals with those exclusively
 
 import {qe} from './qe.js';
+import cxToColor from '../view/cxToColor/cxToColor.txlated.js';
 import cxToRgb from '../view/cxToRgb.js';
 import {cppObjectRegistry, prepForDirectAccessors} from '../utils/directAccessors.js';
 import eSpace from './eSpace.js';
@@ -77,6 +78,7 @@ export function rainbowDump(wave, start, end, nPoints, title) {
 		let mag = (wave[ix2] ** 2 + wave[ix2 + 1] ** 2) * correction;
 		//console.info(`mag=${mag}  mag pre corr=${mag / correction}`)
 
+		// should change this to cxToColor()
 		let color = cxToRgb({re: wave[ix2], im: wave[ix2 + 1]});
 		console.log(`%c `, `background-color: ${color}; padding-right: ${mag+5}px; `);
 	}

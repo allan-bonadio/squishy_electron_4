@@ -15,6 +15,7 @@ import GLView from '../view/GLView.js';
 // import eWave from '../engine/eWave.js';
 // import eCx from '../engine/eCx.js';
 // import cxToRgb from '../view/cxToRgb.js';
+//import cxToColor from '../view/cxToColor/cxToColor.txlated.js';
 import TextNSlider from '../widgets/TextNSlider.js';
 import {} from '../utils/storeSettings.js';
 //import {getASetting, storeASetting, getAGroup, storeAGroup, alternateMinMaxs} from '../utils/storeSettings.js';
