@@ -56,7 +56,7 @@ export class WaveView extends React.Component {
 		super(props);
 
 		this.state = {
-			height: getASetting('miscParams', 'viewHeight'),
+			height: getASetting('miscSettings', 'viewHeight'),
 			space: null,  // set when promise comes in
 		}
 
@@ -106,7 +106,7 @@ export class WaveView extends React.Component {
 			const viewHeight = ev.pageY + this.yOffset;
 			if (this.state.height != viewHeight)
 				this.setState({height: viewHeight});
-			storeASetting('miscParams', 'viewHeight', viewHeight);
+			storeASetting('miscSettings', 'viewHeight', viewHeight);
 			if (traceDragCanvasHeight)
 				console.info(`mouse drag ${ev.pageX} ${ev.pageY}  newheight=${ev.pageY + this.yOffset}`);
 

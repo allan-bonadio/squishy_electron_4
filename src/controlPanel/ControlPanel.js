@@ -67,7 +67,7 @@ export class ControlPanel extends React.Component {
 			valleyScale: getASetting('potentialParams', 'valleyScale'),
 			valleyOffset: getASetting('potentialParams', 'valleyOffset'),
 
-			showingTab: getASetting('miscParams', 'showingTab'),
+			showingTab: getASetting('miscSettings', 'showingTab'),
 		}
 
 		// pour these directly into the initial state
@@ -88,20 +88,20 @@ export class ControlPanel extends React.Component {
 	// set the frequency of iteration frames.  Does not control whether iterating or not.
 	setIterateFrequency(newFreq) {
 		this.setState({iteratePeriod:
-			storeASetting('iterationParams', 'iteratePeriod', 1000. / +newFreq)
+			storeASetting('iterationSettings', 'iteratePeriod', 1000. / +newFreq)
 		});
 	}
 
 	// the first time, we get it from the settings.
-	static isTimeAdvancing = getASetting('iterationParams', 'isTimeAdvancing');
+	static isTimeAdvancing = getASetting('iterationSettings', 'isTimeAdvancing');
 
 	static startIterating() {
-		ControlPanel.isTimeAdvancing = storeASetting('iterationParams', 'isTimeAdvancing', true);;
+		ControlPanel.isTimeAdvancing = storeASetting('iterationSettings', 'isTimeAdvancing', true);;
 		ControlPanel.me.setState({isTimeAdvancing: true});
 	}
 
 	static stopIterating() {
-		ControlPanel.isTimeAdvancing = storeASetting('iterationParams', 'isTimeAdvancing', false);
+		ControlPanel.isTimeAdvancing = storeASetting('iterationSettings', 'isTimeAdvancing', false);
 		ControlPanel.me.setState({isTimeAdvancing: false});
 	}
 
@@ -181,7 +181,7 @@ export class ControlPanel extends React.Component {
 
 	setShowingTab =
 	tabCode => {
-		this.setState({showingTab: storeASetting('miscParams', 'showingTab', tabCode)});
+		this.setState({showingTab: storeASetting('miscSettings', 'showingTab', tabCode)});
 	}
 
 

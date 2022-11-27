@@ -96,24 +96,24 @@ export class SquishPanel extends React.Component {
 
 			// this is controlled by the user (start/stop/step buttons)
 			// does not really influence the rendering of the canvas... (other than running)
-			//isTimeAdvancing: getASetting('iterationParams', 'isTimeAdvancing'),
+			//isTimeAdvancing: getASetting('iterationSettings', 'isTimeAdvancing'),
 
 			// this is the actual 'frequency' in actual milliseconds, as set by that menu.
 			// convert between like 1000/n
 			// eg the menu on the CPToolbar says 10/sec, so this becomes 100
-			iteratePeriod: getASetting('iterationParams', 'iteratePeriod'),
+			iteratePeriod: getASetting('iterationSettings', 'iteratePeriod'),
 
 			// defaults for sliders for deltaT & spi
-			deltaT: getASetting('iterationParams', 'deltaT'),
-			stepsPerIteration: getASetting('iterationParams', 'stepsPerIteration'),
-			lowPassFilter: getASetting('iterationParams', 'lowPassFilter'),
+			deltaT: getASetting('iterationSettings', 'deltaT'),
+			stepsPerIteration: getASetting('iterationSettings', 'stepsPerIteration'),
+			lowPassFilter: getASetting('iterationSettings', 'lowPassFilter'),
 
 			// advance forward with each iter
 			// NOT SAME as shown on WaveView!
 			runningCycleElapsedTime: 0,
 			runningCycleIterateSerial: 0,
 
-			showPotential:  getASetting('potentialParams', 'showPotential'),
+			showPotential:  getASetting('potentialSettings', 'showPotential'),
 
 		};
 
@@ -121,7 +121,7 @@ export class SquishPanel extends React.Component {
 		const now = performance.now();
 		this.initStats(now);
 		this.timeForNextTic = now + 10;  // default so we can get rolling
-		this.lastAniIteration = now;
+		this.lastAniteration = now;
 
 		// stick ?allowRunningOneCycle at the end of URL to show runningOneCycle panel
 		// eslint-disable-next-line
@@ -209,7 +209,7 @@ export class SquishPanel extends React.Component {
 //
 //				create1DMainSpace({N: finalParams.N, continuum: finalParams.continuum, label: 'main'});
 //
-//				// do i really have to wait?  I thiink the promise only works the first time.
+//				// do i really have to wait?  I think the promise only works the first time.
 //				eSpaceCreatedPromise
 //				.then(space => {
 //					this.setState({isTimeAdvancing: timeWasAdvancing,
@@ -377,7 +377,7 @@ export class SquishPanel extends React.Component {
 		}
 
 		// this is in milliseconds
-		const timeSince = iterationStart - this.lastAniIteration;
+		const timeSince = iterationStart - this.lastAniteration;
 //		if (timeSince < 8) {
 //			console.log(` skipping an ani frame cuz we got too much: ${timeSince} ms`)
 //			return;  // we might have more than one cycle in here... this should fix it
@@ -385,7 +385,7 @@ export class SquishPanel extends React.Component {
 
 		if (isNaN(timeSince)) debugger;
 		//console.log(` maintaining the ReqAniFra cycle: ${timeSince.toFixed(1)} ms`)
-		this.lastAniIteration = iterationStart;
+		this.lastAniteration = iterationStart;
 
 		requestAnimationFrame(this.animateHeartbeat);
 	}
@@ -463,20 +463,20 @@ export class SquishPanel extends React.Component {
 
 	// dt is time per step, for the algorithm; deltaT is time per iteration, the user/UI control)
 	setDeltaT = deltaT => {
-		deltaT = storeASetting('iterationParams', 'deltaT', deltaT);
+		deltaT = storeASetting('iterationSettings', 'deltaT', deltaT);
 		this.setState({deltaT});
 		//this.mainEAvatar.dt = deltaT;
 		this.mainEAvatar.dt = deltaT / (this.state.stepsPerIteration + N_EXTRA_STEPS);  // always one more!
 		//qe.Avatar_setDt(dt);
-		//if (typeof storeSettings != 'undefined' && storeSettings.iterationParams)  // goddamned bug in importing works in constructor
+		//if (typeof storeSettings != 'undefined' && storeSettings.iterationSettings)  // goddamned bug in importing works in constructor
 	}
 
 	setStepsPerIteration =
 	stepsPerIteration => {
 		try {
 			if (traceSetPanels) console.log(`js setStepsPerIteration(${stepsPerIteration})`);
-			//if (typeof storeSettings != 'undefined' && storeSettings.iterationParams)  // goddamned bug in importing works in constructor
-			storeASetting('iterationParams', 'stepsPerIteration', stepsPerIteration);
+			//if (typeof storeSettings != 'undefined' && storeSettings.iterationSettings)  // goddamned bug in importing works in constructor
+			storeASetting('iterationSettings', 'stepsPerIteration', stepsPerIteration);
 			this.setState({stepsPerIteration});
 			this.mainEAvatar.stepsPerIteration = stepsPerIteration;
 		} catch (ex) {
@@ -493,7 +493,7 @@ export class SquishPanel extends React.Component {
 	lowPassFilter => {
 		if (traceSetPanels) console.log(`js setLowPassFilter(${lowPassFilter})`)
 
-		let lpf = storeASetting('iterationParams', 'lowPassFilter', lowPassFilter);
+		let lpf = storeASetting('iterationSettings', 'lowPassFilter', lowPassFilter);
 		this.setState({lowPassFilter: lpf});
 
 		// here's where it converts from percent to the C++ style integer number of freqs
@@ -523,7 +523,7 @@ export class SquishPanel extends React.Component {
 	toggleShowPotential =
 	ev => {
 		this.setState({showPotential: ev.target.checked});
-		storeASetting('potentialParams', 'showPotential', ev.target.checked);
+		storeASetting('potentialSettings', 'showPotential', ev.target.checked);
 	}
 
 	// dump the view buffer, from the JS side.  Why not use the C++ version?

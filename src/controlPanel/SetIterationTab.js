@@ -56,8 +56,8 @@ function SetIterationTab(props) {
 				maxLabel='100.0'
 
 				current={props.deltaT}
-				sliderMin={alternateMinMaxs.iterationParams.deltaT.min}
-				sliderMax={alternateMinMaxs.iterationParams.deltaT.max}
+				sliderMin={alternateMinMaxs.iterationSettings.deltaT.min}
+				sliderMax={alternateMinMaxs.iterationSettings.deltaT.max}
 				stepsPerDecade={6}
 
 				handleChange={(power, ix) => {
@@ -74,8 +74,8 @@ function SetIterationTab(props) {
 				maxLabel='smoother'
 
 				current={props.stepsPerIteration}
-				sliderMin={alternateMinMaxs.iterationParams.stepsPerIteration.min}
-				sliderMax={alternateMinMaxs.iterationParams.stepsPerIteration.max}
+				sliderMin={alternateMinMaxs.iterationSettings.stepsPerIteration.min}
+				sliderMax={alternateMinMaxs.iterationSettings.stepsPerIteration.max}
 				stepsPerDecade={6}
 
 				handleChange={(power, ix) => {
@@ -88,8 +88,8 @@ function SetIterationTab(props) {
 			<TextNSlider className='lowPassFilterSlider '
 				label='Percent of High Frequencies to Filter Out'
 				value={props.lowPassFilter.toFixed(nDigits)}
-				min={alternateMinMaxs.iterationParams.lowPassFilter.min}
-				max={alternateMinMaxs.iterationParams.lowPassFilter.max}
+				min={alternateMinMaxs.iterationSettings.lowPassFilter.min}
+				max={alternateMinMaxs.iterationSettings.lowPassFilter.max}
 				step={aStep}
 				style={{width: '80%'}}
 				handleChange={newValue => {
