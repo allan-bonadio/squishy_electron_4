@@ -100,7 +100,7 @@ export default class ResolutionDialog extends React.Component {
 				finalParams.label = 'x';
 				recreateMainSpace(finalParams);
 
-				// do i really have to wait?  I thiink the promise only works the first time.
+				// do i really have to wait?  I think the promise only works the first time.
 				eSpaceCreatedPromise
 				.then(space => {
 					//this.setState({: ,

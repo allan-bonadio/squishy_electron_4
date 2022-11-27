@@ -55,7 +55,7 @@ function tooOldTerminate(prelim) {
 	throw `So long, and thanks for all the fish!`;
 }
 
-// For each GLViiew, there's one:
+// For each GLView, there's one:
 // - canvas, and one gl context
 // - one viewdef that encloses one or more drawings
 class GLView extends React.Component {
@@ -178,7 +178,7 @@ class GLView extends React.Component {
 	}
 
 	// Tell the GLView & its view(s) that the wave contents have changed dramatically;
-	// essentiially refilled with different numbers.  In practice, just resets
+	// essentially refilled with different numbers.  In practice, just resets
 	// the avgHighest.  Passed up to a higher Component.
 	//reStartDrawing =  !!! now done in eAvatar.smoothHighest
 	//() => {
@@ -217,7 +217,7 @@ class GLView extends React.Component {
 		if (tracePainting)
 			p.avatar.dumpViewBuffer(`🖼 🖼 GLView ${p.viewName}: loaded ViewBuffer`);
 
-		// NO!  now done before drawing each drawing indiviidually this.effectiveView.reloadAllVariables();
+		// NO!  now done before drawing each drawing individually this.effectiveView.reloadAllVariables();
 		let endReloadVarsNBuffer = performance.now();
 		//if (tracePainting)
 		//	p.avatar.dumpViewBuffer(`🖼 🖼 GLView ${p.viewName}: reloaded AllVariables`);

@@ -151,7 +151,7 @@ export class viewAttribute extends viewVariable {
 		const glBuffer = this.glBuffer = gl.createBuffer();
 		gl.bindBuffer(gl.ARRAY_BUFFER, glBuffer);
 
-		// now attach some data to it, with CPU-side arrays.  Siince we have to do bufferData
+		// now attach some data to it, with CPU-side arrays.  Since we have to do bufferData
 		// before each frame, maybe bag that rigth now
 //		this.floatArray = this.drawing.floatArray = floatArray;
 //		gl.bufferData(gl.ARRAY_BUFFER, floatArray, gl.DYNAMIC_DRAW);

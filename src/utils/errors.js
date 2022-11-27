@@ -14,7 +14,7 @@ export function dumpJsStack(where = 'somewhere') {
 
 /* ****************************************************** error/exception handling from C++ */
 
-// c++ wiill set this in exceptions.cpp
+// c++ will set this in exceptions.cpp
 window.cppErrorStack = '';
 
 // class of errors that come from inside C++

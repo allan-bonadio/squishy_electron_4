@@ -28,7 +28,7 @@ export class PotentialArea extends React.Component {
 		// for first couple of renders, space and wholeRect are null
 		space: PropTypes.instanceOf(eSpace),
 
-		// thiis can be null if stuff isn't ready
+		// this can be null if stuff isn't ready
 		wholeRect: PropTypes.object,
 
 		setUpdatePotentialArea: PropTypes.func,

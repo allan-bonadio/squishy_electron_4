@@ -207,7 +207,7 @@ void qAvatar::dumpObj(const char *title) {
 
 /* ********************************************************** integration */
 
-// return elapsed real time siince last page reload, in seconds, only for tracing
+// return elapsed real time since last page reload, in seconds, only for tracing
 // seems like it's down to miliseconds
 double getTimeDouble()
 {
