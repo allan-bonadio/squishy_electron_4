@@ -102,3 +102,13 @@ export function powerToIndex(spd, power) {
 //😇 }
 //😇testPowers();
 
+// powers of 2
+export function isPowerOf2(n) {
+	//console.info(`isPowerOf2(${n}) `);
+	while (n > 1 ){
+		// if it's got more than 1 bit on
+		if (n & 1) return false;
+		n = n >> 1;
+	}
+	return true;
+}

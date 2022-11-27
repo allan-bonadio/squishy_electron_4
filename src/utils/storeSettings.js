@@ -3,6 +3,8 @@
 ** Copyright (C) 2022-2022 Tactile Interactive, all rights reserved
 */
 
+import {isPowerOf2} from './powers.js';
+import qe from '../engine/qe.js';
 
 // what a disaster.   I made this whole subsystem,
 // but somehow the compiler fucks it up,
@@ -139,66 +141,71 @@ function makeParam(groupName, varName, defaultValue, criterion) {
 //	});
 }
 
-/* ************************************ spaceParams */
-// somewhere you have to record the defaults and criterion for each setting, so here they are
+/* ********************************************************************** Params & Settings */
+// settings are immediately effective
+// params are effective after user clicks some button to effect or commit changes
+// when referring to both, I use them interchangeably
 
-function isPowerOf2(n) {
-	//console.info(`isPowerOf2(${n}) `);
-	while (n > 1 ){
-		// if it's got more than 1 bit on
-		if (n & 1) return false;
-		n = n >> 1;
-	}
-	return true;
+// unit tests want to recreate these from scratch
+export function createSettings() {
+
+	/* ************************************ spaceParams */
+	// somewhere you have to record the defaults and criterion for each setting, so here they are
+
+
+	// these also define the controls mins and maxes
+
+	// see also resolution dialog for the slider
+	makeParam('spaceParams', 'N', 64,  N => isPowerOf2(N) );
+
+	//makeParam('spaceParams', 'continuum', 2, [0, 1, 2]);
+	makeParam('spaceParams', 'continuum', qe.contENDLESS,
+		[qe.contDISCRETE, qe.contWELL, qe.contENDLESS]);
+
+	/* ************************************ waveParams */
+
+	// this keeps many settings that don't immediately affect running iteration.
+	// So 'Set Wave' button actually sets the wave, but meanwhile the setting sliders
+	// need to be remembered; this does it.  Potential and space too; not active until user does something.
+	// THis also defines slider mins and maxes!  One source of truth.
+
+	makeParam('waveParams', 'waveBreed', 'chord', ['circular', 'standing', 'gaussian', 'chord']);
+	makeParam('waveParams', 'waveFrequency', 16, {min: -100, max: 100, step: 0.5});
+	makeParam('waveParams', 'pulseWidth', 20, {min: 1, max: 100});
+	makeParam('waveParams', 'pulseOffset', 30, {min: 0, max: 100});
+
+	/* ************************************ potentialParams */
+	//makeParam('potentialParams', 'potentialBreed', 'flat', ['flat', 'valley']);
+	makeParam('potentialParams', 'valleyPower', 0, {min: -4, max: 4});
+	makeParam('potentialParams', 'valleyScale', 0, {min: -10, max: 10});
+	makeParam('potentialParams', 'valleyOffset', 50, {min: 0, max: 100});
+
+
+	makeParam('potentialSettings', 'showPotential', true, [true, false]);  // not really the same as the rest...
+
+	/* ************************************ iterationSettings */
+	makeParam('iterationSettings', 'isTimeAdvancing', false,  [false, true]);
+	makeParam('iterationSettings', 'iteratePeriod', 50, {min: 16, max: 60_001});
+	makeParam('iterationSettings', 'deltaT', 1, {min: .01, max: 100.0, });
+	makeParam('iterationSettings', 'stepsPerIteration', 100, {min: 10, max: 1e5});
+	makeParam('iterationSettings', 'lowPassFilter', 50, {min: 0, max: 75});
+
+	/* ************************************miscSettings */
+	makeParam('miscSettings', 'showingTab', 'wave', ['wave', 'potential', 'space', 'iteration']);
+	makeParam('miscSettings', 'viewHeight', 400, {min: 50, max: 1e4});
+
 }
+createSettings();
 
-// these also define the controls mins and maxes
-
-// see also resolution dialog for the slider
-makeParam('spaceParams', 'N', 64,  N => isPowerOf2(N) );
-
-// how to do this correctly with the defined constants???
-makeParam('spaceParams', 'continuum', 2, [0, 1, 2]);
-// makeParam('spaceParams', 'continuum', qe.contENDLESS,
-// 	[qe.contDISCRETE, qe.contWELL, qe.contENDLESS]);
-
-/* ************************************ waveParams */
-
-// this keeps many settings that don't immediately affect running iteration.
-// So 'Set Wave' button actually sets the wave, but meanwhile the setting sliders
-// need to be remembered; this does it.  Potential and space too; not active until user does something.
-// THis also defines slider mins and maxes!  One source of truth.
-
-makeParam('waveParams', 'waveBreed', 'chord', ['circular', 'standing', 'gaussian', 'chord']);
-makeParam('waveParams', 'waveFrequency', 16, {min: -100, max: 100, step: 0.5});
-makeParam('waveParams', 'pulseWidth', 20, {min: 1, max: 100});
-makeParam('waveParams', 'pulseOffset', 30, {min: 0, max: 100});
-
-/* ************************************ potentialParams */
-//makeParam('potentialParams', 'potentialBreed', 'flat', ['flat', 'valley']);
-makeParam('potentialParams', 'valleyPower', 0, {min: -4, max: 4});
-makeParam('potentialParams', 'valleyScale', 0, {min: -10, max: 10});
-makeParam('potentialParams', 'valleyOffset', 50, {min: 0, max: 100});
-makeParam('potentialParams', 'showPotential', true, [true, false]);  // not really the same as the rest...
-
-/* ************************************ iterationParams */
-makeParam('iterationParams', 'isTimeAdvancing', false,  [false, true]);
-makeParam('iterationParams', 'iteratePeriod', 50, {min: 16, max: 60_001});
-makeParam('iterationParams', 'deltaT', 1, {min: .01, max: 100.0, });
-makeParam('iterationParams', 'stepsPerIteration', 100, {min: 10, max: 1e5});
-makeParam('iterationParams', 'lowPassFilter', 50, {min: 0, max: 75});
-
-/* ************************************miscParams */
-makeParam('miscParams', 'showingTab', 'wave', ['wave', 'potential', 'space', 'iteration']);
-makeParam('miscParams', 'viewHeight', 400, {min: 50, max: 1e4});
 
 // they should ALL be there
 // function checkAllSettingData() {
 // 	console.log(`stored group spaceParams: ${localStorage.spaceParams}`);
 // 	console.log(`stored group waveParams: ${localStorage.waveParams}`);
 // 	console.log(`stored group potentialParams: ${localStorage.potentialParams}`);
-// 	console.log(`stored group iterationParams: ${localStorage.iterationParams}`);
-// 	console.log(`stored group miscParams: ${localStorage.miscParams}`);
+// 	console.log(`stored group potentialSettings: ${localStorage.potentialParams}`);
+// 	console.log(`stored group iterationSettings: ${localStorage.iterationSettings}`);
+// 	console.log(`stored group miscSettings: ${localStorage.miscSettings}`);
 //
 // 	console.log(`alternateStoreDefaults`, alternateStoreDefaults);
 // 	console.log(`alternateStoreVerifiers`, alternateStoreVerifiers);
