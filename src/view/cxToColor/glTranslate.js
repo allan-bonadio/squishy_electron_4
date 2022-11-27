@@ -1,11 +1,10 @@
 #!/usr/bin/env node
 /*
-** glTranslate.js - crude translator for GLSL => JS, just for testiing purposes
+** glTranslate.js - crude translator for GLSL => JS, just for testing purposes
 ** Copyright (C) 2022-2022 Tactile Interactive, all rights reserved
 */
 
 import fs from 'fs';
-
 import cxToColorGlsl from './cxToColor.glsl.js';
 
 // This does NOT translate all of glsl; just the stuff used in cxToColor file.
@@ -16,7 +15,6 @@ import cxToColorGlsl from './cxToColor.glsl.js';
 //console.log(`input:`, cxToColorGlsl);
 
 function convertFile() {
-	let text = cxToColorGlsl;
 	//console.log(`text: `, text);
 
 	// intro line for function, sigh, just do it by hand
@@ -48,26 +46,24 @@ function convertFile() {
 	return text;
 }
 
-const preface = `// cxToColor.txlated.js -- generated from cxToColor.glsl.js into js
-// mostly for testing purposes.  do not edit!
-// this file written ${new Date()}
-let trace = false;
+export default function glTranslate() {
+	let text = cxToColorGlsl;
 
-`;
+	const preface = `// cxToColor.txlated.js -- generated from cxToColor.glsl.js into js
+	// mostly for testing purposes.  do not edit!
+	// this file written ${new Date()}
+	let trace = false;
 
-const suffix = '';
+	`;
 
-let jsText = convertFile();
+	const suffix = '\nexport default cxToColor\n';
 
-//console.log(`here it is =============== pwd=${process.cwd()}`);
-//console.log(jsText);
-//console.log(`      done ===============`);
+	let jsText = convertFile();
 
-fs.writeFileSync('cxToColor.txlated.js', preface + jsText + suffix);
+	//console.log(`here it is =============== pwd=${process.cwd()}`);
+	//console.log(jsText);
+	//console.log(`      done ===============`);
 
-/* **************************************************************** main */
-
-
-
-//convertFile(input);
-
+	// at this point, the working dir is the project root.  This'll have to be updated if you rearrange directories.
+	fs.writeFileSync('src/view/cxToColor/cxToColor.txlated.js', preface + jsText + suffix);
+}
