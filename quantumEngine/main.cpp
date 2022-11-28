@@ -27,7 +27,7 @@ EM_JS(void, qeStarted, (int max_dimensions, int max_label_len),
 
 // emscripten calls main() when the whole C++ is all set up.  Tell the JS guys.
 int main() {
-	printf("bonjour le monde!\n");
+	printf(" 🌞 bonjour le monde!\n");
 
 	// call the above function with arbitrary numbers to keep everybody amused
 	qeStarted(MAX_DIMENSIONS, MAX_LABEL_LEN);

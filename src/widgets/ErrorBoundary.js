@@ -49,7 +49,7 @@ React swallowing exceptions:
 ErrorBoundary implemented based on this page from ReactJS.org: https://reactjs.org/docs/error-boundaries.html
 */
 
-let traceExceptions = true;
+let traceExceptions = false;
 
 // 'development' vs 'production'
 const devMode = process.env.development;
