@@ -50,10 +50,14 @@ export let alternateMinMaxs = {};
 
 // figure out a function that can validate this param quickly
 function makeCriterionFunction(criterion) {
+	// because the criterion can change value after this func returns, make
+	// small closures to nail it down.
 	switch (typeof criterion) {
 	// always or never
-	case 'boolean':
-		return value => criterion;
+	case 'boolean': {
+		const crit = criterion;
+		return value => crit;
+	}
 
 	// any function that takes the value as the only param
 	case 'function':
@@ -63,20 +67,26 @@ function makeCriterionFunction(criterion) {
 		switch (criterion.constructor.name) {
 
 		// string matching
-		case 'RegExp':
+		case 'RegExp': {
+			const crit = new RegExp(criterion);
 			return value => criterion.test(value);
+		}
 
 		// must be one of the values in this array
-		case 'Array':
-			return value => criterion.includes(value);
+		case 'Array': {
+			let crit = [...criterion];
+			return value => crit.includes(value);
+		}
 
 		// must be like {min=-100, max=100}; optional step
-		case 'Object':
+		case 'Object': {
+			let crit = {...criterion};
 			if (criterion.step)
-				return value => (value >= criterion.min && value <= criterion.max
-					&& 0 === value % criterion.step);
+				return value => (value >= crit.min && value <= crit.max
+					&& 0 === value % crit.step);
 			else
-				return value => (value >= criterion.min && value <= criterion.max);
+				return value => (value >= crit.min && value <= crit.max);
+		}
 
 		default:
 			debugger;
@@ -147,7 +157,7 @@ function makeParam(groupName, varName, defaultValue, criterion) {
 // when referring to both, I use them interchangeably
 
 // unit tests want to recreate these from scratch
-export function createSettings() {
+export function createStoreSettings() {
 
 	/* ************************************ spaceParams */
 	// somewhere you have to record the defaults and criterion for each setting, so here they are
@@ -195,7 +205,6 @@ export function createSettings() {
 	makeParam('miscSettings', 'viewHeight', 400, {min: 50, max: 1e4});
 
 }
-createSettings();
 
 
 // they should ALL be there
@@ -249,16 +258,22 @@ export function storeASetting(groupName, varName, newValue) {
 	return newValue;
 }
 
-// might as well do this by hand, too
 
 export function getASetting(groupName, varName) {
 	let setting = getAGroup(groupName)[varName];
 // 	console.info(`get some stuff please `, groupName, varName, alternateStoreVerifiers, setting);
 // 	console.info(alternateStoreVerifiers[groupName]);////
 // 	console.info(alternateStoreVerifiers[groupName][varName]);
-	if (!alternateStoreVerifiers
-	|| !alternateStoreVerifiers[groupName]
-	|| !alternateStoreVerifiers[groupName][varName]) debugger;
+	if (!alternateStoreVerifiers?.[groupName]?.[varName]) debugger;
+
+	//console.info(` alternateStoreVerifiers?.[groupName]?.[varName]?.(setting):`,
+	//		 alternateStoreVerifiers?.[groupName]?.[varName]?.(setting));
+	//console.info(` alternateStoreVerifiers?.[groupName]?.[varName]:`,
+	//		 alternateStoreVerifiers?.[groupName]?.[varName]);
+	//console.info(` alternateStoreVerifiers?.[groupName]:`,
+	//		 alternateStoreVerifiers?.[groupName]);
+	//console.info(` alternateStoreVerifiers`,
+	//		 alternateStoreVerifiers);
 
 	// this can still return undefined if the groupName or varName isn't there
 	if (setting === undefined

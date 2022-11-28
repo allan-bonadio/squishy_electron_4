@@ -8,17 +8,17 @@ import App from '../App.js';
 import {getASetting} from '../utils/storeSettings.js';
 import {interpretCppException} from '../utils/errors.js';
 import {resetObjectRegistry} from '../utils/directAccessors.js';
-import {storeASetting} from '../utils/storeSettings.js';
+import {storeASetting, createStoreSettings} from '../utils/storeSettings.js';
 import eSpace from './eSpace.js';
 
 // all of these must be attached to window to  get called by c++
 
+let traceStartup = false;
 let tracePromises = false;
 
 /* ****************************************************** app startup */
 
-// c++ main() calls us to tell us that it's up, and to pass the sizes of different data structures.
-// (qspace can change; double and therefore eCx can change length)
+// c++ main() calls us to tell us that it's up, and to pass some fundamental sizes
 export let MAX_DIMENSIONS, MAX_LABEL_LEN;
 
 // this promise resolves when the main space is created.
@@ -31,26 +31,30 @@ function resetSpaceCreatedPromise() {
 	eSpaceCreatedPromise = new Promise((succeed, fail) => {
 		eSpaceCreatedSucceed = succeed;
 		eSpaceCreatedFail = fail;
-		if (tracePromises) console.info(`eSpaceCreatedPromise (re)created:`, succeed, fail);
+		if (tracePromises) console.info(`🐥 eSpaceCreatedPromise (re)created:`, succeed, fail);
 	});
+	if (traceStartup) console.log(`spaceCreatedPromise 🐣 ... created`);
 }
 resetSpaceCreatedPromise();  // for the first time when app starts up
 
 // export this?  shouldn't have to.
 let theSpace;
 
-// params is {N, continuum, label: 'x'}  label=label for this dimension, not the whole space
-export function create1DMainSpace(params) {
+// called during startup, and also upon every
+// spaceParams is {N, continuum, label: 'x'}  label=label for this dimension, not the whole space
+export function create1DMainSpace(spaceParams) {
 	try {
 		// eSpace expects an array of param sets, one for each dimension
-		let space = theSpace = new eSpace([params], 'main');
+		let space = theSpace = new eSpace([spaceParams], 'main');
+		if (traceStartup) console.log(`theSpace 🐣  created, spaceParams=`, spaceParams);
 
-		storeASetting('spaceParams', 'N', params.N);
-		storeASetting('spaceParams', 'continuum', params.continuum);
+		storeASetting('spaceParams', 'N', spaceParams.N);
+		storeASetting('spaceParams', 'continuum', spaceParams.continuum);
 
 		// wakes up stuff all over the JS, and gives them the space,
 		// that they've been waiting for
 		eSpaceCreatedSucceed(space);
+		if (traceStartup) console.log(`eSpaceCreatedPromise 🐣  resolved`);
 	} catch (ex) {
 		// this is called from eSpaceCreatedPromise so trigger its fail
 		// eslint-disable-next-line no-ex-assign
@@ -60,18 +64,21 @@ export function create1DMainSpace(params) {
 	}
 }
 
-// params is as above.  Liquidate/Delete the existing space, blink the SquishPanel,
+// spaceParams is as above.  Liquidate/Delete the existing space, blink the SquishPanel,
 // and start again just like the app starts over.
-export function recreateMainSpace(params) {
+export function recreateMainSpace(spaceParams) {
+	if (traceStartup) console.log(`recreateMainSpace 🐣  started`);
 	resetSpaceCreatedPromise();
 
 	App.blinkSquishPanel(() => {
-		create1DMainSpace(params);
+		if (traceStartup) console.log(`new space 🐣  triggered`);
+		create1DMainSpace(spaceParams);
 	});
 
 	theSpace.liquidate();
 
 	resetObjectRegistry();  // this will hang on to them otherwise!!
+	if (traceStartup) console.log(`space 🐣  liquidated, obj registry reset`);
 }
 
 // Called by C++ when C++ has finally started up.
@@ -84,17 +91,23 @@ function quantumEngineHasStarted(maxDims, maxLab) {
 
 	//console.log(`quantumEngineHas...Started`, mDimensions, mLabel);
 	defineQEngineFuncs();
-	//qeDefineAccess();
+	if (traceStartup) console.log(`QEngineFuncs 🐣  defined`);
+
+	// must come After defineQEngineFuncs() cuz it uses continuum constants on qe
+	createStoreSettings();
+	if (traceStartup) console.log(`StoreSettings 🐣  created`);
 
 	qe.cppLoaded = true;
 
+	// and this can't happen until the storeSettings and QEngine funcs
 	create1DMainSpace({
 		N: getASetting('spaceParams', 'N'),
 		continuum: getASetting('spaceParams', 'continuum'),
 		label: 'main'});
+	if (traceStartup) console.log(`main space 🐣  created`);
 
 	if (tracePromises) console.log(
-		`quantumEngineHasStarted:  space created and resolving eSpaceCreatedPromise`);
+		`🐥 quantumEngineHasStarted:  space created and resolving eSpaceCreatedPromise`);
 };
 
 window.recreateMainSpace = recreateMainSpace;  // for debugging

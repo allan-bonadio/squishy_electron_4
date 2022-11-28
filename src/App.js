@@ -9,6 +9,7 @@ import './App.scss';
 import SquishPanel from './SquishPanel.js';
 import CommonDialog from './widgets/CommonDialog.js';
 //import {dumpJsStack} from './utils/errors.js';
+import {eSpaceCreatedPromise} from './engine/eEngine.js';
 
 let traceResize = false;
 
@@ -21,7 +22,10 @@ class App extends React.Component {
 			innerWindowWidth: window.innerWidth,
 			squishPanelExists: true,
 			isDialogShowing: false,
+			cppRunning: false,
 		};
+
+		eSpaceCreatedPromise.then(space => this.setState({cppRunning: true}));
 	}
 
 	/* ************************************************ CommonDialog */
@@ -73,7 +77,7 @@ class App extends React.Component {
 		const s = this.state;
 
 		let sqPanel = null;
-		if (s.squishPanelExists)
+		if (s.cppRunning && s.squishPanelExists)
 			sqPanel = <SquishPanel id='theSquishPanel' width={s.innerWindowWidth}/>;
 
 		//const stateParams = sParams || s.stateParams;

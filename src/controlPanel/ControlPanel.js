@@ -31,7 +31,7 @@ export class ControlPanel extends React.Component {
 		showPotential: PropTypes.bool.isRequired,
 
 		iterateFrequency: PropTypes.number.isRequired,  // frames per second
-		setIterateFrequency: PropTypes.func.isRequired,
+		//setIterateFrequency: PropTypes.func.isRequired,
 
 		// early on, there's no space.  Must have SquishPanel mounted first, and the eSpace promise resolved.
 		space: PropTypes.instanceOf(eSpace),
@@ -74,6 +74,12 @@ export class ControlPanel extends React.Component {
 		let waveParams = getAGroup('waveParams');
 		let potentialParams = getAGroup('potentialParams');
 		Object.assign(this.state, waveParams, potentialParams);
+
+		// the static declaration down below fills its variable before an actual
+		// instance is created, so the storeSettings hasn't been initiated yet.
+		// This constructor, on the other hand, can only happen after the
+		// spacePromise has resolved.
+		ControlPanel.isTimeAdvancing = getASetting('iterationSettings', 'isTimeAdvancing');
 	}
 
 	/* ******************************************************* start/stop */
@@ -81,19 +87,18 @@ export class ControlPanel extends React.Component {
 	// set rate, which is 1, 2, 4, 8, ... some float number of times per second you want frames.
 	// can't combine this with 'isRunning' cuz want to remember rate even when stopped
 	setIterateFrequency =
-	freq => this.props.setIterateFrequency(freq);
-
-
+	freq => this.setState({iteratePeriod:
+			storeASetting('iterationSettings', 'iteratePeriod', 1000. / +freq)});
 
 	// set the frequency of iteration frames.  Does not control whether iterating or not.
-	setIterateFrequency(newFreq) {
-		this.setState({iteratePeriod:
-			storeASetting('iterationSettings', 'iteratePeriod', 1000. / +newFreq)
-		});
-	}
+	//setIterateFrequency(newFreq) {
+	//	this.setState({iteratePeriod:
+	//		storeASetting('iterationSettings', 'iteratePeriod', 1000. / +newFreq)
+	//	});
+	//}
 
-	// the first time, we get it from the settings.
-	static isTimeAdvancing = getASetting('iterationSettings', 'isTimeAdvancing');
+	// the first time, we get it from the settings.  in the constructor.
+	static isTimeAdvancing = false;
 
 	static startIterating() {
 		ControlPanel.isTimeAdvancing = storeASetting('iterationSettings', 'isTimeAdvancing', true);;
@@ -128,7 +133,7 @@ export class ControlPanel extends React.Component {
 	}
 
 	// given these params, put it into effect and display it
-	displayMainWave =
+	paintMainWave =
 	waveParams => {
 		const p = this.props;
 		if (!p.space)
@@ -148,13 +153,13 @@ export class ControlPanel extends React.Component {
 	resetMainWave =
 	() => {
 		let waveParams = getAGroup('waveParams');
-		this.displayMainWave(waveParams);
+		this.paintMainWave(waveParams);
 	}
 
 	// SetWave button in SetWaveTab: set it from passed in params, and save it
 	saveMainWave =
 	waveParams => {
-		this.displayMainWave(waveParams);
+		this.paintMainWave(waveParams);
 		storeAGroup('waveParams', waveParams);
 	}
 

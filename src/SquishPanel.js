@@ -12,19 +12,10 @@ import PropTypes from 'prop-types';
 
 import ControlPanel from './controlPanel/ControlPanel.js';
 
-// eslint-disable-next-line no-unused-vars
-import {eSpace} from './engine/eSpace.js';
-// import eWave from './engine/eWave.js';
 import {eSpaceCreatedPromise} from './engine/eEngine.js';
-//import {create1DMainSpace, eSpaceCreatedPromise} from './engine/eEngine.js';
 
 import {interpretCppException} from './utils/errors.js';
-//import {interpretCppException, dumpJsStack} from './utils/errors.js';
-
-//import qe from './engine/qe.js';
-
 import WaveView from './view/WaveView.js';
-//import ResolutionDialog from './controlPanel/ResolutionDialog.js';
 import CommonDialog from './widgets/CommonDialog.js';
 import {setFamiliarPotential} from './utils/potentialUtils.js';
 
@@ -357,7 +348,7 @@ export class SquishPanel extends React.Component {
 	iterationStart => {
 		const s = this.state;
 
-		// no matter how often animateHeartbeat() is called, it'll only iterate once in the iteratePeriod
+		// no matter how often animateHeartbeat() is called, it'll only iterate once per iteratePeriod
 		if (iterationStart >= this.timeForNextTic) {
 			// no point in calling it continuously if it's not doing anything
 			if (ControlPanel.isTimeAdvancing)
@@ -475,7 +466,6 @@ export class SquishPanel extends React.Component {
 	stepsPerIteration => {
 		try {
 			if (traceSetPanels) console.log(`js setStepsPerIteration(${stepsPerIteration})`);
-			//if (typeof storeSettings != 'undefined' && storeSettings.iterationSettings)  // goddamned bug in importing works in constructor
 			storeASetting('iterationSettings', 'stepsPerIteration', stepsPerIteration);
 			this.setState({stepsPerIteration});
 			this.mainEAvatar.stepsPerIteration = stepsPerIteration;
@@ -584,7 +574,6 @@ export class SquishPanel extends React.Component {
 					redrawWholeMainWave={this.redrawWholeMainWave}
 
 					iterateFrequency={1000 / s.iteratePeriod}
-					setIterateFrequency={freq => this.setIterateFrequency(freq)}
 
 					deltaT={s.deltaT}
 					setDeltaT={this.setDeltaT}
@@ -599,6 +588,8 @@ export class SquishPanel extends React.Component {
 				{this.renderRunningOneCycle()}
 			</div>
 		);
+
+		// 					{/*setIterateFrequency={freq => this.setIterateFrequency(freq)}*/}
 	}
 }
 
