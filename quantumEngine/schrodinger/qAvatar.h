@@ -66,16 +66,27 @@ struct qAvatar {
 	// for alignment: put these last
 
 	// true if an iteration is running; set/unset in ::oneIteration()
-	// For interactive simulation switch, see isTimeAdvancing in JS.
+	// For the interactive simulation switch, see isTimeAdvancing in JS.
 	bool isIterating;
 
-	// please do an FFT after the current iteration ends
-	bool pleaseFFT;
-	// make sure the subsequent things are aligned!  or iteration is painfully slow.
 
-	// set the elapsedTime and iterateSerial to zero
-	// this is obsoleted by DirectAccess
-	void resetCounters(void);
+	// JS calls shouldIterate() whenever it's time to start an iteration. If
+	// it's already doing one, it'll remember to do another immediately after
+	// using needsIteratiion, and shouldIterate() will return true. Otherwise,
+	// it'll start one immediately, asynchronously, and return false.  Always
+	// (should) return immediately.
+	bool shouldIterate(void);
+	bool needsIteration;
+
+	// what's the diff between this and isIterating?  not much.
+	bool doingInteration;
+
+	// set pleaseFFt from JS (only if in the middle of an iteration)
+	void askForFFT(void);
+
+	// true = please do an FFT after the current iteration ends
+	bool pleaseFFT;
+	// make sure the subsequent fields are aligned!  or iteration is painfully slow.
 
 	// multiple steps; ≈ stepsPerIteration
 	void oneIteration(void);
@@ -91,15 +102,12 @@ struct qAvatar {
 
 	// kill high frequencies via FFTs
 	void fourierFilter(int lowPassFilter);
-
-	// set pleaseFFt from JS (only if in the middle of an iteration)
-	void askForFFT(void);
 };
 
 
 /* ************************************************************ JS interface */
 
-// for JS to call
+// for JS to call.  Defined in jsSpace
 extern "C" {
 
 	// obsoleted by DirectAccess
@@ -109,6 +117,7 @@ extern "C" {
 
 
 	void avatar_oneIteration(qAvatar *avatar);
+	int avatar_shouldIterate(qAvatar *avatar);
 
 	void avatar_askForFFT(qAvatar *avatar);
 

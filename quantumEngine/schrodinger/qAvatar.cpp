@@ -62,7 +62,8 @@ qAvatar::qAvatar(qSpace *sp, const char *lab)
 	strncpy(label, lab, MAX_LABEL_LEN);
 	label[MAX_LABEL_LEN] = 0;
 
-	resetCounters();
+	elapsedTime = 0.;
+	iterateSerial = 0;
 
 	// we always need a view buffer; that's the whole idea behind an avatar
 	qvBuffer = new qViewBuffer(space, this);
@@ -148,6 +149,12 @@ void qAvatar::formatDirectOffsets(void) {
 	makeBoolSetter(isIterating);
 	makeBoolGetter(pleaseFFT);
 	makeBoolSetter(pleaseFFT);
+
+	makeBoolGetter(needsIteration);
+	makeBoolSetter(needsIteration);
+
+	makeBoolGetter(doingInteration);
+	makeBoolSetter(doingInteration);
 	printf("\n");
 	makeDoubleGetter(dt);
 	makeDoubleSetter(dt);
@@ -181,14 +188,9 @@ void qAvatar::formatDirectOffsets(void) {
 	printf("\n🚦 🚦 --------------- done with qAvatar direct access --------------\n");
 }
 
-void qAvatar::resetCounters(void) {
-	elapsedTime = 0.;
-	iterateSerial = 0;
-}
-
-
 /* ********************************************************** dumpObj  */
 
+// dump all the fields of an avatar
 void qAvatar::dumpObj(const char *title) {
 	printf("\n🌊🌊 ==== qAvatar | %s ", title);
 	printf("        magic: %c%c%c%c   qSpace=%p '%s'   \n",
@@ -205,10 +207,29 @@ void qAvatar::dumpObj(const char *title) {
 	printf("        ==== end of qAvatar ====\n\n");
 }
 
-/* ********************************************************** integration */
+/* ********************************************************** managing Iteration */
+
+// the JS timer (rAF) says it's a good time to start an iteration.
+// current implementation cheats and sometimes does iteration when this is called.
+bool qAvatar::shouldIterate(void) {
+	if (doingInteration) {
+		needsIteration = true;
+
+		// this tells us that the engine is not keeping up
+		return true;
+	}
+
+	// otherwise send a message to iterate thread(s) to start a new one
+	// sortof.  lemme get the threads ini place.
+	oneIteration() ;
+	return false;
+}
+
+
+/* ********************************************************** doing Iteration */
 
 // return elapsed real time since last page reload, in seconds, only for tracing
-// seems like it's down to miliseconds
+// seems like it's down to miliseconds or even a bit smaller
 double getTimeDouble()
 {
     struct timespec ts;
@@ -220,6 +241,8 @@ double getTimeDouble()
 // stepsPerIteration+1 steps; half steps at start and finish to adapt and
 // deadapt to Visscher timing
 void qAvatar::oneIteration() {
+	isIterating = doingInteration = true;
+
 	int tt;
 	bool dangerousTimes = (iterateSerial >= dangerousSerial)
 		&& (((int) iterateSerial % dangerousRate) == 0);
@@ -232,12 +255,12 @@ void qAvatar::oneIteration() {
 	potential = space->potential;
 	potentialFactor = space->potentialFactor;
 
-	if (traceIteration)
+	if (traceIteration) {
 		printf("🚀 🚀 qAvatar::oneIteration() - dt=%lf   stepsPerIteration=%d  %s; potentialFactor=%lf  elapsed time: %lf\n",
 			dt, stepsPerIteration, dangerousTimes ? "dangerous times" : "",
 			potentialFactor,
 			getTimeDouble());
-	isIterating = true;
+		}
 
 	// half step in beginning to move Im forward dt/2
 	// cuz outside of here, re and im are for the same time.
@@ -272,9 +295,6 @@ void qAvatar::oneIteration() {
 	stepReal(qwave->wave, scratchQWave->wave, dt/2);
 	stepImaginary(qwave->wave, scratchQWave->wave, 0);
 
-	isIterating = false;
-
-	iterateSerial++;
 
 	// ok the algorithm tends to diverge after thousands of iterations.  Hose it down.
 	if (this->pleaseFFT) analyzeWaveFFT(qwave, "before fourierFilter()");
@@ -306,13 +326,11 @@ void qAvatar::oneIteration() {
 			stepsPerIteration, space->nStates, qwave->innerProduct());
 	}
 
-//	if (this->pleaseFFT) {
-//		analyzeWaveFFT(qwave, "pleaseFFT at end of iteration");
-//		this->pleaseFFT = false;
-//	}
+	iterateSerial++;
 
 	if (traceIteration)
 		printf("      iteration done; elapsed time: %lf \n", getTimeDouble());
+	isIterating = doingInteration = false;
 }
 
 
