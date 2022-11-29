@@ -50,7 +50,7 @@ export default function glTranslate() {
 	let text = cxToColorGlsl;
 
 	const preface = `// cxToColor.txlated.js -- generated from cxToColor.glsl.js into js
-	// mostly for testing purposes.  do not edit!
+	// mostly for testing purposes.  do not edit!  instead edit cxToColor.glsl.js & run unit tests
 	// this file written ${new Date()}
 	let trace = false;
 
@@ -64,6 +64,7 @@ export default function glTranslate() {
 	//console.log(jsText);
 	//console.log(`      done ===============`);
 
-	// at this point, the working dir is the project root.  This'll have to be updated if you rearrange directories.
+	// at this point, the working dir is the project root.  This'll have to be
+	// updated if you rearrange directories.
 	fs.writeFileSync('src/view/cxToColor/cxToColor.txlated.js', preface + jsText + suffix);
 }

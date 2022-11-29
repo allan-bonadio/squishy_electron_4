@@ -7,6 +7,7 @@
 //#include <stdio.h>
 //#include <cmath>
 
+
 #include "spaceWave/qSpace.h"
 #include "schrodinger/qAvatar.h"
 #include "fourier/fftMain.h"
@@ -29,7 +30,8 @@ EM_JS(void, qeStarted, (int max_dimensions, int max_label_len),
 int main() {
 	printf(" 🌞 bonjour le monde!\n");
 
-	// call the above function with arbitrary numbers to keep everybody amused
+	// returns 1.  pfft.  std::thread::hardware_concurrency();
+
 	qeStarted(MAX_DIMENSIONS, MAX_LABEL_LEN);
 
 	//printf("alignof(double) = %ld, alignof(int) = %ld, alignof(int *) = %ld, alignof(bool) = %ld\n",

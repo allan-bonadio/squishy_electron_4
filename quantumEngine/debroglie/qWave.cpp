@@ -45,10 +45,6 @@ qWave::qWave(qSpace *sp, qCx *useThisBuffer)
 		printf("        sizeof(int):%ld   sizeof(void *):%ld\n", sizeof(int), sizeof(void *));
 	}
 
-	//printf("justTesting...about to rainbowDump this from qWave::qWave\n");
-	//this->rainbowDump("my first rinaninboe");
-	//printf("justTesting...done with rainbowDump this from qWave::qWave\n");
-
 	// enable this when qWave.h fields change
 	//formatDirectOffsets();
 }

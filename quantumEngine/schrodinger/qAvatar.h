@@ -79,7 +79,7 @@ struct qAvatar {
 	bool needsIteration;
 
 	// what's the diff between this and isIterating?  not much.
-	bool doingInteration;
+	bool doingIteration;
 
 	// set pleaseFFt from JS (only if in the middle of an iteration)
 	void askForFFT(void);

@@ -17,13 +17,7 @@
 
 #include "debroglie/qCx.h"
 
-// continuum values - same as in eSpace.js; pls synchronize them!
-// also used in qBuffers and subclasses
-// see now in genExports
 #include "commonConstants.h"
-//const int contDISCRETE = 0;
-//const int contWELL = 1;
-//const int contENDLESS = 2;
 
 // return elapsed time since last page reload, in seconds
 extern double getTimeDouble();

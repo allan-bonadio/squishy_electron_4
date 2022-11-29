@@ -25,7 +25,7 @@ static bool traceIterSteps = false;
 static bool traceJustWave = false;
 static bool traceJustInnerProduct = false;
 
-static bool traceFourierFilter = false;
+static bool traceFourierFilter = true;
 
 static bool dumpFFHiResSpectums = false;
 static bool traceIProd = false;
@@ -153,8 +153,8 @@ void qAvatar::formatDirectOffsets(void) {
 	makeBoolGetter(needsIteration);
 	makeBoolSetter(needsIteration);
 
-	makeBoolGetter(doingInteration);
-	makeBoolSetter(doingInteration);
+	makeBoolGetter(doingIteration);
+	makeBoolSetter(doingIteration);
 	printf("\n");
 	makeDoubleGetter(dt);
 	makeDoubleSetter(dt);
@@ -212,7 +212,7 @@ void qAvatar::dumpObj(const char *title) {
 // the JS timer (rAF) says it's a good time to start an iteration.
 // current implementation cheats and sometimes does iteration when this is called.
 bool qAvatar::shouldIterate(void) {
-	if (doingInteration) {
+	if (doingIteration) {
 		needsIteration = true;
 
 		// this tells us that the engine is not keeping up
@@ -241,7 +241,7 @@ double getTimeDouble()
 // stepsPerIteration+1 steps; half steps at start and finish to adapt and
 // deadapt to Visscher timing
 void qAvatar::oneIteration() {
-	isIterating = doingInteration = true;
+	isIterating = doingIteration = true;
 
 	int tt;
 	bool dangerousTimes = (iterateSerial >= dangerousSerial)
@@ -330,7 +330,7 @@ void qAvatar::oneIteration() {
 
 	if (traceIteration)
 		printf("      iteration done; elapsed time: %lf \n", getTimeDouble());
-	isIterating = doingInteration = false;
+	isIterating = doingIteration = false;
 }
 
 
