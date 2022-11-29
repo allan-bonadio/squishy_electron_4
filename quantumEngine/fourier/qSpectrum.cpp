@@ -45,7 +45,7 @@ void qSpectrum::dumpThatSpectrum(qCx *wave, bool withExtras) {
 	// zeroth entry is freq 0, same both sides
 	double norm = wave[0].norm() / N;
 	double totalNorm = norm;
-	printf("[%3d] (%8.4lf,%8.4lf)     %8.4lf m𝜓\n",
+	printf("[%3d] (%8.4lf,%8.4lf)     %8.4lf m𝜓/nm\n",
 		0, wave[0].re, wave[0].im, norm * 1000);
 
 	// in-between rows shows ix frequency, complementary both sides, except:
@@ -53,14 +53,14 @@ void qSpectrum::dumpThatSpectrum(qCx *wave, bool withExtras) {
 		int cix = (N - ix);
 		norm = (wave[ix].norm() + wave[cix].norm()) / N;
 		totalNorm += norm;
-		printf("[%3d] (%8.4lf,%8.4lf)  (%8.4lf,%8.4lf)    %12.8lf m𝜓\n",
+		printf("[%3d] (%8.4lf,%8.4lf)  (%8.4lf,%8.4lf)    %12.8lf m𝜓/nm\n",
 			ix, wave[ix].re, wave[ix].im, wave[cix].re, wave[cix].im, norm * 1000);
 	}
 
 	// N/2-th entry is nyquist freq, same both sides
 	norm = wave[halfN].norm() / N;
 	totalNorm += norm;
-	printf("[%3d]                      (%8.4lf,%8.4lf)     %8.4lf m𝜓  total: %8.4lf 𝜓\n",
+	printf("[%3d]                      (%8.4lf,%8.4lf)     %8.4lf m𝜓/nm  total: %8.4lf 𝜓\n",
 		halfN, wave[halfN].re, wave[halfN].im, norm * 1000, totalNorm);
 }
 

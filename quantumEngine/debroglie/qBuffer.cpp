@@ -141,7 +141,7 @@ double qBuffer::dumpRow(char buf[200], int ix, qCx w, double *pPrevPhase, bool w
 		//if (dPhase >= 360.) dPhase -= 360.;
 
 		// if this or the previous point was (0,0) then the phase and dPhase will be NAN, and they print that way
-		snprintf(buf, 200, "[%3d] (%8.4lf,%8.4lf) | %8.3lf %9.3lf %8.4lf  m𝜓",
+		snprintf(buf, 200, "[%3d] (%8.4lf,%8.4lf) | %8.3lf %9.3lf %8.4lf  m𝜓/nm",
 			ix, re, im, phase, dPhase, norm * 1000);
 		*pPrevPhase = phase;
 	}

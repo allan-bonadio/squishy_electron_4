@@ -38,7 +38,7 @@ void qViewBuffer::dumpViewBuffer(const char *title) {
 	float *vBuffer = avatar->qvBuffer->vBuffer;
 	float prevPhase =0;
 	#define FORMAT_BASE      "%6d |  %6.5f  %6.5f  %6.5g  %6.5g"
-	#define FORMAT_SUFFIX  " |  %6.5f  %6.5f  %6.5f  m𝜓\n"
+	#define FORMAT_SUFFIX  " |  %6.5f  %6.5f  %6.5f  m𝜓/nm\n"
 
 	if (!title) title = "";
 	printf("==== 📺 dump qVBuffer %p->%p | %s\n", this, vBuffer, title);
