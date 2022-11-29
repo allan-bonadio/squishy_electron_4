@@ -69,7 +69,7 @@ function makeCriterionFunction(criterion) {
 		// string matching
 		case 'RegExp': {
 			const crit = new RegExp(criterion);
-			return value => criterion.test(value);
+			return value => crit.test(value);
 		}
 
 		// must be one of the values in this array
@@ -104,7 +104,6 @@ function makeCriterionFunction(criterion) {
 // Undefined is an illegal value; also the default default value if never set.
 function makeParam(groupName, varName, defaultValue, criterion) {
 	const criterionFunction = makeCriterionFunction(criterion);
-
 
 	// retrieve from localStorage and set this var, or set to default if not there yet.
 //storeSettings[groupName] = storeSettings[groupName] || {};
@@ -205,23 +204,6 @@ export function createStoreSettings() {
 	makeParam('miscSettings', 'viewHeight', 400, {min: 50, max: 1e4});
 
 }
-
-
-// they should ALL be there
-// function checkAllSettingData() {
-// 	console.log(`stored group spaceParams: ${localStorage.spaceParams}`);
-// 	console.log(`stored group waveParams: ${localStorage.waveParams}`);
-// 	console.log(`stored group potentialParams: ${localStorage.potentialParams}`);
-// 	console.log(`stored group potentialSettings: ${localStorage.potentialParams}`);
-// 	console.log(`stored group iterationSettings: ${localStorage.iterationSettings}`);
-// 	console.log(`stored group miscSettings: ${localStorage.miscSettings}`);
-//
-// 	console.log(`alternateStoreDefaults`, alternateStoreDefaults);
-// 	console.log(`alternateStoreVerifiers`, alternateStoreVerifiers);
-// 	console.log(`alternateMinMaxs`, alternateMinMaxs);
-// }
-//
-//checkAllSettingData();
 
 export function getAGroup(groupName) {
 	if (!alternateStoreVerifiers?.[groupName]) debugger;
