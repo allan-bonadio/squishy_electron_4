@@ -6,7 +6,7 @@ let trace = false;
 
 
 let  sqrtOneThird = Math.sqrt(1. / 3.);  // 0.57735..
-let  sqrtThreeOver2 = Math.sqrt(3.) / 2.;  // .8660...
+//let  sqrtThreeOver2 = Math.sqrt(3.) / 2.;  // .8660...
 
 // convert a complex number let o a color, whose hue is based on the
 // complex phase of the number.  Piecewise linear.  Visualize a hexagon

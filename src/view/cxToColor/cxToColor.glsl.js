@@ -7,7 +7,7 @@
 const cxToColorGlsl = `
 #line 9
 float sqrtOneThird = sqrt(1. / 3.);  // 0.57735..
-float sqrtThreeOver2 = sqrt(3.) / 2.;  // .8660...
+//float sqrtThreeOver2 = sqrt(3.) / 2.;  // .8660...
 
 // convert a complex number into a color, whose hue is based on the
 // complex phase of the number.  Piecewise linear.  Visualize a hexagon
