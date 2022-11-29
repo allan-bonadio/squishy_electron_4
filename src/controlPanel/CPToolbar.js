@@ -32,6 +32,7 @@ function clickOnFFT(space)
 	catchEx(() => {
 		// space not there until space promise, but that should happen before anybody clicks on this
 		if (space) {
+			console.info(`ControlPanel.isTimeAdvancing=`, ControlPanel.isTimeAdvancing);
 			if (ControlPanel.isTimeAdvancing)
 				space.mainEAvatar.pleaseFFT = true;  // remind me after next iter
 			else
@@ -116,12 +117,12 @@ function CPToolbar(props) {
 					<input type='checkbox' checked={props.showPotential} onChange={props.toggleShowPotential} />
 					Show Potential
 				</label>
-				&nbsp;
-
-				➩ ↪︎ ↻ <input type='range' onClick={props.slideWave} /> ↺ ↩︎ ⇔ ⟺ ↔︎ ⬌ ➪
 			</div>
 		</div>
 	</div>;
+
+	// i decided against the rotation slider
+	// ➩ ↪︎ ↻ <input type='range' onClick={props.slideWave} /> ↺ ↩︎ ⇔ ⟺ ↔︎ ⬌ ➪
 }
 
 setPT();
