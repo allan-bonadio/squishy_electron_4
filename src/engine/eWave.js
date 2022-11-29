@@ -7,7 +7,7 @@
 
 import {qe} from './qe.js';
 import cxToColor from '../view/cxToColor/cxToColor.txlated.js';
-import cxToRgb from '../view/cxToRgb.js';
+//import cxToRgb from '../view/cxToRgb.js';
 import {cppObjectRegistry, prepForDirectAccessors} from '../utils/directAccessors.js';
 import eSpace from './eSpace.js';
 
@@ -46,7 +46,7 @@ function dumpRow(ix, re, im, prev, isBorder) {
 	if (!isBorder) prev.innerProd += mag;
 
 	return`[${ix}] (${_(re)} , ${_(im)}) | `+
-		`${_(phase)} ${_(dPhase)}} ${_(mag * 1000)} m𝜓\n` ;
+		`${_(phase)} ${_(dPhase)}} ${_(mag * 1000)} m𝜓/nm\n` ;
 }
 
 
@@ -79,7 +79,9 @@ export function rainbowDump(wave, start, end, nPoints, title) {
 		//console.info(`mag=${mag}  mag pre corr=${mag / correction}`)
 
 		// should change this to cxToColor()
-		let color = cxToRgb({re: wave[ix2], im: wave[ix2 + 1]});
+		let color = cxToColor([wave[ix2], wave[ix2 + 1]]);
+		color = `rgb(${color[0]*255}, ${color[1]*255}, ${color[2]*255})`;
+		//let color = cxToRgb({re: wave[ix2], im: wave[ix2 + 1]});
 		console.log(`%c `, `background-color: ${color}; padding-right: ${mag+5}px; `);
 	}
 }
@@ -155,6 +157,8 @@ class eWave {
 	get start() { return this.ints[6]; }
 	get end() { return this.ints[7]; }
 	get continuum() { return this.ints[8]; }
+
+	/* **************************** end of direct accessors */
 
 	/* **************************************************************** dumping */
 
@@ -441,8 +445,8 @@ class eWave {
 		this.fixBoundaries();
 
 		if (traceSetFamiliarWaveResult) {
-			this.dump(`eWave.setFamiliarWave(${waveParams.waveBreed}) done`);
-			//this.rainbowDump(`eWave.setFamiliarWave(${waveParams.waveBreed}) done`);
+			//this.dump(`eWave.setFamiliarWave(${waveParams.waveBreed}) done`);
+			this.rainbowDump(`eWave.setFamiliarWave(${waveParams.waveBreed}) done`);
 		}
 	}
 }
