@@ -62,8 +62,12 @@ class eAvatar {
 
 	get isIterating() { return this.bools[88]; }
 	set isIterating(a) { this.bools[88] = a; }
-	get pleaseFFT() { return this.bools[89]; }
-	set pleaseFFT(a) { this.bools[89] = a; }
+	get pleaseFFT() { return this.bools[91]; }
+	set pleaseFFT(a) { this.bools[91] = a; }
+	get needsIteration() { return this.bools[89]; }
+	set needsIteration(a) { this.bools[89] = a; }
+	get doingIteration() { return this.bools[90]; }
+	set doingIteration(a) { this.bools[90] = a; }
 
 	get dt() { return this.doubles[3]; }
 	set dt(a) { this.doubles[3] = a; }
@@ -83,6 +87,8 @@ class eAvatar {
 	get _qspect() { return this.ints[15]; }
 	get _vBuffer() { return this.ints[17]; }
 	get _label() { return this.pointer + 72; }
+
+	/* **************************** end of direct accessors */
 
 	// this just gets the pointer to the view buffer...  the JS array
 	getViewBuffer() {
