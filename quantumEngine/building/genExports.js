@@ -8,7 +8,7 @@ let traceOutput = false;
 
 if (! process.env.SQUISH_ROOT) throw "env var SQUISH_ROOT not defined!  Should be the source tree root.";
 
-console.log(`Run this whenever the list of C++ functions to call from JS changes.`);
+console.log(`genExports: Run this whenever the list of C++ functions to call from JS changes.`);
 
 const fsProm = import('fs');
 let fs;
@@ -164,6 +164,7 @@ fsProm.then(fsModule => {
 	generateExports();
 	generateCommonConstants();
 	generateQeJs();
+	console.log(`genExports done `);
 	// now give it time to finish, and Node will quit
 }).catch(ex => {
 	console.error(`error generatinig files in genExports: `, ex.stack ?? ex.message ?? ex);
