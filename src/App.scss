@@ -34,6 +34,23 @@ h2.App-header {
 	vertical-align: middle;
 }
 
+footer {
+	height: 4em;
+	padding: 0 2em;
+	margin: 1em 0 0;
+}
+#emscriptenLogo
+{
+	float: right;
+	height: 4em;
+	margin: -1.25em -1.75em;  // white border too wide
+}
+#webglLogo
+{
+	float: right;
+	height: 24px;
+	margin-right: 1em;
+}
 /* **************************************** controls in general */
 
 /* applies to text boxes, checkboxes, radios, sliders, ... */

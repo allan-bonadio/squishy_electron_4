@@ -96,6 +96,10 @@ class App extends React.Component {
 
 				{sqPanel}
 				{sqDialog}
+				<footer>
+					<img id='emscriptenLogo' src='emscripten_powered_by_logo.svg' />
+					<img id='webglLogo' src='WebGL-Logo.svg' />
+				</footer>
 			</div>
 		);
 	}
