@@ -97,13 +97,15 @@ class App extends React.Component {
 				{sqPanel}
 				{sqDialog}
 				<footer>
-					<img id='emscriptenLogo' src='emscripten_powered_by_logo.svg' />
-					<img id='webglLogo' src='WebGL-Logo.svg' />
+					<img id='emscriptenLogo' src='emscripten_powered_by_logo.svg' alt='powered by Emscripten'/>
+					<img id='webassemblyLogo' src='webassemblyLogo.svg'  alt='powered by WebAssembly'/>
+					<img id='webglLogo' src='WebGL-Logo.svg'  alt='powered by WebGL'/>
+					<img id='openglLogo' src='openglLogo.svg'  alt='powered by OpenGL'/>
 				</footer>
 			</div>
 		);
 	}
-
 }
 
 export default App;
+
