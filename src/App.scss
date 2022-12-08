@@ -51,6 +51,7 @@ footer {
 	height: 24px;
 	margin-right: 1em;
 }
+
 /* **************************************** controls in general */
 
 /* applies to text boxes, checkboxes, radios, sliders, ... */
@@ -63,10 +64,6 @@ input[type=range] {
 	//height: 4em;
 // 	background-color: #4cf;
 // 	color: #fc4
-}
-
-button {
-	cursor: pointer;
 }
 
 .LogSlider {
@@ -129,14 +126,32 @@ button {
 	}
 }
 
-
-button.round {
+// buttons in general
+button {
+	cursor: pointer;
+	background-color: #fec;
+	border-radius: .5em;
 	font-size: 100%;
+}
+
+
+// your typical button button; rounded corners and stuff.  NOT start/stop.
+button.round {
 	padding: .2em 1em;
 	margin: .2em;
-	background-color: #112;
-	color: #eef;
+	background-color: #fff;
+	color: #004;
 	border-radius: .5em;
+
+	&:hover {
+		background-color: #cef;
+
+	}
+	&:active {
+		background-color: #048;
+		color: #fff;
+		border-style: inset;
+	}
 }
 
 /* **************************************** CommonDialog */

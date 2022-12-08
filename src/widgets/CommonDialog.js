@@ -13,7 +13,7 @@ import App from '../App.js';
 function SimpleDialog(props) {
 	return <div id='SimpleDialog' >
 		<p>{props.text}</p>
-		<nav><button onClick={CommonDialog.startClosingDialog} >OK</button></nav>
+		<nav><button className='round' onClick={CommonDialog.startClosingDialog} >OK</button></nav>
 	</div>;
 }
 
@@ -23,7 +23,7 @@ function ErrorDialog(props) {
 	let msg = `${props.where} : ${err.stack ?? err.message ?? err.toString()}`;
 	return <div id='ErrorDialog' >
 		<p>{msg}</p>
-		<nav><button onClick={CommonDialog.startClosingDialog} >OK</button></nav>
+		<nav><button className='round' onClick={CommonDialog.startClosingDialog} >OK</button></nav>
 	</div>;
 }
 
@@ -33,7 +33,7 @@ function ErrorBoundaryDialog(props) {
 	let msg = `${props.where} : ${err.stack ?? err.message ?? err.toString()}`;
 	return <div id='ErrorDialog' >
 		<p>{msg}</p>
-		<nav><button onClick={CommonDialog.startClosingDialog} >OK</button></nav>
+		<nav><button className='round' onClick={CommonDialog.startClosingDialog} >OK</button></nav>
 	</div>;
 }
 

@@ -28,7 +28,7 @@ import ErrorBoundary from './widgets/ErrorBoundary.js';
 //	<h3>Sorry, Squishy Electron got an error.</h3>
 //	<p>${ex.stack || ex.message || JSON.stringify(ex)}</p>
 //	<p><i><small>:${ev.lineno}:${ev.colno}</small></i></p>
-//	<button onclick='location=location' style='padding: 1em; border-radius: 1em;'>reload</button>`;
+//	<button className='round'  onclick='location=location' style='padding: 1em; border-radius: 1em;'>reload</button>`;
 //
 //	let asideEl = document.createElement('aside');
 //	asideEl.setAttribute('style', style);

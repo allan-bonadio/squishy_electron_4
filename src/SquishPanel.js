@@ -444,7 +444,7 @@ export class SquishPanel extends React.Component {
 		return <div className='runningOneCycle' style={{display: 'block'}}>
 			<span>total iterations: {s.runningCycleIterateSerial.toFixed(0)} &nbsp;
 				elapsed vtime: {s.runningCycleElapsedTime.toFixed(3)} &nbsp;</span>
-			<button onClick={this.startRunningOneCycle}>start running 1 cycle</button>
+			<button className='round' onClick={this.startRunningOneCycle}>start running 1 cycle</button>
 		</div>
 	}
 

@@ -207,7 +207,7 @@ class ErrorBoundary extends React.Component {
 		const jumpStartCallback = devMode ? jumpStartDev : jumpStartProd;
 		if (jumpStartCallback) {
 			jumpStartButton =
-				<button type='button' onClick={ev => this.jumpStart(errorObj, infoObj)}>
+				<button className='round' onClick={ev => this.jumpStart(errorObj, infoObj)}>
 					try to jump start it again
 				</button>;
 		}
@@ -227,7 +227,7 @@ class ErrorBoundary extends React.Component {
 		else {
 			// gimme that panel with the two buttons
 			buttonNodes = <div className='rightSide'>
-				<button type='button' onClick={ev => this.reset()}>ignore it</button>
+				<button className='round' onClick={ev => this.reset()}>ignore it</button>
 				{jumpStartButton}
 			</div>;
 		}
@@ -332,7 +332,7 @@ class ErrorBoundary extends React.Component {
 				<p style={{backgroundColor: '#804', color: '#fde'}}>
 					Info: {JSON.stringify(this.info)}</p>
 				<p style={{backgroundColor: '#fee', color: '#000'}}>
-					<button onClick={() => this.recover()}>
+					<button className='round' onClick={() => this.recover()}>
 						try to restart</button></p>
 			</main>;
 		}

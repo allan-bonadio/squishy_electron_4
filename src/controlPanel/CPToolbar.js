@@ -105,15 +105,15 @@ function CPToolbar(props) {
 					resolution {props.N} &nbsp;
 				</div>
 
-				<button onClick={props.resetMainWave}>Reset Wave</button>
+				<button className='round' onClick={props.resetMainWave}>Reset Wave</button>
 				&nbsp;
 
-				<button onClick={props.setPotentialHandler}>Reset Potential</button>
+				<button className='round' onClick={props.setPotentialHandler}>Reset Potential</button>
 				&nbsp;
 			</div>
 
 			<div className='toolbarRow'>
-				<button onClick={ev => clickOnFFT(props.space)}>
+				<button className='round' onClick={ev => clickOnFFT(props.space)}>
 					FFT
 				</button>
 				&nbsp;
