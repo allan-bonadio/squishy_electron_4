@@ -16,7 +16,6 @@ fi
 
 
 . $qEMSCRIPTEN/emsdk/emsdk_env.sh
-# was formerly /emsdk-main/ but should be fixed now
 
 # this has all c++ & h files, except main.cpp and the testing files.
 # omit those, so testing can also use this and compile & run itself (see testing/cppu*).
@@ -31,12 +30,12 @@ cd ..
 echo □□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□ compile
 # https://emscripten.org/docs/tools_reference/emcc.html
 emcc -o quantumEngine.js -sLLD_REPORT_UNDEFINED \
-	-gsource-map --source-map-base / \
+	-gsource-map --source-map-base /qe/ \
 	-sASSERTIONS=2 -sSAFE_HEAP=1 -sSTACK_OVERFLOW_CHECK=2 \
 	-sDEMANGLE_SUPPORT=1 -sNO_DISABLE_EXCEPTION_CATCHING \
 	-sEXPORTED_FUNCTIONS=@building/exports.json \
 	-sEXPORTED_RUNTIME_METHODS='["ccall","cwrap","UTF8ArrayToString", "AsciiToString"]' \
-	$PROFILING \
+	$PROFILING  \
 	-DMAX_LABEL_LEN=$MAX_LABEL_LEN -DMAX_DIMENSIONS=$MAX_DIMENSIONS \
 	-I$qEMSCRIPTEN/emsdk/upstream/emscripten/cache/sysroot/include \
 	-include emscripten.h \

@@ -25,7 +25,7 @@ static bool traceIterSteps = false;
 static bool traceJustWave = false;
 static bool traceJustInnerProduct = false;
 
-static bool traceFourierFilter = true;
+static bool traceFourierFilter = false;
 
 static bool dumpFFHiResSpectums = false;
 static bool traceIProd = false;
@@ -206,25 +206,6 @@ void qAvatar::dumpObj(const char *title) {
 
 	printf("        ==== end of qAvatar ====\n\n");
 }
-
-/* ********************************************************** managing Iteration */
-
-// the JS timer (rAF) says it's a good time to start an iteration.
-// current implementation cheats and sometimes does iteration when this is called.
-bool qAvatar::shouldIterate(void) {
-	if (doingIteration) {
-		needsIteration = true;
-
-		// this tells us that the engine is not keeping up
-		return true;
-	}
-
-	// otherwise send a message to iterate thread(s) to start a new one
-	// sortof.  lemme get the threads ini place.
-	oneIteration() ;
-	return false;
-}
-
 
 /* ********************************************************** doing Iteration */
 

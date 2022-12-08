@@ -70,12 +70,13 @@ struct qAvatar {
 	bool isIterating;
 
 
-	// JS calls shouldIterate() whenever it's time to start an iteration. If
-	// it's already doing one, it'll remember to do another immediately after
-	// using needsIteratiion, and shouldIterate() will return true. Otherwise,
-	// it'll start one immediately, asynchronously, and return false.  Always
-	// (should) return immediately.
-	bool shouldIterate(void);
+	//	JS calls pleaseIterate() from a worker whenever it's time to start an
+	//	iteration. If it's already doing one, it'll remember to do another
+	//	immediately after the current iteration, using needsIteration, and
+	//	pleaseIterate() will return false. Otherwise, it'll do an iteration
+	//	immediately, and return true after the last iteration (which could be
+	//	a long time).
+	bool pleaseIterate(void);
 	bool needsIteration;
 
 	// what's the diff between this and isIterating?  not much.
@@ -107,17 +108,11 @@ struct qAvatar {
 
 /* ************************************************************ JS interface */
 
-// for JS to call.  Defined in jsSpace
+// for JS to call.  Defined in jsSpace and elsewhere.
 extern "C" {
-
-	// obsoleted by DirectAccess
-	//float *avatar_getViewBuffer(qAvatar *avatar);
-	//double Avatar_getElapsedTime(void);
-	//double Avatar_getIterateSerial(void);
-
-
+	void avatar_iterationLoop(qAvatar *avatar, int nStages);
 	void avatar_oneIteration(qAvatar *avatar);
-	int avatar_shouldIterate(qAvatar *avatar);
+	int avatar_pleaseIterate(qAvatar *avatar);
 
 	void avatar_askForFFT(qAvatar *avatar);
 

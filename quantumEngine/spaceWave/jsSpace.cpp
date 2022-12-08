@@ -42,7 +42,6 @@ void qSpace_dumpPotential(char *title) { theSpace->dumpPotential(title); }
 
 void avatar_oneIteration(qAvatar *pointer) { pointer->oneIteration(); }
 
-int avatar_shouldIterate(qAvatar *pointer) { return (int) pointer->shouldIterate(); }
 
 // if iterating, FFT as the current iterate finishes, before and after fourierFilter().
 // If stopped, fft current wave. now.

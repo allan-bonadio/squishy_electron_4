@@ -43,9 +43,9 @@ let exportsSrc  = [
 	// avatars - all accept an integer pointer to the avatar as first argument
 	{name: 'avatar_loadViewBuffer', args: ['number'], retType:  'number'},
 
-	// ?? this really has no return value ??
-	{name: 'avatar_oneIteration', args: ['number'], retType: 'number'},
-	{name: 'avatar_shouldIterate', args: ['number'], retType: 'number'},
+	{name: 'avatar_oneIteration', args: ['number'], retType: null},
+	{name: 'avatar_iterationLoop', args: ['number', 'number'], retType: 'number'},
+	{name: 'avatar_pleaseIterate', args: ['number'], retType: null},
 
 	{name: 'avatar_askForFFT', args: ['number'], retType: null},
 	{name: 'avatar_delete', args: ['number'], retType: null},
@@ -132,7 +132,8 @@ function generateQeJs() {
 	export const qe = {};
 
 	export function defineQEngineFuncs() {
-		cwrap = window.Module.cwrap;
+		// eslint-disable-next-line no-restricted-globals
+		cwrap = self.Module.cwrap;
 	\n${defineFuncBody.join('\n')}
 
 		// constants shared with C++
