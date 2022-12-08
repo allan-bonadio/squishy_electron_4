@@ -38,8 +38,8 @@ const DEFAULT_VIEW_CLASS_NAME = 'flatDrawingViewDef';
 const N_EXTRA_STEPS = 1;
 
 
-// figure out how long requestAnimationFrame()'s period is
-let rafPeriod;
+// figure out how long requestAnimationFrame()'s period is, in ms
+let rafPeriod = 16.667;
 setTimeout(() => {
 	requestAnimationFrame(time => {
 		let firstTime = time;
@@ -48,7 +48,7 @@ setTimeout(() => {
 			console.log(`⏱ rafPeriod = ${rafPeriod}  rate=${Math.round(1000/rafPeriod)}`);
 		});
 	});
-}, 5000);
+}, 10000);  // time for things to settle down
 
 export class SquishPanel extends React.Component {
 	static propTypes = {
@@ -275,7 +275,7 @@ export class SquishPanel extends React.Component {
 
 	/* ******************************************************* iteration & animation */
 
-	static divergedBlurb = `Sorry, but your quantum wave diverged!  This isn't your fault; it's a bug or limitation of the mathematical engine - it's just not as accurate as the real thing, and sometimes it just runs off the rails.  Unfortunately, you'll have to start over with a new wave.  Click on the Wave tab below and click Set Wave.`;
+	static divergedBlurb = `Sorry, but your quantum wave diverged!  This isn't your fault; it's a bug or limitation of the mathematical engine - it's just not as accurate as the real thing, and sometimes it just runs off the rails.  Unfortunately, you'll have to start over with a new wave.  Click on the Reset Wave button.`;
 
 	// do one integration iteration
 	crunchOneIteration() {
@@ -375,7 +375,7 @@ export class SquishPanel extends React.Component {
 //		}
 
 		if (isNaN(timeSince)) debugger;
-		//console.log(` maintaining the ReqAniFra cycle: ${timeSince.toFixed(1)} ms`)
+		//console.log(` maintaining the rAF cycle: ${timeSince.toFixed(1)} ms`)
 		this.lastAniteration = iterationStart;
 
 		requestAnimationFrame(this.animateHeartbeat);
