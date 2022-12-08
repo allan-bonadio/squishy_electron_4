@@ -1,16 +1,42 @@
-// this manages the engine's stepping through time, subdividing
+/*
+** grinder -- this manages the engine's stepping through time, threads, etc
+** Copyright (C) 2022-2022 Tactile Interactive, all rights reserved
+*/
 
-// someday
-
-//int qStepper(void) {
-//	const int many = 100;
+//#include <string.h>
 //
-//    std::clock_t c_start = std::clock();
-//	for (int i = 0; i < many; i++) {
-//		theSpace->oneRk2Step();
-//	}
-//    std::clock_t c_end = std::clock();
-//    printf(" time for %d rk2 steps: %lf", many, (double)(c_end - c_start) / CLOCKS_PER_SEC);
-//	return many;
-//}
+//#include <ctime>
+//#include <limits>
+//#include <cfenv>
 
+not sure what i'm using this for ... see qThread.cpp
+
+
+#include "../spaceWave/qSpace.h"
+#include "qAvatar.h"
+//#include "../debroglie/qWave.h"
+//#include "../fourier/qSpectrum.h"
+//#include "../spaceWave/qViewBuffer.h"
+//#include "../fourier/fftMain.h"
+//#include "../directAccessors.h"
+
+
+
+static bool traceIteration = false;  //
+
+
+
+// some old APII as seen on thiis old page:
+//
+//void run_in_worker()
+//{
+//	printf("Hello from wasm worker!\n");
+//}
+//
+//int main()
+//{
+//	// this is the stack size.  prob not enough
+//	emscripten_wasm_worker_t worker = emscripten_malloc_wasm_worker(1024);
+//
+//	emscripten_wasm_worker_post_function_v(worker, run_in_worker);
+//}
