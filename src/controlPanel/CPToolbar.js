@@ -12,6 +12,9 @@ import ControlPanel from './ControlPanel.js';
 import {catchEx} from '../utils/errors.js';
 
 
+import eThread from '../engine/eThread.js';
+
+
 function setPT() {
 	CPToolbar.propTypes = {
 		iterateFrequency: PropTypes.number.isRequired,
@@ -37,6 +40,8 @@ function clickOnFFT(space)
 				space.mainEAvatar.pleaseFFT = true;  // remind me after next iter
 			else
 				qe.avatar_askForFFT(space.mainEAvatar.pointer);  // do it now
+
+			new eThread();
 		}
 	});
 }
