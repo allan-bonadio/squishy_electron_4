@@ -3,7 +3,7 @@
 ** Copyright (C) 2022-2022 Tactile Interactive, all rights reserved
 */
 
-#include "/opt/dvl/emscripten/emsdk/upstream/emscripten/system/include/emscripten/bind.h"
+#include <emscripten/bind.h>
 
 //#include <emscripten/bind.h>
 //#include <emscripten/bind.h>
