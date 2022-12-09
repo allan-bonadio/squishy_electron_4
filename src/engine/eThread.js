@@ -31,7 +31,7 @@ class eThread {
 				ev => this.messageHandler(ev.data, ev.target);
 
 				// now send something...
-				worker.postMessage({verb: 'ping', message: `and maybe i just don't see the reason`});
+				worker.postMessage({verb: 'ping', message: `Welcome, thread!`});
 
 			}
 
