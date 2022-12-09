@@ -40,7 +40,9 @@ export function fixPotentialBoundaries(space, potential) {
 export function setFamiliarPotential(space, potentialArray, potentialParams) {
 	const {start, end, N} = space.startEnd;
 	let {valleyPower, valleyScale, valleyOffset} = potentialParams;
-	// someday this will work ${space.label},
+	if (valleyPower == undefined || valleyScale == undefined || valleyOffset == undefined)
+		throw `bad Potential params: valleyPower=${valleyPower}, valleyScale=${valleyScale},
+			valleyOffset=${valleyOffset}`
 	if (traceFamiliar)
 		console.log(`starting setFamiliarPOTENTIAL(array of POTENTIALArray.length,`+
 			` POTENTIALParams=`, potentialParams);
