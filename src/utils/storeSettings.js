@@ -39,6 +39,9 @@ let alternateStoreDefaults = {};
 let alternateStoreVerifiers = {};
 export let alternateMinMaxs = {};
 
+export let alternateStore = {};  // try this again?
+
+
 // somehow webpack fumbles this if it's extern, in SquishPanel
 // no doesn't seem to make a diff
 //window.storeSettings = storeSettings;
@@ -81,11 +84,18 @@ function makeCriterionFunction(criterion) {
 		// must be like {min=-100, max=100}; optional step
 		case 'Object': {
 			let crit = {...criterion};
-			if (criterion.step)
-				return value => (value >= crit.min && value <= crit.max
+			let func;
+			if (criterion.step) {
+				func = value => (value >= crit.min && value <= crit.max
 					&& 0 === value % crit.step);
-			else
-				return value => (value >= crit.min && value <= crit.max);
+				func.step = crit.step;
+			}
+			else {
+				func = value => (value >= crit.min && value <= crit.max);
+			}
+			func.min = crit.min;
+			func.max = crit.max;
+			return func;
 		}
 
 		default:
@@ -126,6 +136,20 @@ function makeParam(groupName, varName, defaultValue, criterion) {
 	alternateMinMaxs[groupName] ??= {};
 	if (typeof criterion == 'object' && criterion.max !== undefined)
 		alternateMinMaxs[groupName][varName] = criterion;
+
+
+	// try again, meekly
+	alternateStore[groupName] ??= {};
+	alternateStore[groupName][varName] ??= {};
+	let vari = alternateStore[groupName][varName];
+	vari.default = defaultValue;
+	vari.criterion = criterionFunction;
+	if (criterionFunction.max != undefined) {
+		Object.assign(vari, {...criterionFunction})
+		//vari.min = criterionFunction.min;
+		//vari.max = criterionFunction.max;
+		//vari.min = criterionFunction.max;
+	}
 
 
 
@@ -178,7 +202,7 @@ export function createStoreSettings() {
 	// need to be remembered; this does it.  Potential and space too; not active until user does something.
 	// THis also defines slider mins and maxes!  One source of truth.
 
-	makeParam('waveParams', 'waveBreed', 'chord', ['circular', 'standing', 'gaussian', 'chord']);
+	makeParam('waveParams', 'waveBreed', 'gaussian', ['circular', 'standing', 'gaussian', 'chord']);
 	makeParam('waveParams', 'waveFrequency', 16, {min: -100, max: 100, step: 0.5});
 	makeParam('waveParams', 'pulseWidth', 20, {min: 1, max: 100});
 	makeParam('waveParams', 'pulseOffset', 30, {min: 0, max: 100});
@@ -208,13 +232,23 @@ export function createStoreSettings() {
 export function getAGroup(groupName) {
 	if (!alternateStoreVerifiers?.[groupName]) debugger;
 
+	let group;
 	try {
-		let savedGroup = localStorage.getItem(groupName) || '{}';
-		return JSON.parse(savedGroup);
+		let savedGroup = localStorage.getItem(groupName);
+		group = JSON.parse(savedGroup);
 	} catch (ex) {
 		// in hte event that some bogus value gets stored in the localStorage, revert to default.
-		return alternateStoreDefaults[groupName];
+		group = alternateStoreDefaults[groupName];
 	}
+
+	// if completely uninitialized, create each var in the group
+	if (!group) {
+		const asg = alternateStore[groupName];
+		group = {};
+		for (let varName in asg)
+			group[varName] = asg[varName].default;
+	}
+	return group;
 }
 
 // cuz of some magical bad ju-ju, this shit just doesn't owrk and i have to do it by hand.
