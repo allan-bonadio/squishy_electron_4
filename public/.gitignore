@@ -1,4 +1,2 @@
 # compiled results
-quantumEngine.js
-quantumEngine.wasm
-quantumEngine.wasm.map
+# no more - just symlinks are in public

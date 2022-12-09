@@ -24,9 +24,12 @@
     "testcppdb": "quantumEngine/testing/cppuRunner.sh db \"$@\" ",
 
     "start": "react-scripts start",
-    "build": "react-scripts build",
+    "startbb": "REACT_EDITOR=bbedit react-scripts start",
     "test": "react-scripts test",
-    "ejectdonteverdothis": "react-scripts eject"
+    "ejectdonteverdothis": "react-scripts eject",
+
+    "build": "react-scripts build",
+    "startbuilt": "serve -s build -l 6660"
   },
   "eslintConfig": {
     "extends": [

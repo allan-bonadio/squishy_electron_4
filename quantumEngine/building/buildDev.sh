@@ -43,8 +43,8 @@ emcc -o quantumEngine.js -sLLD_REPORT_UNDEFINED \
 	main.cpp $allCpp || exit $?
 # changed -g to -g4 to -gsource-map --source-map-base / ; debugger can see into c++
 
-echo □□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□ copy
-cp quantumEngine.wasm quantumEngine.js quantumEngine.wasm.map ../public
+echo □□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□ done
+#cp quantumEngine.wasm quantumEngine.js quantumEngine.wasm.map ../public
 
 exit $?
 
