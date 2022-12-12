@@ -30,7 +30,7 @@ cd ..
 echo □□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□ compile
 # https://emscripten.org/docs/tools_reference/emcc.html
 emcc -o quantumEngine.js -sLLD_REPORT_UNDEFINED \
-	-gsource-map --source-map-base /qe/ \
+	-gsource-map --source-map-base /qEng/ \
 	-sASSERTIONS=2 -sSAFE_HEAP=1 -sSTACK_OVERFLOW_CHECK=2 \
 	-sDEMANGLE_SUPPORT=1 -sNO_DISABLE_EXCEPTION_CATCHING \
 	-sEXPORTED_FUNCTIONS=@building/exports.json \
@@ -46,7 +46,7 @@ emcc -o quantumEngine.js -sLLD_REPORT_UNDEFINED \
 echo □□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□ done
 #cp quantumEngine.wasm quantumEngine.js quantumEngine.wasm.map ../public
 
-exit $?
+exit 0
 
 # compiler hints and links:
 # https://emscripten.org/docs/tools_reference/emcc.html
