@@ -34,9 +34,9 @@ import qe from '../engine/qe.js';
 //
 //if (typeof storeSettings == 'undefined') debugger;  // webpack fuckups
 
-// these will work
-let alternateStoreDefaults = {};
-let alternateStoreVerifiers = {};
+// these will work - make them classes
+export let alternateStoreDefaults = {};
+export let alternateStoreVerifiers = {};
 export let alternateMinMaxs = {};
 
 export let alternateStore = {};  // try this again?
@@ -303,4 +303,18 @@ export function getASetting(groupName, varName) {
 // useless
 //export default storeSettings;
 
+window.dumpSettings = () => {
+	// this name comes from webpack.  Probably changes from time to time.
+	// eslint-disable-next-line no-undef
+	const zz = _utils_storeSettings_js__WEBPACK_IMPORTED_MODULE_3__;
+	console.log(`\n🎛 Settings: alternateStoreDefaults=`,
+		alternateStoreDefaults ?? zz.alternateStoreDefaults);
+	console.log(`🎛 Settings: alternateStoreVerifiers=`,
+		alternateStoreVerifiers ?? zz.alternateStoreVerifiers);
+	console.log(`🎛 Settings: alternateMinMaxs=`,
+		alternateMinMaxs ?? zz.alternateMinMaxs);
+	console.log(`\n🎛 Settings: alternateStore=`,
+		alternateStore ?? zz.alternateStore);
+}
 
+// _utils_storeSettings_js__WEBPACK_IMPORTED_MODULE_3__
