@@ -39,16 +39,16 @@ const N_EXTRA_STEPS = 1;
 
 
 // figure out how long requestAnimationFrame()'s period is, in ms
-let rafPeriod = 16.667;
-setTimeout(() => {
-	requestAnimationFrame(time => {
-		let firstTime = time;
-		requestAnimationFrame(time => {
-			rafPeriod = time - firstTime;
-			console.log(`⏱ rafPeriod = ${rafPeriod}  rate=${Math.round(1000/rafPeriod)}`);
-		});
-	});
-}, 10000);  // time for things to settle down
+//let rafPeriod = 16.667;
+//setTimeout(() => {
+//	requestAnimationFrame(time => {
+//		let firstTime = time;
+//		requestAnimationFrame(time => {
+//			rafPeriod = time - firstTime;
+//			console.log(`⏱ rafPeriod = ${rafPeriod}  rate=${Math.round(1000/rafPeriod)}`);
+//		});
+//	});
+//}, 10000);  // time for things to settle down
 
 export class SquishPanel extends React.Component {
 	static propTypes = {
@@ -283,7 +283,8 @@ export class SquishPanel extends React.Component {
 
 		try {
 			// hundreds of visscher steps
-			this.mainEAvatar?.oneIteration();
+			this.mainEAvatar?.pleaseIterate();
+			//this.mainEAvatar?.oneIteration();
 		} catch (ex) {
 			ControlPanel.stopIterating();
 			// eslint-disable-next-line no-ex-assign

@@ -39,6 +39,7 @@ struct qWave : public virtual qBuffer {
 struct qFlick : public qWave {
 	qFlick(qSpace *space, int maxWaves);
 	~qFlick();
+	static qFlick *flick;
 
 	// dump
 	double dumpRow(char *buf, int doubleAge, int ix, double *pPrevPhase, bool withExtras);
@@ -50,7 +51,7 @@ struct qFlick : public qWave {
 	// them, all dynamically allocated
 	qCx **waves;
 	int maxWaves;  // how long waves is, in pointiers
-	int nWaves;  // how many are actually in use (those behond should be null!)
+	int nWaves;  // how many are actually in use (those beyond should be null!)
 
 	// create and add a new buffer, zeroed, at the 0 position, pushing the others up
 	void pushWave(void);
@@ -60,7 +61,8 @@ struct qFlick : public qWave {
 	//void pushCopy(qCx *wave);
 	//void installWave(qCx *wave);
 
-	// the current one is === the one pointed to by buffer.  usually zero for the first one.
+	// the current one is === the one pointed to by wave.  usually zero for the first one.
+	// this is not always used as anything can access waves array
 	int currentIx;
 	void setCurrent(int which);
 

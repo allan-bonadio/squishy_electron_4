@@ -7,6 +7,9 @@
 // Although many of these seem to belong to iteration, they also have to display.
 // Hence the Avatar object.  see also JS eAvatar
 
+struct qThread;
+struct qStage;
+
 struct qAvatar {
 	qAvatar(qSpace *, const char *label);
 	~qAvatar(void);
@@ -60,23 +63,28 @@ struct qAvatar {
 	struct qViewBuffer *qvBuffer;
 	float *vBuffer;  // aligned by 4, not 8
 
+	struct qStage *stages;
+	struct qThread *threads;
+	void initIterationLoop(int nThreads, int nStages);
+
+	// for alignment: put the rest of these last
+
 	// mostly for debugging
 	char label[MAX_LABEL_LEN + 1];
 
-	// for alignment: put these last
 
 	// true if an iteration is running; set/unset in ::oneIteration()
 	// For the interactive simulation switch, see isTimeAdvancing in JS.
 	bool isIterating;
 
-
+	// this is different now; js DOES pleaseIterate()
 	//	JS calls pleaseIterate() from a worker whenever it's time to start an
 	//	iteration. If it's already doing one, it'll remember to do another
 	//	immediately after the current iteration, using needsIteration, and
 	//	pleaseIterate() will return false. Otherwise, it'll do an iteration
 	//	immediately, and return true after the last iteration (which could be
 	//	a long time).
-	bool pleaseIterate(void);
+	//bool pleaseIterate(void);
 	bool needsIteration;
 
 	// what's the diff between this and isIterating?  not much.
@@ -110,9 +118,9 @@ struct qAvatar {
 
 // for JS to call.  Defined in jsSpace and elsewhere.
 extern "C" {
-	void avatar_iterationLoop(qAvatar *avatar, int nStages);
+	//void avatar_initIterationLoop(qAvatar *avatar, int nStages);
 	void avatar_oneIteration(qAvatar *avatar);
-	int avatar_pleaseIterate(qAvatar *avatar);
+	//int avatar_pleaseIterate(qAvatar *avatar);
 
 	void avatar_askForFFT(qAvatar *avatar);
 

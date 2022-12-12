@@ -183,6 +183,9 @@ void qAvatar::formatDirectOffsets(void) {
 	// the view Buffer to be passed to webgl.  Just the buffer, not the qViewBuffer
 	makePointerGetter(vBuffer);
 
+	makePointerGetter(stages);
+	makePointerGetter(threads);
+
 	makeStringPointer(label);
 
 	printf("\n🚦 🚦 --------------- done with qAvatar direct access --------------\n");
@@ -363,6 +366,7 @@ void qAvatar::fourierFilter(int lowPassFilter) {
 	if (dumpFFHiResSpectums) qwave->dumpHiRes("wave END fourierFilter() b4 normalize");
 }
 
+/* ********************************************************** misc  */
 
 
 // user button to print it out now, while not running.  See also pleaseFFT for when it is
@@ -370,6 +374,5 @@ void qAvatar::askForFFT(void) {
 	analyzeWaveFFT(qwave, "askForFFT while idle");
 }
 
-/* **********************************************************  */
 
 /* **********************************************************  */

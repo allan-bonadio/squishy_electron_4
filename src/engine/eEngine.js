@@ -10,11 +10,26 @@ import {interpretCppException} from '../utils/errors.js';
 import {resetObjectRegistry} from '../utils/directAccessors.js';
 import {storeASetting, createStoreSettings} from '../utils/storeSettings.js';
 import eSpace from './eSpace.js';
+import eThread from './eThread.js';
 
 // all of these must be attached to window to  get called by c++
 
 let traceStartup = false;
 let tracePromises = false;
+
+/* ****************************************************** experiments */
+// not healthy i think.  Everything else halts after this is done.
+//function dumpModule() {
+//	let noProc = Module[writeStringToMemory];
+//	for (let key in Module) {
+//		let val = Module[key];
+//		//let valString = val.toString();
+//		if (val != noProc)
+//			console.log(`Module[${key}] = `, val);
+//	}
+//}
+//dumpModule();
+//console.log(`done sumping module`);
 
 /* ****************************************************** app startup */
 
@@ -81,10 +96,9 @@ export function recreateMainSpace(spaceParams) {
 	if (traceStartup) console.log(`space 🐣  liquidated, obj registry reset`);
 }
 
-// Called by C++ when C++ has finally started up.
+// Called by C++ when C++ has finally started up.  Once only, at page load.
 // do NOT export this; it's global cuz quantumEngine.js, the compiled C++ proxy,
 // has to have access to it early on, and it doesn't understand JS exports.
-// these arguments are only passed once, at app startup
 function quantumEngineHasStarted(maxDims, maxLab) {
 	MAX_DIMENSIONS = maxDims;
 	MAX_LABEL_LEN = maxLab;
@@ -105,6 +119,10 @@ function quantumEngineHasStarted(maxDims, maxLab) {
 		continuum: getASetting('spaceParams', 'continuum'),
 		label: 'main'});
 	if (traceStartup) console.log(`main space 🐣  created`);
+
+	// startup threads needs avatar
+	eSpaceCreatedPromise.then(space => eThread.createThreads(space.mainEAvatar));
+	if (traceStartup) console.log(`threads 🐣  created`);
 
 	if (tracePromises) console.log(
 		`🐥 quantumEngineHasStarted:  space created and resolving eSpaceCreatedPromise`);

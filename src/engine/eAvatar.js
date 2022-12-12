@@ -7,6 +7,7 @@ import {cppObjectRegistry, prepForDirectAccessors} from '../utils/directAccessor
 import eWave from './eWave.js';
 //import eSpace from './eSpace.js';
 import qe from './qe.js';
+import eThread from './eThread.js';
 
 let traceCreation = false;
 let traceHighest = false;
@@ -53,6 +54,7 @@ class eAvatar {
 	// are passed by pointer and you need to allocate them in JS (eg see
 	// eAvatar.constructor)
 
+
 	get _space() { return this.ints[1]; }
 
 	get elapsedTime() { return this.doubles[1]; }
@@ -60,14 +62,14 @@ class eAvatar {
 	get iterateSerial() { return this.doubles[2]; }
 	set iterateSerial(a) { this.doubles[2] = a; }
 
-	get isIterating() { return this.bools[88]; }
-	set isIterating(a) { this.bools[88] = a; }
-	get pleaseFFT() { return this.bools[91]; }
-	set pleaseFFT(a) { this.bools[91] = a; }
-	get needsIteration() { return this.bools[89]; }
-	set needsIteration(a) { this.bools[89] = a; }
-	get doingIteration() { return this.bools[90]; }
-	set doingIteration(a) { this.bools[90] = a; }
+	get isIterating() { return this.bools[96]; }
+	set isIterating(a) { this.bools[96] = a; }
+	get pleaseFFT() { return this.bools[99]; }
+	set pleaseFFT(a) { this.bools[99] = a; }
+	get needsIteration() { return this.bools[97]; }
+	set needsIteration(a) { this.bools[97] = a; }
+	get doingIteration() { return this.bools[98]; }
+	set doingIteration(a) { this.bools[98] = a; }
 
 	get dt() { return this.doubles[3]; }
 	set dt(a) { this.doubles[3] = a; }
@@ -86,7 +88,9 @@ class eAvatar {
 
 	get _qspect() { return this.ints[15]; }
 	get _vBuffer() { return this.ints[17]; }
-	get _label() { return this.pointer + 72; }
+	get _stages() { return this.ints[18]; }
+	get _threads() { return this.ints[19]; }
+	get _label() { return this.pointer + 80; }
 
 	/* **************************** end of direct accessors */
 
@@ -119,6 +123,25 @@ class eAvatar {
 	// can throw std::runtime_error("divergence")
 	oneIteration() {
 		qe.avatar_oneIteration(this.pointer);
+	}
+
+	// thisis what upper levels call when another iteration is needed.
+	// It either queues it out to a thread, if the threads are idle,
+	// or sets needsIteration if busy
+	pleaseIterate() {
+		console.log(`🚦 eAvatar ${this.label}: pleaseIterate()`);
+		if (this.doingIteration) {
+			console.log(`🚦             pleaseIterate: needsIteration = true cuz busy`);
+			// threads are busy but we'll get to it after we're done with this iteration
+			this.needsIteration = true;
+			return false;
+		}
+		else {
+			console.log(`🚦             pleaseIterate oneItration`);
+			this.needsIteration = false;
+			eThread.oneIteration(this);
+			return true;
+		}
 	}
 
 	askForFFT() {

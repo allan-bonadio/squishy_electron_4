@@ -44,8 +44,8 @@ let exportsSrc  = [
 	{name: 'avatar_loadViewBuffer', args: ['number'], retType:  'number'},
 
 	{name: 'avatar_oneIteration', args: ['number'], retType: null},
-	{name: 'avatar_iterationLoop', args: ['number', 'number'], retType: 'number'},
-	{name: 'avatar_pleaseIterate', args: ['number'], retType: null},
+	{name: 'avatar_initIterationLoop', args: ['number', 'number', 'number'], retType: null},
+	//{name: 'avatar_pleaseIterate', args: ['number'], retType: null},
 
 	{name: 'avatar_askForFFT', args: ['number'], retType: null},
 	{name: 'avatar_delete', args: ['number'], retType: null},

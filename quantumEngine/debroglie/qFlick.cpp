@@ -1,40 +1,42 @@
 /*
-** Flick -- like a video, a sequence of waves
+** Flick -- a qWave that contains a dynamic sequence of waves
 ** Copyright (C) 2021-2022 Tactile Interactive, all rights reserved
 */
-
-// not used much anymore...
 
 #include <cstring>
 #include "../spaceWave/qSpace.h"
 #include "qWave.h"
 
+bool traceConstruction = true;
+
 // how big the delay between re and im, in radians kindof.  see code.
 // see also same thing in qWave
-const double gapFactor = .01;
+//const double gapFactor = .01;
 
 /* ************************************************************ birth & death & basics */
 
 // buffer is initialized to zero bytes therefore 0.0 everywhere
 // with two waves
-qFlick::qFlick(qSpace *space, int maxWaves) :
-	qWave(space), maxWaves(maxWaves), nWaves(2), currentIx(0)
+qFlick::qFlick(qSpace *space, int nW) :
+	qWave(space), nWaves(nW), currentIx(0)
 {
 	if (! space)
 		throw std::runtime_error("qSpectrum::qSpectrum null space");
-	if (maxWaves < 2) throw std::runtime_error("maxwaves must be at least 2");
-	if (maxWaves > 1000) throw std::runtime_error("maxwaves is too big, sure you want that?");
+	if (nWaves < 2) throw std::runtime_error("nWaves must be at least 2");
+	if (nWaves > 1000) throw std::runtime_error("nWaves is too big, sure you want that?");
 
-	// array of waves
-	waves = (qCx **) malloc(maxWaves * sizeof(int *));
+	// array of waves, just the pointers to them
+	waves = (qCx **) malloc(nWaves * sizeof(qCx *));
 
-	// being a qWave, we already have one, just need the other
+	// being a qWave, we already have one, just need the rest
 	waves[0] = wave;
-	waves[1] = allocateWave();
+	for (int w = 1; w < nWaves; w++)
+		waves[w] = allocateWave();
 }
 
 qFlick::~qFlick() {
-	printf("start the qFlick instance destructor...\n");
+	if (traceConstruction)
+		printf("start the qFlick instance destructor...\n");
 	setCurrent(0);
 
 	// note how this starts at 1 so item zero can be freed by superclass
@@ -42,15 +44,21 @@ qFlick::~qFlick() {
 		freeWave(waves[i]);
 		waves[i] = NULL;
 	}
-	printf("    freed most of the buffers...\n");
+	if (traceConstruction)
+		printf("    freed most of the buffers...\n");
 
 	free(waves);
-	printf("    freed waves...\n");
+	if (traceConstruction)
+		printf("    freed waves...\n");
 
 	waves = NULL;
-	printf("setted waves to null; done with qFlick destructor.\n");
+	if (traceConstruction)
+		printf("setted waves to null; done with qFlick destructor.\n");
 
 }
+
+// just one of these
+qFlick *qFlick::flick;
 
 /* ******************************************************** diagnostic dump **/
 
@@ -199,39 +207,39 @@ double qFlick::magnitude(int doubleAge, int ix) {
 
 // push a new, zeroed or filled, wave onto the beginning of this flick, item zero.
 // We also recycle blocks that roll off the end here.
-void qFlick::pushWave(void) {
-	//dumpAllWaves("qFlick::pushWave() Start");
-	printf("pushing a wave...\n");
-
-	// first we need a buffer.
-	qCx *newWave;
-	if (nWaves >= maxWaves) {
-		// sorry charlie, gotta get rid of the oldest one...
-		// but stick around we'll recycle you for the new one
-		newWave = waves[maxWaves - 1];
-
-		// zap it to zeros, like new!
-		std::memset(newWave, 0, space->nPoints * sizeof(qCx));
-	}
-	else {
-		// waves[] grows like this till it's full, then it recycles the
-		// ones that roll off the end
-		newWave = allocateWave();
-		nWaves++;
-	}
-
-	// shove over
-	for (int i = nWaves - 1; i >= 1; i--)
-		waves[i] = waves[i-1];
-
-	// and here we are.  Good luck with it!
-	waves[0] = newWave;
-
-	// somebody will set this back to zero?
-	currentIx++;
-
-	//dumpAllWaves("pushWave() done");
-}
+//void qFlick::pushWave(void) {
+//	//dumpAllWaves("qFlick::pushWave() Start");
+//	printf("pushing a wave...\n");
+//
+//	// first we need a buffer.
+//	qCx *newWave;
+//	if (nWaves >= nWaves) {
+//		// sorry charlie, gotta get rid of the oldest one...
+//		// but stick around we'll recycle you for the new one
+//		newWave = waves[nWaves - 1];
+//
+//		// zap it to zeros, like new!
+//		std::memset(newWave, 0, space->nPoints * sizeof(qCx));
+//	}
+//	else {
+//		// waves[] grows like this till it's full, then it recycles the
+//		// ones that roll off the end
+//		newWave = allocateWave();
+//		nWaves++;
+//	}
+//
+//	// shove over
+//	for (int i = nWaves - 1; i >= 1; i--)
+//		waves[i] = waves[i-1];
+//
+//	// and here we are.  Good luck with it!
+//	waves[0] = newWave;
+//
+//	// somebody will set this back to zero?
+//	currentIx++;
+//
+//	//dumpAllWaves("pushWave() done");
+//}
 
 
 // set which one is 'current', so if someone uses this as a qWave,
