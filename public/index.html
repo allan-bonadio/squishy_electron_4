@@ -18,6 +18,9 @@ Cross-Origin-Embedder-Policy with require-corp as value (protects victims from y
 
 Cross-Origin-Opener-Policy: same-origin
 Cross-Origin-Embedder-Policy: require-corp
+
+see also
+https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Security-Policy/script-src
 -->
 
 		<!--link rel="apple-touch-icon" href="%PUBLIC_URL%/logo192.png" / -->
@@ -44,6 +47,8 @@ Cross-Origin-Embedder-Policy: require-corp
 			Go to Preferences in your browser and look for it there.
 		</noscript>
 		<div id="root"></div>
-		<script async src='%PUBLIC_URL%/qe/quantumEngine.js'></script>
+
+		<!-- one day move this up higher so it starts loading earlier -->
+		<script async src='%PUBLIC_URL%/qEng/quantumEngine.js'></script>
 	</body>
 </html>

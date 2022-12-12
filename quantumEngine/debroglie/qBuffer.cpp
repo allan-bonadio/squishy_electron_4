@@ -90,12 +90,6 @@ void qBuffer::initBuffer(int length, qCx *useThisBuffer) {
 	}
 
 	nPoints = length;
-
-	// don't mess with these; subclass may have already set them
-	//start = end = -1;  // wave / spectrum calculates these differently
-	//continuum = -1;
-	//space = NULL;  // subclasses will fill it in if needed
-
 	if (traceAllocate) {
 		printf("🍕 qBuffer::initBuffer this=%p  wave=%p  nPoints: %d\n",
 			this, wave, nPoints);
