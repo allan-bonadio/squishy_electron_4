@@ -51,8 +51,6 @@ ErrorBoundary implemented based on this page from ReactJS.org: https://reactjs.o
 
 let traceExceptions = false;
 
-// 'development' vs 'production'
-const devMode = process.env.development;
 
 class ErrorBoundary extends React.Component {
 	static propTypes = {
@@ -72,7 +70,11 @@ class ErrorBoundary extends React.Component {
 
 		// this numbers them if there's more than one exception (different Error instances)
 		this.serial = 0;
+
+		// 'development' vs 'production'
+		this.devMode = process.env.NODE_ENV == 'development';
 	}
+
 
 	/* **************************************************** Exception Catchers */
 
@@ -173,7 +175,7 @@ class ErrorBoundary extends React.Component {
 		// maybe we have a jumpStart handler
 		const { jumpStartDev, jumpStartProd } = this.props;
 		let jumpStartButton = null;
-		const jumpStartCallback = devMode ? jumpStartDev : jumpStartProd;
+		const jumpStartCallback = this.devMode ? jumpStartDev : jumpStartProd;
 		if (jumpStartCallback) {
 			jumpStartButton =
 				<button className='round' onClick={ev => this.jumpStart(errorObj, infoObj)}>
@@ -225,7 +227,7 @@ class ErrorBoundary extends React.Component {
 	// THIS triggers the dialog6
 	componentDidUpdate() {
 		// production: just restart.  turn off the error condition & roll back whatever
-		if (this.state.errorObj && !devMode) {
+		if (this.state.errorObj && !this.devMode) {
 			setTimeout(() => {
 				this.jumpStart();
 				// soon it'll rerender, starting over
@@ -233,6 +235,12 @@ class ErrorBoundary extends React.Component {
 
 		}
 	}
+
+	renderDev(errorObj) {
+		return JSON.stringify(errorObj);
+	}
+
+	renderProd = this.renderDev;
 
 	// try to reanimate frankenstein by calling this callback.
 	// It'll call functions passed in as props from our enclosure.
@@ -244,7 +252,7 @@ class ErrorBoundary extends React.Component {
 
 		// decide which callback, and call it safely
 		const { jumpStartDev, jumpStartProd } = this.props;
-		const jsFunc = devMode ? jumpStartDev : jumpStartProd;
+		const jsFunc = this.devMode ? jumpStartDev : jumpStartProd;
 		let rv;
 		try {
 			// call it!  if it's there
@@ -277,9 +285,9 @@ class ErrorBoundary extends React.Component {
 		let ermsgs = '';
 
 		if (terminalErrorObj)
-			ermsgs = devMode ? this.renderDev(terminalErrorObj) : this.renderProd(terminalErrorObj);
+			ermsgs = this.devMode ? this.renderDev(terminalErrorObj) : this.renderProd(terminalErrorObj);
 		if (errorObj)
-			ermsgs += devMode ? this.renderDev(errorObj) : this.renderProd(errorObj);
+			ermsgs += this.devMode ? this.renderDev(errorObj) : this.renderProd(errorObj);
 		if (infoObj)
 			ermsgs += JSON.stringify(infoObj, null, '\t');
 
