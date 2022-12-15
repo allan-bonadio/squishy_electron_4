@@ -9,8 +9,12 @@
 // full control.
 import qe from './qe.js';
 
+let traceIteration = false;
+
+
 // master switch cuz still in development
 let useThreads = false;
+
 
 console.log(`eThread: isSecureContext=${window.isSecureContext},
 crossOriginIsolated=${window.crossOriginIsolated}`);
@@ -111,11 +115,13 @@ class eThread {
 	static oneIteration(avatar) {
 		// i have to think of what to do if there's no workers available...
 		if (eThread.doingThreads) {
-			console.log(`🚦 eThread postMessage toiterate`);
+			if (traceIteration)
+				console.log(`🚦 eThread postMessage toiterate`);
 			eThread.workerThreads[0].postMessage({verb: 'iterate', avatarPointer: avatar.pointer});
 		}
 		else {
-			console.log(`🚦 eThread postMessage directly cuz no threads`);
+			if (traceIteration)
+				console.log(`🚦 eThread postMessage directly cuz no threads`);
 			qe.avatar_oneIteration(avatar.pointer);
 		}
 	}

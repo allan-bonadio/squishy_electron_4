@@ -12,6 +12,7 @@ import eThread from './eThread.js';
 let traceCreation = false;
 let traceHighest = false;
 let traceVBuffer = false;
+let traceIteration = false;
 
 // a qAvatar manages iteration of a wave, and display on a GLView. I keep
 // thinking that I should separate the functions, but what will you do with an itration
@@ -129,15 +130,18 @@ class eAvatar {
 	// It either queues it out to a thread, if the threads are idle,
 	// or sets needsIteration if busy
 	pleaseIterate() {
-		console.log(`🚦 eAvatar ${this.label}: pleaseIterate()`);
+		if (traceIteration)
+				console.log(`🚦 eAvatar ${this.label}: pleaseIterate()`);
 		if (this.doingIteration) {
-			console.log(`🚦             pleaseIterate: needsIteration = true cuz busy`);
+			if (traceIteration)
+				console.log(`🚦             pleaseIterate: needsIteration = true cuz busy`);
 			// threads are busy but we'll get to it after we're done with this iteration
 			this.needsIteration = true;
 			return false;
 		}
 		else {
-			console.log(`🚦             pleaseIterate oneItration`);
+			if (traceIteration)
+				console.log(`🚦             pleaseIterate oneItration`);
 			this.needsIteration = false;
 			eThread.oneIteration(this);
 			return true;
