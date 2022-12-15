@@ -230,7 +230,7 @@ export function createStoreSettings() {
 }
 
 export function getAGroup(groupName) {
-	if (!alternateStoreVerifiers?.[groupName]) debugger;
+	// it's ok  if (!alternateStoreVerifiers?.[groupName]) debugger;
 
 	let group;
 	try {
