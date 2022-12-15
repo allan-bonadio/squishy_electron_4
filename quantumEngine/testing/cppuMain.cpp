@@ -10,7 +10,7 @@
 #include "../schrodinger/qAvatar.h"
 #include "../debroglie/qWave.h"
 #include "../fourier/qSpectrum.h"
-#include "../spaceWave/qViewBuffer.h"
+#include "../greiman/qViewBuffer.h"
 
 #include "CppUTest/TestHarness.h"
 #include "CppUTest/CommandLineTestRunner.h"

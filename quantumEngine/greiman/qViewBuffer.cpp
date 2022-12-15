@@ -4,7 +4,7 @@
 */
 
 
-#include "qSpace.h"
+#include "../spaceWave/qSpace.h"
 #include "../schrodinger/qAvatar.h"
 #include "../debroglie/qWave.h"
 #include "qViewBuffer.h"

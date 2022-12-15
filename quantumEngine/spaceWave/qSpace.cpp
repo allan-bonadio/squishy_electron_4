@@ -10,7 +10,7 @@
 #include "qSpace.h"
 #include "../schrodinger/qAvatar.h"
 #include "../debroglie/qWave.h"
-#include "qViewBuffer.h"
+#include "../greiman/qViewBuffer.h"
 #include "../fourier/fftMain.h"
 
 

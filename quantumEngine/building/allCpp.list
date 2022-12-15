@@ -12,4 +12,4 @@ schrodinger/qThread.cpp
 schrodinger/visscher.cpp
 spaceWave/jsSpace.cpp
 spaceWave/qSpace.cpp
-spaceWave/qViewBuffer.cpp
+greiman/qViewBuffer.cpp

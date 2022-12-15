@@ -16,7 +16,7 @@
 #include "qAvatar.h"
 //#include "../debroglie/qWave.h"
 //#include "../fourier/qSpectrum.h"
-//#include "../spaceWave/qViewBuffer.h"
+//#include "../greiman/qViewBuffer.h"
 //#include "../fourier/fftMain.h"
 //#include "../directAccessors.h"
 

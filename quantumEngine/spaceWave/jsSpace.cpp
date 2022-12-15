@@ -7,7 +7,7 @@
 #include "qSpace.h"
 #include "../schrodinger/qAvatar.h"
 #include "../debroglie/qWave.h"
-#include "qViewBuffer.h"
+#include "../greiman/qViewBuffer.h"
 
 static bool traceSpaceCreation = true;
 static bool traceAvatarDetail = false;
