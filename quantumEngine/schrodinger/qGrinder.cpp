@@ -1,19 +1,18 @@
 /*
-** qAvatar -- the instance and simulation of a quantum mechanical wave in a space
+** qGrinder -- the simulation of a quantum mechanical wave in a space
 ** Copyright (C) 2022-2022 Tactile Interactive, all rights reserved
 */
-
 #include <string.h>
 
+#include <ctime>
 #include <limits>
 #include <cfenv>
 
 #include "../spaceWave/qSpace.h"
-#include "qAvatar.h"
+#include "../schrodinger/qAvatar.h"
 #include "qGrinder.h"
 #include "../debroglie/qWave.h"
 #include "../fourier/qSpectrum.h"
-#include "../greiman/qViewBuffer.h"
 #include "../fourier/fftMain.h"
 #include "../directAccessors.h"
 
@@ -30,7 +29,7 @@ static bool traceFourierFilter = false;
 static bool dumpFFHiResSpectums = false;
 static bool traceIProd = false;
 
-static bool traceSpace = false;  // prints info about the space in the avatar constructor
+static bool traceSpace = false;  // prints info about the space in the grinder constructor
 
 // only do some traces if we're past where it's a problem
 // i don't think this is useful anyore...
@@ -45,17 +44,21 @@ static bool traceEachFFSquelch = false;
 static bool traceEndingFFSpectrum = false;
 
 
-/* *********************************************************************************** qAvatar */
+/* *********************************************************************************** qGrinder */
 
-// create new avatar, complete with its own wave and view buffers
+// create new grinder, complete with its own stage buffers
 // make sure these values are doable by the sliders' steps
-qAvatar::qAvatar(qSpace *sp, const char *lab)
-	: dt(1e-3), stepsPerIteration(100), lowPassFilter(1),
-		space(sp), magic('Avat'), pleaseFFT(false), isIterating(false) {
+qGrinder::qGrinder(qSpace *sp, qAvatar *av, const char *lab)
+	: space(sp), magic('Grin'),
+		dt(1e-3), stepsPerIteration(100), lowPassFilter(1),
+		pleaseFFT(false), isIterating(false), avatar(av) {
 
-	qwave = new qWave(space);
+	qwave = avatar->qwave;  // temp until i get the stages working
+	//qflick = new qFlick(space);
+
 	scratchQWave = NULL;  // until used
 	qspect = NULL;  // until used
+
 	potential = sp->potential;
 	potentialFactor = sp->potentialFactor;
 
@@ -65,12 +68,8 @@ qAvatar::qAvatar(qSpace *sp, const char *lab)
 	elapsedTime = 0.;
 	iterateSerial = 0;
 
-	// we always need a view buffer; that's the whole idea behind an avatar
-	qvBuffer = new qViewBuffer(space, this);
-	vBuffer = qvBuffer->vBuffer;
-
 	if (traceSpace) {
-		printf("the qSpace for avatar %s:   magic=%c%c%c%c label=%s nDimesions=%d  "
+		printf("the qSpace for 🪓 grinder %s:   magic=%c%c%c%c label=%s nDimesions=%d  "
 			"nStates=%d nPoints=%d potential=%p potentialFactor=%lf spectrumLength=%d  \n",
 			label,
 			space->magic >> 24,  space->magic >> 16, space->magic >> 8, space->magic,
@@ -84,19 +83,16 @@ qAvatar::qAvatar(qSpace *sp, const char *lab)
 			dims->continuum, dims->spectrumLength, dims->label);
 	}
 
-	// enable this when qAvatar.h fields change
-	//formatDirectOffsets();
+	// enable this when qGrinder.h fields change
+	formatDirectOffsets();
 };
 
-qAvatar::~qAvatar(void) {
-	// we delete any buffers hanging off the qAvatar here.
-	// eAvatar will delete the Avatar object and any others needed.
+qGrinder::~qGrinder(void) {
+	// we delete any buffers hanging off the qGrinder here.
+	// eGrinder will delete the Grinder object and any others needed.
 
-	// always allocated
-	delete qwave;
-	qwave = NULL;
-	delete qvBuffer;
-	qvBuffer = NULL;
+	//delete qwave;
+	//qwave = NULL;
 
 	// these may or may not have been allocated, depending on whether they were needed
 	if (scratchQWave)
@@ -110,30 +106,30 @@ qAvatar::~qAvatar(void) {
 };
 
 // called from JS
-void avatar_delete(qAvatar *avatar) {
-	delete avatar;
+void grinder_delete(qGrinder *grinder) {
+	delete grinder;
 }
 
 // some uses never need these so wait till they do
-qWave *qAvatar::getScratchWave(void) {
+qWave *qGrinder::getScratchWave(void) {
 	if (!scratchQWave)
 		scratchQWave = new qWave(space);
 	return scratchQWave;
 };
 
-qSpectrum *qAvatar::getSpectrum(void) {
+qSpectrum *qGrinder::getSpectrum(void) {
 	if (!qspect)
 		qspect = new qSpectrum(space);
 	return qspect;
 };
 
 // need these numbers for the js interface to this object, to figure out the offsets.
-// see eAvatar.js ;  usually this function isn't called.
+// see eGrinder.js ;  usually this function isn't called.
 // Insert this into the constructor and run this once.  Copy text output.
-// Paste the output into class eAvatar, the class itself, to replace the existing ones
-void qAvatar::formatDirectOffsets(void) {
+// Paste the output into class eGrinder, the class itself, to replace the existing ones
+void qGrinder::formatDirectOffsets(void) {
 	// don't need magic
-	printf("🚦 🚦 --------------- starting qAvatar direct access JS getters & setters--------------\n\n");
+	printf("🪓 🪓 --------------- starting qGrinder direct access JS getters & setters--------------\n\n");
 
 	makePointerGetter(space);
 	printf("\n");
@@ -180,42 +176,48 @@ void qAvatar::formatDirectOffsets(void) {
 	printf("\n");
 	makePointerGetter(qspect);
 
-	// the view Buffer to be passed to webgl.  Just the buffer, not the qViewBuffer
-	makePointerGetter(vBuffer);
-
 	makePointerGetter(stages);
 	makePointerGetter(threads);
 
 	makeStringPointer(label);
 
-	printf("\n🚦 🚦 --------------- done with qAvatar direct access --------------\n");
+	printf("\n🖼 🖼 --------------- done with qGrinder direct access --------------\n");
 }
 
 /* ********************************************************** dumpObj  */
 
-// dump all the fields of an avatar
-void qAvatar::dumpObj(const char *title) {
-	printf("\n🌊🌊 ==== qAvatar | %s ", title);
+// dump all the fields of an grinder
+void qGrinder::dumpObj(const char *title) {
+	printf("\n🪓🪓 ==== qGrinder | %s ", title);
 	printf("        magic: %c%c%c%c   qSpace=%p '%s'   \n",
 		magic>>3, magic>>2, magic>>1, magic, space, label);
 
 	printf("        elapsedTime %lf, iterateSerial  %lf, dt  %lf, lowPassFilter %d, stepsPerIteration %d\n",
 		elapsedTime, iterateSerial, dt, lowPassFilter, stepsPerIteration);
 
-	printf("        qwave %p, potential  %p, potentialFactor  %lf, scratchQWave %p, qspect %p, qViewBuffer %p\n",
-		qwave, potential, potentialFactor, scratchQWave, qspect, qvBuffer);
+	printf("        qwave %p, potential  %p, potentialFactor  %lf, scratchQWave %p, qspect %p\n",
+		qwave, potential, potentialFactor, scratchQWave, qspect);
 
 	printf("        isIterating: %hhu   pleaseFFT=%hhu \n", isIterating, pleaseFFT);
 
-	printf("        ==== end of qAvatar ====\n\n");
+	printf("        ==== end of qGrinder ====\n\n");
 }
 
 /* ********************************************************** doing Iteration */
 
+// return elapsed real time since last page reload, in seconds, only for tracing
+// seems like it's down to miliseconds or even a bit smaller
+//double getTimeDouble()
+//{
+//    struct timespec ts;
+//    clock_gettime(CLOCK_MONOTONIC, &ts);
+//    return ts.tv_sec + ts.tv_nsec / 1e9;
+//}
+
 // Does several visscher steps (eg 100 or 500). Actually does
 // stepsPerIteration+1 steps; half steps at start and finish to adapt and
 // deadapt to Visscher timing
-void qAvatar::oneIteration() {
+void qGrinder::oneIteration() {
 	isIterating = doingIteration = true;
 
 	int tt;
@@ -231,7 +233,7 @@ void qAvatar::oneIteration() {
 	potentialFactor = space->potentialFactor;
 
 	if (traceIteration) {
-		printf("🚀 🚀 qAvatar::oneIteration() - dt=%lf   stepsPerIteration=%d  %s; potentialFactor=%lf  elapsed time: %lf\n",
+		printf("🪓 🪓 qGrinder::oneIteration() - dt=%lf   stepsPerIteration=%d  %s; potentialFactor=%lf  elapsed time: %lf\n",
 			dt, stepsPerIteration, dangerousTimes ? "dangerous times" : "",
 			potentialFactor,
 			getTimeDouble());
@@ -246,7 +248,7 @@ void qAvatar::oneIteration() {
 
 	int doubleSteps = stepsPerIteration / 2;
 	if (traceIteration)
-		printf("      qAvatar: doubleSteps=%d   stepsPerIteration=%d\n",
+		printf("      qGrinder 🪓: doubleSteps=%d   stepsPerIteration=%d\n",
 			doubleSteps, stepsPerIteration);
 
 	for (tt = 0; tt < doubleSteps; tt++) {
@@ -254,7 +256,7 @@ void qAvatar::oneIteration() {
 		oneVisscherStep(scratchQWave, qwave);
 
 		if (traceIteration && 0 == tt % 32) {
-			printf("       qAvatar: step every 64, step %d; elapsed time: %lf\n", tt * 2, getTimeDouble());
+			printf("       qGrinder 🪓: step every 64, step %d; elapsed time: %lf\n", tt * 2, getTimeDouble());
 		}
 
 		if (traceIterSteps) {
@@ -263,7 +265,7 @@ void qAvatar::oneIteration() {
 	}
 
 	if (traceIteration)
-		printf("      qAvatar: %d steps done; elapsed time: %lf \n", stepsPerIteration, getTimeDouble());
+		printf("      qGrinder 🪓: %d steps done; elapsed time: %lf \n", stepsPerIteration, getTimeDouble());
 
 	// half step at completion to move Re forward dt/2
 	// and copy back to Main
@@ -281,11 +283,11 @@ void qAvatar::oneIteration() {
 	double iProd = qwave->normalize();
 	if (dumpFFHiResSpectums) qwave->dumpHiRes("wave END fourierFilter() after normalize");
 	if (traceIProd && ((int) iterateSerial & 0xf) == 0)
-		printf("      qAvatar: iProd= %lf \n", iProd);
+		printf("      qGrinder: iProd= %lf \n", iProd);
 
 	if (iProd > 1.01) {
 		char buf[64];
-		sprintf(buf, "🔥 🧨 wave is diverging, iProd=%10.4g 🔥 🧨", iProd);
+		sprintf(buf, "🪓 🪓 wave is diverging, iProd=%10.4g 🔥 🧨", iProd);
 		if (iProd > 3) {
 			qwave->dump(buf);
 			throw std::runtime_error("diverged");  // js code intercepts this exact spelling
@@ -315,7 +317,7 @@ void qAvatar::oneIteration() {
 // maye after i get more of this working and fine toon it
 // lowPassFilter = number of freqs to squelch on BOTH sides, excluding nyquist
 // range 0...N/2-1
-void qAvatar::fourierFilter(int lowPassFilter) {
+void qGrinder::fourierFilter(int lowPassFilter) {
 	// this is when the wave tends to come apart with high frequencies
 	bool dangerousTimes = (iterateSerial >= dangerousSerial)
 		&& (((int) iterateSerial % dangerousRate) == 0);
@@ -332,14 +334,14 @@ void qAvatar::fourierFilter(int lowPassFilter) {
 	s[nyquist] = 0;
 
 	if (traceFourierFilter)
-		printf("🌈  fourierFilter: nPoints=%d  nyquist=%d    lowPassFilter=%d\n",
+		printf("🪓 🌈  fourierFilter: nPoints=%d  nyquist=%d    lowPassFilter=%d\n",
 			qspect->nPoints, nyquist, lowPassFilter);
 
 	for (int k = 1; k <= lowPassFilter; k++) {
 		s[nyquist + k] = 0;
 		s[nyquist - k] = 0;
 		if (traceEachFFSquelch && dangerousTimes) {
-			printf("🌈  fourierFilter: smashed in lowPassFilter=%d   [freq: %d which was %lf], "
+			printf("🪓 🌈  fourierFilter: smashed in lowPassFilter=%d   [freq: %d which was %lf], "
 				"and [freq: %d which was %lf]\n",
 				lowPassFilter, nyquist - k, s[nyquist - k].norm(), nyquist + k, s[nyquist + k].norm());
 		}
@@ -361,7 +363,7 @@ void qAvatar::fourierFilter(int lowPassFilter) {
 
 
 // user button to print it out now, while not running.  See also pleaseFFT for when it is
-void qAvatar::askForFFT(void) {
+void qGrinder::askForFFT(void) {
 	analyzeWaveFFT(qwave, "askForFFT while idle");
 }
 

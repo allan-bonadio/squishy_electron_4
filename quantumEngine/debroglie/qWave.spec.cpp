@@ -8,6 +8,7 @@
 //#include <cmath>
 #include "../spaceWave/qSpace.h"
 #include "../schrodinger/qAvatar.h"
+#include "../schrodinger/qGrinder.h"
 #include "qWave.h"
 #include "../testing/cppuMain.h"
 

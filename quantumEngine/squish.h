@@ -20,7 +20,7 @@
 #include "commonConstants.h"
 
 // return elapsed time since last page reload, in seconds
-extern double getTimeDouble();
+extern double getTimeDouble(void);
 
 // Tolerance for ==.  Absolute, not relative, we're comparing 𝜓 values here.
 // all values are |𝜓| <1, and typically |𝜓| > roundoff error

@@ -92,6 +92,7 @@ public:
 
 	struct qAvatar *mainAvatar;
 	struct qAvatar *miniGraphAvatar;
+	struct qGrinder *grinder;
 
 	void dumpPotential(const char *title);
 };
@@ -111,6 +112,8 @@ struct salientPointersType {
 
 	float *miniGraphVBuffer;
 	struct qAvatar *miniGraphAvatar;
+
+	struct qGrinder *grinder;
 };
 
 // for JS to call

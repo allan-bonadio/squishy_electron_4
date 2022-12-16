@@ -10,6 +10,7 @@
 
 #include "spaceWave/qSpace.h"
 #include "schrodinger/qAvatar.h"
+#include "schrodinger/qGrinder.h"
 #include "fourier/fftMain.h"
 
 

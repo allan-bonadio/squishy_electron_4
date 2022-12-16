@@ -14,6 +14,7 @@
 // This is recreated every time the space changes dimension(s) -
 // the salientPointers object is actually deleted and reconstructed along with space and all the rest
 // this instance is kindof like the direct access eSpace
+// maybe I should use the space instead...
 class salientPointersFactory {
 	// hand in a pointer into C++ space for the the buffer pointers, as returned from completeNewSpace()
 	constructor(space, salientPointersPointer) {
@@ -46,7 +47,9 @@ class salientPointersFactory {
 //		this.miniGraphWaveBuffer = new eWave(space, struct[5]);
 //		this.miniGraphVBuffer = new Float32Array(window.Module.HEAPF32.buffer, struct[6],
 //			space.nPoints * 8); // two vec4 s per point
-//		this.miniGraphAvatar = new eAvatar(struct[7]);
+//		this.miniGraphAvatar = new eAvatar(struct[8]);
+
+		this.grinderPointer = struct[6];
 	}
 }
 

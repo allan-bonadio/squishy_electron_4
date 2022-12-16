@@ -5,7 +5,7 @@ debroglie/qWave.cpp
 fourier/cooleyTukey.FFT.cpp
 fourier/fftMain.cpp
 fourier/qSpectrum.cpp
-schrodinger/grinder.cpp
+schrodinger/qGrinder.cpp
 schrodinger/hamiltonian.cpp
 schrodinger/qAvatar.cpp
 schrodinger/qThread.cpp
@@ -13,3 +13,4 @@ schrodinger/visscher.cpp
 spaceWave/jsSpace.cpp
 spaceWave/qSpace.cpp
 greiman/qViewBuffer.cpp
+time.cpp

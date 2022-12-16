@@ -6,6 +6,7 @@
 
 #include "../spaceWave/qSpace.h"
 #include "./qAvatar.h"
+#include "./qGrinder.h"
 
 // not used right now, hopefullly soon
 

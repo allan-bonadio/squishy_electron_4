@@ -6,6 +6,7 @@
 //#include <string.h>
 #include "qSpace.h"
 #include "../schrodinger/qAvatar.h"
+#include "../schrodinger/qGrinder.h"
 #include "../debroglie/qWave.h"
 #include "../greiman/qViewBuffer.h"
 
@@ -102,6 +103,9 @@ struct salientPointersType *completeNewSpace(void) {
 	qAvatar *miniGraphAvatar = salientPointers.miniGraphAvatar = theSpace->miniGraphAvatar = new qAvatar(theSpace, "miniGraph");
 	salientPointers.miniGraphVBuffer = miniGraphAvatar->qvBuffer->vBuffer;
 	if (traceAvatarDetail) printf("🚀 created miniGraphAvatar\n");
+
+	qGrinder *grinder = salientPointers.grinder = theSpace->grinder
+		= new qGrinder(theSpace, mainAvatar, "main");
 
 	if (traceSpaceCreation) printf("   🚀 🚀 🚀 completeNewSpace vBuffers After Creation but BEFORE loadViewBuffer  "
 		"salientPointers.mainVBuffer=%p   salientPointers.miniGraphVBuffer=%p  \n",

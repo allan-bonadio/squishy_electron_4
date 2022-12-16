@@ -6,6 +6,7 @@
 
 #include "../spaceWave/qSpace.h"
 #include "../schrodinger/qAvatar.h"
+#include "../schrodinger/qGrinder.h"
 #include "../debroglie/qWave.h"
 #include "../greiman/qViewBuffer.h"
 #include "../testing/cppuMain.h"

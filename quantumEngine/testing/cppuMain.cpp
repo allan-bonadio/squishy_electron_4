@@ -8,6 +8,7 @@
 #include "../squish.h"
 #include "../spaceWave/qSpace.h"
 #include "../schrodinger/qAvatar.h"
+#include "../schrodinger/qGrinder.h"
 #include "../debroglie/qWave.h"
 #include "../fourier/qSpectrum.h"
 #include "../greiman/qViewBuffer.h"
