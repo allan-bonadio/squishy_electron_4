@@ -5,7 +5,6 @@
 
 /* ********************************** toSiPieces() */
 // SI suffixes, as in milli, micro, nano, pico, .... kilo, mega, giga, ...
-
 const suffixes = [
 	// e-24 thru e-3
 	'y', 'z', 'a', 'f', 'p', 'n', 'µ', 'm',
@@ -184,6 +183,4 @@ export function formatAsPO2Rational(n, normalAscii) {
 // }
 // debugger;
 // testBinades();
-
-
 
