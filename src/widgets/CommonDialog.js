@@ -8,33 +8,52 @@ import React from 'react';
 import PropTypes from 'prop-types';
 
 import App from '../App.js';
+import {interpretCppException} from '../utils/errors.js';
 
 // this does the Simple case
 function SimpleDialog(props) {
-	return <div id='SimpleDialog' >
-		<p>{props.text}</p>
+	return (<section id='SimpleDialog' >
+		<details>{props.text}</details>
 		<nav><button className='round' onClick={CommonDialog.startClosingDialog} >OK</button></nav>
-	</div>;
+	</section>);
+}
+
+function prepError(ex) {
+	// eslint-disable-next-line no-ex-assign
+	ex = interpretCppException(ex);
+	let stackBox;
+	if (ex.stack)
+		stackBox = ex.stack.split('\n').map((line, key) => <div key={key} >{line}</div>);
+
+	if (ex.message && ex.stack) {
+		// use the new cool details & summary (just learned about it)
+		return (<details style={{overflowY: 'auto'}} key='msg_stack'>
+			<summary>{ex.message}</summary>
+			<small>{stackBox}</small>
+		</details>);
+	}
+	else if (ex.message) {
+		return (<h4 key='msg'>{ex.message}</h4>);
+	}
+	else if (ex.stack) {
+		return (<section style={{overflowY: 'auto'}} key='stack'>
+			<div>{stackBox}</div>
+		</section>);
+	}
 }
 
 // similar but for an error, comes out in Red
 function ErrorDialog(props) {
-	let err = props.error;
-	let msg = `${props.where} : ${err.stack ?? err.message ?? err.toString()}`;
-	return <div id='ErrorDialog' >
-		<p>{msg}</p>
-		<nav><button className='round' onClick={CommonDialog.startClosingDialog} >OK</button></nav>
-	</div>;
-}
+	let ex = props.error;
 
-// similar but for an error, comes out in Red
-function ErrorBoundaryDialog(props) {
-	let err = props.error;
-	let msg = `${props.where} : ${err.stack ?? err.message ?? err.toString()}`;
-	return <div id='ErrorDialog' >
-		<p>{msg}</p>
+	console.error('ErrorDialog handles exception:\n'+ JSON.stringify(ex, null, '  '));
+
+	return <article id='ErrorDialog' style={{border: '3px black outset'}}>
+		<h2><big>🧯</big> Error</h2>
+		<h3>(probably not your fault)</h3>
+		{prepError(ex)}
 		<nav><button className='round' onClick={CommonDialog.startClosingDialog} >OK</button></nav>
-	</div>;
+	</article>;
 }
 
 // HEY!  this can be a function component - no state, no props.  App has all the state.
@@ -53,6 +72,7 @@ function ErrorBoundaryDialog(props) {
 
 // Hey!  this should use <dialog>  https://developer.mozilla.org/en-US/docs/Web/HTML/Element/dialog
 // along with  autofocus  https://developer.mozilla.org/en-US/docs/Web/HTML/Global_attributes/autofocus
+// this should probably be a func component: no state, no using this, no CONSTRUCTOR!
 export default class CommonDialog extends React.Component {
 
 	static propTypes = {
@@ -72,14 +92,8 @@ export default class CommonDialog extends React.Component {
 		CommonDialog.openDialog(<SimpleDialog text={text} />);
 	}
 
-	static openErrorDialog(err, where) {
-		CommonDialog.openDialog(<ErrorDialog error={err} where={where} />);
-	}
-
-	static openErrorBoundaryDialog(content) {
-		CommonDialog.openDialog(<ErrorBoundaryDialog >
-			{content}
-		</ErrorBoundaryDialog>);
+	static openErrorDialog(ex, where) {
+		CommonDialog.openDialog(<ErrorDialog error={ex} where={where} />);
 	}
 
 	// called by client sw (whoever called us) after user clicks OK or Cancel
@@ -100,3 +114,4 @@ export default class CommonDialog extends React.Component {
 		);
 	}
 }
+

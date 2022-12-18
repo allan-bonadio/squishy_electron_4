@@ -213,7 +213,6 @@ button.round {
 
 }
 
-
 #SimpleDialog, #ErrorDialog {
 	margin: 5em 25%;
 	padding: 2em;
@@ -238,11 +237,10 @@ button.round {
 }
 #ErrorDialog {
 	background: #800;
-	color: #ff8;
+	color: #ffc;
 	border-color: #000;
+	box-shadow: 1em 1em 1em #0008;
 }
-
-
 
 .runningOneCycle {
 	float: right;
@@ -251,8 +249,6 @@ button.round {
 	background-color: #468;
 	padding: .5em;
 }
-
-
 
 .SquishPanel {
 	position: relative;
