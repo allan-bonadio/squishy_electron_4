@@ -7,7 +7,7 @@
 #include "../spaceWave/qSpace.h"
 #include "qAvatar.h"
 #include "qGrinder.h"
-#include "../debroglie/qWave.h"
+#include "../debroglie/qFlick.h"
 
 
 static bool traceOneStep = false;
@@ -83,6 +83,8 @@ or  2.4059056091210226e-7 m or about 241 µm ??
 other way: 1nm = 1e-9m   square = 1e-18 m^2 times that number = 1.7275985492180218e-14 seconds.  thisi isn't right.
 */
 
+
+// ******************************************************** Duplicated Code: Avatar version
 
 // first step: advance the 𝜓r a dt, from t to t + dt
 // oldW points to buffer with real = 𝜓r(t)    imag = 𝜓i(t + dt/2)
@@ -172,6 +174,98 @@ void qAvatar::oneVisscherStep(qWave *newQWave, qWave *oldQWave) {
 	// ok so after this, the time has advanced dt, and real is at elapsedTime and
 	// imaginary is at elapsedTime + dt/2.  Yes the re and the im are not synchronized.
 	// it was Visscher's idea.  I think he got it from ballistics calculations.
+	elapsedTime += dt;
+
+	if (traceOneStep) {
+		char msg[100];
+		snprintf(msg, 100, "at end of Visscher:new, frame %1.0lf | ", iterateSerial);
+		newQW->dump(msg, true);
+	}
+	if (traceVischerBench) printf("         oneVisscherStep, done: time=%lf\n", getTimeDouble());
+}
+
+
+
+
+
+// ******************************************************** Duplicated Code: Grinder version
+
+// first step: advance the 𝜓r a dt, from t to t + dt
+// oldW points to buffer with real = 𝜓r(t)    imag = 𝜓i(t + dt/2)
+// newW points to buffer with real = 𝜓r(t + dt)   imag unchanged = 𝜓i(t + dt/2)
+// here we will calculate the 𝜓r(t + dt) values in a new buffer only, and fill them in.
+// the 𝜓i values in buffer 0 are still uncalculated
+void qGrinder::stepReal(qCx *newW, qCx *oldW, double dt) {
+	qDimension *dims = space->dimensions;
+	if (traceRealStep) printf("⚛️ start of stepReal nStates=%d, nPoints=%d, start=%d, end=%d\n",
+			space->nStates, space->nPoints, dims->start, dims->end);
+	//dumpThat(oldW, true);
+
+	for (int ix = dims->start; ix < dims->end; ix++) {
+		// second deriv wrt x of psi
+		double d2𝜓i = oldW[ix-1].im + oldW[ix+1].im - oldW[ix].im * 2;
+		if (traceRealStep) printf("⚛️ stepReal ix=%d\n", ix);
+
+		// total hamiltonian including potential
+		double H𝜓 = d2𝜓i + potential[ix] * potentialFactor * oldW[ix].re;
+		//double H𝜓 = d2𝜓i;   // without potential
+
+		// note subtraction
+		if (traceRealStep) printf("⚛️ stepReal ix=%d\n", ix);
+		newW[ix].re = oldW[ix].re - dt * H𝜓;
+		if (traceRealStep) printf("⚛️ stepReal ix=%d\n", ix);
+		qCheck("vischer stepReal", newW[ix]);
+	}
+	if (traceVischerBench) printf("      stepReal, on to fix boundaries: time=%lf\n",
+		getTimeDouble());
+	qflick->fixThoseBoundaries(newW);
+	if (traceRealStep) printf("⚛️ end of stepReal:");
+}
+
+// second step: advance the Imaginaries of 𝜓 a dt, from dt/2 to 3dt/2
+// given the reals we just generated in stepReal() but don't change them
+void qGrinder::stepImaginary(qCx *newW, qCx *oldW, double dt) {
+	qDimension *dims = space->dimensions;
+	//printf("⚛︎ start of stepImaginary(), oldWave=");
+	//dumpThat(oldW, true);
+
+	for (int ix = dims->start; ix < dims->end; ix++) {
+		// second deriv d2𝜓r / dx**2
+		double d2𝜓r = oldW[ix-1].re + oldW[ix+1].re - oldW[ix].re * 2;
+
+		// total hamiltonian
+		double H𝜓 = d2𝜓r + potential[ix] * potentialFactor * oldW[ix].im;
+		//double H𝜓 = d2𝜓r;  // without potential
+
+		// note addition
+		newW[ix].im = oldW[ix].im + dt * H𝜓;
+
+		qCheck("vischer stepImaginary", newW[ix]);
+	}
+	if (traceVischerBench) printf("      stepImaginary, on to fix boundaries: time=%lf\n",
+		getTimeDouble());
+
+	qflick->fixThoseBoundaries(newW);
+	//printf("⚛️ end of stepImaginary - result wave:");
+}
+
+// form the new wave from the old wave, in separate buffers, chosen by our caller.
+// notreally gonna use this; see oneIteration()
+void qGrinder::oneVisscherStep(qWave *newQWave, qWave *oldQWave) {
+	qWave *oldQW = oldQWave;
+	qCx *oldW = oldQWave->wave;
+	qWave *newQW = newQWave;
+	qCx *newW = newQWave->wave;
+
+	if (traceVischerBench) printf("❇️ oneVisscherStep, start: time=%lf\n",
+		getTimeDouble());
+
+	//oldQW->fixBoundaries();
+	if (traceOneStep) oldQW->dump("starting oneVisscherStep: old wave", true);
+
+	stepReal(newW, oldW, dt);
+	stepImaginary(newW, oldW, dt);
+
 	elapsedTime += dt;
 
 	if (traceOneStep) {
