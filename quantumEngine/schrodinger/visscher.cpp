@@ -219,6 +219,11 @@ void qGrinder::stepReal(qCx *newW, qCx *oldW, double dt) {
 	if (traceVischerBench) printf("      stepReal, on to fix boundaries: time=%lf\n",
 		getTimeDouble());
 	qflick->fixThoseBoundaries(newW);
+
+	// add this either in the Re or in the Im, not both!
+	elapsedTime += dt;
+
+
 	if (traceRealStep) printf("⚛️ end of stepReal:");
 }
 

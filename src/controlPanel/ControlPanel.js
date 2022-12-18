@@ -30,9 +30,6 @@ export class ControlPanel extends React.Component {
 		toggleShowPotential: PropTypes.func.isRequired,
 		showPotential: PropTypes.bool.isRequired,
 
-		iterateFrequency: PropTypes.number.isRequired,  // frames per second
-		//setIterateFrequency: PropTypes.func.isRequired,
-
 		// early on, there's no space.  Must have SquishPanel mounted first, and the eSpace promise resolved.
 		space: PropTypes.instanceOf(eSpace),
 		N: PropTypes.number.isRequired,
@@ -61,6 +58,8 @@ export class ControlPanel extends React.Component {
 			//pulseWidth: getASetting('waveParams', 'pulseWidth'),  // a percentage
 			//pulseOffset: getASetting('waveParams', 'pulseOffset'),  // also a percentage
 
+			iteratePeriod: getASetting('iterationSettings', 'iteratePeriod'),
+
 			// state for potential resets - control panel only, setPotential()
 			//potentialBreed: getASetting('potentialParams', 'potentialBreed'),
 			valleyPower: getASetting('potentialParams', 'valleyPower'),
@@ -84,11 +83,16 @@ export class ControlPanel extends React.Component {
 
 	/* ******************************************************* start/stop */
 
-	// set rate, which is 1, 2, 4, 8, ... some float number of times per second you want frames.
-	// can't combine this with 'isRunning' cuz want to remember rate even when stopped
+	// set freq of iteration, which is 1, 2, 4, 8, ... some float number of times per second you want frames.
+	// freq is how the CPToolbar handles it, but we keep the period in the ControlPanel state,
+	// also in iterationSettings:iteratePeriod
 	setIterateFrequency =
-	freq => this.setState({iteratePeriod:
-			storeASetting('iterationSettings', 'iteratePeriod', 1000. / +freq)});
+	freq =>{
+		// set it in the settings, controlpanel state, and SquishPanel's state, too.
+		let period = 1000. / +freq;
+		this.setState({iteratePeriod: storeASetting('iterationSettings', 'iteratePeriod', period)});
+		this.props.setIteratePeriod(period);  // so squish panel can adjust the heartbeat
+	}
 
 	// set the frequency of iteration frames.  Does not control whether iterating or not.
 	//setIterateFrequency(newFreq) {
@@ -254,8 +258,9 @@ export class ControlPanel extends React.Component {
 
 		return <div className='ControlPanel'>
 			<CPToolbar
-				iterateFrequency={p.iterateFrequency}
+				iterateFrequency={1000. / s.iteratePeriod}
 				setIterateFrequency={this.setIterateFrequency}
+
 				isTimeAdvancing={ControlPanel.isTimeAdvancing}
 
 				resetMainWave={this.resetMainWave}

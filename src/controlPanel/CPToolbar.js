@@ -19,6 +19,7 @@ function setPT() {
 	CPToolbar.propTypes = {
 		iterateFrequency: PropTypes.number.isRequired,
 		setIterateFrequency: PropTypes.func.isRequired,
+
 		N: PropTypes.number.isRequired,
 		space: PropTypes.instanceOf(eSpace),
 

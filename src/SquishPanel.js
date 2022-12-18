@@ -92,6 +92,7 @@ export class SquishPanel extends React.Component {
 			// this is the actual 'frequency' in actual milliseconds, as set by that menu.
 			// convert between like 1000/n
 			// eg the menu on the CPToolbar says 10/sec, so this becomes 100
+			// we actually get it from teh control panel which is th official rate keeper
 			iteratePeriod: getASetting('iterationSettings', 'iteratePeriod'),
 
 			// defaults for sliders for deltaT & spi
@@ -177,60 +178,13 @@ export class SquishPanel extends React.Component {
 
 	}
 
-
-//	// puts up the resolution dialog, starting with the values from this.state
-//	openResolutionDialog() {
-//		const s = this.state;
-//
-//		// freeze the iteration while this is going on ... but not if relaxing
-//		const timeWasAdvancing = s.isTimeAdvancing;
-//		this.setState({isTimeAdvancing: false});
-//
-//		// pass our state upward to load into the dialog
-//		ResolutionDialog.openResDialog(
-//			// this is the initialParams
-//			{N: s.N, continuum: s.continuum, mainViewClassName: s.mainViewClassName},
-//
-//			// OK callback
-//			finalParams => {
-//				// let prevLowPassFilter = s.lowPassFilter;
-//				// let prevN = s.N;
-//				this.setState({mainViewClassName: finalParams.mainViewClassName});
-//
-//				qe.deleteTheSpace();
-//
-//				create1DMainSpace({N: finalParams.N, continuum: finalParams.continuum, label: 'main'});
-//
-//				// do i really have to wait?  I think the promise only works the first time.
-//				eSpaceCreatedPromise
-//				.then(space => {
-//					this.setState({isTimeAdvancing: timeWasAdvancing,
-//						N: finalParams.N, continuum: finalParams.continuum});
-//					storeASetting('spaceParams', 'N', finalParams.N);
-//					storeASetting('spaceParams', 'continuum', finalParams.continuum);
-//				});
-//
-//				//storeASetting('spaceParams', 'N', finalParams.N);
-//				//localStorage.space0 = JSON.stringify({N: finalParams.N, continuum: finalParams.continuum});
-//				// should also work storeSettings.setSetting('space0.N, finalParams.N);
-//				// and storeSettings.setSetting('space0.continuum, finalParams.continuum);
-//
-//			},  // end of OK callback
-//
-//			// cancel callback
-//			() => {
-//				this.setState({isTimeAdvancing: timeWasAdvancing});
-//			}
-//		);
-//	}
-//
 	/* ******************************************************* stats */
 
 	// the upper left and right numbers
 	showTimeNIteration() {
 		// need them instantaneously - react is too slow
-		document.querySelector('.voNorthWest').innerHTML = this.mainEAvatar.elapsedTime.toFixed(2);
-		document.querySelector('.voNorthEast').innerHTML =  this.mainEAvatar.iterateSerial;
+		document.querySelector('.voNorthWest').innerHTML = this.grinder.elapsedTime.toFixed(2);
+		document.querySelector('.voNorthEast').innerHTML =  this.grinder.iterateSerial;
 	}
 
 	// constructor only calls this (?)
@@ -367,7 +321,6 @@ export class SquishPanel extends React.Component {
 			//// FOR NOW, avoid overlapping heartbeats.  They become recursive and the
 			//// browser really slows down, and sometimes crashes
 			this.timeForNextTic = rightNow + s.iteratePeriod;
-			//this.timeForNextTic = iterationStart + s.iteratePeriod;
 		}
 
 		// this is in milliseconds
@@ -530,6 +483,9 @@ export class SquishPanel extends React.Component {
 			console.log(_(vb[i*4]), _(vb[i*4+1]), _(vb[i*4+2]), _(vb[i*4+3]));
 	}
 
+	// get this from the control panel every time user changes it
+	setIteratePeriod =
+	(period) => this.setState({iterationPeriod: period});
 
 	/* ******************************************************* rendering */
 	// call this when you change both the GL and iter and elapsed time
@@ -570,13 +526,13 @@ export class SquishPanel extends React.Component {
 
 					iterateAnimate={(shouldAnimate, freq) => this.iterateAnimate(shouldAnimate, freq)}
 
+					setIteratePeriod={this.setIteratePeriod}
+
 					setPotential={this.setPotential}
 					toggleShowPotential={this.toggleShowPotential}
 					showPotential={s.showPotential}
 
 					redrawWholeMainWave={this.redrawWholeMainWave}
-
-					iterateFrequency={1000 / s.iteratePeriod}
 
 					deltaT={s.deltaT}
 					setDeltaT={this.setDeltaT}
@@ -593,6 +549,10 @@ export class SquishPanel extends React.Component {
 		);
 
 		// 					{/*setIterateFrequency={freq => this.setIterateFrequency(freq)}*/}
+//							iterateFrequency={1000 / s.iteratePeriod}
+//					setIterateFrequency={freq => this.setIterateFrequency(freq)}
+
+
 	}
 }
 
