@@ -7,6 +7,7 @@ import qe from './qe.js';
 import {setFamiliarPotential} from '../utils/potentialUtils.js';
 import salientPointersFactory from './salientPointersFactory.js';
 import eAvatar from './eAvatar.js';
+import eGrinder from './eGrinder.js';
 import {getAGroup} from '../utils/storeSettings.js';
 import {cppObjectRegistry} from '../utils/directAccessors.js';
 import {interpretCppException} from '../utils/errors.js';
@@ -107,9 +108,10 @@ export class eSpace {
 		// the avatars create their vbufs and waves, and we make a copy for ourselves
 		this.mainEAvatar = new eAvatar(this,
 				salientPointers.mainVBufferPointer, salientPointers.mainAvatarPointer);
-		//this.mainEAvatar = salientPointers.mainEAvatarPointer;
 		this.mainVBuffer = this.mainEAvatar.vBuffer;
 		this.mainEWave = this.mainEAvatar.ewave;
+
+		this.grinder = new eGrinder(this, this.mainEAvatar, salientPointers.grinderPointer);
 
 		this.miniGraphAvatar = new eAvatar(this,
 				salientPointers.miniGraphVBufferPointer, salientPointers.miniGraphAvatarPointer);
@@ -119,6 +121,8 @@ export class eSpace {
 		// by default it's set to 1s, or zeroes?  but we want something good.
 		let waveParams = getAGroup('waveParams');
 		this.mainEWave.setFamiliarWave(waveParams);  //  SquishPanel re-does this for SetWave
+		qe.grinder_copyFromAvatar(this.grinder.pointer, this.mainEAvatar.pointer);
+
 		this.miniGraphAvatar.ewave.setFamiliarWave(waveParams);  //  SquishPanel re-does this for SetWave
 		if (traceFamiliarWave) console.log(`🚀  done with setFamiliarWave():`, JSON.stringify(this.mainEWave.wave));
 
@@ -209,4 +213,3 @@ export class eSpace {
 }
 
 export default eSpace;
-

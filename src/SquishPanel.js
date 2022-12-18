@@ -142,6 +142,7 @@ export class SquishPanel extends React.Component {
 			this.setState({space});
 
 			this.mainEAvatar = space.mainEAvatar;
+			this.grinder = space.grinder;
 			this.setDeltaT(s.deltaT);
 			//this.mainEAvatar.dt = s.deltaT / (s.stepsPerIteration + N_EXTRA_STEPS);  // always one more!
 			this.setStepsPerIteration(s.stepsPerIteration);
@@ -283,7 +284,8 @@ export class SquishPanel extends React.Component {
 
 		try {
 			// hundreds of visscher steps
-			this.mainEAvatar?.pleaseIterate();
+			this.grinder?.pleaseIterate();
+			//this.mainEAvatar?.pleaseIterate();
 			//this.mainEAvatar?.oneIteration();
 		} catch (ex) {
 			ControlPanel.stopIterating();

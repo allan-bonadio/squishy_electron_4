@@ -5,14 +5,17 @@
 //import qe from './qe.js';
 import {cppObjectRegistry, prepForDirectAccessors} from '../utils/directAccessors.js';
 import eWave from './eWave.js';
+//import eGrinder from './eGrinder.js';
 //import eSpace from './eSpace.js';
 import qe from './qe.js';
-import eThread from './eThread.js';
+//import eThread from './eThread.js';
 
 let traceCreation = false;
 let traceHighest = false;
 let traceVBuffer = false;
 let traceIteration = false;
+
+let iterateWithGrinder = true;
 
 // a qAvatar manages iteration of a wave, and display on a GLView. I keep
 // thinking that I should separate the functions, but what will you do with an itration
@@ -55,18 +58,6 @@ class eAvatar {
 	// are passed by pointer and you need to allocate them in JS (eg see
 	// eAvatar.constructor)
 
-
-	get _space() { return this.ints[1]; }
-
-	get elapsedTime() { return this.doubles[1]; }
-	set elapsedTime(a) { this.doubles[1] = a; }
-	get iterateSerial() { return this.doubles[2]; }
-	set iterateSerial(a) { this.doubles[2] = a; }
-
-	get isIterating() { return this.bools[96]; }
-	set isIterating(a) { this.bools[96] = a; }
-	get pleaseFFT() { return this.bools[99]; }
-	set pleaseFFT(a) { this.bools[99] = a; }
 	get needsIteration() { return this.bools[97]; }
 	set needsIteration(a) { this.bools[97] = a; }
 	get doingIteration() { return this.bools[98]; }
@@ -123,7 +114,10 @@ class eAvatar {
 
 	// can throw std::runtime_error("divergence")
 	oneIteration() {
-		qe.avatar_oneIteration(this.pointer);
+		if (iterateWithGrinder)
+			qe.grinder_oneIteration(this.grinder.pointer);
+		else
+			qe.avatar_oneIteration(this.pointer);
 	}
 
 	// thisis what upper levels call when another iteration is needed.
@@ -143,7 +137,8 @@ class eAvatar {
 			if (traceIteration)
 				console.log(`🚦             pleaseIterate oneItration`);
 			this.needsIteration = false;
-			eThread.oneIteration(this);
+			this.oneIteration();
+			//eThread.oneIteration(this);
 			return true;
 		}
 	}

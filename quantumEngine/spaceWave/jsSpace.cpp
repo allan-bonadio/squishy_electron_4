@@ -8,11 +8,12 @@
 #include "../schrodinger/qAvatar.h"
 #include "../schrodinger/qGrinder.h"
 #include "../debroglie/qWave.h"
+#include "../debroglie/qFlick.h"
 #include "../greiman/qViewBuffer.h"
 
-static bool traceSpaceCreation = true;
+static bool traceSpaceCreation = false;
 static bool traceAvatarDetail = false;
-static bool traceExceptions = true;
+static bool traceExceptions = false;
 
 // 'the' globals are for the one and only SquishPanel being displayed on this
 // curent, preliminary version of SquishyElectron.  Along with various other
@@ -24,15 +25,15 @@ double *thePotential = NULL;
 struct salientPointersType salientPointers;
 
 /* ********************************************************** wave stuff */
-
-// after the initSpace() call, allocate the buffers.
-void allocWaves(void) {
-	// we make our own potential
-}
-
-// call to destroy them
-static void freeWaves(void) {
-}
+//
+//// after the initSpace() call, allocate the buffers.
+//void allocWaves(void) {
+//	// we make our own potential
+//}
+//
+//// call to destroy them
+//static void freeWaves(void) {
+//}
 
 /* ********************************************************** glue functions for js */
 
@@ -40,13 +41,6 @@ static void freeWaves(void) {
 extern "C" {
 
 void qSpace_dumpPotential(char *title) { theSpace->dumpPotential(title); }
-
-void avatar_oneIteration(qAvatar *pointer) { pointer->oneIteration(); }
-
-
-// if iterating, FFT as the current iterate finishes, before and after fourierFilter().
-// If stopped, fft current wave. now.
-void avatar_askForFFT(qAvatar *pointer) { pointer->askForFFT(); }
 
 // this will normalize with the C++ normalize
 void wave_normalize(qWave *qwave) {
@@ -88,8 +82,9 @@ void addSpaceDimension(int N, int continuum, const char *label) {
 // call this from JS to finish the process for the qSpace, create and add the avatars & potential
 struct salientPointersType *completeNewSpace(void) {
 	//printf("completeNewSpace starts\n");
-	if (traceSpaceCreation) printf("🚀 🚀 🚀  JS completeNewSpace starts(%s)   theSpace=%p\n",
-		theSpace->label, theSpace);
+	if (traceSpaceCreation)
+		printf("🚀 🚀 🚀  JS completeNewSpace starts(%s)   theSpace=%p\n",
+			theSpace->label, theSpace);
 
 	// finish up all the dimensions now that we know them all
 	theSpace->initSpace();
@@ -100,12 +95,15 @@ struct salientPointersType *completeNewSpace(void) {
 	salientPointers.mainVBuffer = mainAvatar->qvBuffer->vBuffer;
 	if (traceAvatarDetail) printf("🚀 created mainAvatar\n");
 
+	qGrinder *grinder = salientPointers.grinder = theSpace->grinder
+		= new qGrinder(theSpace, mainAvatar, "mainGrinder");
+	printf("the new grinder: shbe same 3: %p %p %p and %s\n", grinder, salientPointers.grinder, theSpace->grinder, grinder->label );
+	printf("   grinder's flick: %p %p   (%lf %lf)\n", grinder->qflick, grinder->qflick->wave,
+		grinder->qflick->wave->re, grinder->qflick->wave->im );
+
 	qAvatar *miniGraphAvatar = salientPointers.miniGraphAvatar = theSpace->miniGraphAvatar = new qAvatar(theSpace, "miniGraph");
 	salientPointers.miniGraphVBuffer = miniGraphAvatar->qvBuffer->vBuffer;
 	if (traceAvatarDetail) printf("🚀 created miniGraphAvatar\n");
-
-	qGrinder *grinder = salientPointers.grinder = theSpace->grinder
-		= new qGrinder(theSpace, mainAvatar, "main");
 
 	if (traceSpaceCreation) printf("   🚀 🚀 🚀 completeNewSpace vBuffers After Creation but BEFORE loadViewBuffer  "
 		"salientPointers.mainVBuffer=%p   salientPointers.miniGraphVBuffer=%p  \n",
@@ -131,8 +129,12 @@ void deleteTheSpace(qSpace *space) {
 		if (traceAvatarDetail) printf("   🚀 🚀 🚀 deleteTheSpace(): deleting avatars\n");
 		delete theSpace->mainAvatar;
 		theSpace->mainAvatar = NULL;
+
 		delete theSpace->miniGraphAvatar;
 		theSpace->miniGraphAvatar = NULL;
+
+		delete theSpace->grinder;
+		theSpace->grinder = NULL;
 	}
 
 	// potential going to be deleted cuz it's part of the space
@@ -162,4 +164,5 @@ const char *getCppExceptionMessage(intptr_t exceptionPtrInt) {
 
 // end of extern "C"
 }
+
 

@@ -12,6 +12,9 @@ struct qGrinder {
 	void formatDirectOffsets(void);
 	void dumpObj(const char *title);
 
+	void copyFromAvatar(qAvatar *avatar);
+	void copyToAvatar(qAvatar *avatar);
+
 	int magic;
 	qSpace *space;
 	qAvatar *avatar;
@@ -37,19 +40,17 @@ struct qGrinder {
 
 	/* *********************************************** iteration */
 
-	// our main qWave, either for the WaveView or the SetWave tab
-	// this grinder OWNS the qWave & is responsible for deleting it
-	struct qWave *qwave;
-	//struct qFlick *qflick;
+	// a subclass of  qWave, it has multiple waves to do grinding with
+	// this grinder OWNS the qFlick & is responsible for deleting it
+	struct qFlick *qflick;
 
 	// pointer grabbed from the space, often.  Same buffer as in space.
 	double *potential;
 	double potentialFactor;  // aligned by 8
 
-	// and a scratch wave for stepping. Call the function first time you need it.
-	// owned if non-null
-	struct qWave *scratchQWave;
-	struct qWave *getScratchWave(void);
+	// and a scratch wave for stepping.... no more.  use waves[1] instead
+	//struct qWave *scratchQWave;
+	//struct qWave *getScratchWave(void);
 
 	// for the fourier filter.  Call the function first time you need it.
 	// owned if non-null
@@ -58,7 +59,7 @@ struct qGrinder {
 
 	struct qStage *stages;
 	struct qThread *threads;
-	void initIterationLoop(int nThreads, int nStages);
+	void initIterationLoop(int xxx, int nThreads, int nStages);
 
 	// for alignment: put the rest of these last
 
@@ -107,13 +108,16 @@ struct qGrinder {
 
 // for JS to call.  Defined in jsSpace and elsewhere.
 extern "C" {
-	//void grinder_initIterationLoop(qGrinder *grinder, int nStages);
+	void grinder_initIterationLoop(qGrinder *grinder, int nStage, int nnn, int mmms);
 	void grinder_oneIteration(qGrinder *grinder);
-	//int grinder_pleaseIterate(qGrinder *grinder);
 
 	void grinder_askForFFT(qGrinder *grinder);
 
-	void grinder_delete(qGrinder *grinder);
+	void grinder_copyFromAvatar(qGrinder *grinder, qAvatar *avatar);
+	void grinder_copyToAvatar(qGrinder *grinder, qAvatar *avatar);
+
+
+	//void grinder_delete(qGrinder *grinder);
 }
 
 
