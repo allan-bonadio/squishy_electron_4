@@ -4,6 +4,9 @@
 ** Copyright (C) 2021-2022 Tactile Interactive, all rights reserved
 */
 
+#ifndef __QWAVE_H__
+#define __QWAVE_H__
+
 #include "qBuffer.h"
 
 
@@ -33,51 +36,6 @@ struct qWave : public virtual qBuffer {
 
 
 // (maybe obsolete...  might use this for MP)
-// a flick is a sequence of Wave buffers.  Used for visscher waves.
-// Multiple complex buffers; they all share the same characteristics in the qWave fields.
-// Acts like a qWave that only points to the 'current' buffer.
-struct qFlick : public qWave {
-	qFlick(qSpace *space, int maxWaves);
-	~qFlick();
-	static qFlick *flick;
-
-	// dump
-	double dumpRow(char *buf, int doubleAge, int ix, double *pPrevPhase, bool withExtras);
-	void dumpOneAge(const char *title, int doubleAge, bool withExtras);
-	void dumpLatest(const char *titleIn, bool withExtras);
-	void dumpAllWaves(const char *title);
-	void dumpOverview(const char *title);
-
-	// them, all dynamically allocated
-	qCx **waves;
-	int maxWaves;  // how long waves is, in pointiers
-	int nWaves;  // how many are actually in use (those beyond should be null!)
-
-	// create and add a new buffer, zeroed, at the 0 position, pushing the others up
-	void pushWave(void);
-
-	// make a new wave, copy of wave (can't have duplicate waves in the
-	// flick or it'll be confusing deallocating?)
-	//void pushCopy(qCx *wave);
-	//void installWave(qCx *wave);
-
-	// the current one is === the one pointed to by wave.  usually zero for the first one.
-	// this is not always used as anything can access waves array
-	int currentIx;
-	void setCurrent(int which);
-
-	// for vischer
-	double innerProduct(void);
-	void normalize(void);
-
-	// retrieve properly interpolated values here
-	double magnitude(int doubleAge, int ix = 1);
-	qCx value(int doubleAge, int ix = 1);
-	double magnitude(int ix = 1) { return magnitude(1, ix); }
-	qCx value(int ix = 1) { return value(1, ix); }
-
-	void fixBoundaries(void);  // on latest two buffers
-};
 
 // for JS to call
 extern "C" {
@@ -86,3 +44,4 @@ extern "C" {
 	void wave_normalize(qWave *qw);
 }
 
+#endif
