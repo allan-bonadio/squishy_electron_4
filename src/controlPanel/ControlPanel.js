@@ -16,7 +16,7 @@ import eSpace from '../engine/eSpace.js';
 import SquishPanel from '../SquishPanel.js';
 import {getASetting, storeASetting, getAGroup, storeAGroup} from '../utils/storeSettings.js';
 //import {eSpaceCreatedPromise} from '../engine/eEngine.js';
-// import qe from '../engine/qe.js';
+import qe from '../engine/qe.js';
 
 export class ControlPanel extends React.Component {
 	static propTypes = {
@@ -141,6 +141,7 @@ export class ControlPanel extends React.Component {
 
 		const mainEWave = p.space.mainEWave;
 		mainEWave.setFamiliarWave(waveParams);  // eSpace does this initially
+		qe.grinder_copyFromAvatar(this.grinder.pointer, this.mainEWave.pointer);
 		p.redrawWholeMainWave();
 		//let mainEAvatar = p.space.mainEAvatar;
 		//mainEAvatar.reStartDrawing();
