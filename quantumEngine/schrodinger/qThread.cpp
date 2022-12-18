@@ -35,14 +35,14 @@ void qThread::threadStarts() {
 
 // init up the whole thing.  Called once upon app startup.
 // start and run the iteration loop, that runs parallel to the heartbeat in squishPanel
-void qAvatar::initIterationLoop(int nThreads, int nStages) {
-
-	qFlick *stages = qFlick::flick = new qFlick(space, nStages);
-	threads = qThread::threads = new qThread[nThreads];
-	// allocate the buffer stages
-
-	// light it off (?)
-}
+//void qAvatar::initIterationLoop(int nThreads, int nStages) {
+//
+//	qFlick *stages = qFlick::flick = new qFlick(space, nStages);
+//	threads = qThread::threads = new qThread[nThreads];
+//	// allocate the buffer stages
+//
+//	// light it off (?)
+//}
 
 // no!  this has to be in JS
 // the JS timer (rAF) says it's a good time to start an iteration.
@@ -61,10 +61,10 @@ void qAvatar::initIterationLoop(int nThreads, int nStages) {
 //	}
 //}
 
-extern "C" void avatar_initIterationLoop(qAvatar *avatar, int nThreads, int nStages) {
-	emscripten_debugger();
-	avatar->initIterationLoop(nThreads, nStages);
-}
+//extern "C" void avatar_initIterationLoop(qAvatar *avatar, int nThreads, int nStages) {
+//	emscripten_debugger();
+//	avatar->initIterationLoop(nThreads, nStages);
+//}
 
 // no!  this has to be in JS
 //extern "C" int avatar_pleaseIterate(qAvatar *avatar) {
