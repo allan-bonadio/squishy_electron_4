@@ -48,19 +48,19 @@ void freeWave(qCx *wave) {
 
 // make one, the right size for this buffer's space, or nPoints long if no space
 qCx *qBuffer::allocateWave(int nPoints) {
-	if (nPoints <= 0) {
+	if (traceAllocate) printf("🍕qBuffer::allocateWave(int nPoints=%d)\n", nPoints);
+	if (nPoints <= 0)
 		throw std::runtime_error("qBuffer::allocateWave() - no nPoints");
-	}
 
 	// ?? this is weird  this->nPoints = nPoints;
-	qCx *buf =  (qCx *) malloc(nPoints * sizeof(qCx));
+	qCx *wa =  (qCx *) malloc(nPoints * sizeof(qCx));
 	if (traceAllocate) {
-		printf("🍕 qBuffer::allocateWave this=%p  nPoints: %d  buf: %p, filled with 0x77\n",
-			this, nPoints, buf);
-		for (int j = 0; j < nPoints*2; j++)
-			wave[j] = -77;
+		printf("🍕 qBuffer::allocateWave this=%p  nPoints: %d  buffer: %p, filled with -77\n",
+			this, nPoints, wa);
+		for (int j = 0; j < nPoints; j++)
+			wa[j] = -77.;  // sets both Re and Im
 	}
-	return buf;
+	return wa;
 }
 
 
@@ -276,6 +276,7 @@ void qBuffer::fixThoseBoundaries(qCx *targetWave) {
 }
 
 // calculate ⟨𝜓 | 𝜓⟩  'inner product'.  Non-visscher; do not use it during an iteration.
+// use it when the Re and the Im are synchronized.
 double qBuffer::innerProduct(void) {
 	qCx *wave = this->wave;
 	double sum = 0.;

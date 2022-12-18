@@ -25,3 +25,7 @@
 
 static bool traceIteration = false;  //
 
+
+
+// not really used rightr now; should get rid of it
+

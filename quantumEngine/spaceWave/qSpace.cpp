@@ -103,7 +103,7 @@ void qSpace::initSpace() {
 //	bufferNum = 0;
 }
 
-// the avatars are deleted in deleteTheSpace
+// the avatars and grinder are deleted in deleteTheSpace
 qSpace::~qSpace(void) {
 	if (traceQSpace) printf("🚀 🚀 qSpace destructor starting %s, this= %p  \n", label, (this));
 

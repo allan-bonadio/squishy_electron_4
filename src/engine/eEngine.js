@@ -5,10 +5,9 @@
 
 import {qe, defineQEngineFuncs} from './qe.js';
 import App from '../App.js';
-import {getASetting} from '../utils/storeSettings.js';
 import {interpretCppException} from '../utils/errors.js';
 import {resetObjectRegistry} from '../utils/directAccessors.js';
-import {storeASetting, createStoreSettings} from '../utils/storeSettings.js';
+import {getASetting, storeASetting, createStoreSettings} from '../utils/storeSettings.js';
 import eSpace from './eSpace.js';
 import eThread from './eThread.js';
 
@@ -59,6 +58,8 @@ let theSpace;
 // spaceParams is {N, continuum, label: 'x'}  label=label for this dimension, not the whole space
 export function create1DMainSpace(spaceParams) {
 	try {
+		if (traceStartup) console.log(`theSpace 🐣  before creation, spaceParams=`, spaceParams);
+
 		// eSpace expects an array of param sets, one for each dimension
 		let space = theSpace = new eSpace([spaceParams], 'main');
 		if (traceStartup) console.log(`theSpace 🐣  created, spaceParams=`, spaceParams);

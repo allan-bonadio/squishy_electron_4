@@ -1,6 +1,34 @@
 This project is like, pre-alpha quality.  sorry.
 It has hardwired file paths that I've created identically on my machines.
 
+====================================================== Dec 2022
+
+tweaking CRA config:
+https://marmelab.com/blog/2021/07/22/cra-webpack-no-eject.html
+
+make a general purpose object identifyer function
+
+====================================================== Dec 2022
+Browser availability for important features I use:
+
+WebGL 1: most browsers 2010 thru 2016, android maybe 2016
+
+WebGL 2: chrome & firefox Jan '17, Safari (both) & Edge 2020-2021
+
+WebGL 2 if you enable experimental features: Chrome & Safari 2015-2017
+
+WebAssembly: most browsers 2017, on android maybe 2018
+
+WebWorkers:
+safari & Firefox & Chrome 2009 to early 2010
+Edge July 2015
+Safari ios 2012
+Android 2013 - 2022
+
+in general, Android browsers lag the rest, although I'm not sure which browsers they use.  Maybe Chrome, then Samsung, then Edge then Firefox.
+
+need to update code for this.
+
 ====================================================== Oct 2022
 
 other notes:

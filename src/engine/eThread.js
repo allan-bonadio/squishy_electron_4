@@ -30,7 +30,7 @@ class eThread {
 	// the code for each thread's root is off in /public/qEng/tThread.js
 	// a symlink that poinits to engine/tThread.js
 	constructor(serial, avatar) {
-		console.log(`🚦 eThread constructor ${serial} about to make worker`);
+		console.log(`⛏ eThread constructor ${serial} about to make worker`);
 		// the root code is a URL into the /public folder
 		let opts = {type: 'module', name: `qThread_${serial}`};
 		let worker = this.worker = eThread.workerThreads[0] =
@@ -69,7 +69,7 @@ class eThread {
 		//WebAssembly.compileStreaming(fetch("qEng/quantumEngine.wasm"))
 		//.then(newModule => {
 		//	// the worker also needs to know which one iit is, and what avatar is running the show
-		//	console.log(`🚦 eThread ${serial} compiled wasm file, sending off to new thread`, newModule);
+		//	console.log(`⛏ eThread ${serial} compiled wasm file, sending off to new thread`, newModule);
 		//	worker.postMessage({verb: 'init', module: newModule, serial, avatarPointer: avatar.pointer});
 		//})
 		//.catch(err => console.error(`error while posting init mesage:`, err));
@@ -94,14 +94,14 @@ class eThread {
 		// just use one for now
 		for (let serial = 0; serial < this.nThreads; serial++) {
 			try {
-				console.log(`🚦 eThread creating thread ${serial}`);
+				console.log(`⛏ eThread creating thread ${serial}`);
 				const thread = eThread.threads[serial] = new eThread(serial, avatar);
 
 
 				// now send something...
 				thread.worker.postMessage({verb: 'ping', message: `Welcome, thread!`});
 				eThread.doingThreads = true;
-				console.log(`🚦 eThread done creating thread ${serial} (except for async stuff)`);
+				console.log(`⛏ eThread done creating thread ${serial} (except for async stuff)`);
 			} catch (ex) {
 				console.error(`eThread: worker creation exc: `, ex.stack ?? ex.message ?? ex);
 				debugger;
@@ -116,13 +116,13 @@ class eThread {
 		// i have to think of what to do if there's no workers available...
 		if (eThread.doingThreads) {
 			if (traceIteration)
-				console.log(`🚦 eThread postMessage toiterate`);
+				console.log(`⛏ eThread postMessage toiterate`);
 			eThread.workerThreads[0].postMessage({verb: 'iterate', avatarPointer: avatar.pointer});
 		}
 		else {
 			if (traceIteration)
-				console.log(`🚦 eThread postMessage directly cuz no threads`);
-			qe.avatar_oneIteration(avatar.pointer);
+				console.log(`⛏ eThread postMessage directly cuz no threads`);
+			qe.grinder_oneIteration(avatar.pointer);
 		}
 	}
 

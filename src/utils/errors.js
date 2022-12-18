@@ -20,7 +20,7 @@ window.cppErrorStack = '';
 // class of errors that come from inside C++
 class cppError extends Error {
 	constructor(exNumber) {
-		super('🧯 from C++: ‹' + window.UTF8ToString(qe.getCppExceptionMessage(exNumber)) +'›');
+		super('from C++: ' + window.UTF8ToString(qe.getCppExceptionMessage(exNumber)));
 
 		console.info(`🧯 cppError(${exNumber}) =>`, window.UTF8ToString(qe.getCppExceptionMessage(exNumber)));
 		//this.stack = this.message + window.cppErrorStack;

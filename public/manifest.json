@@ -1,6 +1,7 @@
 {
 	"short_name": "Squish",
 	"name": "Squishy Electron",
+	"description": "Simulates a quantum mechanical electron, interactively",
 	"icons": [
 		{
 			"src": "logo|𝒆⟩3.png",
