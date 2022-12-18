@@ -32,14 +32,6 @@ static bool traceIProd = false;
 
 static bool traceSpace = false;  // prints info about the space in the avatar constructor
 
-// only do some traces if we're past where it's a problem
-// i don't think this is useful anyore...
-static int dangerousSerial = 4000;  // for the chord pulse
-static int dangerousRate = 250;
-
-//static int dangerousSerial = 50;  // for the short gaussian pulse
-//static int dangerousRate = 25;
-
 // those apply to these tracing flags
 static bool traceEachFFSquelch = false;
 static bool traceEndingFFSpectrum = false;
@@ -109,10 +101,10 @@ qAvatar::~qAvatar(void) {
 
 };
 
-// called from JS
-void avatar_delete(qAvatar *avatar) {
-	delete avatar;
-}
+// never called from JS
+//void avatar_delete(qAvatar *avatar) {
+//	delete avatar;
+//}
 
 // some uses never need these so wait till they do
 qWave *qAvatar::getScratchWave(void) {
@@ -218,10 +210,6 @@ void qAvatar::dumpObj(const char *title) {
 void qAvatar::oneIteration() {
 	isIterating = doingIteration = true;
 
-	int tt;
-	bool dangerousTimes = (iterateSerial >= dangerousSerial)
-		&& (((int) iterateSerial % dangerousRate) == 0);
-
 	// now we need it
 	getScratchWave();
 
@@ -231,8 +219,8 @@ void qAvatar::oneIteration() {
 	potentialFactor = space->potentialFactor;
 
 	if (traceIteration) {
-		printf("🚀 🚀 qAvatar::oneIteration() - dt=%lf   stepsPerIteration=%d  %s; potentialFactor=%lf  elapsed time: %lf\n",
-			dt, stepsPerIteration, dangerousTimes ? "dangerous times" : "",
+		printf("🚀 🚀 qAvatar::oneIteration() - dt=%lf   stepsPerIteration=%d ; potentialFactor=%lf  elapsed time: %lf\n",
+			dt, stepsPerIteration,
 			potentialFactor,
 			getTimeDouble());
 		}
@@ -249,7 +237,7 @@ void qAvatar::oneIteration() {
 		printf("      qAvatar: doubleSteps=%d   stepsPerIteration=%d\n",
 			doubleSteps, stepsPerIteration);
 
-	for (tt = 0; tt < doubleSteps; tt++) {
+	for (int tt = 0; tt < doubleSteps; tt++) {
 		oneVisscherStep(qwave, scratchQWave);
 		oneVisscherStep(scratchQWave, qwave);
 
@@ -294,10 +282,10 @@ void qAvatar::oneIteration() {
 
 
 	if (traceJustWave) {
-		qwave->dump("      traceJustWave at end of iteration", true);
+		qwave->dump("     qAvatar  traceJustWave at end of iteration", true);
 	}
 	if (traceJustInnerProduct) {
-		printf("      traceJustInnerProduct: finished one iteration (%d steps, N=%d), iProduct: %lf\n",
+		printf("      qAvatar traceJustInnerProduct: finished one iteration (%d steps, N=%d), iProduct: %lf\n",
 			stepsPerIteration, space->nStates, qwave->innerProduct());
 	}
 
@@ -317,9 +305,6 @@ void qAvatar::oneIteration() {
 // range 0...N/2-1
 void qAvatar::fourierFilter(int lowPassFilter) {
 	// this is when the wave tends to come apart with high frequencies
-	bool dangerousTimes = (iterateSerial >= dangerousSerial)
-		&& (((int) iterateSerial % dangerousRate) == 0);
-
 	qspect = getSpectrum();
 	qspect->generateSpectrum(qwave);
 	if (dumpFFHiResSpectums) qspect->dumpSpectrum("qspect right at start of fourierFilter()");
@@ -338,19 +323,7 @@ void qAvatar::fourierFilter(int lowPassFilter) {
 	for (int k = 1; k <= lowPassFilter; k++) {
 		s[nyquist + k] = 0;
 		s[nyquist - k] = 0;
-		if (traceEachFFSquelch && dangerousTimes) {
-			printf("🌈  fourierFilter: smashed in lowPassFilter=%d   [freq: %d which was %lf], "
-				"and [freq: %d which was %lf]\n",
-				lowPassFilter, nyquist - k, s[nyquist - k].norm(), nyquist + k, s[nyquist + k].norm());
-		}
 	}
-
-	if (traceEndingFFSpectrum && dangerousTimes) {
-			qspect->dumpSpectrum("🐠  finished fourierFilter: spectrum");
-			//printf("frame iterateSerial=%lf, dangerousSerial=%d,  dangerousRate=%d\n",
-			//	iterateSerial, dangerousSerial, dangerousRate);
-	}
-
 
 	if (dumpFFHiResSpectums) qspect->dumpSpectrum("qspect right at END of fourierFilter()");
 	qspect->generateWave(qwave);
@@ -364,6 +337,19 @@ void qAvatar::fourierFilter(int lowPassFilter) {
 void qAvatar::askForFFT(void) {
 	analyzeWaveFFT(qwave, "askForFFT while idle");
 }
+
+// if iterating, FFT as the current iterate finishes, before and after fourierFilter().
+// If stopped, fft current wave. now.
+void avatar_askForFFT(qAvatar *pointer) { pointer->askForFFT(); }
+
+void avatar_oneIteration(qAvatar *pointer) { pointer->oneIteration(); }
+
+
+void qAvatar::initIterationLoop(int a, int b, int c) {
+	// to e imprelmented
+}
+
+void avatar_initIterationLoop(qAvatar *pointer, int a, int b, int c) {pointer ->initIterationLoop(a, b, c);}
 
 
 /* **********************************************************  */

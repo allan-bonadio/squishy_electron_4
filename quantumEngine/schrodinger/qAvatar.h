@@ -63,9 +63,10 @@ struct qAvatar {
 	struct qViewBuffer *qvBuffer;
 	float *vBuffer;  // aligned by 4, not 8
 
-	struct qStage *stages;
-	struct qThread *threads;
-	void initIterationLoop(int nThreads, int nStages);
+	struct qStage *stages;  // i doon't thiink i need these
+	struct qThread *threads; // i doon't thiink i need these
+
+	void initIterationLoop(int xxx, int nThreads, int nStages);
 
 	// for alignment: put the rest of these last
 
@@ -118,15 +119,14 @@ struct qAvatar {
 
 // for JS to call.  Defined in jsSpace and elsewhere.
 extern "C" {
-	//void avatar_initIterationLoop(qAvatar *avatar, int nStages);
+	void avatar_initIterationLoop(qAvatar *avatar, int nStages, int nnn, int mmm);
 	void avatar_oneIteration(qAvatar *avatar);
-	//int avatar_pleaseIterate(qAvatar *avatar);
 
 	void avatar_askForFFT(qAvatar *avatar);
 
 	// a qSpace does not contain any qAvatars
 	// an eSpace DOES contain two eAvatars; this how it deletes them from JS
-	void avatar_delete(qAvatar *avatar);
+	//void avatar_delete(qAvatar *avatar);
 }
 
 
