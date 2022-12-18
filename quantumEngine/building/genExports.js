@@ -18,7 +18,9 @@ let fs;
 // the exports list.
 // in C++: each function must be declared 'export "C" ...'
 // in JS: import qe from 'engine/qe', then use qe.funcname()
-// also must call defineQEngineFuncs after C++ is initialized
+// also must call defineQEngineFuncs() after C++ is initialized
+// Very often, object pointers are passed in as numbers from JS, which keeps pointers for significant objects
+// then, in C++, those arguments are just the right type.  ez peazy.
 let exportsSrc  = [
 	// args and retType can be 'number', 'string', 'array' (of bytes), or null
 	// meaning void. That's all.  Anything more complex, you have to make up out
@@ -41,18 +43,27 @@ let exportsSrc  = [
 	{name: 'wave_normalize', args: ['number'], retType: null},
 
 	// avatars - all accept an integer pointer to the avatar as first argument
+	// views, visual stuff not grind stuff
+	{name: 'avatar_getViewBuffer', args: ['number'], retType: 'number'},
 	{name: 'avatar_loadViewBuffer', args: ['number'], retType:  'number'},
+	{name: 'avatar_dumpViewBuffer', args: ['number', 'string'], retType: null},
 
-	{name: 'avatar_oneIteration', args: ['number'], retType: null},
+	// ************************* avatar versions - will go away
 	{name: 'avatar_initIterationLoop', args: ['number', 'number', 'number'], retType: null},
-	//{name: 'avatar_pleaseIterate', args: ['number'], retType: null},
+	{name: 'avatar_oneIteration', args: ['number'], retType: null},
 
 	{name: 'avatar_askForFFT', args: ['number'], retType: null},
-	{name: 'avatar_delete', args: ['number'], retType: null},
 
-	// views
-	{name: 'avatar_getViewBuffer', args: ['number'], retType: 'number'},
-	{name: 'avatar_dumpViewBuffer', args: ['number', 'string'], retType: null},
+
+	// ************************* grinder versions
+	{name: 'grinder_initIterationLoop', args: ['number', 'number', 'number'], retType: null},
+	{name: 'grinder_oneIteration', args: ['number'], retType: null},
+
+	{name: 'grinder_askForFFT', args: ['number'], retType: null},
+
+	{name: 'grinder_copyFromAvatar', args: ['number', 'number'], retType: null},
+	{name: 'grinder_copyToAvatar', args: ['number', 'number'], retType: null},
+
 
 ];
 
