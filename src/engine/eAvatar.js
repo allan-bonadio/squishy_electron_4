@@ -13,9 +13,6 @@ import qe from './qe.js';
 let traceCreation = false;
 let traceHighest = false;
 let traceVBuffer = false;
-let traceIteration = false;
-
-let iterateWithGrinder = true;
 
 // a qAvatar manages iteration of a wave, and display on a GLView. I keep
 // thinking that I should separate the functions, but what will you do with an itration
@@ -58,31 +55,13 @@ class eAvatar {
 	// are passed by pointer and you need to allocate them in JS (eg see
 	// eAvatar.constructor)
 
-	get needsIteration() { return this.bools[97]; }
-	set needsIteration(a) { this.bools[97] = a; }
-	get doingIteration() { return this.bools[98]; }
-	set doingIteration(a) { this.bools[98] = a; }
+	get _space() { return this.ints[1]; }
 
-	get dt() { return this.doubles[3]; }
-	set dt(a) { this.doubles[3] = a; }
-	get lowPassFilter() { return this.ints[8]; }
-	set lowPassFilter(a) { this.ints[8] = a; }
-	get stepsPerIteration() { return this.ints[9]; }
-	set stepsPerIteration(a) { this.ints[9] = a; }
+	get _qwave() { return this.ints[2]; }
 
-	get _qwave() { return this.ints[10]; }
+	get _vBuffer() { return this.ints[7]; }
+	get _label() { return this.pointer + 40; }
 
-	get _potential() { return this.ints[11]; }
-	get potentialFactor() { return this.doubles[6]; }
-	set potentialFactor(a) { this.doubles[6] = a; }
-
-	get _scratchQWave() { return this.ints[14]; }
-
-	get _qspect() { return this.ints[15]; }
-	get _vBuffer() { return this.ints[17]; }
-	get _stages() { return this.ints[18]; }
-	get _threads() { return this.ints[19]; }
-	get _label() { return this.pointer + 80; }
 
 	/* **************************** end of direct accessors */
 
@@ -112,39 +91,39 @@ class eAvatar {
 			this.dumpViewBuffer(`afterLoadViewBuffer`);
 	}
 
-	// can throw std::runtime_error("divergence")
-	oneIteration() {
-		if (iterateWithGrinder)
-			qe.grinder_oneIteration(this.grinder.pointer);
-		else
-			qe.avatar_oneIteration(this.pointer);
-	}
-
-	// thisis what upper levels call when another iteration is needed.
-	// It either queues it out to a thread, if the threads are idle,
-	// or sets needsIteration if busy
-	pleaseIterate() {
-		if (traceIteration)
-				console.log(`🚦 eAvatar ${this.label}: pleaseIterate()`);
-		if (this.doingIteration) {
-			if (traceIteration)
-				console.log(`🚦             pleaseIterate: needsIteration = true cuz busy`);
-			// threads are busy but we'll get to it after we're done with this iteration
-			this.needsIteration = true;
-			return false;
-		}
-		else {
-			if (traceIteration)
-				console.log(`🚦             pleaseIterate oneItration`);
-			this.needsIteration = false;
-			this.oneIteration();
-			return true;
-		}
-	}
-
-	askForFFT() {
-		qe.avatar_askForFFT(this.pointer);
-	}
+	//// can throw std::runtime_error("divergence")
+	//oneIteration() {
+	//	if (iterateWithGrinder)
+	//		qe.grinder_oneIteration(this.grinder.pointer);
+	//	else
+	//		qe.avatar_oneIteration(this.pointer);
+	//}
+	//
+	//// thisis what upper levels call when another iteration is needed.
+	//// It either queues it out to a thread, if the threads are idle,
+	//// or sets needsIteration if busy
+	//pleaseIterate() {
+	//	if (traceIteration)
+	//			console.log(`🚦 eAvatar ${this.label}: pleaseIterate()`);
+	//	if (this.doingIteration) {
+	//		if (traceIteration)
+	//			console.log(`🚦             pleaseIterate: needsIteration = true cuz busy`);
+	//		// threads are busy but we'll get to it after we're done with this iteration
+	//		this.needsIteration = true;
+	//		return false;
+	//	}
+	//	else {
+	//		if (traceIteration)
+	//			console.log(`🚦             pleaseIterate oneItration`);
+	//		this.needsIteration = false;
+	//		this.oneIteration();
+	//		return true;
+	//	}
+	//}
+	//
+	//askForFFT() {
+	//	qe.avatar_askForFFT(this.pointer);
+	//}
 
 	// delete the eAvatar and qAvatar and its owned buffers
 	deleteAvatar() {

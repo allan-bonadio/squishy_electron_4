@@ -26,18 +26,18 @@ struct qAvatar {
 	// how much time we've iterated, from creation.  pseudo-seconds.  Since we've eliminated
 	// all the actual physical constants from the math, why not choose our own definition
 	// of what a second is?  Resets to zero every so often.
-	double elapsedTime;
-
-	// total number of times thru the number cruncher. (should always be an integer;
-	// it's a double cuz I don't know how big it'll get)
-	double iterateSerial;
-
-
-	// params that the user can set/get
-	double dt;
-	int lowPassFilter;
-	int stepsPerIteration;
-
+	//double elapsedTime;
+	//
+	//// total number of times thru the number cruncher. (should always be an integer;
+	//// it's a double cuz I don't know how big it'll get)
+	//double iterateSerial;
+	//
+	//
+	//// params that the user can set/get
+	//double dt;
+	//int lowPassFilter;
+	//int stepsPerIteration;
+	//
 	/* *********************************************** iteration */
 
 	// our main qWave, either for the WaveView or the SetWave tab
@@ -50,13 +50,13 @@ struct qAvatar {
 
 	// and a scratch wave for stepping. Call the function first time you need it.
 	// owned if non-null
-	struct qWave *scratchQWave;
-	struct qWave *getScratchWave(void);
+	//struct qWave *scratchQWave;
+	//struct qWave *getScratchWave(void);
 
 	// for the fourier filter.  Call the function first time you need it.
 	// owned if non-null
-	struct qSpectrum *qspect;
-	qSpectrum *getSpectrum(void);
+	//struct qSpectrum *qspect;
+	//qSpectrum *getSpectrum(void);
 
 	// the qViewBuffer to be passed to webgl.  qAvatar is a visual thing after all.
 	// Avatar owns the qViewBuffer
@@ -76,7 +76,7 @@ struct qAvatar {
 
 	// true if an iteration is running; set/unset in ::oneIteration()
 	// For the interactive simulation switch, see isTimeAdvancing in JS.
-	bool isIterating;
+	//bool isIterating;
 
 	// this is different now; js DOES pleaseIterate()
 	//	JS calls pleaseIterate() from a worker whenever it's time to start an
@@ -85,28 +85,28 @@ struct qAvatar {
 	//	pleaseIterate() will return false. Otherwise, it'll do an iteration
 	//	immediately, and return true after the last iteration (which could be
 	//	a long time).
-	bool needsIteration;
+	//bool needsIteration;
 
 	// what's the diff between this and isIterating?  not much.
-	bool doingIteration;
+	//bool doingIteration;
 
 	// set pleaseFFt from JS (only if in the middle of an iteration)
-	void askForFFT(void);
+	//void askForFFT(void);
 
 	// true = please do an FFT after the current iteration ends
-	bool pleaseFFT;
+	//bool pleaseFFT;
 	// make sure the subsequent fields are aligned!  or iteration is painfully slow.
 
 	// multiple steps; ≈ stepsPerIteration
-	void oneIteration(void);
+	//void oneIteration(void);
 
 	// visscher
-	void stepReal(qCx *newW, qCx *oldW, double dt);
-	void stepImaginary(qCx *newW, qCx *oldW, double dt);
-	void oneVisscherStep(qWave *newQWave, qWave *oldQWave);
+	//void stepReal(qCx *newW, qCx *oldW, double dt);
+	//void stepImaginary(qCx *newW, qCx *oldW, double dt);
+	//void oneVisscherStep(qWave *newQWave, qWave *oldQWave);
 
 	// kill high frequencies via FFTs
-	void fourierFilter(int lowPassFilter);
+	//void fourierFilter(int lowPassFilter);
 };
 
 
@@ -114,10 +114,10 @@ struct qAvatar {
 
 // for JS to call.  Defined in jsSpace and elsewhere.
 extern "C" {
-	void avatar_initIterationLoop(qAvatar *avatar, int nStages, int nnn, int mmm);
-	void avatar_oneIteration(qAvatar *avatar);
-
-	void avatar_askForFFT(qAvatar *avatar);
+	//void avatar_initIterationLoop(qAvatar *avatar, int nStages, int nnn, int mmm);
+	//void avatar_oneIteration(qAvatar *avatar);
+	//
+	//void avatar_askForFFT(qAvatar *avatar);
 }
 
 

@@ -8,6 +8,8 @@
 // i think the exception thing needs this, not sure
 #include <emscripten/bind.h>
 
+#include "squish.h"
+
 
 // return elapsed real time since last page reload, in seconds, only for tracing
 // seems like it's down to miliseconds or even a bit smaller

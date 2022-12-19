@@ -34,17 +34,10 @@ let traceDragCanvasHeight = false;
 
 export class WaveView extends React.Component {
 	static propTypes = {
-		// the class itself.  Not the instance! the class, the type of view, with drawings baked in.
-		// not the class!  just the class name.  Not a JS class!
-		viewClassName: PropTypes.string,
-
 		// the title of the view
 		viewName: PropTypes.string,
 
 		width: PropTypes.number,  // handed in, depends on window width
-
-		elapsedTime: PropTypes.number,  // redraws when these change
-		iterateSerial: PropTypes.number,
 
 		setUpdatePotentialArea: PropTypes.func,
 
@@ -69,6 +62,7 @@ export class WaveView extends React.Component {
 
 			// easy access
 			this.space = space;
+			this.grinder = space.grinder;
 			this.mainEAvatar = space.mainEAvatar;
 		})
 		.catch(ex => {
@@ -143,10 +137,10 @@ export class WaveView extends React.Component {
 		// if c++ isn't initialized yet, we can assume the time and frame serial
 		let elapsedTime = '0';
 		let iterateSerial = '0';
-		if (this.mainEAvatar) {
+		if (this.grinder) {
 			// after qe has been initialized
-			elapsedTime = thousands(p.elapsedTime.toFixed(4));
-			iterateSerial = thousands(p.iterateSerial);
+			elapsedTime = thousands(this.grinder.elapsedTime.toFixed(4));
+			iterateSerial = thousands(this.grinder.iterateSerial);
 		}
 
 		const spinner = qe.cppLoaded ? ''
@@ -158,7 +152,7 @@ export class WaveView extends React.Component {
 
 			<GLView width={p.width} height={s.height}
 				space={this.space} avatar={this.mainEAvatar}
-				viewClassName={p.viewClassName} viewName={p.viewName} />
+				viewClassName='flatDrawingViewDef' viewName={p.viewName} />
 
 			<aside className='viewOverlay'
 				style={{width: `${p.width}px`, height: `${s.height}px`}}>
