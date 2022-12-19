@@ -7,4 +7,19 @@ quantumEngine/quantumEngine.js : quantumEngine/*.*  quantumEngine/*/*.*
 	cd quantumEngine; make
 
 clean :
-	cd quantumEngine; make clean
+	cd quantumEngine; make clean; cd ..
+	rm -rf build
+
+cleanAll : clean
+	rm -rf node_modules
+	rm -f package-lock.json
+	npm install
+
+test
+	cd quantumEngine; make clean; cd ..
+	npm run test
+
+build :
+	maint/build.sh
+
+
