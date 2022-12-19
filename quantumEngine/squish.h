@@ -27,4 +27,6 @@ extern double getTimeDouble(void);
 // these are not really the radius, it's more rectangular, but pretty much the same idea
 #define ERROR_RADIUS  1e-12
 
+extern void qCheck(const char *where, qCx aCx);
+
 #endif
