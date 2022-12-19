@@ -6,7 +6,7 @@
 import PropTypes from 'prop-types';
 import LogSlider from '../widgets/LogSlider.js';
 import TextNSlider from '../widgets/TextNSlider.js';
-import {alternateMinMaxs} from '../utils/storeSettings.js';
+import {getASetting, alternateMinMaxs} from '../utils/storeSettings.js';
 
 let traceSliderChanges = false;
 
@@ -19,17 +19,10 @@ function setPT() {
 		setStepsPerIteration: PropTypes.func.isRequired,
 		lowPassFilter: PropTypes.number.isRequired,
 		setLowPassFilter: PropTypes.func.isRequired,
-
-		// needed for filter
-		N: PropTypes.number.isRequired,
 	};
 }
 
 function SetIterationTab(props) {
-	const p = props;
-	if (!props)
-		debugger;
-
 	// lowPassFilter, the number setting.  On the JS side, it's a percentage of N/2:
 	// and can range from 200/N (nyquist only) to 75
 	// so when N=16, user can set lowPass to 12.5 ... 75 percents = 1 to 6 freqs
@@ -37,10 +30,11 @@ function SetIterationTab(props) {
 
 	// step between valid settings, and also the minimum setting, where you just
 	// filter off Nyquist.  Think of this like 100 * ( 1 / (N/2))
-	const aStep = 200 / p.N;
+	const N = getASetting('spaceParams', 'N');
+	const lowPassStep = 200 / N;
 
-	// should be 0 if N <= 150, 1 if N = 256...512, 2 above that
-	const nDigits = Math.max(0, 1 -Math.ceil(Math.log10(aStep)));
+	const nDigits = (N < 150) ? 0 : ((N < 600) ? 1 : 2);
+	// ...Math.max(0, 1 -Math.ceil(Math.log10(lowPassStep)));
 
 	// Unlike other tabs, all these are instant-update.
 
@@ -90,7 +84,7 @@ function SetIterationTab(props) {
 				value={props.lowPassFilter.toFixed(nDigits)}
 				min={alternateMinMaxs.iterationSettings.lowPassFilter.min}
 				max={alternateMinMaxs.iterationSettings.lowPassFilter.max}
-				step={aStep}
+				step={lowPassStep}
 				style={{width: '80%'}}
 				handleChange={newValue => {
 						if (traceSliderChanges)

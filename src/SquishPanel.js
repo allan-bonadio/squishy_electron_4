@@ -24,31 +24,17 @@ import {getASetting, storeASetting} from './utils/storeSettings.js';
 // runtime debugging flags - you can change in the debugger or here
 let areBenchmarking = false;
 let traceTheViewBuffer = false;
-let traceSetPanels = false;
 let tracePromises = false;
 let traceSquishPanel = false;
 let traceIteration = false;
+
+let verifyTickTimes = true;
 //let traceConstructor = false;
 
 //if (typeof storeSettings == 'undefined') debugger;
 
 const DEFAULT_VIEW_CLASS_NAME = 'flatDrawingViewDef';
 
-// iterations always need specific numbers of steps.
-const N_EXTRA_STEPS = 1;
-
-
-// figure out how long requestAnimationFrame()'s period is, in ms
-//let rafPeriod = 16.667;
-//setTimeout(() => {
-//	requestAnimationFrame(time => {
-//		let firstTime = time;
-//		requestAnimationFrame(time => {
-//			rafPeriod = time - firstTime;
-//			console.log(`⏱ rafPeriod = ${rafPeriod}  rate=${Math.round(1000/rafPeriod)}`);
-//		});
-//	});
-//}, 10000);  // time for things to settle down
 
 export class SquishPanel extends React.Component {
 	static propTypes = {
@@ -75,29 +61,12 @@ export class SquishPanel extends React.Component {
 			// Many of these things should be in a lower component;
 			// don't need to rerender the whole panel just cuz some params changed.
 
-			// THE N and continuum for THE space we're currently doing
-			// kept between sessions in localStore
-			N: getASetting('spaceParams', 'N'),
-
-			continuum: getASetting('spaceParams', 'continuum'),
 			mainViewClassName: DEFAULT_VIEW_CLASS_NAME,
-
-			// the eSpace
-			space: null,
 
 			// this is controlled by the user (start/stop/step buttons)
 			// does not really influence the rendering of the canvas... (other than running)
 
-			// this is the actual 'frequency' as a period in milliseconds, as set by that menu.
-			// convert between like 1000/n
-			// eg the menu on the CPToolbar says 10/sec, so this becomes 100
-			// we actually get it from the control panel which is the official rate keeper
-			iteratePeriod: getASetting('iterationSettings', 'iteratePeriod'),
-
-			// defaults for sliders for deltaT & spi
-			deltaT: getASetting('iterationSettings', 'deltaT'),
-			stepsPerIteration: getASetting('iterationSettings', 'stepsPerIteration'),
-			lowPassFilter: getASetting('iterationSettings', 'lowPassFilter'),
+			//iterationPeriod: getASetting('iterationSettings', 'iterationPeriod'),
 
 			// advance forward with each iter
 			// NOT SAME as shown on WaveView!
@@ -113,6 +82,12 @@ export class SquishPanel extends React.Component {
 		this.initStats(now);
 		this.timeForNextTic = now + 10;  // default so we can get rolling
 		this.lastAniteration = now;
+
+		// this is the actual 'frequency' as a period in milliseconds, as set by that menu.
+		// convert between like 1000/n
+		// eg the menu on the CPToolbar says 10/sec, so this becomes 100
+		// we actually get it from the control panel which is the official rate keeper
+		this.iterationPeriod = getASetting('iterationSettings', 'iterationPeriod');
 
 		// stick ?allowRunningOneCycle at the end of URL to show runningOneCycle panel
 		// eslint-disable-next-line
@@ -134,7 +109,7 @@ export class SquishPanel extends React.Component {
 		// why do this in DidMount and not in constructor?  dunno...
 		eSpaceCreatedPromise
 		.then((space) => {
-			const s = this.state;
+			//const s = this.state;
 			if (tracePromises) console.log(`SquishPanel.compDidMount about to set state`);
 
 			// space will end up in the state but meanwhile we need it now
@@ -143,8 +118,8 @@ export class SquishPanel extends React.Component {
 
 			this.mainEAvatar = space.mainEAvatar;
 			this.grinder = space.grinder;
-			this.setDeltaT(s.deltaT);
-			this.setStepsPerIteration(s.stepsPerIteration);
+			//this.setDeltaT(s.deltaT);
+			//this.setStepsPerIteration(s.stepsPerIteration);
 
 			if (tracePromises) console.log(`SquishPanel.compDidMount about to animateHeartbeat`);
 
@@ -163,8 +138,7 @@ export class SquishPanel extends React.Component {
 				// obnoxious hot reloading; always end up here, so let me reload the right way
 				debugger;
 				location = location;  // eslint-disable-line no-restricted-globals
-				debugger;
-				return;  // needed?  no.
+				// never gets here
 			}
 			console.error(`error  SquishPanel.didMount.then():`, ex.stack ?? ex.message ?? ex);
 		});
@@ -172,13 +146,6 @@ export class SquishPanel extends React.Component {
 	}
 
 	/* ******************************************************* stats */
-
-	// the upper left and right numbers
-	showTimeNIteration() {
-		// need them instantaneously - react is too slow
-		document.querySelector('.voNorthWest').innerHTML = this.grinder.elapsedTime.toFixed(2);
-		document.querySelector('.voNorthEast').innerHTML =  this.grinder.iterateSerial;
-	}
 
 	// constructor only calls this (?)
 	initStats(now) {
@@ -245,6 +212,14 @@ export class SquishPanel extends React.Component {
 			this.dumpViewBuffer('SquishPanel. did iterate()');
 	}
 
+	// the upper left and right numbers: insert them into the HTML.  Faster than react.
+	// should move this to like WaveView
+	showTimeNIteration() {
+		// need them instantaneously - react is too slow
+		document.querySelector('.voNorthWest').innerHTML = this.grinder.elapsedTime.toFixed(2);
+		document.querySelector('.voNorthEast').innerHTML =  this.grinder.iterateSerial;
+	}
+
 	// Integrate the ODEs by one 'iteration', or not.  and then display.  or not.
 	// called every so often in animateHeartbeat() so it's called as often as the menu setting says
 	// so if needsRepaint false or absent, it'll only repaint if an iteration has been done.
@@ -293,8 +268,13 @@ export class SquishPanel extends React.Component {
 	animateHeartbeat =
 	iterationStart => {
 		const s = this.state;
+		if (verifyTickTimes) {
+			if (!isFinite(this.timeForNextTic)) debugger;
+			if (!isFinite(iterationStart)) debugger;
+			if (!isFinite(this.timeForNextTic)) debugger;
+		}
 
-		// no matter how often animateHeartbeat() is called, it'll only iterate once per iteratePeriod
+		// no matter how often animateHeartbeat() is called, it'll only iterate once per iterationPeriod
 		if (iterationStart >= this.timeForNextTic) {
 			// no point in calling it continuously if it's not doing anything
 			if (ControlPanel.isTimeAdvancing)
@@ -304,10 +284,18 @@ export class SquishPanel extends React.Component {
 			// iterateOneIteration(), so periods are exactly timed (unless it's so slow
 			// that we get behind).  Speaking of which, how far behind are we?
 			let rightNow = 	performance.now();
+			if (!isFinite(rightNow)) debugger;
 
 			//// FOR NOW, avoid overlapping heartbeats.  They become recursive and the
 			//// browser really slows down, and sometimes crashes
-			this.timeForNextTic = rightNow + s.iteratePeriod;
+			this.timeForNextTic = rightNow + this.iterationPeriod;
+			//this.timeForNextTic = rightNow + s.iterationPeriod;
+			if (verifyTickTimes) {
+				if (!isFinite(this.timeForNextTic)) debugger;
+				if (!isFinite(this.iterationPeriod)) debugger;
+			}
+			if ((this.grinder.iterateSerial & 255) == 0)
+				console.info(`the iterate period: ${s.iterationPeriod}  serial/256: ${this.grinder.iterateSerial/256} `, s.iterationPeriod);
 		}
 
 		// this is in milliseconds
@@ -323,7 +311,7 @@ export class SquishPanel extends React.Component {
 		requestAnimationFrame(this.animateHeartbeat);
 	}
 
-	/* ******************************************************* runningOneCycle of circular wave*/
+	/* *******************************************************  OneCycle of circular wave*/
 
 	// use for benchmarking with a circular wave.  Will start iteration, and stop after
 	// the leftmost state is at its peak.  Then display stats.
@@ -334,8 +322,8 @@ export class SquishPanel extends React.Component {
 	() => {
 		if (!this.allowRunningOneCycle) return;
 		this.runningOneCycle = true;
-		this.runningCycleStartingTime = this.mainEAvatar.elapsedTime;
-		this.runningCycleStartingSerial = this.mainEAvatar.iterateSerial;
+		this.runningCycleStartingTime = this.grinder.elapsedTime;
+		this.runningCycleStartingSerial = this.grinder.iterateSerial;
 		ControlPanel.startIterating();
 	}
 
@@ -390,46 +378,11 @@ export class SquishPanel extends React.Component {
 	}
 
 	/* ******************************************************* user settings */
-	// iteration params managed from SquishPanel; others managed from ControlPanel
+	// others managed from ControlPanel
 	// can i move these to the control panel?
 
-	// dt is time per step, for the algorithm; deltaT is time per iteration, the user/UI control)
-	setDeltaT = deltaT => {
-		deltaT = storeASetting('iterationSettings', 'deltaT', deltaT);
-		this.setState({deltaT});
-		this.mainEAvatar.dt = deltaT / (this.state.stepsPerIteration + N_EXTRA_STEPS);  // always one more!
-	}
-
-	setStepsPerIteration =
-	stepsPerIteration => {
-		try {
-			if (traceSetPanels) console.log(`js setStepsPerIteration(${stepsPerIteration})`);
-			storeASetting('iterationSettings', 'stepsPerIteration', stepsPerIteration);
-			this.setState({stepsPerIteration});
-			this.mainEAvatar.stepsPerIteration = stepsPerIteration;
-		} catch (ex) {
-			// eslint-disable-next-line no-ex-assign
-			ex = interpretCppException(ex);
-			console.error(`setStepsPerIteration error:`,
-				ex.stack ?? ex.message ?? ex);
-			////debugger;
-		}
-	}
-
-	// sets the LPF in both SPanel state AND in the C++ area
-	setLowPassFilter =
-	lowPassFilter => {
-		if (traceSetPanels) console.log(`js setLowPassFilter(${lowPassFilter})`)
-
-		let lpf = storeASetting('iterationSettings', 'lowPassFilter', lowPassFilter);
-		this.setState({lowPassFilter: lpf});
-
-		// here's where it converts from percent to the C++ style integer number of freqs
-		this.mainEAvatar.lowPassFilter = Math.round(lpf / 200 * this.state.N);
-	}
-
 	// completely wipe out the quantum potential and replace it with one of our canned patterns.
-	// (but do not change N or anything else in the state)  Called upon set potential in potential tab
+	// (but do not change N or anything else)  Called upon set potential in potential tab
 	setPotential =
 	(potentialParams) => {
 		// sets the numbers
@@ -464,8 +417,10 @@ export class SquishPanel extends React.Component {
 	}
 
 	// get this from the control panel every time user changes it
-	setIteratePeriod =
-	(period) => this.setState({iterationPeriod: period});
+	setIterationPeriod =
+	(period) => this.iterationPeriod = period;
+//	(period) => this.setState({iterationPeriod: period},
+//		() => console.log(`iteration period is now set to ${this.state.iterationPeriod}`));
 
 	/* ******************************************************* rendering */
 	// call this when you change both the GL and iter and elapsed time
@@ -473,10 +428,11 @@ export class SquishPanel extends React.Component {
 	redrawWholeMainWave =
 	() => {
 		let avatar = this.mainEAvatar;
+		let grinder = this.grinder;
 
 		// trigger redrawing of WaveView cuz they're passed in via props
-		avatar.elapsedTime = 0;
-		avatar.iterateSerial = 0;
+		grinder.elapsedTime = 0;
+		grinder.iterateSerial = 0;
 
 		// directly redraw the GL
 		avatar.reStartDrawing();
@@ -486,39 +442,25 @@ export class SquishPanel extends React.Component {
 	render() {
 		const p = this.props;
 		const s = this.state;
-		let avatar = this.mainEAvatar;
 
 		return (
 			<div id={this.props.id} className="SquishPanel">
 				<WaveView
-					viewClassName={s.mainViewClassName}
 					viewName='mainView'
 					width={p.width}
-					elapsedTime={avatar?.elapsedTime ?? 0}
-					iterateSerial={avatar?.iterateSerial ?? 0}
 					setUpdatePotentialArea={this.setUpdatePotentialArea}
 					showPotential={s.showPotential}
 				/>
 				<ControlPanel
-					space={s.space}
-					N={this.state.N}
-
 					iterateAnimate={(shouldAnimate, freq) => this.iterateAnimate(shouldAnimate, freq)}
 
-					setIteratePeriod={this.setIteratePeriod}
+					setIterationPeriod={this.setIterationPeriod}
 
 					setPotential={this.setPotential}
 					toggleShowPotential={this.toggleShowPotential}
 					showPotential={s.showPotential}
 
 					redrawWholeMainWave={this.redrawWholeMainWave}
-
-					deltaT={s.deltaT}
-					setDeltaT={this.setDeltaT}
-					stepsPerIteration={s.stepsPerIteration}
-					setStepsPerIteration={this.setStepsPerIteration}
-					lowPassFilter={s.lowPassFilter}
-					setLowPassFilter={this.setLowPassFilter}
 
 					iStats={this.iStats}
 					refreshStats={this.refreshStats}
@@ -528,7 +470,7 @@ export class SquishPanel extends React.Component {
 		);
 
 		// 					{/*setIterateFrequency={freq => this.setIterateFrequency(freq)}*/}
-//							iterateFrequency={1000 / s.iteratePeriod}
+//							iterateFrequency={1000 / s.iterationPeriod}
 //					setIterateFrequency={freq => this.setIterateFrequency(freq)}
 
 

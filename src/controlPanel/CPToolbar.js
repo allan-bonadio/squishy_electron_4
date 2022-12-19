@@ -20,7 +20,8 @@ function setPT() {
 		iterateFrequency: PropTypes.number.isRequired,
 		setIterateFrequency: PropTypes.func.isRequired,
 
-		N: PropTypes.number.isRequired,
+		// these two might be undefined during startup, so get ready to punt
+		N: PropTypes.number,
 		space: PropTypes.instanceOf(eSpace),
 
 		resetMainWave: PropTypes.func.isRequired,
@@ -103,7 +104,7 @@ function CPToolbar(props) {
 		<div className='toolbarThing'>
 			<div className='toolbarRow'>
 				<div className='toolbarThing'>
-					resolution {props.N} &nbsp;
+					resolution {props.N ?? '...'} &nbsp;
 				</div>
 
 				<button className='round' onClick={props.resetMainWave}>Reset Wave</button>
@@ -126,9 +127,6 @@ function CPToolbar(props) {
 			</div>
 		</div>
 	</div>;
-
-	// i decided against the rotation slider
-	// ➩ ↪︎ ↻ <input type='range' onClick={props.slideWave} /> ↺ ↩︎ ⇔ ⟺ ↔︎ ⬌ ➪
 }
 
 setPT();

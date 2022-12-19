@@ -12,11 +12,21 @@ import SetWaveTab from './SetWaveTab.js';
 import SetPotentialTab from './SetPotentialTab.js';
 import SetResolutionTab from './SetResolutionTab.js';
 import SetIterationTab from './SetIterationTab.js';
-import eSpace from '../engine/eSpace.js';
+//import eSpace from '../engine/eSpace.js';
 import SquishPanel from '../SquishPanel.js';
 import {getASetting, storeASetting, getAGroup, storeAGroup} from '../utils/storeSettings.js';
-//import {eSpaceCreatedPromise} from '../engine/eEngine.js';
+import {eSpaceCreatedPromise} from '../engine/eEngine.js';
 import qe from '../engine/qe.js';
+import {interpretCppException} from '../utils/errors.js';
+
+
+let traceSetPanels = false;
+
+
+// iterations always need specific numbers of steps.  But there's always one more.
+// maybe this should be defined in the grinder.  Hey, isn't this really 1/2 step?  cuz it's always dt/2
+const N_EXTRA_STEPS = 0.5;
+
 
 export class ControlPanel extends React.Component {
 	static propTypes = {
@@ -29,10 +39,6 @@ export class ControlPanel extends React.Component {
 		setPotential: PropTypes.func.isRequired,
 		toggleShowPotential: PropTypes.func.isRequired,
 		showPotential: PropTypes.bool.isRequired,
-
-		// early on, there's no space.  Must have SquishPanel mounted first, and the eSpace promise resolved.
-		space: PropTypes.instanceOf(eSpace),
-		N: PropTypes.number.isRequired,
 
 		redrawWholeMainWave: PropTypes.func.isRequired,
 
@@ -49,24 +55,39 @@ export class ControlPanel extends React.Component {
 
 		// most of the state is kept here.  But, also, in the store settings
 		this.state = {
-			// state for the wave resets - these are control-panel only.
-			// waveParams - Only change if user clicks setWave
+			iterationPeriod: getASetting('iterationSettings', 'iterationPeriod'),
 
-			iteratePeriod: getASetting('iterationSettings', 'iteratePeriod'),
+			// defaults for sliders for deltaT & spi
+			deltaT: getASetting('iterationSettings', 'deltaT'),
+			stepsPerIteration: getASetting('iterationSettings', 'stepsPerIteration'),
+			lowPassFilter: getASetting('iterationSettings', 'lowPassFilter'),
 
-			// state for potential resets - control panel only, setPotential()
+			// state for potential resets - control panel only, setPotential()  see below;...
 			//potentialBreed: getASetting('potentialParams', 'potentialBreed'),
-			valleyPower: getASetting('potentialParams', 'valleyPower'),
-			valleyScale: getASetting('potentialParams', 'valleyScale'),
-			valleyOffset: getASetting('potentialParams', 'valleyOffset'),
+			//valleyPower: getASetting('potentialParams', 'valleyPower'),
+			//valleyScale: getASetting('potentialParams', 'valleyScale'),
+			//valleyOffset: getASetting('potentialParams', 'valleyOffset'),
 
 			showingTab: getASetting('miscSettings', 'showingTab'),
+
+			// waveParams & potential params - see below
 		}
 
-		// pour these directly into the initial state
+		// pour these directly into the initial state.  The control panel saves
+		// these params in its state, but they're not saved in localStorage until a user clicks
+		// SetWave or SetPotential.
 		let waveParams = getAGroup('waveParams');
 		let potentialParams = getAGroup('potentialParams');
 		Object.assign(this.state, waveParams, potentialParams);
+
+		eSpaceCreatedPromise.then(space => {
+			// not much happens without this info
+			this.space = space;
+			this.N = space.dimensions[0].N;
+			this.grinder = space.grinder;
+			this.mainEWave = space.mainEWave;
+
+		});
 
 		// the static declaration down below fills its variable before an actual
 		// instance is created, so the storeSettings hasn't been initiated yet.
@@ -79,13 +100,14 @@ export class ControlPanel extends React.Component {
 
 	// set freq of iteration, which is 1, 2, 4, 8, ... some float number of times per second you want frames.
 	// freq is how the CPToolbar handles it, but we keep the period in the ControlPanel state,
-	// also in iterationSettings:iteratePeriod
+	// also in iterationSettings:iterationPeriod
 	setIterateFrequency =
 	freq =>{
 		// set it in the settings, controlpanel state, and SquishPanel's state, too.
 		let period = 1000. / +freq;
-		this.setState({iteratePeriod: storeASetting('iterationSettings', 'iteratePeriod', period)});
-		this.props.setIteratePeriod(period);  // so squish panel can adjust the heartbeat
+		this.setState({iterationPeriod: storeASetting('iterationSettings', 'iterationPeriod', period)});
+		this.props.setIterationPeriod(period);  // so squish panel can adjust the heartbeat
+		// NO!  the grinder doesn't use this; squishpanel does.  this.grinder.iterationPeriod = period;
 	}
 
 	// the first time, we get it from the settings.  in the constructor.
@@ -127,10 +149,10 @@ export class ControlPanel extends React.Component {
 	paintMainWave =
 	waveParams => {
 		const p = this.props;
-		if (!p.space)
+		if (!this.space)
 			return;
 
-		const mainEWave = p.space.mainEWave;
+		const mainEWave = this.space.mainEWave;
 		mainEWave.setFamiliarWave(waveParams);  // eSpace does this initially
 		qe.grinder_copyFromAvatar(this.grinder.pointer, this.mainEWave.pointer);
 		p.redrawWholeMainWave();
@@ -166,15 +188,49 @@ export class ControlPanel extends React.Component {
 		storeASetting('potentialParams', 'valleyOffset', valleyOffset);
 	}
 
-	slideWave =
-	ev => {
-		console.info(`slide wave `, ev)
-	}
-
 	setShowingTab =
 	tabCode => {
 		this.setState({showingTab: storeASetting('miscSettings', 'showingTab', tabCode)});
 	}
+
+
+	/* ********************************************** iteration */
+
+	// dt is time per step, for the algorithm; deltaT is time per iteration, the user/UI control)
+	setDeltaT = deltaT => {
+		deltaT = storeASetting('iterationSettings', 'deltaT', deltaT);
+		this.setState({deltaT});
+		this.grinder.dt = deltaT / (this.state.stepsPerIteration + N_EXTRA_STEPS);  // always one more!
+	}
+
+	setStepsPerIteration =
+	stepsPerIteration => {
+		try {
+			if (traceSetPanels) console.log(`js setStepsPerIteration(${stepsPerIteration})`);
+			storeASetting('iterationSettings', 'stepsPerIteration', stepsPerIteration);
+			this.setState({stepsPerIteration});
+			this.grinder.stepsPerIteration = stepsPerIteration;
+		} catch (ex) {
+			// eslint-disable-next-line no-ex-assign
+			ex = interpretCppException(ex);
+			console.error(`setStepsPerIteration error:`,
+				ex.stack ?? ex.message ?? ex);
+			////debugger;
+		}
+	}
+
+	// sets the LPF in both SPanel state AND in the C++ area
+	setLowPassFilter =
+	lowPassFilter => {
+		if (traceSetPanels) console.log(`js setLowPassFilter(${lowPassFilter})`)
+
+		let lpf = storeASetting('iterationSettings', 'lowPassFilter', lowPassFilter);
+		this.setState({lowPassFilter: lpf});
+
+		// here's where it converts from percent to the C++ style integer number of freqs
+		this.grinder.lowPassFilter = Math.round(lpf / 200 * this.state.N);
+	}
+
 
 
 	/* ********************************************** render  pieces */
@@ -194,7 +250,7 @@ export class ControlPanel extends React.Component {
 				saveMainWave={this.saveMainWave}
 				waveParams={{waveBreed, waveFrequency, pulseWidth, pulseOffset,}}
 				setCPState={this.setCPState}
-				space={p.space}
+				space={this.space}
 			/>;
 
 		case 'potential':
@@ -202,7 +258,7 @@ export class ControlPanel extends React.Component {
 				setPotentialHandler={this.setPotentialHandler}
 				potentialParams={{ valleyPower, valleyScale, valleyOffset,}}
 				setCPState={this.setCPState}
-				space={p.space}
+				space={this.space}
 				toggleShowPotential={p.toggleShowPotential}
 				showPotential={p.showPotential}
 			/>;
@@ -212,14 +268,14 @@ export class ControlPanel extends React.Component {
 
 		case 'iteration':
 			return <SetIterationTab
-				deltaT={p.deltaT}
-				setDeltaT={p.setDeltaT}
-				stepsPerIteration={p.stepsPerIteration}
-				setStepsPerIteration={p.setStepsPerIteration}
-				lowPassFilter={p.lowPassFilter}
-				setLowPassFilter={p.setLowPassFilter}
+				deltaT={s.deltaT}
+				setDeltaT={this.setDeltaT}
+				stepsPerIteration={s.stepsPerIteration}
+				setStepsPerIteration={this.setStepsPerIteration}
+				lowPassFilter={s.lowPassFilter}
+				setLowPassFilter={this.setLowPassFilter}
 
-				N={p.N}
+				N={this.N}
 				iStats={p.iStats}
 			/>;
 
@@ -234,13 +290,13 @@ export class ControlPanel extends React.Component {
 		const s = this.state;
 
 		// before the mount event on SquishPanel
-		// why?  this just shows panels and buttons if (!p.space) return '';
+		// why?  this just shows panels and buttons if (!this.space) return '';
 
 		let showingTabHtml = this.createShowingTab();
 
 		return <div className='ControlPanel'>
 			<CPToolbar
-				iterateFrequency={1000. / s.iteratePeriod}
+				iterateFrequency={1000. / s.iterationPeriod}
 				setIterateFrequency={this.setIterateFrequency}
 
 				isTimeAdvancing={ControlPanel.isTimeAdvancing}
@@ -249,10 +305,9 @@ export class ControlPanel extends React.Component {
 				setPotentialHandler={this.setPotentialHandler}
 				toggleShowPotential={p.toggleShowPotential}
 				showPotential={p.showPotential}
-				slideWave={this.slideWave}
 
-				N={p.N}
-				space={p.space}
+				N={this.N}
+				space={this.space}
 			/>
 			<div className='cpSecondRow'>
 				<ul className='TabBar' >
