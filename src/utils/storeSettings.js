@@ -212,7 +212,7 @@ export function createStoreSettings() {
 
 	/* ************************************ iterationSettings */
 	makeParam('iterationSettings', 'isTimeAdvancing', false,  [false, true]);
-	makeParam('iterationSettings', 'iteratePeriod', 50, {min: 16, max: 60_001});
+	makeParam('iterationSettings', 'iterationPeriod', 50, {min: 16, max: 60_001});
 	makeParam('iterationSettings', 'deltaT', 1, {min: .01, max: 100.0, });
 	makeParam('iterationSettings', 'stepsPerIteration', 100, {min: 10, max: 1e5});
 	makeParam('iterationSettings', 'lowPassFilter', 50, {min: 0, max: 75});

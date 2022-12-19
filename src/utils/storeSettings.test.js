@@ -127,7 +127,7 @@ describe('cxToColor tests', () => {
 
 	/* ************************************ iterationSettings */
 	testParam('iterationSettings', 'isTimeAdvancing', false,  [false, true]);
-	testParam('iterationSettings', 'iteratePeriod', 50, {min: 16, max: 60_001});
+	testParam('iterationSettings', 'iterationPeriod', 50, {min: 16, max: 60_001});
 	testParam('iterationSettings', 'deltaT', 1, {min: .01, max: 100.0, });
 	testParam('iterationSettings', 'stepsPerIteration', 100, {min: 10, max: 1e5});
 	testParam('iterationSettings', 'lowPassFilter', 50, {min: 0, max: 75});
