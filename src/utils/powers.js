@@ -34,14 +34,12 @@ export const stepsPerDecadeStepFactors = {
 	// 26: [16, 18, 20, 22, 24,  28,]  // 6 steps per binade
 	// 28: [16, 18, 20, 22, 24, 26, 28, 30, ]  // 8 steps per binade
 };
-//const Base2 = 16;
 
 // convert eg 20, 21, 25, 30 into 100, 125, 300, 1000, the corresponding power
 // special case: pass spd=16 to get a power-of-2 setting
 // willRoundPowers = boolean, true if all values should be integers   stepFactors = element of stepsPerDecadeStepFactors
 // ix = actual index to convert to a power
 export function indexToPower(willRoundPowers, stepFactors, spd, ix) {
-	//console.info(`indexToPower(willRoundPowers=${willRoundPowers}    stepFactors=[${stepFactors[0]},${stepFactors[1]},${stepFactors[2]}]    spd=${spd}    ix=${ix} )   `)
 	let whichDecade, decadePower, factor;
 	if (spd != 16) {
 		whichDecade = Math.floor(ix/spd);
@@ -56,13 +54,11 @@ export function indexToPower(willRoundPowers, stepFactors, spd, ix) {
 	}
 	let power = factor * decadePower;
 	if (willRoundPowers) power = Math.round(power) ;
-	//console.info(`indexToPower - spd=${spd}  ix=${ix}  => power=${power}    factor=${factor}  whichDecade=${whichDecade } `)
 	return power
 }
 
 // convert eg 100, 125, 300, 1000 into 20, 21, 25, 30
 export function powerToIndex(spd, power) {
-	//console.info(`powerToIndex(power=${power}   spd=${spd}  ) `)
 	let logOf;
 	if (spd != 16) {
 		logOf = Math.log10(power) * spd;
@@ -71,11 +67,9 @@ export function powerToIndex(spd, power) {
 		logOf = Math.log2(power);
 	}
 
-	//console.info(`powerToIndex - spd=${spd}  power=${power}    logOf=${logOf}  6=${6}   `)
 
 	// now it's reasonable at this point to say why are we rounding vs flooring?  Well, try spd=3 and power=200;
 	// log*spd => 6.903 which falls down to 6 when it should be 7.
-	//return Math.floor(logOf);
 	return Math.round(logOf);
 }
 
@@ -104,7 +98,6 @@ export function powerToIndex(spd, power) {
 
 // powers of 2
 export function isPowerOf2(n) {
-	//console.info(`isPowerOf2(${n}) `);
 	while (n > 1 ){
 		// if it's got more than 1 bit on
 		if (n & 1) return false;

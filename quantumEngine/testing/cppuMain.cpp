@@ -153,8 +153,6 @@ void compareWaves(qBuffer *qexpected, qBuffer *qactual) {
 
 
 static void complexEqualText(qCx cx1, qCx cx2, const char *msg) {
-	//printf("checking.   see if (%lf %lf) == (%lf %lf) close enough.\n",
-	//	cx1.re, cx1.im, cx2.re, cx2.im);
 	DOUBLES_EQUAL_TEXT(cx1.re, cx2.re, ERROR_RADIUS, msg);
 	DOUBLES_EQUAL_TEXT(cx1.im, cx2.im, ERROR_RADIUS, msg);
 }

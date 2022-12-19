@@ -62,7 +62,6 @@ class GLView extends React.Component {
 	static propTypes = {
 		viewClassName: PropTypes.string.isRequired,
 		viewName: PropTypes.string,
-		//returnGLFuncs: PropTypes.func.isRequired,
 
 		width: PropTypes.number.isRequired,
 		height: PropTypes.number.isRequired,
@@ -95,8 +94,6 @@ class GLView extends React.Component {
 			return null;
 		if (trySRGB) {
 			this.srgbExt = this.srgbExt = gl.getExtension("EXT_sRGB");  // make colors brighter?
-			//if (!srgbExt)
-			//	return null;
 		}
 
 		// backfill these methods for consistent usage
@@ -122,7 +119,6 @@ class GLView extends React.Component {
 		if (!canvas) return;  // i have no idea why this happens but we can't use the canvas
 
 		const p = this.props;
-		//const s = this.state;
 		if (this.canvas === canvas)
 			return;  // already done
 
@@ -140,9 +136,6 @@ class GLView extends React.Component {
 		if (!this.gl)
 			tooOldTerminate(`Sorry, your browser's WebGL is kinidof old.`);
 
-		//console.info(`gl.getSupportedExtensions: `, this.gl.getSupportedExtensions());
-
-		//this.vao = this.gl.createVertexArray();
 		canvas.glview = this;
 		canvas.viewName = p.viewName;
 
@@ -153,18 +146,12 @@ class GLView extends React.Component {
 	initViewClass =
 	() => {
 		const p = this.props;
-		//const s = this.state;
 
-		//let vClass = listOfViewClasses['abstractViewDef'];
 		let vClass = listOfViewClasses[p.viewClassName];
 
 		// MUST use the props.avatar!  we can't get it from the space, cuz which one?
 		this.effectiveView = new vClass(p.viewName, this, p.space, p.avatar);
 		this.effectiveView.completeView();
-
-		// Make sure you call the new view's domSetup method.
-		// i think this is redundant - completeView() also does this...
-		//this.effectiveView.domSetupForAllDrawings(this.canvas);
 
 		// now that there's an avatar, we can set these functions so everybody can use them.
 		p.avatar.doRepaint = this.doRepaint;
@@ -176,19 +163,6 @@ class GLView extends React.Component {
 		// never helps this.doRepaint();
 
 	}
-
-	// Tell the GLView & its view(s) that the wave contents have changed dramatically;
-	// essentially refilled with different numbers.  In practice, just resets
-	// the avgHighest.  Passed up to a higher Component.
-	//reStartDrawing =  !!! now done in eAvatar.smoothHighest
-	//() => {
-	//	if (this.effectiveView) {
-	//		//this.effectiveView.reStartDrawing();
-	//		//const curView = this.effectiveView || this.state.effectiveView;
-	//		this.effectiveView.drawings.forEach(dr => dr.reStartDrawing());
-	//		if (tracePainting) console.log(`🖼 🖼 GLView:${this.props.viewName} ${this.props.avatar.label}: did reStartDrawing`);
-	//	}
-	//}
 
 	setGeometry =
 	() => {
@@ -219,8 +193,6 @@ class GLView extends React.Component {
 
 		// NO!  now done before drawing each drawing individually this.effectiveView.reloadAllVariables();
 		let endReloadVarsNBuffer = performance.now();
-		//if (tracePainting)
-		//	p.avatar.dumpViewBuffer(`🖼 🖼 GLView ${p.viewName}: reloaded AllVariables`);
 
 		// draw
 		this.effectiveView.drawAllDrawings();
@@ -229,14 +201,12 @@ class GLView extends React.Component {
 			console.log(`🖼 🖼 GLView ${p.viewName} ${p.avatar.label}: doRepaint done drawing`);
 
 		return {endReloadVarsNBuffer, endDraw};
-		//return {endReloadVarsNBuffer, endReloadInputs, endDraw};
 	}
 
 	// this just creates the canvas
 	render() {
 		const p = this.props;
 		//const s = this.state;
-		//if (traceGLView) console.log(`🖼 🖼 GLView ${p.viewName}  ${p.avatar?.label}: about to render`);
 
 		return (
 			<canvas className='GLView'

@@ -48,10 +48,6 @@ struct qGrinder {
 	double *potential;
 	double potentialFactor;  // aligned by 8
 
-	// and a scratch wave for stepping.... no more.  use waves[1] instead
-	//struct qWave *scratchQWave;
-	//struct qWave *getScratchWave(void);
-
 	// for the fourier filter.  Call the function first time you need it.
 	// owned if non-null
 	struct qSpectrum *qspect;
@@ -71,14 +67,6 @@ struct qGrinder {
 	// For the interactive simulation switch, see isTimeAdvancing in JS.
 	bool isIterating;
 
-	// this is different now; js DOES pleaseIterate()
-	//	JS calls pleaseIterate() from a worker whenever it's time to start an
-	//	iteration. If it's already doing one, it'll remember to do another
-	//	immediately after the current iteration, using needsIteration, and
-	//	pleaseIterate() will return false. Otherwise, it'll do an iteration
-	//	immediately, and return true after the last iteration (which could be
-	//	a long time).
-	//bool pleaseIterate(void);
 	bool needsIteration;
 
 	// what's the diff between this and isIterating?  not much.
@@ -115,9 +103,6 @@ extern "C" {
 
 	void grinder_copyFromAvatar(qGrinder *grinder, qAvatar *avatar);
 	void grinder_copyToAvatar(qGrinder *grinder, qAvatar *avatar);
-
-
-	//void grinder_delete(qGrinder *grinder);
 }
 
 

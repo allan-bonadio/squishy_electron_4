@@ -15,8 +15,6 @@ import cxToColorGlsl from './cxToColor.glsl.js';
 //console.log(`input:`, cxToColorGlsl);
 
 function convertFile() {
-	//console.log(`text: `, text);
-
 	// intro line for function, sigh, just do it by hand
 	text = text.replace(/vec3 cxToColor\(vec2 (\w+)\)/g, 'export function cxToColor($1) ');
 
@@ -60,9 +58,6 @@ export default function glTranslate() {
 
 	let jsText = convertFile();
 
-	//console.log(`here it is =============== pwd=${process.cwd()}`);
-	//console.log(jsText);
-	//console.log(`      done ===============`);
 
 	// at this point, the working dir is the project root.  This'll have to be
 	// updated if you rearrange directories.

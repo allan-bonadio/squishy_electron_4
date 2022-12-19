@@ -92,9 +92,6 @@ ev => {
 		console.error(`tThread error, bad verb: '${msg.verb}':`, msg);
 		break;
 	}
-	// now send a message back
-	//postMessage({verb: 'ping', message: `ok so worker got this message, '${ev.data}'`});
-
 }
 
 // first message we get has a Module object plus other stuff

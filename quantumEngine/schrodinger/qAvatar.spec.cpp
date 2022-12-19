@@ -48,7 +48,6 @@ static void completeNewAvatarGauntlet(int N) {
 
 	LONGS_EQUAL(0, avatar->elapsedTime);
 	LONGS_EQUAL(0, avatar->iterateSerial);
-	//pointless DOUBLES_EQUAL(1.0, avatar->dt, 1e-12);
 	LONGS_EQUAL(100, avatar->stepsPerIteration);
 	// long story DOUBLES_EQUAL(N/8, avatar->lowPassFilter, 1e-12);
 	LONGS_EQUAL(false, avatar->isIterating);
@@ -104,7 +103,6 @@ static void tryFourierFilter(int N, int goodFreq, int badFreq, int lowPassFilter
 	rainbow->generateSpectrum(qw);
 	if (traceFourierFilter)
 		rainbow->dumpSpectrum("spectrum before FourierFilter(), input wave:");
-	//qw->dump("avatar wave BEFORE fourierFilter()", true);
 
 	// now the actual filter, do it!
 	avatar->fourierFilter(lowPassFilter);
@@ -113,11 +111,8 @@ static void tryFourierFilter(int N, int goodFreq, int badFreq, int lowPassFilter
 	rainbow->generateSpectrum(qw);
 	if (traceFourierFilter)
 		rainbow->dumpSpectrum("after fourierFilter()");
-	//qw->dump("")
-	//rainbow->dumpHiRes("tryFourierFilter() done");
 
 	CHECK(shouldFail ^ isAllZeroesExceptFor(rainbow, goodFreq));
-	//qw->dump("avatar wave AFTER fourierFilter()", true);
 
 	delete avatar;
 	delete space;
@@ -165,9 +160,6 @@ static void fourierExperiments(int N) {
 	qSpectrum *allOnes = new qSpectrum(space);
 	allOnes->fill();
 
-	//allOnes->wave[N/4] = 1;
-	//allOnes->wave[1] = 1;
-	//allOnes->wave[0] = 1;
 	allOnes->wave[N/2 - 1] = 1;
 
 	allOnes->dumpSpectrum("all ones");
@@ -177,7 +169,6 @@ static void fourierExperiments(int N) {
 	allOnes->generateWave(onesWave);
 	onesWave->dump("onesWave after conversion", true);
 
-	//isAllZeroes(allOnes);
 	delete allOnes;
 	delete onesWave;
 	delete avatar;

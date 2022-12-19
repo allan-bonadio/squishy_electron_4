@@ -36,9 +36,8 @@ function dumpRow(ix, re, im, prev, isBorder) {
 
 	// make sure diff is -180 ... +180
 	let dPhase = (phase - prev.phase + 180) / 360;
-	dPhase = (dPhase - floor(dPhase)) * 360 - 180;
-	//let dPhase = phase - prev.phase + 360;  // so now its positive, right?
-	//while (dPhase >= 360) dPhase -= 360;
+	if (dPhase <= -180) dPhase += 360;
+	if (dPhase > 180) dPhase -= 360;
 
 	prev.phase = phase;
 
@@ -59,29 +58,22 @@ export function rainbowDump(wave, start, end, nPoints, title) {
 	if (isNaN(start2) || isNaN(end2))
 		debugger;
 
-// 	const wave = this.wave;
-// 	const {start2, end2} = this.space.startEnd2;
-
 	// maybe doesn't work when called from c++?
 	console.log(`%c rainbowDump  🌊 |  ${title} `,
 		`color: #222; background-color: #fff; font: 14px Palatino;`);
-	//console.info(`${start2/2}...${end2/2}  🌊 with ${nPoints} pts`0;
 
 	// autorange
 	let maxi = 0;
 	for (let ix2 = start2; ix2 < end2; ix2 += 2)
 		maxi = Math.max(maxi, wave[ix2] ** 2 + wave[ix2 + 1] ** 2);
 	let correction = 1000 / maxi;  // intended max width in console
-	//console.info(`maxi=${maxi}  corr=${correction}`)
 
 	for (let ix2 = start2; ix2 < end2; ix2 += 2) {
 		let mag = (wave[ix2] ** 2 + wave[ix2 + 1] ** 2) * correction;
-		//console.info(`mag=${mag}  mag pre corr=${mag / correction}`)
 
 		// should change this to cxToColor()
 		let color = cxToColor([wave[ix2], wave[ix2 + 1]]);
 		color = `rgb(${color[0]*255}, ${color[1]*255}, ${color[2]*255})`;
-		//let color = cxToRgb({re: wave[ix2], im: wave[ix2 + 1]});
 		console.log(`%c `, `background-color: ${color}; padding-right: ${mag+5}px; `);
 	}
 }
@@ -127,7 +119,6 @@ class eWave {
 		else if (Number.isInteger(waveArg)) {
 			// Mapped from C++; waveArg is integer offset from start of C++ space
 			const wave = new Float64Array(window.Module.HEAPF64.buffer, waveArg, 2 * space.nPoints);
-			//space.waveBuffer = qe.waveBuffer = wave;
 			this.wave = wave;
 			cppObjectRegistry[waveArg] = wave;
 
@@ -234,11 +225,6 @@ class eWave {
 		return iProd;
 	}
 
-	// I can't get this one to work...
-	//normalize() {
-	//	qe.wave_normalize(this.pointer);
-	//}
-
 	// refresh the wraparound points
 	// modeled after fixThoseBoundaries() in C++ pls keep in sync!
 	fixBoundaries() {
@@ -279,7 +265,6 @@ class eWave {
 	// pass negative to make it go backward.
 	// the first point here is like x=0 as far as the trig functions, and the last like x=-1
 	setCircularWave(n) {
-		//console.info(`setCircularWave(${n})`);
 		const {start2, end2, N} = this.space.startEnd2;
 		const dAngle = Math.PI / N * (+n) * 2;
 		const wave = this.wave;
@@ -444,10 +429,8 @@ class eWave {
 		this.normalize();
 		this.fixBoundaries();
 
-		if (traceSetFamiliarWaveResult) {
-			//this.dump(`eWave.setFamiliarWave(${waveParams.waveBreed}) done`);
+		if (traceSetFamiliarWaveResult)
 			this.rainbowDump(`eWave.setFamiliarWave(${waveParams.waveBreed}) done`);
-		}
 	}
 }
 

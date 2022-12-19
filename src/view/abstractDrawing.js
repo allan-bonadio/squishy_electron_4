@@ -40,9 +40,6 @@ export class abstractDrawing {
 		this.gl = viewDef.gl;
 		//this.vaoExt = viewDef.vaoExt;
 
-		//this.bufferDataDrawMode = viewDef.bufferDataDrawMode;
-		//bufferDataDrawMode = this.gl.STATIC_DRAW;
-
 		this.space = viewDef.space;
 		this.avatar = viewDef.avatar;
 		this.avatarLabel = viewDef.avatar.label;
@@ -91,10 +88,6 @@ export class abstractDrawing {
 		this.vao = this.gl.createVertexArray();
 		this.setDrawing();
 
-		//if (traceAttrNames) {
-		//	this.program = program;
-		//	this.dumpAttrNames('before compile');
-		//}
 		const vertexShader = this.compileShader(gl.VERTEX_SHADER, this.vertexShaderSrc);
 		gl.attachShader(program, vertexShader);
 		this.vertexShader = vertexShader;

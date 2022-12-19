@@ -81,7 +81,6 @@ void addSpaceDimension(int N, int continuum, const char *label) {
 
 // call this from JS to finish the process for the qSpace, create and add the avatars & potential
 struct salientPointersType *completeNewSpace(void) {
-	//printf("completeNewSpace starts\n");
 	if (traceSpaceCreation)
 		printf("🚀 🚀 🚀  JS completeNewSpace starts(%s)   theSpace=%p\n",
 			theSpace->label, theSpace);

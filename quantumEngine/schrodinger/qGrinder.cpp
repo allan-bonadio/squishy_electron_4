@@ -83,8 +83,8 @@ qGrinder::~qGrinder(void) {
 	// we delete any buffers hanging off the qGrinder here.
 	// eGrinder will delete the Grinder object and any others needed.
 
-	//delete qflick;
-	//qflick = NULL;
+	delete qflick;
+	qflick = NULL;
 
 	// these may or may not have been allocated, depending on whether they were needed
 	if (qflick->waves[1])

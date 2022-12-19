@@ -13,6 +13,7 @@ const VALLEY_FACTOR = .000_01;
 // Potential is simple array.  No wrapper object needed (not yet)  Just make a typed array from what C++ created
 // um... soon though, call it ePotential.  maybe also on the c++ side
 
+// don't need this - I never calculate the boundary points so don't need their potential
 export function fixPotentialBoundaries(space, potential) {
 	const {end, continuum} = space.startEnd;
 
@@ -66,8 +67,6 @@ export function setFamiliarPotential(space, potentialArray, potentialParams) {
 
 	// fix boundaries; the only points we didn't set
 	fixPotentialBoundaries(space, potentialArray);
-
-	//dumpPotential(space, potentialArray, 8);
 }
 
 export function dumpPotential(space, potentialArray, nPerRow = 1, skipAllButEvery = 1) {

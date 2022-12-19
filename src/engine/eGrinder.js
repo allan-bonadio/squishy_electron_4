@@ -26,11 +26,6 @@ class eGrinder {
 		// must allocate my qFlick
 		//this.qflick = new qFlick(space, this, 4);
 
-		//this.ewave = new eWave(space, null, this._qwave);
-//		this.vBuffer = new Float32Array(
-//			window.Module.HEAPF32.buffer, vBufferPointer,
-//				space.nPoints * 8); // two vec4 s per point
-
 		if (traceCreation)
 			console.log(`eGrinder constructed:`, this);
 	}
@@ -88,33 +83,6 @@ class eGrinder {
 
 
 	/* **************************** end of direct accessors */
-
-	// this just gets the pointer to the view buffer...  integer pointer to C++ array
-	//getViewBuffer() {
-	//	return cppObjectRegistry[qe.grinder_getViewBuffer(this.pointer)];
-	//}
-	//
-	//// qGrinder functions run from here
-	//dumpViewBuffer(title) { qe.grinder_dumpViewBuffer(this.pointer, title) }
-	//
-	//reStartDrawing() {
-	//	// start the averaging over again
-	//	this.smoothHighest = 0;
-	//}
-	//
-	//loadViewBuffer() {
-	//	// flatDrawing will use this for tweaking the highest uniform
-	//	this.highest = qe.grinder_loadViewBuffer(this.pointer);
-	//	if (!this.smoothHighest)
-	//		this.smoothHighest = this.highest;
-	//	else
-	//		this.smoothHighest = (this.highest + 3*this.smoothHighest) / 4;
-	//	if (traceHighest) console.log(`🪓 eGrinder ${this.label}: highest=${this.highest}  `+
-	//		`smoothHighest=${this.smoothHighest}`);
-	//	if (traceVBuffer)
-	//		this.dumpViewBuffer(`afterLoadViewBuffer`);
-	//}
-
 	// can throw std::runtime_error("divergence")
 	oneIteration() {
 		qe.grinder_oneIteration(this.pointer);

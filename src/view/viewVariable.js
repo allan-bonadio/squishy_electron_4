@@ -86,7 +86,6 @@ export class viewUniform extends viewVariable {
 	// call this when the uniform's value changes, to reload it into the GPU
 	// actually, calls before each draw, always
 	reloadVariable() {
-		//debugger;
 		// is passed the previous value
 		const {value, type} =  this.getFunc(this.value);
 		if (traceUniforms) console.log(
@@ -130,7 +129,6 @@ export class viewAttribute extends viewVariable {
 	constructor(varName, drawing, tupleWidth, getFunc = () => {}) {
 		super(varName, drawing, getFunc);
 		this.tupleWidth = tupleWidth;  // num of float32s in each row/tuple
-		//debugger;
 
 		// small integer indicating which attr this is.  Set by compileProgram() for each drawing in the view def
 		const attrLocation = this.attrLocation = this.gl.getAttribLocation(drawing.program, varName);
@@ -184,16 +182,11 @@ export class viewAttribute extends viewVariable {
 	// must return another Float32Array (or same) with JS property 'nTuples'
 	reloadVariable() {
 		const gl = this.gl;
-		//console.log(`reload Array variable ${this.this.varName} : `, this.floatArray);
-		// not sure we have to do this again...  seems we don't.
-		//gl.bindBuffer(gl.ARRAY_BUFFER, this.glBuffer);
-		//debugger;
 
 		// get the latest
 		let floatArray = this.floatArray = this.getFunc();
 		this.nTuples = floatArray.nTuples
 
-		//this.gl.bindVertexArray(this.drawing.vao);
 		this.drawing.setDrawing();
 
 		// must do a bufferData() every frame now with our own personal vao?

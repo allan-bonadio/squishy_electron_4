@@ -47,7 +47,6 @@ qWave::qWave(qSpace *sp, qCx *useThisBuffer)
 	}
 
 	// enable this when qWave.h fields change
-	//formatDirectOffsets();
 }
 
 qWave::~qWave(void) {
@@ -76,11 +75,6 @@ void qWave::formatDirectOffsets(void) {
 	makeIntGetter(start);
 	makeIntGetter(end);
 	makeIntGetter(continuum);
-	//printf("\n");
-
-	//makeBoolGetter(dynamicallyAllocated);
-
-
 
 	printf("\n🚦 🚦 --------------- done with qWave direct access --------------\n");
 }
@@ -95,8 +89,6 @@ void qWave::forEachPoint(void (*callback)(qCx, int) ) {
 	qCx *wave = wave;
 	int end = dims->end + dims->start;
 	for (int ix = 0; ix < end; ix++) {
-		//printf("\n[%3d] ", ix);
-		//printf("(%lf,%lf) \n", wave[ix].re, wave[ix].im);
 		callback(wave[ix], ix);
 	}
 }
@@ -107,8 +99,6 @@ void qWave::forEachState(void (*callback)(qCx, int) ) {
 	int end = dims->end;
 	qCx *wave = wave;
 	for (int ix = dims->start; ix < end; ix++) {
-		//printf("\n[%3d] ", ix);
-		//printf("(%lf,%lf) ", wave[ix].re, wave[ix].im);
 		callback(wave[ix], ix);
 	}
 

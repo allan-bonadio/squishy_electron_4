@@ -16,20 +16,6 @@ import eThread from './eThread.js';
 let traceStartup = false;
 let tracePromises = false;
 
-/* ****************************************************** experiments */
-// not healthy i think.  Everything else halts after this is done.
-//function dumpModule() {
-//	let noProc = Module[writeStringToMemory];
-//	for (let key in Module) {
-//		let val = Module[key];
-//		//let valString = val.toString();
-//		if (val != noProc)
-//			console.log(`Module[${key}] = `, val);
-//	}
-//}
-//dumpModule();
-//console.log(`done sumping module`);
-
 /* ****************************************************** app startup */
 
 // c++ main() calls us to tell us that it's up, and to pass some fundamental sizes
@@ -104,7 +90,6 @@ function quantumEngineHasStarted(maxDims, maxLab) {
 	MAX_DIMENSIONS = maxDims;
 	MAX_LABEL_LEN = maxLab;
 
-	//console.log(`quantumEngineHas...Started`, mDimensions, mLabel);
 	defineQEngineFuncs();
 	if (traceStartup) console.log(`QEngineFuncs 🐣  defined`);
 

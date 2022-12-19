@@ -59,7 +59,6 @@ export function thousandsBackup(n) {
 	n = Math.round(n * 1e6) / 1e6;
 	let nInt = Math.floor(n);
 	let nFrac = (n) % 1;
-	//let nFrac = (n + 1e-13) % 1;
 	if (n < 1e-12) {
 		console.warn(` hey!  ${n} is too small for thousands!!`);
 	}
@@ -71,7 +70,6 @@ export function thousandsBackup(n) {
 		while (nuPart != fracPart) {
 			nuPart = fracPart;
 			fracPart = nuPart.replace(/ (\d\d\d)/, ' $1 ');  // each additional space
-			//console.info(`thousands: fracPart='${fracPart} '  nuPart='${nuPart}'`)
 		}
 		fracPart = fracPart.substr(1);  // get rid of leading 0
 	}
@@ -81,7 +79,6 @@ export function thousandsBackup(n) {
 	while (nuPart != intPart) {
 		nuPart = intPart;
 		intPart = nuPart.replace(/(\d\d\d) /, ' $1 ').trim();  // each additional space
-		//console.info(`thousands: intPart='${intPart}'   nuPart='${nuPart}'`)
 	}
 
 	console.log( '    done: '+ intPart + fracPart);

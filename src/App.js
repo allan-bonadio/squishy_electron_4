@@ -72,7 +72,6 @@ class App extends React.Component {
 		});
 	}
 
-	//static whyDidYouRender = true;
 	render() {
 		const s = this.state;
 
@@ -80,10 +79,7 @@ class App extends React.Component {
 		if (s.cppRunning && s.squishPanelExists)
 			sqPanel = <SquishPanel id='theSquishPanel' width={s.innerWindowWidth}/>;
 
-		//const stateParams = sParams || s.stateParams;
 		const sqDialog = s.isDialogShowing ? <CommonDialog  /> : null;
-			//stateParams={stateParams}
-			//closeResolutionDialog={() => this.closeResolutionDialog()}
 
 		return (
 			<div className="App">

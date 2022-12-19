@@ -41,8 +41,6 @@ int main() {
 
 	int hardwareConcurrency = qeStarted(MAX_DIMENSIONS, MAX_LABEL_LEN);
 	printf("hardwareConcurrency=%d  \n", hardwareConcurrency);
-	//printf("alignof(double) = %ld, alignof(int) = %ld, alignof(int *) = %ld, alignof(bool) = %ld\n",
-	//	alignof(double), alignof(int), alignof(int *), alignof(bool));
 	return 0;
 }
 

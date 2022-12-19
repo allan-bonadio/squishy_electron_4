@@ -24,13 +24,9 @@ qCx hamiltonian(qCx *wave, int x) {
 	qCx d2 = wave[x-1] + wave[x+1] - wave[x] * 2;
 	qCheck("hamiltonian d2", d2);
 
-	//printf("c++ d2= %lf %lf\n", d2.re, d2.im);
-
 	qCx pot = wave[x] * thePotential[x];
 	qCheck("hamiltonian pot", pot);
 	qCx rate = pot - d2;
-
-	//printf("c++ hamiltonian= %lf %lf\n", rate.re, rate.im);
 
 	return rate;
 }

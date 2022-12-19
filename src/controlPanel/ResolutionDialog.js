@@ -50,9 +50,6 @@ export default class ResolutionDialog extends React.Component {
 		ResolutionDialog.okCallback = okCallback;
 		ResolutionDialog.cancelCallback = cancelCallback;
 
-		//let initialParams = {N: getASetting('spaceParams', 'N'), continiuum: getASetting('spaceParams', 'continiuum')}]
-		//this.me.setState(initialParams);
-
 		// open the general dialog with resolutionDialog as the main component
 		CommonDialog.openDialog(
 			<ResolutionDialog />
@@ -79,23 +76,11 @@ export default class ResolutionDialog extends React.Component {
 		// freeze the iteration while this is going on ...
 		const timeWasAdvancing = ControlPanel.isTimeAdvancing;
 		ControlPanel.isTimeAdvancing = false;
-		//?? ResolutionDialog.me.setState()
 
 		// pass our state upward to load into the dialog
 		ResolutionDialog.openResDialog(
-			// this is the initialParams
-			//{N: s.N, continuum: s.continuum, mainViewClassName: s.mainViewClassName},
-
 			// OK callback
 			finalParams => {
-				//let prevLowPassFilter = s.lowPassFilter;
-				//let prevN = s.N;
-				//this.setState({mainViewClassName: finalParams.mainViewClassName});
-
-//				qe.deleteTheSpace();
-//
-//				create1DMainSpace({N: finalParams.N, continuum: finalParams.continuum, label: 'main'});
-
 				// this is the 0-th dimension of the space, the x axis
 				finalParams.label = 'x';
 				recreateMainSpace(finalParams);
@@ -103,16 +88,8 @@ export default class ResolutionDialog extends React.Component {
 				// do i really have to wait?  I think the promise only works the first time.
 				eSpaceCreatedPromise
 				.then(space => {
-					//this.setState({: ,
-					//N: finalParams.N, continuum: finalParams.continuum});
 					ControlPanel.isTimeAdvancing = timeWasAdvancing;
 				});
-
-				//storeASetting('spaceParams', 'N', finalParams.N);
-				//localStorage.space0 = JSON.stringify({N: finalParams.N, continuum: finalParams.continuum});
-				// should also work storeSettings.setSetting('space0.N, finalParams.N);
-				// and storeSettings.setSetting('space0.continuum, finalParams.continuum);
-
 			},  // end of OK callback
 
 			// cancel callback
@@ -189,33 +166,7 @@ export default class ResolutionDialog extends React.Component {
 		</>;
 	}
 
-	//renderViewRadios() {
-	//	//const onChange = ev => this.setState({mainViewClassName: ev.target.value});
-	//	// the one that theoreticallyt should work
-	//	const radioz = [];
-	//	for (let vuClassName in listOfViewClasses) {
-	//		const vuClass = listOfViewClasses[vuClassName];
-	//		//console.log(`doin this vuClass:`, vuClass.displayName);
-	//		//console.dir(vuClass);
-	//		//console.log(`   typeof:`, typeof vuClassName, typeof vuClass);
-	//		//console.log(`   names:`, vuClass.displayName, vuClass.displayName, vuClass.displayName);
-	//		radioz.push(<label key={vuClass.displayName}>
-	//			<input type='radio' key={vuClass.displayName} name='mainViewClassName'
-	//				value={vuClass.displayName}
-	//				checked={vuClass.displayName == this.state.mainViewClassName}
-	//				onChange={onChange}/>
-	//			{vuClass.displayName}</label>);
-	//	}
-	//	return radioz;
-	//}
-			//<section className='dialogSection' key='viewRadios'
-			//style={{float: 'left', width: '45%'}}>
-			//{this.renderViewRadios()}
-			//</section>
-
 	render() {
-		//const s = this.state;
-
 		return (
 			<article className='dialog ResolutionDialog'>
 

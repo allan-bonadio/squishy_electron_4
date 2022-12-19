@@ -12,8 +12,6 @@ import ResolutionDialog from './ResolutionDialog.js';
 //}
 
 function SetResolutionTab(props) {
-	//const p = props;
-
 	return (<div className='SetResolutionTab'>
 		<button className='setResolutionButton  round'
 			onClick={ev => ResolutionDialog.openResolutionDialog()}>

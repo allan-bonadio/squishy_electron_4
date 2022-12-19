@@ -138,7 +138,6 @@ class eAvatar {
 				console.log(`🚦             pleaseIterate oneItration`);
 			this.needsIteration = false;
 			this.oneIteration();
-			//eThread.oneIteration(this);
 			return true;
 		}
 	}

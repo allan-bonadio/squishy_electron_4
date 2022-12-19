@@ -24,7 +24,6 @@ function setPT() {
 		space: PropTypes.instanceOf(eSpace),
 
 		// actually sets the one in use by the algorithm
-		//setFlatPotentialHandler: PropTypes.func.isRequired,
 		setPotentialHandler: PropTypes.func.isRequired,
 		toggleShowPotential: PropTypes.func.isRequired,
 		showPotential: PropTypes.bool.isRequired,
@@ -44,56 +43,6 @@ class SetPotentialTab extends React.Component {
 	miniHeight = 100;
 	xScale = scaleLinear().range([0, this.miniWidth]);
 	yScale = scaleLinear().range([0, this.miniHeight]);
-
-	// rendering for the elements of the minitab
-	// Returns a <g element enclosing the juicy stuff
-	// NOT the main display space, but the minigraph space
-//	recipe =
-//	(miniSpace, potentialParams) => {
-//		//const p = this.props;
-//		//const {start, end, N, nPoints} = miniSpace.startEnd;
-//
-//		// temporarily disabled
-//		return '';
-
-		// keep these buffers around for reuse - a bit faster
-		// if (! this.potentialArray || this.potentialArray.length != nPoints)
-		// 	this.potentialArray = new Float64Array(nPoints);
-		// let potentialArray = this.potentialArray;
-		//
-		// // generate the values
-		// setFamiliarPotential(miniSpace, potentialArray, potentialParams);
-		//
-		// // calc domain
-		// let maxY = 0;
-		// let minY = 0;  // in case all the other values are zero, which is the default
-		// for (let ix = start; ix < end; ix++) {
-		// 	minY = Math.min(minY, potentialArray[ix]);
-		// 	maxY = Math.max(maxY, potentialArray[ix]);
-		// }
-		//
-		// // make some room in case it's small or zero
-		// minY -= SOME_POTENTIAL;
-		// maxY += SOME_POTENTIAL;
-		//
-		// this.xScale.domain([1, N]);
-		// this.yScale.domain([maxY, minY]);
-		//
-		// // generate the points for the <path
-		// let pathObj = d3path();
-		// //console.info(`point 1 = (${this.xScale(start)}, ${ this.yScale(potentialArray[start])})`)
-		// pathObj.moveTo(this.xScale(start),  this.yScale(potentialArray[start]).toFixed(2));
-		// for (let ix = start+1; ix < end; ix++) {
-		// 	pathObj.lineTo(this.xScale(ix), this.yScale(potentialArray[ix]).toFixed(2));
-		// }
-		// const d = pathObj.toString();
-		// //console.info(`d = ${d}`)
-		// //dumpPotential(miniSpace, potentialArray);
-		//
-		// return <g className='linePaths' >
-		// 	<path d={d} stroke='#fff' fill='none'  key='only' strokeWidth={3} />
-		// </g>;
-//	}
 
 	/* *************************************************************** short term setters */
 	// they keep the settings before user clicks 'flat' or 'valley'
@@ -164,7 +113,6 @@ class SetPotentialTab extends React.Component {
 
 	render() {
 		const p = this.props;
-		//const pp = p.potentialParams;
 
 		// remember that set*PotentialHandler is an event handler that gets the params from ControlPanel state
 		return <div className='setPotentialTab'>

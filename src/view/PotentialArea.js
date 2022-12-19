@@ -67,9 +67,6 @@ export class PotentialArea extends React.Component {
 			return false;
 
 		this.yScale = scaleLinear([-2, 8], [0, w.height]);
-		//this.yScale = scaleLinear([-2, 8], [y, y + w.height]);
-		//for (let j = -2; j <= 8; j += .5) console.log(`j=${j} -> ${this.yScale(j)}`)
-		//this.yScale = scaleLinear([0, 3], [y + w.height, y]);
 		// spongeFactor?
 
 		this.nPoints = p.space.nPoints;
@@ -103,15 +100,8 @@ export class PotentialArea extends React.Component {
 				return `M0,0`;  // too early
 		}
 
-		//if (tracePathAttribute)
-		//	console.log(`         xScale(d&r) & yScale(d&r):`,
-		//		this.xScale.domain(), this.xScale.range(), this.yScale.domain(), this.yScale.range(), );
-
 		const space = p.space;
-		//qe.qSpace_dumpPotential(`makePathAttribute(${start}, ${end})`);
 		const potentialBuffer = this.potentialBuffer = space.potentialBuffer;
-		//for (let i = 0; i < this.nPoints; i++)
-		//	console.log(`👆 👆 potentialBuffer[${i}] = ${potentialBuffer[i]}`);
 
 		// array to collect small snippets of text
 		const points = new Array(this.nPoints);
@@ -143,9 +133,7 @@ export class PotentialArea extends React.Component {
 		let {start, end, continuum} = p.space.startEnd;
 		let paths = [];
 
-		//switch (p.space.dimensions[0].continuum) {
 		switch (continuum) {
-			//case 	qe.contDISCRETE:
 			case qe.contWELL:
 				// stone slabs on each end on the borders vaguely means 'quantum well'.
 				paths.push(
@@ -162,8 +150,6 @@ export class PotentialArea extends React.Component {
 
 			case qe.contENDLESS:
 				// full width including boundaries?  can you drag the boundaries?!?!  no.
-				//start = 0;
-				//end += 1;
 				break;
 
 			default: throw new Error(`bad continuum ${p.space.dimensions.continuum}`);
@@ -194,9 +180,7 @@ export class PotentialArea extends React.Component {
 		return paths
 	}
 
-	//static whyDidYouRender = true;
 	render() {
-		//throw "holy smokes!"
 		if (traceRendering)
 			console.log(`👆 👆 PotentialArea.render()`);
 
@@ -208,7 +192,6 @@ export class PotentialArea extends React.Component {
 		if (! p.space)
 			return '';  // too early
 		this.barWidth = w.width / this.nPoints;
-		//debugger;
 
 		let returnV = (
 			<svg className='PotentialArea' viewBox={`0 0 ${w.width} ${w.height}`}
@@ -239,11 +222,8 @@ export class PotentialArea extends React.Component {
 		const w = p.wholeRect;
 
 		// new situation given new position
-		//let pixPotential = p.wholeRect.y + p.wholeRect.height - ev.clientY;
 		let newPotential = this.yScale.invert(w.height - ev.clientY + p.wholeRect.top);
-		//newPotential -= 5;  // dunno if this works better
 
-		//let ix = Math.round((ev.clientX - p.wholeRect.x) / this.barWidth);
 		let ix = Math.round(this.xScale.invert(ev.clientX));
 
 		if (ix == this.latestIx && newPotential == this.latestPotential)
@@ -278,7 +258,6 @@ export class PotentialArea extends React.Component {
 		this.latestIx = ix;
 		this.latestPotential = newPotential;
 
-		//qe.set1DPotential(ix, w.height + p.y - newPotential);
 		this.updatePotentialArea();
 		return true;
 	}
@@ -311,7 +290,6 @@ export class PotentialArea extends React.Component {
 
 		if (ev.buttons) {
 			this.changePotential(ev, 'move DRAGGING');
-			//debugger;
 			ev.preventDefault();
 			ev.stopPropagation();
 		}
@@ -334,7 +312,6 @@ export class PotentialArea extends React.Component {
 		console.log(`👆 👆 mouse UP on point (%f,%f) potential @ ix=%d stopped at %f`,
 			ev.clientX, ev.clientY,
 			this.latestIx, this.potentialBuffer[this.latestIx]);
-		//this.changePotential(ev, 'mouse UP');
 
 		// remind everybody that this episode is over.  Tune in next week.
 		this.latestIx = this.latestPotential = undefined;

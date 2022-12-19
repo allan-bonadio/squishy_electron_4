@@ -146,9 +146,6 @@ function makeParam(groupName, varName, defaultValue, criterion) {
 	vari.criterion = criterionFunction;
 	if (criterionFunction.max != undefined) {
 		Object.assign(vari, {...criterionFunction})
-		//vari.min = criterionFunction.min;
-		//vari.max = criterionFunction.max;
-		//vari.min = criterionFunction.max;
 	}
 
 
@@ -184,14 +181,11 @@ export function createStoreSettings() {
 
 	/* ************************************ spaceParams */
 	// somewhere you have to record the defaults and criterion for each setting, so here they are
-
-
 	// these also define the controls mins and maxes
 
 	// see also resolution dialog for the slider
 	makeParam('spaceParams', 'N', 64,  N => isPowerOf2(N) );
 
-	//makeParam('spaceParams', 'continuum', 2, [0, 1, 2]);
 	makeParam('spaceParams', 'continuum', qe.contENDLESS,
 		[qe.contDISCRETE, qe.contWELL, qe.contENDLESS]);
 
@@ -230,8 +224,6 @@ export function createStoreSettings() {
 }
 
 export function getAGroup(groupName) {
-	// it's ok  if (!alternateStoreVerifiers?.[groupName]) debugger;
-
 	let group;
 	try {
 		let savedGroup = localStorage.getItem(groupName);
@@ -277,19 +269,7 @@ export function storeASetting(groupName, varName, newValue) {
 
 export function getASetting(groupName, varName) {
 	let setting = getAGroup(groupName)[varName];
-// 	console.info(`get some stuff please `, groupName, varName, alternateStoreVerifiers, setting);
-// 	console.info(alternateStoreVerifiers[groupName]);////
-// 	console.info(alternateStoreVerifiers[groupName][varName]);
 	if (!alternateStoreVerifiers?.[groupName]?.[varName]) debugger;
-
-	//console.info(` alternateStoreVerifiers?.[groupName]?.[varName]?.(setting):`,
-	//		 alternateStoreVerifiers?.[groupName]?.[varName]?.(setting));
-	//console.info(` alternateStoreVerifiers?.[groupName]?.[varName]:`,
-	//		 alternateStoreVerifiers?.[groupName]?.[varName]);
-	//console.info(` alternateStoreVerifiers?.[groupName]:`,
-	//		 alternateStoreVerifiers?.[groupName]);
-	//console.info(` alternateStoreVerifiers`,
-	//		 alternateStoreVerifiers);
 
 	// this can still return undefined if the groupName or varName isn't there
 	if (setting === undefined

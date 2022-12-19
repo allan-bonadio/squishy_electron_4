@@ -25,9 +25,6 @@ qViewBuffer::qViewBuffer(qSpace *space, qAvatar *av)
 	vBuffer = new float[space->nPoints * 8];
 	if (traceViewBuffer) printf("📺 new qvBuffer(): vBuffer ptr %p \n",
 		vBuffer);
-	//printf("📺 qViewBuffer constructor done: this=%p   vBuffer=%p\n",
-	//this, vBuffer);
-	// done in completeNewSpace    theQViewBuffer = this;
 }
 
 qViewBuffer::~qViewBuffer() {
@@ -53,8 +50,6 @@ void qViewBuffer::dumpViewBuffer(const char *title) {
 			row[0], row[1], row[2], row[3]);
 
 
-		//float dRe = re - prevRe;
-		//float dIm = im - prevIm;
 		float re = row[4];
 		float im = row[5];
 		float phase = atan2(im, re) * 180 / PI;
@@ -87,12 +82,8 @@ float qViewBuffer::loadViewBuffer(void) {
 	int nPoints = space->nPoints;
 	double highest = 0;
 	double tiny = 1;
-	//double tiny = 0;
-	//double tiny = 1e-8;
 
 	if (traceInDetail) {
-		//printf("loadViewBuffer(P): thePotential=%p\n",
-		//thePotential);
 		printf("loadViewBuffer(B): qViewBuffer->avatar->qwave->wave=%p->%p->%p->%p\n",
 			this,
 			avatar,

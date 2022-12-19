@@ -46,7 +46,6 @@ export class WaveView extends React.Component {
 		elapsedTime: PropTypes.number,  // redraws when these change
 		iterateSerial: PropTypes.number,
 
-		//returnGLFuncs: PropTypes.func.isRequired,
 		setUpdatePotentialArea: PropTypes.func,
 
 		showPotential: PropTypes.bool.isRequired,
@@ -76,7 +75,6 @@ export class WaveView extends React.Component {
 			// eslint-disable-next-line no-ex-assign
 			ex = interpretCppException(ex);
 			console.error(ex.stack ?? ex.message ?? ex);
-			//debugger;
 		});
 	}
 
@@ -101,8 +99,6 @@ export class WaveView extends React.Component {
 
 	mouseMove =
 	ev => {
-		//if (this.resizing) {
-
 			const viewHeight = ev.pageY + this.yOffset;
 			if (this.state.height != viewHeight)
 				this.setState({height: viewHeight});
@@ -117,7 +113,6 @@ export class WaveView extends React.Component {
 
 	mouseUp =
 	ev => {
-		//if (this.resizing) {
 			if (traceDragCanvasHeight)
 				console.info(`mouse up ${ev.pageX} ${ev.pageY}`);
 			this.resizing = false;
@@ -136,7 +131,6 @@ export class WaveView extends React.Component {
 
 	/* ************************************************************************ render */
 
-	//static whyDidYouRender = true;
 	render() {
 		const p = this.props;
 		const s = this.state;

@@ -33,7 +33,6 @@ struct qViewBuffer {
 extern "C" {
 	void avatar_dumpViewBuffer(qAvatar *avatar, const char *title = NULL);
 	float *avatar_getViewBuffer(qAvatar *avatar);
-	//double qViewBuffer_loadViewBuffer(void);  // deprecated
 	double avatar_loadViewBuffer(qAvatar *avatar);
 }
 

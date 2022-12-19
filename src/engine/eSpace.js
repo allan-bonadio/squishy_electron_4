@@ -43,8 +43,6 @@ export class eDimension {
 // Coords are the same if two dims are parallel, eg two particles with x coords.
 // Not the same if one particle with x and y coords; eg you could have an endless canal.
 export class eSpace {
-	//unused static contCodeToText = code => ['Discrete', 'Well', 'Endless'][code];
-
 	constructor(dims, spaceLabel) {
 		if (traceSpace) console.log(`eSpace constructor just starting`, dims, spaceLabel);
 		if (dims.length > MAX_DIMENSIONS)
@@ -88,11 +86,6 @@ export class eSpace {
 
 		// remember that eSpace.salientPointers doesn't work for multiple spaces or multiple dimensions
 		eSpace.salientPointers = salientPointers;
-
-		// this reaches into C++ space and accesses the main wave buffer of this space
-		// hmmm space shouldn't point to this - just avatar?
-		//this.ewave = salientPointers.mainEWavethis.mainEAvatar;
-		//this.wave = this.ewave.wave;
 
 		this.pointer = salientPointers.spacePointer;
 		cppObjectRegistry[this.pointer] = this;
@@ -178,38 +171,6 @@ export class eSpace {
 		return {start2: dim.start*2, end2: dim.end*2, N: dim.N, nPoints2: this.nPoints * 2,
 			continuum: dim.continuum};
 	}
-
-	// refresh the wraparound points for ANY WAVE subscribing to this space
-	// 'those' or 'that' means some wave other than this.wave
-	// modeled after fixThoseBoundaries() in C++ pls keep in sync!
-	//fixThoseBoundaries(wave) {
-	//	if (this.nPoints <= 0) throw "🚀  qSpace::fixThoseBoundaries() with zero points";
-	//	const {end2, continuum} = this.startEnd2;
-	//
-	//	switch (continuum) {
-	//	case qe.contDISCRETE:
-	//		// no neighbor-to-neighbor crosstalk, well except...
-	//		// I guess whatever the hamiltonion says.  Everybody's got a hamiltonian.
-	//		break;
-	//
-	//	case qe.contWELL:
-	//		// the points on the end are ∞ potential, but the arithmetic goes bonkers
-	//		// if I actually set the voltage to ∞.  Remember complex values 2 doubles
-	//		wave[0] = wave[1] = wave[end2] = wave[end2+1] = 0;
-	//		break;
-	//
-	//	case qe.contENDLESS:
-	//		// the points on the end get set to the opposite side.  Remember this is for complex, 2x floats
-	//		wave[0] = wave[end2-2];
-	//		wave[1]  = wave[end2-1];
-	//		wave[end2] = wave[2];
-	//		wave[end2+1] = wave[3];
-	//		break;
-	//
-	//	default: throw new Error(`🚀  bad continuum '${continuum}' in  eSpace.fixThoseBoundaries()`);
-	//	}
-	//}
-
 }
 
 export default eSpace;

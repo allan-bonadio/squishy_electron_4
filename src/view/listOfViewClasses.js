@@ -11,12 +11,10 @@ import starViewDef from './starViewDef.js';
 // this will appear in the resolution dialog
 export const listOfViewClasses = {
 	abstractViewDef,
-	//manualViewDef, viewVariableViewDef, flatViewDef,
 
 	starViewDef,  // simple for testinig ... makes its own inputs
 
 
-	//drawingViewDef,
 	flatDrawingViewDef,
 };
 

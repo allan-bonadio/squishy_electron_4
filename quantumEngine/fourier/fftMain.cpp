@@ -38,8 +38,6 @@ void qSpectrum::generateSpectrum(qWave *inputQWave) {
 		start, N);
 
 	cooleyTukeyFFT(wave, inputQWave->wave + start, N);
-
-	//printf("    generateSpectrum completed\n");
 }
 
 // do an inverse FFT to reconstruct the wave from generateSpectrum()

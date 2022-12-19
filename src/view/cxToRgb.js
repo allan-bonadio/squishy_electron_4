@@ -3,9 +3,9 @@
 ** Copyright (C) 2021-2022 Tactile Interactive, all rights reserved
 */
 
+// this is obsolete.
 // this is rewritten from cxToColor.glsl to be the JS implementation.
-// (I tried to automatically translate it but it was too hard.)
-// fiinally got it working
+// by hand.  See new translator and new translation in subdir.
 
 const sqrtOneThird = Math.sqrt(1. / 3.);  // 0.57735..
 //const sqrtThreeOver2 = Math.sqrt(3.) / 2.;  // .8660...

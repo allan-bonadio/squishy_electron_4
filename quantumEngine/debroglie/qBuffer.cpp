@@ -82,9 +82,6 @@ void qBuffer::initBuffer(int length, qCx *useThisBuffer) {
 		dynamicallyAllocated = false;
 	}
 	else {
-		// borrow will allocate if nothing in the freelist
-		//wave = space->borrowBuffer();
-
 		wave = allocateWave(length);
 		dynamicallyAllocated = true;
 	}
@@ -101,11 +98,9 @@ qBuffer::~qBuffer() {
 		printf("🍕  start the qBuffer instance destructor...space=%p\n", space);
 	if (dynamicallyAllocated) {
 		freeWave(wave);
-//		printf("   🍕  freed qBuffer...\n");
 	}
 
 	space = NULL;
-	//wave = NULL;
 	if (traceAllocate) printf("   🍕  setted buffer to null; done with qBuffer destructor.\n");
 }
 
@@ -131,8 +126,6 @@ double qBuffer::dumpRow(char buf[200], int ix, qCx w, double *pPrevPhase, bool w
 
 		// difference, then adjust it to -180...+180
 		double dPhase = fmod(phase - *pPrevPhase + 180, 360) - 180.;
-		//double dPhase = phase - *pPrevPhase + 360.;  // so now its positive, right?
-		//if (dPhase >= 360.) dPhase -= 360.;
 
 		// if this or the previous point was (0,0) then the phase and dPhase will be NAN, and they print that way
 		snprintf(buf, 200, "[%3d] (%8.4lf,%8.4lf) | %8.3lf %9.3lf %8.4lf  m𝜓/nm",
@@ -141,16 +134,12 @@ double qBuffer::dumpRow(char buf[200], int ix, qCx w, double *pPrevPhase, bool w
 	}
 	else {
 		snprintf(buf,200, "[%3d] (%8.4lf,%8.4lf)    ... norm=%lg", ix, re, im, norm);
-		//snprintf(buf,200, "[%3d] (%8.4lf,%8.4lf)", ix, re, im);
 	}
 	return norm;
 }
 
 // you can use this on waves or spectrums; for the latter, leave off the start and the rest
 void qBuffer::dumpSegment(qCx *wave, bool withExtras, int start, int end, int continuum) {
-	//printf("qBuffer::dumpSegment(%p, %s)\n", wave, withExtras ? "with extras" : "without extras");
-	//printf("      start:%d  end:%d  continuum: %d\n", start, end, continuum);
-
 	if (start >= end) {
 		printf("qBuffer::dumpSegment(%p, %d, %d, %d)\n",
 			wave, start, end, continuum);
@@ -185,7 +174,6 @@ void qBuffer::dumpSegment(qCx *wave, bool withExtras, int start, int end, int co
 
 // any wave, probably shouldn't call this
 void qBuffer::dumpThat(qCx *wave, bool withExtras) {
-	//printf("🌊🌊 any wave, probably shouldn't call this\n");
 	qBuffer::dumpSegment(wave, withExtras, start, end, continuum);
 }
 
@@ -194,7 +182,6 @@ void qBuffer::dump(const char *title, bool withExtras) {
 	printf(" \n🌊🌊 qBuffer ==== a '%c%c%c%c'  %p->%p | %s ",
 		magic >> 24, magic >> 16, magic >> 8, magic, this, wave, title);
 	qBuffer::dumpSegment(wave, withExtras, start, end, continuum);
-	//space->dumpThat(wave, withExtras);
 	printf("        ==== end of Wave ====\n\n");
 }
 
@@ -218,18 +205,12 @@ void qBuffer::rainbowDump(const char *title) {
 	// this also has to compile for standard C++ with no emscripten
 	#ifdef EM_ASM
 	EM_ASM({
-		// somehow these console msgs never work
-		//console.log('rainbowDump: starting the inner JS; I received: start=%d end=%d nPoints=%d title=%s\n',
-		//$1, $2, $3);
-
 		// temporary
 		let waveJS = new Float64Array(window.Module.HEAPF64.buffer, $0, 2 * $3);
 		let titleJS = UTF8ToString($4);
 
-		//rainbowDump(wave, start, end, nPoints, title);
 		rainbowDump(waveJS, $1, $2, $3, titleJS);
 
-		//console.log("rainbowDump: done the inner JS; I received: start=%d end=%d nPoints=%d title=%s\n",
 		//	$1, $2, $3, $4);
 	}, wave, start, end, nPoints, title);
 	#endif
@@ -254,17 +235,12 @@ static void fixSomeBoundaries(qCx *wave, int continuum, int start, int end) {
 		// if I actually set the voltage to ∞
 		wave[0] = qCx();
 		wave[end] = qCx();
-		//printf("🌊🌊 contWELL cont=%d w0=(%lf, %lf) wEnd=(%lf, %lf)\n", continuum,
-		//wave[0].re, wave[0].im, wave[end].re, wave[end].im);
 		break;
 
 	case contENDLESS:
-		//printf("🌊🌊 Endless ye said: on the endless case, %d = %d, %d = %d\n", 0, N, end, 1 );
 		// the points on the end get set to the opposite side
 		wave[0] = wave[end-1];
 		wave[end] = wave[1];
-		//printf("🌊🌊 contENDLESS cont=%d w0=(%lf, %lf) wEnd=(%lf, %lf)\n", continuum,
-		//	wave[0].re, wave[0].im, wave[end].re, wave[end].im);
 		break;
 	}
 }
@@ -432,8 +408,5 @@ void qBuffer::add(qBuffer *qwave1, double coeff1, qBuffer *qwave2, double coeff2
 		dest[ix] = wave1[ix] * coeff1 +  wave2[ix] * coeff2;
 	}
 
-	//normalize();
-	//fixBoundaries();
-	//dump("qBuffer::add() done");
 }
 

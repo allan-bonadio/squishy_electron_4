@@ -95,7 +95,6 @@ void qAvatar::stepReal(qCx *newW, qCx *oldW, double dt) {
 	qDimension *dims = space->dimensions;
 	if (traceRealStep) printf("⚛️ start of stepReal nStates=%d, nPoints=%d, start=%d, end=%d\n",
 			space->nStates, space->nPoints, dims->start, dims->end);
-	//dumpThat(oldW, true);
 
 	for (int ix = dims->start; ix < dims->end; ix++) {
 		// second deriv wrt x of psi
@@ -104,7 +103,6 @@ void qAvatar::stepReal(qCx *newW, qCx *oldW, double dt) {
 
 		// total hamiltonian including potential
 		double H𝜓 = d2𝜓i + potential[ix] * potentialFactor * oldW[ix].re;
-		//double H𝜓 = d2𝜓i;   // without potential
 
 		// note subtraction
 		if (traceRealStep) printf("⚛️ stepReal ix=%d\n", ix);
@@ -122,8 +120,6 @@ void qAvatar::stepReal(qCx *newW, qCx *oldW, double dt) {
 // given the reals we just generated in stepReal() but don't change them
 void qAvatar::stepImaginary(qCx *newW, qCx *oldW, double dt) {
 	qDimension *dims = space->dimensions;
-	//printf("⚛︎ start of stepImaginary(), oldWave=");
-	//dumpThat(oldW, true);
 
 	for (int ix = dims->start; ix < dims->end; ix++) {
 		// second deriv d2𝜓r / dx**2
@@ -131,7 +127,6 @@ void qAvatar::stepImaginary(qCx *newW, qCx *oldW, double dt) {
 
 		// total hamiltonian
 		double H𝜓 = d2𝜓r + potential[ix] * potentialFactor * oldW[ix].im;
-		//double H𝜓 = d2𝜓r;  // without potential
 
 		// note addition
 		newW[ix].im = oldW[ix].im + dt * H𝜓;
@@ -142,7 +137,6 @@ void qAvatar::stepImaginary(qCx *newW, qCx *oldW, double dt) {
 		getTimeDouble());
 
 	qwave->fixThoseBoundaries(newW);
-	//printf("⚛️ end of stepImaginary - result wave:");
 }
 
 // form the new wave from the old wave, in separate buffers, chosen by our caller.
@@ -199,7 +193,6 @@ void qGrinder::stepReal(qCx *newW, qCx *oldW, double dt) {
 	qDimension *dims = space->dimensions;
 	if (traceRealStep) printf("⚛️ start of stepReal nStates=%d, nPoints=%d, start=%d, end=%d\n",
 			space->nStates, space->nPoints, dims->start, dims->end);
-	//dumpThat(oldW, true);
 
 	for (int ix = dims->start; ix < dims->end; ix++) {
 		// second deriv wrt x of psi
@@ -208,7 +201,6 @@ void qGrinder::stepReal(qCx *newW, qCx *oldW, double dt) {
 
 		// total hamiltonian including potential
 		double H𝜓 = d2𝜓i + potential[ix] * potentialFactor * oldW[ix].re;
-		//double H𝜓 = d2𝜓i;   // without potential
 
 		// note subtraction
 		if (traceRealStep) printf("⚛️ stepReal ix=%d\n", ix);
@@ -231,8 +223,6 @@ void qGrinder::stepReal(qCx *newW, qCx *oldW, double dt) {
 // given the reals we just generated in stepReal() but don't change them
 void qGrinder::stepImaginary(qCx *newW, qCx *oldW, double dt) {
 	qDimension *dims = space->dimensions;
-	//printf("⚛︎ start of stepImaginary(), oldWave=");
-	//dumpThat(oldW, true);
 
 	for (int ix = dims->start; ix < dims->end; ix++) {
 		// second deriv d2𝜓r / dx**2
@@ -240,7 +230,6 @@ void qGrinder::stepImaginary(qCx *newW, qCx *oldW, double dt) {
 
 		// total hamiltonian
 		double H𝜓 = d2𝜓r + potential[ix] * potentialFactor * oldW[ix].im;
-		//double H𝜓 = d2𝜓r;  // without potential
 
 		// note addition
 		newW[ix].im = oldW[ix].im + dt * H𝜓;
@@ -251,7 +240,6 @@ void qGrinder::stepImaginary(qCx *newW, qCx *oldW, double dt) {
 		getTimeDouble());
 
 	qflick->fixThoseBoundaries(newW);
-	//printf("⚛️ end of stepImaginary - result wave:");
 }
 
 // form the new wave from the old wave, in separate buffers, chosen by our caller.
@@ -265,7 +253,6 @@ void qGrinder::oneVisscherStep(qWave *newQWave, qWave *oldQWave) {
 	if (traceVischerBench) printf("❇️ oneVisscherStep, start: time=%lf\n",
 		getTimeDouble());
 
-	//oldQW->fixBoundaries();
 	if (traceOneStep) oldQW->dump("starting oneVisscherStep: old wave", true);
 
 	stepReal(newW, oldW, dt);

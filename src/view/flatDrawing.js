@@ -107,7 +107,6 @@ export class flatDrawing extends abstractDrawing {
 		this.avatar.loadViewBuffer();
 
 
-		//let maxHeightUniform =
 		this.maxHeightUniform = new viewUniform('maxHeight', this,
 			() => {
 				if (traceHighest)
@@ -120,7 +119,6 @@ export class flatDrawing extends abstractDrawing {
 
 		let nPoints = this.nPoints = this.space.nPoints;
 		let barWidth = 1 / (nPoints - 1);
-		//let barWidthUniform =
 		this.barWidthUniform = new viewUniform('barWidth', this,
 			() => ({value: barWidth, type: '1f'}) );
 
@@ -130,27 +128,13 @@ export class flatDrawing extends abstractDrawing {
 			this.avatar.vBuffer.nTuples = this.vertexCount;
 			return this.avatar.vBuffer;
 		});
-		//this.rowAttr.attachArray(this.avatar.vBuffer, this.rowFloats);
-
-		//this.dumpAttrNames('end of createVariables');
 
 		this.gl.bindVertexArray(null);
 	}
 
-	// call this when you reset the wave otherwise the smoothing is surprised
-	// thisi is now done in eAvatar.smoothHighest
-	//reStartDrawing() {
-	//	this.avgHighest = 0;
-	//}
-
 	draw() {
 		const gl = this.gl;
 		if (traceFlatDrawing) console.log(`flatDrawing ${this.viewName}, ${this.avatarLabel}: drawing`);
-
-		//this.setDrawing();  should be already done!
-		//this.viewVariables.forEach(v => v.reloadVariable());
-
-		//this.dumpAttrNames('beginning of flat draw');
 
 		gl.drawArrays(gl.TRIANGLE_STRIP, 0, this.vertexCount);
 
@@ -158,7 +142,6 @@ export class flatDrawing extends abstractDrawing {
 			gl.lineWidth(1);  // it's the only option anyway
 
 			gl.drawArrays(gl.LINES, 0, this.vertexCount);
-			//gl.drawArrays(gl.LINE_STRIP, 0, this.vertexCount);
 		}
 
 		if (alsoDrawPoints)

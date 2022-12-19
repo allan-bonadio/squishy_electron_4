@@ -49,10 +49,6 @@ TEST(visscher, VisscherOneStep)
 	avatar->oneVisscherStep(newWave4, oldWave4);
 	if (traceOneStep) printf("⚛️ after : oneVisscherStep\n");
 
-	//newWave4->dumpWave("VisscherOneStep");
-	//expectedWave4->dumpHiRes("expectedWave4");
-	//oldWave4->dumpHiRes("oldWave4");
-	//newWave4->dumpHiRes("newWave4");
 
 	compareWaves(expectedWave4, newWave4);
 	delete avatar;
@@ -113,9 +109,6 @@ TEST(visscher, VisscherOneIteration)
 	av->lowPassFilter = 10;
 
 	av->oneIteration();
-
-	// activate this to regenerate the expected table above
-	//av->qwave->dumpHiRes("VisscherOneIteration test");
 
 	// we'll use this to compare against
 	qWave *expectedQWave = new qWave(space, expectedArray);

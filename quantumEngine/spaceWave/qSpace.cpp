@@ -88,19 +88,6 @@ void qSpace::initSpace() {
 
 	// part of the space: the lay of the land
 	potential = new double[nPoints];
-
-
-	// this allocates the qwaves so must call this after sizes have been decided
-	// not there anymore avatar = new qAvatar(this);
-
-//	// try out different formulas here.  Um, this is actually set manually in CP
-//	avatar->dt = 1. / (nStates * nStates);
-	//double dt = dt = nStates * 0.02;  // try out different factors here
-
-	// used only for the RKs - therefore obsolete
-//	dtOverI = qCx(0., -dt);
-//	halfDtOverI = qCx(0., -dt / 2.);
-//	bufferNum = 0;
 }
 
 // the avatars and grinder are deleted in deleteTheSpace

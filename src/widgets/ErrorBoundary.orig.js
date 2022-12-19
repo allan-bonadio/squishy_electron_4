@@ -129,7 +129,6 @@ class ErrorBoundary extends React.Component {
 
 		// same error was set, before this
 		if (this.state.errorObj === errorObj) {
-			//console.info(`ErrorBoundary: sameold sameold `, errorObj.message);
 
 			// just make sure we got the infoObj - getDerivedStateFromError() doesn't get that.
 			if ( ! this.state.infoObj)

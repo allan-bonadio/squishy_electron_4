@@ -65,12 +65,7 @@ struct qBuffer {
 	// for a naked wave, and for a qWave.
 	// so the length of each buffer is nPoints from the wave's space.
 	void dumpThat(qCx *wave, bool withExtras = false);
-
-	//void dumpWave(const char *title, bool withExtras = false);
-
 	void dump(const char *title = "any buffer", bool withExtras = false);
-
-
 	void dumpHiRes(const char *title = "a hi res buffer");
 	void rainbowDump(const char *title = "a rainbow buffer");  // calls JS to do it
 

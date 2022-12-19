@@ -26,7 +26,6 @@
 // src and dest can be different or the same.  N better be a power of 2.
 void cooleyTukeyFFT(qCx *dest, qCx *src, int N)
 {
-	//printf("cooleyTukeyFFT(N=%d)\n", N);
 	if (N <= 1) return;
 
 	// make we can do this with first-stride-length objects
@@ -50,7 +49,6 @@ void cooleyTukeyFFT(qCx *dest, qCx *src, int N)
 	{
 		double angle = -2 * PI * k / N;
 		qCx t = qCx(cos(angle), sin(angle)) * odd[k];  // make a table to look these up
-		//std::polar(1.0, -2 * PI * k / N) * odd[k];
 		dest[k    ] = even[k] + t;
 		dest[k+N2] = even[k] - t;
 	}

@@ -85,7 +85,6 @@ struct qAvatar {
 	//	pleaseIterate() will return false. Otherwise, it'll do an iteration
 	//	immediately, and return true after the last iteration (which could be
 	//	a long time).
-	//bool pleaseIterate(void);
 	bool needsIteration;
 
 	// what's the diff between this and isIterating?  not much.
@@ -100,10 +99,6 @@ struct qAvatar {
 
 	// multiple steps; ≈ stepsPerIteration
 	void oneIteration(void);
-
-	//void oneRk2Step(qWave *oldQWave, qWave *newQWave);  // obsolete
-	//void oneRk4Step(qWave *oldQWave, qWave *newQWave);  // obsolete
-	//void visscherHalfStep(qWave *oldQWave, qWave *newQWave);  // obsolete
 
 	// visscher
 	void stepReal(qCx *newW, qCx *oldW, double dt);
@@ -123,10 +118,6 @@ extern "C" {
 	void avatar_oneIteration(qAvatar *avatar);
 
 	void avatar_askForFFT(qAvatar *avatar);
-
-	// a qSpace does not contain any qAvatars
-	// an eSpace DOES contain two eAvatars; this how it deletes them from JS
-	//void avatar_delete(qAvatar *avatar);
 }
 
 

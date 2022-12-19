@@ -58,8 +58,6 @@ varying highp vec4 vColor;
 
 void main() {
 	gl_FragColor = vColor;
-	//gl_FragColor = vec4(1., .5, .2, 1.);
-	//gl_FragColor = vec4(1.0, 1.0, .8, .5);
 }
 `;
 
@@ -83,29 +81,15 @@ export class ticDrawing extends abstractDrawing {
 
 		this.vao = this.gl.createVertexArray();
 
-		//let maxHeightUniform = this.maxHeightUniform =
-		//	new viewUniform('maxHeight', this,
-		//		() => {
-		//			// this gets called every redrawing (every reloadAllVariables() -> reloadVariable())
-		//			// isn't smoothed out as with flatDrawing - see if that's good or bad
-		//			return {value: this.avatar.highest, type: '1f'};
-		//		}
-		//	);
-
 		this.cornerFloats = 2;
 		this.cornerAttr = new viewAttribute('corner', this, this.cornerFloats, () => {
 			return this.generateTics();
 		});
-		//this.cornerAttr.attachArray(this.avatar.vBuffer, this.cornerFloats);
 	}
-
-	//reStartDrawing = () => {}
 
 	generateTics() {
 		// how big should the tics be?
 		let ticHalfHeight = 2 / this.gl.drawingBufferHeight;  // fixed number of pixels
-		//let ticHalfHeight = .01;  // proportional to graph height
-		//let ticHalfHeight = .003;  // proportional to graph height
 		let ticWidth = 20 / this.gl.drawingBufferWidth;  // fixed number of pixels
 		let ticOrigin = -1 - ticWidth/2;
 
@@ -166,7 +150,6 @@ export class ticDrawing extends abstractDrawing {
 		this.setDrawing();
 		this.viewVariables.forEach(v => v.reloadVariable());
 
-		//this.dumpAttrNames('start of tic drawing');
 
 		let start = 3;
 		let len = this.vertexCount - start;
@@ -181,13 +164,6 @@ export class ticDrawing extends abstractDrawing {
 
 		if (alsoDrawPoints)
 			gl.drawArrays(gl.POINTS, start, len);
-
-		// i think this is problematic
-		//if (dumpViewBufAfterDrawing) {
-		//	this.avatar.dumpViewBuffer(`finished drawing ${this.viewName} in ticDrawing.js; drew buf:`);
-		//	console.log(`barWidthUniform=${this.barWidthUniform.staticValue}    `
-		//		+`maxHeightUniform=`, this.maxHeightUniform.getFunc());
-		//}
 	}
 }
 

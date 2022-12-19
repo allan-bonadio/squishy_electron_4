@@ -25,8 +25,6 @@ qSpectrum::qSpectrum(qSpace *sp, qCx *useThisBuffer)
 	if (! space)
 		throw std::runtime_error("qSpectrum::qSpectrum null space");
 
-	//printf("🌈 🌈 qSpectrum::qSpectrum(%s)  utb=%p => this %p\n", space->label,
-	//	useThisBuffer, this);
 	initBuffer(space->spectrumLength, useThisBuffer);
 }
 

@@ -126,14 +126,12 @@ class LogSlider extends React.Component {
 		const p = this.props;
 		const spd = p.stepsPerDecade;
 		const cur = p.current;
-		//const cur = indexToPower(p.willRoundPowers, stepFactors, p.stepsPerDecade, p.current);
 
 		// the actual css ID used for the datalist
 		const uniqueId = `LogSliderDataList-${p.unique.replace(/\W+/, '_')}`;
 
 		// right on the edge of transition, it can vibrate!  average this out. so it slides gently
 		let val = powerToIndex(spd, p.current);
-		//val = (val + this.avgValue * 15) / 16
 
 		if (traceThisSlider.test(p.unique)) console.info(
 			`LogSlider render..  spd=${spd}, p.current=${p.current}   value=${val}`);

@@ -52,12 +52,6 @@ export class ControlPanel extends React.Component {
 			// state for the wave resets - these are control-panel only.
 			// waveParams - Only change if user clicks setWave
 
-			// the wave params have to be analogous when the N changes
-			//waveBreed: getASetting('waveParams', 'waveBreed'),
-			//waveFrequency: getASetting('waveParams', 'waveFrequency'),  // an integer (but a well can have halfs?)
-			//pulseWidth: getASetting('waveParams', 'pulseWidth'),  // a percentage
-			//pulseOffset: getASetting('waveParams', 'pulseOffset'),  // also a percentage
-
 			iteratePeriod: getASetting('iterationSettings', 'iteratePeriod'),
 
 			// state for potential resets - control panel only, setPotential()
@@ -93,13 +87,6 @@ export class ControlPanel extends React.Component {
 		this.setState({iteratePeriod: storeASetting('iterationSettings', 'iteratePeriod', period)});
 		this.props.setIteratePeriod(period);  // so squish panel can adjust the heartbeat
 	}
-
-	// set the frequency of iteration frames.  Does not control whether iterating or not.
-	//setIterateFrequency(newFreq) {
-	//	this.setState({iteratePeriod:
-	//		storeASetting('iterationSettings', 'iteratePeriod', 1000. / +newFreq)
-	//	});
-	//}
 
 	// the first time, we get it from the settings.  in the constructor.
 	static isTimeAdvancing = false;
@@ -147,11 +134,6 @@ export class ControlPanel extends React.Component {
 		mainEWave.setFamiliarWave(waveParams);  // eSpace does this initially
 		qe.grinder_copyFromAvatar(this.grinder.pointer, this.mainEWave.pointer);
 		p.redrawWholeMainWave();
-		//let mainEAvatar = p.space.mainEAvatar;
-		//mainEAvatar.reStartDrawing();
-		//mainEAvatar.elapsedTime = 0;
-		//mainEAvatar.iterateSerial = 0;
-		//mainEAvatar.doRepaint();  // only does the GL
 	}
 
 	// toolbar: reset wave button.  Display it from saved params

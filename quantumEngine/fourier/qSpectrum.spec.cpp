@@ -21,14 +21,13 @@ static qSpace *spectSpace = new qSpace("testing chooseSpectrumLength");
 
 
 static void testOneSpectrumLength(int N, int expLength) {
-	//printf("chooseSpectrumLength -- testOneSpectrumLength(%s, N=%d, expected=%d) \n",
-	//	spectSpace->label, N, expLength);
 	spectSpace->dimensions[0].nStates = N;
 	spectSpace->dimensions[0].chooseSpectrumLength();
 
 // no this is only set by the space constructor
 //	LONGS_EQUAL_TEXT(expLength, spectSpace->spectrumLength,
 //		"spectSpace->spectrumLength isn't right");
+
 	LONGS_EQUAL_TEXT(expLength, spectSpace->dimensions->spectrumLength,
 		"spectSpace->dimensions->spectrumLength isn't right");
 }
@@ -72,12 +71,8 @@ TEST(qSpectrum, chooseSpectrumLength524288) { testOneSpectrumLength(524288, 5242
 
 
 static void tryOutSpectrum(int N, int expectedSpLength, int expectedFBLength) {
-	//printf("🌊🌊🌊  starting tryOutSpectrum(N=%d, sl=%d, fbl=%d)\n",
-	//	N, expectedSpLength, expectedFBLength);
 	qSpace *space = makeFullSpace(N);
-	//printf("🌊🌊🌊    made it this far, %s:%d\n", __FILE__, __LINE__);
 	qSpectrum *spectrum = new qSpectrum(space);
-	//printf("🌊🌊🌊    made it this far, %s:%d\n", __FILE__, __LINE__);
 
 	// whatsi sposed to be?  Find next powerof 2.  Try to do it differently
 	// from the software

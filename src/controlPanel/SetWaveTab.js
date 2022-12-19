@@ -70,7 +70,6 @@ class SetWaveTab extends React.Component {
 			// if the space has been created, so has all the stuff hanging off it
 			this.miniGraphAvatar = space.miniGraphAvatar;
 			this.miniGraphEWave = this.miniGraphAvatar.ewave;
-			//this.miniGraphVBuffer = this.miniGraphAvatar.vBuffer;
 
 			// space in the state will allow the GLView to start showing, therefore initializing
 			this.setState({space});
@@ -79,7 +78,6 @@ class SetWaveTab extends React.Component {
 			// eslint-disable-next-line no-ex-assign
 			ex = interpretCppException(ex);
 			console.error(ex.stack ?? ex.message ?? ex);
-			//debugger;
 		});
 	}
 	miniWidth = 300;
@@ -195,9 +193,7 @@ class SetWaveTab extends React.Component {
 			</label>
 		</div>;
 
-		//debugger;
 		return <div className='SetWaveTab'>
-
 			<div className='waveTabCol'>
 				<h3>Design a new Wave</h3>
 				{sliders}
@@ -218,9 +214,7 @@ class SetWaveTab extends React.Component {
 			</div>
 		</div>;
 	}
-
 }
 setPT();
 
 export default SetWaveTab;
-
