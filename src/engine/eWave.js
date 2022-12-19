@@ -20,7 +20,7 @@ let traceSetFamiliarWaveResult = false;
 const _ = num => num.toFixed(4).padStart(9);
 const atan2 = Math.atan2;
 const abs = Math.abs;
-const floor = Math.floor;
+//const floor = Math.floor;
 const π = Math.PI;
 
 // generate string for this one cx value, w, at location ix

@@ -309,11 +309,13 @@ export class PotentialArea extends React.Component {
 		// must also switch the svg to pass thru mouse events otherwise other stuff can't get clicks
 		this.svgElement.style.pointerEvents = 'none';
 
-		console.log(`👆 👆 mouse UP on point (%f,%f) potential @ ix=%d stopped at %f`,
-			ev.clientX, ev.clientY,
-			this.latestIx, this.potentialBuffer[this.latestIx]);
+		if (traceDragging) {
+			console.log(`👆 👆 mouse UP on point (%f,%f) potential @ ix=%d stopped at %f`,
+				ev.clientX, ev.clientY,
+				this.latestIx, this.potentialBuffer[this.latestIx]);
+		}
 
-		// remind everybody that this episode is over.  Tune in next week.
+		// remind everybody that this episode is over.  Tune in next week.  next mousedown.
 		this.latestIx = this.latestPotential = undefined;
 
 		if (traceDragging)

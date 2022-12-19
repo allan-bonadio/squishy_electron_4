@@ -3,7 +3,8 @@
 ** Copyright (C) 2022-2022 Tactile Interactive, all rights reserved
 */
 //import qe from './qe.js';
-import {cppObjectRegistry, prepForDirectAccessors} from '../utils/directAccessors.js';
+import {prepForDirectAccessors} from '../utils/directAccessors.js';
+//import {cppObjectRegistry, prepForDirectAccessors} from '../utils/directAccessors.js';
 //import eWave from './eWave.js';
 //import eSpace from './eSpace.js';
 import qe from './qe.js';
