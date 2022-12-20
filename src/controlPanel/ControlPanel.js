@@ -85,8 +85,8 @@ export class ControlPanel extends React.Component {
 			this.space = space;
 			this.N = space.dimensions[0].N;
 			this.grinder = space.grinder;
+			this.mainEAvatar = space.mainEAvatar;
 			this.mainEWave = space.mainEWave;
-
 		});
 
 		// the static declaration down below fills its variable before an actual
@@ -146,7 +146,7 @@ export class ControlPanel extends React.Component {
 	}
 
 	// given these params, put it into effect and display it
-	paintMainWave =
+	setAndPaintMainWave =
 	waveParams => {
 		const p = this.props;
 		if (!this.space)
@@ -154,7 +154,7 @@ export class ControlPanel extends React.Component {
 
 		const mainEWave = this.space.mainEWave;
 		mainEWave.setFamiliarWave(waveParams);  // eSpace does this initially
-		qe.grinder_copyFromAvatar(this.grinder.pointer, this.mainEWave.pointer);
+		qe.grinder_copyFromAvatar(this.grinder.pointer, this.mainEAvatar.pointer);
 		p.redrawWholeMainWave();
 	}
 
@@ -162,13 +162,13 @@ export class ControlPanel extends React.Component {
 	resetMainWave =
 	() => {
 		let waveParams = getAGroup('waveParams');
-		this.paintMainWave(waveParams);
+		this.setAndPaintMainWave(waveParams);
 	}
 
 	// SetWave button in SetWaveTab: set it from passed in params, and save it
 	saveMainWave =
 	waveParams => {
-		this.paintMainWave(waveParams);
+		this.setAndPaintMainWave(waveParams);
 		storeAGroup('waveParams', waveParams);
 	}
 
