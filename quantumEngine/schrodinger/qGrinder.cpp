@@ -117,13 +117,6 @@ qSpectrum *qGrinder::getSpectrum(void) {
 };
 
 void qGrinder::copyFromAvatar(qAvatar *avatar) {
-	printf("😎qGrinder::qflick->wave=%p;  copyFromAvatar(av->qwave->wave=%p)\n",
-		qflick->wave,
-		avatar->qwave->wave);
-	printf("😎qGrinder::qflick->wave=%p %lf %lf;  copyFromAvatar(av->qwave->wave=%p  %lf %lf)\n",
-		qflick->wave, qflick->wave->re, qflick->wave->im,
-		avatar->qwave->wave, avatar->qwave->wave->re, avatar->qwave->wave->im);
-
 	qflick->copyBuffer(qflick, avatar->qwave);
 }
 

@@ -22,16 +22,14 @@ import {setFamiliarPotential} from './utils/potentialUtils.js';
 import {getASetting, storeASetting} from './utils/storeSettings.js';
 
 // runtime debugging flags - you can change in the debugger or here
-let areBenchmarking = false;
 let traceTheViewBuffer = false;
 let tracePromises = false;
 let traceSquishPanel = false;
 let traceIteration = false;
+let traceIterateEssentials = false;
 
 let verifyTickTimes = true;
-//let traceConstructor = false;
-
-//if (typeof storeSettings == 'undefined') debugger;
+let areBenchmarking = false;
 
 const DEFAULT_VIEW_CLASS_NAME = 'flatDrawingViewDef';
 
@@ -294,8 +292,8 @@ export class SquishPanel extends React.Component {
 				if (!isFinite(this.timeForNextTic)) debugger;
 				if (!isFinite(this.iterationPeriod)) debugger;
 			}
-			if ((this.grinder.iterateSerial & 255) == 0)
-				console.info(`the iterate period: ${s.iterationPeriod}  serial/256: ${this.grinder.iterateSerial/256} `, s.iterationPeriod);
+			if (traceIterateEssentials && ((this.grinder.iterateSerial & 255) == 0))
+				console.info(`the iterate period: ${this.iterationPeriod}  serial: ${this.grinder.iterateSerial} `);
 		}
 
 		// this is in milliseconds
