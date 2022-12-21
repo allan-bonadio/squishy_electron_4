@@ -20,7 +20,7 @@ qWave::qWave(qSpace *sp, qCx *useThisBuffer)
 
 	if (! sp)
 		throw "qWave::qWave null space";
-	magic = 'wave';
+	magic = 'Wave';
 	space = sp;
 
 	if (traceCreate) {

@@ -67,7 +67,7 @@ qCx *qBuffer::allocateWave(int nPoints) {
 
 // create one
 qBuffer::qBuffer(void)
-	: magic('buff'), wave(NULL),
+	: magic('Buff'), wave(NULL),
 		nPoints(0), start(0), end(0), continuum(contDISCRETE),
 		space(NULL) {
 }

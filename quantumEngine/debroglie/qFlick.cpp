@@ -23,7 +23,7 @@ qFlick::qFlick(qSpace *space, qGrinder *gr, int nW) :
 	if (nWaves < 2) throw std::runtime_error("nWaves must be at least 2");
 	if (nWaves > 1000) throw std::runtime_error("nWaves is too big, sure you want that?");
 
-	magic = 'flic';
+	magic = 'Flic';
 
 	// array of waves, just the pointers to them
 	waves = (qCx **) malloc(nWaves * sizeof(qCx *));

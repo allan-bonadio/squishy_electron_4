@@ -17,7 +17,7 @@ qSpectrum::qSpectrum(qSpace *sp, qCx *useThisBuffer)
 	: qBuffer() {
 
 	space = sp;
-	magic = 'spec';
+	magic = 'Spec';
 	continuum = contDISCRETE;  // always zero for spectrum
 	start = 0;
 	end = nPoints = sp->spectrumLength;

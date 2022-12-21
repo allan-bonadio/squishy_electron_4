@@ -4,37 +4,41 @@
 
 # turn this on for profiling help
 #PROFILING=--profiling
+# also maybe ? --cpuprofiler --memoryprofiler --threadprofiler
+# see 80% down in https://emscripten.org/docs/tools_reference/emcc.html
+# i think --threadprofiler is only for pthreads
+
+#CHECK_EMCC_CMD=--check
 
 cd `dirname $0`
+cd ..
 
 if [ -z "$qEMSCRIPTEN" ]
 then
-	echo 'You have to define qEMSCRIPTEN in your login stuff like .profile or .bashrc'
-	echo 'for this whole project'
-	exit 5
+	echo 'You have to define qEMSCRIPTEN and SSQUISH_ROOT in your '
+	echo 'login stuff like .profile (or .bashrc) for this whole project'
+	exit 55
 fi
-
 
 . $qEMSCRIPTEN/emsdk/emsdk_env.sh
 
 # this has all c++ & h files, except main.cpp and the testing files.
 # omit those, so testing can also use this and compile & run itself (see testing/cppu*).
-allCpp=`cat allCpp.list`
+allCpp=`cat building/allCpp.list`
 
 # keep MAX_LABEL_LEN+1 a multiple of 4 or 8 for alignment, eg 7, 15 or 32
 MAX_LABEL_LEN=15
 MAX_DIMENSIONS=2
 
-cd ..
 
-echo □□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□ compile
+echo ℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏ compile
 # https://emscripten.org/docs/tools_reference/emcc.html
 emcc -o quantumEngine.js -sLLD_REPORT_UNDEFINED \
 	-gsource-map --source-map-base /qEng/ \
 	-sASSERTIONS=2 -sSAFE_HEAP=1 -sSTACK_OVERFLOW_CHECK=2 \
 	-sDEMANGLE_SUPPORT=1 -sNO_DISABLE_EXCEPTION_CATCHING \
 	-sEXPORTED_FUNCTIONS=@building/exports.json \
-	-sEXPORTED_RUNTIME_METHODS='["ccall","cwrap","UTF8ArrayToString", "AsciiToString"]' \
+	-sEXPORTED_RUNTIME_METHODS='["ccall","cwrap","UTF8ArrayToString","AsciiToString"]' \
 	$PROFILING  \
 	-DMAX_LABEL_LEN=$MAX_LABEL_LEN -DMAX_DIMENSIONS=$MAX_DIMENSIONS \
 	-I$qEMSCRIPTEN/emsdk/upstream/emscripten/cache/sysroot/include \
@@ -43,8 +47,7 @@ emcc -o quantumEngine.js -sLLD_REPORT_UNDEFINED \
 	main.cpp $allCpp || exit $?
 # changed -g to -g4 to -gsource-map --source-map-base / ; debugger can see into c++
 
-echo □□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□ done
-#cp quantumEngine.wasm quantumEngine.js quantumEngine.wasm.map ../public
+echo ℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏ done
 
 exit 0
 
@@ -83,6 +86,8 @@ exit 0
 # EXCEPTION_CATCHING_ALLOWED and NO_DISABLE_EXCEPTION_CATCHING can apparently
 # allow exception catching but there's overhead each throw.
 # in the short term i'm using -fexceptions
+# maybe i should turn this off?  exceptions are caught in JS anyway.
+# search for 'try {' in quantumEngine.js for more clues
 
 # Hey!  Should try out the sanitizers for more debug checks!
 # tried this in testing but I got all these alignment problems (or maybe just messages)

@@ -43,7 +43,7 @@ qGrinder::qGrinder(qSpace *sp, qAvatar *av, const char *lab)
 		dt(1e-3), stepsPerIteration(100), lowPassFilter(1),
 		pleaseFFT(false), isIterating(false), avatar(av) {
 
-	magic = 'grin';
+	magic = 'Grin';
 
 	qflick = new qFlick(space, this, 2);
 
