@@ -2,7 +2,8 @@
 # build for Production -- script to compile emscripten/C++ sources into WebAssembly
 # Copyright (C) 2023-2021 Tactile Interactive, all rights reserved
 
-CHECK_EMCC_CMD=--check
+# either this does nothing or it causes problems.  figure it out later.
+#CHECK_EMCC_CMD=--check
 
 
 cd `dirname $0`
@@ -30,7 +31,7 @@ echo 🎁 🎁 🎁 🎁 🎁 🎁 🎁 🎁 🎁 🎁 🎁 🎁 🎁 🎁 🎁 
 # https://emscripten.org/docs/tools_reference/emcc.html
 # https://emscripten.org/docs/optimizing/Optimizing-Code.html
 emcc -o quantumEngine.js -sLLD_REPORT_UNDEFINED \
-	-O3 -flto --closure 2 \
+	-O3 -flto --closure 1 \
 	-sASSERTIONS=2 -sSAFE_HEAP=1 -sSTACK_OVERFLOW_CHECK=2 \
 	-sDEMANGLE_SUPPORT=1 -sNO_DISABLE_EXCEPTION_CATCHING \
 	-sEXPORTED_FUNCTIONS=@building/exports.json \

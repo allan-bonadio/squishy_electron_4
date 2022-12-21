@@ -8,5 +8,6 @@ package-lock.json
 
 # production
 /build
+/build.zip
 
 npm-debug.log*
