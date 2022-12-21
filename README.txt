@@ -6,7 +6,7 @@ It has hardwired file paths that I've created identically on my machines.
 tweaking CRA config:
 https://marmelab.com/blog/2021/07/22/cra-webpack-no-eject.html
 
-make a general purpose object identifyer function
+make a general purpose binary object identifier function
 
 ====================================================== Dec 2022
 Browser availability for important features I use:
@@ -167,6 +167,10 @@ get the installed version numbers:
 this is automatically done in the build scripts so you don't have to put them into your .profile or whatever files:
 
 . /opt/dvl/emscripten/emsdk/emsdk_env.sh
+
+# according to informal benchmarks run June 5, 2021, the C++
+# version of RK2 is 5x or 6x faster than the JS version.  ha.
+# not even using rk2 anymore
 
 
 ================================================================ Dec 2021

@@ -25,6 +25,9 @@
 # see other switches https://cpputest.github.io/manual.html#command-line-switches
 #
 
+# emrun is another option for testing:
+# https://emscripten.org/docs/compiling/Running-html-files-with-emrun.html
+
 # this runs from the main quantumEngine directory
 cd `dirname $0`
 cd ..
@@ -44,6 +47,7 @@ allCpp=`cat building/allCpp.list`
 # keep (MAX_LABEL_LEN+1) a multiple of 4, 8, 16, 32 or 8 for alignment, eg 7, 15 or 31
 MAX_LABEL_LEN=7
 
+# mildly analogous to emcc builds in buildDev.sh and buildProd.sh
 # note that main.cpp is NOT included in the .cpp files; that's for web use only
 # and makes all the diff.  cppuMain.cpp is the main instead.
 # Update list of test srcs as needed.
@@ -96,3 +100,6 @@ else
 fi
 
 
+# see https://emscripten.org/docs/compiling/Running-html-files-with-emrun.html
+# to test under more-real browser conditions
+# also you can test under Node.js
