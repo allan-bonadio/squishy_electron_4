@@ -4,7 +4,7 @@
 	"description": "Simulates a quantum mechanical electron, interactively",
 	"icons": [
 		{
-			"src": "logo|𝒆⟩3.png",
+			"src": "logos/logo|𝒆⟩3.png",
 			"sizes": "256x256",
 			"type": "image/png"
 		}

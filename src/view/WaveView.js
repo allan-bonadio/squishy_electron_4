@@ -144,7 +144,7 @@ export class WaveView extends React.Component {
 		}
 
 		const spinner = qe.cppLoaded ? ''
-			: <img className='spinner' alt='spinner' src='eclipseOnTransparent.gif' />;
+			: <img className='spinner' alt='spinner' src='images/eclipseOnTransparent.gif' />;
 
 		// voNorthWest/East are populated during iteration
 		// Always generate the PotentialArea so it keeps its state, but it won't always draw

@@ -84,7 +84,7 @@ class App extends React.Component {
 		return (
 			<div className="App">
 				<h2 className="App-header">
-					<img className='splatImage' src='splat.png'
+					<img className='splatImage' src='images/splat.png'
 						width='100px' alt='squishy icon'/>
 					&nbsp; &nbsp;
 					Squishy Electron
@@ -93,10 +93,10 @@ class App extends React.Component {
 				{sqPanel}
 				{sqDialog}
 				<footer>
-					<img id='emscriptenLogo' src='emscripten_powered_by_logo.svg' alt='powered by Emscripten'/>
-					<img id='webassemblyLogo' src='webassemblyLogo.svg'  alt='powered by WebAssembly'/>
-					<img id='webglLogo' src='WebGL-Logo.svg'  alt='powered by WebGL'/>
-					<img id='openglLogo' src='openglLogo.svg'  alt='powered by OpenGL'/>
+					<img id='emscriptenLogo' src='logos/emscriptenLogo.svg' alt='powered by Emscripten'/>
+					<img id='webassemblyLogo' src='logos/webassemblyLogo.svg'  alt='powered by WebAssembly'/>
+					<img id='webglLogo' src='logos/webglLogo.svg'  alt='powered by WebGL'/>
+					<img id='openglLogo' src='logos/openglLogo.svg'  alt='powered by OpenGL'/>
 				</footer>
 			</div>
 		);
