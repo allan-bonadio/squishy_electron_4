@@ -265,7 +265,6 @@ export class SquishPanel extends React.Component {
 	// it will advance one heartbeat in animation time, which every so often calls iterateOneIteration()
 	animateHeartbeat =
 	iterationStart => {
-		const s = this.state;
 		if (verifyTickTimes) {
 			if (!isFinite(this.timeForNextTic)) debugger;
 			if (!isFinite(iterationStart)) debugger;
