@@ -22,7 +22,7 @@
     "start": "react-scripts start",
     "startbb": "REACT_EDITOR=bbedit react-scripts start",
     "ejectdonteverdothis": "react-scripts eject",
-    "build": "react-scripts build",
+    "build": "maint/build.sh",
     "startbuilt": "serve -s build -l 6660"
   },
   "eslintConfig": {
