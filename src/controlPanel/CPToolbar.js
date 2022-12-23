@@ -39,11 +39,9 @@ function clickOnFFT(space)
 		if (space) {
 			console.info(`ControlPanel.isTimeAdvancing=`, ControlPanel.isTimeAdvancing);
 			if (ControlPanel.isTimeAdvancing)
-				space.mainEAvatar.pleaseFFT = true;  // remind me after next iter
+				space.grinder.pleaseFFT = true;  // remind me after next iter
 			else
-				qe.avatar_askForFFT(space.mainEAvatar.pointer);  // do it now
-
-			new eThread();
+				qe.grinder_askForFFT(space.grinder.pointer);  // do it now
 		}
 	});
 }

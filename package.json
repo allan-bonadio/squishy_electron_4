@@ -23,7 +23,7 @@
     "startbb": "REACT_EDITOR=bbedit react-scripts start",
     "ejectdonteverdothis": "react-scripts eject",
     "build": "maint/build.sh",
-    "deploy": "maint/deploy.sh",
+    "deploy": "maint/deploy.sh"
   },
   "eslintConfig": {
     "extends": [

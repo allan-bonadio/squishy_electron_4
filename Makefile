@@ -8,14 +8,14 @@ quantumEngine/quantumEngine.js : quantumEngine/*.*  quantumEngine/*/*.*
 
 clean :
 	cd quantumEngine; make clean; cd ..
-	rm -rf build
+	rm -rf build build.zip
 
 cleanAll : clean
 	rm -rf node_modules
 	rm -f package-lock.json
 	npm install
 
-test
+test :
 	cd quantumEngine; make clean; cd ..
 	npm run test
 
