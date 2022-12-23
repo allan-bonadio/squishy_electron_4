@@ -30,7 +30,7 @@ Multiprocessing must be done with pThreads and/or web workers, it seems.
 - ability to 'stick your finger in' and measure a state variable and thereby change the state
 
 - small key image indicating phase-color correspondence
-- time display, iterations,
+- time display, frame,
 - some diagnostics for me?
 
 - Fourier transforms with http://www.fftw.org to xform space domain to momentum domain
@@ -62,7 +62,7 @@ Each dimension's variable is an integer, either 0...N-1 or 1...N, the latter for
 	As fo present writing, only does one dimension
 	class Space {
 		qDimension dimensions[];
-		Manifestation mani;  // manages iterations; may go away
+		Manifestation mani;  // manages integration; may go away
 		function V(array of state variables);
 		coordinates = what names for dimensions
 	}
@@ -173,14 +173,14 @@ next time, try 200px text so there's more padding space
 
 ---------------------- with 25 points, on firefox:
 stepsPerIteraction: 1000
-iteration calc time:     23.00ms
+frame calc time:     23.00ms
 update GL variables:     15.00ms
-total for iteration:  38.00ms
+total for frame:  38.00ms
 
 stepsPerIteraction: 500
-iteration calc time:     41.00ms
+frame calc time:     41.00ms
 updateCounts:   0.00ms
-total for iteration:  41.00ms
+total for frame:  41.00ms
 
 period:  67.00ms
 

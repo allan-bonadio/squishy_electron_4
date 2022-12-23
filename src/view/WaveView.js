@@ -136,17 +136,17 @@ export class WaveView extends React.Component {
 
 		// if c++ isn't initialized yet, we can assume the time and frame serial
 		let elapsedTime = '0';
-		let iterateSerial = '0';
+		let frameSerial = '0';
 		if (this.grinder) {
 			// after qe has been initialized
 			elapsedTime = thousands(this.grinder.elapsedTime.toFixed(4));
-			iterateSerial = thousands(this.grinder.iterateSerial);
+			frameSerial = thousands(this.grinder.frameSerial);
 		}
 
 		const spinner = qe.cppLoaded ? ''
 			: <img className='spinner' alt='spinner' src='images/eclipseOnTransparent.gif' />;
 
-		// voNorthWest/East are populated during iteration
+		// voNorthWest/East are populated during frame
 		// Always generate the VoltageArea so it keeps its state, but it won't always draw
 		return (<div className='WaveView'  ref={el => this.element = el} style={{height: s.height + 'px'}}>
 
@@ -161,7 +161,7 @@ export class WaveView extends React.Component {
 					<span className='voNorthWest'>{elapsedTime}</span> ps
 				</div>
 				<div className='northEastWrapper'>
-					iteration <span className='voNorthEast'>{iterateSerial}</span>
+					frame <span className='voNorthEast'>{frameSerial}</span>
 				</div>
 
 				<div className='sizeBox' onMouseDown={this.mouseDown} ref={el => this.sizeBox = el}>

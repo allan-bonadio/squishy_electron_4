@@ -14,9 +14,6 @@ let traceCreation = false;
 let traceHighest = false;
 let traceVBuffer = false;
 
-// a qAvatar manages iteration of a wave, and display on a GLView. I keep
-// thinking that I should separate the functions, but what will you do with an itration
-// if you're not going to view it in GL?
 class eAvatar {
 	// space is the eSpace we're in (note eSpace constructor constructs 2 Avatars
 	// and they're the only ones who know nPoints etc)
@@ -92,31 +89,31 @@ class eAvatar {
 	}
 
 	//// can throw std::runtime_error("divergence")
-	//oneIteration() {
+	//oneIntegration() {
 	//	if (iterateWithGrinder)
-	//		qe.grinder_oneIteration(this.grinder.pointer);
+	//		qe.grinder_oneIntegration(this.grinder.pointer);
 	//	else
-	//		qe.avatar_oneIteration(this.pointer);
+	//		qe.avatar_oneIntegration(this.pointer);
 	//}
 	//
-	//// thisis what upper levels call when another iteration is needed.
+	//// thisis what upper levels call when another frame is needed.
 	//// It either queues it out to a thread, if the threads are idle,
-	//// or sets needsIteration if busy
-	//pleaseIterate() {
-	//	if (traceIteration)
-	//			console.log(`🚦 eAvatar ${this.label}: pleaseIterate()`);
-	//	if (this.doingIteration) {
-	//		if (traceIteration)
-	//			console.log(`🚦             pleaseIterate: needsIteration = true cuz busy`);
-	//		// threads are busy but we'll get to it after we're done with this iteration
-	//		this.needsIteration = true;
+	//// or sets needsIntegration if busy
+	//pleaseIntegrate() {
+	//	if (traceIntegration)
+	//			console.log(`🚦 eAvatar ${this.label}: pleaseIntegrate()`);
+	//	if (this.doingIntegration) {
+	//		if (traceIntegration)
+	//			console.log(`🚦             pleaseIntegrate: needsIntegration = true cuz busy`);
+	//		// threads are busy but we'll get to it after we're done with this frame
+	//		this.needsIntegration = true;
 	//		return false;
 	//	}
 	//	else {
-	//		if (traceIteration)
-	//			console.log(`🚦             pleaseIterate oneItration`);
-	//		this.needsIteration = false;
-	//		this.oneIteration();
+	//		if (traceIntegration)
+	//			console.log(`🚦             pleaseIntegrate oneItration`);
+	//		this.needsIntegration = false;
+	//		this.oneIntegration();
 	//		return true;
 	//	}
 	//}

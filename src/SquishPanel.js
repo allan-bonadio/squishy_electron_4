@@ -25,8 +25,8 @@ import {getASetting, storeASetting} from './utils/storeSettings.js';
 let traceTheViewBuffer = false;
 let tracePromises = false;
 let traceSquishPanel = false;
-let traceIteration = false;
-let traceIterateEssentials = false;
+let traceIntegration = false;
+let traceIntegrateEssentials = false;
 
 let verifyTickTimes = true;
 let areBenchmarking = false;
@@ -64,12 +64,12 @@ export class SquishPanel extends React.Component {
 			// this is controlled by the user (start/stop/step buttons)
 			// does not really influence the rendering of the canvas... (other than running)
 
-			//iterationPeriod: getASetting('iterationSettings', 'iterationPeriod'),
+			//framePeriod: getASetting('frameSettings', 'framePeriod'),
 
 			// advance forward with each iter
 			// NOT SAME as shown on WaveView!
 			runningCycleElapsedTime: 0,
-			runningCycleIterateSerial: 0,
+			runningCycleIntegrateSerial: 0,
 
 			showVoltage:  getASetting('voltageSettings', 'showVoltage'),
 
@@ -79,13 +79,13 @@ export class SquishPanel extends React.Component {
 		const now = performance.now();
 		this.initStats(now);
 		this.timeForNextTic = now + 10;  // default so we can get rolling
-		this.lastAniteration = now;
+		this.prevFrameStart = now;
 
 		// this is the actual 'frequency' as a period in milliseconds, as set by that menu.
 		// convert between like 1000/n
 		// eg the menu on the CPToolbar says 10/sec, so this becomes 100
 		// we actually get it from the control panel which is the official rate keeper
-		this.iterationPeriod = getASetting('iterationSettings', 'iterationPeriod');
+		this.framePeriod = getASetting('frameSettings', 'framePeriod');
 
 		// stick ?allowRunningOneCycle at the end of URL to show runningOneCycle panel
 		// eslint-disable-next-line
@@ -117,7 +117,7 @@ export class SquishPanel extends React.Component {
 			this.mainEAvatar = space.mainEAvatar;
 			this.grinder = space.grinder;
 			//this.setDeltaT(s.deltaT);
-			//this.setStepsPerIteration(s.stepsPerIteration);
+			//this.setStepsPerFrame(s.stepsPerFrame);
 
 			if (tracePromises) console.log(`SquishPanel.compDidMount about to animateHeartbeat`);
 
@@ -148,11 +148,11 @@ export class SquishPanel extends React.Component {
 	// constructor only calls this (?)
 	initStats(now) {
 		this.iStats = {
-			startIteration: now,
+			startIntegration: now,
 			endCalc: now,
 			endReloadVarsNBuffer: now,
 			endDraw: now,
-			prevStart: now,
+			prevStartIntegration: now,
 		}
 	}
 
@@ -162,7 +162,7 @@ export class SquishPanel extends React.Component {
 
 		// given a stat name, value and precision, display it using oldschool DOM
 		function show(cName, ms, nDigits = 2) {
-			const el = document.querySelector(`#${p.id}.SquishPanel .ControlPanel .SetIterationTab .${cName}`);
+			const el = document.querySelector(`#${p.id}.SquishPanel .ControlPanel .SetIntegrationTab .${cName}`);
 			if (el) {
 				// hard to see if it's jumping around a lot
 				if (!el.iStatAvg)
@@ -174,87 +174,87 @@ export class SquishPanel extends React.Component {
 		}
 
 		const st = this.iStats;
-		show('iterationCalcTime', st.endCalc - st.startIteration);
+		show('frameCalcTime', st.endCalc - st.startIntegration);
 		show('reloadVarsNBuffer', st.endReloadVarsNBuffer - st.endCalc);
 		show('drawTime', st.endDraw - st.endReloadVarsNBuffer);
 //		show('reloadGlInputs', st.endReloadInputs - st.endReloadVarsNBuffer);
 //		show('drawTime', st.endDraw - st.endReloadInputs);
-		show('totalForIteration', st.endDraw - st.startIteration);
-		const period = st.startIteration - st.prevStart;
-		show('iterationPeriod', period);
-		show('iterationsPerSec', Math.round(1000 / period), 0)
+		show('totalForIntegration', st.endDraw - st.startIntegration);
+		const period = st.startIntegration - st.prevStartIntegration;
+		show('framePeriod', period);
+		show('framesPerSec', Math.round(1000 / period), 0)
 	}
 
-	/* ******************************************************* iteration & animation */
+	/* ******************************************************* frame & animation */
 
 	static divergedBlurb = `Sorry, but your quantum wave diverged!  This isn't your fault; it's a bug or limitation of the mathematical engine - it's just not as accurate as the real thing, and sometimes it just runs off the rails.  Unfortunately, you'll have to start over with a new wave.  Click on the Reset Wave button.`;
 
-	// do one integration iteration
-	crunchOneIteration() {
-		if (traceIteration) console.log(`SquishPanel. about to iterate`);
+	// do one integration frame
+	crunchoneIntegration() {
+		if (traceIntegration) console.log(`SquishPanel. about to frame`);
 
 		try {
 			// hundreds of visscher steps
-			this.grinder?.pleaseIterate();
+			this.grinder?.pleaseIntegrate();
 		} catch (ex) {
-			ControlPanel.stopIterating();
+			ControlPanel.stopAnimating();
 			// eslint-disable-next-line no-ex-assign
 			ex = interpretCppException(ex);
 			CommonDialog.openErrorDialog(
-				ex.message == 'diverged' ? SquishPanel.divergedBlurb : ex, 'while iterating');
+				ex.message == 'diverged' ? SquishPanel.divergedBlurb : ex, 'while integrating');
 		}
 
-		if (traceIteration) console.log(`SquishPanel. did iterate`);
+		if (traceIntegration) console.log(`SquishPanel. did frame`);
 
 		if (traceTheViewBuffer)
-			this.dumpViewBuffer('SquishPanel. did iterate()');
+			this.dumpViewBuffer('SquishPanel. did frame()');
 	}
 
 	// the upper left and right numbers: insert them into the HTML.  Faster than react.
 	// should move this to like WaveView
-	showTimeNIteration() {
+	showTimeNIntegration() {
 		// need them instantaneously - react is too slow
 		document.querySelector('.voNorthWest').innerHTML = this.grinder.elapsedTime.toFixed(2);
-		document.querySelector('.voNorthEast').innerHTML =  this.grinder.iterateSerial;
+		document.querySelector('.voNorthEast').innerHTML =  this.grinder.frameSerial;
 	}
 
-	// Integrate the ODEs by one 'iteration', or not.  and then display.  or not.
+	// Integrate the ODEs by one 'integrate', or not.  and then display.  or not.
 	// called every so often in animateHeartbeat() so it's called as often as the menu setting says
-	// so if needsRepaint false or absent, it'll only repaint if an iteration has been done.
-	// shouldIterate is often set to isTimeAdvancing, or you can pass in whatever eg for single iteration
-	iterateOneIteration(shouldIterate, needsRepaint) {
-		if (traceIteration) console.log(`time since last tic: ${performance.now() - this.iStats.startIteration}ms`)
+	// so if needsRepaint false or absent, it'll only repaint if frame has been done.
+	// shouldIntegrate is often set to isTimeAdvancing, or you can pass in whatever eg for single frame
+	integrateOneFrame(shouldIntegrate, needsRepaint) {
+		if (traceIntegration) console.log(`time since last tic: ${performance.now() - this.iStats.startIntegration}ms`)
 // 		this.endCalc = this.startReloadViewBuffer = this.endReloadVarsNBuffer =
-// 			this.endIteration = 0;
-		this.iStats.startIteration = performance.now();  // absolute beginning of integrate iteration
+// 			this.endIntegration = 0;
+		this.iStats.startIntegration = performance.now();  // absolute beginning of integrate frame
 		// could be slow.
-		if (shouldIterate) {
-			this.crunchOneIteration();
+		if (shouldIntegrate) {
+			this.crunchoneIntegration();
 			needsRepaint = true;
 		}
 		this.iStats.endCalc = performance.now();
 
-		// if we need to repaint... if we're iterating, if the view says we have to,
+		// if we need to repaint... if we're integrating, if the view says we have to,
 		// or if this is a one shot step
 		if (needsRepaint) {
 			this.mainEAvatar.doRepaint?.();
-			this.showTimeNIteration();
+			this.showTimeNIntegration();
 
 			this.iStats.endReloadVarsNBuffer = this.iStats.endDraw = performance.now();
 		}
 
-		// print out per-iteration benchmarks.  This is now displayed in the Iterate tab.
+		// print out per-frame benchmarks.  This is now displayed in the Integrate tab.
 		if (areBenchmarking) {
 			console.log(`times:\n`+
-				`iteration calc time:     ${(this.iStats.endCalc - this.iStats.startIteration).toFixed(2)}ms\n`+
+				`frame calc time:     ${(this.iStats.endCalc - this.iStats.startIntegration).toFixed(2)}ms\n`+
 				`reloadVarsNBuffer:     ${(this.iStats.endReloadVarsNBuffer - this.iStats.endCalc).toFixed(2)}ms\n`+
 				//`reload GL variables:     ${(this.iStats.endReloadInputs - this.iStats.endReloadVarsNBuffer).toFixed(2)}ms\n`+
 				`draw:   ${(this.iStats.endDraw - this.iStats.endReloadVarsNBuffer).toFixed(2)}ms\n`+
-				`total for iteration:  ${(this.iStats.endDraw - this.iStats.startIteration).toFixed(2)}ms\n` +
-				`period since last:  ${(this.iStats.startIteration - this.iStats.prevStart).toFixed(2)}ms\n`);
+				`total for frame:  ${(this.iStats.endDraw - this.iStats.startIntegration).toFixed(2)}ms\n` +
+				`period since last:  ${(this.iStats.startIntegration - this.iStats.prevStartIntegration).toFixed(2)}ms\n`);
 		}
 		this.refreshStats();
-		this.iStats.prevStart = this.iStats.startIteration;
+		this.iStats.prevStartIntegration = this.iStats.startIntegration;
 
 		this.continueRunningOneCycle();
 	}
@@ -262,55 +262,55 @@ export class SquishPanel extends React.Component {
 
 	// This gets called once each animation period according to requestAnimationFrame(), usually 60/sec
 	// and maintaining that as long as the website is running.  Even if there's no apparent motion.
-	// it will advance one heartbeat in animation time, which every so often calls iterateOneIteration()
+	// it will advance one heartbeat in animation time, which every so often calls integrateOneFrame()
 	animateHeartbeat =
-	iterationStart => {
+	frameStart => {
 		if (verifyTickTimes) {
 			if (!isFinite(this.timeForNextTic)) debugger;
-			if (!isFinite(iterationStart)) debugger;
+			if (!isFinite(frameStart)) debugger;
 			if (!isFinite(this.timeForNextTic)) debugger;
 		}
 
-		// no matter how often animateHeartbeat() is called, it'll only iterate once per iterationPeriod
-		if (iterationStart >= this.timeForNextTic) {
+		// no matter how often animateHeartbeat() is called, it'll only frame once per framePeriod
+		if (frameStart >= this.timeForNextTic) {
 			// no point in calling it continuously if it's not doing anything
 			if (ControlPanel.isTimeAdvancing)
-				this.iterateOneIteration(true, true);
+				this.integrateOneFrame(true, true);
 
-			// remember (iterationStart) is the one passed in, before
-			// iterateOneIteration(), so periods are exactly timed (unless it's so slow
+			// remember (frameStart) is the one passed in, before
+			// integrateOneFrame(), so periods are exactly timed (unless it's so slow
 			// that we get behind).  Speaking of which, how far behind are we?
 			let rightNow = 	performance.now();
 			if (!isFinite(rightNow)) debugger;
 
 			//// FOR NOW, avoid overlapping heartbeats.  They become recursive and the
 			//// browser really slows down, and sometimes crashes
-			this.timeForNextTic = rightNow + this.iterationPeriod;
-			//this.timeForNextTic = rightNow + s.iterationPeriod;
+			this.timeForNextTic = rightNow + this.framePeriod;
+			//this.timeForNextTic = rightNow + s.framePeriod;
 			if (verifyTickTimes) {
 				if (!isFinite(this.timeForNextTic)) debugger;
-				if (!isFinite(this.iterationPeriod)) debugger;
+				if (!isFinite(this.framePeriod)) debugger;
 			}
-			if (traceIterateEssentials && ((this.grinder.iterateSerial & 255) == 0))
-				console.info(`the iterate period: ${this.iterationPeriod}  serial: ${this.grinder.iterateSerial} `);
+			if (traceIntegrateEssentials && ((this.grinder.frameSerial & 255) == 0))
+				console.info(`the frame period: ${this.framePeriod}  serial: ${this.grinder.frameSerial} `);
 		}
 
 		// this is in milliseconds
-		const timeSince = iterationStart - this.lastAniteration;
+		const timeSince = frameStart - this.prevFrameStart;
 //		if (timeSince < 8) {
 //			console.log(` skipping an ani frame cuz we got too much: ${timeSince} ms`)
 //			return;  // we might have more than one cycle in here... this should fix it
 //		}
 
 		if (isNaN(timeSince)) debugger;
-		this.lastAniteration = iterationStart;
+		this.prevFrameStart = frameStart;
 
 		requestAnimationFrame(this.animateHeartbeat);
 	}
 
 	/* *******************************************************  OneCycle of circular wave*/
 
-	// use for benchmarking with a circular wave.  Will start iteration, and stop after
+	// use for benchmarking with a circular wave.  Will start frame, and stop after
 	// the leftmost state is at its peak.  Then display stats.
 	// not used for several months so probably broken somehow.
 
@@ -320,11 +320,11 @@ export class SquishPanel extends React.Component {
 		if (!this.allowRunningOneCycle) return;
 		this.runningOneCycle = true;
 		this.runningCycleStartingTime = this.grinder.elapsedTime;
-		this.runningCycleStartingSerial = this.grinder.iterateSerial;
-		ControlPanel.startIterating();
+		this.runningCycleStartingSerial = this.grinder.frameSerial;
+		ControlPanel.startAnimating();
 	}
 
-	// manage runningOneCycle - called each iteration
+	// manage runningOneCycle - called each frame
 	continueRunningOneCycle() {
 		if (!this.allowRunningOneCycle) return
 		if (this.runningOneCycle) {
@@ -337,11 +337,11 @@ export class SquishPanel extends React.Component {
 					// if we were going up, we've gone just 1 deltaT past the peak.  Good time to stop.
 					this.runningOneCycle = false;
 
-					ControlPanel.stopIterating();
+					ControlPanel.stopAnimating();
 
 					this.setState({
 						runningCycleElapsedTime: this.mainEAvatar.elapsedTime - this.runningCycleStartingTime,
-						runningCycleIterateSerial: this.mainEAvatar.iterateSerial - this.runningCycleStartingSerial,
+						runningCycleIntegrateSerial: this.mainEAvatar.frameSerial - this.runningCycleStartingSerial,
 					});
 
 					this.goingDown = false;
@@ -368,7 +368,7 @@ export class SquishPanel extends React.Component {
 
 		// you can turn this on in the debugger anytime
 		return <div className='runningOneCycle' style={{display: 'block'}}>
-			<span>total iterations: {s.runningCycleIterateSerial.toFixed(0)} &nbsp;
+			<span>total frames: {s.runningCycleIntegrateSerial.toFixed(0)} &nbsp;
 				elapsed vtime: {s.runningCycleElapsedTime.toFixed(3)} &nbsp;</span>
 			<button className='round' onClick={this.startRunningOneCycle}>start running 1 cycle</button>
 		</div>
@@ -414,10 +414,10 @@ export class SquishPanel extends React.Component {
 	}
 
 	// get this from the control panel every time user changes it
-	setIterationPeriod =
-	(period) => this.iterationPeriod = period;
-//	(period) => this.setState({iterationPeriod: period},
-//		() => console.log(`iteration period is now set to ${this.state.iterationPeriod}`));
+	setFramePeriod =
+	(period) => this.framePeriod = period;
+//	(period) => this.setState({framePeriod: period},
+//		() => console.log(`frame period is now set to ${this.state.framePeriod}`));
 
 	/* ******************************************************* rendering */
 	// call this when you change both the GL and iter and elapsed time
@@ -429,7 +429,7 @@ export class SquishPanel extends React.Component {
 
 		// trigger redrawing of WaveView cuz they're passed in via props
 		grinder.elapsedTime = 0;
-		grinder.iterateSerial = 0;
+		grinder.frameSerial = 0;
 
 		// directly redraw the GL
 		avatar.reStartDrawing();
@@ -449,9 +449,9 @@ export class SquishPanel extends React.Component {
 					showVoltage={s.showVoltage}
 				/>
 				<ControlPanel
-					iterateAnimate={(shouldAnimate, freq) => this.iterateAnimate(shouldAnimate, freq)}
+					frameAnimate={(shouldAnimate, freq) => this.frameAnimate(shouldAnimate, freq)}
 
-					setIterationPeriod={this.setIterationPeriod}
+					setFramePeriod={this.setFramePeriod}
 
 					setVoltage={this.setVoltage}
 					toggleShowVoltage={this.toggleShowVoltage}
@@ -466,9 +466,9 @@ export class SquishPanel extends React.Component {
 			</div>
 		);
 
-		// 					{/*setIterateFrequency={freq => this.setIterateFrequency(freq)}*/}
-//							iterateFrequency={1000 / s.iterationPeriod}
-//					setIterateFrequency={freq => this.setIterateFrequency(freq)}
+		// 					{/*setFrameFrequency={freq => this.setFrameFrequency(freq)}*/}
+//							frameFrequency={1000 / s.framePeriod}
+//					setFrameFrequency={freq => this.setFrameFrequency(freq)}
 
 
 	}

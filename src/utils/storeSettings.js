@@ -191,7 +191,7 @@ export function createStoreSettings() {
 
 	/* ************************************ waveParams */
 
-	// this keeps many settings that don't immediately affect running iteration.
+	// this keeps many settings that don't immediately affect running frame.
 	// So 'Set Wave' button actually sets the wave, but meanwhile the setting sliders
 	// need to be remembered; this does it.  Voltage and space too; not active until user does something.
 	// THis also defines slider mins and maxes!  One source of truth.
@@ -210,15 +210,15 @@ export function createStoreSettings() {
 
 	makeParam('voltageSettings', 'showVoltage', true, [true, false]);  // not really the same as the rest...
 
-	/* ************************************ iterationSettings */
-	makeParam('iterationSettings', 'isTimeAdvancing', false,  [false, true]);
-	makeParam('iterationSettings', 'iterationPeriod', 50, {min: 16, max: 60_001});
-	makeParam('iterationSettings', 'deltaT', 1, {min: .01, max: 100.0, });
-	makeParam('iterationSettings', 'stepsPerIteration', 100, {min: 10, max: 1e5});
-	makeParam('iterationSettings', 'lowPassFilter', 50, {min: 0, max: 75});
+	/* ************************************ frameSettings */
+	makeParam('frameSettings', 'isTimeAdvancing', false,  [false, true]);
+	makeParam('frameSettings', 'framePeriod', 50, {min: 16, max: 60_001});
+	makeParam('frameSettings', 'deltaT', 1, {min: .01, max: 100.0, });
+	makeParam('frameSettings', 'stepsPerFrame', 100, {min: 10, max: 1e5});
+	makeParam('frameSettings', 'lowPassFilter', 50, {min: 0, max: 75});
 
 	/* ************************************miscSettings */
-	makeParam('miscSettings', 'showingTab', 'wave', ['wave', 'voltage', 'space', 'iteration']);
+	makeParam('miscSettings', 'showingTab', 'wave', ['wave', 'voltage', 'space', 'integrate']);
 	makeParam('miscSettings', 'viewHeight', 400, {min: 50, max: 1e4});
 
 }

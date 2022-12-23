@@ -18,7 +18,7 @@
 
 
 
-static bool traceIteration = false;
+static bool traceIntegration = false;
 
 static bool traceJustWave = false;
 
@@ -40,8 +40,8 @@ static bool traceEndingFFSpectrum = false;
 // make sure these values are doable by the sliders' steps
 qGrinder::qGrinder(qSpace *sp, qAvatar *av, const char *lab)
 	: space(sp),
-		dt(1e-3), stepsPerIteration(100), lowPassFilter(1),
-		pleaseFFT(false), isIterating(false), avatar(av) {
+		dt(1e-3), stepsPerFrame(100), lowPassFilter(1),
+		pleaseFFT(false), isIntegrating(false), avatar(av) {
 
 	magic = 'Grin';
 
@@ -58,7 +58,7 @@ qGrinder::qGrinder(qSpace *sp, qAvatar *av, const char *lab)
 	label[MAX_LABEL_LEN] = 0;
 
 	elapsedTime = 0.;
-	iterateSerial = 0;
+	frameSerial = 0;
 
 	if (traceSpace) {
 		printf("the qSpace for 🪓 grinder %s:   magic=%c%c%c%c label=%s nDimesions=%d  "
@@ -139,26 +139,26 @@ void qGrinder::formatDirectOffsets(void) {
 
 	makeDoubleGetter(elapsedTime);
 	makeDoubleSetter(elapsedTime);
-	makeDoubleGetter(iterateSerial);
-	makeDoubleSetter(iterateSerial);
+	makeDoubleGetter(frameSerial);
+	makeDoubleSetter(frameSerial);
 	printf("\n");
-	makeBoolGetter(isIterating);
-	makeBoolSetter(isIterating);
+	makeBoolGetter(isIntegrating);
+	makeBoolSetter(isIntegrating);
 	makeBoolGetter(pleaseFFT);
 	makeBoolSetter(pleaseFFT);
 
-	makeBoolGetter(needsIteration);
-	makeBoolSetter(needsIteration);
+	makeBoolGetter(needsIntegration);
+	makeBoolSetter(needsIntegration);
 
-	makeBoolGetter(doingIteration);
-	makeBoolSetter(doingIteration);
+	makeBoolGetter(doingIntegration);
+	makeBoolSetter(doingIntegration);
 	printf("\n");
 	makeDoubleGetter(dt);
 	makeDoubleSetter(dt);
 	makeIntGetter(lowPassFilter);
 	makeIntSetter(lowPassFilter);
-	makeIntGetter(stepsPerIteration);
-	makeIntSetter(stepsPerIteration);
+	makeIntGetter(stepsPerFrame);
+	makeIntSetter(stepsPerFrame);
 
 	/* *********************************************** waves & buffers */
 
@@ -193,18 +193,18 @@ void qGrinder::dumpObj(const char *title) {
 	printf("        magic: %c%c%c%c   qSpace=%p '%s'   \n",
 		magic>>3, magic>>2, magic>>1, magic, space, label);
 
-	printf("        elapsedTime %lf, iterateSerial  %lf, dt  %lf, lowPassFilter %d, stepsPerIteration %d\n",
-		elapsedTime, iterateSerial, dt, lowPassFilter, stepsPerIteration);
+	printf("        elapsedTime %lf, frameSerial  %lf, dt  %lf, lowPassFilter %d, stepsPerFrame %d\n",
+		elapsedTime, frameSerial, dt, lowPassFilter, stepsPerFrame);
 
 	printf("        qflick %p, voltage  %p, voltageFactor  %lf, qspect %p\n",
 		qflick, voltage, voltageFactor, qspect);
 
-	printf("        isIterating: %hhu   pleaseFFT=%hhu \n", isIterating, pleaseFFT);
+	printf("        isIntegrating: %hhu   pleaseFFT=%hhu \n", isIntegrating, pleaseFFT);
 
 	printf("        ==== end of qGrinder ====\n\n");
 }
 
-/* ********************************************************** doing Iteration */
+/* ********************************************************** doing Integration */
 
 // return elapsed real time since last page reload, in seconds, only for tracing
 // seems like it's down to miliseconds or even a bit smaller
@@ -216,23 +216,23 @@ void qGrinder::dumpObj(const char *title) {
 //}
 
 // Does several visscher steps (eg 100 or 500). Actually does
-// stepsPerIteration+1 steps; half steps at start and finish to adapt and
+// stepsPerFrame+1 steps; half steps at start and finish to adapt and
 // deadapt to Visscher timing
-void qGrinder::oneIteration() {
-	isIterating = doingIteration = true;
+void qGrinder::oneIntegration() {
+	isIntegrating = doingIntegration = true;
 	qCx *wave0 = qflick->waves[0];
 	qCx *wave1 = qflick->waves[1];
 
 
 	// half step in beginning to move Im forward dt/2
 	// cuz outside of here, re and im are for the same time.
-	// Note here the latest is in [1]; iterate continues this,
+	// Note here the latest is in [1]; frame continues this,
 	// and the halfwave at the end moves it back to [0]].
 	qflick->fixThoseBoundaries(wave0);
 	stepReal(wave1, wave0, 0);
 	stepImaginary(wave1, wave0, dt/2);
 
-	int doubleSteps = stepsPerIteration / 2;
+	int doubleSteps = stepsPerFrame / 2;
 	for (int step = 0; step < doubleSteps; step++) {
 
 		qflick->fixThoseBoundaries(wave1);
@@ -251,7 +251,7 @@ void qGrinder::oneIteration() {
 	stepImaginary(wave0, wave1, 0);
 
 
-	// ok the algorithm tends to diverge after thousands of iterations.  Hose it down.
+	// ok the algorithm tends to diverge after thousands of frames.  Hose it down.
 	if (this->pleaseFFT) analyzeWaveFFT(qflick, "before fourierFilter()");
 	fourierFilter(lowPassFilter);
 	if (this->pleaseFFT) analyzeWaveFFT(qflick, "after fourierFilter()");
@@ -260,7 +260,7 @@ void qGrinder::oneIteration() {
 	// normalize it and return the old inner product, see how close to 1.000 it is
 	double iProd = qflick->normalize();
 	if (dumpFFHiResSpectums) qflick->dumpHiRes("wave END fourierFilter() after normalize");
-	if (traceIProd && ((int) iterateSerial & 0xf) == 0)
+	if (traceIProd && ((int) frameSerial & 0xf) == 0)
 		printf("      qGrinder: iProd= %lf \n", iProd);
 
 	if (iProd > 1.01) {
@@ -274,16 +274,16 @@ void qGrinder::oneIteration() {
 
 
 	if (traceJustWave)
-		qflick->dump("      qGrinder traceJustWave at end of iteration", true);
+		qflick->dump("      qGrinder traceJustWave at end of frame", true);
 
 	// now, copy it to the Avatar's wave buffer, so iit can copy it to its ViewBuffer, so webgl can pick it up
 	copyToAvatar(avatar);
 
-	if (traceIteration)
-		printf("      qGrinder iteration done; elapsed time: %lf \n", getTimeDouble());
+	if (traceIntegration)
+		printf("      qGrinder frame done; elapsed time: %lf \n", getTimeDouble());
 
-	iterateSerial++;
-	isIterating = doingIteration = false;
+	frameSerial++;
+	isIntegrating = doingIntegration = false;
 }
 
 
@@ -330,18 +330,18 @@ void qGrinder::askForFFT(void) {
 	analyzeWaveFFT(qflick, "askForFFT while idle");
 }
 
-// if iterating, FFT as the current iterate finishes, before and after fourierFilter().
+// if integrating, FFT as the current frame finishes, before and after fourierFilter().
 // If stopped, fft current wave. now.
 void grinder_askForFFT(qGrinder *pointer) { pointer->askForFFT(); }
 
-void grinder_oneIteration(qGrinder *pointer) { pointer->oneIteration(); }
+void grinder_oneIntegration(qGrinder *pointer) { pointer->oneIntegration(); }
 
 
-void qGrinder::initIterationLoop(int a, int b, int c) {
+void qGrinder::initIntegrationLoop(int a, int b, int c) {
 	// to e imprelmented
 }
 
-void grinder_initIterationLoop(qGrinder *pointer, int a, int b, int c) {pointer ->initIterationLoop(a, b, c);}
+void grinder_initIntegrationLoop(qGrinder *pointer, int a, int b, int c) {pointer ->initIntegrationLoop(a, b, c);}
 
 void grinder_copyFromAvatar(qGrinder *grinder, qAvatar *avatar) {grinder->copyFromAvatar(avatar);}
 //	printf("grinder_copyFromAvatar; grinder='%s', avatar='%s'\n", (char *) grinder, (char *) avatar);

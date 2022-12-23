@@ -13,7 +13,7 @@
 #include "CppUTest/TestHarness.h"
 
 bool traceOneStep = false;
-bool traceOneIteration = false;
+bool traceoneIntegration = false;
 
 TEST_GROUP(visscher)
 {
@@ -54,7 +54,7 @@ TEST(visscher, VisscherOneStep)
 	delete avatar;
 }
 
-/* ****************************************************************** one iteration */
+/* ****************************************************************** one frame */
 
 static qCx expectedArray[34] = {
 qCx(    0.1719190461333459,   -0.04115680867662573),
@@ -94,7 +94,7 @@ qCx(    0.1766448653389613,  -0.006825749407538643)
 };
 
 // everything turns into nans.  dunno what's wrong.
-TEST(visscher, VisscherOneIteration)
+TEST(visscher, VisscheroneIntegration)
 {
 	// simulate the app starting up
 	qSpace *space = makeFullSpace(32);
@@ -104,11 +104,11 @@ TEST(visscher, VisscherOneIteration)
 
 
 	// simulate the app taking one iter = 100 steps
-	av->stepsPerIteration = 100;
+	av->stepsPerFrame = 100;
 	av->dt = .01;
 	av->lowPassFilter = 10;
 
-	av->oneIteration();
+	av->oneIntegration();
 
 	// we'll use this to compare against
 	qWave *expectedQWave = new qWave(space, expectedArray);

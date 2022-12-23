@@ -51,7 +51,7 @@ let importantWorkerStuff = {reactBuildType: null,serial: null, avatarPointer: nu
 //console.info(` 🧽   WebAssembly?.Module?.cwrap:`,WebAssembly?.Module?.cwrap );
 
 // copied out of qe.js
-//const avatar_oneIteration = WebAssembly?.Module?.cwrap('avatar_oneIteration', null, ['number']);
+//const avatar_oneIntegration = WebAssembly?.Module?.cwrap('avatar_oneIntegration', null, ['number']);
 
 postMessage({verb: 'ping', message: `the thread lives!`});
 
@@ -80,8 +80,8 @@ ev => {
 		break;
 
 //	case 'start':
-//		// Start the C++ iteration loop
-//		qe.avatar_initIterationLoop(msg.avatarPointer, 4);
+//		// Start the C++ frame loop
+//		qe.avatar_initIntegrationLoop(msg.avatarPointer, 4);
 //		break;
 
 	case 'init':
@@ -89,8 +89,8 @@ ev => {
 
 		break;
 
-	case 'iterate':
-		iterate(msg);
+	case 'integrate':
+		frame(msg);
 		break;
 
 	default:
@@ -143,11 +143,11 @@ debugger;
 
 }
 
-// an asynch msg telling me to do an iteration
-function iterate(msg) {
-	// time to iterate again!  will start After any current iteration finishes
-	console.log(`time to iterate again!  will start After any current iteration finishes`);
-	// wait for it ... avatar_oneIteration?.(msg.avatarPointer);
+// an asynch msg telling me to do frame
+function frame(msg) {
+	// time to frame again!  will start After any current frame finishes
+	console.log(`time to frame again!  will start After any current frame finishes`);
+	// wait for it ... avatar_oneIntegration?.(msg.avatarPointer);
 }
 
 

@@ -9,7 +9,7 @@
 // full control.
 import qe from './qe.js';
 
-let traceIteration = false;
+let traceIntegration = false;
 
 
 // master switch cuz still in development
@@ -111,18 +111,18 @@ class eThread {
 		}
 	}
 
-	// tell the thread(s) to do 1 iteration, like we did synchronously but now done by the thread(s)
-	static oneIteration(avatar) {
+	// tell the thread(s) to do 1 frame, like we did synchronously but now done by the thread(s)
+	static oneIntegration(avatar) {
 		// i have to think of what to do if there's no workers available...
 		if (eThread.doingThreads) {
-			if (traceIteration)
-				console.log(`⛏ eThread postMessage toiterate`);
-			eThread.workerThreads[0].postMessage({verb: 'iterate', avatarPointer: avatar.pointer});
+			if (traceIntegration)
+				console.log(`⛏ eThread postMessage toframe`);
+			eThread.workerThreads[0].postMessage({verb: 'integrate', avatarPointer: avatar.pointer});
 		}
 		else {
-			if (traceIteration)
+			if (traceIntegration)
 				console.log(`⛏ eThread postMessage directly cuz no threads`);
-			qe.grinder_oneIteration(avatar.pointer);
+			qe.grinder_oneIntegration(avatar.pointer);
 		}
 	}
 

@@ -23,7 +23,7 @@
 
 
 
-static bool traceIteration = false;  //
+static bool traceIntegration = false;  //
 
 
 

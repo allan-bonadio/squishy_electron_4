@@ -49,15 +49,15 @@ let exportsSrc  = [
 	{name: 'avatar_dumpViewBuffer', args: ['number', 'string'], retType: null},
 
 	// ************************* avatar versions - will go away
-	//{name: 'avatar_initIterationLoop', args: ['number', 'number', 'number'], retType: null},
-	//{name: 'avatar_oneIteration', args: ['number'], retType: null},
+	//{name: 'avatar_initIntegrationLoop', args: ['number', 'number', 'number'], retType: null},
+	//{name: 'avatar_oneIntegration', args: ['number'], retType: null},
 	//
 	//{name: 'avatar_askForFFT', args: ['number'], retType: null},
 
 
 	// ************************* grinder versions
-	{name: 'grinder_initIterationLoop', args: ['number', 'number', 'number'], retType: null},
-	{name: 'grinder_oneIteration', args: ['number'], retType: null},
+	{name: 'grinder_initIntegrationLoop', args: ['number', 'number', 'number'], retType: null},
+	{name: 'grinder_oneIntegration', args: ['number'], retType: null},
 
 	{name: 'grinder_askForFFT', args: ['number'], retType: null},
 

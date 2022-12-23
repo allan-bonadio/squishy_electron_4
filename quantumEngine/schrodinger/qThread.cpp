@@ -34,8 +34,8 @@ void qThread::threadStarts() {
 /* ********************************************************************************** misc */
 
 // init up the whole thing.  Called once upon app startup.
-// start and run the iteration loop, that runs parallel to the heartbeat in squishPanel
-//void qAvatar::initIterationLoop(int nThreads, int nStages) {
+// start and run the frame loop, that runs parallel to the heartbeat in squishPanel
+//void qAvatar::initIntegrationLoop(int nThreads, int nStages) {
 //
 //	qFlick *stages = qFlick::flick = new qFlick(space, nStages);
 //	threads = qThread::threads = new qThread[nThreads];
@@ -45,30 +45,30 @@ void qThread::threadStarts() {
 //}
 
 // no!  this has to be in JS
-// the JS timer (rAF) says it's a good time to start an iteration.
-// tell whatever threads that it's time to do another iteration. they may
+// the JS timer (rAF) says it's a good time to start frame.
+// tell whatever threads that it's time to do another frame. they may
 // already be in the middle of one, in which case they should start again
 // immediately on the next.
-//bool qAvatar::pleaseIterate(void) {
-//	if (doingIteration) {
-//		needsIteration = true;
+//bool qAvatar::pleaseIntegrate(void) {
+//	if (doingIntegration) {
+//		needsIntegration = true;
 //		return false;
 //	}
 //	else {
-//		needsIteration = false;
-//		oneIteration();
+//		needsIntegration = false;
+//		oneIntegration();
 //		return true;
 //	}
 //}
 
-//extern "C" void avatar_initIterationLoop(qAvatar *avatar, int nThreads, int nStages) {
+//extern "C" void avatar_initIntegrationLoop(qAvatar *avatar, int nThreads, int nStages) {
 //	emscripten_debugger();
-//	avatar->initIterationLoop(nThreads, nStages);
+//	avatar->initIntegrationLoop(nThreads, nStages);
 //}
 
 // no!  this has to be in JS
-//extern "C" int avatar_pleaseIterate(qAvatar *avatar) {
+//extern "C" int avatar_pleaseIntegrate(qAvatar *avatar) {
 //	emscripten_debugger();
-//	return avatar->pleaseIterate();
+//	return avatar->pleaseIntegrate();
 //}
 

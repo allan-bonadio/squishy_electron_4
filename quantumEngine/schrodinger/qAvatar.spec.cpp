@@ -30,7 +30,7 @@ TEST(qAvatar, CheckConstructor)
 	LONGS_EQUAL(1, avatar->lowPassFilter);
 
 	LONGS_EQUAL(false, avatar->pleaseFFT);
-	LONGS_EQUAL(false, avatar->isIterating);
+	LONGS_EQUAL(false, avatar->isIntegrating);
 
 	delete avatar;
 	delete space;
@@ -47,10 +47,10 @@ static void completeNewAvatarGauntlet(int N) {
 	int nPoints = space->nPoints;
 
 	LONGS_EQUAL(0, avatar->elapsedTime);
-	LONGS_EQUAL(0, avatar->iterateSerial);
-	LONGS_EQUAL(100, avatar->stepsPerIteration);
+	LONGS_EQUAL(0, avatar->frameSerial);
+	LONGS_EQUAL(100, avatar->stepsPerFrame);
 	// long story DOUBLES_EQUAL(N/8, avatar->lowPassFilter, 1e-12);
-	LONGS_EQUAL(false, avatar->isIterating);
+	LONGS_EQUAL(false, avatar->isIntegrating);
 
 
 	// lets see if the buffers are all large enough

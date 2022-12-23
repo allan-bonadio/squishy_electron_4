@@ -106,7 +106,7 @@ describe('cxToColor tests', () => {
 
 	/* ************************************ waveParams */
 
-	// this keeps many settings that don't immediately affect running iteration.
+	// this keeps many settings that don't immediately affect running frame.
 	// So 'Set Wave' button actually sets the wave, but meanwhile the setting sliders
 	// need to be remembered; this does it.  Voltage and space too; not active until user does something.
 	// THis also defines slider mins and maxes!  One source of truth.
@@ -125,15 +125,15 @@ describe('cxToColor tests', () => {
 
 	testParam('voltageSettings', 'showVoltage', true, [true, false]);  // not really the same as the rest...
 
-	/* ************************************ iterationSettings */
-	testParam('iterationSettings', 'isTimeAdvancing', false,  [false, true]);
-	testParam('iterationSettings', 'iterationPeriod', 50, {min: 16, max: 60_001});
-	testParam('iterationSettings', 'deltaT', 1, {min: .01, max: 100.0, });
-	testParam('iterationSettings', 'stepsPerIteration', 100, {min: 10, max: 1e5});
-	testParam('iterationSettings', 'lowPassFilter', 50, {min: 0, max: 75});
+	/* ************************************ frameSettings */
+	testParam('frameSettings', 'isTimeAdvancing', false,  [false, true]);
+	testParam('frameSettings', 'framePeriod', 50, {min: 16, max: 60_001});
+	testParam('frameSettings', 'deltaT', 1, {min: .01, max: 100.0, });
+	testParam('frameSettings', 'stepsPerFrame', 100, {min: 10, max: 1e5});
+	testParam('frameSettings', 'lowPassFilter', 50, {min: 0, max: 75});
 
 	/* ************************************miscSettings */
-	testParam('miscSettings', 'showingTab', 'wave', ['wave', 'voltage', 'space', 'iteration']);
+	testParam('miscSettings', 'showingTab', 'wave', ['wave', 'voltage', 'space', 'integrate']);
 	testParam('miscSettings', 'viewHeight', 400, {min: 50, max: 1e4});
 });
 

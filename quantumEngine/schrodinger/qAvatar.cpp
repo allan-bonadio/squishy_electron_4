@@ -19,9 +19,6 @@
 
 
 
-static bool traceIteration = false;
-static bool traceIterSteps = false;
-
 static bool traceJustWave = false;
 static bool traceJustInnerProduct = false;
 
@@ -116,26 +113,26 @@ void qAvatar::formatDirectOffsets(void) {
 
 	//makeDoubleGetter(elapsedTime);
 	//makeDoubleSetter(elapsedTime);
-	//makeDoubleGetter(iterateSerial);
-	//makeDoubleSetter(iterateSerial);
+	//makeDoubleGetter(frameSerial);
+	//makeDoubleSetter(frameSerial);
 	//printf("\n");
-	//makeBoolGetter(isIterating);
-	//makeBoolSetter(isIterating);
+	//makeBoolGetter(isIntegrating);
+	//makeBoolSetter(isIntegrating);
 	//makeBoolGetter(pleaseFFT);
 	//makeBoolSetter(pleaseFFT);
 
-	//makeBoolGetter(needsIteration);
-	//makeBoolSetter(needsIteration);
+	//makeBoolGetter(needsIntegration);
+	//makeBoolSetter(needsIntegration);
 	//
-	//makeBoolGetter(doingIteration);
-	//makeBoolSetter(doingIteration);
+	//makeBoolGetter(doingIntegration);
+	//makeBoolSetter(doingIntegration);
 	//printf("\n");
 	//makeDoubleGetter(dt);
 	//makeDoubleSetter(dt);
 	//makeIntGetter(lowPassFilter);
 	//makeIntSetter(lowPassFilter);
-	//makeIntGetter(stepsPerIteration);
-	//makeIntSetter(stepsPerIteration);
+	//makeIntGetter(stepsPerFrame);
+	//makeIntSetter(stepsPerFrame);
 
 	/* *********************************************** waves & buffers */
 
@@ -177,13 +174,13 @@ void qAvatar::dumpObj(const char *title) {
 	printf("        ==== end of qAvatar ====\n\n");
 }
 
-/* ********************************************************** doing Iteration */
+/* ********************************************************** doing Integration */
 
 // Does several visscher steps (eg 100 or 500). Actually does
-// stepsPerIteration+1 steps; half steps at start and finish to adapt and
+// stepsPerFrame+1 steps; half steps at start and finish to adapt and
 // deadapt to Visscher timing
-	//void qAvatar::oneIteration() {
-	//isIterating = doingIteration = true;
+	//void qAvatar::oneIntegration() {
+	//isIntegrating = doingIntegration = true;
 	//
 	//// now we need it
 	//getScratchWave();
@@ -193,30 +190,30 @@ void qAvatar::dumpObj(const char *title) {
 	//voltage = space->voltage;
 	//voltageFactor = space->voltageFactor;
 	//
-	//if (traceIteration) {
-	//	printf("🚀 🚀 qAvatar::oneIteration() - dt=%lf   stepsPerIteration=%d ; voltageFactor=%lf  elapsed time: %lf\n",
-	//		dt, stepsPerIteration,
+	//if (traceIntegration) {
+	//	printf("🚀 🚀 qAvatar::oneIntegration() - dt=%lf   stepsPerFrame=%d ; voltageFactor=%lf  elapsed time: %lf\n",
+	//		dt, stepsPerFrame,
 	//		voltageFactor,
 	//		getTimeDouble());
 	//	}
 	//
 	//// half step in beginning to move Im forward dt/2
 	//// cuz outside of here, re and im are for the same time.
-	//// Note here the latest is in scratch; iterate continues this,
+	//// Note here the latest is in scratch; frame continues this,
 	//// and the halfwave at the end moves it back to main.
 	//stepReal(scratchQWave->wave, qwave->wave, 0);
 	//stepImaginary(scratchQWave->wave, qwave->wave, dt/2);
 	//
-	//int doubleSteps = stepsPerIteration / 2;
-	//if (traceIteration)
-	//	printf("      qAvatar: doubleSteps=%d   stepsPerIteration=%d\n",
-	//		doubleSteps, stepsPerIteration);
+	//int doubleSteps = stepsPerFrame / 2;
+	//if (traceIntegration)
+	//	printf("      qAvatar: doubleSteps=%d   stepsPerFrame=%d\n",
+	//		doubleSteps, stepsPerFrame);
 	//
 	//for (int tt = 0; tt < doubleSteps; tt++) {
 	//	oneVisscherStep(qwave, scratchQWave);
 	//	oneVisscherStep(scratchQWave, qwave);
 	//
-	//	if (traceIteration && 0 == tt % 32) {
+	//	if (traceIntegration && 0 == tt % 32) {
 	//		printf("       qAvatar: step every 64, step %d; elapsed time: %lf\n", tt * 2, getTimeDouble());
 	//	}
 	//
@@ -225,8 +222,8 @@ void qAvatar::dumpObj(const char *title) {
 	//	}
 	//}
 	//
-	//if (traceIteration)
-	//	printf("      qAvatar: %d steps done; elapsed time: %lf \n", stepsPerIteration, getTimeDouble());
+	//if (traceIntegration)
+	//	printf("      qAvatar: %d steps done; elapsed time: %lf \n", stepsPerFrame, getTimeDouble());
 	//
 	//// half step at completion to move Re forward dt/2
 	//// and copy back to Main
@@ -234,7 +231,7 @@ void qAvatar::dumpObj(const char *title) {
 	//stepImaginary(qwave->wave, scratchQWave->wave, 0);
 	//
 	//
-	//// ok the algorithm tends to diverge after thousands of iterations.  Hose it down.
+	//// ok the algorithm tends to diverge after thousands of frames.  Hose it down.
 	//if (this->pleaseFFT) analyzeWaveFFT(qwave, "before fourierFilter()");
 	//fourierFilter(lowPassFilter);
 	//if (this->pleaseFFT) analyzeWaveFFT(qwave, "after fourierFilter()");
@@ -243,7 +240,7 @@ void qAvatar::dumpObj(const char *title) {
 	//
 	//double iProd = qwave->normalize();
 	//if (dumpFFHiResSpectums) qwave->dumpHiRes("wave END fourierFilter() after normalize");
-	//if (traceIProd && ((int) iterateSerial & 0xf) == 0)
+	//if (traceIProd && ((int) frameSerial & 0xf) == 0)
 	//	printf("      qAvatar: iProd= %lf \n", iProd);
 	//
 	//if (iProd > 1.01) {
@@ -257,18 +254,18 @@ void qAvatar::dumpObj(const char *title) {
 	//
 	//
 	//if (traceJustWave) {
-	//	qwave->dump("     qAvatar  traceJustWave at end of iteration", true);
+	//	qwave->dump("     qAvatar  traceJustWave at end of frame", true);
 	//}
 	//if (traceJustInnerProduct) {
-	//	printf("      qAvatar traceJustInnerProduct: finished one iteration (%d steps, N=%d), iProduct: %lf\n",
-	//		stepsPerIteration, space->nStates, qwave->innerProduct());
+	//	printf("      qAvatar traceJustInnerProduct: finished one frame (%d steps, N=%d), iProduct: %lf\n",
+	//		stepsPerFrame, space->nStates, qwave->innerProduct());
 	//}
 	//
-	//iterateSerial++;
+	//frameSerial++;
 	//
-	//if (traceIteration)
-	//	printf("      iteration done; elapsed time: %lf \n", getTimeDouble());
-	//isIterating = doingIteration = false;
+	//if (traceIntegration)
+	//	printf("      frame done; elapsed time: %lf \n", getTimeDouble());
+	//isIntegrating = doingIntegration = false;
 	//}
 	//
 	//
@@ -313,18 +310,18 @@ void qAvatar::dumpObj(const char *title) {
 //	analyzeWaveFFT(qwave, "askForFFT while idle");
 //}
 //
-//// if iterating, FFT as the current iterate finishes, before and after fourierFilter().
+//// if integrating, FFT as the current frame finishes, before and after fourierFilter().
 //// If stopped, fft current wave. now.
 //void avatar_askForFFT(qAvatar *pointer) { pointer->askForFFT(); }
 //
-//void avatar_oneIteration(qAvatar *pointer) { pointer->oneIteration(); }
+//void avatar_oneIntegration(qAvatar *pointer) { pointer->oneIntegration(); }
 //
 //
-//void qAvatar::initIterationLoop(int a, int b, int c) {
+//void qAvatar::initIntegrationLoop(int a, int b, int c) {
 //	// to e imprelmented
 //}
 //
-//void avatar_initIterationLoop(qAvatar *pointer, int a, int b, int c) {pointer ->initIterationLoop(a, b, c);}
+//void avatar_initIntegrationLoop(qAvatar *pointer, int a, int b, int c) {pointer ->initIntegrationLoop(a, b, c);}
 
 
 /* **********************************************************  */

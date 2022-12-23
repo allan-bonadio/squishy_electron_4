@@ -17,8 +17,8 @@ import eThread from '../engine/eThread.js';
 
 function setPT() {
 	CPToolbar.propTypes = {
-		iterateFrequency: PropTypes.number.isRequired,
-		setIterateFrequency: PropTypes.func.isRequired,
+		frameFrequency: PropTypes.number.isRequired,
+		setFrameFrequency: PropTypes.func.isRequired,
 
 		// these two might be undefined during startup, so get ready to punt
 		N: PropTypes.number,
@@ -48,7 +48,7 @@ function clickOnFFT(space)
 
 
 function CPToolbar(props) {
-	const {iterateFrequency, setIterateFrequency} = props;
+	const {frameFrequency, setFrameFrequency} = props;
 
 	const repRates = <>
 		<option key='60' value='60'>60 per sec</option>
@@ -70,15 +70,15 @@ function CPToolbar(props) {
 
 	// nail this down so roundoff error doesn't spoil everything.
 	// It's always of the form n or 1/n where n is an integer
-	const apparentFrequency = (iterateFrequency >= 1)
-		? Math.round(iterateFrequency)
-		: (1 / Math.round(1 / iterateFrequency)).toFixed(3);
+	const apparentFrequency = (frameFrequency >= 1)
+		? Math.round(frameFrequency)
+		: (1 / Math.round(1 / frameFrequency)).toFixed(3);
 
 	return <div className='CPToolbar'>
 		<div className='frameRateBox'>
 			frame rate:<br />
 			<select className='rateSelector' value={apparentFrequency}
-					onChange={ev => setIterateFrequency(ev.currentTarget.value)}>
+					onChange={ev => setFrameFrequency(ev.currentTarget.value)}>
 				{repRates}
 			</select>
 		</div>
@@ -93,7 +93,7 @@ function CPToolbar(props) {
 		</button>
 
 		<button className={`stepButton startStopTool`}
-			onClick={ControlPanel.singleIteration}>
+			onClick={ControlPanel.singleFrame}>
 			<big>►</big> ▌
 		</button>
 

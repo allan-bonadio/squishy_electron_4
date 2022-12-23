@@ -23,22 +23,22 @@ struct qGrinder {
 	// please keep alignment stable and correct!  See also eGrinder.js
 	// Keep arranged from larger to smaller - doubles, then ints, then bools
 
-	// how much time we've iterated, from creation.  pseudo-seconds.  Since we've eliminated
+	// how much time we've integrated, from creation.  pseudo-seconds.  Since we've eliminated
 	// all the actual physical constants from the math, why not choose our own definition
 	// of what a second is?  Resets to zero every so often.
 	double elapsedTime;
 
 	// total number of times thru the number cruncher. (should always be an integer;
 	// it's a double cuz I don't know how big it'll get)
-	double iterateSerial;
+	double frameSerial;
 
 
 	// params that the user can set/get
 	double dt;
 	int lowPassFilter;
-	int stepsPerIteration;
+	int stepsPerFrame;
 
-	/* *********************************************** iteration */
+	/* *********************************************** frame */
 
 	// a subclass of  qWave, it has multiple waves to do grinding with
 	// this grinder OWNS the qFlick & is responsible for deleting it
@@ -55,7 +55,7 @@ struct qGrinder {
 
 	struct qStage *stages;
 	struct qThread *threads;
-	void initIterationLoop(int xxx, int nThreads, int nStages);
+	void initIntegrationLoop(int xxx, int nThreads, int nStages);
 
 	// for alignment: put the rest of these last
 
@@ -63,24 +63,24 @@ struct qGrinder {
 	char label[MAX_LABEL_LEN + 1];
 
 
-	// true if an iteration is running; set/unset in ::oneIteration()
+	// true if frame is running; set/unset in ::oneIntegration()
 	// For the interactive simulation switch, see isTimeAdvancing in JS.
-	bool isIterating;
+	bool isIntegrating;
 
-	bool needsIteration;
+	bool needsIntegration;
 
-	// what's the diff between this and isIterating?  not much.
-	bool doingIteration;
+	// what's the diff between this and isIntegrating?  not much.
+	bool doingIntegration;
 
-	// set pleaseFFt from JS (only if in the middle of an iteration)
+	// set pleaseFFt from JS (only if in the middle of frame)
 	void askForFFT(void);
 
-	// true = please do an FFT after the current iteration ends
+	// true = please do an FFT after the current frame ends
 	bool pleaseFFT;
-	// make sure the subsequent fields are aligned!  or iteration is painfully slow.
+	// make sure the subsequent fields are aligned!  or frame is painfully slow.
 
-	// multiple steps; ≈ stepsPerIteration
-	void oneIteration(void);
+	// multiple steps; ≈ stepsPerFrame
+	void oneIntegration(void);
 
 	// visscher
 	void stepReal(qCx *newW, qCx *oldW, double dt);
@@ -96,8 +96,8 @@ struct qGrinder {
 
 // for JS to call.  Defined in jsSpace and elsewhere.
 extern "C" {
-	void grinder_initIterationLoop(qGrinder *grinder, int nStage, int nnn, int mmms);
-	void grinder_oneIteration(qGrinder *grinder);
+	void grinder_initIntegrationLoop(qGrinder *grinder, int nStage, int nnn, int mmms);
+	void grinder_oneIntegration(qGrinder *grinder);
 
 	void grinder_askForFFT(qGrinder *grinder);
 

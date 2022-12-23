@@ -109,7 +109,7 @@ export class abstractViewDef {
 //		throw new Error(`Error linking program for ${this.viewName}: ${msg}`);
 //	}
 
-	// this does shaders and inputs, iterating thru the list of drawings
+	// this does shaders and inputs, integrating thru the list of drawings
 	// they got their glsl scripts in their constructors
 	setShadersOnDrawings() {
 		this.drawings.forEach(drawing => {

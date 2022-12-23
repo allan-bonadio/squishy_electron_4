@@ -1,5 +1,5 @@
 /*
-** SetIterationTab -- tab for adjusting deltaT, stepsPerIteration, etc
+** SetIntegrationTab -- tab for adjusting deltaT, stepsPerFrame, etc
 ** Copyright (C) 2022-2022 Tactile Interactive, all rights reserved
 */
 
@@ -12,17 +12,17 @@ let traceSliderChanges = false;
 
 // set prop types
 function setPT() {
-	SetIterationTab.propTypes = {
+	SetIntegrationTab.propTypes = {
 		deltaT: PropTypes.number.isRequired,
 		setDeltaT: PropTypes.func.isRequired,
-		stepsPerIteration: PropTypes.number.isRequired,
-		setStepsPerIteration: PropTypes.func.isRequired,
+		stepsPerFrame: PropTypes.number.isRequired,
+		setStepsPerFrame: PropTypes.func.isRequired,
 		lowPassFilter: PropTypes.number.isRequired,
 		setLowPassFilter: PropTypes.func.isRequired,
 	};
 }
 
-function SetIterationTab(props) {
+function SetIntegrationTab(props) {
 	// lowPassFilter, the number setting.  On the JS side, it's a percentage of N/2:
 	// and can range from 200/N (nyquist only) to 75
 	// so when N=16, user can set lowPass to 12.5 ... 75 percents = 1 to 6 freqs
@@ -38,20 +38,20 @@ function SetIterationTab(props) {
 
 	// Unlike other tabs, all these are instant-update.
 
-	return (<div className='SetIterationTab'>
+	return (<div className='SetIntegrationTab'>
 		<div className='sliderBlock'>
-			<h3>Iteration Controls</h3>
+			<h3>Integration Controls</h3>
 
 			<LogSlider
 				unique='deltaTSlider'
 				className='deltaTSlider cpSlider'
-				label='𝚫t each iteration'
+				label='𝚫t each frame'
 				minLabel='0.01'
 				maxLabel='100.0'
 
 				current={props.deltaT}
-				sliderMin={alternateMinMaxs.iterationSettings.deltaT.min}
-				sliderMax={alternateMinMaxs.iterationSettings.deltaT.max}
+				sliderMin={alternateMinMaxs.frameSettings.deltaT.min}
+				sliderMax={alternateMinMaxs.frameSettings.deltaT.max}
 				stepsPerDecade={6}
 
 				handleChange={(power, ix) => {
@@ -61,29 +61,29 @@ function SetIterationTab(props) {
 				}}
 			/>
 			<LogSlider
-				unique='stepsPerIterationSlider'
-				className='stepsPerIterationSlider cpSlider'
-				label='steps Per Iteration'
+				unique='stepsPerFrameSlider'
+				className='stepsPerFrameSlider cpSlider'
+				label='steps Per Frame'
 				minLabel='faster'
 				maxLabel='smoother'
 
-				current={props.stepsPerIteration}
-				sliderMin={alternateMinMaxs.iterationSettings.stepsPerIteration.min}
-				sliderMax={alternateMinMaxs.iterationSettings.stepsPerIteration.max}
+				current={props.stepsPerFrame}
+				sliderMin={alternateMinMaxs.frameSettings.stepsPerFrame.min}
+				sliderMax={alternateMinMaxs.frameSettings.stepsPerFrame.max}
 				stepsPerDecade={6}
 
 				handleChange={(power, ix) => {
 					if (traceSliderChanges)
-						console.log(`🏃🏽 🏃🏽 ch stepsPerIteration::  ix=${ix}  power=${power}`);
-					props.setStepsPerIteration(power);
+						console.log(`🏃🏽 🏃🏽 ch stepsPerFrame::  ix=${ix}  power=${power}`);
+					props.setStepsPerFrame(power);
 				}}
 			/>
 
 			<TextNSlider className='lowPassFilterSlider '
 				label='Percent of High Frequencies to Filter Out'
 				value={props.lowPassFilter.toFixed(nDigits)}
-				min={alternateMinMaxs.iterationSettings.lowPassFilter.min}
-				max={alternateMinMaxs.iterationSettings.lowPassFilter.max}
+				min={alternateMinMaxs.frameSettings.lowPassFilter.min}
+				max={alternateMinMaxs.frameSettings.lowPassFilter.max}
 				step={lowPassStep}
 				style={{width: '80%'}}
 				handleChange={newValue => {
@@ -95,14 +95,14 @@ function SetIterationTab(props) {
 
 		</div>
 		<div className='iStats'>
-			<h3 style={{textAlign: 'left'}}>Iteration Statistics</h3>
+			<h3 style={{textAlign: 'left'}}>Integration Statistics</h3>
 			<table><tbody>
-				<tr><td>iteration calc time:     </td><td><span  className='iterationCalcTime'>-</span> ms</td></tr>
+				<tr><td>frame calc time:     </td><td><span  className='frameCalcTime'>-</span> ms</td></tr>
 				<tr><td>reload view variables:     </td><td><span  className='reloadVarsNBuffer'>-</span> ms</td></tr>
 				<tr><td>draw:                      </td><td><span  className='drawTime'>-</span> ms</td></tr>
-				<tr><td>total for iteration:  </td><td><span  className='totalForIteration'>-</span> ms</td></tr>
-				<tr><td>iteration period:  </td><td><span  className='iterationPeriod'>-</span> ms</td></tr>
-				<tr><td>iterations per sec:  </td><td><span  className='iterationsPerSec'>-</span>/sec</td></tr>
+				<tr><td>total for frame:  </td><td><span  className='totalForIntegration'>-</span> ms</td></tr>
+				<tr><td>frame period:  </td><td><span  className='framePeriod'>-</span> ms</td></tr>
+				<tr><td>frames per sec:  </td><td><span  className='framesPerSec'>-</span>/sec</td></tr>
 			</tbody></table>
 		</div>
 	</div>);
@@ -112,5 +112,5 @@ function SetIterationTab(props) {
 
 setPT();
 
-export default SetIterationTab;
+export default SetIntegrationTab;
 

@@ -11,7 +11,7 @@ import CPToolbar from './CPToolbar.js';
 import SetWaveTab from './SetWaveTab.js';
 import SetVoltageTab from './SetVoltageTab.js';
 import SetResolutionTab from './SetResolutionTab.js';
-import SetIterationTab from './SetIterationTab.js';
+import SetIntegrationTab from './SetIntegrationTab.js';
 //import eSpace from '../engine/eSpace.js';
 import SquishPanel from '../SquishPanel.js';
 import {getASetting, storeASetting, getAGroup, storeAGroup} from '../utils/storeSettings.js';
@@ -23,14 +23,14 @@ import {interpretCppException} from '../utils/errors.js';
 let traceSetPanels = false;
 
 
-// iterations always need specific numbers of steps.  But there's always one more.
+// integrations always need specific numbers of steps.  But there's always one more.
 // maybe this should be defined in the grinder.  Hey, isn't this really 1/2 step?  cuz it's always dt/2
 const N_EXTRA_STEPS = 0.5;
 
 
 export class ControlPanel extends React.Component {
 	static propTypes = {
-		iterateAnimate: PropTypes.func.isRequired,
+		frameAnimate: PropTypes.func.isRequired,
 
 		// these are the actual functions that change the main qWave and ultimately
 		// the WaveView on the screen
@@ -43,7 +43,7 @@ export class ControlPanel extends React.Component {
 		redrawWholeMainWave: PropTypes.func.isRequired,
 
 		iStats: PropTypes.shape({
-			startIteration: PropTypes.number.isRequired,
+			startIntegration: PropTypes.number.isRequired,
 			endDraw: PropTypes.number.isRequired,
 		}),
 		refreshStats: PropTypes.func.isRequired,
@@ -55,12 +55,12 @@ export class ControlPanel extends React.Component {
 
 		// most of the state is kept here.  But, also, in the store settings
 		this.state = {
-			iterationPeriod: getASetting('iterationSettings', 'iterationPeriod'),
+			framePeriod: getASetting('frameSettings', 'framePeriod'),
 
 			// defaults for sliders for deltaT & spi
-			deltaT: getASetting('iterationSettings', 'deltaT'),
-			stepsPerIteration: getASetting('iterationSettings', 'stepsPerIteration'),
-			lowPassFilter: getASetting('iterationSettings', 'lowPassFilter'),
+			deltaT: getASetting('frameSettings', 'deltaT'),
+			stepsPerFrame: getASetting('frameSettings', 'stepsPerFrame'),
+			lowPassFilter: getASetting('frameSettings', 'lowPassFilter'),
 
 			// state for voltage resets - control panel only, setVoltage()  see below;...
 			//voltageBreed: getASetting('voltageParams', 'voltageBreed'),
@@ -93,46 +93,46 @@ export class ControlPanel extends React.Component {
 		// instance is created, so the storeSettings hasn't been initiated yet.
 		// This constructor, on the other hand, can only happen after the
 		// spacePromise has resolved.
-		ControlPanel.isTimeAdvancing = getASetting('iterationSettings', 'isTimeAdvancing');
+		ControlPanel.isTimeAdvancing = getASetting('frameSettings', 'isTimeAdvancing');
 	}
 
 	/* ******************************************************* start/stop */
 
-	// set freq of iteration, which is 1, 2, 4, 8, ... some float number of times per second you want frames.
+	// set freq of frame, which is 1, 2, 4, 8, ... some float number of times per second you want frames.
 	// freq is how the CPToolbar handles it, but we keep the period in the ControlPanel state,
-	// also in iterationSettings:iterationPeriod
-	setIterateFrequency =
+	// also in frameSettings:framePeriod
+	setFrameFrequency =
 	freq =>{
 		// set it in the settings, controlpanel state, and SquishPanel's state, too.
 		let period = 1000. / +freq;
-		this.setState({iterationPeriod: storeASetting('iterationSettings', 'iterationPeriod', period)});
-		this.props.setIterationPeriod(period);  // so squish panel can adjust the heartbeat
-		// NO!  the grinder doesn't use this; squishpanel does.  this.grinder.iterationPeriod = period;
+		this.setState({framePeriod: storeASetting('frameSettings', 'framePeriod', period)});
+		this.props.setFramePeriod(period);  // so squish panel can adjust the heartbeat
+		// NO!  the grinder doesn't use this; squishpanel does.  this.grinder.framePeriod = period;
 	}
 
 	// the first time, we get it from the settings.  in the constructor.
 	static isTimeAdvancing = false;
 
-	static startIterating() {
-		ControlPanel.isTimeAdvancing = storeASetting('iterationSettings', 'isTimeAdvancing', true);;
+	static startAnimating() {
+		ControlPanel.isTimeAdvancing = storeASetting('frameSettings', 'isTimeAdvancing', true);;
 		ControlPanel.me.setState({isTimeAdvancing: true});
 	}
 
-	static stopIterating() {
-		ControlPanel.isTimeAdvancing = storeASetting('iterationSettings', 'isTimeAdvancing', false);
+	static stopAnimating() {
+		ControlPanel.isTimeAdvancing = storeASetting('frameSettings', 'isTimeAdvancing', false);
 		ControlPanel.me.setState({isTimeAdvancing: false});
 	}
 
 	static startStop() {
 		if (ControlPanel.isTimeAdvancing)
-			ControlPanel.stopIterating();
+			ControlPanel.stopAnimating();
 		else
-			ControlPanel.startIterating();
+			ControlPanel.startAnimating();
 	}
 
-	static singleIteration() {
-		SquishPanel.me.iterateOneIteration(true);
-		ControlPanel.stopIterating();
+	static singleFrame() {
+		SquishPanel.me.integrateOneFrame(true);
+		ControlPanel.stopAnimating();
 	}
 
 	/* ********************************************** wave & pot */
@@ -194,26 +194,26 @@ export class ControlPanel extends React.Component {
 	}
 
 
-	/* ********************************************** iteration */
+	/* ********************************************** frame */
 
-	// dt is time per step, for the algorithm; deltaT is time per iteration, the user/UI control)
+	// dt is time per step, for the algorithm; deltaT is time per frame, the user/UI control)
 	setDeltaT = deltaT => {
-		deltaT = storeASetting('iterationSettings', 'deltaT', deltaT);
+		deltaT = storeASetting('frameSettings', 'deltaT', deltaT);
 		this.setState({deltaT});
-		this.grinder.dt = deltaT / (this.state.stepsPerIteration + N_EXTRA_STEPS);  // always one more!
+		this.grinder.dt = deltaT / (this.state.stepsPerFrame + N_EXTRA_STEPS);  // always one more!
 	}
 
-	setStepsPerIteration =
-	stepsPerIteration => {
+	setStepsPerFrame =
+	stepsPerFrame => {
 		try {
-			if (traceSetPanels) console.log(`js setStepsPerIteration(${stepsPerIteration})`);
-			storeASetting('iterationSettings', 'stepsPerIteration', stepsPerIteration);
-			this.setState({stepsPerIteration});
-			this.grinder.stepsPerIteration = stepsPerIteration;
+			if (traceSetPanels) console.log(`js setStepsPerFrame(${stepsPerFrame})`);
+			storeASetting('frameSettings', 'stepsPerFrame', stepsPerFrame);
+			this.setState({stepsPerFrame});
+			this.grinder.stepsPerFrame = stepsPerFrame;
 		} catch (ex) {
 			// eslint-disable-next-line no-ex-assign
 			ex = interpretCppException(ex);
-			console.error(`setStepsPerIteration error:`,
+			console.error(`setStepsPerFrame error:`,
 				ex.stack ?? ex.message ?? ex);
 			////debugger;
 		}
@@ -224,7 +224,7 @@ export class ControlPanel extends React.Component {
 	lowPassFilter => {
 		if (traceSetPanels) console.log(`js setLowPassFilter(${lowPassFilter})`)
 
-		let lpf = storeASetting('iterationSettings', 'lowPassFilter', lowPassFilter);
+		let lpf = storeASetting('frameSettings', 'lowPassFilter', lowPassFilter);
 		this.setState({lowPassFilter: lpf});
 
 		// here's where it converts from percent to the C++ style integer number of freqs
@@ -266,12 +266,12 @@ export class ControlPanel extends React.Component {
 		case 'space':
 			return <SetResolutionTab />;
 
-		case 'iteration':
-			return <SetIterationTab
+		case 'integrate':
+			return <SetIntegrationTab
 				deltaT={s.deltaT}
 				setDeltaT={this.setDeltaT}
-				stepsPerIteration={s.stepsPerIteration}
-				setStepsPerIteration={this.setStepsPerIteration}
+				stepsPerFrame={s.stepsPerFrame}
+				setStepsPerFrame={this.setStepsPerFrame}
 				lowPassFilter={s.lowPassFilter}
 				setLowPassFilter={this.setLowPassFilter}
 
@@ -296,8 +296,8 @@ export class ControlPanel extends React.Component {
 
 		return <div className='ControlPanel'>
 			<CPToolbar
-				iterateFrequency={1000. / s.iterationPeriod}
-				setIterateFrequency={this.setIterateFrequency}
+				frameFrequency={1000. / s.framePeriod}
+				setFrameFrequency={this.setFrameFrequency}
 
 				isTimeAdvancing={ControlPanel.isTimeAdvancing}
 
@@ -317,8 +317,8 @@ export class ControlPanel extends React.Component {
 						onClick={ev => this.setShowingTab('voltage')}>Voltage</li>
 					<li  className={s.showingTab == 'space' ? 'selected' : ''} key='space'
 						onClick={ev => this.setShowingTab('space')}>Space</li>
-					<li  className={s.showingTab == 'iteration' ? 'selected' : ''} key='iteration'
-						onClick={ev => this.setShowingTab('iteration')}>Iteration</li>
+					<li  className={s.showingTab == 'integrate' ? 'selected' : ''} key='integrate'
+						onClick={ev => this.setShowingTab('integrate')}>Integration</li>
 				</ul>
 				<div className='tabFrame'>
 					{showingTabHtml}

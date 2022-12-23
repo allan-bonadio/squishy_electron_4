@@ -73,7 +73,7 @@ export default class ResolutionDialog extends React.Component {
 
 	// puts up the resolution dialog, starting with the values from the state
 	static openResolutionDialog() {
-		// freeze the iteration while this is going on ...
+		// freeze the frame while this is going on ...
 		const timeWasAdvancing = ControlPanel.isTimeAdvancing;
 		ControlPanel.isTimeAdvancing = false;
 

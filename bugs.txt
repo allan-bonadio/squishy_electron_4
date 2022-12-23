@@ -8,7 +8,7 @@
 https://emscripten.org/docs/getting_started/downloads.html
 Multiprocessing must be done with pThreads and/or web workers, it seems.
 
-- test harness to run C++ iterator for testing
+- test harness to run C++ integrator for testing
 
 - OpenGL, if possible (maybe v4?)  Must be webgl cuz emscripten doesn't do full OpenGL
 (basically OpenGL ES = WebGL anyway).
@@ -21,7 +21,7 @@ Multiprocessing must be done with pThreads and/or web workers, it seems.
 
 - some diagnostics for me
 
-- time display, iterations
+- time display, frames
 - time & frame num should display in real time, not via react
 - after setting wave or potential, redraw!
 
@@ -35,7 +35,7 @@ Multiprocessing must be done with pThreads and/or web workers, it seems.
 ------------------------------------------- to do - small
 - small key image indicating phase-color correspondence. ?? does it  really matter?  Maybe just an explanation.
 
-- should detect off-the-rails situations and stop iteration.
+- should detect off-the-rails situations and stop frame.
 	any NaNs, Infinity, or consecutive ix values that differ greatly.  Maybe calculate sum of abs of differences between consecutive psi values - and figure how whatthreshold to use.
 
 - sliders for potential don't quite work the way i want - I think they need log and negative versions but log slider isn't ste up for that yet.

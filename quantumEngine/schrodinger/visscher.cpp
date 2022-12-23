@@ -172,7 +172,7 @@ other way: 1nm = 1e-9m   square = 1e-18 m^2 times that number = 1.72759854921802
 //
 //	if (traceOneStep) {
 //		char msg[100];
-//		snprintf(msg, 100, "at end of Visscher:new, frame %1.0lf | ", iterateSerial);
+//		snprintf(msg, 100, "at end of Visscher:new, frame %1.0lf | ", frameSerial);
 //		newQW->dump(msg, true);
 //	}
 //	if (traceVischerBench) printf("         oneVisscherStep, done: time=%lf\n", getTimeDouble());
@@ -243,7 +243,7 @@ void qGrinder::stepImaginary(qCx *newW, qCx *oldW, double dt) {
 }
 
 // form the new wave from the old wave, in separate buffers, chosen by our caller.
-// notreally gonna use this; see oneIteration()
+// notreally gonna use this; see oneIntegration()
 void qGrinder::oneVisscherStep(qWave *newQWave, qWave *oldQWave) {
 	qWave *oldQW = oldQWave;
 	qCx *oldW = oldQWave->wave;
@@ -262,7 +262,7 @@ void qGrinder::oneVisscherStep(qWave *newQWave, qWave *oldQWave) {
 
 	if (traceOneStep) {
 		char msg[100];
-		snprintf(msg, 100, "at end of Visscher:new, frame %1.0lf | ", iterateSerial);
+		snprintf(msg, 100, "at end of Visscher:new, frame %1.0lf | ", frameSerial);
 		newQW->dump(msg, true);
 	}
 	if (traceVischerBench) printf("         oneVisscherStep, done: time=%lf\n", getTimeDouble());

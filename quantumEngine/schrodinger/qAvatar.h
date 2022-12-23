@@ -4,8 +4,7 @@
 */
 
 // formerly called: Manifestation, Incarnation, Timeline, ... formerly part of qSpace
-// Although many of these seem to belong to iteration, they also have to display.
-// Hence the Avatar object.  see also JS eAvatar
+// see also JS eAvatar
 
 struct qThread;
 struct qStage;
@@ -23,22 +22,22 @@ struct qAvatar {
 	// please keep alignment stable and correct!  See also eAvatar.js
 	// Keep arranged from larger to smaller - doubles, then ints, then bools
 
-	// how much time we've iterated, from creation.  pseudo-seconds.  Since we've eliminated
+	// how much time we've integrated, from creation.  pseudo-seconds.  Since we've eliminated
 	// all the actual physical constants from the math, why not choose our own definition
 	// of what a second is?  Resets to zero every so often.
 	//double elapsedTime;
 	//
 	//// total number of times thru the number cruncher. (should always be an integer;
 	//// it's a double cuz I don't know how big it'll get)
-	//double iterateSerial;
+	//double frameSerial;
 	//
 	//
 	//// params that the user can set/get
 	//double dt;
 	//int lowPassFilter;
-	//int stepsPerIteration;
+	//int stepsPerFrame;
 	//
-	/* *********************************************** iteration */
+	/* *********************************************** frame */
 
 	// our main qWave, either for the WaveView or the SetWave tab
 	// this avatar OWNS the qWave & is responsible for deleting it
@@ -66,7 +65,7 @@ struct qAvatar {
 	struct qStage *stages;  // i doon't thiink i need these
 	struct qThread *threads; // i doon't thiink i need these
 
-	void initIterationLoop(int xxx, int nThreads, int nStages);
+	void initIntegrationLoop(int xxx, int nThreads, int nStages);
 
 	// for alignment: put the rest of these last
 
@@ -74,31 +73,31 @@ struct qAvatar {
 	char label[MAX_LABEL_LEN + 1];
 
 
-	// true if an iteration is running; set/unset in ::oneIteration()
+	// true if frame is running; set/unset in ::oneIntegration()
 	// For the interactive simulation switch, see isTimeAdvancing in JS.
-	//bool isIterating;
+	//bool isIntegrating;
 
-	// this is different now; js DOES pleaseIterate()
-	//	JS calls pleaseIterate() from a worker whenever it's time to start an
-	//	iteration. If it's already doing one, it'll remember to do another
-	//	immediately after the current iteration, using needsIteration, and
-	//	pleaseIterate() will return false. Otherwise, it'll do an iteration
-	//	immediately, and return true after the last iteration (which could be
+	// this is different now; js DOES pleaseIntegrate()
+	//	JS calls pleaseIntegrate() from a worker whenever it's time to start an
+	//	frame. If it's already doing one, it'll remember to do another
+	//	immediately after the current frame, using needsIntegration, and
+	//	pleaseIntegrate() will return false. Otherwise, it'll do frame
+	//	immediately, and return true after the last frame (which could be
 	//	a long time).
-	//bool needsIteration;
+	//bool needsIntegration;
 
-	// what's the diff between this and isIterating?  not much.
-	//bool doingIteration;
+	// what's the diff between this and isIntegrating?  not much.
+	//bool doingIntegration;
 
-	// set pleaseFFt from JS (only if in the middle of an iteration)
+	// set pleaseFFt from JS (only if in the middle of frame)
 	//void askForFFT(void);
 
-	// true = please do an FFT after the current iteration ends
+	// true = please do an FFT after the current frame ends
 	//bool pleaseFFT;
-	// make sure the subsequent fields are aligned!  or iteration is painfully slow.
+	// make sure the subsequent fields are aligned!  or frame is painfully slow.
 
-	// multiple steps; ≈ stepsPerIteration
-	//void oneIteration(void);
+	// multiple steps; ≈ stepsPerFrame
+	//void oneIntegration(void);
 
 	// visscher
 	//void stepReal(qCx *newW, qCx *oldW, double dt);
@@ -114,8 +113,8 @@ struct qAvatar {
 
 // for JS to call.  Defined in jsSpace and elsewhere.
 extern "C" {
-	//void avatar_initIterationLoop(qAvatar *avatar, int nStages, int nnn, int mmm);
-	//void avatar_oneIteration(qAvatar *avatar);
+	//void avatar_initIntegrationLoop(qAvatar *avatar, int nStages, int nnn, int mmm);
+	//void avatar_oneIntegration(qAvatar *avatar);
 	//
 	//void avatar_askForFFT(qAvatar *avatar);
 }
