@@ -29,8 +29,8 @@ Versions
 v3 refers to the previous SquishyElectron project.
 v4 is squishy_electron_4, this project.
 
-Internals
-=========
+Files
+=====
 
 The top level of the source is a standard React project from CreateReactApp.
 
@@ -72,7 +72,27 @@ quantumEngine/squish.h - global include file
 quantumEngine/testing/ - scripts etc specifically for testing
 
 
+Scripts
+=======
 
+To run scripts this project, you need to export SQUISH_ROOT to point to the
+directory in one of your login files:
+export SQUISH_ROOT='/opt/dvl/squishyElectron/SquishyElectron'
+
+Usually the file ~/.profile works; if you already have another file with a name like ~/.*profile*, that would probably be better.  Otherwise, create .profile .
+
+To use this source tree, you MUST put the following line in your ~/.profile or
+~/.bash_profile or similar, whichever you have:
+   export SQUISH_ROOT=/opt/dvl/squishyElectron/squishy_electron_4
+or whatever path to your cloned repo.  You MUST do this to compile squishy
+electron even if you don't use the aliases in this file!
+
+
+If you're using BASH, you might also like to put this in your ~/.bashrc file, or if you have an existing ~/.*rc file for your shell:
+
+source $SQUISH_ROOT/maint/aliases.sh
+
+it'll define some aliases to quickly zip around among the important directories in the terminal.
 
 quantumEngine
 =============
@@ -80,99 +100,34 @@ quantumEngine
 This is C++ code that runs directly in the browser.  It relies on WebAssembly.
 https://developer.mozilla.org/en-US/docs/WebAssembly/Concepts
 
-On top of that, the enscriptem package compiles and links C++ to make .wasm and other object files.
+On top of that, the enscriptem package compiles and links C++ to make .wasm and other object files.  So, if you want to build this, you have to install emscripten:
+https://emscripten.org/docs
+
+Export qEMSCRIPTEN to point to the directory in one of your login files like .profile :
+export qEMSCRIPTEN=/opt/dvl/emscripten
 
 
+## operation
 
 
+- a 'Space' describes where the electron travels.  (Classes qSpace in C++ or eSpace in JS.)  Most important parts:
+N = number of datapoints in a wave, always a power of two, typically 32 thru 512
+continuum = int enum that describes the edges of the space: wall or wrap-round
+These two values dictate the wave buffers allocated all over.  If the user changes either, everything is tossed and reallocated.
 
-This is aspirational, or maybe just the description of the quantum engine.
-
-- a 'dimension' is a description of one of the state variable sets that index a wave.
-class qDimension {
-	continuum: contWELL or contENDLESS (has N+2 values for N possibilities)
-		or contDISCRETE (has N values for N possibilities)
-	N: possible QM states.  Always a power of 2 for non-discrete dimensions.
-	nPoints: number of values (=N or N+2) times nPoints for lower-numbered dimensions
-	nStates: number of states (N) times nStates for lower-numbered dimensions
-	label: 'x', 'y' or 'z' or other; C string
-		two particles will have x1, x2 but one in 2d will have x, y.
-			Spin: Sz, or Sz1, Sz2, ...  Smax = 2S+1.  Sz= ix - S.  Orbital Ang: Lz, combined: Jz
-			variable total angular mom: L combines Lz and Ltot so: state ix = 0...Lmax^2
-			Ltot = floor(sqrt(ix))   Lz = ix - L(L+1) and you have to choose a Lmax sorry
-			Also could have Energy dimensions...
-}
-Each dimension's variable is an integer, either 0...N-1 or 1...N, the latter for contWELL or contENDLESS.
-	Coordinates always have 1 extra point on each end, either for ∞ wall or for wraparound
-
-- a 'Space' is a list of dimensions, and a potential function of those dimension variables
-	Dimensions are listed from outer to inner as with the resulting psi array:
-	psi[outermost-dim][dim][dim][innermost-dim]
-	As fo present writing, only does one dimension
-	class Space {
-		qDimension dimensions[];
-		Avatar, one or more.  manages iteration and display
-		potential (array of state variables often denoted V);
-		Waves, one or more
-	}
-
-- a 'Wave' is a multidimensional array of psi  values, each a complex number (two floats, usually double)
-	- qWave is a quantum system state
+- a 'Wave' is an array of N psi  values, each a complex number (two doubles, class qCx).  There's actually several classes:
+	- qWave and eWave is a quantum system state
 	- qSpectrum is an FFT of a qWave
-	- qBuffer is the superclass of the above two
-	- qBuffer points to space it's designed for; all buffers are freed when space changes dimensions so they can be recreated
-	- iterate passes thru all psi values along all dimensions
-	- fixBoundaries() automatically wraps continuum dimensions
-	- can have multiple waves per space; user can superimpose them (someday)
+	- qBuffer is the superclass of the qWave and qSpectrum
+	- qWaves have an extra point on each end to aid in calculations, so if N=32, there's 66 double floats in the buffer.  Methods named fixBoundaries() automatically implements the details.
+
+- an 'Avatar' manages display of a Wave.  There's two per space; the second one is for the Set Wave minigraph.  It owns a qViewBuffer, which is ultimately handed to WebGL.
+
+- a 'Grinder' iterates the differential equation.
 
 
-Also must have shared between JS and C++:
-- animation period
-- potential energy as function of state; scalars not complex
-- elapsed time; frame number
-- all things in the control panel
-- just lots of others
-
-Also must have in C++; not sure if JS cares:
-- progress of each thread, so it can coordinate the threads
-someday
-
------------------------------------------------- equations
-
-ih ∂ψ / ∂t  =  [V - (h^2/2m) (∂^2/∂x^2)] ψ
-
-
-ih ∂psi / ∂t  =  V psi - (h^2/2m) (∂^2/∂x^2) psi
-
-where t=time, x=location (potentially scalar, 2-vec or 3-vec)
-h=hbar ħ plank's constant / 2π   m=particle (electron) mass
-V=potential, function of x (and t maybe someday)
-psi ψ is the wave function itself, a complex function of x and t.  Both of those are discretized: dx=1 always, and dt is variable
-
-
-
-
------------------------------------------------- wish list
-
-
-- UI ability to set n of dimensions, and to specify angular momentum, and any energy/potential differences therein.  Two particles in the same space should have the same X coordinates; one in 2-d space should have X  and Y coords.  The V potential would be 1-dimensional or 2 dimensional, depending.
-Any number of dimensions, eg x and s, the spin, becomes ψ[1...N][-½, ½]
-or a 2d wave is ψ[1...N][1...N], either two 1D particles or 1 2D particle
-whats the diff?  well, the potential V with two particles, each depends on the loc of the other.
-For one particle in 2D, the potential is a 2d map.
-
-- Multiprocessing must be done with web workers, with atomics synchronizing.  Multiple threads working on successive generations; dual threads on Re and Im.
-
-- display Spiral in 3d could be easy.  Dual waves for an electron with spin?
-
-- ability to create two wave functions and superimpose them, with varying complex ratio between
-
-- ability to 'stick your finger in' and measure a state variable and thereby change the state
-
-- small key table indicating phase-color correspondence (see that file... i think in resume directory)
-
-
-================================================================ emscripten
+emscripten
+==========
 
 Follow the directions on this page to install it, into /opt/dvl/emscripten:
 
@@ -183,81 +138,4 @@ quantumEngine/building/genExports.js
 
 go change that file as you add more C++ exports you want to call from JS.
 
--------------------- node and python
 
-I had to upgrade my Python to 3.9.5, otherwise the 'install' wouldn't work.  And then, add the 'certificates'.
-
-I think it installs its own version of Python 3.9.2 (after I installed 3.9.5), and also its own version of node 14.15.5, which I also already have installed with nvm.  Should figure out a way to better coexist with that someday.
-
-oh yeah, here:
-emsdk uninstall node-14.15.5-64bit
-emsdk uninstall python-3.9.2-1-64bit
-
-get the installed version numbers:
-./emsdk list
-
-----------------------
-
-this is automatically done in the build scripts so you don't have to put them into your .profile or whatever files:
-
-. /opt/dvl/emscripten/emsdk/emsdk_env.sh
-
-# according to informal benchmarks run June 5, 2021, the C++
-# version of RK2 is 5x or 6x faster than the JS version.  ha.
-# not even using rk2 anymore
-
-
-================================================================ Dec 2021
-
--------------------------------------------------- icon notes
-
-⏋𝒆⟩
-230pt font
-212 height of text
-logo|𝒆⟩2.png - original image, pink but darker
-logo|𝒆⟩3.png - latest, white
-
-next time, try 200px text so there's more padding space
-
-
--------------------------------------------------- benchmarks
-
----------------------- with 25 points, on Firefox:
-stepsPerIteraction: 1000
-iteration calc time:     23.00ms
-update GL variables:     15.00ms
-total for iteration:  38.00ms
-
-stepsPerIteraction: 500
-iteration calc time:     41.00ms
-updateCounts:   0.00ms
-total for iteration:  41.00ms
-
-period:  67.00ms
-
-needs more research
---------------------------------------------------
-
-
-Great discussion of how to integrate Schrodinger.
-https://physics.stackexchange.com/questions/259134/schrodinger-equation-for-a-hamiltonian-with-explicit-time-dependence
-
--------------------------------------------------- react management after eject
-and other tips and tricks
-
-https://github.com/sanjsanj/create-react-app-ejected
-
-CRA docs
-https://create-react-app.dev/docs/documentation-intro
-
-v4 gets rid of the ejected property cuz almost no docs on how to do that
-
--------------------------------------------------- optimization
-
-Use PureComponent to speed up rendering if you follow the rules:
-https://reactjs.org/docs/react-api.html#reactpurecomponent
-
---------------------------------------------------
---------------------------------------------------
---------------------------------------------------
---------------------------------------------------
