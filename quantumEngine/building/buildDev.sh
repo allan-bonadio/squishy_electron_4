@@ -8,7 +8,6 @@
 # see 80% down in https://emscripten.org/docs/tools_reference/emcc.html
 # i think --threadprofiler is only for pthreads
 
-#CHECK_EMCC_CMD=--check
 
 cd `dirname $0`
 cd ..
@@ -22,7 +21,7 @@ fi
 
 . $qEMSCRIPTEN/emsdk/emsdk_env.sh
 
-# this has all c++ & h files, except main.cpp and the testing files.
+# this lists all c++ files, except main.cpp and the testing files.
 # omit those, so testing can also use this and compile & run itself (see testing/cppu*).
 allCpp=`cat building/allCpp.list`
 

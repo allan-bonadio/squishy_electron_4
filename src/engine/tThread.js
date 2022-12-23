@@ -11,11 +11,16 @@
 
 //import qe from './qe.js';
 
+// this does nothing now but proves that we can do workers
+
+
+
+
 console.log(`tThread worker starts`);
 console.log(`isSecureContext=${self.isSecureContext},
 				crossOriginIsolated=${self.crossOriginIsolated}`);
 
-debugger;
+//debugger;
 
 onerror =
 ev => {
