@@ -31,7 +31,7 @@ let pointSize = alsoDrawPoints ? `gl_PointSize = 10.;` : '';
 
 /*
 ** data format of attributes:  four column table of floats
-** 𝜓.re  𝜓.im   (potential unused)    ...0?...
+** 𝜓.re  𝜓.im   (voltage unused)    ...0?...
 ** uses gl_VertexID to figure out whether the y should be re^2+im^2  NO! opengl 2 only
 ** or zero
 */

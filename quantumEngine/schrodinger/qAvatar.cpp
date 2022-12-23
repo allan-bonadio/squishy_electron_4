@@ -45,8 +45,8 @@ qAvatar::qAvatar(qSpace *sp, const char *lab)
 	: space(sp), magic('Avat') {
 
 	qwave = new qWave(space);
-	potential = sp->potential;
-	potentialFactor = sp->potentialFactor;
+	voltage = sp->voltage;
+	voltageFactor = sp->voltageFactor;
 
 	strncpy(label, lab, MAX_LABEL_LEN);
 	label[MAX_LABEL_LEN] = 0;
@@ -57,11 +57,11 @@ qAvatar::qAvatar(qSpace *sp, const char *lab)
 
 	if (traceSpace) {
 		printf("the qSpace for avatar %s:   magic=%c%c%c%c label=%s nDimesions=%d  "
-			"nStates=%d nPoints=%d potential=%p potentialFactor=%lf spectrumLength=%d  \n",
+			"nStates=%d nPoints=%d voltage=%p voltageFactor=%lf spectrumLength=%d  \n",
 			label,
 			space->magic >> 24,  space->magic >> 16, space->magic >> 8, space->magic,
 			space->label, space->nDimensions, space->nStates, space->nPoints,
-			space->potential, space->potentialFactor, space->spectrumLength);
+			space->voltage, space->voltageFactor, space->spectrumLength);
 		qDimension *dims = space->dimensions;
 		printf("      its qDimension:   N=%d start=%d end=%d ",
 			dims->N, dims->start, dims->end);
@@ -143,9 +143,9 @@ void qAvatar::formatDirectOffsets(void) {
 	makePointerGetter(qwave);
 
 	printf("\n");
-	//makePointerGetter(potential);
-	//makeDoubleGetter(potentialFactor);
-	//makeDoubleSetter(potentialFactor);
+	//makePointerGetter(voltage);
+	//makeDoubleGetter(voltageFactor);
+	//makeDoubleSetter(voltageFactor);
 
 	//makePointerGetter(scratchQWave);
 	//
@@ -190,13 +190,13 @@ void qAvatar::dumpObj(const char *title) {
 	//
 	//// update this all the time cuz user might have changed it.  Well, actually,
 	//// since it's a pointer, maybe not.... maybe just the factor...
-	//potential = space->potential;
-	//potentialFactor = space->potentialFactor;
+	//voltage = space->voltage;
+	//voltageFactor = space->voltageFactor;
 	//
 	//if (traceIteration) {
-	//	printf("🚀 🚀 qAvatar::oneIteration() - dt=%lf   stepsPerIteration=%d ; potentialFactor=%lf  elapsed time: %lf\n",
+	//	printf("🚀 🚀 qAvatar::oneIteration() - dt=%lf   stepsPerIteration=%d ; voltageFactor=%lf  elapsed time: %lf\n",
 	//		dt, stepsPerIteration,
-	//		potentialFactor,
+	//		voltageFactor,
 	//		getTimeDouble());
 	//	}
 	//

@@ -51,8 +51,8 @@ qGrinder::qGrinder(qSpace *sp, qAvatar *av, const char *lab)
 
 	qspect = NULL;  // until used
 
-	potential = sp->potential;
-	potentialFactor = sp->potentialFactor;
+	voltage = sp->voltage;
+	voltageFactor = sp->voltageFactor;
 
 	strncpy(label, lab, MAX_LABEL_LEN);
 	label[MAX_LABEL_LEN] = 0;
@@ -62,11 +62,11 @@ qGrinder::qGrinder(qSpace *sp, qAvatar *av, const char *lab)
 
 	if (traceSpace) {
 		printf("the qSpace for 🪓 grinder %s:   magic=%c%c%c%c label=%s nDimesions=%d  "
-			"nStates=%d nPoints=%d potential=%p potentialFactor=%lf spectrumLength=%d  \n",
+			"nStates=%d nPoints=%d voltage=%p voltageFactor=%lf spectrumLength=%d  \n",
 			label,
 			space->magic >> 24,  space->magic >> 16, space->magic >> 8, space->magic,
 			space->label, space->nDimensions, space->nStates, space->nPoints,
-			space->potential, space->potentialFactor, space->spectrumLength);
+			space->voltage, space->voltageFactor, space->spectrumLength);
 		qDimension *dims = space->dimensions;
 		printf("      its qDimension:   N=%d start=%d end=%d ",
 			dims->N, dims->start, dims->end);
@@ -166,9 +166,9 @@ void qGrinder::formatDirectOffsets(void) {
 	makePointerGetter(qflick);
 
 	printf("\n");
-	makePointerGetter(potential);
-	makeDoubleGetter(potentialFactor);
-	makeDoubleSetter(potentialFactor);
+	makePointerGetter(voltage);
+	makeDoubleGetter(voltageFactor);
+	makeDoubleSetter(voltageFactor);
 
 //	printf("\n");
 //	makePointerGetter(scratchQWave);
@@ -196,8 +196,8 @@ void qGrinder::dumpObj(const char *title) {
 	printf("        elapsedTime %lf, iterateSerial  %lf, dt  %lf, lowPassFilter %d, stepsPerIteration %d\n",
 		elapsedTime, iterateSerial, dt, lowPassFilter, stepsPerIteration);
 
-	printf("        qflick %p, potential  %p, potentialFactor  %lf, qspect %p\n",
-		qflick, potential, potentialFactor, qspect);
+	printf("        qflick %p, voltage  %p, voltageFactor  %lf, qspect %p\n",
+		qflick, voltage, voltageFactor, qspect);
 
 	printf("        isIterating: %hhu   pleaseFFT=%hhu \n", isIterating, pleaseFFT);
 

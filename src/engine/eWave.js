@@ -239,7 +239,7 @@ class eWave {
 			break;
 
 		case qe.contWELL:
-			// the points on the end are ∞ potential, but the arithmetic goes bonkers
+			// the points on the end are ∞ voltage, but the arithmetic goes bonkers
 			// if I actually set the voltage to ∞.  Remember complex values 2 doubles
 			w[0] = w[1] = w[end2] = w[end2+1] = 0;
 			break;

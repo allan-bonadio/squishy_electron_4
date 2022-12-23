@@ -112,7 +112,7 @@ void completeNewSpaceGauntlet(int N) {
 	LONGS_EQUAL_TEXT(1, space->nDimensions, "space nDimensions");
 
 	// lets see if the buffers are all large enough
-	proveItsMine(theSpace->potential, nPoints * sizeof(double));
+	proveItsMine(theSpace->voltage, nPoints * sizeof(double));
 
 	// and the avatars' waves and vbufs
 	proveItsMine(theSpace->mainAvatar->qwave->wave, nPoints * sizeof(qCx));

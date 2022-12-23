@@ -4,7 +4,7 @@
 */
 import qe from './qe.js';
 //import eWave from './eWave.js';
-import {setFamiliarPotential} from '../utils/potentialUtils.js';
+import {setFamiliarVoltage} from '../utils/voltageUtils.js';
 import salientPointersFactory from './salientPointersFactory.js';
 import eAvatar from './eAvatar.js';
 import eGrinder from './eGrinder.js';
@@ -91,11 +91,11 @@ export class eSpace {
 		cppObjectRegistry[this.pointer] = this;
 
 
-		// direct access into the potential buffer
-		this.potentialBuffer = new Float64Array(window.Module.HEAPF64.buffer,
-				salientPointers.potentialBufferPointer, this.nPoints);;
-		let potentialParams = getAGroup('potentialParams');
-		setFamiliarPotential(this, this.potentialBuffer, potentialParams);
+		// direct access into the voltage buffer
+		this.voltageBuffer = new Float64Array(window.Module.HEAPF64.buffer,
+				salientPointers.voltageBufferPointer, this.nPoints);;
+		let voltageParams = getAGroup('voltageParams');
+		setFamiliarVoltage(this, this.voltageBuffer, voltageParams);
 			//
 
 		// the avatars create their vbufs and waves, and we make a copy for ourselves
@@ -142,7 +142,7 @@ export class eSpace {
 			this.mainEAvatar.liquidate();
 			this.mainEAvatar = this.mainVBuffer = this.mainEWave = null;
 
-			this.potentialBuffer = this.dimensions = null;
+			this.voltageBuffer = this.dimensions = null;
 
 			// finally, get rid of the C++ object
 			if (traceSpace) console.log(`🚀  done  eSpace:`, this);

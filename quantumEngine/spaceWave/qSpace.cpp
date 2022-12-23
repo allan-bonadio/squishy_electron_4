@@ -22,7 +22,7 @@ static bool traceQSpace = false;
 // note if you just use the constructor and these functions,
 // NO waves or buffers will be allocated for you
 qSpace::qSpace(const char *lab)
-	: magic('Spac'), nDimensions(0), potential(NULL), nPoints(0), nStates(0), potentialFactor(+.03) {
+	: magic('Spac'), nDimensions(0), voltage(NULL), nPoints(0), nStates(0), voltageFactor(+.03) {
 
 	if (traceQSpace) printf("🚀 🚀 qSpace::qSpace() constructor starts label:'%s'  this= %p\n", lab, (this));
 
@@ -87,7 +87,7 @@ void qSpace::initSpace() {
 	// now we know the sizes of buffers!!
 
 	// part of the space: the lay of the land
-	potential = new double[nPoints];
+	voltage = new double[nPoints];
 }
 
 // the avatars and grinder are deleted in deleteTheSpace
@@ -95,21 +95,21 @@ qSpace::~qSpace(void) {
 	if (traceQSpace) printf("🚀 🚀 qSpace destructor starting %s, this= %p  \n", label, (this));
 
 	// not there if initSpace() never called
-	if (potential)
-		delete[] potential;
+	if (voltage)
+		delete[] voltage;
 
 	if (traceQSpace) printf("🚀 🚀 qSpace destructor done this= %p\n", (this));
 }
 
 
-/* ********************************************************** potential */
+/* ********************************************************** voltage */
 
 // is this obsolete?  no, need it for C++ testing
-void qSpace::dumpPotential(const char *title) {
+void qSpace::dumpVoltage(const char *title) {
 	int ix;
 	qDimension *dims = dimensions;
 
-	printf("🚀 🚀 == Potential %s, %d...%d\n", title, dims->start, dims->end);
+	printf("🚀 🚀 == Voltage %s, %d...%d\n", title, dims->start, dims->end);
 
 	int half = dims->N / 2;
 	int quarter = dims->N / 4;
@@ -117,9 +117,9 @@ void qSpace::dumpPotential(const char *title) {
 	for (ix = dims->start; ix < quarterEnd; ix++) {
 
 		printf("[%3d] %8.4lg   [%3d] %8.4lg   [%3d] %8.4lg   [%3d] %8.4lg\n",
-			ix, potential[ix], ix+quarter, potential[ix+quarter],
-			ix+half, potential[ix+half], ix+half+quarter, potential[ix+half+quarter]);
+			ix, voltage[ix], ix+quarter, voltage[ix+quarter],
+			ix+half, voltage[ix+half], ix+half+quarter, voltage[ix+half+quarter]);
 	}
-	printf("🚀 🚀 == Potential %s, %d...%d\n", title, dims->start, dims->end);
+	printf("🚀 🚀 == Voltage %s, %d...%d\n", title, dims->start, dims->end);
 }
 

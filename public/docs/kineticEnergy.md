@@ -11,7 +11,7 @@ Kinetic Energy is the energy a particle has because of its velocity, it's speed.
 
 <p>K = 1/2 m v^2
 
-<p>As it rolls uphill and gains altitude, that kinetic energy will be converted to <a href=potentialEnergy.html>Potential Energy</a>.
+<p>As it rolls uphill and gains altitude, that kinetic energy will be converted to <a href=voltageEnergy.html>Potential Energy</a>.
 
 
 https://www.myphysicslab.com/roller/roller-single-en.html

@@ -21,7 +21,7 @@ import './view.scss';
 // import {abstractViewDef} from './abstractViewDef.js';
 // import flatDrawingViewDef from './flatDrawingViewDef.js';
 import {getASetting, storeASetting} from '../utils/storeSettings.js';
-import PotentialArea from './PotentialArea.js';
+import VoltageArea from './VoltageArea.js';
 import GLView from './GLView.js';
 import {eSpaceCreatedPromise} from '../engine/eEngine.js';
 
@@ -39,9 +39,9 @@ export class WaveView extends React.Component {
 
 		width: PropTypes.number,  // handed in, depends on window width
 
-		setUpdatePotentialArea: PropTypes.func,
+		setUpdateVoltageArea: PropTypes.func,
 
-		showPotential: PropTypes.bool.isRequired,
+		showVoltage: PropTypes.bool.isRequired,
 	};
 
 	constructor(props) {
@@ -147,7 +147,7 @@ export class WaveView extends React.Component {
 			: <img className='spinner' alt='spinner' src='images/eclipseOnTransparent.gif' />;
 
 		// voNorthWest/East are populated during iteration
-		// Always generate the PotentialArea so it keeps its state, but it won't always draw
+		// Always generate the VoltageArea so it keeps its state, but it won't always draw
 		return (<div className='WaveView'  ref={el => this.element = el} style={{height: s.height + 'px'}}>
 
 			<GLView width={p.width} height={s.height}
@@ -171,11 +171,11 @@ export class WaveView extends React.Component {
 				{spinner}
 			</aside>
 
-			<PotentialArea
+			<VoltageArea
 				space={s.space} wholeRect={wholeRect}
 				canvas={this.canvas}
-				setUpdatePotentialArea={p.setUpdatePotentialArea}
-				showPotential={p.showPotential}/>
+				setUpdateVoltageArea={p.setUpdateVoltageArea}
+				showVoltage={p.showVoltage}/>
 		</div>);
 	}
 

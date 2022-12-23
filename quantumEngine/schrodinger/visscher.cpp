@@ -102,7 +102,7 @@ other way: 1nm = 1e-9m   square = 1e-18 m^2 times that number = 1.72759854921802
 //		if (traceRealStep) printf("⚛️ stepReal ix=%d\n", ix);
 //
 //		// total hamiltonian including potential
-//		double H𝜓 = d2𝜓i + potential[ix] * potentialFactor * oldW[ix].re;
+//		double H𝜓 = d2𝜓i + voltage[ix] * voltageFactor * oldW[ix].re;
 //
 //		// note subtraction
 //		if (traceRealStep) printf("⚛️ stepReal ix=%d\n", ix);
@@ -126,7 +126,7 @@ other way: 1nm = 1e-9m   square = 1e-18 m^2 times that number = 1.72759854921802
 //		double d2𝜓r = oldW[ix-1].re + oldW[ix+1].re - oldW[ix].re * 2;
 //
 //		// total hamiltonian
-//		double H𝜓 = d2𝜓r + potential[ix] * potentialFactor * oldW[ix].im;
+//		double H𝜓 = d2𝜓r + voltage[ix] * voltageFactor * oldW[ix].im;
 //
 //		// note addition
 //		newW[ix].im = oldW[ix].im + dt * H𝜓;
@@ -199,8 +199,8 @@ void qGrinder::stepReal(qCx *newW, qCx *oldW, double dt) {
 		double d2𝜓i = oldW[ix-1].im + oldW[ix+1].im - oldW[ix].im * 2;
 		if (traceRealStep) printf("⚛️ stepReal ix=%d\n", ix);
 
-		// total hamiltonian including potential
-		double H𝜓 = d2𝜓i + potential[ix] * potentialFactor * oldW[ix].re;
+		// total hamiltonian including voltage
+		double H𝜓 = d2𝜓i + voltage[ix] * voltageFactor * oldW[ix].re;
 
 		// note subtraction
 		if (traceRealStep) printf("⚛️ stepReal ix=%d\n", ix);
@@ -229,7 +229,7 @@ void qGrinder::stepImaginary(qCx *newW, qCx *oldW, double dt) {
 		double d2𝜓r = oldW[ix-1].re + oldW[ix+1].re - oldW[ix].re * 2;
 
 		// total hamiltonian
-		double H𝜓 = d2𝜓r + potential[ix] * potentialFactor * oldW[ix].im;
+		double H𝜓 = d2𝜓r + voltage[ix] * voltageFactor * oldW[ix].im;
 
 		// note addition
 		newW[ix].im = oldW[ix].im + dt * H𝜓;

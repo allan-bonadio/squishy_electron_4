@@ -9,7 +9,7 @@ import PropTypes from 'prop-types';
 import './ControlPanel.scss';
 import CPToolbar from './CPToolbar.js';
 import SetWaveTab from './SetWaveTab.js';
-import SetPotentialTab from './SetPotentialTab.js';
+import SetVoltageTab from './SetVoltageTab.js';
 import SetResolutionTab from './SetResolutionTab.js';
 import SetIterationTab from './SetIterationTab.js';
 //import eSpace from '../engine/eSpace.js';
@@ -36,9 +36,9 @@ export class ControlPanel extends React.Component {
 		// the WaveView on the screen
 		// when user chooses 'set wave'
 		//// this should move into controlPanel from squishPanel
-		setPotential: PropTypes.func.isRequired,
-		toggleShowPotential: PropTypes.func.isRequired,
-		showPotential: PropTypes.bool.isRequired,
+		setVoltage: PropTypes.func.isRequired,
+		toggleShowVoltage: PropTypes.func.isRequired,
+		showVoltage: PropTypes.bool.isRequired,
 
 		redrawWholeMainWave: PropTypes.func.isRequired,
 
@@ -62,23 +62,23 @@ export class ControlPanel extends React.Component {
 			stepsPerIteration: getASetting('iterationSettings', 'stepsPerIteration'),
 			lowPassFilter: getASetting('iterationSettings', 'lowPassFilter'),
 
-			// state for potential resets - control panel only, setPotential()  see below;...
-			//potentialBreed: getASetting('potentialParams', 'potentialBreed'),
-			//valleyPower: getASetting('potentialParams', 'valleyPower'),
-			//valleyScale: getASetting('potentialParams', 'valleyScale'),
-			//valleyOffset: getASetting('potentialParams', 'valleyOffset'),
+			// state for voltage resets - control panel only, setVoltage()  see below;...
+			//voltageBreed: getASetting('voltageParams', 'voltageBreed'),
+			//valleyPower: getASetting('voltageParams', 'valleyPower'),
+			//valleyScale: getASetting('voltageParams', 'valleyScale'),
+			//valleyOffset: getASetting('voltageParams', 'valleyOffset'),
 
 			showingTab: getASetting('miscSettings', 'showingTab'),
 
-			// waveParams & potential params - see below
+			// waveParams & voltage params - see below
 		}
 
 		// pour these directly into the initial state.  The control panel saves
 		// these params in its state, but they're not saved in localStorage until a user clicks
-		// SetWave or SetPotential.
+		// SetWave or SetVoltage.
 		let waveParams = getAGroup('waveParams');
-		let potentialParams = getAGroup('potentialParams');
-		Object.assign(this.state, waveParams, potentialParams);
+		let voltageParams = getAGroup('voltageParams');
+		Object.assign(this.state, waveParams, voltageParams);
 
 		eSpaceCreatedPromise.then(space => {
 			// not much happens without this info
@@ -173,19 +173,19 @@ export class ControlPanel extends React.Component {
 	}
 
 
-	// fills in the potential buffer with values according to the potentialParams
-	// called when user clicks Valley potential or Flat potential
-	setPotentialHandler =
+	// fills in the voltage buffer with values according to the voltageParams
+	// called when user clicks Valley voltage or Flat voltage
+	setVoltageHandler =
 	() => {
 		const {valleyPower, valleyScale, valleyOffset} = this.state;
 
 		// actually sets buffer
-		this.props.setPotential({valleyPower, valleyScale, valleyOffset});
+		this.props.setVoltage({valleyPower, valleyScale, valleyOffset});
 
 		// only NOW do we set it in the localStorage
-		storeASetting('potentialParams', 'valleyPower', valleyPower);
-		storeASetting('potentialParams', 'valleyScale', valleyScale);
-		storeASetting('potentialParams', 'valleyOffset', valleyOffset);
+		storeASetting('voltageParams', 'valleyPower', valleyPower);
+		storeASetting('voltageParams', 'valleyScale', valleyScale);
+		storeASetting('voltageParams', 'valleyOffset', valleyOffset);
 	}
 
 	setShowingTab =
@@ -253,14 +253,14 @@ export class ControlPanel extends React.Component {
 				space={this.space}
 			/>;
 
-		case 'potential':
-			return <SetPotentialTab
-				setPotentialHandler={this.setPotentialHandler}
-				potentialParams={{ valleyPower, valleyScale, valleyOffset,}}
+		case 'voltage':
+			return <SetVoltageTab
+				setVoltageHandler={this.setVoltageHandler}
+				voltageParams={{ valleyPower, valleyScale, valleyOffset,}}
 				setCPState={this.setCPState}
 				space={this.space}
-				toggleShowPotential={p.toggleShowPotential}
-				showPotential={p.showPotential}
+				toggleShowVoltage={p.toggleShowVoltage}
+				showVoltage={p.showVoltage}
 			/>;
 
 		case 'space':
@@ -302,9 +302,9 @@ export class ControlPanel extends React.Component {
 				isTimeAdvancing={ControlPanel.isTimeAdvancing}
 
 				resetMainWave={this.resetMainWave}
-				setPotentialHandler={this.setPotentialHandler}
-				toggleShowPotential={p.toggleShowPotential}
-				showPotential={p.showPotential}
+				setVoltageHandler={this.setVoltageHandler}
+				toggleShowVoltage={p.toggleShowVoltage}
+				showVoltage={p.showVoltage}
 
 				N={this.N}
 				space={this.space}
@@ -313,8 +313,8 @@ export class ControlPanel extends React.Component {
 				<ul className='TabBar' >
 					<li className={s.showingTab == 'wave' ? 'selected' : ''} key='wave'
 						onClick={ev => this.setShowingTab('wave')}>Wave</li>
-					<li  className={s.showingTab == 'potential' ? 'selected' : ''} key='potential'
-						onClick={ev => this.setShowingTab('potential')}>Potential</li>
+					<li  className={s.showingTab == 'voltage' ? 'selected' : ''} key='voltage'
+						onClick={ev => this.setShowingTab('voltage')}>Voltage</li>
 					<li  className={s.showingTab == 'space' ? 'selected' : ''} key='space'
 						onClick={ev => this.setShowingTab('space')}>Space</li>
 					<li  className={s.showingTab == 'iteration' ? 'selected' : ''} key='iteration'

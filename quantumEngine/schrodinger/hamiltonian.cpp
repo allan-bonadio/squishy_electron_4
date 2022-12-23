@@ -24,7 +24,7 @@ qCx hamiltonian(qCx *wave, int x) {
 	qCx d2 = wave[x-1] + wave[x+1] - wave[x] * 2;
 	qCheck("hamiltonian d2", d2);
 
-	qCx pot = wave[x] * thePotential[x];
+	qCx pot = wave[x] * theVoltage[x];
 	qCheck("hamiltonian pot", pot);
 	qCx rate = pot - d2;
 

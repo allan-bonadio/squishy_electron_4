@@ -70,7 +70,7 @@ void qViewBuffer::dumpViewBuffer(const char *title) {
 // copy the numbers in our qAvatar's qWave into this vBuffer
 // one row per vertex, two rows per wave datapoint.
 // each row of 4 floats looks like this:
-//     real   imaginary    potential    serial
+//     real   imaginary    voltage    serial
 // Two vertices per datapoint: bottom then top, same data.
 // also converts from doubles to floats for GL.
 float qViewBuffer::loadViewBuffer(void) {

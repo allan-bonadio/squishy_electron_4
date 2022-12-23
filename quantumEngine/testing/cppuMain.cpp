@@ -80,7 +80,7 @@ salientPointersType *fullSpaceSalientPointers = NULL;
 // the way JS does it.  Needed for lots of tests.
 // You are (usually) responsible for deleting it with deleteTheSpace(space).
 // Space generated in theSpace.  Old theSpace triggers error if you don't deleteTheSpace().
-// frees and reallocates thePotential and the ViewBuffer
+// frees and reallocates theVoltage and the ViewBuffer
 qSpace *makeFullSpace(int N) {
 	if (traceMakeSpace) printf("🧨 🧨  starting makeFullSpace(%d), about to startNewSpace\n", N);
 

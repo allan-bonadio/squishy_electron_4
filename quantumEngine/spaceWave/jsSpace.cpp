@@ -19,7 +19,7 @@ static bool traceExceptions = false;
 // curent, preliminary version of SquishyElectron.  Along with various other
 // important objects.  Someday we'll get the JS to hold these.
 class qSpace *theSpace = NULL;
-double *thePotential = NULL;
+double *theVoltage = NULL;
 
 
 struct salientPointersType salientPointers;
@@ -28,7 +28,7 @@ struct salientPointersType salientPointers;
 //
 //// after the initSpace() call, allocate the buffers.
 //void allocWaves(void) {
-//	// we make our own potential
+//	// we make our own voltage
 //}
 //
 //// call to destroy them
@@ -40,7 +40,7 @@ struct salientPointersType salientPointers;
 // these are for JS only; they're all extern "C"
 extern "C" {
 
-void qSpace_dumpPotential(char *title) { theSpace->dumpPotential(title); }
+void qSpace_dumpVoltage(char *title) { theSpace->dumpVoltage(title); }
 
 // this will normalize with the C++ normalize
 void wave_normalize(qWave *qwave) {
@@ -79,7 +79,7 @@ void addSpaceDimension(int N, int continuum, const char *label) {
 	theSpace->addDimension(N, continuum, label);
 }
 
-// call this from JS to finish the process for the qSpace, create and add the avatars & potential
+// call this from JS to finish the process for the qSpace, create and add the avatars & voltage
 struct salientPointersType *completeNewSpace(void) {
 	if (traceSpaceCreation)
 		printf("🚀 🚀 🚀  JS completeNewSpace starts(%s)   theSpace=%p\n",
@@ -108,8 +108,8 @@ struct salientPointersType *completeNewSpace(void) {
 		"salientPointers.mainVBuffer=%p   salientPointers.miniGraphVBuffer=%p  \n",
 		salientPointers.mainVBuffer, salientPointers.miniGraphVBuffer);
 
-	if (thePotential) throw std::runtime_error("🚀 🚀 🚀 thePotential exists while trying to create new one");
-	salientPointers.potentialBuffer = thePotential = theSpace->potential;
+	if (theVoltage) throw std::runtime_error("🚀 🚀 🚀 theVoltage exists while trying to create new one");
+	salientPointers.voltageBuffer = theVoltage = theSpace->voltage;
 
 	if (traceSpaceCreation) printf("   🚀 🚀 🚀 qSpace::jsSpace: done\n");
 	return &salientPointers;
@@ -136,15 +136,15 @@ void deleteTheSpace(qSpace *space) {
 		theSpace->grinder = NULL;
 	}
 
-	// potential going to be deleted cuz it's part of the space
+	// voltage going to be deleted cuz it's part of the space
 
-	// deletes its potential
+	// deletes its voltage
 	delete theSpace;
 	theSpace = NULL;
-	thePotential = NULL;
+	theVoltage = NULL;
 
-	if (traceSpaceCreation) printf("    🚀  deleteTheSpace(): done.  theSpace=%p, thePotential=%p \n",
-		theSpace, thePotential);
+	if (traceSpaceCreation) printf("    🚀  deleteTheSpace(): done.  theSpace=%p, theVoltage=%p \n",
+		theSpace, theVoltage);
 }
 
 /* ***************************************************************************************************** exceptions */

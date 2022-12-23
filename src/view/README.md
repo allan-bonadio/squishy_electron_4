@@ -14,7 +14,7 @@ Things drawn into the canvas by webgl.
 Sets up the inputs and arrays, passes to GL, draws.
 * abstractDrawing.js - abstract superclass of drawings, although you can use them as-is for smoke testing
 * flatDrawing.js - draws the flat bargraph of a wave
-* potentialDrawing.js - draws the white potential bar
+* voltageDrawing.js - draws the white voltage bar
 
 ## view defs
 Sortof a framework around the drawing situation.

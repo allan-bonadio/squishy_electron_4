@@ -45,8 +45,8 @@ struct qAvatar {
 	struct qWave *qwave;
 
 	// pointer grabbed from the space, often.  Same buffer as in space.
-	double *potential;
-	double potentialFactor;  // aligned by 8
+	double *voltage;
+	double voltageFactor;  // aligned by 8
 
 	// and a scratch wave for stepping. Call the function first time you need it.
 	// owned if non-null

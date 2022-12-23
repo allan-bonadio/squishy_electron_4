@@ -108,7 +108,7 @@ describe('cxToColor tests', () => {
 
 	// this keeps many settings that don't immediately affect running iteration.
 	// So 'Set Wave' button actually sets the wave, but meanwhile the setting sliders
-	// need to be remembered; this does it.  Potential and space too; not active until user does something.
+	// need to be remembered; this does it.  Voltage and space too; not active until user does something.
 	// THis also defines slider mins and maxes!  One source of truth.
 
 	testParam('waveParams', 'waveBreed', 'chord', ['circular', 'standing', 'gaussian', 'chord']);
@@ -116,14 +116,14 @@ describe('cxToColor tests', () => {
 	testParam('waveParams', 'pulseWidth', 20, {min: 1, max: 100});
 	testParam('waveParams', 'pulseOffset', 30, {min: 0, max: 100});
 
-	/* ************************************ potentialParams */
-	//testParam('potentialParams', 'potentialBreed', 'flat', ['flat', 'valley']);
-	testParam('potentialParams', 'valleyPower', 0, {min: -4, max: 4});
-	testParam('potentialParams', 'valleyScale', 0, {min: -10, max: 10});
-	testParam('potentialParams', 'valleyOffset', 50, {min: 0, max: 100});
+	/* ************************************ voltageParams */
+	//testParam('voltageParams', 'voltageBreed', 'flat', ['flat', 'valley']);
+	testParam('voltageParams', 'valleyPower', 0, {min: -4, max: 4});
+	testParam('voltageParams', 'valleyScale', 0, {min: -10, max: 10});
+	testParam('voltageParams', 'valleyOffset', 50, {min: 0, max: 100});
 
 
-	testParam('potentialSettings', 'showPotential', true, [true, false]);  // not really the same as the rest...
+	testParam('voltageSettings', 'showVoltage', true, [true, false]);  // not really the same as the rest...
 
 	/* ************************************ iterationSettings */
 	testParam('iterationSettings', 'isTimeAdvancing', false,  [false, true]);
@@ -133,7 +133,7 @@ describe('cxToColor tests', () => {
 	testParam('iterationSettings', 'lowPassFilter', 50, {min: 0, max: 75});
 
 	/* ************************************miscSettings */
-	testParam('miscSettings', 'showingTab', 'wave', ['wave', 'potential', 'space', 'iteration']);
+	testParam('miscSettings', 'showingTab', 'wave', ['wave', 'voltage', 'space', 'iteration']);
 	testParam('miscSettings', 'viewHeight', 400, {min: 50, max: 1e4});
 });
 

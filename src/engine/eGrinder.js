@@ -70,9 +70,9 @@ class eGrinder {
 
 	get _qflick() { return this.ints[12]; }
 
-	get _potential() { return this.ints[13]; }
-	get potentialFactor() { return this.doubles[7]; }
-	set potentialFactor(a) { this.doubles[7] = a; }
+	get _voltage() { return this.ints[13]; }
+	get voltageFactor() { return this.doubles[7]; }
+	set voltageFactor(a) { this.doubles[7] = a; }
 
 	get _qspect() { return this.ints[16]; }
 	get _stages() { return this.ints[17]; }

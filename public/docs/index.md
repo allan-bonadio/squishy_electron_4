@@ -2,7 +2,7 @@ topics I need:
 
 - sci notation & powers of 10
 - dimensions
-- potential
+- voltage
 - the wave
 - numbers and their domains, and complex numbers
 - equations - arghhhh!

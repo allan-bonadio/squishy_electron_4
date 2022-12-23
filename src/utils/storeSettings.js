@@ -193,7 +193,7 @@ export function createStoreSettings() {
 
 	// this keeps many settings that don't immediately affect running iteration.
 	// So 'Set Wave' button actually sets the wave, but meanwhile the setting sliders
-	// need to be remembered; this does it.  Potential and space too; not active until user does something.
+	// need to be remembered; this does it.  Voltage and space too; not active until user does something.
 	// THis also defines slider mins and maxes!  One source of truth.
 
 	makeParam('waveParams', 'waveBreed', 'gaussian', ['circular', 'standing', 'gaussian', 'chord']);
@@ -201,14 +201,14 @@ export function createStoreSettings() {
 	makeParam('waveParams', 'pulseWidth', 20, {min: 1, max: 100});
 	makeParam('waveParams', 'pulseOffset', 30, {min: 0, max: 100});
 
-	/* ************************************ potentialParams */
-	//makeParam('potentialParams', 'potentialBreed', 'flat', ['flat', 'valley']);
-	makeParam('potentialParams', 'valleyPower', 0, {min: -4, max: 4});
-	makeParam('potentialParams', 'valleyScale', 0, {min: -10, max: 10});
-	makeParam('potentialParams', 'valleyOffset', 50, {min: 0, max: 100});
+	/* ************************************ voltageParams */
+	//makeParam('voltageParams', 'voltageBreed', 'flat', ['flat', 'valley']);
+	makeParam('voltageParams', 'valleyPower', 0, {min: -4, max: 4});
+	makeParam('voltageParams', 'valleyScale', 0, {min: -10, max: 10});
+	makeParam('voltageParams', 'valleyOffset', 50, {min: 0, max: 100});
 
 
-	makeParam('potentialSettings', 'showPotential', true, [true, false]);  // not really the same as the rest...
+	makeParam('voltageSettings', 'showVoltage', true, [true, false]);  // not really the same as the rest...
 
 	/* ************************************ iterationSettings */
 	makeParam('iterationSettings', 'isTimeAdvancing', false,  [false, true]);
@@ -218,7 +218,7 @@ export function createStoreSettings() {
 	makeParam('iterationSettings', 'lowPassFilter', 50, {min: 0, max: 75});
 
 	/* ************************************miscSettings */
-	makeParam('miscSettings', 'showingTab', 'wave', ['wave', 'potential', 'space', 'iteration']);
+	makeParam('miscSettings', 'showingTab', 'wave', ['wave', 'voltage', 'space', 'iteration']);
 	makeParam('miscSettings', 'viewHeight', 400, {min: 50, max: 1e4});
 
 }

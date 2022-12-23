@@ -17,7 +17,7 @@
 	// overlay with frame count and virtual time, on top of canvas
 	aside.viewOverlay {
 		position: absolute;
-		pointer-events: none;  // need to click through for potential
+		pointer-events: none;  // need to click through for voltage
 		z-index: 40;
 
 
@@ -56,8 +56,8 @@
 		}
 	}
 
-	svg.PotentialArea {
-		$potentialColor: white;
+	svg.VoltageArea {
+		$voltageColor: white;
 		pointer-events: none;  // need to click through for size box
 
 		position: relative;
@@ -65,7 +65,7 @@
 		transform: scale(1, -1);
 
 		path.visibleLine {
-			stroke: $potentialColor;
+			stroke: $voltageColor;
 			stroke-width: 3;
 			pointer-events: none;
 		}
@@ -78,7 +78,7 @@
 		}
 
 		rect.wellSlab {
-			fill: $potentialColor;
+			fill: $voltageColor;
 
 		}
 	}

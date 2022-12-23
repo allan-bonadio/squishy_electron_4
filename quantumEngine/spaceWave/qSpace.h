@@ -7,7 +7,7 @@
 #include "../squish.h"
 
 extern class qSpace *theSpace;
-extern double *thePotential;
+extern double *theVoltage;
 
 extern qCx hamiltonian(qCx *wave, int x);
 //extern void qeStarted(void);
@@ -87,14 +87,14 @@ public:
 	int spectrumLength;  // should == nStates
 
 	// part of the space; it helps to define the lay of the land
-	double *potential;
-	double potentialFactor;  // tweak this
+	double *voltage;
+	double voltageFactor;  // tweak this
 
 	struct qAvatar *mainAvatar;
 	struct qAvatar *miniGraphAvatar;
 	struct qGrinder *grinder;
 
-	void dumpPotential(const char *title);
+	void dumpVoltage(const char *title);
 };
 
 /* ************************************************************ JS interface */
@@ -105,7 +105,7 @@ public:
 //eAvatar
 struct salientPointersType {
 	qSpace *space;
-	double *potentialBuffer;
+	double *voltageBuffer;
 
 	float *mainVBuffer;  // raw float[4][2] array
 	struct qAvatar *mainAvatar;

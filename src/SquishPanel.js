@@ -17,7 +17,7 @@ import {eSpaceCreatedPromise} from './engine/eEngine.js';
 import {interpretCppException} from './utils/errors.js';
 import WaveView from './view/WaveView.js';
 import CommonDialog from './widgets/CommonDialog.js';
-import {setFamiliarPotential} from './utils/potentialUtils.js';
+import {setFamiliarVoltage} from './utils/voltageUtils.js';
 
 import {getASetting, storeASetting} from './utils/storeSettings.js';
 
@@ -71,7 +71,7 @@ export class SquishPanel extends React.Component {
 			runningCycleElapsedTime: 0,
 			runningCycleIterateSerial: 0,
 
-			showPotential:  getASetting('potentialSettings', 'showPotential'),
+			showVoltage:  getASetting('voltageSettings', 'showVoltage'),
 
 		};
 
@@ -378,28 +378,28 @@ export class SquishPanel extends React.Component {
 	// others managed from ControlPanel
 	// can i move these to the control panel?
 
-	// completely wipe out the quantum potential and replace it with one of our canned patterns.
-	// (but do not change N or anything else)  Called upon set potential in potential tab
-	setPotential =
-	(potentialParams) => {
+	// completely wipe out the quantum voltage and replace it with one of our canned patterns.
+	// (but do not change N or anything else)  Called upon set voltage in voltage tab
+	setVoltage =
+	(voltageParams) => {
 		// sets the numbers
-		setFamiliarPotential(this.state.space, this.state.space.potentialBuffer, potentialParams);
+		setFamiliarVoltage(this.state.space, this.state.space.voltageBuffer, voltageParams);
 
-		this.updatePotentialArea();
+		this.updateVoltageArea();
 
 		// no this doesn't affect the vBuffer
 	}
 
-	// potential area needs to be told when the data changes.  can't put the whole potential buffer in the state!
-	setUpdatePotentialArea =
-	(updatePotentialArea) => {
-		this.updatePotentialArea = updatePotentialArea;
+	// voltage area needs to be told when the data changes.  can't put the whole voltage buffer in the state!
+	setUpdateVoltageArea =
+	(updateVoltageArea) => {
+		this.updateVoltageArea = updateVoltageArea;
 	};
 
-	toggleShowPotential =
+	toggleShowVoltage =
 	ev => {
-		this.setState({showPotential: ev.target.checked});
-		storeASetting('potentialSettings', 'showPotential', ev.target.checked);
+		this.setState({showVoltage: ev.target.checked});
+		storeASetting('voltageSettings', 'showVoltage', ev.target.checked);
 	}
 
 	// dump the view buffer, from the JS side.  Why not use the C++ version?
@@ -445,17 +445,17 @@ export class SquishPanel extends React.Component {
 				<WaveView
 					viewName='mainView'
 					width={p.width}
-					setUpdatePotentialArea={this.setUpdatePotentialArea}
-					showPotential={s.showPotential}
+					setUpdateVoltageArea={this.setUpdateVoltageArea}
+					showVoltage={s.showVoltage}
 				/>
 				<ControlPanel
 					iterateAnimate={(shouldAnimate, freq) => this.iterateAnimate(shouldAnimate, freq)}
 
 					setIterationPeriod={this.setIterationPeriod}
 
-					setPotential={this.setPotential}
-					toggleShowPotential={this.toggleShowPotential}
-					showPotential={s.showPotential}
+					setVoltage={this.setVoltage}
+					toggleShowVoltage={this.toggleShowVoltage}
+					showVoltage={s.showVoltage}
 
 					redrawWholeMainWave={this.redrawWholeMainWave}
 

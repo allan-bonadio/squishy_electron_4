@@ -36,8 +36,8 @@ let exportsSrc  = [
 	// gets
 	{name: 'getCppExceptionMessage', args: ['number'], retType: 'number'},
 
-	// the potential
-	{name: 'qSpace_dumpPotential', args: ['string'], retType: 'number'},
+	// the voltage
+	{name: 'qSpace_dumpVoltage', args: ['string'], retType: 'number'},
 
 	// accept an integer pointer to the qWave as first arg
 	{name: 'wave_normalize', args: ['number'], retType: null},

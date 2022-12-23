@@ -1,5 +1,5 @@
 /*
-** Set Potential tab -- user can set the potential to something interesting
+** Set Voltage tab -- user can set the voltage to something interesting
 ** Copyright (C) 2021-2022 Tactile Interactive, all rights reserved
 */
 
@@ -10,35 +10,35 @@ import {scaleLinear} from 'd3-scale';
 //import {path as d3path} from 'd3-path';
 
 // eslint-disable-next-line no-unused-vars
-import {setFamiliarPotential, dumpPotential} from '../utils/potentialUtils.js';
+import {setFamiliarVoltage, dumpVoltage} from '../utils/voltageUtils.js';
 import eSpace from '../engine/eSpace.js';
 import TextNSlider from '../widgets/TextNSlider.js';
 import {storeASetting, alternateMinMaxs} from '../utils/storeSettings.js';
 
-// some typical potential value, so we can get an idea of how to scale in the graph
+// some typical voltage value, so we can get an idea of how to scale in the graph
 //let SOME_POTENTIAL = 0.01;
 
 // set prop types
 function setPT() {
-	SetPotentialTab.propTypes = {
+	SetVoltageTab.propTypes = {
 		space: PropTypes.instanceOf(eSpace),
 
 		// actually sets the one in use by the algorithm
-		setPotentialHandler: PropTypes.func.isRequired,
-		toggleShowPotential: PropTypes.func.isRequired,
-		showPotential: PropTypes.bool.isRequired,
+		setVoltageHandler: PropTypes.func.isRequired,
+		toggleShowVoltage: PropTypes.func.isRequired,
+		showVoltage: PropTypes.bool.isRequired,
 
-		potentialParams: PropTypes.shape({
-			//potentialBreed: PropTypes.oneOf(['flat', 'valley',]),
+		voltageParams: PropTypes.shape({
+			//voltageBreed: PropTypes.oneOf(['flat', 'valley',]),
 			valleyPower: PropTypes.number.isRequired,
-			valleyScale: PropTypes.number.isRequired,  // NOT the same as potentialFactor; this is JS only
+			valleyScale: PropTypes.number.isRequired,  // NOT the same as voltageFactor; this is JS only
 			valleyOffset: PropTypes.number.isRequired,
 		}).isRequired,
 	};
 }
 
-// the tab that user sets potential with
-class SetPotentialTab extends React.Component {
+// the tab that user sets voltage with
+class SetVoltageTab extends React.Component {
 	miniWidth = 200;
 	miniHeight = 100;
 	xScale = scaleLinear().range([0, this.miniWidth]);
@@ -49,39 +49,39 @@ class SetPotentialTab extends React.Component {
 	setValleyPower =
 	valleyPower => {
 		this.props.setCPState({valleyPower});
-		storeASetting('potentialParams', 'valleyPower', valleyPower);
+		storeASetting('voltageParams', 'valleyPower', valleyPower);
 	}
 	setValleyScale =
 	valleyScale => {
 		this.props.setCPState({valleyScale});
-		storeASetting('potentialParams', 'valleyScale', valleyScale);
+		storeASetting('voltageParams', 'valleyScale', valleyScale);
 	}
 	setValleyOffset =
 	valleyOffset => {
 		this.props.setCPState({valleyOffset});
-		storeASetting('potentialParams', 'valleyOffset', valleyOffset);
+		storeASetting('voltageParams', 'valleyOffset', valleyOffset);
 	}
 
-	setFlatPotentialHandler =
+	setFlatVoltageHandler =
 	(ev) => {
 		this.setValleyPower(0);
 		this.setValleyScale(0);
 		this.setValleyOffset(50);
-		storeASetting('potentialParams', 'valleyPower', 0);
-		storeASetting('potentialParams', 'valleyScale', 0);
-		storeASetting('potentialParams', 'valleyOffset', 50);
-		this.props.setPotentialHandler();
+		storeASetting('voltageParams', 'valleyPower', 0);
+		storeASetting('voltageParams', 'valleyScale', 0);
+		storeASetting('voltageParams', 'valleyOffset', 50);
+		this.props.setVoltageHandler();
 	};
 
 	/* *************************************************************** rendering for the Tab */
 
 	renderSliders() {
-		const pp = this.props.potentialParams;
+		const pp = this.props.voltageParams;
 		return <>
 			<TextNSlider className='powerSlider'  label='Power'
 				value={+pp.valleyPower}
-				min={alternateMinMaxs.potentialParams.valleyPower.min}
-				max={alternateMinMaxs.potentialParams.valleyPower.max}
+				min={alternateMinMaxs.voltageParams.valleyPower.min}
+				max={alternateMinMaxs.voltageParams.valleyPower.max}
 				step={.01}
 				style={{width: '8em'}}
 				handleChange={this.setValleyPower}
@@ -90,8 +90,8 @@ class SetPotentialTab extends React.Component {
 			<br/>
 			<TextNSlider className='scaleSlider'  label='Scale'
 				value={+pp.valleyScale}
-				min={alternateMinMaxs.potentialParams.valleyScale.min}
-				max={alternateMinMaxs.potentialParams.valleyScale.max}
+				min={alternateMinMaxs.voltageParams.valleyScale.min}
+				max={alternateMinMaxs.voltageParams.valleyScale.max}
 				step={.01}
 				style={{width: '8em'}}
 				handleChange={this.setValleyScale}
@@ -100,8 +100,8 @@ class SetPotentialTab extends React.Component {
 			<br/>
 			<TextNSlider className='offsetSlider'  label='Offset %'
 				value={+pp.valleyOffset}
-				min={alternateMinMaxs.potentialParams.valleyOffset.min}
-				max={alternateMinMaxs.potentialParams.valleyOffset.max}
+				min={alternateMinMaxs.voltageParams.valleyOffset.min}
+				max={alternateMinMaxs.voltageParams.valleyOffset.max}
 				step={.1}
 				style={{width: '8em'}}
 				handleChange={this.setValleyOffset}
@@ -114,32 +114,32 @@ class SetPotentialTab extends React.Component {
 	render() {
 		const p = this.props;
 
-		// remember that set*PotentialHandler is an event handler that gets the params from ControlPanel state
-		return <div className='setPotentialTab'>
-			<div className='potentialTitlePanel'>
-				<h3>Set Potential</h3>
+		// remember that set*VoltageHandler is an event handler that gets the params from ControlPanel state
+		return <div className='setVoltageTab'>
+			<div className='voltageTitlePanel'>
+				<h3>Set Voltage</h3>
 				<button className='zeroVoltageButton round'
-					onClick={this.setFlatPotentialHandler}>
-						Reset Potential
+					onClick={this.setFlatVoltageHandler}>
+						Reset Voltage
 				</button>
 
 			</div>
 			<div className='divider' ></div>
 
-			<div className='potentialValleyPanel'>
+			<div className='voltageValleyPanel'>
 				{this.renderSliders()}
 
 				<button className='valleyVoltageButton round'
-					onClick={p.setPotentialHandler} >
-						Set to Valley Potential
+					onClick={p.setVoltageHandler} >
+						Set to Valley Voltage
 				</button>
 			</div>
 			<div className='MiniGraph' style={{marginLeft: '500px', color: 'yellow'}}>pot. mini graph goes here</div>
 			<div style={{clear: 'left'}} />
 
 			<label style={{float:'right'}}>
-				<input type='checkbox' checked={p.showPotential} onChange={p.toggleShowPotential} />
-				Show Potential
+				<input type='checkbox' checked={p.showVoltage} onChange={p.toggleShowVoltage} />
+				Show Voltage
 			</label>
 
 		</div>;
@@ -147,4 +147,4 @@ class SetPotentialTab extends React.Component {
 }
 setPT();
 
-export default SetPotentialTab;
+export default SetVoltageTab;

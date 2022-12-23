@@ -25,8 +25,8 @@ function setPT() {
 		space: PropTypes.instanceOf(eSpace),
 
 		resetMainWave: PropTypes.func.isRequired,
-		toggleShowPotential: PropTypes.func.isRequired,
-		showPotential: PropTypes.bool.isRequired,
+		toggleShowVoltage: PropTypes.func.isRequired,
+		showVoltage: PropTypes.bool.isRequired,
 
 		isTimeAdvancing: PropTypes.bool.isRequired,  // make sure start/stop button updates
 	};
@@ -108,7 +108,7 @@ function CPToolbar(props) {
 				<button className='round' onClick={props.resetMainWave}>Reset Wave</button>
 				&nbsp;
 
-				<button className='round' onClick={props.setPotentialHandler}>Reset Potential</button>
+				<button className='round' onClick={props.setVoltageHandler}>Reset Voltage</button>
 				&nbsp;
 			</div>
 
@@ -119,8 +119,8 @@ function CPToolbar(props) {
 				&nbsp;
 
 				<label>
-					<input type='checkbox' checked={props.showPotential} onChange={props.toggleShowPotential} />
-					Show Potential
+					<input type='checkbox' checked={props.showVoltage} onChange={props.toggleShowVoltage} />
+					Show Voltage
 				</label>
 			</div>
 		</div>

@@ -231,7 +231,7 @@ static void fixSomeBoundaries(qCx *wave, int continuum, int start, int end) {
 		break;
 
 	case contWELL:
-		// the points on the end are ∞ potential, but the arithmetic goes bonkers
+		// the points on the end are ∞ voltage, but the arithmetic goes bonkers
 		// if I actually set the voltage to ∞
 		wave[0] = qCx();
 		wave[end] = qCx();

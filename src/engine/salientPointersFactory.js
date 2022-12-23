@@ -30,7 +30,7 @@ class salientPointersFactory {
 		this.spacePointer = struct[0];  // just the pointer...maybe not hooked up yet
 
 		// one double per point.  One Float64Array per space.
-		this.potentialBufferPointer = struct[1];
+		this.voltageBufferPointer = struct[1];
 		//= new Float64Array(window.Module.HEAPF64.buffer,
 		//	struct[1], space.nPoints);
 

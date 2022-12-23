@@ -177,9 +177,9 @@
 	}
 
 
-	/* **************************************** Set Potential tab */
+	/* **************************************** Set Voltage tab */
 
-	.setPotentialTab {
+	.setVoltageTab {
 		width: calc( 50em + 200px );
 		height: 8em;
 
@@ -190,12 +190,12 @@
 			margin: 1em .5em;
 		}
 
-		.potentialTitlePanel {
+		.voltageTitlePanel {
 			float: left;
 			width: 14em;
 		}
 
-		.potentialValleyPanel {
+		.voltageValleyPanel {
 			float: left;
 			width: 24em;
 		}

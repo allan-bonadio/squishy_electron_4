@@ -6,11 +6,11 @@ v3 refers to this SquishyElectron project.
 ------------------------------------------------wish list for v3
 
 
-- UI ability to set n of dimensions, and to specify angular momentum, and any energy/potential differences therein.  Two particles in the same space should have the same X coordinates; one in 2-d space should have X  and Y coords.  The V potential would be 1-dimensional or 2 dimensional, depending.
+- UI ability to set n of dimensions, and to specify angular momentum, and any energy/potential differences therein.  Two particles in the same space should have the same X coordinates; one in 2-d space should have X  and Y coords.  The V voltage would be 1-dimensional or 2 dimensional, depending.
 Any number of dimensions, eg x and s, the spin, becomes ψ[1...N][-½, ½]
 or a 2d wave is ψ[1...N][1...N], either two 1D particles or 1 2D particle
-whats the diff?  well, the potential V with two particles, each depends on the loc of the other.
-For one particle in 2D, the potential is a 2d map.
+whats the diff?  well, the voltage V with two particles, each depends on the loc of the other.
+For one particle in 2D, the voltage is a 2d map.
 
 - Emscripten engine in C - definitely
 https://emscripten.org/docs/getting_started/downloads.html
@@ -56,7 +56,7 @@ class qDimension {
 Each dimension's variable is an integer, either 0...N-1 or 1...N, the latter for contWELL or contENDLESS.
 	Coordinates always have 1 extra point on each end, either for ∞ wall or for wraparound
 
-- a 'Space' is a list of dimensions, and a potential function of those dimension variables, known as V
+- a 'Space' is a list of dimensions, and a voltage function of those dimension variables, known as V
 	Dimensions are listed from outer to inner as with the resulting psi array:
 	psi[outermost-dim][dim][dim][innermost-dim]
 	As fo present writing, only does one dimension
@@ -81,7 +81,7 @@ Each dimension's variable is an integer, either 0...N-1 or 1...N, the latter for
 
 Also must have shared between JS and C++:
 - animation period?
-- potential energy as function of state; scalars not complex
+- potential/voltage energy as function of state; scalars not complex
 - elapsed time
 
 Also must have in C++; not sure if JS cares:
