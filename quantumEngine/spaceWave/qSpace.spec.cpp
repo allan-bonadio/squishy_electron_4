@@ -8,7 +8,7 @@
 #include "../schrodinger/qAvatar.h"
 #include "../schrodinger/qGrinder.h"
 #include "../debroglie/qWave.h"
-#include "qViewBuffer.h"
+#include "../greiman/qViewBuffer.h"
 #include "../testing/cppuMain.h"
 
 #include "CppUTest/TestHarness.h"
@@ -89,7 +89,7 @@ TEST(qSpace, qSpace_ConstructorGauntlet)
 	delete space;
 }
 
-// this tests the whole shebang, as created from JS
+// this tests the whole shebang, as it is created from JS
 void completeNewSpaceGauntlet(int N) {
 //	printf("🧨 🧨 starting completeNewSpaceGauntlet(N=%d)\n",
 //		N);
@@ -125,9 +125,9 @@ void completeNewSpaceGauntlet(int N) {
 //	printf("🧨 🧨       completeNewSpaceGauntlet() completed\n");
 }
 
-TEST(qSpace, qSpace_CompleteNewSpaceGauntlet4000) { completeNewSpaceGauntlet(4096); }
-TEST(qSpace, qSpace_CompleteNewSpaceGauntlet254) { completeNewSpaceGauntlet(256); }
-TEST(qSpace, qSpace_CompleteNewSpaceGauntlet63) { completeNewSpaceGauntlet(64); }
+TEST(qSpace, qSpace_CompleteNewSpaceGauntlet4096) { completeNewSpaceGauntlet(4096); }
+TEST(qSpace, qSpace_CompleteNewSpaceGauntlet256) { completeNewSpaceGauntlet(256); }
+TEST(qSpace, qSpace_CompleteNewSpaceGauntlet64) { completeNewSpaceGauntlet(64); }
 TEST(qSpace, qSpace_CompleteNewSpaceGauntlet32) { completeNewSpaceGauntlet(32); }
 TEST(qSpace, qSpace_CompleteNewSpaceGauntlet32again) { completeNewSpaceGauntlet(32); }
 TEST(qSpace, qSpace_CompleteNewSpaceGauntlet4) { completeNewSpaceGauntlet(4); }
