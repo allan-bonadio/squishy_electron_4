@@ -5,6 +5,9 @@
 
 
 //#include <cmath>
+#include <cstring>
+#include <stdexcept>
+
 #include "../spaceWave/qSpace.h"
 #include "../schrodinger/qAvatar.h"
 #include "../schrodinger/qGrinder.h"

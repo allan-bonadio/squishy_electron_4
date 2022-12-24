@@ -5,8 +5,9 @@
 */
 
 
-//#include <ctime>
 #include <cstring>
+#include <stdexcept>
+
 #include "qSpace.h"
 #include "../schrodinger/qAvatar.h"
 #include "../schrodinger/qGrinder.h"

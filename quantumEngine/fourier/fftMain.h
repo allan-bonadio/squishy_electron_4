@@ -4,16 +4,6 @@
 */
 
 
-//extern "C" {
-//
-//	void testFFT(void);
-//
-//	// UI requests FFT immediate, or at end of next iteration
-//	void askForFFT(void);
-//}
-
-//extern void askForFFT(void);
-
 extern void cooleyTukeyFFT(qCx *dest, qCx *src, int N);
 extern void cooleyTukeyIFFT(qCx *dest, qCx *src, int N);
 

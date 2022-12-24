@@ -3,9 +3,8 @@
 ** Copyright (C) 2022-2022 Tactile Interactive, all rights reserved
 */
 
+#include <stdexcept>
 
-
-#include "../squish.h"
 #include "../spaceWave/qSpace.h"
 #include "../schrodinger/qAvatar.h"
 #include "../schrodinger/qGrinder.h"

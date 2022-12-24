@@ -4,12 +4,8 @@
 */
 
 #include <ctime>
-
-// i think the exception thing needs this, not sure
-#include <emscripten/bind.h>
-
-#include "squish.h"
-
+#include <string>
+#include <stdexcept>
 
 // return elapsed real time since last page reload, in seconds, only for tracing
 // seems like it's down to miliseconds or even a bit smaller
@@ -20,7 +16,6 @@ double getTimeDouble(void)
     return ts.tv_sec + ts.tv_nsec / 1e9;
 }
 
-
 // this is from https://emscripten.org/docs/porting/Debugging.html#handling-c-exceptions-from-javascript
 // it's only called from genExports for JS to get a textual error message from C++
 // nobody in C++ calls it
@@ -28,8 +23,7 @@ std::string getCppExceptionMessage(intptr_t exceptionPtr) {
 	return std::string(reinterpret_cast<std::exception *>(exceptionPtr)->what());
 }
 
-
-// obsolete
+// obsolete... but we use it anyway?
 // check to make sure real and imag are finite and nice; warn if not
 void qCheck(const char *where, qCx aCx) {
 	// this is exactly the test I want: not NAN, not ∞

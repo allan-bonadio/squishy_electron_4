@@ -3,7 +3,6 @@
 ** Copyright (C) 2021-2022 Tactile Interactive, all rights reserved
 */
 
-#include "../squish.h"
 
 
 qCx qCx::operator/(qCx b) {

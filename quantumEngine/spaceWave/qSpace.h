@@ -4,7 +4,6 @@
 */
 
 
-#include "../squish.h"
 
 extern class qSpace *theSpace;
 extern double *theVoltage;

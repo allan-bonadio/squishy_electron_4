@@ -3,10 +3,10 @@
 ** Copyright (C) 2022-2022 Tactile Interactive, all rights reserved
 */
 #include <string.h>
-
 #include <ctime>
 #include <limits>
 #include <cfenv>
+#include <stdexcept>
 
 #include "../spaceWave/qSpace.h"
 #include "../schrodinger/qAvatar.h"
@@ -40,7 +40,7 @@ static bool traceEndingFFSpectrum = false;
 // make sure these values are doable by the sliders' steps
 qGrinder::qGrinder(qSpace *sp, qAvatar *av, const char *lab)
 	: space(sp),
-		dt(1e-3), stepsPerFrame(100), lowPassFilter(1),
+		dt(1e-3), lowPassFilter(1), stepsPerFrame(100),
 		pleaseFFT(false), isIntegrating(false), avatar(av) {
 
 	magic = 'Grin';

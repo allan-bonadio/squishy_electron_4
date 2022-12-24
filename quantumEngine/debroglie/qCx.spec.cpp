@@ -4,7 +4,6 @@
 */
 
 // this already has qCx defined in it
-#include "../squish.h"
 #include "../testing/cppuMain.h"
 
 #include "CppUTest/TestHarness.h"

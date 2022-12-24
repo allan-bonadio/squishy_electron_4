@@ -4,6 +4,7 @@
 */
 
 #include <cstring>
+#include <stdexcept>
 #include "../spaceWave/qSpace.h"
 #include "qFlick.h"
 

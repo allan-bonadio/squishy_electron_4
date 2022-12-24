@@ -41,7 +41,7 @@ emcc -o quantumEngine.js -sLLD_REPORT_UNDEFINED \
 	$PROFILING  \
 	-DMAX_LABEL_LEN=$MAX_LABEL_LEN -DMAX_DIMENSIONS=$MAX_DIMENSIONS \
 	-I$qEMSCRIPTEN/emsdk/upstream/emscripten/cache/sysroot/include \
-	-include emscripten.h \
+	-include emscripten.h -include squish.h \
 	-ffast-math  -lembind \
 	main.cpp $allCpp || exit $?
 # changed -g to -g4 to -gsource-map --source-map-base / ; debugger can see into c++
