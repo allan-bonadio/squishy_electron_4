@@ -7,6 +7,8 @@
 #ifndef __SQUISH_H__
 #define __SQUISH_H__
 
+using namespace std;
+
 #include <cstdio>
 //#include <cstdlib>
 #include <cmath>
