@@ -123,19 +123,18 @@ These two values dictate the wave buffers allocated all over.  If the user chang
 
 - an 'Avatar' manages display of a Wave.  There's two per space; the second one is for the Set Wave minigraph.  It owns a qViewBuffer, which is ultimately handed to WebGL.
 
-- a 'Grinder' iterates the differential equation.
+- a 'Grinder' integrates the differential equation.
 
 
 emscripten
 ==========
 
-Follow the directions on this page to install it, into /opt/dvl/emscripten:
-
+Follow the directions on this page to install it somewhere:
 https://emscripten.org/docs/getting_started/downloads.html
 
-then from the top level run this:
+then from the top level run this (or, make will do it):
 quantumEngine/building/genExports.js
 
-go change that file as you add more C++ exports you want to call from JS.
+Go change that file as you add more C++ exports you want to call from JS.  They all have to be "C" functions, see the code.  Note there's a fair amount of overhead for each call; trace it in the debugger to see.  This is why I made the DirectAccess system; see directAccess.h, and classes that use it: e/qWave, e/qGrinder, Avatar
 
 
