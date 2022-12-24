@@ -46,6 +46,8 @@ allCpp=`cat building/allCpp.list`
 
 # keep (MAX_LABEL_LEN+1) a multiple of 4, 8, 16, 32 or 8 for alignment, eg 7, 15 or 31
 MAX_LABEL_LEN=7
+MAX_DIMENSIONS=2
+
 
 # mildly analogous to emcc builds in buildDev.sh and buildProd.sh
 # note that main.cpp is NOT included in the .cpp files; that's for web use only
@@ -53,13 +55,15 @@ MAX_LABEL_LEN=7
 # Update list of test srcs as needed.
 # some of these options - dunno if I need them
 set -x
-g++ -o cppuTestBin -Wno-tautological-undefined-compare  \
+#what was i thinking? g++ -o cppuTestBin -Wno-tautological-undefined-compare  \
+clang -o cppuTestBin -Wno-tautological-undefined-compare  \
 	-g -O0 \
 	-std=c++11 -fexceptions  \
-	-DMAX_LABEL_LEN=$MAX_LABEL_LEN \
+	-DMAX_LABEL_LEN=$MAX_LABEL_LEN -DMAX_DIMENSIONS=$MAX_DIMENSIONS \
 	-I$CPPUTEST_HOME/include \
 	-include $CPPUTEST_HOME/include/CppUTest/MemoryLeakDetectorNewMacros.h \
 	-L$CPPUTEST_HOME/lib -lCppUTest -lCppUTestExt \
+	-include squish.h \
 	testing/cppuMain.cpp */*.spec.cpp \
 	$allCpp \
 	|| exit $?
