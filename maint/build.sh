@@ -1,9 +1,10 @@
 #!/bin/bash
 
+# set this to non-empty to generate the Dev wasm files instead of Prod; better for debugging
+buildWithDev=yes
+
 echo "🎁 🔨 Clean and Build Production Squishy Electron"  `date +%c`
 cd $SQUISH_ROOT
-#cd `dirname $0`
-#cd ..
 
 # must create the C++ wasm binary first
 
@@ -18,26 +19,40 @@ echo "🎁 🔨  starting Emscripten Build"
 $SQUISH_ROOT/quantumEngine/building/genExports.js || exit 35
 
 # which one to use - should use prod but...
-#quantumEngine/building/buildDev.sh || exit 11
-quantumEngine/building/buildProd.sh || exit 11
+if [ -n "$buildWithDev" ]
+then
+	quantumEngine/building/buildDev.sh || exit 11
+else
+	quantumEngine/building/buildProd.sh || exit 11
+fi
 echo "🎁 🔨  Emscripten Build Completed"
 
 
 
 echo "🎁 🔨  starting NPM Build"
-react-scripts build || exit 37
+if [ -z "$buildWithDev" ]
+then
+	# complains if any symlink points to a nonexistent file.  sigh.
+	mv public/qEng/quantumEngine.wasm.map /tmp
+	react-scripts build || exit 37
+	mv /tmp/quantumEngine.wasm.map public/qEng/
+else
+	react-scripts build || exit 37
+fi
 echo
-echo "🎁 🔨  NPM Build Completed - here is all files:"
+echo "🎁 🔨  NPM Build Completed"
 
 
 echo "🎁 🔨  starting final cleanup"
 # move these out of the way so they don't get confused with dev versions
 # but don't delete them in case I have to examine them later
 cd quantumEngine
-mv quantumEngine.js quantumEngine.wasm quantumEngine.wasm.map /tmp
+if [ -n "$buildWithDev" ]
+then mv -f quantumEngine.js quantumEngine.wasm quantumEngine.wasm.map /tmp
+else mv -f quantumEngine.js quantumEngine.wasm /tmp
+fi
 cd $SQUISH_ROOT
 echo "🎁 🔨  final cleanup Completed, here's all the files:"
-
 ls -lR build
 
 
