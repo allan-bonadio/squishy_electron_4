@@ -36,17 +36,18 @@ qCx ex4Wave[6] = {
 };
 qWave *expectedWave4 = new qWave(space4, ex4Wave);
 
-// this seems to crash early in stepReal, but I can't figure out what's gone wrong.  One iteration works fine.
+// this seems to crash early in stepReal, but I can't figure out what's gone wrong.  One integration works fine.
 TEST(visscher, VisscherOneStep)
 {
 	oldWave4->setCircularWave(1.);
 	if (traceOneStep) oldWave4->dump("start VisscherOneStep test");
 
 	qAvatar *avatar = new qAvatar(space4, "VisscherOneStep");
+	qGrinder *grinder = new qGrinder(space4, avatar, "Visscher1Step");
 
-	avatar->dt = 0.01;
-	if (traceOneStep) avatar->dumpObj("⚛️ before : oneVisscherStep");
-	avatar->oneVisscherStep(newWave4, oldWave4);
+	grinder->dt = 0.01;
+	if (traceOneStep) grinder->dumpObj("⚛️ before : oneVisscherStep");
+	grinder->oneVisscherStep(newWave4, oldWave4);
 	if (traceOneStep) printf("⚛️ after : oneVisscherStep\n");
 
 
@@ -54,7 +55,7 @@ TEST(visscher, VisscherOneStep)
 	delete avatar;
 }
 
-/* ****************************************************************** one frame */
+/* ****************************************************************** one integration */
 
 static qCx expectedArray[34] = {
 qCx(    0.1719190461333459,   -0.04115680867662573),
@@ -99,16 +100,17 @@ TEST(visscher, VisscheroneIntegration)
 	// simulate the app starting up
 	qSpace *space = makeFullSpace(32);
 	qAvatar *av = theSpace->mainAvatar;
+	qGrinder *grinder = theSpace->grinder;
 	av->qwave->setCircularWave(1.);
 
 
 
 	// simulate the app taking one iter = 100 steps
-	av->stepsPerFrame = 100;
-	av->dt = .01;
-	av->lowPassFilter = 10;
+	grinder->stepsPerFrame = 100;
+	grinder->dt = .01;
+	grinder->lowPassFilter = 10;
 
-	av->oneIntegration();
+	grinder->oneIntegration();
 
 	// we'll use this to compare against
 	qWave *expectedQWave = new qWave(space, expectedArray);
