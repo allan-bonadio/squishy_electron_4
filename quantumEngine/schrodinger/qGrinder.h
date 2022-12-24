@@ -44,7 +44,7 @@ struct qGrinder {
 	// this grinder OWNS the qFlick & is responsible for deleting it
 	struct qFlick *qflick;
 
-	// pointer grabbed from the space, often.  Same buffer as in space.
+	// pointer grabbed from the space.  Same buffer as in space.
 	double *voltage;
 	double voltageFactor;  // aligned by 8
 
