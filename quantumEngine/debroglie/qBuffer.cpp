@@ -3,8 +3,6 @@
 ** Copyright (C) 2022-2022 Tactile Interactive, all rights reserved
 */
 
-#include <cstring>
-
 /*
 a long array of qCx complex numbers, plus some other info
 
@@ -15,10 +13,11 @@ qBuffer - object, superclass of qWave and qSpectrum
 qWave - object that owns a single wave, and points to its space
 qSpectrum - object that owns a single qSpectrum, and points to its space
 qFlick - object that owns a list of waves, and points to its space
-	(not sure if i'll keep using qFlick)
 */
 
-#include "../squish.h"
+#include <cstring>
+#include <stdexcept>
+
 #include "../spaceWave/qSpace.h"
 #include "qBuffer.h"
 
@@ -397,10 +396,8 @@ void qBuffer::setSquareWave(int wavelength, int first, qCx height) {
 
 // add these two waves, modulated by the coefficients, leaving result in this->wave
 // UN-normalized, UN-fixed boundaries.  Either can be this if you want, no probs
-void qBuffer::add(qBuffer *qwave1, double coeff1, qBuffer *qwave2, double coeff2) {
+void qBuffer::add(double coeff1, qCx *wave1, double coeff2, qCx *wave2) {
 	int N = end - start;
-	qCx *wave1 = qwave1->wave + qwave1->start;
-	qCx *wave2 = qwave2->wave + qwave2->start;
 	qCx *dest = wave + start;
 
 	for (int ix = 0; ix < N; ix++) {
@@ -410,3 +407,8 @@ void qBuffer::add(qBuffer *qwave1, double coeff1, qBuffer *qwave2, double coeff2
 
 }
 
+// add these two waves, modulated by the coefficients, leaving result in this->wave
+// UN-normalized, UN-fixed boundaries.  Either can be this if you want, no probs
+void qBuffer::add(double coeff1, qBuffer *qwave1, double coeff2, qBuffer *qwave2) {
+	add(coeff1, qwave1->wave + qwave1->start, coeff2, qwave2->wave + qwave2->start);
+}

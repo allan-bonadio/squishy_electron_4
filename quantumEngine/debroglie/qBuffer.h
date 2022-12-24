@@ -15,7 +15,6 @@
 #ifndef __QBUFFER_H__
 #define __QBUFFER_H__
 
-#include "../squish.h"
 
 struct qSpace;
 struct qWave;
@@ -80,7 +79,12 @@ struct qBuffer {
 	void copyFrom(qBuffer *src);
 	void copyTo(qBuffer *dest);
 
-	void add(qBuffer *qwave1, double coeff1, qBuffer *qwave2, double coeff2);
+	// Add any two qBuffers, leave result in this.  Must have same space N, although not continuum.
+	void add(double coeff1, qBuffer *qwave1, double coeff2, qBuffer *qwave2);
+
+	// Same, but you can pass pass raw waves; the waves assume same N as this wave.
+	// YOU MUST OFFSET THE WAVE POINTERS YOURSELF!
+	void add(double coeff1, qCx *wave1, double coeff2, qCx *wave2);
 
 	// like the JS version but in C++ and used only for testing
 	void setCircularWave(double freq = 1., int first = 0);
