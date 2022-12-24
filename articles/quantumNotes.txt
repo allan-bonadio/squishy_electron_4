@@ -1,0 +1,338 @@
+====================================================== Dec 24 2022
+
+the potential is Vψ, sortof, must be units of energy.  So that expr says V=units of energy.  1 volt = 1 joule (of work) per 1 coulomb (of charge).
+
+1 eV = 1.602176634×10−19 J
+meaning the charge of an electron is 1.602176634×10−19 coulomb.
+
+
+====================================================== Dec 2022
+
+macro-fu:
+rumor has it these work:
+__FUNCTION__, __func__ = current function
+__LINE__ = line number in file __FILE__ .  __LINE__ is an int; the rest are strings.
+#line 477    sets the line number to 477 fwiw
+#line 477 "qAvatar.cpp"    also sets the __FILE__ name
+__PRETTY_FUNCTION__ (gcc & clang) and __FUNCSIG__ (Vis C++) also include the signature
+__PRETTY_FUNCTION__ handles C++ features: classes, namespaces, templates and overload
+
+__cplusplus, an integer, not in C.    __STDC__, integer., not in C++
+__DATE__ "Mmm dd yyyy"      __TIME__="hh:mm:ss"
+
+
+tweaking CRA config:
+https://marmelab.com/blog/2021/07/22/cra-webpack-no-eject.html
+
+make a general purpose binary object identifier function
+
+====================================================== Dec 2022
+Browser availability for important features I use:
+
+WebGL 1: most browsers 2010 thru 2016, android maybe 2016
+
+WebGL 2: chrome & firefox Jan '17, Safari (both) & Edge 2020-2021
+
+WebGL 2 if you enable experimental features: Chrome & Safari 2015-2017
+
+WebAssembly: most browsers 2017, on android maybe 2018
+
+WebWorkers:
+safari & Firefox & Chrome 2009 to early 2010
+Edge July 2015
+Safari ios 2012
+Android 2013 - 2022
+
+in general, Android browsers lag the rest, although I'm not sure which browsers they use.  Maybe Chrome, then Samsung, then Edge then Firefox.
+
+need to update code for this.
+
+====================================================== Nov 18, 2022
+
+In order to deal properly with units, I have to shift from MKS units to more commensurate units, but I want to stick to SI prefixes.  So, for instance, picoseconds and nanometers.
+
+1 s = 1e12 ps
+1 s = 1e9 ns
+1 s = 1e6 µs
+1 m = 1e12 pm
+1 m = 1e9 nm
+1 kg = 1000g = 1e+30 kilo-quectograms = 1e+33 quectograms
+  = 1e21 kilo-zepto grams = 1e24 zeptograms
+1 g = 1e+30 quecto-grams
+1 g = 1e+30 femto-femto-grams
+
+pretty wacky prefix names.  I should stick to no farther than femto, and
+then just double up like pico-pico-seconds.
+
+ℏ = 1.054571817e-34 kg m^2 / s
+= 1.054571817e-34 kg (1e12 pm)^2 / 1e12 ps
+= 1.054571817e-22 kg pm^2 / ps
+
+m_e = 9.1093837015e-31 kg = 9.1e-28 g
+= 9.1093837015e-31 * 1e24 zeptograms
+= 9.1093837015e-7 zeptograms
+zepto = 1e−21 so like micro-femto-grams or nano-pico-grams
+
+1 eV = 1.602176634e-19 J , kg m^2 / s^2
+
+ħ^2/2m_e = in kg meters seconds
+
+1.054571817e-34 ^ 2 / 9.1093837015e-31  oh wait forgot the factor of 1/2
+= 6.10426431498079e-39 kg^2 m^4 / s^2 / kg
+= 6.10426431498079e-39 kg m^4 / s^2
+= 6.10426431498079e-39 kg (1e12 pm)^4 / (1e12 ps)^2
+= 6.10426431498079e-39 kg 1e48 pm^4 / 1e24 ps^2
+= 6.10426431498079e-15 kg pm^4 / ps^2
+
+wait try nanometers instead of picometers
+= 6.10426431498079e-39 kg (1e9 nm)^4 / (1e12 ps)^2
+= 6.10426431498079e-39 kg 1e36 nm^4 / 1e24 ps^2
+= 6.10426431498079e-27 kg nm^4 / ps^2
+
+= 6.10426431498079e-39 kg (1e12 pm)^4 / (1e9 ns)^2
+= 6.10426431498079e-39 kg 1e48 pm^4 / 1e18 ns^2
+= 6.10426431498079e-9 kg pm^4 / ns^2
+
+= 6.10426431498079e-39 kg (1e12 pm)^4 / (1e6 µs)^2
+= 6.10426431498079e-39 kg 1e48 pm^4 / 1e12 µs^2
+= 6.10426431498079e-3 kg pm^4 / µs^2
+
+but wait, iħ ∂ψ / ∂t  =  [V - (ħ^2/2m) (∂^2/∂x^2)] ψ
+so really we want ħ / 2m_e to be an easy number.  sigh.
+
+ħ / 2m_e = (1.054571817e-34 kg m^2 / s) / 2(9.1093837015e-31 kg)
+ok now i got the factor of 2.  oh wait that should have been ħ^2
+=0.000057883818025271484 m^2 / s
+= 57.883818025271484 e-6 m^2 / s
+= 57.883818025271484 e-6 (1e9 nm)^2 / 1e12 ps
+= 57.883818025271484 e-6 1e18 nm^2 / 1e12 ps
+= 57.883818025271484 nm^2 / ps
+
+so we use nanometers and picoseconds, so
+
+ℏ = 1.054571817e-34 kg (1e9 nm)^2 / (1e12 ps)
+= (1.054571817e-34 * 1e18 / 1e12) kg nm^2 / ps
+= (1.054571817e-34 * 1e18 / 1e12) kg nm^2 / ps
+= 1.054571817e-28 kg nm^2 / ps
+
+ħ^2/2m_e = 6.10426431498079e-39 kg m^4 / s^2
+= 6.10426431498079e-39 kg (1e9 nm)^4 / (1e12 ps)^2
+= (6.10426431498079e-39 * 1e36 / 1e24) kg nm^4 / ps^2
+= 6.10426431498079e-27 kg nm^4 / ps^2
+
+and potential energy would be in units:
+1eV = 1.602176634e-19 kg m^2 / s^2
+1eV = 1.602176634e-19 kg (1e9 nm)^2 / (1e12 ps)^2
+1eV = (1.602176634e-19 * 1e18 / 1e24) kg nm^2 / ps^2
+= 1.602176634e-25 kg nm^2 / ps^2
+= 1.602176634e-25 * 1e+33 quectograms nm^2 / ps^2
+= 1.6021766341e+8 quectogram nm^2 / ps^2
+= 1.602176634e-25 1e24 zeptograms nm^2 / ps^2
+= .1602176634 zeptograms nm^2 / ps^2
+
+====================================================== Oct 2022
+
+other notes:
+webassembly error handling:
+https://emscripten.org/docs/compiling/WebAssembly.html?highlight=webassembly%20exception#web-server-setup
+for some streamlining; by adding a Mime type and .gz
+more deploy tips:  https://emscripten.org/docs/compiling/Deploying-Pages.html
+some type of error handling I might be able to implement someday:
+https://developer.mozilla.org/en-US/docs/WebAssembly/JavaScript_interface/Exception/stack
+
+
+-------------------------------------------------- 9/19,2022
+Maybe I should think of waves WRT an atom size.  H atom sized 1Å.
+actually no, maybe 1/4 Å for hydrogen but about 1Å average for most of the elements
+
+====================================================== Sep 2022
+While it's running, try surfing here:
+http://localhost:4444/webpack-dev-server
+
+====================================================== Aug 2022
+original, mid-2021
+
+v3 refers to the previous SquishyElectron project.
+v4 is squishy_electron_4, this project.
+
+====================================================== Mid-2021 notes
+
+v3 refers to this SquishyElectron project.
+
+------------------------------------------------wish list for v3
+
+
+- UI ability to set n of dimensions, and to specify angular momentum, and any energy/potential differences therein.  Two particles in the same space should have the same X coordinates; one in 2-d space should have X  and Y coords.  The V voltage would be 1-dimensional or 2 dimensional, depending.
+Any number of dimensions, eg x and s, the spin, becomes ψ[1...N][-½, ½]
+or a 2d wave is ψ[1...N][1...N], either two 1D particles or 1 2D particle
+whats the diff?  well, the voltage V with two particles, each depends on the loc of the other.
+For one particle in 2D, the voltage is a 2d map.
+
+- Emscripten engine in C - definitely
+https://emscripten.org/docs/getting_started/downloads.html
+Multiprocessing must be done with pThreads and/or web workers, it seems.
+
+- test harness to run C++ iterator for testing
+
+- OpenGL, if possible (maybe v4?)  Must be webgl cuz emscripten doesn't do full OpenGL
+(basically OpenGL ES = WebGL anyway).
+
+- display Spiral in 3d could be easy.  Dual waves for an electron with spin.
+
+- ability to create two wave functions and superimpose them, with varying complex ratio between
+
+- ability to alter speed of animation/calculation
+
+- ability to 'stick your finger in' and measure a state variable and thereby change the state
+
+- small key image indicating phase-color correspondence
+- time display, frame,
+- some diagnostics for me?
+
+- Fourier transforms with http://www.fftw.org to xform space domain to momentum domain
+
+------------------------------------------------ v3 definitions
+
+This is aspirational, or maybe just the description of the quantum engine.
+I don't know how i'll put a UI on all  of this, but the simpler variations should be  no problem.
+
+- a 'dimension' is a description of one of the state variable sets that index a wave.
+class qDimension {
+	continuum: contWELL or contENDLESS (has N+2 values for N possibilities)
+		or contDISCRETE (has N values for N possibilities)
+	N: possible QM states.  Always a power of 2 (for non-discrete dimensions?).
+	nPoints: number of values (=N or N+2) times nPoints for lower-numbered dimensions
+	nStates: number of states (N) times nStates for lower-numbered dimensions
+	label: 'x', 'y' or 'z' or other; C string
+		two particles will have x1, x2 but one in 2d will have x, y.
+			Spin: Sz, or Sz1, Sz2, ...  Smax = 2S+1.  Sz= ix - S.  Orbital Ang: Lz, combined: Jz
+			variable total angular mom: L combines Lz and Ltot so: state ix = 0...Lmax^2
+			Ltot = floor(sqrt(ix))   Lz = ix - L(L+1) and you have to choose a Lmax sorry
+			Also could have Energy dimensions...
+}
+Each dimension's variable is an integer, either 0...N-1 or 1...N, the latter for contWELL or contENDLESS.
+	Coordinates always have 1 extra point on each end, either for ∞ wall or for wraparound
+
+- a 'Space' has a list of dimensions, and a voltage (potential) function of those dimension variables, known as V
+	Dimensions are listed from outer to inner as with the resulting psi array:
+	psi[outermost-dim][dim][dim][innermost-dim]
+	As fo present writing, only does one dimension
+	class Space {
+		qDimension dimensions[];
+		Avatar, one or more.  manages display of a wave
+		Grinder, manages integration
+		real buffer V (array parallel to state variables, the potential);
+		coordinates = what names for dimensions
+	}
+
+- a 'Wave' is a multidimensional array of psi  values, each a complex number (two floats, usually double)
+	- qWave is a quantum system state
+	- qSpectrum is an FFT of a qWave
+	- qBuffer is the superclass of the above two
+	- qBuffer points to space it's designed for; all buffers are freed when space changes dimensions so they can be recreated
+	- iterate passes thru all psi values along all dimensions
+	- fixBoundaries() automatically wraps continuum dimensions
+	- can have multiple waves per space; user can superimpose them (someday)
+
+
+Also must have shared between JS and C++:
+- animation period
+- potential energy as function of state; scalars not complex
+- elapsed time; frame number
+- all things in the control panel
+- just lots of others
+
+Also must have in C++; not sure if JS cares:
+- acceptable error amount
+- progress of each thread, so it can coordinate the threads
+
+------------------------------------------------ equations
+
+iħ ∂ψ / ∂t  =  [V - (ħ^2/2m) (∂^2/∂x^2)] ψ
+
+
+iħ ∂psi / ∂t  =  V psi - (ħ^2/2m) (∂^2/∂x^2) psi
+
+where t=time, x=location (potentially scalar, 2-vec or 3-vec)
+h=hbar ħ plank's constant / 2π   m=particle (electron) mass
+V=potential, function of x (and t maybe someday)
+psi ψ is the wave function itself, a complex function of x and t.  Both of those are discretized: dx=1 always, and dt is variable
+
+
+------------------------------------------------ wish list
+
+
+- UI ability to set n of dimensions, and to specify angular momentum, and any energy/potential differences therein.  Two particles in the same space should have the same X coordinates; one in 2-d space should have X  and Y coords.  The V potential would be 1-dimensional or 2 dimensional, depending.
+Any number of dimensions, eg x and s, the spin, becomes ψ[1...N][-½, ½]
+or a 2d wave is ψ[1...N][1...N], either two 1D particles or 1 2D particle
+whats the diff?  well, the potential V with two particles, each depends on the loc of the other.
+For one particle in 2D, the potential is a 2d map.
+
+- Multiprocessing must be done with web workers, with atomics synchronizing.  Multiple threads working on successive generations; dual threads on Re and Im.
+
+- display Spiral in 3d could be easy.  Dual waves for an electron with spin?
+
+- ability to create two wave functions and superimpose them, with varying complex ratio between
+
+- ability to 'stick your finger in' and measure a state variable and thereby change the state
+
+- small key table indicating phase-color correspondence (see that file... i think in resume directory)
+
+
+================================================================ Dec 2021:
+
+-------------------------------------------------- icon notes
+
+⏋𝒆⟩
+230pt font
+212 height of text
+logo|𝒆⟩2.png - original image, pink but darker
+logo|𝒆⟩3.png - latest, white
+
+next time, try 200px text so there's more padding space
+
+
+-------------------------------------------------- benchmarks
+
+---------------------- with 25 points, on firefox:
+stepsPerIteraction: 1000
+frame calc time:     23.00ms
+update GL variables:     15.00ms
+total for frame:  38.00ms
+
+stepsPerIteraction: 500
+frame calc time:     41.00ms
+updateCounts:   0.00ms
+total for frame:  41.00ms
+
+period:  67.00ms
+
+-------------------------------------------------- Bogdonoff Affair
+blurb by vman
+
+You see, many years ago, I had a stint as a Mathematical Physicist, and because of that I was a regular reader of the Mathematical Physicist John Baez's blog "This week's finds in Mathematical Physics".  I remember being very interested in an intriguing article he wrote where he discussed the "Bogdonoff Affair" where in 2002 it was discovered that each of these two brothers earned their PhDs in the 90s by fraudulently by publishing articles in journals and defending theses that were complete gibberish. Their work was simply nonsensical strings of research physics buzzwords. All of this caused quite a stir in the world Physics community as it was shocking that this could even happen. In fact, it caused much tighter review processes to be instituted by journals and Universities alike.  I discovered that the Bogdanoffs published a book In 1991, called Dieu et la Science (God and Science), which became a French bestseller. However, they were sued by Astronomy Professor Trinh Xuan They settled out of court, and the Bogdanovs later denied plagiarism.  It's been suggested that the plagiarism suit pressed the brothers to obtain doctorates as fast as possible, since the back cover of the book claimed that the Bogdanoff's held doctorates but they didn't.
+
+
+
+--------------------------------------------------
+
+
+Great discussion of how to integrate Schrodinger.
+https://physics.stackexchange.com/questions/259134/schrodinger-equation-for-a-hamiltonian-with-explicit-time-dependence
+
+-------------------------------------------------- react management after eject
+and other tips and tricks
+
+https://github.com/sanjsanj/create-react-app-ejected
+
+CRA docs
+https://create-react-app.dev/docs/documentation-intro
+
+v4 gets rid of the ejected property cuz almost no docs on how to do that
+
+-------------------------------------------------- optimization
+
+Use PureComponent to speed up rendering if you follow the rules:
+https://reactjs.org/docs/react-api.html#reactpurecomponent
+
+--------------------------------------------------

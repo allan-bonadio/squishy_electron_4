@@ -21,8 +21,8 @@ Quantum mechanical sizes are very different from the sizes that you and I are us
 
 
 
--------------------------------
 
+------------------------------------------------ layman descriptions
 
 
 Q: what does an electron look like?

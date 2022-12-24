@@ -138,3 +138,22 @@ quantumEngine/building/genExports.js
 Go change that file as you add more C++ exports you want to call from JS.  They all have to be "C" functions, see the code.  Note there's a fair amount of overhead for each call; trace it in the debugger to see.  This is why I made the DirectAccess system; see directAccess.h, and classes that use it: e/qWave, e/qGrinder, Avatar
 
 
+-------------------- node and python
+
+I had to upgrade my Python to 3.9.5, otherwise the 'install' wouldn't work.  And then, add the 'certificates'.
+
+I think it installs its own version of Python 3.9.2 (after I installed 3.9.5), and also its own version of node 14.15.5, which I also already have installed with nvm.  Should figure out a way to get rid of that someday.
+
+oh yeah, here:
+emsdk uninstall node-14.15.5-64bit
+emsdk uninstall python-3.9.2-1-64bit
+
+get the installed version numbers:
+./emsdk list
+
+----------------------
+
+this is automatically done in the build scripts so you don't have to put them into your .profile or whatever files:
+
+. /dvl/emscripten/emsdk/emsdk_env.sh
+
