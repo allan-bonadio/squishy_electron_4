@@ -61,5 +61,5 @@ export default function glTranslate() {
 
 	// at this point, the working dir is the project root.  This'll have to be
 	// updated if you rearrange directories.
-	fs.writeFileSync('src/view/cxToColor/cxToColor.txlated.js', preface + jsText + suffix);
+	fs.writeFileSync('src/gl/cxToColor/cxToColor.txlated.js', preface + jsText + suffix);
 }

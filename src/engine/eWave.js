@@ -6,7 +6,7 @@
 // There is no eBuffer or eSpectrum; C++ deals with those exclusively
 
 import {qe} from './qe.js';
-import cxToColor from '../view/cxToColor/cxToColor.txlated.js';
+import cxToColor from '../gl/cxToColor/cxToColor.txlated.js';
 //import cxToRgb from '../view/cxToRgb.js';
 import {cppObjectRegistry, prepForDirectAccessors} from '../utils/directAccessors.js';
 import eSpace from './eSpace.js';

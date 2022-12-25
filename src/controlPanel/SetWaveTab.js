@@ -10,12 +10,12 @@ import {scaleLinear} from 'd3-scale';
 
 //import MiniGraph from './MiniGraph.js';
 //import eSpace from '../engine/eSpace.js';
-import GLView from '../view/GLView.js';
+import GLView from '../gl/GLView.js';
 
 // import eWave from '../engine/eWave.js';
 // import eCx from '../engine/eCx.js';
 // import cxToRgb from '../view/cxToRgb.js';
-//import cxToColor from '../view/cxToColor/cxToColor.txlated.js';
+//import cxToColor from '../gl/cxToColor/cxToColor.txlated.js';
 import TextNSlider from '../widgets/TextNSlider.js';
 import {} from '../utils/storeSettings.js';
 //import {getASetting, storeASetting, getAGroup, storeAGroup, alternateMinMaxs} from '../utils/storeSettings.js';
@@ -74,10 +74,10 @@ class SetWaveTab extends React.Component {
 			// space in the state will allow the GLView to start showing, therefore initializing
 			this.setState({space});
 		})
-		.catch(ex => {
-			// eslint-disable-next-line no-ex-assign
-			ex = interpretCppException(ex);
+		.catch(rex => {
+			let ex = interpretCppException(rex);
 			console.error(ex.stack ?? ex.message ?? ex);
+			debugger;
 		});
 	}
 	miniWidth = 300;

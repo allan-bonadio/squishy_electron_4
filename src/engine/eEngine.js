@@ -107,11 +107,19 @@ function quantumEngineHasStarted(maxDims, maxLab) {
 	if (traceStartup) console.log(`main space 🐣  created`);
 
 	// startup threads needs avatar
-	eSpaceCreatedPromise.then(space => eThread.createThreads(space.mainEAvatar));
-	if (traceStartup) console.log(`threads 🐣  created`);
+	eSpaceCreatedPromise
+	.then(space => {
+		eThread.createThreads(space.mainEAvatar);
 
-	if (tracePromises) console.log(
-		`🐥 quantumEngineHasStarted:  space created and resolving eSpaceCreatedPromise`);
+		if (traceStartup) console.log(`threads 🐣  created`);
+		if (tracePromises) console.log(
+			`🐥 quantumEngineHasStarted:  space created and resolving eSpaceCreatedPromise`);
+	})
+	.catch(ex => {
+		console.error(`eSpaceCreatedPromise failed`, ex);
+		debugger;
+	});
+
 };
 
 window.recreateMainSpace = recreateMainSpace;  // for debugging

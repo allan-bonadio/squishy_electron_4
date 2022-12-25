@@ -3,9 +3,9 @@
 ** Copyright (C) 2021-2022 Tactile Interactive, all rights reserved
 */
 
-//import complex from 'complex';
+// should get rid of cxToRgb; it was an old translation
 import cxToRgb from '../view/cxToRgb.js';
-import cxToColor from '../view/cxToColor/cxToColor.txlated.js';
+import cxToColor from '../gl/cxToColor/cxToColor.txlated.js';
 
 // do this old school class so  i can use the constructor without new
 // very handy - either arg can be a complex obj, or a real, and the im arg can be absent

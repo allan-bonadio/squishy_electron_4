@@ -10,7 +10,7 @@ import qe from '../engine/qe.js';
 import CommonDialog from '../widgets/CommonDialog.js';
 import {powerToIndex} from '../utils/powers.js';
 import LogSlider from '../widgets/LogSlider.js';
-//import listOfViewClasses from '../view/listOfViewClasses.js';
+//import listOfViewClasses from '../gl/listOfViewClasses.js';
 //import SquishPanel from '../SquishPanel.js';
 import {recreateMainSpace, eSpaceCreatedPromise} from '../engine/eEngine.js';
 import {getASetting} from '../utils/storeSettings.js';

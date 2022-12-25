@@ -6,18 +6,11 @@ cd ..
 echo "$@"
 
 # couldn't figure out how to generate this within the test
-src/view/cxToColor/glTranslate.js
+src/gl/cxToColor/glTranslate.js
 
 # now for the c++ tests
 quantumEngine/testing/cppuRunner.sh
 
 # jest testing JS
 node --experimental-vm-modules node_modules/.bin/jest --runInBand
-
-
-quantumEngine/main.cpp
-shortened that time in that startup delay.  much better.
-
-
-
 

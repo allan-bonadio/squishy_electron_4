@@ -22,7 +22,7 @@ import './view.scss';
 // import flatDrawingViewDef from './flatDrawingViewDef.js';
 import {getASetting, storeASetting} from '../utils/storeSettings.js';
 import VoltageArea from './VoltageArea.js';
-import GLView from './GLView.js';
+import GLView from '../gl/GLView.js';
 import {eSpaceCreatedPromise} from '../engine/eEngine.js';
 
 
@@ -66,9 +66,8 @@ export class WaveView extends React.Component {
 			this.mainEAvatar = space.mainEAvatar;
 		})
 		.catch(ex => {
-			// eslint-disable-next-line no-ex-assign
-			ex = interpretCppException(ex);
-			console.error(ex.stack ?? ex.message ?? ex);
+			console.error(`eSpaceCreatedPromise failed`, ex);
+			debugger;
 		});
 	}
 
