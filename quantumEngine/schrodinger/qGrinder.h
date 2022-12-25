@@ -32,13 +32,12 @@ struct qGrinder {
 	// it's a double cuz I don't know how big it'll get)
 	double frameSerial;
 
-
 	// params that the user can set/get
 	double dt;
 	int lowPassFilter;
 	int stepsPerFrame;
 
-	/* *********************************************** frame */
+	/* *********************************************** integrating */
 
 	// a subclass of  qWave, it has multiple waves to do grinding with
 	// this grinder OWNS the qFlick & is responsible for deleting it
@@ -85,7 +84,7 @@ struct qGrinder {
 	// visscher
 	void stepReal(qCx *newW, qCx *oldW, double dt);
 	void stepImaginary(qCx *newW, qCx *oldW, double dt);
-	void oneVisscherStep(qWave *newQWave, qWave *oldQWave);
+	//void oneVisscherStep(qWave *newQWave, qWave *oldQWave);
 
 	// kill high frequencies via FFTs
 	void fourierFilter(int lowPassFilter);
