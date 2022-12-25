@@ -16,16 +16,16 @@
 // or, per-view or per-space.
 // btw, this is really Hψ not just H.  Isn't H supposed to be real?
 // real eigenvalues.
-qCx hamiltonian(qCx *wave, int x) {
-	// so at location x, if dx = 1,
-	// the derivative would be (𝜓[x+1] - 𝜓[x])
-	//                      or (𝜓[x] - 𝜓[x-1])
-	// so second deriv would be 𝜓[x+1] + 𝜓[x-1] - 2* 𝜓[x]
-	qCx d2 = wave[x-1] + wave[x+1] - wave[x] * 2;
-	qCheck("hamiltonian d2", d2);
+qCx hamiltonian(qCx *wave, int ix) {
+	// so at location ix, if dx = 1,
+	// the derivative would be (𝜓[ix+1] - 𝜓[ix])
+	//                      or (𝜓[ix] - 𝜓[ix-1])
+	// so second deriv would be 𝜓[ix+1] + 𝜓[ix-1] - 2* 𝜓[ix]
+	qCx d2 = wave[ix-1] + wave[ix+1] - wave[ix] * 2;
+	qCheck(d2, "hamiltonian d2", ix);
 
-	qCx pot = wave[x] * theVoltage[x];
-	qCheck("hamiltonian pot", pot);
+	qCx pot = wave[ix] * theVoltage[ix];
+	qCheck(pot, "hamiltonian pot", ix);
 	qCx rate = pot - d2;
 
 	return rate;
