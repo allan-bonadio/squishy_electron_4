@@ -109,15 +109,14 @@ qBuffer::~qBuffer() {
 /* ******************************************************** diagnostic dumps **/
 
 // print one complex number, plus maybe some more calculated metrics for that point, on a line in the dump on stdout.
+// Results in buf, handed in
 // if it overflows the buffer, it won't.  just dump a row for a cx datapoint.
 // returns the magnitude non-visscher, but only withExtras
 double qBuffer::dumpRow(char buf[200], int ix, qCx w, double *pPrevPhase, bool withExtras) {
 	double re = w.re;
 	double im = w.im;
-	double norm = 0;
+	double norm = w.norm();
 	if (withExtras) {
-		norm = w.norm();
-
 		// if re and im are zero (or close) then the angle is undefined.  Use NaN.
 		double phase = NAN;
 		if (abs(im) + abs(re) > 1e-9)
@@ -132,7 +131,7 @@ double qBuffer::dumpRow(char buf[200], int ix, qCx w, double *pPrevPhase, bool w
 		*pPrevPhase = phase;
 	}
 	else {
-		snprintf(buf,200, "[%3d] (%8.4lf,%8.4lf)    ... norm=%lg", ix, re, im, norm);
+		snprintf(buf, 200, "[%3d] (%8.4lf,%8.4lf)    ... norm=%lg", ix, re, im, norm);
 	}
 	return norm;
 }
@@ -282,11 +281,13 @@ double qBuffer::normalize(void) {
 	if (traceNormalize) {
 		printf("🍕 normalizing qBuffer.  innerProduct=%lf\n", iProd);
 	}
-	if (iProd == 0. || ! isfinite(iProd)) {
+	if (iProd == 0.) {
 		// ALL ZEROES!??! this is bogus, shouldn't be happening.
 		// Well, except that brand new buffers are initialized to zeroes.
 		throw std::runtime_error("tried to normalize a buffer with all zeroes!");
 	}
+	if (! isfinite(iProd))
+		throw std::runtime_error("tried to normalize; iProd not finite");
 
 	// normal functioning
 	const double factor = pow(iProd, -0.5);
