@@ -50,7 +50,7 @@ TEST(qSpace, qSpace_ConstructorGauntlet)
 
 	LONGS_EQUAL(0, space->nDimensions);
 	// hmm must be something else to test...
-	LONGS_EQUAL_TEXT('qSpa', space->magic, "qSpace magic");
+	LONGS_EQUAL_TEXT('Spac', space->magic, "qSpace magic");
 
 
 	// should change one of these to discrete someday or

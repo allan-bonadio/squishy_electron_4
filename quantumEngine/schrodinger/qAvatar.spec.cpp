@@ -25,7 +25,7 @@ TEST_GROUP(qAvatar)
 TEST(qAvatar, CheckAvatarConstructor)
 {
 	qSpace *space = makeBareSpace(8, contENDLESS);
-	qAvatar *avatar = new qAvatar(space, "CheckConst");
+	qAvatar *avatar = new qAvatar(space, "outcome");
 
 	LONGS_EQUAL(space->nPoints, avatar->qwave->nPoints);
 	proveItsMine(avatar->qwave->wave	, space->nPoints * sizeof(qCx));
@@ -42,7 +42,7 @@ TEST(qAvatar, CheckAvatarConstructor)
 	POINTERS_EQUAL(avatar, avatar->qvBuffer->avatar);
 	POINTERS_EQUAL(avatar->vBuffer, avatar->qvBuffer->vBuffer);
 
-	STRCMP_EQUAL("CheckConst", avatar->label);
+	STRCMP_EQUAL("outcome", avatar->label);
 
 	delete avatar;
 	delete space;

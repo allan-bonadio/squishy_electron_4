@@ -39,9 +39,9 @@ static bool traceEndingFFSpectrum = false;
 // create new grinder, complete with its own stage buffers
 // make sure these values are doable by the sliders' steps
 qGrinder::qGrinder(qSpace *sp, qAvatar *av, const char *lab)
-	: space(sp),
+	: space(sp), avatar(av), elapsedTime(0), frameSerial(0),
 		dt(1e-3), lowPassFilter(1), stepsPerFrame(100),
-		pleaseFFT(false), isIntegrating(false), avatar(av) {
+		isIntegrating(false), needsIntegration(false), pleaseFFT(false) {
 
 	magic = 'Grin';
 
@@ -87,27 +87,15 @@ qGrinder::~qGrinder(void) {
 	qflick = NULL;
 
 	// these may or may not have been allocated, depending on whether they were needed
-	if (qflick->waves[1])
-		delete qflick->waves[1];
-	qflick->waves[1] = NULL;
 	if (qspect)
 		delete qspect;
 	qspect = NULL;
-
-
 };
 
 // no - deleteSpace() deletes this
 //void grinder_delete(qGrinder *grinder) {
 //	delete grinder;
 //}
-
-//qWave *qGrinder::getScratchWave(void) {
-//	if (!qflick->waves[1])
-//		qflick->waves[1] = new qWave(space);
-//	return qflick->waves[1];
-//};
-//
 
 // some uses never need this so wait till they do
 qSpectrum *qGrinder::getSpectrum(void) {

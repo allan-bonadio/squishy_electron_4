@@ -88,7 +88,7 @@ static void tryOutSpectrum(int N, int expectedSpLength, int expectedFBLength) {
 	proveItsMine(spectrum->wave, spectrum->nPoints * sizeof(qCx));
 
 	delete spectrum;
-	deleteTheSpace(theSpace);
+	deleteTheSpace(space);
 }
 
 // test out multiple cases.  For endless waves the bufsize is +2; for spectra, the next power of 2
