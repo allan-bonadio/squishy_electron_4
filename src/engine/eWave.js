@@ -142,12 +142,12 @@ class eWave {
 
 	/* **************************************************************** direct access */
 
-	get _wave() { return this.ints[4]; }
+	get _wave() { return this.ints[8]; }
 
-	get nPoints() { return this.ints[5]; }
-	get start() { return this.ints[6]; }
-	get end() { return this.ints[7]; }
-	get continuum() { return this.ints[8]; }
+	get nPoints() { return this.ints[10]; }
+	get start() { return this.ints[11]; }
+	get end() { return this.ints[12]; }
+	get continuum() { return this.ints[13]; }
 
 	/* **************************** end of direct accessors */
 
