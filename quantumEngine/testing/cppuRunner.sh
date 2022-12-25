@@ -54,12 +54,14 @@ MAX_DIMENSIONS=2
 # and makes all the diff.  cppuMain.cpp is the main instead.
 # Update list of test srcs as needed.
 # some of these options - dunno if I need them
+# I tried the clang compiler, what emscripten uses;couldn't get it to link.
+# even tried Xcode.  That was a worse disaster.  Stick with GNU.
 set -x
-#what was i thinking? g++ -o cppuTestBin -Wno-tautological-undefined-compare  \
-clang -o cppuTestBin -Wno-tautological-undefined-compare  \
+#clang -o cppuTestBin -Wno-tautological-undefined-compare  \
+g++ -o cppuTestBin -Wno-tautological-undefined-compare  \
 	-g -O0 \
 	-std=c++11 -fexceptions  \
-	-DMAX_LABEL_LEN=$MAX_LABEL_LEN -DMAX_DIMENSIONS=$MAX_DIMENSIONS \
+	-DqDEV_VERSION -DMAX_LABEL_LEN=$MAX_LABEL_LEN -DMAX_DIMENSIONS=$MAX_DIMENSIONS \
 	-I$CPPUTEST_HOME/include \
 	-include $CPPUTEST_HOME/include/CppUTest/MemoryLeakDetectorNewMacros.h \
 	-L$CPPUTEST_HOME/lib -lCppUTest -lCppUTestExt \

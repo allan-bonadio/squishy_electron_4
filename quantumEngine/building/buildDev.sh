@@ -39,7 +39,7 @@ emcc -o quantumEngine.js -sLLD_REPORT_UNDEFINED \
 	-sEXPORTED_FUNCTIONS=@building/exports.json \
 	-sEXPORTED_RUNTIME_METHODS='["ccall","cwrap","UTF8ArrayToString","AsciiToString"]' \
 	$PROFILING  \
-	-DMAX_LABEL_LEN=$MAX_LABEL_LEN -DMAX_DIMENSIONS=$MAX_DIMENSIONS \
+	-DqDEV_VERSION -DMAX_LABEL_LEN=$MAX_LABEL_LEN -DMAX_DIMENSIONS=$MAX_DIMENSIONS \
 	-I$qEMSCRIPTEN/emsdk/upstream/emscripten/cache/sysroot/include \
 	-include emscripten.h -include squish.h \
 	-ffast-math  -lembind \

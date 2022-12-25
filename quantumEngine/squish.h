@@ -7,15 +7,10 @@
 #ifndef __SQUISH_H__
 #define __SQUISH_H__
 
-using namespace std;
-
 #include <cstdio>
 //#include <cstdlib>
 #include <cmath>
 #include <stdexcept>
-
-//?#include <string>
-//?
 
 #include "debroglie/qCx.h"
 
@@ -29,6 +24,14 @@ extern double getTimeDouble(void);
 // these are not really the radius, it's more rectangular, but pretty much the same idea
 #define ERROR_RADIUS  1e-12
 
-extern void qCheck(const char *where, qCx aCx);
+#ifdef qDEV_VERSION
+	extern void qCheck(qCx aCx, const char *where = "", index = -999999999);
+#else
+	#define qCheck(where, ...)
+#endif
+
+// use this for tracing without needing the debugger.
+#define FOOTPRINT  printf("FOOTPRINT 🦶 %s() in %s:%d\n", __FUNCTION__, __FILE__, __LINE__);
+
 
 #endif

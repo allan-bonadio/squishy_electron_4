@@ -23,15 +23,21 @@ std::string getCppExceptionMessage(intptr_t exceptionPtr) {
 	return std::string(reinterpret_cast<std::exception *>(exceptionPtr)->what());
 }
 
-// obsolete... but we use it anyway?
+#ifdef qDEV_VERSION
 // check to make sure real and imag are finite and nice; warn if not
-void qCheck(const char *where, qCx aCx) {
+void qCheck(qCx aCx, const char *where, int index) {
 	// this is exactly the test I want: not NAN, not ∞
 	if (isfinite(aCx.re) && isfinite(aCx.im))
 		return;
-	printf("🚨 🚨 complex number became non-finite in %s: (%lf,%lf)\n",
-		where, aCx.re, aCx.im);
-//	call_stack st;
-//	printf(st.to_string());
+
+	if ( -999999999 == index) {
+		printf("💥 complex number became non-finite in %s: (%lf,%lf)\n",
+			where, aCx.re, aCx.im);
+	}
+	else {
+		printf("💥 complex wave member became non-finite in %s[%d]: (%lf,%lf)\n",
+				where, index, aCx.re, aCx.im);
+	}
 }
+#endif
 
