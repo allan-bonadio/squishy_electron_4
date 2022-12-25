@@ -5,12 +5,12 @@
 
 #include <stdexcept>
 
-#include "../spaceWave/qSpace.h"
-#include "../schrodinger/qAvatar.h"
-#include "../schrodinger/qGrinder.h"
 #include "../debroglie/qWave.h"
 #include "../fourier/qSpectrum.h"
+#include "../schrodinger/qAvatar.h"
 #include "../greiman/qViewBuffer.h"
+#include "../schrodinger/qGrinder.h"
+#include "../spaceWave/qSpace.h"
 
 #include "CppUTest/TestHarness.h"
 #include "CppUTest/CommandLineTestRunner.h"
@@ -23,28 +23,32 @@ static bool traceRando = false;
 
 
 
-// how do initializers in C++ work?
+// how do initializers in C++ work?  need them for mocks
 static void initExperiments(void) {
-	int n0{};
-	int n1{1};
-
-	int nn0 = {0};
-	int nn1 = {1};
-//	int nn2 = {1, 2};
-
-	qCx zombie[2] = {qCx(1.0, 2.0)};
-	qCx zoot[2] = {qCx(6.0, 7.0), qCx(3.0, 4.0)};
-	printf("n0:%d n1:%d nn0: %d   nn1: %d   zombie: %lf, %lf  ... %lf, %lf   zoot: %lf, %lf  ... %lf, %lf\n",
-		n0, n1, nn0, nn1,
-		zombie[0].re, zombie[0].im, zombie[1].re, zombie[1].im,
-		zoot[0].re, zoot[0].im, zoot[1].re, zoot[1].im
-		);
+//	int n0{};
+//	int n1{1};
+//
+//	int nn0 = {0};
+//	int nn1 = {1};
+////	int nn2 = {1, 2};
+//
+//	qCx zombie[2] = {qCx(1.0, 2.0)};
+//	qCx zoot[2] = {qCx(6.0, 7.0), qCx(3.0, 4.0)};
+//	printf("initializers in C++\n"
+//		"| scalar vars;  empty init:%d   one initializer 1:%d nn0: %d   nn1: %d  \n"
+//		"| arrays of cx: twoW1init: [0]%lf, %lf  [1]]%lf, %lf   2with2inits: [0]%lf, %lf  [1]]%lf, %lf\n",
+//		n0, n1, nn0, nn1,
+//		zombie[0].re, zombie[0].im, zombie[1].re, zombie[1].im,
+//		zoot[0].re, zoot[0].im, zoot[1].re, zoot[1].im
+//		);
 }
 
 // for memory leaks that cppu conveniently gives us, some clues:
 static void dumpSizes(void) {
-	printf("byte sizes... sz(qSpace)=%lu  sz(qWave)=%lu  sz(qBuffer)=%lu  sz(qSpectrum)=%lu  sz(qViewBuffer)=%lu  sz(qAvatar)=%lu\n\n",
-		sizeof(qSpace), sizeof(qWave), sizeof(qBuffer), sizeof(qSpectrum), sizeof(qViewBuffer), sizeof(qAvatar));
+	printf("byte sizes... sz(qSpace)=%lu  sz(qWave)=%lu  sz(qBuffer)=%lu  sz(qSpectrum)=%lu  \n"
+		"sz(qViewBuffer)=%lu  sz(qAvatar)=%lu  sz(qGrinder)=%lu\n\n",
+		sizeof(qSpace), sizeof(qWave), sizeof(qBuffer), sizeof(qSpectrum),
+		sizeof(qViewBuffer), sizeof(qAvatar), sizeof(qGrinder));
 }
 
 
@@ -58,11 +62,11 @@ int main(int ac, char** av)
 
 /* ******************************************************** helpers - cppu */
 
-// CHECK_EQUAL() figures complex equality using our == operator.
+// cppuTest's CHECK_EQUAL() figures complex equality using our == operator.
 // this only displays complex if a failure, for the message.
 SimpleString StringFrom(const qCx value) {
 	char buffer[100];
-	snprintf(buffer, 100, "%15.12lf %+15.12lf•i", value.re, value.im);
+	snprintf(buffer, 100, "%13.10lf %+13.10lf•i", value.re, value.im);
 	SimpleString buf = SimpleString(buffer);
 	return buf;
 }
@@ -166,19 +170,18 @@ bool isAllZeroesExceptFor(qBuffer *qwave, int except1, int except2) {
 
 	for (int ix = start; ix < end; ix++) {
 		qCx cx = wave[ix];
-		double re = cx.re, im = cx.im;
-		sprintf(buf, "wave at [%d]  bad value = %8.8lf %8.8lf",
-			ix, re, im);
+		sprintf(buf, "\nwave at [%d]  😢 bad value = %8.8lf %8.8lf\n",
+			ix, cx.re, cx.im);
 
 		if (ix != except1 && ix != except2) {
 			if (cx != 0) {
-				printf("%s", buf);
+				printf("not zero %s", buf);
 				return false;
 			}
 		}
 		else {
 			if (cx.norm() < ERROR_RADIUS) {
-				printf("%s", buf);
+				printf("is zero %s", buf);
 				return false;
 			}
 		}
@@ -186,8 +189,7 @@ bool isAllZeroesExceptFor(qBuffer *qwave, int except1, int except2) {
 	return true;
 }
 
-/* ********************************************** my favorite random number generator */
-
+/* ********************************************** my favorite pseudo random number generator */
 
 // set this any time you need a predictable sequence.  Probably a number -.5 to .5,
 // or I dunno -10 to 10 or 100x or 100÷ that

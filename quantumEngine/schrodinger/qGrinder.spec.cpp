@@ -69,7 +69,7 @@ TEST(qGrinder, CheckGrinderConstructor)
 /* ******************************************************************************************** FourierFilter */
 static bool traceFourierFilter = false;
 
-// try out FF on a mix of frequencies; should filter out
+// try out FF on a mix of frequencies goodFreq & badFreq, should filter
 // goodFreq should stay there, while badFreq should be filtered out.
 static void tryFourierFilter(int N, int goodFreq, int badFreq, int lowPassFilter, bool shouldFail)
 {
@@ -113,31 +113,31 @@ static void tryFourierFilter(int N, int goodFreq, int badFreq, int lowPassFilter
 // example: 16 states.  Initially has waves of frequencies 3 & 6.
 // filter out frequencies 5, 6, 7, ... *8* ... 9, 10, 11.   8 is the nyquist freq
 // So expect only freq 3 left, value=4 on fft.
-//TEST(qGrinder, foFi16_3_6) { tryFourierFilter(16, 3, 6, 3); }
+//TEST(qGrinder, fourFilt16_3_6) { tryFourierFilter(16, 3, 6, 3); }
 //
-//TEST(qGrinder, foFi16_1_8) { tryFourierFilter(16, 1, 8, 1); }
+//TEST(qGrinder, fourFilt16_1_8) { tryFourierFilter(16, 1, 8, 1); }
 //
-//TEST(qGrinder, foFi16_2_7) { tryFourierFilter(16, 2, 7, 3); }
+//TEST(qGrinder, fourFilt16_2_7) { tryFourierFilter(16, 2, 7, 3); }
 
 
 // ok we have a freq 1 carrier.  We stick in a freq 5 noise.  When does it cut off?
 // these are not cut off
-TEST(qGrinder, foFi16_1_LPFscan0) { tryFourierFilter(16, 1, 5, 0, true); }
-TEST(qGrinder, foFi16_1_LPFscan1) { tryFourierFilter(16, 1, 5, 1, true); }
-TEST(qGrinder, foFi16_1_LPFscan2) { tryFourierFilter(16, 1, 5, 2, true); }
+TEST(qGrinder, fourFilt16_1_LPFscan0) { tryFourierFilter(16, 1, 5, 0, true); }
+TEST(qGrinder, fourFilt16_1_LPFscan1) { tryFourierFilter(16, 1, 5, 1, true); }
+TEST(qGrinder, fourFilt16_1_LPFscan2) { tryFourierFilter(16, 1, 5, 2, true); }
 
 // these ARE cut off
-TEST(qGrinder, foFi16_1_LPFscan3) { tryFourierFilter(16, 1, 5, 3, false); }
-TEST(qGrinder, foFi16_1_LPFscan4) { tryFourierFilter(16, 1, 5, 4, false); }
-TEST(qGrinder, foFi16_1_LPFscan5) { tryFourierFilter(16, 1, 5, 5, false); }
-TEST(qGrinder, foFi16_1_LPFscan6) { tryFourierFilter(16, 1, 5, 6, false); }
+TEST(qGrinder, fourFilt16_1_LPFscan3) { tryFourierFilter(16, 1, 5, 3, false); }
+TEST(qGrinder, fourFilt16_1_LPFscan4) { tryFourierFilter(16, 1, 5, 4, false); }
+TEST(qGrinder, fourFilt16_1_LPFscan5) { tryFourierFilter(16, 1, 5, 5, false); }
+TEST(qGrinder, fourFilt16_1_LPFscan6) { tryFourierFilter(16, 1, 5, 6, false); }
 
 // also wipes out freq 1 so should fail the test
-TEST(qGrinder, foFi16_1_LPFscan7) { tryFourierFilter(16, 1, 5, 7, true); }
+TEST(qGrinder, fourFilt16_1_LPFscan7) { tryFourierFilter(16, 1, 5, 7, true); }
 
-//TEST(qGrinder, foFi16_1_3_LPFscan7) { tryFourierFilter(16, 1, 3, 7); }
+//TEST(qGrinder, fourFilt16_1_3_LPFscan7) { tryFourierFilter(16, 1, 3, 7); }
 
-//TEST(qGrinder, foFi64_5_22) { tryFourierFilter(64, 5, 22, 16); }
+//TEST(qGrinder, fourFilt64_5_22) { tryFourierFilter(64, 5, 22, 16); }
 
 
 /* ********************************************************************** random experimentatiojn */

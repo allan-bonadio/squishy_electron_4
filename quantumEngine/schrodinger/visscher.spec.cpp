@@ -4,11 +4,12 @@
 */
 
 
+#include "../debroglie/qWave.h"
 #include "../spaceWave/qSpace.h"
+#include "../testing/cppuMain.h"
 #include "qAvatar.h"
 #include "qGrinder.h"
-#include "../debroglie/qWave.h"
-#include "../testing/cppuMain.h"
+#include "../debroglie/qFlick.h"
 
 #include "CppUTest/TestHarness.h"
 
@@ -37,7 +38,7 @@ qCx ex4Wave[6] = {
 qWave *expectedWave4 = new qWave(space4, ex4Wave);
 
 // this seems to crash early in stepReal, but I can't figure out what's gone wrong.  One integration works fine.
-TEST(visscher, VisscherOneStep)
+TEST(visscher, VisscherOneStep4)
 {
 	oldWave4->setCircularWave(1.);
 	if (traceOneStep) oldWave4->dump("start VisscherOneStep test");
@@ -45,80 +46,99 @@ TEST(visscher, VisscherOneStep)
 	qAvatar *avatar = new qAvatar(space4, "VisscherOneStep");
 	qGrinder *grinder = new qGrinder(space4, avatar, "Visscher1Step");
 
-	grinder->dt = 0.01;
-	if (traceOneStep) grinder->dumpObj("⚛️ before : oneVisscherStep");
-	grinder->oneVisscherStep(newWave4, oldWave4);
-	if (traceOneStep) printf("⚛️ after : oneVisscherStep\n");
+
+	double dt = 0.01;
+	if (traceOneStep) grinder->dumpObj("⚛️ before : one Visscher Step");
+	grinder->stepReal(newWave4->wave, oldWave4->wave, dt);
+	grinder->stepImaginary(newWave4->wave, oldWave4->wave, dt);
+	if (traceOneStep) printf("⚛️ after : one Visscher Step\n");
 
 
 	compareWaves(expectedWave4, newWave4);
+	delete grinder;
 	delete avatar;
 }
 
 /* ****************************************************************** one integration */
 
 static qCx expectedArray[34] = {
-qCx(    0.1719190461333459,   -0.04115680867662573),
-qCx(    0.1766448653389613,  -0.006825749407538643),
-qCx(    0.1745823214331821,     0.0277676195833559),
-qCx(    0.1658106768216196,    0.06129389452592257),
-qCx(    0.1506670208875011,    0.09246467947586984),
-qCx(    0.1297333158357147,     0.1200820986483493),
-qCx(    0.1038140322116433,     0.1430848301125895),
-qCx(   0.07390523354925881,     0.1605888917984998),
-qCx(   0.04115629820810851,     0.1719216124318822),
-qCx(  0.006825749407538592,     0.1766474819142581),
-qCx(  -0.02776710911483864,     0.1745848877317183),
-qCx(  -0.06129289320590692,     0.1658130942219815),
-qCx(  -0.09246322578452253,     0.1506691964903487),
-qCx(   -0.1200802484502134,     0.1297351660338505),
-qCx(   -0.1430826545097418,     0.1038154859029908),
-qCx(   -0.1605864743981379,    0.07390623486927438),
-qCx(   -0.1719190461333459,     0.0411568086766257),
-qCx(   -0.1766448653389613,     0.0068257494075386),
-qCx(   -0.1745823214331821,   -0.02776761958335584),
-qCx(   -0.1658106768216196,   -0.06129389452592256),
-qCx(    -0.150667020887501,   -0.09246467947586982),
-qCx(   -0.1297333158357147,    -0.1200820986483493),
-qCx(   -0.1038140322116434,    -0.1430848301125894),
-qCx(  -0.07390523354925868,    -0.1605888917984999),
-qCx(  -0.04115629820810852,    -0.1719216124318821),
-qCx( -0.006825749407538635,     -0.176647481914258),
-qCx(   0.02776710911483869,    -0.1745848877317183),
-qCx(   0.06129289320590688,    -0.1658130942219816),
-qCx(   0.09246322578452253,    -0.1506691964903487),
-qCx(    0.1200802484502134,    -0.1297351660338505),
-qCx(    0.1430826545097418,    -0.1038154859029908),
-qCx(    0.1605864743981379,    -0.0739062348692744),
-qCx(    0.1719190461333459,   -0.04115680867662573),
-qCx(    0.1766448653389613,  -0.006825749407538643)
+qCx(    0.1719177767,     -0.0411565048),  // 0
+qCx(    0.1766435610,     -0.0068256990),  // 1
+qCx(    0.1745810323,      0.0277674145),  // 2
+qCx(    0.1658094525,      0.0612934419),  // 3
+qCx(    0.1506659083,      0.0924639967),  // 4
+qCx(    0.1297323579,      0.1200812119),  // 5
+qCx(    0.1038132656,      0.1430837736),  // 6
+qCx(    0.0739046878,      0.1605877060),  // 7
+qCx(    0.0411559943,      0.1719203429),  // 8
+qCx(    0.0068256990,      0.1766461775),  // 9
+qCx(   -0.0277669041,      0.1745835986),  // 10
+qCx(   -0.0612924406,      0.1658118698),  // 11
+qCx(   -0.0924625430,      0.1506680839),  // 12
+qCx(   -0.1200793618,      0.1297342081),  // 13
+qCx(   -0.1430815980,      0.1038147193),  // 14
+qCx(   -0.1605852886,      0.0739056891),  // 15
+qCx(   -0.1719177767,      0.0411565048),  // 16
+qCx(   -0.1766435610,      0.0068256990),  // 17
+qCx(   -0.1745810323,     -0.0277674145),  // 18
+qCx(   -0.1658094525,     -0.0612934419),  // 19
+qCx(   -0.1506659083,     -0.0924639967),  // 20
+qCx(   -0.1297323579,     -0.1200812119),  // 21
+qCx(   -0.1038132656,     -0.1430837736),  // 22
+qCx(   -0.0739046878,     -0.1605877060),  // 23
+qCx(   -0.0411559943,     -0.1719203429),  // 24
+qCx(   -0.0068256990,     -0.1766461775),  // 25
+qCx(    0.0277669041,     -0.1745835986),  // 26
+qCx(    0.0612924406,     -0.1658118698),  // 27
+qCx(    0.0924625430,     -0.1506680839),  // 28
+qCx(    0.1200793618,     -0.1297342081),  // 29
+qCx(    0.1430815980,     -0.1038147193),  // 30
+qCx(    0.1605852886,     -0.0739056891),  // 31
+qCx(    0.1719177767,     -0.0411565048),  // 32
+qCx(    0.1766435610,     -0.0068256990),  // 33
 };
 
+static void regenerateOutput(qCx *psi, int nPoints) {
+	printf("static qCx expectedArray[34] = {\n");
+	for (int ix = 0; ix < nPoints; ix++) {
+		printf("\tqCx(%16.10lf,  %16.10lf),  // %d\n",
+			psi[ix].re, psi[ix].im, ix);
+	}
+	printf("};\n");
+
+}
+
 // everything turns into nans.  dunno what's wrong.
-TEST(visscher, VisscheroneIntegration)
+TEST(visscher, VisscherOneIntegration32)
 {
 	// simulate the app starting up
 	qSpace *space = makeFullSpace(32);
 	qAvatar *av = theSpace->mainAvatar;
 	qGrinder *grinder = theSpace->grinder;
-	av->qwave->setCircularWave(1.);
+	grinder->qflick->setCircularWave(1.);
 
-
+	grinder->qflick->dump("VisscherOneIntegration, before", true);
 
 	// simulate the app taking one iter = 100 steps
 	grinder->stepsPerFrame = 100;
+	//grinder->stepsPerFrame = 100;
 	grinder->dt = .01;
 	grinder->lowPassFilter = 10;
 
 	grinder->oneIntegration();
+
+	grinder->qflick->dump("VisscherOneIntegration, after", true);
+
+	// use this to regenerate the table, if needed
+	regenerateOutput(grinder->qflick->wave, space->nPoints);
 
 	// we'll use this to compare against
 	qWave *expectedQWave = new qWave(space, expectedArray);
 	compareWaves(expectedQWave, av->qwave);
 	delete expectedQWave;
 
-	// simulate the app ... tearing down, although probably not done much in reality
-	deleteTheSpace(theSpace);
+	// simulate the app ... will also delete avatar and grinder.
+	deleteTheSpace(space);
 
 	// anything i'm forgetting?
 }
