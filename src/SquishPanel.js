@@ -139,6 +139,7 @@ export class SquishPanel extends React.Component {
 				// never gets here
 			}
 			console.error(`error  SquishPanel.didMount.then():`, ex.stack ?? ex.message ?? ex);
+			debugger;
 		});
 
 	}

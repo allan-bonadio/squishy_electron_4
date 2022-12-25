@@ -25,7 +25,7 @@ extern double getTimeDouble(void);
 #define ERROR_RADIUS  1e-12
 
 #ifdef qDEV_VERSION
-	extern void qCheck(qCx aCx, const char *where = "", index = -999999999);
+	extern void qCheck(qCx aCx, const char *where = "", int index = -999999999);
 #else
 	#define qCheck(where, ...)
 #endif
