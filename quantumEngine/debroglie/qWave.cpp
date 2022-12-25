@@ -49,6 +49,7 @@ qWave::qWave(qSpace *sp, qCx *useThisBuffer)
 	}
 
 	// enable this when qWave.h fields change
+	//formatDirectOffsets();
 }
 
 qWave::~qWave(void) {

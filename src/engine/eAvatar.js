@@ -52,12 +52,10 @@ class eAvatar {
 	// are passed by pointer and you need to allocate them in JS (eg see
 	// eAvatar.constructor)
 
-	get _space() { return this.ints[1]; }
-
-	get _qwave() { return this.ints[2]; }
-
-	get _vBuffer() { return this.ints[7]; }
-	get _label() { return this.pointer + 40; }
+	get _space() { return this.ints[2]; }
+	get _qwave() { return this.ints[4]; }
+	get _vBuffer() { return this.ints[12]; }
+	get _label() { return this.pointer + 56; }
 
 
 	/* **************************** end of direct accessors */
@@ -88,47 +86,11 @@ class eAvatar {
 			this.dumpViewBuffer(`afterLoadViewBuffer`);
 	}
 
-	//// can throw std::runtime_error("divergence")
-	//oneIntegration() {
-	//	if (iterateWithGrinder)
-	//		qe.grinder_oneIntegration(this.grinder.pointer);
-	//	else
-	//		qe.avatar_oneIntegration(this.pointer);
-	//}
-	//
-	//// thisis what upper levels call when another frame is needed.
-	//// It either queues it out to a thread, if the threads are idle,
-	//// or sets needsIntegration if busy
-	//pleaseIntegrate() {
-	//	if (traceIntegration)
-	//			console.log(`🚦 eAvatar ${this.label}: pleaseIntegrate()`);
-	//	if (this.doingIntegration) {
-	//		if (traceIntegration)
-	//			console.log(`🚦             pleaseIntegrate: needsIntegration = true cuz busy`);
-	//		// threads are busy but we'll get to it after we're done with this frame
-	//		this.needsIntegration = true;
-	//		return false;
-	//	}
-	//	else {
-	//		if (traceIntegration)
-	//			console.log(`🚦             pleaseIntegrate oneItration`);
-	//		this.needsIntegration = false;
-	//		this.oneIntegration();
-	//		return true;
-	//	}
-	//}
-	//
-	//askForFFT() {
-	//	qe.avatar_askForFFT(this.pointer);
-	//}
-
 	// delete the eAvatar and qAvatar and its owned buffers
 	deleteAvatar() {
 		qe.avatar_delete(this.pointer);
 	}
 }
 
-
-window.eAvatar = eAvatar;  // debugging
 export default eAvatar;
 

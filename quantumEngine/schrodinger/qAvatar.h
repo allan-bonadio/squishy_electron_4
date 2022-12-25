@@ -6,8 +6,8 @@
 // formerly called: Manifestation, Incarnation, Timeline, ... formerly part of qSpace
 // see also JS eAvatar
 
-struct qThread;
-struct qStage;
+//struct qThread;
+//struct qStage;
 
 struct qAvatar {
 	qAvatar(qSpace *, const char *label);
@@ -33,9 +33,6 @@ struct qAvatar {
 	// Avatar owns the qViewBuffer
 	struct qViewBuffer *qvBuffer;
 	float *vBuffer;  // aligned by 4, not 8
-
-	struct qStage *stages;  // i doon't thiink i need these
-	struct qThread *threads; // i doon't thiink i need these
 
 	void initIntegrationLoop(int xxx, int nThreads, int nStages);
 

@@ -3,8 +3,6 @@
 ** Copyright (C) 2021-2022 Tactile Interactive, all rights reserved
 */
 
-
-
 extern class qSpace *theSpace;
 extern double *theVoltage;
 

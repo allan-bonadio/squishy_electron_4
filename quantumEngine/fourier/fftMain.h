@@ -15,4 +15,3 @@ extern void analyzeWaveFFT(qWave *qw, const char *title = "untitled");
 
 // rounds up to the nearest power of two or whatever
 extern int chooseSpectrumLength(qSpace *);
-

@@ -3,7 +3,7 @@
 the potential is Vψ, sortof, must be units of energy.  So that expr says V=units of energy.  1 volt = 1 joule (of work) per 1 coulomb (of charge).
 
 1 eV = 1.602176634×10−19 J
-meaning the charge of an electron is 1.602176634×10−19 coulomb.
+meaning the charge of an electron is 1.602176634×10−19 coulomb, exactly.
 
 
 ====================================================== Dec 2022

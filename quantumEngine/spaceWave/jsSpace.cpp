@@ -98,9 +98,10 @@ struct salientPointersType *completeNewSpace(void) {
 
 	qGrinder *grinder = salientPointers.grinder = theSpace->grinder
 		= new qGrinder(theSpace, mainAvatar, "mainGrinder");
-	printf("the new grinder: shbe same 3: %p %p %p and %s\n", grinder, salientPointers.grinder, theSpace->grinder, grinder->label );
-	printf("   grinder's flick: %p %p   (%lf %lf)\n", grinder->qflick, grinder->qflick->wave,
-		grinder->qflick->wave->re, grinder->qflick->wave->im );
+	//printf("the new grinder: shbe same 3: %p %p %p and %s\n", grinder, salientPointers.grinder,
+	//	theSpace->grinder, grinder->label );
+	//printf("   grinder's flick: %p %p   (%lf %lf)\n", grinder->qflick, grinder->qflick->wave,
+	//	grinder->qflick->wave->re, grinder->qflick->wave->im );
 
 	qAvatar *miniGraphAvatar = salientPointers.miniGraphAvatar = theSpace->miniGraphAvatar = new qAvatar(theSpace, "miniGraph");
 	salientPointers.miniGraphVBuffer = miniGraphAvatar->qvBuffer->vBuffer;

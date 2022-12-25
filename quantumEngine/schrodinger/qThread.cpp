@@ -43,32 +43,3 @@ void qThread::threadStarts() {
 //
 //	// light it off (?)
 //}
-
-// no!  this has to be in JS
-// the JS timer (rAF) says it's a good time to start frame.
-// tell whatever threads that it's time to do another frame. they may
-// already be in the middle of one, in which case they should start again
-// immediately on the next.
-//bool qAvatar::pleaseIntegrate(void) {
-//	if (doingIntegration) {
-//		needsIntegration = true;
-//		return false;
-//	}
-//	else {
-//		needsIntegration = false;
-//		oneIntegration();
-//		return true;
-//	}
-//}
-
-//extern "C" void avatar_initIntegrationLoop(qAvatar *avatar, int nThreads, int nStages) {
-//	emscripten_debugger();
-//	avatar->initIntegrationLoop(nThreads, nStages);
-//}
-
-// no!  this has to be in JS
-//extern "C" int avatar_pleaseIntegrate(qAvatar *avatar) {
-//	emscripten_debugger();
-//	return avatar->pleaseIntegrate();
-//}
-
