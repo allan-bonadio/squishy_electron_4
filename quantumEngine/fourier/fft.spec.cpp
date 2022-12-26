@@ -17,8 +17,8 @@
 
 #include "CppUTest/TestHarness.h"
 
-bool traceDumpWaves = false;
-bool tracing = false;
+static bool traceDumpWaves = false;
+static bool tracing = false;
 
 TEST_GROUP(fft)
 {

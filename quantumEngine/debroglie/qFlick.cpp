@@ -8,7 +8,7 @@
 #include "../spaceWave/qSpace.h"
 #include "qFlick.h"
 
-bool traceConstruction = false;
+static bool traceConstruction = false;
 
 // here ix still points to the x location in the wave
 // but serial points to which wave in the flick

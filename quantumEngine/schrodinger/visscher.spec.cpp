@@ -13,8 +13,8 @@
 
 #include "CppUTest/TestHarness.h"
 
-bool traceOneStep = false;
-bool traceoneIntegration = false;
+static bool traceOneStep = false;
+static bool traceoneIntegration = false;
 
 TEST_GROUP(visscher)
 {
