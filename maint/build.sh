@@ -2,9 +2,12 @@
 
 # set this to non-empty to generate the Dev wasm files instead of Prod; better for debugging
 buildWithDev=yes
+cd $SQUISH_ROOT
+
+# make sure there's no traces left on
+maint/scanForTraces.sh || exit $?
 
 echo "🎁 🔨 Clean and Build Production Squishy Electron"  `date +%c`
-cd $SQUISH_ROOT
 
 # must create the C++ wasm binary first
 
