@@ -87,6 +87,11 @@ export class ControlPanel extends React.Component {
 			this.grinder = space.grinder;
 			this.mainEAvatar = space.mainEAvatar;
 			this.mainEWave = space.mainEWave;
+		})
+		.catch(rex => {
+			let ex = interpretCppException(rex);
+			console.error(ex.stack ?? ex.message ?? ex);
+			debugger;
 		});
 
 		// the static declaration down below fills its variable before an actual
