@@ -33,6 +33,7 @@ class eThread {
 		console.log(`⛏ eThread constructor ${serial} about to make worker`);
 		// the root code is a URL into the /public folder
 		let opts = {type: 'module', name: `qThread_${serial}`};
+		debugger;
 		let worker = this.worker = eThread.workerThreads[0] =
 			new Worker(new URL('./tThread.js', import.meta.url), opts);
 			// webpack says dosnt work new Worker('qEng/tThread.js', opts);
@@ -84,6 +85,9 @@ class eThread {
 			eThread.doingThreads = false;
 			return;
 		}
+
+		// we're not ready for this
+		return;
 
 		eThread.nCores = navigator.hardwareConcurrency;
 		eThread.nThreads = 1;
