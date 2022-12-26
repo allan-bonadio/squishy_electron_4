@@ -97,25 +97,25 @@ public:
 //construct stuff just a one-off struct; JS will access it via Uint32Array Note:
 //the wave buffer fields should be eliminated cuz JS can get to them from the
 //eAvatar
-struct salientPointersType {
-	qSpace *space;
-	double *voltageBuffer;
-
-	float *mainVBuffer;  // raw float[4][2] array
-	struct qAvatar *mainAvatar;
-
-	float *miniGraphVBuffer;
-	struct qAvatar *miniGraphAvatar;
-
-	struct qGrinder *grinder;
-};
+//struct salientPointersType {
+//	qSpace *space;
+//	double *voltageBuffer;
+//
+//	float *mainVBuffer;  // raw float[4][2] array
+//	struct qAvatar *mainAvatar;
+//
+//	float *miniGraphVBuffer;
+//	struct qAvatar *miniGraphAvatar;
+//
+//	struct qGrinder *grinder;
+//};
 
 // for JS to call
 extern "C" {
 	// create
 	qSpace *startNewSpace(const char *name = "a space");
 	void addSpaceDimension(int N, int continuum, const char *label);
-	struct salientPointersType *completeNewSpace(void);
+	qSpace *completeNewSpace(void);
 
 	// destroy
 	void deleteTheSpace(qSpace *space);

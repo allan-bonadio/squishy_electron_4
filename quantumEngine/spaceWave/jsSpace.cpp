@@ -24,8 +24,6 @@ class qSpace *theSpace = NULL;
 double *theVoltage = NULL;
 
 
-struct salientPointersType salientPointers;
-
 /* ********************************************************** wave stuff */
 //
 //// after the initSpace() call, allocate the buffers.
@@ -64,7 +62,7 @@ qSpace *startNewSpace(const char *label) {
 	if (theSpace)
 		throw std::runtime_error("Trying to start a new space when one already exists!");
 
-	theSpace = salientPointers.space = new qSpace(label);
+	theSpace = new qSpace(label);
 
 	if (traceSpaceCreation) {
 		printf("🚀 🚀 🚀  JS startNewSpace   done (%s == %s)   theSpace=%p\n",
@@ -82,7 +80,7 @@ void addSpaceDimension(int N, int continuum, const char *label) {
 }
 
 // call this from JS to finish the process for the qSpace, create and add the avatars & voltage
-struct salientPointersType *completeNewSpace(void) {
+qSpace *completeNewSpace(void) {
 	if (traceSpaceCreation)
 		printf("🚀 🚀 🚀  JS completeNewSpace starts(%s)   theSpace=%p\n",
 			theSpace->label, theSpace);
@@ -92,42 +90,18 @@ struct salientPointersType *completeNewSpace(void) {
 
 	if (traceAvatarDetail) printf("🚀 about to create avatars\n");
 
-	qAvatar *mainAvatar
-	//= salientPointers.mainAvatar
-	= theSpace->mainAvatar = new qAvatar(theSpace, "mainAvatar");
-	//salientPointers.mainVBuffer = mainAvatar->qvBuffer->vBuffer;
+	qAvatar *mainAvatar = theSpace->mainAvatar = new qAvatar(theSpace, "mainAvatar");
 	if (traceAvatarDetail) printf("🚀 created mainAvatar\n");
 
-	qGrinder *grinder = theSpace->grinder
-	//= salientPointers.grinder =
-		= new qGrinder(theSpace, mainAvatar, "mainGrinder");
-	//printf("the new grinder: shbe same 3: %p %p %p and %s\n", grinder, salientPointers.grinder,
-	//	theSpace->grinder, grinder->label );
-	//printf("   grinder's flick: %p %p   (%lf %lf)\n", grinder->qflick, grinder->qflick->wave,
-	//	grinder->qflick->wave->re, grinder->qflick->wave->im );
+	qGrinder *grinder = theSpace->grinder = new qGrinder(theSpace, mainAvatar, "mainGrinder");
 
-	//qAvatar *miniGraphAvatar = salientPointers.miniGraphAvatar =
 	theSpace->miniGraphAvatar = new qAvatar(theSpace, "miniGraph");
-	//salientPointers.miniGraphVBuffer = miniGraphAvatar->qvBuffer->vBuffer;
-//	if (traceAvatarDetail) printf("🚀 created miniGraphAvatar\n");
-
-//	if (traceSpaceCreation) printf("   🚀 🚀 🚀 completeNewSpace vBuffers After Creation but BEFORE loadViewBuffer  "
-//		"salientPointers.mainVBuffer=%p   salientPointers.miniGraphVBuffer=%p  \n",
-//		salientPointers.mainVBuffer, salientPointers.miniGraphVBuffer);
 
 	if (theVoltage) throw std::runtime_error("🚀 🚀 🚀 theVoltage exists while trying to create new one");
-//	salientPointers.voltageBuffer =
 	theVoltage = theSpace->voltage;
-//
-//	printf("Salient Pointers: space: %d    voltageBuffer: %d    mainVBuffer: %d    mainAvatar: %d    miniGraphVBuffer: %d    miniGraphAvatar: %d    grinder: %d    \n",
-//
-//(int) salientPointers.space, (int)  salientPointers.voltageBuffer, (int)  salientPointers.mainVBuffer,
-//(int)  salientPointers.mainAvatar, (int)  salientPointers.miniGraphVBuffer,
-//(int)  salientPointers.miniGraphAvatar, (int)  salientPointers.grinder);
-//
 
 	if (traceSpaceCreation) printf("   🚀 🚀 🚀 qSpace::jsSpace: done\n");
-	return &salientPointers;
+	return theSpace;
 }
 
 // dispose of ALL of everything attached to the space

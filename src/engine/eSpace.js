@@ -6,7 +6,6 @@ import qe from './qe.js';
 import {cppObjectRegistry, prepForDirectAccessors} from '../utils/directAccessors.js';
 //import eWave from './eWave.js';
 import {setFamiliarVoltage} from '../utils/voltageUtils.js';
-//import salientPointersFactory from './salientPointersFactory.js';
 import eAvatar from './eAvatar.js';
 import eGrinder from './eGrinder.js';
 import {getAGroup} from '../utils/storeSettings.js';
@@ -61,34 +60,7 @@ export class eSpace {
 			}
 		);
 
-		// total for the space = must agree with qSpace
-		this.XXXnPoints = nPoints;
-		this.XXXnStates = nStates;
-
-		if (traceSpace) console.log(`🚀  the resulting eSpace dimensions: `, this);
-
-
-// 		dims.forEach(dim => {
-//
-// 			// these are convenient to have
-// 			// change this when we get to multiple dimensions
-// 			this.N = dim.N;
-// 			this.start = dim.continuum ? 1 : 0;
-// 			this.end = this.start + this.N;
-// 			this.nPoints = this.start + this.end;
-// 		});
-
-		// salientPointers will give us pointers to buffers and stuff we need
-		let sp = qe.completeNewSpace();
-		//let salientPointers = this.salientPointers = new salientPointersFactory(this, sp);
-		//console.info(`the salient pointers, in decimal:`, salientPointers);
-
-		// remember that eSpace.salientPointers doesn't work for multiple spaces or multiple dimensions
-		//eSpace.salientPointers = salientPointers;
-
-		//this.XXXpointer = salientPointers.spacePointer;
-		//cppObjectRegistry[this.pointer] = this;
-
+		qe.completeNewSpace();
 
 		// direct access into the voltage buffer
 		this.voltageBuffer = new Float64Array(window.Module.HEAPF64.buffer,

@@ -76,9 +76,6 @@ SimpleString StringFrom(const qCx value) {
 
 static bool traceMakeSpace = false;
 
-// in case someone wants some of the other pointers after making a fullSpace, here they are
-salientPointersType *fullSpaceSalientPointers = NULL;
-
 // make a new 1d space with N state locations along x, in theSpace, along with whatever else
 // the way JS does it.  Needed for lots of tests.
 // You are (usually) responsible for deleting it with deleteTheSpace(space).
@@ -91,7 +88,7 @@ qSpace *makeFullSpace(int N) {
 	if (traceMakeSpace) printf("        finished startNewSpace(), on to add\n");
 	addSpaceDimension(N, contENDLESS, "x");
 	if (traceMakeSpace) printf("        finished addSpaceDimension(), on to complete\n");
-	fullSpaceSalientPointers = completeNewSpace();
+	completeNewSpace();
 
 	if (traceMakeSpace) printf("        finished makeFullSpace(%d)\n", N);
 	return theSpace;

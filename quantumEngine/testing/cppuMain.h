@@ -18,7 +18,6 @@ extern struct qSpace *makeBareSpace(int N, int continuum = contENDLESS);
 // with all of the buffers allocated.
 extern struct qSpace *makeFullSpace(int N);  // handy
 #define MAKEFULLSPACE_LABEL "makeFul"
-extern struct salientPointersType *fullSpaceSalientPointers;
 
 /* *************************************************** waves, buffers */
 
