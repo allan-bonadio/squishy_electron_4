@@ -37,7 +37,6 @@ import ErrorBoundary from './widgets/ErrorBoundary.js';
 //
 //});
 
-
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
 	<ErrorBoundary>

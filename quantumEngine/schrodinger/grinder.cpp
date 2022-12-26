@@ -9,7 +9,8 @@
 //#include <limits>
 //#include <cfenv>
 
-// not sure what i'm using this for ... see qThread.cpp
+// not sure what i'm using this file for ... probably should get rid of it in favor of qGrinder
+// see qThread.cpp
 
 
 #include "../spaceWave/qSpace.h"

@@ -22,7 +22,6 @@ import {} from '../utils/storeSettings.js';
 import {getAGroup, alternateMinMaxs} from '../utils/storeSettings.js';
 //import {storeASetting, alternateMinMaxs} from '../utils/storeSettings.js';
 
-//import salientPointersFactory from './salientPointersFactory.js';
 import {eSpaceCreatedPromise} from '../engine/eEngine.js';
 import {interpretCppException} from '../utils/errors.js';
 
