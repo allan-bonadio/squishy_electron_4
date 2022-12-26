@@ -68,7 +68,7 @@ qAvatar::qAvatar(qSpace *sp, const char *lab)
 	}
 
 	// enable this when qAvatar.h fields change
-	//formatDirectOffsets();
+	FORMAT_DIRECT_OFFSETS;
 };
 
 qAvatar::~qAvatar(void) {

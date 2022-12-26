@@ -75,8 +75,7 @@ qGrinder::qGrinder(qSpace *sp, qAvatar *av, const char *lab)
 			dims->continuum, dims->spectrumLength, dims->label);
 	}
 
-	// enable this when qGrinder.h fields change
-	//formatDirectOffsets();
+	FORMAT_DIRECT_OFFSETS;
 };
 
 qGrinder::~qGrinder(void) {
@@ -105,6 +104,9 @@ qSpectrum *qGrinder::getSpectrum(void) {
 };
 
 void qGrinder::copyFromAvatar(qAvatar *avatar) {
+	printf("qGrinder(%p)::copyFromAvatar(qAvatar *%p) \n", this, avatar);
+	printf("    qAvatar-  qwave=%p   voltageFactor=%lf  label=%s\n", avatar->qwave, avatar->voltageFactor, avatar->label);
+	printf("    qGrinder-    qflick=%p   voltageFactor=%lf  label=%s \n", this->qflick, this->voltageFactor, this->label);
 	qflick->copyBuffer(qflick, avatar->qwave);
 }
 

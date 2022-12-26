@@ -48,8 +48,7 @@ qWave::qWave(qSpace *sp, qCx *useThisBuffer)
 		printf("        sizeof(int):%ld   sizeof(void *):%ld\n", sizeof(int), sizeof(void *));
 	}
 
-	// enable this when qWave.h fields change
-	//formatDirectOffsets();
+	FORMAT_DIRECT_OFFSETS;
 }
 
 qWave::~qWave(void) {

@@ -44,40 +44,40 @@ class eGrinder {
 	// are passed by pointer and you need to allocate them in JS (eg see
 	// eGrinder.constructor)
 
+	get _space() { return this.ints[1]; }
 
-	get _space() { return this.ints[2]; }
+ 	get elapsedTime() { return this.doubles[2]; }
+ 	set elapsedTime(a) { this.doubles[2] = a; }
+ 	get frameSerial() { return this.doubles[3]; }
+ 	set frameSerial(a) { this.doubles[3] = a; }
 
-	get elapsedTime() { return this.doubles[3]; }
-	set elapsedTime(a) { this.doubles[3] = a; }
-	get frameSerial() { return this.doubles[4]; }
-	set frameSerial(a) { this.doubles[4] = a; }
+ 	get isIntegrating() { return this.bools[92]; }
+ 	set isIntegrating(a) { this.bools[92] = a; }
+ 	get pleaseFFT() { return this.bools[95]; }
+ 	set pleaseFFT(a) { this.bools[95] = a; }
+ 	get needsIntegration() { return this.bools[93]; }
+ 	set needsIntegration(a) { this.bools[93] = a; }
+ 	get doingIntegration() { return this.bools[94]; }
+ 	set doingIntegration(a) { this.bools[94] = a; }
 
-	get isIntegrating() { return this.bools[112]; }
-	set isIntegrating(a) { this.bools[112] = a; }
-	get pleaseFFT() { return this.bools[115]; }
-	set pleaseFFT(a) { this.bools[115] = a; }
-	get needsIntegration() { return this.bools[113]; }
-	set needsIntegration(a) { this.bools[113] = a; }
-	get doingIntegration() { return this.bools[114]; }
-	set doingIntegration(a) { this.bools[114] = a; }
 
-	get dt() { return this.doubles[5]; }
-	set dt(a) { this.doubles[5] = a; }
-	get lowPassFilter() { return this.ints[12]; }
-	set lowPassFilter(a) { this.ints[12] = a; }
-	get stepsPerFrame() { return this.ints[13]; }
-	set stepsPerFrame(a) { this.ints[13] = a; }
+	get dt() { return this.doubles[4]; }
+ 	set dt(a) { this.doubles[4] = a; }
+ 	get lowPassFilter() { return this.ints[10]; }
+ 	set lowPassFilter(a) { this.ints[10] = a; }
+ 	get stepsPerFrame() { return this.ints[11]; }
+ 	set stepsPerFrame(a) { this.ints[11] = a; }
 
-	get _qflick() { return this.ints[14]; }
+ 	get _qflick() { return this.ints[12]; }
 
-	get _voltage() { return this.ints[16]; }
-	get voltageFactor() { return this.doubles[9]; }
-	set voltageFactor(a) { this.doubles[9] = a; }
+ 	get _voltage() { return this.ints[13]; }
+ 	get voltageFactor() { return this.doubles[7]; }
+ 	set voltageFactor(a) { this.doubles[7] = a; }
 
-	get _qspect() { return this.ints[20]; }
-	get _stages() { return this.ints[22]; }
-	get _threads() { return this.ints[24]; }
-	get _label() { return this.pointer + 104; }
+ 	get _qspect() { return this.ints[16]; }
+ 	get _stages() { return this.ints[17]; }
+ 	get _threads() { return this.ints[18]; }
+ 	get _label() { return this.pointer + 76; }
 
 	/* **************************** end of direct accessors */
 	// can throw std::runtime_error("divergence")
