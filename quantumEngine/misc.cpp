@@ -16,10 +16,13 @@ double getTimeDouble(void)
     return ts.tv_sec + ts.tv_nsec / 1e9;
 }
 
+// there's TWO copies of this: jsSpace.cpp and misc.cpp .
 // this is from https://emscripten.org/docs/porting/Debugging.html#handling-c-exceptions-from-javascript
 // it's only called from genExports for JS to get a textual error message from C++
 // nobody in C++ calls it
 std::string getCppExceptionMessage(intptr_t exceptionPtr) {
+	printf("calling std::string getCppExceptionMessage(%ld) in misc.cpp\n", exceptionPtr);
+
 	return std::string(reinterpret_cast<std::exception *>(exceptionPtr)->what());
 }
 
