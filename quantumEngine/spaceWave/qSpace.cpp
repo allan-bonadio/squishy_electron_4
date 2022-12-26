@@ -14,6 +14,7 @@
 #include "../debroglie/qWave.h"
 #include "../greiman/qViewBuffer.h"
 #include "../fourier/fftMain.h"
+#include "../directAccessors.h"
 
 
 static bool traceQSpace = false;
@@ -35,6 +36,9 @@ qSpace::qSpace(const char *lab)
 
 	if (traceQSpace) printf("🚀 🚀 qSpace::qSpace() constructor done this= %p, length %lx\n",
 			(this), sizeof(qSpace));
+
+	// put this in the constructor so it's run early on, in case you have to rebuild them all
+	FORMAT_DIRECT_OFFSETS;
 }
 
 // after the contructor, call this to add each dimension up to MAX_DIMENSIONS
@@ -102,6 +106,44 @@ qSpace::~qSpace(void) {
 	if (traceQSpace) printf("🚀 🚀 qSpace destructor done this= %p\n", (this));
 }
 
+// need these numbers for the js interface to this object, to figure out the offsets.
+// see eGrinder.js ;  usually this function isn't called.
+// Insert this into the constructor and run this once.  Copy text output.
+// Paste the output into class eGrinder, the class itself, to replace the existing ones
+void qSpace::formatDirectOffsets(void) {
+	printf("🪓 🪓 --------------- starting qSpace direct access JS getters & setters--------------\n\n");
+
+	makePointerGetter(voltage);
+	makeDoubleGetter(voltageFactor);
+	printf("\n");
+
+	/* *********************************************** dimensions */
+
+	makeNamedIntGetter(N, dimensions[0].N);  // until 2nd D
+	makeNamedIntGetter(continuum, dimensions[0].continuum);  // until 2nd D
+	makeNamedIntGetter(start, dimensions[0].start);  // until 2nd D
+	makeNamedIntGetter(end, dimensions[0].end);  // until 2nd D
+	makeNamedIntGetter(nStates0, dimensions[0].nStates);
+	makeNamedIntGetter(nPoints0, dimensions[0].nPoints);
+	makeNamedIntGetter(spectrumLength0, dimensions[0].spectrumLength);
+	makeNamedStringPointer(label0, dimensions[0].label);
+
+
+	/* *********************************************** scalars */
+
+	makeIntGetter(nDimensions);
+	makeIntGetter(nStates);
+	makeIntGetter(nPoints);
+	makeIntGetter(spectrumLength);
+
+	makePointerGetter(mainAvatar);
+	makePointerGetter(miniGraphAvatar);
+	makePointerGetter(grinder);
+
+	makeStringPointer(label);
+
+	printf("\n🖼 🖼 --------------- done with qSpace direct access --------------\n");
+}
 
 /* ********************************************************** voltage */
 

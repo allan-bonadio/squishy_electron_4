@@ -3,17 +3,17 @@
 ** Copyright (C) 2021-2022 Tactile Interactive, all rights reserved
 */
 import qe from './qe.js';
+import {cppObjectRegistry, prepForDirectAccessors} from '../utils/directAccessors.js';
 //import eWave from './eWave.js';
 import {setFamiliarVoltage} from '../utils/voltageUtils.js';
-import salientPointersFactory from './salientPointersFactory.js';
+//import salientPointersFactory from './salientPointersFactory.js';
 import eAvatar from './eAvatar.js';
 import eGrinder from './eGrinder.js';
 import {getAGroup} from '../utils/storeSettings.js';
-import {cppObjectRegistry} from '../utils/directAccessors.js';
 import {interpretCppException} from '../utils/errors.js';
 import {MAX_DIMENSIONS} from './eEngine.js';
 
-let traceSpace = false;
+let traceSpace = true;
 let traceFamiliarWave = false;
 
 /* **************************************************************** eDimension */
@@ -31,9 +31,6 @@ export class eDimension {
 	}
 }
 
-
-
-
 /* **************************************************************** eSpace */
 // this is how you create a qSpace - start from JS and call this.
 // call like this:
@@ -49,7 +46,8 @@ export class eSpace {
 			throw new Error(`Too many dimensions for space: ${dims.length} given but max is ${MAX_DIMENSIONS}`);
 
 		// this actually does it over on the C++ side
-		qe.startNewSpace(spaceLabel);
+		this.pointer = qe.startNewSpace(spaceLabel);
+		prepForDirectAccessors(this, this.pointer);
 
 		// make each dimension (someday there'll be more than 1)
 		let nPoints = 1, nStates = 1;
@@ -64,8 +62,8 @@ export class eSpace {
 		);
 
 		// total for the space = must agree with qSpace
-		this.nPoints = nPoints;
-		this.nStates = nStates;
+		this.XXXnPoints = nPoints;
+		this.XXXnStates = nStates;
 
 		if (traceSpace) console.log(`🚀  the resulting eSpace dimensions: `, this);
 
@@ -82,34 +80,32 @@ export class eSpace {
 
 		// salientPointers will give us pointers to buffers and stuff we need
 		let sp = qe.completeNewSpace();
-		let salientPointers = this.salientPointers = new salientPointersFactory(this, sp);
+		//let salientPointers = this.salientPointers = new salientPointersFactory(this, sp);
+		//console.info(`the salient pointers, in decimal:`, salientPointers);
 
 		// remember that eSpace.salientPointers doesn't work for multiple spaces or multiple dimensions
-		eSpace.salientPointers = salientPointers;
+		//eSpace.salientPointers = salientPointers;
 
-		this.pointer = salientPointers.spacePointer;
-		cppObjectRegistry[this.pointer] = this;
+		//this.XXXpointer = salientPointers.spacePointer;
+		//cppObjectRegistry[this.pointer] = this;
 
 
 		// direct access into the voltage buffer
 		this.voltageBuffer = new Float64Array(window.Module.HEAPF64.buffer,
-				salientPointers.voltageBufferPointer, this.nPoints);;
+				this._voltage, this.nPoints);;
 		let voltageParams = getAGroup('voltageParams');
 		setFamiliarVoltage(this, this.voltageBuffer, voltageParams);
-			//
 
 		// the avatars create their vbufs and waves, and we make a copy for ourselves
-		this.mainEAvatar = new eAvatar(this,
-				salientPointers.mainVBufferPointer, salientPointers.mainAvatarPointer);
+		this.mainEAvatar = new eAvatar(this, this._mainAvatar);
 		this.mainVBuffer = this.mainEAvatar.vBuffer;
 		this.mainEWave = this.mainEAvatar.ewave;
 
-		this.grinder = new eGrinder(this, this.mainEAvatar, salientPointers.grinderPointer);
+		this.grinder = new eGrinder(this, this.mainEAvatar, this._grinder);
 
-		this.miniGraphAvatar = new eAvatar(this,
-				salientPointers.miniGraphVBufferPointer, salientPointers.miniGraphAvatarPointer);
+		this.miniGraphAvatar = new eAvatar(this, this._miniGraphAvatar);
 		this.miniGraphVBuffer = this.miniGraphAvatar.vBuffer;
-		this.miniGraphEWave = this.miniGraphAvatar.mainEWave
+		this.miniGraphEWave = this.miniGraphAvatar.mainEWave;
 
 		// by default it's set to 1s, or zeroes?  but we want something good.
 		let waveParams = getAGroup('waveParams');
@@ -154,7 +150,31 @@ export class eSpace {
 		}
 	}
 
-	/* ******************************************************************************************* arithmetic */
+	/* *************************************************************** Direct Accessors */
+	// see qSpace.cpp and squish.h to regenerate this.
+
+	get _voltage() { return this.ints[1]; }
+ 	get voltageFactor() { return this.doubles[1]; }
+
+	get N() { return this.ints[4]; }
+ 	get continuum() { return this.ints[5]; }
+ 	get start() { return this.ints[6]; }
+ 	get end() { return this.ints[7]; }
+ 	get nStates0() { return this.ints[8]; }
+ 	get nPoints0() { return this.ints[9]; }
+ 	get spectrumLength0() { return this.ints[10]; }
+ 	get _label0() { return this.pointer + 44; }
+ 	get nDimensions() { return this.ints[26]; }
+ 	get nStates() { return this.ints[27]; }
+ 	get nPoints() { return this.ints[28]; }
+ 	get spectrumLength() { return this.ints[29]; }
+ 	get _mainAvatar() { return this.ints[30]; }
+ 	get _miniGraphAvatar() { return this.ints[31]; }
+ 	get _grinder() { return this.ints[32]; }
+ 	get _label() { return this.pointer + 132; }
+
+	/* **************************** end of direct accessors */
+
 	// call it like this: const {start, end, N, continuum} = space.startEnd;
 	get startEnd() {
 		const dim = this.dimensions[0];

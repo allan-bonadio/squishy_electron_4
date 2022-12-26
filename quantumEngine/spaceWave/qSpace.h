@@ -15,6 +15,11 @@ public:
 	// possible  states, just for this  dimension.  end + start == datapoints=nPoints
 	// end - start == N.  always loop for (j=start; j < end; j++) for actual state 𝜓
 	int N;
+
+	// contWELL or contENDLESS (has N+2 values for N possibilities)
+	// contDISCRETE = (has N values for N possibilities)
+	int continuum;
+
 	int start;
 	int end;
 
@@ -25,10 +30,6 @@ public:
 	// accumulated number of complex values in wave, from this dim to the end.
 	// includes boundaries.
 	int nPoints;
-
-	// contWELL or contENDLESS (has N+2 values for N possibilities)
-	// contDISCRETE = (has N values for N possibilities)
-	int continuum;
 
 	// size for Fourier transforms, or zero if not yet calculated.  ON THIS DIMENSION ONLY!
 	// Often a power of two.  no boundaries.
@@ -42,11 +43,6 @@ public:
 	// Also could have Energy dimensions...
 	char label[MAX_LABEL_LEN+1];
 
-};
-
-// coerce your buffers into being one of these and you link them into a list
-struct FreeBuffer {
-	struct FreeBuffer *next;
 };
 
 /* ************************************************************ the space */
@@ -67,7 +63,10 @@ public:
 
 	int magic;
 
-	char label[MAX_LABEL_LEN+1];
+	// part of the space; it helps to define the lay of the land
+	double *voltage;
+	double voltageFactor;  // tweak this
+	void dumpVoltage(const char *title);
 
 	// Dimensions are listed from outer to inner as with the resulting 𝜓 array:
 	// 𝜓[outermost-dim][dim][dim][innermost-dim]
@@ -83,15 +82,13 @@ public:
 	int nPoints;  // allocated size
 	int spectrumLength;  // should == nStates
 
-	// part of the space; it helps to define the lay of the land
-	double *voltage;
-	double voltageFactor;  // tweak this
-
 	struct qAvatar *mainAvatar;
 	struct qAvatar *miniGraphAvatar;
 	struct qGrinder *grinder;
 
-	void dumpVoltage(const char *title);
+	char label[MAX_LABEL_LEN+1];
+
+	void formatDirectOffsets(void);
 };
 
 /* ************************************************************ JS interface */

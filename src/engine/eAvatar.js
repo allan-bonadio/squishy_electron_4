@@ -22,14 +22,14 @@ class eAvatar {
 	// Give us the pointer, we'll reach in and make an eWave from qwave.
 	// the q objects must be in place.
 	// this way we can't get the wrong wave in the wrong avatar.
-	constructor(space, vBufferPointer, pointer) {
+	constructor(space, pointer) {
 		prepForDirectAccessors(this, pointer);
 		this.label = window.Module.AsciiToString(this._label);
 
 		this.space = space;
 		this.ewave = new eWave(space, null, this._qwave);
 		this.vBuffer = new Float32Array(
-			window.Module.HEAPF32.buffer, vBufferPointer,
+			window.Module.HEAPF32.buffer, this._vBuffer,
 				space.nPoints * 8); // two vec4 s per point
 
 		// label everything for better traces
@@ -52,11 +52,10 @@ class eAvatar {
 	// are passed by pointer and you need to allocate them in JS (eg see
 	// eAvatar.constructor)
 
-	get _space() { return this.ints[2]; }
-	get _qwave() { return this.ints[4]; }
-	get _vBuffer() { return this.ints[12]; }
-	get _label() { return this.pointer + 56; }
-
+	get _space() { return this.ints[1]; }
+ 	get _qwave() { return this.ints[2]; }
+ 	get _vBuffer() { return this.ints[7]; }
+ 	get _label() { return this.pointer + 32; }
 
 	/* **************************** end of direct accessors */
 

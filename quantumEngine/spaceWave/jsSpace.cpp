@@ -92,27 +92,39 @@ struct salientPointersType *completeNewSpace(void) {
 
 	if (traceAvatarDetail) printf("🚀 about to create avatars\n");
 
-	qAvatar *mainAvatar = salientPointers.mainAvatar = theSpace->mainAvatar = new qAvatar(theSpace, "mainAvatar");
-	salientPointers.mainVBuffer = mainAvatar->qvBuffer->vBuffer;
+	qAvatar *mainAvatar
+	//= salientPointers.mainAvatar
+	= theSpace->mainAvatar = new qAvatar(theSpace, "mainAvatar");
+	//salientPointers.mainVBuffer = mainAvatar->qvBuffer->vBuffer;
 	if (traceAvatarDetail) printf("🚀 created mainAvatar\n");
 
-	qGrinder *grinder = salientPointers.grinder = theSpace->grinder
+	qGrinder *grinder = theSpace->grinder
+	//= salientPointers.grinder =
 		= new qGrinder(theSpace, mainAvatar, "mainGrinder");
 	//printf("the new grinder: shbe same 3: %p %p %p and %s\n", grinder, salientPointers.grinder,
 	//	theSpace->grinder, grinder->label );
 	//printf("   grinder's flick: %p %p   (%lf %lf)\n", grinder->qflick, grinder->qflick->wave,
 	//	grinder->qflick->wave->re, grinder->qflick->wave->im );
 
-	qAvatar *miniGraphAvatar = salientPointers.miniGraphAvatar = theSpace->miniGraphAvatar = new qAvatar(theSpace, "miniGraph");
-	salientPointers.miniGraphVBuffer = miniGraphAvatar->qvBuffer->vBuffer;
-	if (traceAvatarDetail) printf("🚀 created miniGraphAvatar\n");
+	//qAvatar *miniGraphAvatar = salientPointers.miniGraphAvatar =
+	theSpace->miniGraphAvatar = new qAvatar(theSpace, "miniGraph");
+	//salientPointers.miniGraphVBuffer = miniGraphAvatar->qvBuffer->vBuffer;
+//	if (traceAvatarDetail) printf("🚀 created miniGraphAvatar\n");
 
-	if (traceSpaceCreation) printf("   🚀 🚀 🚀 completeNewSpace vBuffers After Creation but BEFORE loadViewBuffer  "
-		"salientPointers.mainVBuffer=%p   salientPointers.miniGraphVBuffer=%p  \n",
-		salientPointers.mainVBuffer, salientPointers.miniGraphVBuffer);
+//	if (traceSpaceCreation) printf("   🚀 🚀 🚀 completeNewSpace vBuffers After Creation but BEFORE loadViewBuffer  "
+//		"salientPointers.mainVBuffer=%p   salientPointers.miniGraphVBuffer=%p  \n",
+//		salientPointers.mainVBuffer, salientPointers.miniGraphVBuffer);
 
 	if (theVoltage) throw std::runtime_error("🚀 🚀 🚀 theVoltage exists while trying to create new one");
-	salientPointers.voltageBuffer = theVoltage = theSpace->voltage;
+//	salientPointers.voltageBuffer =
+	theVoltage = theSpace->voltage;
+//
+//	printf("Salient Pointers: space: %d    voltageBuffer: %d    mainVBuffer: %d    mainAvatar: %d    miniGraphVBuffer: %d    miniGraphAvatar: %d    grinder: %d    \n",
+//
+//(int) salientPointers.space, (int)  salientPointers.voltageBuffer, (int)  salientPointers.mainVBuffer,
+//(int)  salientPointers.mainAvatar, (int)  salientPointers.miniGraphVBuffer,
+//(int)  salientPointers.miniGraphAvatar, (int)  salientPointers.grinder);
+//
 
 	if (traceSpaceCreation) printf("   🚀 🚀 🚀 qSpace::jsSpace: done\n");
 	return &salientPointers;
@@ -152,9 +164,12 @@ void deleteTheSpace(qSpace *space) {
 
 /* ***************************************************************************************************** exceptions */
 
+// there's TWO copies of this: jsSpace.cpp and misc.cpp .
 // Given the mysterious number thrown when C++ barfs, get a real error message.  this is loosely from
 // https://emscripten.org/docs/porting/Debugging.html#handling-c-exceptions-from-javascript
 const char *getCppExceptionMessage(intptr_t exceptionPtrInt) {
+	printf("calling const char *getCppExceptionMessage(%ld) in jsSpace\n", exceptionPtrInt);
+
 	// what() returns a C string; pass pointer back to JS as integer
 	if (traceExceptions) printf("getCppExceptionMessage(%ld) \n", exceptionPtrInt);
 	if (exceptionPtrInt & 3)
