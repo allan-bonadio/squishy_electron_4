@@ -220,9 +220,12 @@ export class VoltageArea extends React.Component {
 		//if (!p.canvasWidth)
 		//return false;
 
-		// new situation given new position
-		let top = this.svgElement.getBoundingClientRect().top;
-		let newVoltage = v.yScale.invert(p.height - ev.clientY + top);
+		// shift key gives you steady voltage as you drag across
+		let newVoltage = this.latestVoltage;
+		if (! ev.shiftKey) {
+			let top = this.svgElement.getBoundingClientRect().top;
+			newVoltage = v.yScale.invert(p.height - ev.clientY + top);
+		}
 
 		let ix = Math.round(v.xScale.invert(ev.clientX));
 

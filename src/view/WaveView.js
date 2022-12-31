@@ -271,10 +271,10 @@ export class WaveView extends React.Component {
 	// handles zoom in/out buttons    They pass +1 or -1.  viewHeight will usually be an integer power of zoomFactor.
 	zoomHandler =
 	upDown => {
-		debugger;
+		//debugger;
 		const v = this.volts;
 		let newLogZoom = Math.log(v.viewHeight) / logZoomFactor;
-		newLogZoom = Math.round(newLogZoom + upDown);  // round off to integer power of zoom Factor
+		newLogZoom = Math.round(newLogZoom - upDown);  // round off to integer power of zoom Factor
 		v.viewHeight = zoomFactor ** newLogZoom;
 		storeASetting('voltageSettings', 'viewHeight', v.viewHeight.toFixed(6));
 		this.setState({viewHeight: v.viewHeight});
