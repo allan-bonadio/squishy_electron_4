@@ -39,7 +39,7 @@ extern double getTimeDouble(void);
 // print out JS code. Then run in the browser (not C++ cppu tests, they use
 // 64bit ptrs), and take the generated JS and paste it into the corresponding JS
 // files, in src/engine, where indicated. Remove the line numbers that the browsers stick in!
-//#define FORMAT_DIRECT_OFFSETS
-#define FORMAT_DIRECT_OFFSETS  formatDirectOffsets()
+#define FORMAT_DIRECT_OFFSETS
+//#define FORMAT_DIRECT_OFFSETS  formatDirectOffsets()
 
 #endif

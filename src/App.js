@@ -20,7 +20,7 @@ class App extends React.Component {
 
 		this.state = {
 			innerWindowWidth: window.innerWidth,
-			squishPanelExists: true,
+			squishPanelExists: true,  // briefly cycles off and on when user changes resolution
 			isDialogShowing: false,
 			cppRunning: false,
 		};
