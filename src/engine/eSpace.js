@@ -3,7 +3,7 @@
 ** Copyright (C) 2021-2022 Tactile Interactive, all rights reserved
 */
 import qe from './qe.js';
-import {cppObjectRegistry, prepForDirectAccessors} from '../utils/directAccessors.js';
+import {prepForDirectAccessors} from '../utils/directAccessors.js';
 //import eWave from './eWave.js';
 import {setFamiliarVoltage} from '../utils/voltageUtils.js';
 import eAvatar from './eAvatar.js';
@@ -49,13 +49,13 @@ export class eSpace {
 		prepForDirectAccessors(this, this.pointer);
 
 		// make each dimension (someday there'll be more than 1)
-		let nPoints = 1, nStates = 1;
+		//let nPoints = 1, nStates = 1;
 		this.dimensions = dims.map(d => {
 				qe.addSpaceDimension(d.N, d.continuum, d.label);  // c++
 
 				let dim = new eDimension(d)
-				nStates *= dim.N;
-				nPoints *= dim.start + dim.end;
+				//nStates *= dim.N;
+				//nPoints *= dim.start + dim.end;
 				return dim;
 			}
 		);
