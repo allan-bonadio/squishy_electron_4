@@ -11,17 +11,19 @@
 
 import React from 'react';
 import PropTypes from 'prop-types';
+import {scaleLinear} from 'd3-scale';
 
 //import eSpace from '../engine/eSpace.js';
 //import eAvatar from '../engine/eAvatar.js';
 import {thousands} from '../utils/formatNumber.js';
 import qe from '../engine/qe.js';
-import {interpretCppException} from '../utils/errors.js';
+//import {interpretCppException} from '../utils/errors.js';
 import './view.scss';
 // import {abstractViewDef} from './abstractViewDef.js';
 // import flatDrawingViewDef from './flatDrawingViewDef.js';
 import {getASetting, storeASetting} from '../utils/storeSettings.js';
 import VoltageArea from './VoltageArea.js';
+import VoltageSidebar from './VoltageSidebar.js';
 import GLView from '../gl/GLView.js';
 import {eSpaceCreatedPromise} from '../engine/eEngine.js';
 
@@ -30,14 +32,26 @@ import {eSpaceCreatedPromise} from '../engine/eEngine.js';
 
 //import {dumpJsStack} from '../utils/errors.js';
 
+let traceScaling = true;
 let traceDragCanvasHeight = false;
+let traceVoltageArea = false;
+
+// size of the size box at lower right of canvas; also width of the voltage sidebar
+const sizeBoxSize = 24;
+const voltageSidebarWidth = 24;
+
+// how much to zoom in/out each click (rounded if it's not an integer power)
+const zoomFactor = Math.sqrt(2);
+const logZoomFactor = Math.log(zoomFactor);
+
+
 
 export class WaveView extends React.Component {
 	static propTypes = {
 		// the title of the view
 		viewName: PropTypes.string,
 
-		width: PropTypes.number,  // handed in, depends on window width
+		width: PropTypes.number,  // handed in, pixels, depends on window width
 
 		setUpdateVoltageArea: PropTypes.func,
 
@@ -48,12 +62,19 @@ export class WaveView extends React.Component {
 		super(props);
 
 		this.state = {
-			height: getASetting('miscSettings', 'viewHeight'),
+			height: getASetting('miscSettings', 'viewHeight'),  // pixels
 			space: null,  // set when promise comes in
+			canvasWidth: props.width - (props.showVoltage * voltageSidebarWidth),
+
+			//voltageScroll:
+			//voltageZoom: getASetting('voltageSettings', 'voltageZoom'),
 		}
 
 		this.formerWidth = props.width;
 		this.formerHeight = this.state.height;
+		this.formerShowVoltage = props.showVoltage;
+
+		this.adjustDimensions();
 
 		eSpaceCreatedPromise
 		.then(space => {
@@ -71,6 +92,60 @@ export class WaveView extends React.Component {
 		});
 	}
 
+	// call this when the width or height of the canvas has changed either by window sizebox or showVoltage
+	adjustDimensions() {
+		const p = this.props;
+		const s = this.state;
+		this.canvasWidth = p.width - 16;
+		if (p.showVoltage)
+			this.canvasWidth -= voltageSidebarWidth;
+
+		if (this.waveViewEl)
+			this.top = this.waveViewEl.getBoundingClientRect().top;
+
+		// the canvas and all other apparatus needs to be updated, if it's not too early
+		if (this.gl && this.canvas) {
+			this.canvas.width = this.canvasWidth;
+			this.canvas.height = s.height;
+			this.gl.viewport(0, 0, this.canvasWidth, s.height);
+		}
+		// makes no diff this.setState({canvasWidth: this.canvasWidth});
+		if (traceScaling) {
+			console.log(`👆 👆 WaveView.adjustDimensions(): canvasWidth=${this.canvasWidth}
+				wv height=${s.height}  wv width=${p.width}  sidebarWid=${voltageSidebarWidth}
+				on window (${window.innerWidth} wide, ${window.innerHeight}) tall`);
+		}
+
+		this.formerWidth = p.width;
+		this.formerHeight = s.height;
+		this.formerShowVoltage = p.showVoltage;
+	}
+
+	componentDidMount() {
+		this.adjustDimensions();
+	}
+
+	componentDidUpdate() {
+		const p = this.props;
+		const s = this.state;
+
+		// only need this when the WaveView outer dims change, either a user resize
+		// or show/hide the voltage.  On that occasion, we have to adjust a lot, including resizing the canvas.
+		if (this.mainEAvatar && (this.formerShowVoltage != p.showVoltage
+					|| this.formerWidth != p.width
+					|| this.formerHeight != s.height) ) {
+			if (traceScaling) {
+				console.log(``);
+				console.log(`mainEAvatar=${this.mainEAvatar}`);
+				console.log(`formerShowVoltage=${this.formerShowVoltage}   showVoltage=${p.showVoltage} `);
+				console.log(`formerWidth=${this.formerWidth}   width=${p.width} `);
+				console.log(`formerHeight=${this.formerHeight}   height=${s.height}`);
+			}
+			this.adjustDimensions();
+			this.setVoltScales();
+		}
+	}
+
 	/* ************************************************************************ resizing */
 
 	// these are for resizing the WaveView ONLY.
@@ -85,7 +160,7 @@ export class WaveView extends React.Component {
 		b.addEventListener('mouseup', this.mouseUp);
 		b.addEventListener('mouseleave', this.mouseUp);
 
-		this.sizeBox.style.borderColor = '#aaa';
+		//this.sizeBoxEl.style.borderColor = '#aaa';
 		ev.preventDefault();
 		ev.stopPropagation();
 	}
@@ -115,23 +190,111 @@ export class WaveView extends React.Component {
 			b.removeEventListener('mouseup', this.mouseUp);
 			b.removeEventListener('mouseleave', this.mouseUp);
 
-			this.sizeBox.style.borderColor = 'transparent';
+			//this.sizeBoxEl.style.borderColor = '';
 
 			ev.preventDefault();
 			ev.stopPropagation();
 		//}
 	}
 
+	/* ************************************************************************ volts */
+
+	// keeps many variables affecting voltage area and voltage sidebar, passed in as props
+	volts = {
+		voltMin: 0, voltMax: 0,   // from voltage function; voltage area keeps these updated
+
+		// the scroll position of the voltage area, in volts, is where the bottom edge of the Volt Area is.
+		scrollSetting: getASetting('voltageSettings', 'scrollSetting'),
+
+		// how many volts higher the top edge of the view is.  Zoom increases/decreases this.
+		viewHeight: getASetting('voltageSettings', 'viewHeight'),
+
+		// the range over which the user can slide the scrollSetting up and down.
+		// These change values when the user does a zoom.
+		scrollMin: getASetting('voltageSettings', 'scrollMin'),
+		scrollMax: getASetting('voltageSettings', 'scrollMax'),
+
+		xScale: () => 0,  // see setVoltScales
+		yScale: () => 0,  // see setVoltScales
+	};
+
+	// scales to transform coords.  Call after user scrolls it up ordown, or
+	// user changes height or width of ccanvas.  Must call AFTER adjustDimensions().
+	// p.width and s.height are the size of the whole WaveView.
+	// yScale is function that transforms from volts to pixels.
+	// yScale.invert()) goes the other way.  xScale transforms from ix to
+	// pixels.  Used for clicking and for display.
+	setVoltScales() {
+		const p = this.props;
+		const s = this.state;
+		const v = this.volts;
+		if (!p.width || !s.height || !s.space)
+			return false; // early on, avoid dividing by zero (?)
+
+		v.yScale = scaleLinear([v.scrollSetting, v.scrollSetting + v.viewHeight], [0, s.height]);
+		v.xScale = scaleLinear([0, s.space.nPoints-1], [0, this.canvasWidth]);
+
+		if (traceVoltageArea) {
+			console.log(
+			`👆 👆 VoltageArea.setVoltScales():done, xScale(d&r) & yScale(d&r):`,
+			v.xScale.domain(), v.xScale.range(), v.yScale.domain(), v.yScale.range());
+		}
+		return true;
+	}
+
+	// after user has done something to change the scrollMin/Max or zoom
+	// recalculate everything so setVoltScales() can work right.  Then setVoltScales().
+	//adjustVoltLimits() {
+	//	// voltage zoom is sortof the height the user asked for, but if the
+	//	// actual range of voltage is beyond, widen it so user can see
+	//	const s = this.state;
+	//	const v = this.volts;
+	//	v.viewHeight = s.voltageZoom + (v.max - v.min);
+	//
+	//	// then put the voltage line in the middle somewhere
+	//	this.scrollTop = (v.max + v.min + voltageScrollHeight) / 2;
+	//	this.scrollSetting = (v.max + v.min - voltageScrollHeight) / 2;
+	//
+	//	setVoltScales();
+	//}
+
+	scrollHandler =
+	ev => {
+		let target = ev.currentTarget;
+		let scrollSetting = this.volts.scrollSetting = target.valueAsNumber;
+		this.setState({voltScrollSetting: scrollSetting});
+		storeASetting('voltageSettings', 'scrollSetting', scrollSetting);
+
+		this.setVoltScales();
+	}
+
+	// handles zoom in/out buttons    They pass +1 or -1.  viewHeight will usually be an integer power of zoomFactor.
+	zoomHandler =
+	upDown => {
+		debugger;
+		const v = this.volts;
+		let newLogZoom = Math.log(v.viewHeight) / logZoomFactor;
+		newLogZoom = Math.round(newLogZoom + upDown);  // round off to integer power of zoom Factor
+		v.viewHeight = zoomFactor ** newLogZoom;
+		storeASetting('voltageSettings', 'viewHeight', v.viewHeight.toFixed(6));
+		this.setState({viewHeight: v.viewHeight});
+
+		this.setVoltScales();
+	}
+
 	/* ************************************************************************ render */
+
+	gimmeGlCanvas =
+	(gl, canvas) => {
+		this.gl = gl;
+		this.canvas = canvas;
+	}
 
 	render() {
 		const p = this.props;
 		const s = this.state;
 
-		let wholeRect = null;  // if null, not ready (first render, etc)
-		if (this.element) {
-			wholeRect = this.element.getBoundingClientRect();
-		}
+		//this.setVoltScales();
 
 		// if c++ isn't initialized yet, we can assume the time and frame serial
 		let elapsedTime = '0';
@@ -145,49 +308,63 @@ export class WaveView extends React.Component {
 		const spinner = qe.cppLoaded ? ''
 			: <img className='spinner' alt='spinner' src='images/eclipseOnTransparent.gif' />;
 
+		// make room for voltage sidebar
+		//this.canvasWidth = p.width;
+		//if (p.showVoltage) {
+		//	this.canvasWidth -= voltageSidebarWidth;
+		//	if (p.width && s.height)
+		//		wholeRect -= voltageSidebarWidth;
+		//}
+
 		// voNorthWest/East are populated during frame
 		// Always generate the VoltageArea so it keeps its state, but it won't always draw
-		return (<div className='WaveView'  ref={el => this.element = el} style={{height: s.height + 'px'}}>
-
-			<GLView width={p.width} height={s.height}
-				space={this.space} avatar={this.mainEAvatar}
-				viewClassName='flatDrawingViewDef' viewName={p.viewName} />
-
-			<aside className='viewOverlay'
+		return (
+		<div className='WaveView'  ref={el => this.waveViewEl = el}
 				style={{width: `${p.width}px`, height: `${s.height}px`}}>
+			<div className='viewArea' style={{width: `${this.canvasWidth}px`}}>
+				<GLView width={this.canvasWidth} height={s.height}
+					space={this.space} avatar={this.mainEAvatar}
+					gimmeGlCanvas={this.gimmeGlCanvas}
+					viewClassName='flatDrawingViewDef' viewName={p.viewName} />
 
-				<div className='northWestWrapper'>
-					<span className='voNorthWest'>{elapsedTime}</span> ps
-				</div>
-				<div className='northEastWrapper'>
-					frame <span className='voNorthEast'>{frameSerial}</span>
-				</div>
+				<section className='viewOverlay'
+					style={{width: `${this.canvasWidth}px`, height: `${s.height}px`}}>
 
-				<div className='sizeBox' onMouseDown={this.mouseDown} ref={el => this.sizeBox = el}>
-					<div />
-				</div>
+					<div className='northWestWrapper'>
+						<span className='voNorthWest'>{elapsedTime}</span> ps
+					</div>
+					<div className='northEastWrapper'>
+						frame <span className='voNorthEast'>{frameSerial}</span>
+					</div>
 
-				{spinner}
-			</aside>
+					<img className='sizeBox' src='images/sizeBox4.png' alt='size box'
+						onMouseDown={this.mouseDown}
+						style={{width: `${sizeBoxSize}px`, height: `${sizeBoxSize}px`}} />
 
-			<VoltageArea
-				space={s.space} wholeRect={wholeRect}
-				canvas={this.canvas}
-				setUpdateVoltageArea={p.setUpdateVoltageArea}
-				showVoltage={p.showVoltage}/>
-		</div>);
-	}
+					{spinner}
+				</section>
 
-	componentDidUpdate() {
-		const p = this.props;
-		const s = this.state;
+				<VoltageArea
+					space={s.space} canvas={this.canvas}
+					canvasWidth={this.canvasWidth} height={s.height}
+					setUpdateVoltageArea={p.setUpdateVoltageArea}
+					showVoltage={p.showVoltage}
+					scrollSetting={this.volts.scrollSetting}
+					viewHeight={this.volts.viewHeight}
+					xScale={this.volts.xScale} yScale={this.volts.yScale}
+					volts={this.volts}
+				/>
+			</div>
+			<VoltageSidebar width={voltageSidebarWidth} height={s.height}
+				showVoltage={p.showVoltage}
+				scrollSetting={this.volts.scrollSetting}
+				scrollMin={this.volts.scrollMin} scrollMax={this.volts.scrollMax}
+				scrollHandler={this.scrollHandler}
+				zoomHandler={this.zoomHandler}
+			/>
 
-		// only need this when the canvas outer dims change
-		if (this.mainEAvatar && (this.formerWidth != p.width || this.formerHeight != s.height)) {
-			this.mainEAvatar.setGeometry();
-			this.formerWidth = p.width;
-			this.formerHeight = s.height;
-		}
+		</div>
+		);
 	}
 
 }

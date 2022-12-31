@@ -3,87 +3,127 @@
 ** Copyright (C) 2021-2021 Tactile Interactive, all rights reserved
 */
 
-// top of the squish view where the graphics goes
+$voltageColor: #eee;
+//$voltageColor: #fec;
+$sizeBoxSize: 32px;
+
+// top of the WaveView where the graphics goes
 .WaveView {
 	position: relative;
+	display: flex;
 
-	/* canvas itself: bottom layer */
-	canvas.GLView {
-		position: absolute;
-		border: 1px #666 inset;
-		z-index: 10;
-	}
+	// view area is the canvas, GLView and everything that should be the same size
+	// like the voltage area.  NOT the voltage sidebar.
+	.viewArea {
+		flex: 1 1 auto;
 
-	// overlay with frame count and virtual time, on top of canvas
-	aside.viewOverlay {
-		position: absolute;
-		pointer-events: none;  // need to click through for voltage
-		z-index: 40;
-
-
-		// numbers in upper corners
-		.northWestWrapper, .northEastWrapper {
+		/* canvas itself: bottom layer */
+		canvas.GLView {
 			position: absolute;
-			top: .5em;
+			border: 1px #666 inset;
 			z-index: 10;
-			text-shadow: 1px 1px 3px #000f;
 		}
 
-		.northWestWrapper { left: 2em; }
-		.northEastWrapper { right: 2em; }
-
-		.sizeBox {
+		// overlay with frame count and virtual time, on top of canvas
+		.viewOverlay {
 			position: absolute;
-			pointer-events: auto;
-			bottom: 0; right: 0;
-			width: 1.5em; height: 1.5em;
-			border: 1px transparent solid;
-			border-style: outset none none outset;
-			z-index: 10;
-			cursor: ns-resize;
+			pointer-events: none;  // need to click through for voltage
+			z-index: 40;
 
-			&:hover {
-				border-color: #aaa;
 
-				div {
-					width: 60%;
-					height: 60%;
-					margin: 30% 0% 0% 30%;
-					border: 1px #666 solid;
-				}
+			// numbers in upper corners
+			.northWestWrapper, .northEastWrapper {
+				position: absolute;
+				top: .5em;
+				z-index: 10;
+				text-shadow: 1px 1px 3px #000f;
 			}
 
+			.northWestWrapper { left: 2em; }
+			.northEastWrapper { right: 2em; }
+
+			.sizeBox {
+				position: absolute;
+				pointer-events: auto;
+				bottom: 1px;
+				right: 0;
+				width: $sizeBoxSize; height: $sizeBoxSize;
+				z-index: 10;
+				cursor: ns-resize;
+				opacity: 0.1;
+
+				&:hover { opacity: 1; }
+				&:active { opacity: 1; }
+			}
 		}
-	}
 
-	svg.VoltageArea {
-		$voltageColor: white;
-		pointer-events: none;  // need to click through for size box
+		svg.VoltageArea {
+			pointer-events: none;  // need to click through for size box
 
-		position: relative;
-		z-index: 30;
-		transform: scale(1, -1);
+			position: relative;
+			z-index: 30;
+			transform: scale(1, -1);
 
-		path.visibleLine {
-			stroke: $voltageColor;
-			stroke-width: 3;
+			path.visibleLine {
+				stroke: $voltageColor;
+				stroke-width: 3;
+				pointer-events: none;
+			}
+
+			path.tactileLine {
+				stroke: none;
+				stroke-width: 15;
+				pointer-events: stroke;  // but this is sensitive
+				cursor: pointer;
+			}
+
+			rect.wellSlab {
+				fill: $voltageColor;
+
+			}
+		}  // end of VoltageArea
+	}  // end of viewArea
+
+	.VoltageSidebar {
+		// this is a column flex box
+		display: flex;
+		// but particpates in its parent's row flex box
+		flex-direction: column;
+		text-align: center;
+
+		// but it's also a component of the WaveView flex box that encloses it
+		flex: 0 0;
+
+		background-color: $voltageColor;
+
+		button {
+			background-color: $voltageColor;
+			border: none;
+			flex: 0 0;
+			display: block;
+
+			img {
+				width: 1em;
+			}
+		}
+
+		.lightningBolt {
 			pointer-events: none;
+			font-size: 2em;
 		}
 
-		path.tactileLine {
-			stroke: none;
-			stroke-width: 15;
-			pointer-events: stroke;  // but this is sensitive
-			cursor: pointer;
-		}
-
-		rect.wellSlab {
-			fill: $voltageColor;
-
+		input[type=range] {
+			display: block;
+			width: 100%;
+			flex: 1 1;
+			appearance: slider-vertical;  // works on safari & chrome, not firefox
+			color: #000;
+			background-color: #voltageColor;
+			border: none;
+			accent-color: #fd0;
 		}
 	}
 }
-
 
 .spinner {
 	position: absolute;

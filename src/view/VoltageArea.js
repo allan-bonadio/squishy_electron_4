@@ -20,16 +20,25 @@ let traceVoltageArea = false;
 let tracePathAttribute = false;
 
 let traceRendering = false;
-let traceDragging = false;
+let traceDragging = true;
 
 // ultimately, this is a <svg node with a <path inside it
 export class VoltageArea extends React.Component {
 	static propTypes = {
-		// for first couple of renders, space and wholeRect are null
+		// for first couple of renders, space and idunno are null
 		space: PropTypes.instanceOf(eSpace),
 
 		// this can be null if stuff isn't ready
-		wholeRect: PropTypes.object,
+		//wholeRect: PropTypes.object,
+		canvasWidth: PropTypes.number.isRequired,
+		height: PropTypes.number.isRequired,
+
+		// includes scrollSetting, viewHeight, voltMin, voltMax, xScale, yScale
+		volts: PropTypes.object,
+		//scrollSetting: PropTypes.number.isRequired,
+		//viewHeight: PropTypes.number.isRequired,
+		//xScale: PropTypes.func,
+		//yScale: PropTypes.func,
 
 		setUpdateVoltageArea: PropTypes.func,
 
@@ -53,35 +62,25 @@ export class VoltageArea extends React.Component {
 		if (traceVoltageArea) console.log(`👆 👆 VoltageArea  constructor done`);
 	}
 
-	// scales to transform coords.  Call whenever the coord systems change
-	// affecting the voltage. Returns false if it failed cuz too early.  yScale
-	// is function that transforms from sci units to pixels.  yScale.invert())
-	// goes the other way.  Same for xScale.  Used for clicking and for display.
-	setScales() {
-		const p = this.props;
-		const w = p.wholeRect;
-		if (traceVoltageArea) console.log('👆 👆 VoltageArea.setScales(): on window= '
-			+`(${window.innerWidth},${window.innerHeight}) the wholeRect:`,
-			p.wholeRect);
-		if (!p.wholeRect)
-			return false;
-
-		this.yScale = scaleLinear([-2, 8], [0, w.height]);
-		// spongeFactor?
-
-		this.nPoints = p.space.nPoints;
-		this.xScale = scaleLinear([0, this.nPoints-1], [0, w.width]);
-
-		if (traceVoltageArea) console.log(
-			`👆 👆 VoltageArea.setScales():done, xScale(d&r) & yScale(d&r):`,
-			this.xScale.domain(), this.xScale.range(), this.yScale.domain(), this.yScale.range(), );
-		return true;
-	}
-
 	/* *************************************************** drawing */
 
+	// tell the VoltageArea (that;s us) that something in the space.voltageBuffer changed.  Sometimes called from above.
 	updateVoltageArea =
 	() => {
+		// btw, everybody needs to know the min and max voltage in use, so we can always show it
+		let v = this.props.volts;
+		let space = this.props.space;
+		let voltageBuffer = space.voltageBuffer;
+		let {start, end} = space.startEnd;
+
+		let mini = Infinity, maxi = -Infinity;
+		for (let ix = start; ix < end; ix++) {
+			mini = Math.min(voltageBuffer[ix], mini);
+			maxi = Math.max(voltageBuffer[ix], maxi)
+		}
+		v.voltMin = mini;
+		v.voltMax = maxi;
+
 		this.forceUpdate();
 	}
 
@@ -89,14 +88,15 @@ export class VoltageArea extends React.Component {
 	// as compressed as possible.  Returns one long string.
 	makePathAttribute(start, end) {
 		const p = this.props;
+		let v = this.props.volts;
 		if (tracePathAttribute)
 			console.log(`👆 👆 VoltageArea.makePathAttribute(${start}, ${end})`);
 
 		// yawn too early
 		if (! p.space) throw new Error(`makePathAttribute(): no functioning space`);
-		if (! this.yScale) {
-			// I still haven't figured out the best time to call setScales()
-			if (!this.setScales())
+		if (! p.yScale) {
+			// I still haven't figured out the best time to call setVoltScales()
+			//if (!this.setVoltScales())
 				return `M0,0`;  // too early
 		}
 
@@ -105,13 +105,13 @@ export class VoltageArea extends React.Component {
 
 		// array to collect small snippets of text
 		const points = new Array(this.nPoints);
-		let y = this.yScale(voltageBuffer[start]);  //qe.get1DVoltage(dim.start);
-		let x = this.xScale(start);
+		let y = v.yScale(voltageBuffer[start]);  //qe.get1DVoltage(dim.start);
+		let x = v.xScale(start);
 		points[start] = `M${x},${y.toFixed(1)}L `;
 
 		for (let ix = start+1; ix < end; ix++) {
-			y = this.yScale(voltageBuffer[ix]);
-			x = this.xScale(ix);
+			y = v.yScale(voltageBuffer[ix]);
+			x = v.xScale(ix);
 			points[ix] = `${x.toFixed(1)},${y.toFixed(1)} `;
 		}
 
@@ -128,7 +128,7 @@ export class VoltageArea extends React.Component {
 	renderPaths() {
 		const p = this.props;
 		if (!p.space) return <></>;
-		const w = p.wholeRect;
+		//const wholeRect = p.wholeRect;
 
 		let {start, end, continuum} = p.space.startEnd;
 		let paths = [];
@@ -138,12 +138,12 @@ export class VoltageArea extends React.Component {
 				// stone slabs on each end on the borders vaguely means 'quantum well'.
 				paths.push(
 					<rect className='left wellSlab' key='left'
-						x={0} y={0} width={this.barWidth} height={w.height}
+						x={0} y={0} width={this.barWidth} height={p.height}
 					/>
 				);
 				paths.push(
 					<rect className='right wellSlab' key='right'
-						x={w.width - this.barWidth} y={0} width={this.barWidth} height={w.height}
+						x={p.canvasWidth - this.barWidth} y={0} width={this.barWidth} height={p.height}
 					/>
 				);
 				break;
@@ -185,17 +185,16 @@ export class VoltageArea extends React.Component {
 			console.log(`👆 👆 VoltageArea.render()`);
 
 		// some of the math we do can be eliminated if we just do this
-		this.setScales();
+		//this.setVoltScales();
 
 		const p = this.props;
-		const w = p.wholeRect;
 		if (! p.space)
 			return '';  // too early
-		this.barWidth = w.width / this.nPoints;
+		this.barWidth = p.canvasWidth / this.nPoints;
 
 		let returnV = (
-			<svg className='VoltageArea' viewBox={`0 0 ${w.width} ${w.height}`}
-					width={w.width} height={w.height}
+			<svg className='VoltageArea' viewBox={`0 0 ${p.canvasWidth} ${p.height}`}
+					width={p.canvasWidth} height={p.height}
 					onMouseMove={ev => this.mouseMove(ev)}
 					onMouseUp={ev => this.mouseUp(ev)}
 					ref={el => this.svgElement = el}
@@ -213,18 +212,19 @@ export class VoltageArea extends React.Component {
 
 	/* ***************************************************  click & drag */
 
-	// every time user changes it.  Also set points interpolated between.
+	// every time user changes one datapoint.  Also set points interpolated between.
 	// returns false if it failed and needs to be done again.  True means it succeeded.
 	changeVoltage(ev, title) {
 		const p = this.props;
-		if (!p.wholeRect)
-			return false;
-		const w = p.wholeRect;
+		const v = this.props.volts;
+		//if (!p.canvasWidth)
+		//return false;
 
 		// new situation given new position
-		let newVoltage = this.yScale.invert(w.height - ev.clientY + p.wholeRect.top);
+		let top = this.svgElement.getBoundingClientRect().top;
+		let newVoltage = v.yScale.invert(p.height - ev.clientY + top);
 
-		let ix = Math.round(this.xScale.invert(ev.clientX));
+		let ix = Math.round(v.xScale.invert(ev.clientX));
 
 		if (ix == this.latestIx && newVoltage == this.latestVoltage)
 			return;  // same old same old; these events come too fast
@@ -265,7 +265,7 @@ export class VoltageArea extends React.Component {
 	mouseDown =
 	(ev) => {
 		// a hit! otherwise we wouldn't be calling the event handler.
-		this.changeVoltage(ev, 'Mouse Down');
+		this.changeVoltage(ev, 'Down');
 		this.dragging = true;
 
 		// must also switch the svg to catch mouse events otherwise you can't drag far
@@ -273,11 +273,14 @@ export class VoltageArea extends React.Component {
 
 		// must figure out pointer offset; diff between mousedown pot and the neareest piece of line
 		// remember that clientY is in pix units
-		let potNow = this.latestVoltage
-		let chosenVoltage = this.yScale.invert(ev.clientY);
-		this.mouseYOffset = chosenVoltage - potNow;
-		if (traceDragging)
-			console.log(`👆 👆 🎯  Y numbers: mouseYOffset(${this.mouseYOffset}) = chosenVoltage(${chosenVoltage}) - potNow(${potNow})`);
+		const p = this.props;
+		let chosenVoltage = p.yScale.invert(ev.clientY);
+		this.mouseYOffset = chosenVoltage - this.latestVoltage;
+		if (traceDragging) {
+			console.log(`👆 👆 🎯  Y numbers: mouseYOffset(${this.mouseYOffset}) =
+				chosenVoltage(${chosenVoltage}) - latestVoltage(${this.latestVoltage})
+				from client X=${ev.clientX}    Y=${ev.clientY}`);
+		}
 
 		ev.preventDefault();
 		ev.stopPropagation();
@@ -289,7 +292,7 @@ export class VoltageArea extends React.Component {
 		if (! this.dragging) return;
 
 		if (ev.buttons) {
-			this.changeVoltage(ev, 'move DRAGGING');
+			this.changeVoltage(ev, 'DRAG');
 			ev.preventDefault();
 			ev.stopPropagation();
 		}
