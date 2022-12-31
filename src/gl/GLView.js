@@ -20,6 +20,7 @@ import {listOfViewClasses} from './listOfViewClasses.js';
 
 let traceSetup = false;
 let tracePainting = false;
+let traceGeometry = true;
 
 // true to try v2 before v1; either or both might fail.  never tried.
 let tryWebGL2 = false;
@@ -68,6 +69,9 @@ class GLView extends React.Component {
 
 		avatar: PropTypes.instanceOf(eAvatar),  // undefined early on
 		space: PropTypes.object,
+
+		// passing gl to higher levels
+		gimmeGlCanvas: PropTypes.func,
 	}
 	static defaultProps = {
 		viewName: 'gl view',
@@ -138,6 +142,8 @@ class GLView extends React.Component {
 
 		canvas.glview = this;
 		canvas.viewName = p.viewName;
+		if (p.gimmeGlCanvas)
+			p.gimmeGlCanvas(this.gl, this.canvas);
 
 		if (traceSetup) console.log(`🖼 🖼 GLView ${p.viewName}: setGLCanvas done`);
 	}
@@ -156,7 +162,7 @@ class GLView extends React.Component {
 		// now that there's an avatar, we can set these functions so everybody can use them.
 		p.avatar.doRepaint = this.doRepaint;
 		// intrinsic to avatar p.avatar.reStartDrawing = this.reStartDrawing;
-		p.avatar.setGeometry = this.setGeometry;
+		p.avatar.setGlViewport = this.setGlViewport;
 		if (traceSetup) console.log(`🖼 🖼 GLView ${p.viewName} ${p.avatar.label}: done with initViewClass`);
 
 		// BTW, since there hasn't been a doRepaint() func, I betcha it needs to be done right now.
@@ -164,13 +170,15 @@ class GLView extends React.Component {
 
 	}
 
-	setGeometry =
-	() => {
-		if (this.effectiveView) {
-			this.effectiveView.setGeometry();
-			if (tracePainting) console.log(`🖼 🖼 GLView:${this.props.viewName}  ${this.props.avatar.label} did setGeometry`);
-		}
-	}
+	// this is attached to the avatar so WebView can call it.
+	// It, in turn, calls the function on the viewDef.
+	//setGlViewport =
+	//() => {
+	//	if (this.effectiveView) {
+	//		this.effectiveView.setGlViewport();
+	//		if (tracePainting) console.log(`🖼 🖼 GLView:${this.props.viewName}  ${this.props.avatar.label} did setGlViewport`);
+	//	}
+	//}
 
 	// repaint whole GL image.  This is not 'render' as in React;
 	// this is repainting a canvas with GL.   returns an object with perf stats.
@@ -207,6 +215,9 @@ class GLView extends React.Component {
 	render() {
 		const p = this.props;
 		//const s = this.state;
+
+		if (traceGeometry)
+			console.log(`🖼 🖼 GLView render:  canvas width: ${p.width}   height: ${p.height}`);
 
 		return (
 			<canvas className='GLView'

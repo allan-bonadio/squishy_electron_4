@@ -42,7 +42,8 @@ export class abstractViewDef {
 		this.setShadersOnDrawings();
 		this.createVariablesOnDrawings();
 
-		this.setGeometry();  // call again if canvas outer dimensions change
+		// call again if canvas outer dimensions change
+		this.gl.viewport(0, 0, this.canvas.width, this.canvas.height);
 
 		// kick it off by drawing it once
 		this.drawAllDrawings();
@@ -141,14 +142,10 @@ export class abstractViewDef {
 //	}
 
 	/* ************************************************** Geometry and transformations */
-	// abstract supermethod: another dummy submethod... write yer  own
-	// is this really needed?  seems like it can be omitted...
-	// no, call this every time the canvas resizes
-	setGeometry() {
-
-		// yeah i think it automatically defaults to all these so we can remove this...?
-		this.gl.viewport(0, 0, this.canvas.width, this.canvas.height);
-	}
+	// Synch the gl viewport to the canvvas size.  call this every time the canvas resizes
+	//setGlViewport() {
+	//	this.gl.viewport(0, 0, this.canvas.width, this.canvas.height);
+	//}
 
 	/* ************************************************** drawing */
 
