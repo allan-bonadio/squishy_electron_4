@@ -7,10 +7,20 @@ import qe from '../engine/qe.js';
 
 /* ****************************************************** diagnostics */
 
+// this is global so we can use it anywhere in JS
+window.isDevel = (process.env.NODE_ENV === 'development');
+
+
 export function dumpJsStack(where = 'somewhere') {
 	console.info(`${where} traceback: ${(new Error()).stack.replace(/^.*\n.*at dumpJsStack.*\n/, '\n')}`);
 }
+window.dumpJsStack = dumpJsStack;
 
+export function dAssert(condition, msg) {
+	if (window.isDevel && !condition)
+		throw `Assertion failed: ${msg}`;
+}
+window.dAssert = dAssert;
 
 /* ****************************************************** error/exception handling from C++ */
 
