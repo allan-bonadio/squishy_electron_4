@@ -17,8 +17,9 @@ import PropTypes from 'prop-types';
 import eAvatar from '../engine/eAvatar.js';
 import {listOfViewClasses} from './listOfViewClasses.js';
 //import {eSpaceCreatedPromise} from '../engine/eEngine.js';
+import {tooOldTerminate} from '../utils/errors.js';
 
-let traceSetup = false;
+let traceSetup = true;
 let tracePainting = false;
 let traceGeometry = true;
 
@@ -26,35 +27,6 @@ let traceGeometry = true;
 let tryWebGL2 = false;
 let trySRGB = false;
 
-
-const tooOldMessage = `<p>
-		try these, 2013 or 2014 or later:
-
-		<p>Probably the best solution: you can get a more recent copy of
-			<a href=https://www.mozilla.org/en-US/firefox/new/>Firefox</a>,
-			<a href=https://www.google.com/chrome/dr/download>Google Chrome</a>,
-			<a href=https://support.apple.com/downloads/safari>Safari</a>, or
-			<a href=https://www.microsoft.com/en-us/edge>MS Edge</a>.
-
-		<p>Or if you can't, you can try (desktop):
-
-		<p>Enable WebGL in Firefox by setting the about:config preference
-		webgl.enable-prototype-webgl2 to true
-
-		<p>Enable WebGL  in Chrome by passing the "--enable-unsafe-es3-apis"
-		flag when starting the browser through the command line
-		OR: chrome://flags/#enable-webgl-draft-extensions in Chromium based browsers (Chrome, Opera).
-
-		<p>Enable WebGL Safari in the "Experimental Features" developer menu
-`;
-
-function tooOldTerminate(prelim) {
-	document.body.innerHTML = prelim + tooOldMessage;
-	document.body.style.padding = '4em' ;
-	document.body.style.fontSize = '1.5em' ;
-	document.body.style.backgroundColor = '#c00' ;
-	throw `So long, and thanks for all the fish!`;
-}
 
 // For each GLView, there's one:
 // - canvas, and one gl context
@@ -64,14 +36,18 @@ class GLView extends React.Component {
 		viewClassName: PropTypes.string.isRequired,
 		viewName: PropTypes.string,
 
-		width: PropTypes.number.isRequired,
-		height: PropTypes.number.isRequired,
+		// lets try this with plain old CSS and let the containers dictate sizes
+		width: PropTypes.number,
+		height: PropTypes.number,
 
 		avatar: PropTypes.instanceOf(eAvatar),  // undefined early on
 		space: PropTypes.object,
 
 		// passing gl to higher levels
 		gimmeGlCanvas: PropTypes.func,
+
+		// the width and height we measure
+		canvasFacts: PropTypes.object.isRequired,
 	}
 	static defaultProps = {
 		viewName: 'gl view',
@@ -162,7 +138,7 @@ class GLView extends React.Component {
 		// now that there's an avatar, we can set these functions so everybody can use them.
 		p.avatar.doRepaint = this.doRepaint;
 		// intrinsic to avatar p.avatar.reStartDrawing = this.reStartDrawing;
-		p.avatar.setGlViewport = this.setGlViewport;
+		//p.avatar.setGlViewport = this.setGlViewport;
 		if (traceSetup) console.log(`🖼 🖼 GLView ${p.viewName} ${p.avatar.label}: done with initViewClass`);
 
 		// BTW, since there hasn't been a doRepaint() func, I betcha it needs to be done right now.
@@ -216,12 +192,27 @@ class GLView extends React.Component {
 		const p = this.props;
 		//const s = this.state;
 
-		if (traceGeometry)
-			console.log(`🖼 🖼 GLView render:  canvas width: ${p.width}   height: ${p.height}`);
+		if (traceGeometry) {
+			// facts are filled in in componentDidUpdate() so the first render, tehre's none
+			let facts = p.canvasFacts;
+			console.log(`🖼 🖼 GLV rend ''${p.viewName}'': canvas=${this.canvas?.nodeName}
+				Facts.width: ${facts.width}      Facts.height: ${facts.height}`);
+			console.log(`🖼 🖼 BUT:  canvas.parent.clientWidth: ${this.canvas?.parentNode?.clientWidth ?? 'no canv'}`);
+		}
 
+		// the canvas w&h attributes define its inner coord system, and default size.
+		// We want them to reflect actual pixels on the screen
+		let cWidth = p.width, cHeight = p.height;
+		if (this.canvas) {
+			let cRect = this.canvas.getBoundingClientRect();
+			cWidth = cRect.width;
+			cHeight = cRect.height;
+		}
+
+		// but we override the size with CSS here.  Ultimately, bounding width will change to p.width
 		return (
 			<canvas className='GLView'
-				width={p.width} height={p.height}
+				width={cWidth} height={cHeight}
 				ref={ canvas => this.setGLCanvas(canvas) }
 				style={{width: `${p.width}px`, height: `${p.height}px`}}
 			/>
@@ -229,19 +220,32 @@ class GLView extends React.Component {
 	}
 
 	componentDidMount() {
-		this.componentDidUpdate();
+		// maybe, don't do this... canvas won't exist the first time
+		//this.componentDidUpdate();
+		console.info(`hey, child, the GLView ${this.viewName} did mount`);////
 	}
 
 	componentDidUpdate() {
 		const p = this.props;
 		//const s = this.state;
 
+		if (this.canvas) {
+			// do this only when the dust has settled, other parts of the code depend on canvasFacts
+			let cRect = this.canvas.getBoundingClientRect();
+			p.canvasFacts.width = cRect.width;
+			p.canvasFacts.height = cRect.height;
+		}
+		else
+			console.warn(`oops no canvas in GLView.componentDidUpdate()`)
+
 		// a one-time initialization.  but upon page load, neither the avatar,
 		// space or canvas are there yet.  Don't worry, when the space comes in,
 		// we'll all initViewClass.
-		if (traceSetup && !this.effectiveView)
-			console.log(`🖼 🖼 GLView:${p.viewName}: time to init?  avatar=${p.avatar}  `+
-				`space=${p.space}  canvas=${this.canvas}  effectiveView=${this.effectiveView}`);
+		if (traceSetup && !this.effectiveView) {
+			console.log(`🖼 🖼 GLView:${p.viewName}: time to init?  avatar=${p.avatar?.label}  `+
+				`space=${p.space?.nPoints}  canvas=${this.canvas?.nodeName}  `+
+				`effectiveView=${this.effectiveView?.viewName}`);
+		}
 		if (p.avatar && p.space && this.canvas && !this.effectiveView) {
 			this.initViewClass();
 		}

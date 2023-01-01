@@ -11,13 +11,12 @@ import PropTypes from 'prop-types';
 //import eSpace from '../engine/eSpace.js';
 //import {dumpVoltage} from '../utils/voltageUtils.js';
 
+let traceVoltageSidebar = true;
+
 // I dunno but the voltages I'm generating are too strong.
 // So I reduced it by this factor, but still have to magnify it to make it visible.
 export const spongeFactor = 100;
 
-let traceVoltageSidebar = false;
-
-let traceRendering = false;
 
 function setPT() {
 	VoltageSidebar.propTypes = {
@@ -45,19 +44,30 @@ function setPT() {
 
 // ultimately, this is a <svg node with a <path inside it
 export function VoltageSidebar(p) {
-	if (traceVoltageSidebar) console.log(`👆 👆 the new VoltageSidebar:`, this);
+	if (traceVoltageSidebar) {
+		console.log(`🍟 🍟 the VoltageSidebar: width=${p.width} height=${p.height}`);
+		console.log(`🍟 🍟     scroll 𝚫=${p.scrollMax-p.scrollMin}:
+			${p.scrollMin} ... ${p.scrollSetting} ... ${p.scrollMax}`);
+	}
 
 	// should just use forceUpdate on our comp obj instead!
 	//if (props.setUpdateVoltageSidebar)
 	//	props.setUpdateVoltageSidebar(this.updateVoltageSidebar);
 
+//		style={{height: `${p.height}px`, flexBasis: p.width, display: p.showVoltage ? 'flex' : 'none'}} >
 
-	if (traceRendering)
-		console.log(`👆 👆 VoltageSidebar render`);
+	let sidebarWidth = p.width;
+	let sidebarDisplay = 'flex';
+	if (! p.showVoltage) {
+		// oops not showing
+		sidebarWidth = 0;
+		sidebarDisplay = 'none';
+		return '';
+	}
 
-	// render.  The buttons and stuff are square.
+	// render.  The buttons and stuff are almost square.
 	return (<aside className='VoltageSidebar'
-		style={{height: `${p.height}px`, flexBasis: p.width, display: p.showVoltage ? 'flex' : 'none'}} >
+		style={{height: `100%`, flexBasis: sidebarWidth, display: sidebarDisplay}} >
 
 		<button className='zoomIn' onClick={ev => p.zoomHandler(+1)} style={{flexBasis: p.width}} >
 			<img src='images/zoomInIcon.png' alt='zoom in' />

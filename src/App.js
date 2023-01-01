@@ -8,7 +8,6 @@ import './App.scss';
 
 import SquishPanel from './SquishPanel.js';
 import CommonDialog from './widgets/CommonDialog.js';
-//import {dumpJsStack} from './utils/errors.js';
 import {eSpaceCreatedPromise} from './engine/eEngine.js';
 
 let traceResize = false;
@@ -19,7 +18,7 @@ class App extends React.Component {
 		App.me = this;
 
 		this.state = {
-			innerWindowWidth: window.innerWidth,
+			//clientWidth: document.body.clientWidth - 24,
 			squishPanelExists: true,  // briefly cycles off and on when user changes resolution
 			isDialogShowing: false,
 			cppRunning: false,
@@ -67,22 +66,37 @@ class App extends React.Component {
 		// add listener only executed once
 		window.addEventListener('resize', ev => {
 			if (traceResize)
-				console.log(` window resize to ${ev.currentTarget.innerWidth}==> `, ev);
-			this.setState({innerWindowWidth: ev.currentTarget.innerWidth})
+				console.log(`🍦 window resize to ${this.appEl?.clientWidth}`, ev);
+			console.assert(ev.currentTarget === window, `ev.currentTarget === window`);
+
+			// if we don't set the state here, nobody redraws.  Otherwise, get body.clientWidth directly.
+			this.setState({clientWidth: document.body.clientWidth})
 		});
 	}
 
 	render() {
 		const s = this.state;
 
-		let sqPanel = null;
-		if (s.cppRunning && s.squishPanelExists)
-			sqPanel = <SquishPanel id='theSquishPanel' width={s.innerWindowWidth}/>;
+		// until things start up.  Must always have a className theSquishPanel for tooOldTerminate()
+		let sqPanel;
+
+
+		if (s.cppRunning && s.squishPanelExists) {
+			// real squishpanel
+			sqPanel = <SquishPanel id='theSquishPanel'
+				width={this.appEl?.clientWidth ?? document.body.clientWidth}/>;
+		}
+		else {
+			// spinner tells ppl we're working on it
+			sqPanel= <div id='theSquishPanel' >
+				<img className='spinner' alt='spinner' src='images/eclipseOnTransparent.gif' />;
+			</div>;
+		}
 
 		const sqDialog = s.isDialogShowing ? <CommonDialog  /> : null;
 
 		return (
-			<div className="App">
+			<div className="App" ref={el => this.appEl = el}>
 				<h2 className="App-header">
 					<img className='splatImage' src='images/splat.png'
 						width='100px' alt='squishy icon'/>
