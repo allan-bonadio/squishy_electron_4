@@ -18,13 +18,39 @@ class App extends React.Component {
 		App.me = this;
 
 		this.state = {
-			//clientWidth: document.body.clientWidth - 24,
+			clientWidth: document.body.clientWidth,  // window width as of constructor
 			squishPanelExists: true,  // briefly cycles off and on when user changes resolution
 			isDialogShowing: false,
 			cppRunning: false,
 		};
 
 		eSpaceCreatedPromise.then(space => this.setState({cppRunning: true}));
+	}
+
+	// once at startup, shortly after first render
+	componentDidMount() {
+		let bodyClientWidth = document.body.clientWidth;
+
+		// keep track of any window width changes, to reset the canvas and svg
+		// add listener only executed once
+		window.addEventListener('resize', ev => {
+			if (traceResize)
+				console.log(`🍦 window resize to ${this.appEl?.clientWidth}`, ev);
+			console.assert(ev.currentTarget === window, `ev.currentTarget === window`);
+
+			// if we don't set the state here, nobody redraws.  Otherwise, get body.clientWidth directly.
+			this.setState({clientWidth: bodyClientWidth})
+		});
+
+		// meanwhile, sometimes the first render starts before the vertical scrollbar kicks in,
+		// cuz there's nothing in the page yet.  This confuses everybody, but give it a kick.
+		if (this.state.clientWidth != bodyClientWidth) {
+			this.setState({clientWidth: bodyClientWidth});
+			if (traceResize)
+				console.log(`🍦 mounting resize cuz scrollbar:
+					${this.state.clientWidth} --> ${bodyClientWidth} `);
+			debugger;
+		}
 	}
 
 	/* ************************************************ CommonDialog */
@@ -59,20 +85,6 @@ class App extends React.Component {
 	}
 
 	/* ************************************************ App */
-
-	// once at startup
-	componentDidMount() {
-		// keep track of any window width changes, to reset the canvas and svg
-		// add listener only executed once
-		window.addEventListener('resize', ev => {
-			if (traceResize)
-				console.log(`🍦 window resize to ${this.appEl?.clientWidth}`, ev);
-			console.assert(ev.currentTarget === window, `ev.currentTarget === window`);
-
-			// if we don't set the state here, nobody redraws.  Otherwise, get body.clientWidth directly.
-			this.setState({clientWidth: document.body.clientWidth})
-		});
-	}
 
 	render() {
 		const s = this.state;
