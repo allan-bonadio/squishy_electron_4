@@ -195,7 +195,7 @@ class GLView extends React.Component {
 		if (traceGeometry) {
 			// facts are filled in in componentDidUpdate() so the first render, tehre's none
 			let facts = p.canvasFacts;
-			console.log(`🖼 🖼 GLV rend ''${p.viewName}'': canvas=${this.canvas?.nodeName}
+			console.log(`🖼 🖼 GLV rend '${p.viewName}': canvas=${this.canvas?.nodeName}
 				Facts.width: ${facts.width}      Facts.height: ${facts.height}`);
 			console.log(`🖼 🖼 BUT:  canvas.parent.clientWidth: ${this.canvas?.parentNode?.clientWidth ?? 'no canv'}`);
 		}

@@ -10,7 +10,7 @@ import SquishPanel from './SquishPanel.js';
 import CommonDialog from './widgets/CommonDialog.js';
 import {eSpaceCreatedPromise} from './engine/eEngine.js';
 
-let traceResize = false;
+let traceResize = true;
 
 class App extends React.Component {
 	constructor(props) {
