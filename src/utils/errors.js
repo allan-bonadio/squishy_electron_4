@@ -61,3 +61,43 @@ export function catchEx(func, where) {
 		console.error(`error ${where}: `, ex.stack ?? ex.message ?? ex);
 	}
 }
+
+/* ****************************************************** Too Old */
+
+
+const tryWebGL = `<p>Or if you can't, and you have an old browser, you can try (desktop):
+	<p>Enable WebGL in Firefox by setting the about:config preference
+	webgl.enable-prototype-webgl2 to true
+
+	<p>Enable WebGL  in Chrome by passing the "--enable-unsafe-es3-apis"
+	flag when starting the browser through the command line
+	OR: chrome://flags/#enable-webgl-draft-extensions in Chromium based browsers (Chrome, Opera).
+
+	<p>Enable WebGL Safari in the "Experimental Features" developer menu
+`;
+
+// call this if the browser/machine are just way too old to support the stuff we use:
+// what = 'WebGL' at least v1, 'WebAssembly', dedicated 'WebWorkers', ...
+export function tooOldTerminate(what) {
+	let tooOldMessage = `<p>Sorry, your browser's ${what} is too old.
+		For browsers from 2013 or 2014 or later:
+
+		<p>Probably the best solution: click to get a more recent copy of
+			<a href=https://www.mozilla.org/en-US/firefox/new/>Firefox</a>,
+			<a href=https://www.google.com/chrome/dr/download>Google Chrome</a>,
+			<a href=https://support.apple.com/downloads/safari>Safari</a>, or
+			<a href=https://www.microsoft.com/en-us/edge>MS Edge</a>.
+			If your machine is old, you might be able to download an older ('legacy') version.
+	`;
+	if ('WebGL' == what)
+		tooOldMessage += tryWebGL;
+	let inHere = document.querySelector('#theSquishPanel') || document.body;
+	inHere.innerHTML = tooOldMessage;
+	inHere.style.backgroundColor = '#f44' ;
+	inHere.style.color = '#000' ;
+	inHere.style.padding = '2em 4em' ;
+	inHere.style.margin = '2em 4em' ;
+	inHere.style.fontSize = '1.5em' ;
+	throw `So long, and thanks for all the fish!`;
+}
+

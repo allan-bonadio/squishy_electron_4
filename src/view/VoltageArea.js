@@ -29,22 +29,22 @@ export class VoltageArea extends React.Component {
 		space: PropTypes.instanceOf(eSpace),
 
 		// this can be null if stuff isn't ready
-		//wholeRect: PropTypes.object,
-		canvasWidth: PropTypes.number.isRequired,
-		height: PropTypes.number.isRequired,
+		// these are now determined by css
+		//canvasWidth: PropTypes.object,////
+		height: PropTypes.number,
 
-		// includes scrollSetting, viewHeight, voltMin, voltMax, xScale, yScale
+		// includes scrollSetting, heightVolts, voltMin, voltMax, xScale, yScale
 		volts: PropTypes.object,
 		//scrollSetting: PropTypes.number.isRequired,
-		//viewHeight: PropTypes.number.isRequired,
+		//heightVolts: PropTypes.number.isRequired,
 		//xScale: PropTypes.func,
 		//yScale: PropTypes.func,
-
-		setUpdateVoltageArea: PropTypes.func,
 
 		// this component is always rendered so it retains its state,
 		// but won't draw anything if the checkbox is off
 		showVoltage: PropTypes.bool.isRequired,
+
+		canvasFacts: PropTypes.object,
 	};
 
 	constructor(props) {
@@ -56,8 +56,8 @@ export class VoltageArea extends React.Component {
 		if (traceVoltageArea) console.log(`👆 👆 the new VoltageArea:`, this);
 
 		// should just use forceUpdate on our comp obj instead!
-		if (props.setUpdateVoltageArea)
-			props.setUpdateVoltageArea(this.updateVoltageArea);
+		//if (props.setUpdateVoltageArea)
+		//	props.setUpdateVoltageArea(this.updateVoltageArea);
 
 		if (traceVoltageArea) console.log(`👆 👆 VoltageArea  constructor done`);
 	}
@@ -65,21 +65,18 @@ export class VoltageArea extends React.Component {
 	/* *************************************************** drawing */
 
 	// tell the VoltageArea (that;s us) that something in the space.voltageBuffer changed.  Sometimes called from above.
+	// sheesh this is passed up and down so much; should figure out who and where needs it and simplify stuff.
 	updateVoltageArea =
 	() => {
-		// btw, everybody needs to know the min and max voltage in use, so we can always show it
-		let v = this.props.volts;
-		let space = this.props.space;
-		let voltageBuffer = space.voltageBuffer;
-		let {start, end} = space.startEnd;
+		const p = this.props;
 
-		let mini = Infinity, maxi = -Infinity;
-		for (let ix = start; ix < end; ix++) {
-			mini = Math.min(voltageBuffer[ix], mini);
-			maxi = Math.max(voltageBuffer[ix], maxi)
-		}
-		v.voltMin = mini;
-		v.voltMax = maxi;
+		// btw, everybody needs to know the min and max voltage in use, so we can always show it
+//		let v = this.props.volts;
+//		let space = this.props.space;
+//		let voltageBuffer = space.voltageBuffer;
+//		let {start, end} = space.startEnd;
+
+		p.findVoltExtremes();
 
 		this.forceUpdate();
 	}
@@ -88,7 +85,7 @@ export class VoltageArea extends React.Component {
 	// as compressed as possible.  Returns one long string.
 	makePathAttribute(start, end) {
 		const p = this.props;
-		let v = this.props.volts;
+		let v = p.volts;
 		if (tracePathAttribute)
 			console.log(`👆 👆 VoltageArea.makePathAttribute(${start}, ${end})`);
 
@@ -112,6 +109,8 @@ export class VoltageArea extends React.Component {
 		for (let ix = start+1; ix < end; ix++) {
 			y = v.yScale(voltageBuffer[ix]);
 			x = v.xScale(ix);
+			if ((x==null) || !isFinite(x) || (y==null) || !isFinite(y) || Math.abs(y) > 10_000)
+				debugger;
 			points[ix] = `${x.toFixed(1)},${y.toFixed(1)} `;
 		}
 
@@ -120,8 +119,10 @@ export class VoltageArea extends React.Component {
 			points.pop();
 			points.shift();
 		}
-		if (tracePathAttribute)
+		if (tracePathAttribute) {
 			console.log(`👆 👆 VoltageArea.makePathAttribute: done`, points.join(''));
+			console.log(`     from:`, points);
+		}
 		return points.join('');
 	}
 
@@ -143,7 +144,7 @@ export class VoltageArea extends React.Component {
 				);
 				paths.push(
 					<rect className='right wellSlab' key='right'
-						x={p.canvasWidth - this.barWidth} y={0} width={this.barWidth} height={p.height}
+						x={p.canvasFacts.width - this.barWidth} y={0} width={this.barWidth} height={p.height}
 					/>
 				);
 				break;
@@ -190,11 +191,12 @@ export class VoltageArea extends React.Component {
 		const p = this.props;
 		if (! p.space)
 			return '';  // too early
-		this.barWidth = p.canvasWidth / this.nPoints;
+		this.barWidth = p.canvasFacts.width / this.nPoints;
 
 		let returnV = (
-			<svg className='VoltageArea' viewBox={`0 0 ${p.canvasWidth} ${p.height}`}
-					width={p.canvasWidth} height={p.height}
+			<svg className='VoltageArea'
+				viewBox={`0 0 ${p.canvasFacts.width} ${p.canvasFacts.height}`}
+					width={p.canvasFacts.width} height={p.canvasFacts.height}
 					onMouseMove={ev => this.mouseMove(ev)}
 					onMouseUp={ev => this.mouseUp(ev)}
 					ref={el => this.svgElement = el}

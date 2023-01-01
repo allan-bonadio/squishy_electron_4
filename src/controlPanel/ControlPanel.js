@@ -36,7 +36,7 @@ export class ControlPanel extends React.Component {
 		// the WaveView on the screen
 		// when user chooses 'set wave'
 		//// this should move into controlPanel from squishPanel
-		setVoltage: PropTypes.func.isRequired,
+		//populateFamiliarVoltage: PropTypes.func.isRequired,
 		toggleShowVoltage: PropTypes.func.isRequired,
 		showVoltage: PropTypes.bool.isRequired,
 
@@ -62,8 +62,8 @@ export class ControlPanel extends React.Component {
 			stepsPerFrame: getASetting('frameSettings', 'stepsPerFrame'),
 			lowPassFilter: getASetting('frameSettings', 'lowPassFilter'),
 
-			// state for voltage resets - control panel only, setVoltage()  see below;...
-			//voltageBreed: getASetting('voltageParams', 'voltageBreed'),
+			// state for voltage resets - control panel only, populateFamiliarVoltage()  see below;...
+			//potentialBreed: getASetting('voltageParams', 'potentialBreed'),
 			//valleyPower: getASetting('voltageParams', 'valleyPower'),
 			//valleyScale: getASetting('voltageParams', 'valleyScale'),
 			//valleyOffset: getASetting('voltageParams', 'valleyOffset'),
@@ -180,18 +180,14 @@ export class ControlPanel extends React.Component {
 
 	// fills in the voltage buffer with values according to the voltageParams
 	// called when user clicks Valley voltage or Flat voltage
-	setVoltageHandler =
-	() => {
-		const {valleyPower, valleyScale, valleyOffset} = this.state;
-
-		// actually sets buffer
-		this.props.setVoltage({valleyPower, valleyScale, valleyOffset});
-
-		// only NOW do we set it in the localStorage
-		storeASetting('voltageParams', 'valleyPower', valleyPower);
-		storeASetting('voltageParams', 'valleyScale', valleyScale);
-		storeASetting('voltageParams', 'valleyOffset', valleyOffset);
-	}
+	//setVoltageHandler =
+	//() => {
+	//	const {valleyPower, valleyScale, valleyOffset} = this.state;
+	//
+	//	// actually sets buffer
+	//	this.props.populateFamiliarVoltage({valleyPower, valleyScale, valleyOffset});
+	//
+	//}
 
 	setShowingTab =
 	tabCode => {
@@ -259,8 +255,8 @@ export class ControlPanel extends React.Component {
 			/>;
 
 		case 'voltage':
+		// setVoltageHandler={this.setVoltageHandler}
 			return <SetVoltageTab
-				setVoltageHandler={this.setVoltageHandler}
 				voltageParams={{ valleyPower, valleyScale, valleyOffset,}}
 				setCPState={this.setCPState}
 				space={this.space}
@@ -299,6 +295,7 @@ export class ControlPanel extends React.Component {
 
 		let showingTabHtml = this.createShowingTab();
 
+		//setVoltageHandler={this.setVoltageHandler}
 		return <div className='ControlPanel'>
 			<CPToolbar
 				frameFrequency={1000. / s.framePeriod}
@@ -307,7 +304,6 @@ export class ControlPanel extends React.Component {
 				isTimeAdvancing={ControlPanel.isTimeAdvancing}
 
 				resetMainWave={this.resetMainWave}
-				setVoltageHandler={this.setVoltageHandler}
 				toggleShowVoltage={p.toggleShowVoltage}
 				showVoltage={p.showVoltage}
 

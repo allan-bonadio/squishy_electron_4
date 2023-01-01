@@ -202,14 +202,14 @@ export function createStoreSettings() {
 	makeParam('waveParams', 'pulseOffset', 30, {min: 0, max: 100});
 
 	/* ************************************ voltageParams */
-	//makeParam('voltageParams', 'voltageBreed', 'flat', ['flat', 'valley']);
+	makeParam('voltageParams', 'potentialBreed', 'flat', ['flat', 'valley', 'double']);
 	makeParam('voltageParams', 'valleyPower', 0, {min: -4, max: 4});
 	makeParam('voltageParams', 'valleyScale', 0, {min: -10, max: 10});
 	makeParam('voltageParams', 'valleyOffset', 50, {min: 0, max: 100});
 
 	makeParam('voltageSettings', 'showVoltage', true, [true, false]);
 	makeParam('voltageSettings', 'scrollSetting', 0, {min: -256, max: 256});
-	makeParam('voltageSettings', 'viewHeight', 4, {min: 1/64, max: 256});
+	makeParam('voltageSettings', 'heightVolts', 4, {min: 1/64, max: 256});
 	makeParam('voltageSettings', 'scrollMin', -16, {min: -256, max: 256});
 	makeParam('voltageSettings', 'scrollMax', 16, {min: -256, max: 256});
 
@@ -222,7 +222,7 @@ export function createStoreSettings() {
 
 	/* ************************************miscSettings */
 	makeParam('miscSettings', 'showingTab', 'wave', ['wave', 'voltage', 'space', 'integrate']);
-	makeParam('miscSettings', 'viewHeight', 400, {min: 50, max: 1e4});
+	makeParam('miscSettings', 'waveViewHeight', 400, {min: 50, max: 1e4});
 
 }
 

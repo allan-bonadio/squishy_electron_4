@@ -117,7 +117,7 @@ describe('cxToColor tests', () => {
 	testParam('waveParams', 'pulseOffset', 30, {min: 0, max: 100});
 
 	/* ************************************ voltageParams */
-	//testParam('voltageParams', 'voltageBreed', 'flat', ['flat', 'valley']);
+	testParam('voltageParams', 'potentialBreed', 'flat', ['flat', 'valley']);
 	testParam('voltageParams', 'valleyPower', 0, {min: -4, max: 4});
 	testParam('voltageParams', 'valleyScale', 0, {min: -10, max: 10});
 	testParam('voltageParams', 'valleyOffset', 50, {min: 0, max: 100});
@@ -134,6 +134,6 @@ describe('cxToColor tests', () => {
 
 	/* ************************************miscSettings */
 	testParam('miscSettings', 'showingTab', 'wave', ['wave', 'voltage', 'space', 'integrate']);
-	testParam('miscSettings', 'viewHeight', 400, {min: 50, max: 1e4});
+	testParam('miscSettings', 'waveViewHeight', 400, {min: 50, max: 1e4});
 });
 

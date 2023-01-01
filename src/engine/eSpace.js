@@ -66,7 +66,7 @@ export class eSpace {
 		this.voltageBuffer = new Float64Array(window.Module.HEAPF64.buffer,
 				this._voltage, this.nPoints);;
 		let voltageParams = getAGroup('voltageParams');
-		setFamiliarVoltage(this, this.voltageBuffer, voltageParams);
+		setFamiliarVoltage(this.start, this.end, this.voltageBuffer, voltageParams);
 
 		// the avatars create their vbufs and waves, and we make a copy for ourselves
 		this.mainEAvatar = new eAvatar(this, this._mainAvatar);
@@ -163,6 +163,29 @@ export class eSpace {
 		return {start2: dim.start*2, end2: dim.end*2, N: dim.N, nPoints2: this.nPoints * 2,
 			continuum: dim.continuum};
 	}
+
+
+
+	/* **************************** Voltage Potential */
+
+
+	// completely wipe out the quantum voltage and replace it with one of our familiar patterns.
+	// Called upon set voltage in voltage tab
+	populateFamiliarVoltage =
+	(voltageParams) => {
+		// sets the numbers
+		setFamiliarVoltage(this.start, this.end, this.voltageBuffer, voltageParams);
+
+		// no this doesn't affect the vBuffer
+	}
+
+	// voltage area needs to be told when the data changes.  can't put the whole voltage buffer in the state!
+//	setUpdateVoltageArea =
+//	(updateVoltageArea) => {
+//		this.updateVoltageArea = updateVoltageArea;
+//	};
+
+
 }
 
 export default eSpace;

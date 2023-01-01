@@ -17,9 +17,11 @@ import {eSpaceCreatedPromise} from './engine/eEngine.js';
 import {interpretCppException} from './utils/errors.js';
 import WaveView from './view/WaveView.js';
 import CommonDialog from './widgets/CommonDialog.js';
-import {setFamiliarVoltage} from './utils/voltageUtils.js';
+//import {setFamiliarVoltage} from './utils/voltageUtils.js';
 
 import {getASetting, storeASetting} from './utils/storeSettings.js';
+import {tooOldTerminate} from './utils/errors.js';
+
 
 // runtime debugging flags - you can change in the debugger or here
 let traceTheViewBuffer = false;
@@ -27,6 +29,7 @@ let tracePromises = false;
 let traceSquishPanel = false;
 let traceIntegration = false;
 let traceIntegrateEssentials = false;
+let traceWidth = true;
 
 let verifyTickTimes = true;
 let areBenchmarking = false;
@@ -91,7 +94,7 @@ export class SquishPanel extends React.Component {
 		// eslint-disable-next-line
 		this.allowRunningOneCycle = /allowRunningOneCycle/.test(location.search);
 
-		if (traceSquishPanel) console.log(`SquishPanel constructor done`);
+		if (traceSquishPanel) console.log(`👑 SquishPanel constructor done`);
 	}
 
 	// this squishPanelConstructed count will detect hot reloading screwing up the app,
@@ -108,7 +111,7 @@ export class SquishPanel extends React.Component {
 		eSpaceCreatedPromise
 		.then((space) => {
 			//const s = this.state;
-			if (tracePromises) console.log(`SquishPanel.compDidMount about to set state`);
+			if (tracePromises) console.log(`👑 SquishPanel.compDidMount about to set state`);
 
 			// space will end up in the state but meanwhile we need it now
 			this.space = space;
@@ -119,7 +122,7 @@ export class SquishPanel extends React.Component {
 			//this.setDeltaT(s.deltaT);
 			//this.setStepsPerFrame(s.stepsPerFrame);
 
-			if (tracePromises) console.log(`SquishPanel.compDidMount about to animateHeartbeat`);
+			if (tracePromises) console.log(`👑 SquishPanel.compDidMount about to animateHeartbeat`);
 
 			// this should be the only place animateHeartbeat() should be called
 			// except for inside the function itself
@@ -127,7 +130,7 @@ export class SquishPanel extends React.Component {
 
 			this.mainEAvatar?.doRepaint?.();
 
-			if (tracePromises) console.log(`SquishPanel.compDidMount done`);
+			if (tracePromises) console.log(`👑 SquishPanel.compDidMount done`);
 		})
 		.catch(ex => {
 			// eslint-disable-next-line no-ex-assign
@@ -142,6 +145,11 @@ export class SquishPanel extends React.Component {
 			debugger;
 		});
 
+		// check for obsolescence.  Do this after the dummy SquishPanel appears.
+		if (!window.WebAssembly)
+			tooOldTerminate('WebAssembly');
+		if (!window.Worker)
+			tooOldTerminate('WebWorkers');
 	}
 
 	/* ******************************************************* stats */
@@ -192,7 +200,7 @@ export class SquishPanel extends React.Component {
 
 	// do one integration frame
 	crunchoneIntegration() {
-		if (traceIntegration) console.log(`SquishPanel. about to frame`);
+		if (traceIntegration) console.log(`👑 SquishPanel. about to frame`);
 
 		try {
 			// hundreds of visscher steps
@@ -205,7 +213,7 @@ export class SquishPanel extends React.Component {
 				ex.message == 'diverged' ? SquishPanel.divergedBlurb : ex, 'while integrating');
 		}
 
-		if (traceIntegration) console.log(`SquishPanel. did frame`);
+		if (traceIntegration) console.log(`👑 SquishPanel. did frame`);
 
 		if (traceTheViewBuffer)
 			this.dumpViewBuffer('SquishPanel. did frame()');
@@ -379,24 +387,6 @@ export class SquishPanel extends React.Component {
 	// others managed from ControlPanel
 	// can i move these to the control panel?
 
-	// completely wipe out the quantum voltage and replace it with one of our canned patterns.
-	// (but do not change N or anything else)  Called upon set voltage in voltage tab
-	setVoltage =
-	(voltageParams) => {
-		// sets the numbers
-		setFamiliarVoltage(this.state.space, this.state.space.voltageBuffer, voltageParams);
-
-		this.updateVoltageArea();
-
-		// no this doesn't affect the vBuffer
-	}
-
-	// voltage area needs to be told when the data changes.  can't put the whole voltage buffer in the state!
-	setUpdateVoltageArea =
-	(updateVoltageArea) => {
-		this.updateVoltageArea = updateVoltageArea;
-	};
-
 	toggleShowVoltage =
 	ev => {
 		this.setState({showVoltage: ev.target.checked});
@@ -441,12 +431,15 @@ export class SquishPanel extends React.Component {
 		const p = this.props;
 		const s = this.state;
 
+		if (traceWidth) console.log(`👑 SquishPanel render, p.width=${p.width}  body.clientWidth=${document.body.clientWidth}`);
+
+		//setUpdateVoltageArea={this.setUpdateVoltageArea}
+		//populateFamiliarVoltage={this.populateFamiliarVoltage}
 		return (
 			<div id={this.props.id} className="SquishPanel">
 				<WaveView
-					viewName='mainView'
 					width={p.width}
-					setUpdateVoltageArea={this.setUpdateVoltageArea}
+					space={this.space}
 					showVoltage={s.showVoltage}
 				/>
 				<ControlPanel
@@ -454,7 +447,6 @@ export class SquishPanel extends React.Component {
 
 					setFramePeriod={this.setFramePeriod}
 
-					setVoltage={this.setVoltage}
 					toggleShowVoltage={this.toggleShowVoltage}
 					showVoltage={s.showVoltage}
 

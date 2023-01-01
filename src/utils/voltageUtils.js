@@ -38,9 +38,11 @@ export function fixVoltageBoundaries(space, voltage) {
 	}
 }
 
-export function setFamiliarVoltage(space, voltageArray, voltageParams) {
-	const {start, end, N} = space.startEnd;
-	let {valleyPower, valleyScale, valleyOffset} = voltageParams;
+// set a valley, flat or double voltage potential in the given array, according to params.
+// No space needed.
+export function setFamiliarVoltage(start, end, voltageArray, voltageParams) {
+	//const {start, end, N} = space.startEnd;
+	let {valleyPower, valleyScale, valleyOffset, potentialBreed} = voltageParams;
 	if (valleyPower == undefined || valleyScale == undefined || valleyOffset == undefined)
 		throw `bad Voltage params: valleyPower=${valleyPower}, valleyScale=${valleyScale},
 			valleyOffset=${valleyOffset}`
@@ -48,25 +50,26 @@ export function setFamiliarVoltage(space, voltageArray, voltageParams) {
 		console.log(`starting setFamiliarPOTENTIAL(array of POTENTIALArray.length,`+
 			` POTENTIALParams=`, voltageParams);
 	let pot;
-	const offset = valleyOffset * N / 100;
+	const offset = valleyOffset * (end - start) / 100;
 	for (let ix = start; ix < end; ix++) {
-		if (valleyScale == 0) {
+		if ('flat' == potentialBreed) {
 			pot = 0;
 		}
 		else {
 			pot = Math.pow(Math.abs(ix - offset), +valleyPower) * (+valleyScale * VALLEY_FACTOR);
-			if (! isFinite(pot)) {
-				console.warn(`voltage ${pot} not finite at x=${ix}`, JSON.stringify(voltageParams));
-				console.warn(`   ix - offset=${ix - offset}`);
-				console.warn(`   Math.pow(ix - offset, +valleyPower)=${Math.pow(ix - offset, +valleyPower)}`);
-				console.warn(`  Math.pow(ix - offset, +valleyPower) * +valleyScale=${Math.pow(ix - offset, +valleyPower) * +valleyScale}`);
-			}
+		}
+		if (! isFinite(pot)) {
+			console.warn(`voltage ${pot} not finite at x=${ix} ${JSON.stringify(voltageParams)}
+			ix - offset=${ix - offset}
+			x ** ${valleyPower}=${Math.pow(ix - offset, +valleyPower)}
+			x ** ${valleyPower} * ${valleyScale}=
+			${Math.pow(ix - offset, +valleyPower) * +valleyScale}`);
 		}
 		voltageArray[ix] = pot;
 	}
 
 	// fix boundaries; the only points we didn't set
-	fixVoltageBoundaries(space, voltageArray);
+	//no, we don't use the boundaries of the voltage fixVoltageBoundaries(space, voltageArray);
 }
 
 export function dumpVoltage(space, voltageArray, nPerRow = 1, skipAllButEvery = 1) {
