@@ -28,6 +28,11 @@ import {interpretCppException} from '../utils/errors.js';
 
 //let debugWaveTab = false;
 
+// fixed size, I hope
+const miniWidth = 300;
+const miniHeight = 150;
+
+
 function setPT() {
 	// variables from on high, and the funcs needed to change them
 	SetWaveTab.propTypes = {
@@ -79,9 +84,7 @@ class SetWaveTab extends React.Component {
 			debugger;
 		});
 	}
-	miniWidth = 300;
-	miniHeight = 150;
-	yScale = scaleLinear().range([0, this.miniHeight]);
+	yScale = scaleLinear().range([0, miniHeight]);
 
 	// set the captive minGraph wave to the new settings, after user changed one.
 	// Since the state was also changed, we'll do a render.  but this will do a GL draw.
@@ -160,9 +163,10 @@ class SetWaveTab extends React.Component {
 
 		let glView = '';
 		if (s.space) {
-			glView = <GLView width={this.miniWidth} height={this.miniHeight}
+			glView = <GLView width={miniWidth} height={miniHeight}
 						space={s.space} avatar={this.miniGraphAvatar}
-						viewClassName='flatDrawingViewDef' viewName='waveMiniGraph'
+						viewClassName='flatDrawingViewDef' viewName='setWaveMiniGraph'
+						canvasFacts={{/* ignored */}}
 					/>
 		}
 

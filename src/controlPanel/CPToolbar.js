@@ -12,7 +12,7 @@ import ControlPanel from './ControlPanel.js';
 import {catchEx} from '../utils/errors.js';
 
 
-import eThread from '../engine/eThread.js';
+//import eThread from '../engine/eThread.js';
 
 
 function setPT() {
@@ -108,7 +108,9 @@ function CPToolbar(props) {
 				<button className='round' onClick={props.resetMainWave}>Reset Wave</button>
 				&nbsp;
 
-				<button className='round' onClick={props.setVoltageHandler}>Reset Voltage</button>
+				<button className='round' onClick={props.setVoltageHandler}>
+					Reset Voltage
+				</button>
 				&nbsp;
 			</div>
 

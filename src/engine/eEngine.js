@@ -125,3 +125,17 @@ function quantumEngineHasStarted(maxDims, maxLab) {
 window.recreateMainSpace = recreateMainSpace;  // for debugging
 window.quantumEngineHasStarted = quantumEngineHasStarted;  // for emscripten
 
+//let noWebAssy = () => {
+//	let webAssyThere = setTimeout(() => {
+//		// too many test situations & breakpoints can falsely trigger this
+//		if (!window.isDevel)
+//			tooOldTerminate('WebAssembly');
+//	}, 20_000);
+//
+//	eSpaceCreatedPromise.then(space => {
+//		clearTimeout(this.webAssyThere);
+//		noWebAssy = null;
+//	});
+//};
+//noWebAssy();
+
