@@ -42,7 +42,7 @@ class SetVoltageTab extends React.Component {
 
 		// you can use the state as a voltageParams object
 		this.state = {
-			valleyPower: getASetting('voltageParams', 'potentialBreed'),
+			potentialBreed: getASetting('voltageParams', 'potentialBreed'),
 			valleyPower: getASetting('voltageParams', 'valleyPower'),
 			valleyScale: getASetting('voltageParams', 'valleyScale'),
 			valleyOffset: getASetting('voltageParams', 'valleyOffset'),
