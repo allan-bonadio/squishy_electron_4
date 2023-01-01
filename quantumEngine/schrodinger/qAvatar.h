@@ -1,6 +1,6 @@
 /*
 ** qAvatar -- the instance and simulation of a quantum mechanical wave in a space
-** Copyright (C) 2021-2022 Tactile Interactive, all rights reserved
+** Copyright (C) 2021-2023 Tactile Interactive, all rights reserved
 */
 
 // formerly called: Manifestation, Incarnation, Timeline, ... formerly part of qSpace

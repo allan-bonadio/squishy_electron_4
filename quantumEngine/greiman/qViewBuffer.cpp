@@ -1,6 +1,6 @@
 /*
 ** view Buffer -- interface data buffer to webGL
-** Copyright (C) 2021-2022 Tactile Interactive, all rights reserved
+** Copyright (C) 2021-2023 Tactile Interactive, all rights reserved
 */
 
 

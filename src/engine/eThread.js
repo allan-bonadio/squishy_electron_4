@@ -1,6 +1,6 @@
 /*
 ** e thread -- main thread source for creating crunching threads
-** Copyright (C) 2022-2022 Tactile Interactive, all rights reserved
+** Copyright (C) 2022-2023 Tactile Interactive, all rights reserved
 */
 
 // The main thread part of the asynch stuff. It turns out that most of the
@@ -16,12 +16,14 @@ let traceIntegration = false;
 let useThreads = false;
 
 
-console.log(`eThread: isSecureContext=${window.isSecureContext},
-crossOriginIsolated=${window.crossOriginIsolated}`);
+console.log(`eThread: isSecureContext=${window.isSecureContext},`+
+	`crossOriginIsolated=${window.crossOriginIsolated}`);
 
-// i can't decide if there's one of htese for each thread or one total.  hmmm
-// how about this: everythiing that's unique, make iit static.  Prob moved to Avatar evenually.  Oh wait ... stuff that's per-space, actually per SquishPanel, should be on the avatar.  Then there's really unique things like nCores...
-// everything per-thread, make it for the eThread iiinstance.
+// i can't decide if there's one of these for each thread or one total.  hmmm
+// how about this: everythiing that's unique, make iit static.  Prob moved to
+// Avatar evenually.  Oh wait ... stuff that's per-space, actually per
+// SquishPanel, should be on the avatar.  Then there's really unique things like
+// nCores... everything per-thread, make it for the eThread iiinstance.
 class eThread {
 	static workerThreads = [];  // instances of Worker
 	static threads = [];  // instances of eThread
@@ -89,30 +91,30 @@ class eThread {
 		// we're not ready for this
 		return;
 
-		eThread.nCores = navigator.hardwareConcurrency;
-		eThread.nThreads = 1;
-		eThread.workerThreads = new Array(this.nThreads);
-		eThread.threads = new Array(this.nThreads);
-
-		// now set up that many threads
-		// just use one for now
-		for (let serial = 0; serial < this.nThreads; serial++) {
-			try {
-				console.log(`⛏ eThread creating thread ${serial}`);
-				const thread = eThread.threads[serial] = new eThread(serial, avatar);
-
-
-				// now send something...
-				thread.worker.postMessage({verb: 'ping', message: `Welcome, thread!`});
-				eThread.doingThreads = true;
-				console.log(`⛏ eThread done creating thread ${serial} (except for async stuff)`);
-			} catch (ex) {
-				console.error(`eThread: worker creation exc: `, ex.stack ?? ex.message ?? ex);
-				debugger;
-				eThread.doingThreads = false;
-				break;
-			}
-		}
+		//eThread.nCores = navigator.hardwareConcurrency;
+		//eThread.nThreads = 1;
+		//eThread.workerThreads = new Array(this.nThreads);
+		//eThread.threads = new Array(this.nThreads);
+		//
+		//// now set up that many threads
+		//// just use one for now
+		//for (let serial = 0; serial < this.nThreads; serial++) {
+		//	try {
+		//		console.log(`⛏ eThread creating thread ${serial}`);
+		//		const thread = eThread.threads[serial] = new eThread(serial, avatar);
+		//
+		//
+		//		// now send something...
+		//		thread.worker.postMessage({verb: 'ping', message: `Welcome, thread!`});
+		//		eThread.doingThreads = true;
+		//		console.log(`⛏ eThread done creating thread ${serial} (except for async stuff)`);
+		//	} catch (ex) {
+		//		console.error(`eThread: worker creation exc: `, ex.stack ?? ex.message ?? ex);
+		//		debugger;
+		//		eThread.doingThreads = false;
+		//		break;
+		//	}
+		//}
 	}
 
 	// tell the thread(s) to do 1 frame, like we did synchronously but now done by the thread(s)

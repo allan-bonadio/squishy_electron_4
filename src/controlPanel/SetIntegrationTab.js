@@ -1,6 +1,6 @@
 /*
 ** SetIntegrationTab -- tab for adjusting deltaT, stepsPerFrame, etc
-** Copyright (C) 2022-2022 Tactile Interactive, all rights reserved
+** Copyright (C) 2022-2023 Tactile Interactive, all rights reserved
 */
 
 import PropTypes from 'prop-types';

@@ -1,33 +1,14 @@
-These files are concerned with WebGL.
-
+These files are the top display of the wave, but above the webgl code itself (see gl dir).
 
 # Strategic Files
 
-* SquishView.js - react component that wraps the <canvas.
-* view.scss - for SquishView
+* WaveView.js - react component that wraps the <canvas.
+* view.scss - for WaveView and contents
 
-
-# drawing modules
-
-## drawings
-Things drawn into the canvas by webgl.
-Sets up the inputs and arrays, passes to GL, draws.
-* abstractDrawing.js - abstract superclass of drawings, although you can use them as-is for smoke testing
-* flatDrawing.js - draws the flat bargraph of a wave
-* voltageDrawing.js - draws the white voltage bar
-
-## view defs
-Sortof a framework around the drawing situation.
-Roughly corresponds to an Avatar?  not really...
-* abstractViewDef.js  - abstract superclass of ViewDefs, although you can use them as-is for smoke testing
-* flatDrawingViewDef.js - view def for flat bargraph
-
-## misc drawing code
-* viewVariable.js - helps drawing modules with the variables passed into GL
-* cxToColor.glsl.js - GLSL code to calculate colors based on complex numbers
+# sub-widgets of WaveView
+* VoltageArea.js - overlays canvas, contains voltage line & axis, does click/drag
+* VoltageSidebar.js - scrolling slider & zoom buttons on right of canvas
 
 # other
-* old/ - old srcs used in the gradual evolution of this system
 * README.md - this file
-* curiosity.js - test code to explore WebGL; retrieves all settings and other stuff, interesting!
-* cxToRgb.js - porting the cxToColor to .js (will go away)
+* cxToRgb.js - porting the cxToColor to .js (old, deprecated, will go away)

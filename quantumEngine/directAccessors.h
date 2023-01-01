@@ -1,6 +1,6 @@
 /*
 ** directAccessors -- helpers to generate direct accessor funcs for JS
-** Copyright (C) 2022-2022 Tactile Interactive, all rights reserved
+** Copyright (C) 2022-2023 Tactile Interactive, all rights reserved
 */
 
 // see how these are used in qAvatar.cpp and qWave.cpp

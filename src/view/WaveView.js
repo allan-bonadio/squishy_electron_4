@@ -1,6 +1,6 @@
 /*
 ** WaveView -- a webgl image of the quantum wave (or whatever)
-** Copyright (C) 2021-2022 Tactile Interactive, all rights reserved
+** Copyright (C) 2021-2023 Tactile Interactive, all rights reserved
 */
 
 // WaveView has a 1:1 relationship with a C++ Avatar.
@@ -153,7 +153,6 @@ export class WaveView extends React.Component {
 					|| this.formerWidth != this.waveViewEl.clientWidth
 					|| this.formerHeight != s.height) ) {
 			if (traceScaling) {
-				console.log(``);
 				console.log(`🏄 🏄 mainEAvatar=${this.mainEAvatar.label}`);
 				console.log(`    formerShowVoltage=${this.formerShowVoltage}   showVoltage=${p.showVoltage} `);
 				console.log(`    formerWidth=${this.formerWidth}   wv.clientWidth=${this.waveViewEl.clientWidth} `);

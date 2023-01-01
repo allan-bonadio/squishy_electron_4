@@ -1,6 +1,6 @@
 /*
 ** fft spec - testing fft code for Squishy Electron
-** Copyright (C) 2022-2022 Tactile Interactive, all rights reserved
+** Copyright (C) 2022-2023 Tactile Interactive, all rights reserved
 */
 
 //#include <string>

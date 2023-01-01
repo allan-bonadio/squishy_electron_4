@@ -1,6 +1,6 @@
 /*
 ** cooley-tuckey fft algorithm -- spectral analysis for Squishy Electron
-** Copyright (C) 2022-2022 Tactile Interactive, all rights reserved
+** Copyright (C) 2022-2023 Tactile Interactive, all rights reserved
 */
 
 

@@ -1,6 +1,6 @@
 /*
 ** t thread -- top level thread source for crunching thread
-** Copyright (C) 2022-2022 Tactile Interactive, all rights reserved
+** Copyright (C) 2022-2023 Tactile Interactive, all rights reserved
 */
 /* eslint-disable no-restricted-globals */
 

@@ -1,6 +1,6 @@
 /*
 ** View Buffer -- a wrapped buffer of float32s meant to be sent to webgl and the gpu
-** Copyright (C) 2021-2022 Tactile Interactive, all rights reserved
+** Copyright (C) 2021-2023 Tactile Interactive, all rights reserved
 */
 
 

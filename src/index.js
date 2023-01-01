@@ -1,3 +1,8 @@
+/*
+** index js -- root JS file for Squishy Electron
+** Copyright (C) 2021-2023 Tactile Interactive, all rights reserved
+*/
+
 // uncomment this only for debugging re-render bugs
 //import './wdyr'; // <--- wdyr must be first import
 

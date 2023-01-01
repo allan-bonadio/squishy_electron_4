@@ -1,6 +1,6 @@
 /*
 ** Resolution/Space tab -- lets user choose a new nStates
-** Copyright (C) 2021-2022 Tactile Interactive, all rights reserved
+** Copyright (C) 2021-2023 Tactile Interactive, all rights reserved
 */
 
 //import PropTypes from 'prop-types';

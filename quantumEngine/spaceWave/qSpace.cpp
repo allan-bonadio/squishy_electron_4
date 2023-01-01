@@ -1,7 +1,7 @@
 /*
 ** quantum Space -- where an electron (or whatever) lives and moves around
 **		and the forces that impact its motion and time evolution
-** Copyright (C) 2021-2022 Tactile Interactive, all rights reserved
+** Copyright (C) 2021-2023 Tactile Interactive, all rights reserved
 */
 
 

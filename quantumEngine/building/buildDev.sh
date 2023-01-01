@@ -1,6 +1,12 @@
 #!/bin/bash
+##
+## Makefile -- makefile for quantum engine, for compiling the C++
+## Copyright (C) 2021-2022 Tactile Interactive, all rights reserved
+##
+
+
 # build for development -- script to compile emscripten/C++ sources into WebAssembly
-# Copyright (C) 2021-2022 Tactile Interactive, all rights reserved
+# Copyright (C) 2021-2023 Tactile Interactive, all rights reserved
 
 # turn this on for profiling help
 #PROFILING=--profiling

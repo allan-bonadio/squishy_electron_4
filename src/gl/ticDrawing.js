@@ -1,6 +1,6 @@
 /*
 ** tic drawing -- tic marks for the flat drawing, along the sides
-** Copyright (C) 2022-2022 Tactile Interactive, all rights reserved
+** Copyright (C) 2022-2023 Tactile Interactive, all rights reserved
 */
 
 import {abstractDrawing} from './abstractDrawing.js';

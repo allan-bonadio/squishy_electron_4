@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 /*
 ** generate exports -- generate files for JS calling C++ code through emscripten
-** Copyright (C) 2021-2022 Tactile Interactive, all rights reserved
+** Copyright (C) 2021-2023 Tactile Interactive, all rights reserved
 */
 
 let traceOutput = false;
