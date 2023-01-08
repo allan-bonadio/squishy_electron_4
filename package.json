@@ -14,13 +14,14 @@
     "web-vitals": "^2.1.4"
   },
   "scripts": {
+    "start": "react-scripts start",
+    "startbb": "REACT_EDITOR=bbedit react-scripts start",
     "test": "react-scripts test",
     "testjs": "node --experimental-vm-modules node_modules/.bin/jest --runInBand",
     "testjsdb": "node --experimental-vm-modules node_modules/.bin/jest --runInBand",
     "testcpp": "quantumEngine/testing/cppuRunner.sh \"$@\" ",
     "testcppdb": "quantumEngine/testing/cppuRunner.sh db \"$@\" ",
-    "start": "react-scripts start",
-    "startbb": "REACT_EDITOR=bbedit react-scripts start",
+    "cleanAll": "make cleanAll",
     "ejectdonteverdothis": "react-scripts eject",
     "build": "maint/build.sh",
     "deploy": "maint/deploy.sh"
