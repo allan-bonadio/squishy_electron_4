@@ -13,11 +13,29 @@ static bool traceConstruction = false;
 // here ix still points to the x location in the wave
 // but serial points to which wave in the flick
 
+/* ************************************************************ boundaries */
+
+// set to 'not yet encountered'
+void segmentBoundary::init(void) {
+	lock = 0;
+	boundary = -1;
+	loDone = hiDone = false;
+}
+
+int segmentBoundary::claim(void) {
+	return 0;
+}
+
+void segmentBoundary::iterate(void) {
+
+}
+
+
 /* ************************************************************ birth & death & basics */
 
 // each buffer is initialized to zero bytes therefore 0.0 everywhere
-qFlick::qFlick(qSpace *space, qGrinder *gr, int nW) :
-	qWave(space), qgrinder(gr), nWaves(nW), currentIx(0)
+qFlick::qFlick(qSpace *space, qGrinder *gr, int nW, int nThr) :
+	qWave(space), qgrinder(gr), nWaves(nW), nThreads(nThr), currentWave(0)
 {
 	if (! space)
 		throw std::runtime_error("qSpectrum::qSpectrum null space");
@@ -34,6 +52,13 @@ qFlick::qFlick(qSpace *space, qGrinder *gr, int nW) :
 	waves[0] = wave;
 	for (int w = 1; w < nWaves; w++)
 		waves[w] = allocateWave(nPoints);
+
+	// all the boundaries
+	nBoundaries = nThreads * nWaves;
+	boundaries = (segmentBoundary *) malloc(nBoundaries * sizeof(segmentBoundary));
+	for (int b = 0; b < nBoundaries; b++) {
+		boundaries[b].init();
+	}
 }
 
 qFlick::~qFlick() {
@@ -232,7 +257,7 @@ double qFlick::magnitude(int doubleSerial, int ix) {
 //	waves[0] = newWave;
 //
 //	// somebody will set this back to zero?
-//	currentIx++;
+//	currentWave++;
 //
 //	//dumpAllWaves("pushWave() done");
 //}
@@ -244,7 +269,7 @@ double qFlick::magnitude(int doubleSerial, int ix) {
 void qFlick::setCurrent(int newSerial) {
 	if (newSerial < 0 || newSerial >= nWaves)
 		printf("qFlick::setCurrent() bad serial: %d\n", newSerial);
-	currentIx = newSerial;
+	currentWave = newSerial;
 	wave = waves[newSerial];
 }
 
@@ -261,28 +286,22 @@ void qFlick::setCurrent(int newSerial) {
 // 		between the reals from doubleSerial and doubleSerial+1
 // you can't take it at zero cuz there's no Im before that.
 //double qFlick::innerProduct(void) {
-//	int doubleSerial = 1;  // not sure if I'll ever want this as a variable
+//	int doubleSerial )= 1;ever want this as a variable
 //
 //	printf("qFlick::innerProduct starting at serial %d\n", doubleSerial);
-//	qDimension *dims = space->dimensions;
-//	double sum = 0.;
-//	int end = dims->end;
-//	if (doubleSerial <= 0)
-//		throw std::runtime_error("Error in qFlick::innerProduct: doubleSerial is negative");
-////	const int t = doubleSerial / 2;
-////	const bool even = (doubleSerial & 1) == 0;
-////	qCx *newWave = waves[t];
-////	qCx *oldWave = waves[t + 1];
+//	qDimension *dims = space->dimensions; double sum = 0.; int end =
+//	dims->end; if (doubleSerial <= 0) throw std::runtime_error("Error in
+//	qFlick::innerProduct: doubleSerial is negative");
+//	//	const int t = doubleSerial / 2; const bool even = (doubleSerial & 1)
+//	//	== 0; qCx *newWave = waves[t]; qCx *oldWave = waves[t + 1];
 //
 //	//printf("        got to loop\n");
-//	for (int ix = dims->start; ix < end; ix++) {
-//		double mag = magnitude(doubleSerial, ix);
-//		sum += mag;
-//		//printf("                dserial=%d ix=%d  mag=%lf  sum=%lf\n",
-//		//	doubleSerial, ix, mag, sum);
-//	}
+//	for (int ix = dims->start; ix < end; ix++) { double mag =
+//	magnitude(doubleSerial, ix); sum += mag;
+//		//printf("                dserial=%d ix=%d  mag=%lf
+//		//sum=%lf\n", doubleSerial, ix, mag, sum);
 //	//printf("        returning sum=%lf\n", sum);
-//	return sum;
+//	return sum; }
 //}
 
 // normalize the top of the stack of waves; needs at least two waves in the flick
@@ -385,8 +404,6 @@ void qFlick::setCurrent(int newSerial) {
 ////printf(" got past loadViewBuffer\n");
 //}
 
-
-/* ************************************************************ visscher */
 
 // 	pushWave();
 

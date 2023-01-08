@@ -45,7 +45,7 @@ qGrinder::qGrinder(qSpace *sp, qAvatar *av, const char *lab)
 
 	magic = 'Grin';
 
-	qflick = new qFlick(space, this, 2);
+	qflick = new qFlick(space, this, 2, 2);
 
 	// so wave in the flick points to the zero-th wave
 
