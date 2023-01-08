@@ -76,6 +76,11 @@ let commonConstants = [
 	{name: 'contDISCRETE', cppType: 'int', value: 0},
 	{name: 'contWELL', cppType: 'int', value: 1},
 	{name: 'contENDLESS', cppType: 'int', value: 2},
+
+	// Tolerance for ==.  Absolute, not relative, we're comparing 𝜓 values here.
+	// all values are |𝜓| <1, and typically |𝜓| > roundoff error
+	// these are not really the radius, it's more rectangular, but pretty much the same idea
+	{name: 'ERROR_RADIUS', cppType: 'double', value: 1e-12},
 ];
 
 
