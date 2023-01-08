@@ -17,7 +17,6 @@ import {eSpaceCreatedPromise} from './engine/eEngine.js';
 import {interpretCppException} from './utils/errors.js';
 import WaveView from './view/WaveView.js';
 import CommonDialog from './widgets/CommonDialog.js';
-//import {setFamiliarVoltage} from './utils/voltageUtils.js';
 
 import {getASetting, storeASetting} from './utils/storeSettings.js';
 import {tooOldTerminate} from './utils/errors.js';
