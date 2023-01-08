@@ -12,7 +12,11 @@ window.isDevel = (process.env.NODE_ENV === 'development');
 
 
 export function dumpJsStack(where = 'somewhere') {
-	console.info(`${where} traceback: ${(new Error()).stack.replace(/^.*\n.*at dumpJsStack.*\n/, '\n')}`);
+	let tb = (new Error()).stack
+		.replace(/^.*\n.*at dumpJsStack.*\n/, '\n')
+		.replace(/Error: /, '\n')
+		.substr(0, 500)
+	console.info(`\n${where} traceback: ${tb}`);
 }
 window.dumpJsStack = dumpJsStack;
 
