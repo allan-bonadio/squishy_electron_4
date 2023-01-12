@@ -200,13 +200,16 @@ class GLView extends React.Component {
 			console.log(`🖼 🖼 BUT:  canvas.parent.clientWidth: ${this.canvas?.parentNode?.clientWidth ?? 'no canv'}`);
 		}
 
-		// the canvas w&h attributes define its inner coord system, and default size.
-		// We want them to reflect actual pixels on the screen
-		let cWidth = p.width, cHeight = p.height;
+		// the canvas w&h attributes define its inner coord system
+		// We want them to reflect actual pixels on the screen; should be same as client W&H
+		// offset outer W&H includes borders, 1px on all sides
+		let cWidth = p.width - 2, cHeight = p.height - 2;
 		if (this.canvas) {
-			let cRect = this.canvas.getBoundingClientRect();
-			cWidth = cRect.width;
-			cHeight = cRect.height;
+			cWidth = this.canvas.clientWidth;
+			cHeight = this.canvas.clientHeight;
+			//let cRect = this.canvas.getBoundingClientRect();
+			//cWidth = cRect.width;
+			//cHeight = cRect.height;
 		}
 
 		// but we override the size with CSS here.  Ultimately, bounding width will change to p.width
@@ -214,9 +217,9 @@ class GLView extends React.Component {
 			<canvas className='GLView'
 				width={cWidth} height={cHeight}
 				ref={ canvas => this.setGLCanvas(canvas) }
-				style={{width: `${p.width}px`, height: `${p.height}px`}}
 			/>
 		)
+		// took out style={{width: `${p.width}px`, height: `${p.height}px`}}
 	}
 
 	componentDidMount() {
@@ -231,9 +234,9 @@ class GLView extends React.Component {
 
 		if (this.canvas) {
 			// do this only when the dust has settled, other parts of the code depend on canvasFacts
-			let cRect = this.canvas.getBoundingClientRect();
-			p.canvasFacts.width = cRect.width;
-			p.canvasFacts.height = cRect.height;
+			//let cRect = this.canvas.getBoundingClientRect();
+			p.canvasFacts.width = this.canvas.clientWidth;
+			p.canvasFacts.height = this.canvas.clientHeight;
 		}
 		else
 			console.warn(`oops no canvas in GLView.componentDidUpdate()`)
