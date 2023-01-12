@@ -5,10 +5,10 @@
 
 
 #include "../spaceWave/qSpace.h"
-#include "../schrodinger/qAvatar.h"
+#include "qAvatar.h"
 #include "../schrodinger/qGrinder.h"
 #include "../debroglie/qWave.h"
-#include "../greiman/qViewBuffer.h"
+#include "qViewBuffer.h"
 #include "../testing/cppuMain.h"
 #include "../fourier/qSpectrum.h"
 

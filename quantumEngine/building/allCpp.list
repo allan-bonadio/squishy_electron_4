@@ -7,7 +7,7 @@ fourier/fftMain.cpp
 fourier/qSpectrum.cpp
 schrodinger/qGrinder.cpp
 schrodinger/hamiltonian.cpp
-schrodinger/qAvatar.cpp
+greiman/qAvatar.cpp
 schrodinger/qThread.cpp
 schrodinger/visscher.cpp
 spaceWave/jsSpace.cpp

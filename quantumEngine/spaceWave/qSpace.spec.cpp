@@ -5,7 +5,7 @@
 
 
 #include "qSpace.h"
-#include "../schrodinger/qAvatar.h"
+#include "../greiman/qAvatar.h"
 #include "../schrodinger/qGrinder.h"
 #include "../debroglie/qWave.h"
 #include "../greiman/qViewBuffer.h"

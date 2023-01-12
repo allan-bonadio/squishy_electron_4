@@ -9,7 +9,7 @@
 #include <stdexcept>
 
 #include "qSpace.h"
-#include "../schrodinger/qAvatar.h"
+#include "../greiman/qAvatar.h"
 #include "../schrodinger/qGrinder.h"
 #include "../debroglie/qWave.h"
 #include "../greiman/qViewBuffer.h"
@@ -24,7 +24,7 @@ static bool traceQSpace = false;
 // note if you just use the constructor and these functions,
 // NO waves or buffers will be allocated for you
 qSpace::qSpace(const char *lab)
-	: magic('Spac'), nDimensions(0), voltage(NULL), nPoints(0), nStates(0), voltageFactor(+.03) {
+	: magic('Spac'), nDimensions(0), voltage(NULL), nPoints(0), nStates(0), voltageFactor(-.1) {
 
 	if (traceQSpace) printf("🚀 🚀 qSpace::qSpace() constructor starts label:'%s'  this= %p\n", lab, (this));
 

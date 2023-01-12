@@ -14,7 +14,7 @@
 
 
 #include "../spaceWave/qSpace.h"
-#include "qAvatar.h"
+#include "../greiman/qAvatar.h"
 #include "qGrinder.h"
 //#include "../debroglie/qWave.h"
 //#include "../fourier/qSpectrum.h"

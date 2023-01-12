@@ -9,7 +9,7 @@
 #include <stdexcept>
 
 #include "../spaceWave/qSpace.h"
-#include "../schrodinger/qAvatar.h"
+#include "../greiman/qAvatar.h"
 #include "qGrinder.h"
 #include "../debroglie/qFlick.h"
 #include "../fourier/qSpectrum.h"

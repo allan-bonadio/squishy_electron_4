@@ -7,7 +7,7 @@
 #include <stdexcept>
 
 #include "../spaceWave/qSpace.h"
-#include "../schrodinger/qAvatar.h"
+#include "qAvatar.h"
 #include "../schrodinger/qGrinder.h"
 #include "../debroglie/qWave.h"
 #include "qViewBuffer.h"

@@ -7,7 +7,7 @@
 
 #include "../debroglie/qWave.h"
 #include "../fourier/qSpectrum.h"
-#include "../schrodinger/qAvatar.h"
+#include "../greiman/qAvatar.h"
 #include "../greiman/qViewBuffer.h"
 #include "../schrodinger/qGrinder.h"
 #include "../spaceWave/qSpace.h"

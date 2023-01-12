@@ -7,7 +7,7 @@
 #include "../debroglie/qWave.h"
 #include "../spaceWave/qSpace.h"
 #include "../testing/cppuMain.h"
-#include "qAvatar.h"
+#include "../greiman/qAvatar.h"
 #include "qGrinder.h"
 #include "../debroglie/qFlick.h"
 
