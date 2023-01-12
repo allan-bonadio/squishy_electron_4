@@ -4,6 +4,8 @@ echo "🎁 🛫 Deploy Production Squishy Electron" `date +%c`
 cd `dirname $0`
 cd ..
 
+echo you can do either make deploy or npm deploy, same
+
 # make sure it's there & compiled
 echo "🎁 🛫 make sure the build is there"
 for fn in index.html 'logos/logo|𝒆⟩3.png' qEng/quantumEngine.js qEng/quantumEngine.wasm qEng/quantumEngine.wasm.map

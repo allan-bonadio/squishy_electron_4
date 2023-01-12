@@ -20,7 +20,7 @@ cd ..
 
 if [ -z "$qEMSCRIPTEN" ]
 then
-	echo 'You have to define qEMSCRIPTEN and SSQUISH_ROOT in your '
+	echo 'You have to define qEMSCRIPTEN and SQUISH_ROOT in your '
 	echo 'login stuff like .profile (or .bashrc) for this whole project'
 	exit 55
 fi
@@ -38,7 +38,7 @@ MAX_DIMENSIONS=2
 
 echo ℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏ compile
 # https://emscripten.org/docs/tools_reference/emcc.html
-emcc -o quantumEngine.js -sLLD_REPORT_UNDEFINED \
+emcc -o wasm/quantumEngine.js -sLLD_REPORT_UNDEFINED \
 	-gsource-map --source-map-base /qEng/ \
 	-sASSERTIONS=2 -sSAFE_HEAP=1 -sSTACK_OVERFLOW_CHECK=2 \
 	-sDEMANGLE_SUPPORT=1 -sNO_DISABLE_EXCEPTION_CATCHING \

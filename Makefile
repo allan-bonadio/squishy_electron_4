@@ -23,4 +23,7 @@ test :
 build :
 	maint/build.sh
 
+deploy :
+	maint/deploy.sh
+
 

@@ -58,7 +58,7 @@ MAX_DIMENSIONS=2
 # even tried Xcode.  That was a worse disaster.  Stick with GNU.
 set -x
 #clang -o cppuTestBin -Wno-tautological-undefined-compare  \
-g++ -o cppuTestBin -Wno-tautological-undefined-compare  \
+g++ -o wasm/cppuTestBin -Wno-tautological-undefined-compare  \
 	-g -O0 \
 	-std=c++11 -fexceptions  \
 	-DqDEV_VERSION -DMAX_LABEL_LEN=$MAX_LABEL_LEN -DMAX_DIMENSIONS=$MAX_DIMENSIONS \
@@ -98,11 +98,12 @@ done
 if $debug
 then
 	echo "gonna run: cppuTestBin -v -c $moreArgs"
+	echo "Really this should be a relative path!!"
 	# it's a real C++ program and I can use gdb!
 	#  well, lldb at least.
-	lldb  -f /opt/dvl/squishyElectron/SquishyElectron/quantumEngine/cppuTestBin -- -v -c $moreArgs
+	lldb  -f $SQUISH_ROOT/quantumEngine/wasm/cppuTestBin -- -v -c $moreArgs
 else
-	./cppuTestBin -v -c  $moreArgs
+	wasm/cppuTestBin -v -c  $moreArgs
 fi
 
 

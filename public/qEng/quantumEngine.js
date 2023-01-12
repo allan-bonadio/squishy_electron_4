@@ -1,1 +1,1 @@
-../../quantumEngine/quantumEngine.js
+../../quantumEngine/wasm/quantumEngine.js

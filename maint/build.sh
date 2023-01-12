@@ -8,6 +8,7 @@ cd $SQUISH_ROOT
 maint/scanForTraces.sh || exit $?
 
 echo "🎁 🔨 Clean and Build Production Squishy Electron"  `date +%c`
+echo you can do either make build or npm build, same
 
 # must create the C++ wasm binary first
 
@@ -37,10 +38,10 @@ if [ -z "$buildWithDev" ]
 then
 	# complains if any symlink points to a nonexistent file.  sigh.
 	mv public/qEng/quantumEngine.wasm.map /tmp
-	react-scripts build || exit 37
+	node_modules/.bin/react-scripts build || exit 37
 	mv /tmp/quantumEngine.wasm.map public/qEng/
 else
-	react-scripts build || exit 37
+	node_modules/.bin/react-scripts build || exit 37
 fi
 echo
 echo "🎁 🔨  NPM Build Completed"
@@ -49,7 +50,7 @@ echo "🎁 🔨  NPM Build Completed"
 echo "🎁 🔨  starting final cleanup"
 # move these out of the way so they don't get confused with dev versions
 # but don't delete them in case I have to examine them later
-cd quantumEngine
+cd quantumEngine/wasm
 if [ -n "$buildWithDev" ]
 then mv -f quantumEngine.js quantumEngine.wasm quantumEngine.wasm.map /tmp
 else mv -f quantumEngine.js quantumEngine.wasm /tmp

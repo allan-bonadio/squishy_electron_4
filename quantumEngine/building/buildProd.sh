@@ -33,7 +33,7 @@ MAX_DIMENSIONS=2
 echo 🎁 🎁 🎁 🎁 🎁 🎁 🎁 🎁 🎁 🎁 🎁 🎁 🎁 🎁 🎁 🎁 🎁 🎁  compile
 # https://emscripten.org/docs/tools_reference/emcc.html
 # https://emscripten.org/docs/optimizing/Optimizing-Code.html
-emcc -o quantumEngine.js -sLLD_REPORT_UNDEFINED \
+emcc -o wasm/quantumEngine.js -sLLD_REPORT_UNDEFINED \
 	-O3 -flto --closure 1 \
 	-sASSERTIONS=2 -sSAFE_HEAP=1 -sSTACK_OVERFLOW_CHECK=2 \
 	-sDEMANGLE_SUPPORT=1 -sNO_DISABLE_EXCEPTION_CATCHING \
