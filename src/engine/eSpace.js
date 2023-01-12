@@ -5,7 +5,7 @@
 import qe from './qe.js';
 import {prepForDirectAccessors} from '../utils/directAccessors.js';
 //import eWave from './eWave.js';
-import {setFamiliarVoltage} from '../utils/voltageUtils.js';
+import voltInfo from '../utils/voltInfo.js';
 import eAvatar from './eAvatar.js';
 import eGrinder from './eGrinder.js';
 import {getAGroup} from '../utils/storeSettings.js';
@@ -65,8 +65,10 @@ export class eSpace {
 		// direct access into the voltage buffer
 		this.voltageBuffer = new Float64Array(window.Module.HEAPF64.buffer,
 				this._voltage, this.nPoints);;
+		let voltageSettings = getAGroup('voltageSettings');
+		this.vInfo = new voltInfo(this.start, this.end, this.voltageBuffer, voltageSettings);
 		let voltageParams = getAGroup('voltageParams');
-		setFamiliarVoltage(this.start, this.end, this.voltageBuffer, voltageParams);
+		this.vInfo.setFamiliarVoltage(voltageParams);
 
 		// the avatars create their vbufs and waves, and we make a copy for ourselves
 		this.mainEAvatar = new eAvatar(this, this._mainAvatar);
@@ -174,9 +176,7 @@ export class eSpace {
 	populateFamiliarVoltage =
 	(voltageParams) => {
 		// sets the numbers
-		setFamiliarVoltage(this.start, this.end, this.voltageBuffer, voltageParams);
-
-		// no this doesn't affect the vBuffer
+		this.vInfo.setFamiliarVoltage(voltageParams);
 	}
 
 	// voltage area needs to be told when the data changes.  can't put the whole voltage buffer in the state!
