@@ -18,7 +18,7 @@ class App extends React.Component {
 		App.me = this;
 
 		this.state = {
-			clientWidth: document.body.clientWidth,  // window width as of constructor
+			//clientWidth: document.body.clientWidth,  // window width as of constructor
 			squishPanelExists: true,  // briefly cycles off and on when user changes resolution
 			isDialogShowing: false,
 			cppRunning: false,
@@ -36,7 +36,7 @@ class App extends React.Component {
 		window.addEventListener('resize', ev => {
 			if (traceResize)
 				console.log(`🍦 window resize to ${this.appEl?.clientWidth}`, ev);
-			console.assert(ev.currentTarget === window, `ev.currentTarget === window`);
+			console.assert(ev.currentTarget === window, `ev.currentTarget =?== window`);
 
 			// if we don't set the state here, nobody redraws.  Otherwise, get body.clientWidth directly.
 			this.setState({clientWidth: bodyClientWidth})
@@ -44,12 +44,12 @@ class App extends React.Component {
 
 		// meanwhile, sometimes the first render starts before the vertical scrollbar kicks in,
 		// cuz there's nothing in the page yet.  This confuses everybody, but give it a kick.
+		// NO somehow if I don't init clientWidth in constructor, this catches and fixes it
 		if (this.state.clientWidth != bodyClientWidth) {
 			this.setState({clientWidth: bodyClientWidth});
 			if (traceResize)
-				console.log(`🍦 mounting resize cuz scrollbar:
-					${this.state.clientWidth} --> ${bodyClientWidth} `);
-			debugger;
+				console.log(`🍦 mounting resize cuz scrollbar: ${this.state.clientWidth} --> ${bodyClientWidth} `);
+			//debugger;
 		}
 	}
 
@@ -74,7 +74,7 @@ class App extends React.Component {
 
 	componentDidUpdate() {
 		if (!this.state.squishPanelExists) {
-			// after SquishPanel has been excluded from one render,
+			// after res change and SquishPanel has been excluded from one render,
 			// that guarantees that all the other components have been freed.
 			// So now we can start over.  big hack, maybe after I figure out how to kill hot reload I can get rid of this crap.
 			SquishPanel.anticipateConstruction();
