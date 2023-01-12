@@ -259,7 +259,6 @@ export class ControlPanel extends React.Component {
 			return <SetVoltageTab
 				voltageParams={{ valleyPower, valleyScale, valleyOffset,}}
 				setCPState={this.setCPState}
-				space={this.space}
 				toggleShowVoltage={p.toggleShowVoltage}
 				showVoltage={p.showVoltage}
 			/>;
