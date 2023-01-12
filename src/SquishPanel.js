@@ -221,9 +221,11 @@ export class SquishPanel extends React.Component {
 	// the upper left and right numbers: insert them into the HTML.  Faster than react.
 	// should move this to like WaveView
 	showTimeNIntegration() {
-		// need them instantaneously - react is too slow
-		document.querySelector('.voNorthWest').innerHTML = this.grinder.elapsedTime.toFixed(2);
-		document.querySelector('.voNorthEast').innerHTML =  this.grinder.frameSerial;
+		// need them instantaneously - react is too slow.  but react replaces the whole screen upon error
+		let nw = document.querySelector('.voNorthWest')
+		if (nw) nw.innerHTML = this.grinder.elapsedTime.toFixed(2);
+		let ne = document.querySelector('.voNorthEast')
+		if (ne) ne.innerHTML =  this.grinder.frameSerial;
 	}
 
 	// Integrate the ODEs by one 'integrate', or not.  and then display.  or not.
