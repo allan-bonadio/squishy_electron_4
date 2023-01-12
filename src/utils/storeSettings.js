@@ -208,10 +208,10 @@ export function createStoreSettings() {
 	makeParam('voltageParams', 'valleyOffset', 50, {min: 0, max: 100});
 
 	makeParam('voltageSettings', 'showVoltage', true, [true, false]);
-	makeParam('voltageSettings', 'scrollSetting', 0, {min: -256, max: 256});
-	makeParam('voltageSettings', 'heightVolts', 4, {min: 1/64, max: 256});
-	makeParam('voltageSettings', 'scrollMin', -16, {min: -256, max: 256});
-	makeParam('voltageSettings', 'scrollMax', 16, {min: -256, max: 256});
+	makeParam('voltageSettings', 'bottomVolts', -.25, {min: -256, max: 256});
+	makeParam('voltageSettings', 'heightVolts', 1, {min: 1/64, max: 256});
+	makeParam('voltageSettings', 'scrollMin', -.5, {min: -256, max: 256});
+	// always = min + 2 * heightVolts makeParam('voltageSettings', 'scrollMax', 16, {min: -256, max: 256});
 
 	/* ************************************ frameSettings */
 	makeParam('frameSettings', 'isTimeAdvancing', false,  [false, true]);
@@ -232,17 +232,19 @@ export function getAGroup(groupName) {
 		let savedGroup = localStorage.getItem(groupName);
 		group = JSON.parse(savedGroup);
 	} catch (ex) {
-		// in hte event that some bogus value gets stored in the localStorage, revert to default.
+		// in the event that some bogus value gets stored in the localStorage, revert to default.
 		group = alternateStoreDefaults[groupName];
 	}
 
-	// if completely uninitialized, create each var in the group
-	if (!group) {
-		const asg = alternateStore[groupName];
+	// if completely uninitialized, create.
+	if (!group)
 		group = {};
-		for (let varName in asg)
-			group[varName] = asg[varName].default;
-	}
+
+	// If some are missing, fill those in.
+	const asg = alternateStore[groupName];
+	for (let varName in asg)
+		group[varName] ??= asg[varName].default;
+
 	return group;
 }
 
@@ -257,7 +259,8 @@ export function storeASetting(groupName, varName, newValue) {
 	|| !alternateStoreVerifiers[groupName]
 	|| !alternateStoreVerifiers[groupName][varName]) debugger;
 
-	// if bad value, just set to default.  ////Should clamp continuum variables to min or max!
+	// if bad value, just set to default.
+	// Should clamp continuum variables to min or max!  should eliminate variables no longer part of the group!
 	if (newValue === undefined || !alternateStoreVerifiers[groupName][varName](newValue))
 		newValue = alternateStoreDefaults[groupName][varName];
 
