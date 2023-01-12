@@ -13,7 +13,7 @@ import eThread from './eThread.js';
 
 // all of these must be attached to window to  get called by c++
 
-let traceStartup = false;
+let traceStartup = true;
 let tracePromises = false;
 
 /* ****************************************************** app startup */
@@ -85,40 +85,47 @@ export function recreateMainSpace(spaceParams) {
 
 // Called by C++ when C++ has finally started up.  Once only, at page load.
 // do NOT export this; it's global cuz quantumEngine.js, the compiled C++ proxy,
-// has to have access to it early on, and it doesn't understand JS exports.
+// has to have access to it early on, and it can't reach JS exports.
 function quantumEngineHasStarted(maxDims, maxLab) {
 	MAX_DIMENSIONS = maxDims;
 	MAX_LABEL_LEN = maxLab;
 
-	defineQEngineFuncs();
-	if (traceStartup) console.log(`QEngineFuncs 🐣  defined`);
+	// get out from under emscripten/C++; otherwise,
+	// exceptions raised during initialization make a mess when it bubbles up there.
+	setTimeout(() => {
+		defineQEngineFuncs();
+		if (traceStartup) console.log(`QEngineFuncs 🐣  defined`);
 
-	// must come After defineQEngineFuncs() cuz it uses continuum constants on qe
-	createStoreSettings();
-	if (traceStartup) console.log(`StoreSettings 🐣  created`);
+		// must come After defineQEngineFuncs() cuz it uses continuum constants on qe
+		createStoreSettings();
+		if (traceStartup) console.log(`StoreSettings 🐣  created`);
 
-	qe.cppLoaded = true;
+		qe.cppLoaded = true;
 
-	// and this can't happen until the storeSettings and QEngine funcs
-	create1DMainSpace({
-		N: getASetting('spaceParams', 'N'),
-		continuum: getASetting('spaceParams', 'continuum'),
-		label: 'main'});
-	if (traceStartup) console.log(`main space 🐣  created`);
+		// and this can't happen until the storeSettings and QEngine funcs
+		create1DMainSpace({
+			N: getASetting('spaceParams', 'N'),
+			continuum: getASetting('spaceParams', 'continuum'),
+			label: 'main'});
+		if (traceStartup) console.log(`main space 🐣  created`);
 
-	// startup threads needs avatar
-	eSpaceCreatedPromise
-	.then(space => {
-		eThread.createThreads(space.mainEAvatar);
+		// startup threads needs avatar
+		eSpaceCreatedPromise
+		.then(space => {
+			eThread.createThreads(space.mainEAvatar);
 
-		if (traceStartup) console.log(`threads 🐣  created`);
-		if (tracePromises) console.log(
-			`🐥 quantumEngineHasStarted:  space created and resolving eSpaceCreatedPromise`);
-	})
-	.catch(ex => {
-		console.error(`eSpaceCreatedPromise failed`, ex);
-		debugger;
-	});
+			if (traceStartup) console.log(`threads 🐣  created`);
+			if (tracePromises) console.log(
+				`🐥 quantumEngineHasStarted:  space created and resolving eSpaceCreatedPromise`);
+		})
+		.catch(ex => {
+			// help!  Mister Wizard!
+			// eslint-disable-next-line no-ex-assign
+			ex = interpretCppException(ex);
+			console.error(`eSpaceCreatedPromise failed`, ex);
+			debugger;
+		});
+	}, 0);
 
 };
 
