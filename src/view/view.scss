@@ -3,9 +3,7 @@
 ** Copyright (C) 2021-2023 Tactile Interactive, all rights reserved
 */
 
-$voltageColor: #fd4;
-$voltageHoverColor: #fec;
-$sizeBoxSize: 32px;
+@use "../widgets/common.scss";
 
 // top of the WaveView where the graphics goes.  Height dictated by where the
 // user last dragged the resize box in the corner, in WaveView state.  Width
@@ -56,7 +54,7 @@ $sizeBoxSize: 32px;
 				pointer-events: auto;
 				bottom: 1px;
 				right: 0;
-				width: $sizeBoxSize; height: $sizeBoxSize;
+				width: common.$sizeBoxSize; height: common.$sizeBoxSize;
 				z-index: 20;
 				cursor: ns-resize;
 				opacity: 0.1;
@@ -76,7 +74,7 @@ $sizeBoxSize: 32px;
 			pointer-events: none;  // need to click through for size box
 
 			path.visibleLine {
-				stroke: $voltageColor;
+				stroke: common.$voltageColor;
 				stroke-width: 3;
 				pointer-events: none;
 			}
@@ -89,7 +87,7 @@ $sizeBoxSize: 32px;
 			}
 
 			rect.wellSlab {
-				fill: $voltageColor;
+				fill: common.$voltageColor;
 
 			}
 		}  // end of VoltageArea
@@ -105,11 +103,11 @@ $sizeBoxSize: 32px;
 		text-align: center;
 		flex: 0 0;
 
-		background-color: $voltageColor;
+		background-color: common.$voltageColor;
 
 		// zoom in/out buttons
 		button {
-			background-color: $voltageColor;
+			background-color: common.$voltageColor;
 			border: none;
 			flex: 0 0;
 			display: block;
@@ -120,28 +118,44 @@ $sizeBoxSize: 32px;
 			}
 		}
 		button:hover {
-			background-color: $voltageHoverColor;
+			background-color: common.$voltageLighterColor;
 		}
 		button:active {
 			background-color: #44f;
 		}
 
-		// this emoji
-		.lightningBolt {
-			pointer-events: none;
-			font-size: 1.5em;
+		.voltRail {
+			position: relative;
+			flex: 1 1;
+			margin: 2px;
+			border: 1px inset #aaa;
+			background-color: common.$voltageDarkerColor;
+
+			.voltThumb {
+				position: absolute;
+				left: 0;
+				right: 0;
+				height: 2em;
+				line-height: 2em;
+				cursor: ns-resize;
+
+				border: 1px outset #aaa;
+				background-color: common.$voltageColor;
+
+				text-align: center;
+			}
 		}
 
-		input[type=range] {
-			display: block;
-			width: 100%;
-			flex: 1 1;
-			appearance: slider-vertical;  // works on safari & chrome, not firefox
-			color: #000;
-			background-color: #voltageColor;
-			border: none;
-			accent-color: #fd0;
-		}
+		//input[type=range] {
+		//	display: block;
+		//	width: 100%;
+		//	flex: 1 1;
+		//	appearance: slider-vertical;  // works on safari & chrome, not firefox
+		//	color: #000;
+		//	background-color: #voltageColor;
+		//	border: none;
+		//	accent-color: #fd0;
+		//}
 	}
 }
 

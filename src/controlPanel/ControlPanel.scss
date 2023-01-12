@@ -2,6 +2,7 @@
 ** Control Panel -- everything under the WaveView component (almost)
 ** Copyright (C) 2021-2023 Tactile Interactive, all rights reserved
 */
+@use "../widgets/common.scss";
 
 .ControlPanel {
 	// with the tabs
@@ -148,10 +149,10 @@
 	}
 
 
-	.MiniGraph {
-		border: #888 solid 1px;
-		background: #222;
-	}
+	//.MiniGraph {
+	//border: #888 solid 1px;
+	//background: #222;
+	//}
 
 
 	/* **************************************** Set Wave tab */
@@ -200,9 +201,15 @@
 			width: 24em;
 		}
 
-		.valleyMiniGraph {
-			float: left;
-			width: 200px;
+		.miniGraph {
+			//float: left;
+			width: 300px;
+			height: 150px;
+			border: #aaa 1px outset;
+			stroke: common.$voltageColor;
+			stroke-width: 1;
+			pointer-events: none;
+			background-color: #000;
 		}
 	}
 
