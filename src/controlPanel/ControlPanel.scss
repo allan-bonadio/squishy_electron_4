@@ -212,6 +212,8 @@
 			gap: .5em;
 			width: 450px;
 
+			// will trigger 2 warnings, it's ok, ignore it as long as it still works
+			// "The keyword 'slider-vertical' ... is not standardized..."
 			.canyonScale, .canyonPower {
 				appearance: slider-vertical;
 				width: 2.5em;
