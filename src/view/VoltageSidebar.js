@@ -6,7 +6,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-import voltInfo from '../utils/voltInfo.js';
+import voltDisplay from '../utils/voltDisplay.js';
 
 let traceVoltageSidebar = false;
 let traceDragging = true;
@@ -47,7 +47,7 @@ function setPT() {
 
 		// whatever the slider should show, between minMini and maxMaxi
 		//scrollSetting: PropTypes.number.isRequired,
-		vInfo: PropTypes.instanceOf(voltInfo),
+		vInfo: PropTypes.instanceOf(voltDisplay),
 
 		// Same as voltage area, this shows and hides along with it
 		// but won't draw anything if the checkbox is off

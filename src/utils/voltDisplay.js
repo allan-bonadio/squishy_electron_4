@@ -33,7 +33,7 @@ const isOK = (c) => {
 }
 
 // this contains the voltage scrolling and zooming numbers and what's visible
-export class voltInfo {
+export class voltDisplay {
 	// make it from given settings obj. Note we don't get the buffer from the space,
 	// cuz the Voltage minigraph needs its own buffer
 	constructor(start, end, voltageBuffer, settings) {
@@ -63,9 +63,9 @@ export class voltInfo {
 		this.adjustScrollBounds();
 	}
 
-	// create a voltInfo the way the app needs it
+	// create a voltDisplay the way the app needs it
 	static voltInfoFromSettingsSpace(space) {
-		return new voltInfo(
+		return new voltDisplay(
 			space.start, space.end,
 			space.voltageBuffer,
 			getAGroup('voltageSettings')
@@ -269,7 +269,7 @@ export class voltInfo {
 		let start = this.start;
 		let end = this.end;
 		if (tracePathAttribute)
-			console.log(`⚡️ ⚡️ voltInfo.makePathAttribute(${start}, ${end})`);
+			console.log(`⚡️ ⚡️ voltDisplay.makePathAttribute(${start}, ${end})`);
 
 		// yawn too early?
 		if (! this.yScale) {
@@ -325,13 +325,13 @@ export class voltInfo {
 
 		let final = points.join('');
 		if (tracePathAttribute) {
-			console.log(`⚡️ ⚡️  voltInfo.makePathAttribute: done`, final);
+			console.log(`⚡️ ⚡️  voltDisplay.makePathAttribute: done`, final);
 		}
 		return final;
 	}
 }
 
-export default voltInfo;
+export default voltDisplay;
 
 //			if ((x==null) || !isFinite(x) || (y==null) || !isFinite(y))
 //				debugger;

@@ -10,7 +10,7 @@ import {scaleLinear} from 'd3-scale';
 
 import qe from '../engine/qe.js';
 import eSpace from '../engine/eSpace.js';
-//import {dumpVoltage, makeVoltagePathAttribute} from '../utils/voltInfo.js';
+//import {dumpVoltage, makeVoltagePathAttribute} from '../utils/voltDisplay.js';
 
 // I dunno but the voltages I'm generating are too strong.
 // So I reduced it by this factor, but still have to magnify it to make it visible.

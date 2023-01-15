@@ -1,10 +1,10 @@
 /*
-** voltInfo test -- testing hte math for viewing and zooming the voltage in the WaveView
+** voltDisplay test -- testing hte math for viewing and zooming the voltage in the WaveView
 ** Copyright (C) 2022-2023 Tactile Interactive, all rights reserved
 */
 
 import {expect, test, jest} from '@jest/globals';
-import voltInfo from './voltInfo.js';
+import voltDisplay from './voltDisplay.js';
 import {dumpJsStack} from './errors.js';
 
 //import {getASetting, storeASetting, getAGroup, storeAGroup} from '../utils/storeSettings.js';
@@ -32,7 +32,7 @@ describe(`findVoltExtremes() method`, () => {
 		 //console.info(`findVoltExtremes() method`);
 		// shouldn't matter what the settings passed in are
 		volts16 = new Float64Array(16);  // all zeroes, right?
-		vInfo = new voltInfo(0, 16, volts16,
+		vInfo = new voltDisplay(0, 16, volts16,
 			{showVoltage: true, scrollMin: 0, heightVolts: 0, bottomVolts: 0,});
 
 	})
@@ -102,9 +102,9 @@ describe(`voltage creation & consistency`, () => {
 		[{scrollMin: 6, heightVolts: 10, bottomVolts: 8}, munger,
 			{scrollMin: 6, scrollMax: 16, actualMax: 26, heightVolts: 10, bottomVolts: 8,}],
 
-	])(`voltInfo created w/%j  munger? %p should yield %o`, (settings, mungeFunc, expected) => {
+	])(`voltDisplay created w/%j  munger? %p should yield %o`, (settings, mungeFunc, expected) => {
 		mungeFunc?.();
-		vInfo = new voltInfo(0, 16, volts16,
+		vInfo = new voltDisplay(0, 16, volts16,
 			{showVoltage: true, ...settings});
 		tryOutConsistency(vInfo);
 

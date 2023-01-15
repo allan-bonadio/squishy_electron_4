@@ -23,7 +23,7 @@ import './view.scss';
 // import flatDrawingViewDef from './flatDrawingViewDef.js';
 import {getAGroup, getASetting, storeASetting} from '../utils/storeSettings.js';
 
-import voltInfo from '../utils/voltInfo.js';
+import voltDisplay from '../utils/voltDisplay.js';
 import VoltageArea from './VoltageArea.js';
 import VoltageSidebar from './VoltageSidebar.js';
 import GLView from '../gl/GLView.js';
@@ -101,7 +101,7 @@ export class WaveView extends React.Component {
 			this.grinder = space.grinder;
 			this.mainEAvatar = space.mainEAvatar;
 
-			this.vInfo = new voltInfo(space.start, space.end, space.voltageBuffer,
+			this.vInfo = new voltDisplay(space.start, space.end, space.voltageBuffer,
 				getAGroup('voltageSettings'));
 			this.setState({vInfo: this.vInfo});////
 		})

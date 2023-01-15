@@ -10,7 +10,7 @@ import PropTypes from 'prop-types';
 //import {path as d3path} from 'd3-path';
 
 // eslint-disable-next-line no-unused-vars
-import voltInfo from '../utils/voltInfo.js';
+import voltDisplay from '../utils/voltDisplay.js';
 //import eSpace from '../engine/eSpace.js';
 //import TextNSlider from '../widgets/TextNSlider.js';
 import {storeASetting, getAGroup, storeAGroup, alternateMinMaxs} from '../utils/storeSettings.js';
@@ -54,8 +54,8 @@ debugger;
 
 			// used for depicting what the user's selected.  Copy from live one.
 			this.exampleBuffer = new Float64Array(space.nPoints);
-			voltInfo.copyVolts(this.exampleBuffer, space.voltageBuffer);
-			this.miniVolts = new voltInfo(space.start, space.end,
+			voltDisplay.copyVolts(this.exampleBuffer, space.voltageBuffer);
+			this.miniVolts = new voltDisplay(space.start, space.end,
 				this.exampleBuffer, getAGroup('voltageSettings'));
 
 			// only now set the state, when we're prepared to render
@@ -69,7 +69,7 @@ debugger;
 		if (!this.vInfo)
 			return;
 debugger;
-		voltInfo.copyVolts(this.space.voltageBuffer, this.exampleBuffer);
+		voltDisplay.copyVolts(this.space.voltageBuffer, this.exampleBuffer);
 		this.vInfo.populateFamiliarVoltage({...this.state});
 
 		// only NOW do we set it in the localStorage

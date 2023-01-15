@@ -5,7 +5,7 @@
 import qe from './qe.js';
 import {prepForDirectAccessors} from '../utils/directAccessors.js';
 //import eWave from './eWave.js';
-import voltInfo from '../utils/voltInfo.js';
+import voltDisplay from '../utils/voltDisplay.js';
 import eAvatar from './eAvatar.js';
 import eGrinder from './eGrinder.js';
 import {getAGroup} from '../utils/storeSettings.js';
@@ -66,7 +66,7 @@ export class eSpace {
 		this.voltageBuffer = new Float64Array(window.Module.HEAPF64.buffer,
 				this._voltage, this.nPoints);;
 		let voltageSettings = getAGroup('voltageSettings');
-		this.vInfo = new voltInfo(this.start, this.end, this.voltageBuffer, voltageSettings);
+		this.vInfo = new voltDisplay(this.start, this.end, this.voltageBuffer, voltageSettings);
 		let voltageParams = getAGroup('voltageParams');
 		this.vInfo.setFamiliarVoltage(voltageParams);
 
