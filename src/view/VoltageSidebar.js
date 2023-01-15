@@ -47,7 +47,7 @@ function setPT() {
 
 		// whatever the slider should show, between minMini and maxMaxi
 		//scrollSetting: PropTypes.number.isRequired,
-		vInfo: PropTypes.instanceOf(voltDisplay),
+		vDisp: PropTypes.instanceOf(voltDisplay),
 
 		// Same as voltage area, this shows and hides along with it
 		// but won't draw anything if the checkbox is off
@@ -63,7 +63,7 @@ function setPT() {
 // ultimately, this is a <svg node with a <path inside it
 export function VoltageSidebar(props) {
 	if (!props) return 'no props';  // too early
-	let v = props.vInfo;
+	let v = props.vDisp;
 	if (!v) return '';  // too early
 
 	if (traceVoltageSidebar) {
@@ -88,7 +88,7 @@ export function VoltageSidebar(props) {
 			thumbY = Math.min(freedom, Math.max(0, ev.pageY - topOfRail));
 			let newFrac = 1 - thumbY / railHeight;
 
-			props.scrollVoltHandler(props.vInfo.changeScroll(newFrac));
+			props.scrollVoltHandler(props.vDisp.changeScroll(newFrac));
 			if (traceDragging)
 				console.log(`🍟 mouse Move newFrac=${newFrac} freedom=${freedom} shd be constant`);
 		}

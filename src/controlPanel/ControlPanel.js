@@ -47,6 +47,8 @@ export class ControlPanel extends React.Component {
 			endDraw: PropTypes.number.isRequired,
 		}),
 		refreshStats: PropTypes.func.isRequired,
+
+		tellMeWhenVoltsChanged: PropTypes.func.isRequired,
 	}
 
 	constructor(props) {
@@ -261,6 +263,7 @@ export class ControlPanel extends React.Component {
 				setCPState={this.setCPState}
 				toggleShowVoltage={p.toggleShowVoltage}
 				showVoltage={p.showVoltage}
+				tellMeWhenVoltsChanged={p.tellMeWhenVoltsChanged}
 			/>;
 
 		case 'space':

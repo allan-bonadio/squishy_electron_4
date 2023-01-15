@@ -14,25 +14,25 @@ import {dumpJsStack} from './errors.js';
 let traceObj = false;
 
 // minimal expect() checks to see if it's ok
-function tryOutConsistency(vInfo) {
-	expect(vInfo.heightVolts).toBeGreaterThan(0);
-	expect(vInfo.heightVolts).toBeLessThan(1000);
+function tryOutConsistency(vDisp) {
+	expect(vDisp.heightVolts).toBeGreaterThan(0);
+	expect(vDisp.heightVolts).toBeLessThan(1000);
 
-	expect(vInfo.bottomVolts).toBeGreaterThan(-1000);
-	expect(vInfo.bottomVolts).toBeLessThan(1000);
+	expect(vDisp.bottomVolts).toBeGreaterThan(-1000);
+	expect(vDisp.bottomVolts).toBeLessThan(1000);
 
-	expect(vInfo.voltMax).toBeGreaterThanOrEqual(vInfo.voltMin);
+	expect(vDisp.voltMax).toBeGreaterThanOrEqual(vDisp.voltMin);
 }
 
 let volts16;
-let vInfo;
+let vDisp;
 
 describe(`findVoltExtremes() method`, () => {
 	beforeEach(() => {
 		 //console.info(`findVoltExtremes() method`);
 		// shouldn't matter what the settings passed in are
 		volts16 = new Float64Array(16);  // all zeroes, right?
-		vInfo = new voltDisplay(0, 16, volts16,
+		vDisp = new voltDisplay(0, 16, volts16,
 			{showVoltage: true, scrollMin: 0, heightVolts: 0, bottomVolts: 0,});
 
 	})
@@ -48,14 +48,14 @@ describe(`findVoltExtremes() method`, () => {
 	])(`at [2] = %i, at [9] = %i`, (at2, at9, mini, maxi) => {
 		volts16[2] = at2;
 		volts16[9] = at9;
-		vInfo.findVoltExtremes();
-		expect(vInfo.voltMin).toEqual(mini);
-		expect(vInfo.voltMax).toEqual(maxi);
+		vDisp.findVoltExtremes();
+		expect(vDisp.voltMin).toEqual(mini);
+		expect(vDisp.voltMax).toEqual(maxi);
 	})
 });
 
 describe(`voltage creation & consistency`, () => {
-	let vInfo;
+	let vDisp;
 	beforeEach(() => {
 		volts16 = new Float64Array(16);  // all zeroes, right?
 	});
@@ -63,7 +63,7 @@ describe(`voltage creation & consistency`, () => {
 	// make the range be 13...17, with other values in between.  Pass in this as a munge function
 	// if you want a realistic data range to test against
 	const munger = () => {
-		for (let ix = vInfo.start; ix < vInfo.end; ix++)
+		for (let ix = vDisp.start; ix < vDisp.end; ix++)
 			volts16[ix] = 14 + Math.random();  // 14 ... 15
 		volts16[7] = 13;
 		volts16[1] = 17;
@@ -104,15 +104,15 @@ describe(`voltage creation & consistency`, () => {
 
 	])(`voltDisplay created w/%j  munger? %p should yield %o`, (settings, mungeFunc, expected) => {
 		mungeFunc?.();
-		vInfo = new voltDisplay(0, 16, volts16,
+		vDisp = new voltDisplay(0, 16, volts16,
 			{showVoltage: true, ...settings});
-		tryOutConsistency(vInfo);
+		tryOutConsistency(vDisp);
 
-		expect(vInfo.scrollMin).toEqual(expected.scrollMin);
-		expect(vInfo.scrollMax).toEqual(expected.scrollMax);
-		expect(vInfo.actualMax).toEqual(expected.actualMax);
-		expect(vInfo.heightVolts).toEqual(expected.heightVolts);
-		expect(vInfo.bottomVolts).toEqual(expected.bottomVolts);
+		expect(vDisp.scrollMin).toEqual(expected.scrollMin);
+		expect(vDisp.scrollMax).toEqual(expected.scrollMax);
+		expect(vDisp.actualMax).toEqual(expected.actualMax);
+		expect(vDisp.heightVolts).toEqual(expected.heightVolts);
+		expect(vDisp.bottomVolts).toEqual(expected.bottomVolts);
 	});
 
 });

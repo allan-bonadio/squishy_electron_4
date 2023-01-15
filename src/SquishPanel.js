@@ -322,7 +322,7 @@ export class SquishPanel extends React.Component {
 
 	// use for benchmarking with a circular wave.  Will start frame, and stop after
 	// the leftmost state is at its peak.  Then display stats.
-	// not used for several months so probably broken somehow.
+	// not used for a year or more, so probably broken somehow.
 
 	// button handler
 	startRunningOneCycle =
@@ -411,6 +411,22 @@ export class SquishPanel extends React.Component {
 //	(period) => this.setState({framePeriod: period},
 //		() => console.log(`frame period is now set to ${this.state.framePeriod}`));
 
+	// SetVoltageTab goes and changes the voltage.  VoltageArea needs to know when it changes.
+	// So pass this down and it'll return the va instance.
+	gimmeVoltageArea =
+	(vArea) => {
+		debugger;
+		this.voltageArea = vArea;
+	}
+
+	// something tells me that this isn't the way to do it in React
+	tellMeWhenVoltsChanged =
+	voltageParams => {
+		console.log(`SquishPanel.tellMeWhenVoltsChanged:`, voltageParams);
+		debugger;
+		this.voltageArea?.updateVoltageArea(voltageParams);
+	}
+
 	/* ******************************************************* rendering */
 	// call this when you change both the GL and iter and elapsed time
 	// we need it here in SquishPanel cuz it's often called in ControlPanel but affects WaveView
@@ -442,6 +458,7 @@ export class SquishPanel extends React.Component {
 					width={p.width}
 					space={this.space}
 					showVoltage={s.showVoltage}
+					gimmeVoltageArea={this.gimmeVoltageArea}
 				/>
 				<ControlPanel
 					frameAnimate={(shouldAnimate, freq) => this.frameAnimate(shouldAnimate, freq)}
@@ -455,6 +472,8 @@ export class SquishPanel extends React.Component {
 
 					iStats={this.iStats}
 					refreshStats={this.refreshStats}
+
+					tellMeWhenVoltsChanged={this.tellMeWhenVoltsChanged}
 				/>
 				{this.renderRunningOneCycle()}
 			</div>

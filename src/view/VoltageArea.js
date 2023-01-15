@@ -33,13 +33,14 @@ export class VoltageArea extends React.Component {
 		height: PropTypes.number,
 
 		// includes scrollSetting, heightVolts, voltMin, voltMax, xScale, yScale
-		vInfo: PropTypes.object,
+		vDisp: PropTypes.object,
 
 		// this component is always rendered so it retains its state,
 		// but won't draw anything if the checkbox is off
 		showVoltage: PropTypes.bool.isRequired,
 
 		canvasFacts: PropTypes.object,
+		gimmeVoltageArea: PropTypes.func.isRequired,
 	};
 
 	constructor(props) {
@@ -54,6 +55,9 @@ export class VoltageArea extends React.Component {
 		//if (props.setUpdateVoltageArea)
 		//	props.setUpdateVoltageArea(this.updateVoltageArea);
 
+		debugger;
+		props.gimmeVoltageArea(this);
+
 		if (traceVoltageArea) console.log(`👆 👆 VoltageArea  constructor done`);
 	}
 
@@ -62,16 +66,17 @@ export class VoltageArea extends React.Component {
 	// tell the VoltageArea (that;s us) that something in the space.voltageBuffer changed.  Sometimes called from above.
 	// sheesh this is passed up and down so much; should figure out who and where needs it and simplify stuff.
 	updateVoltageArea =
-	() => {
+	voltageParams => {
+		console.log(`VoltageArea.updateVoltageArea: %O`, voltageParams);
 		//const space = this.props.space;
-		this.props.vInfo?.findVoltExtremes();
+		this.props.vDisp?.findVoltExtremes();
 		this.forceUpdate();
 	}
 
 	// the main path is the voltage, but for WELL we also draw end blocks, and also...
 	renderPaths() {
 		const p = this.props;
-		const v = p.vInfo;
+		const v = p.vDisp;
 		if (!p.space) return <></>;
 		//const wholeRect = p.wholeRect;
 
@@ -163,7 +168,7 @@ export class VoltageArea extends React.Component {
 	// returns false if it failed and needs to be done again.  True means it succeeded.
 	changeVoltage(ev, title) {
 		const p = this.props;
-		const v = p.vInfo;
+		const v = p.vDisp;
 		//if (!p.canvasWidth)
 		//return false;
 
@@ -217,7 +222,7 @@ export class VoltageArea extends React.Component {
 		ev.preventDefault();
 		ev.stopPropagation();
 
-		const v = this.props.vInfo;
+		const v = this.props.vDisp;
 
 		// a hit! otherwise we wouldn't be here.
 		this.changeVoltage(ev, 'Down');
@@ -263,7 +268,7 @@ export class VoltageArea extends React.Component {
 		ev.stopPropagation();
 
 		const p = this.props;
-		const v = p.vInfo;
+		const v = p.vDisp;
 		this.dragging = false;  // the ONLY place this can be set false
 
 		// must also switch the svg to pass thru mouse events otherwise other stuff can't get clicks

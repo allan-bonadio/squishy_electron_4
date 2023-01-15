@@ -64,6 +64,7 @@ export class WaveView extends React.Component {
 		//setUpdateVoltageArea: PropTypes.func,
 
 		showVoltage: PropTypes.bool.isRequired,
+		gimmeVoltageArea: PropTypes.func.isRequired,
 	};
 
 	constructor(props) {
@@ -76,7 +77,7 @@ export class WaveView extends React.Component {
 			// No!  dom and he row flex decides canvasWidth: props.width - (props.showVoltage * voltageSidebarWidth),
 
 			// These are in
-			vInfo: null,
+			vDisp: null,
 		}
 		// facts: directly measured Canvas dimensions
 		this.canvasFacts = {width: 0, height: 0};  // temporary
@@ -89,7 +90,7 @@ export class WaveView extends React.Component {
 		this.formerShowVoltage = props.showVoltage;
 
 		// make the proptypes shuddup about it being undefined
-		this.vInfo = null;
+		this.vDisp = null;
 
 		eSpaceCreatedPromise
 		.then(space => {
@@ -101,9 +102,9 @@ export class WaveView extends React.Component {
 			this.grinder = space.grinder;
 			this.mainEAvatar = space.mainEAvatar;
 
-			this.vInfo = new voltDisplay(space.start, space.end, space.voltageBuffer,
+			this.vDisp = new voltDisplay(space.start, space.end, space.voltageBuffer,
 				getAGroup('voltageSettings'));
-			this.setState({vInfo: this.vInfo});////
+			this.setState({vDisp: this.vDisp});////
 		})
 		.catch(ex => {
 			console.error(`eSpaceCreatedPromise failed`, ex);
@@ -133,7 +134,7 @@ export class WaveView extends React.Component {
 			this.formerShowVoltage = p.showVoltage;
 
 			//this.adjustDimensions();
-			this.vInfo.setVoltScales(this.canvasFacts.width, s.height, p.space.nPoints);
+			this.vDisp.setVoltScales(this.canvasFacts.width, s.height, p.space.nPoints);
 		}
 	}
 
@@ -191,16 +192,16 @@ export class WaveView extends React.Component {
 	scrollVoltHandler =
 	bottomVolts => {
 		this.setState({bottomVolts: bottomVolts});
-		this.vInfo.setVoltScales(this.canvasFacts.width, this.state.height, this.props.space.nPoints);
+		this.vDisp.setVoltScales(this.canvasFacts.width, this.state.height, this.props.space.nPoints);
 	}
 
 	// handles zoom in/out buttons    They pass +1 or -1.  heightVolts will usually be an integer power of zoomFactor.
 	zoomVoltHandler =
 	upDown => {
-		const v = this.vInfo;
+		const v = this.vDisp;
 		v.changeZoom(upDown);
 		this.setState({heightVolts: v.heightVolts});
-		this.vInfo.setVoltScales(this.canvasFacts.width, this.state.height, this.props.space.nPoints);
+		this.vDisp.setVoltScales(this.canvasFacts.width, this.state.height, this.props.space.nPoints);
 	}
 
 	/* ************************************************************************ render */
@@ -258,11 +259,11 @@ export class WaveView extends React.Component {
 		}
 
 		//findVoltExtremes={this.findVoltExtremes}
-		//bottomVolts={this.vInfo.bottomVolts}
-		//heightVolts={this.vInfo.heightVolts}
-		//xScale={this.vInfo.xScale} yScale={this.vInfo.yScale}
-		//bottomVolts={this.vInfo.bottomVolts}
-		//scrollMin={this.vInfo.scrollMin} scrollMax={this.vInfo.scrollMax}
+		//bottomVolts={this.vDisp.bottomVolts}
+		//heightVolts={this.vDisp.heightVolts}
+		//xScale={this.vDisp.xScale} yScale={this.vDisp.yScale}
+		//bottomVolts={this.vDisp.bottomVolts}
+		//scrollMin={this.vDisp.scrollMin} scrollMax={this.vDisp.scrollMax}
 
 		return (
 		<div className='WaveView'  ref={el => this.waveViewEl = el}
@@ -296,12 +297,13 @@ export class WaveView extends React.Component {
 					space={s.space} canvas={this.canvas}
 					height={s.height}
 					showVoltage={p.showVoltage}
-					vInfo={this.vInfo}
+					vDisp={this.vDisp}
 					canvasFacts={this.canvasFacts}
+					gimmeVoltageArea={p.gimmeVoltageArea}
 				/>
 			</div>
 			<VoltageSidebar width={voltageSidebarWidth} height={s.height}
-				vInfo={this.vInfo}
+				vDisp={this.vDisp}
 				showVoltage={p.showVoltage}
 				scrollVoltHandler={this.scrollVoltHandler}
 				zoomVoltHandler={this.zoomVoltHandler}

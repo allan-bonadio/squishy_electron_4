@@ -66,9 +66,9 @@ export class eSpace {
 		this.voltageBuffer = new Float64Array(window.Module.HEAPF64.buffer,
 				this._voltage, this.nPoints);;
 		let voltageSettings = getAGroup('voltageSettings');
-		this.vInfo = new voltDisplay(this.start, this.end, this.voltageBuffer, voltageSettings);
+		this.vDisp = new voltDisplay(this.start, this.end, this.voltageBuffer, voltageSettings);
 		let voltageParams = getAGroup('voltageParams');
-		this.vInfo.setFamiliarVoltage(voltageParams);
+		this.vDisp.setFamiliarVoltage(voltageParams);
 
 		// the avatars create their vbufs and waves, and we make a copy for ourselves
 		this.mainEAvatar = new eAvatar(this, this._mainAvatar);
@@ -176,7 +176,7 @@ export class eSpace {
 //	populateFamiliarVoltage =
 //	(voltageParams) => {
 //		// sets the numbers
-//		this.vInfo.setFamiliarVoltage(voltageParams);
+//		this.vDisp.setFamiliarVoltage(voltageParams);
 //	}
 
 	// voltage area needs to be told when the data changes.  can't put the whole voltage buffer in the state!

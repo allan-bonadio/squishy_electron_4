@@ -30,6 +30,8 @@ class SetVoltageTab extends React.Component {
 		toggleShowVoltage: PropTypes.func.isRequired,
 		showVoltage: PropTypes.bool.isRequired,
 
+		tellMeWhenVoltsChanged: PropTypes.func.isRequired,
+
 		//voltageParams: PropTypes.shape({
 		//	voltageBreed: PropTypes.oneOf(['flat', 'canyon', 'double']),
 		//	canyonPower: PropTypes.number.isRequired,
@@ -49,7 +51,6 @@ class SetVoltageTab extends React.Component {
 		// be prepared.  If this isn't an object, punt
 		this.miniVolts = null;
 		eSpaceCreatedPromise.then(space => {
-debugger;
 			this.space = space;
 
 			// used for depicting what the user's selected.  Copy from live one.
@@ -59,22 +60,27 @@ debugger;
 				this.exampleBuffer, getAGroup('voltageSettings'));
 
 			// only now set the state, when we're prepared to render
-			this.setState(getAGroup('voltageParams'));
+			let vParams = getAGroup('voltageParams');
+			this.setState(vParams);
+			this.miniVolts.setFamiliarVoltage(vParams);
 		})
 	}
 
 	// Set Voltage button
 	setVoltage=
 	(ev) => {
-		if (!this.vInfo)
+		if (!this.miniVolts)
 			return;
 debugger;
-		voltDisplay.copyVolts(this.space.voltageBuffer, this.exampleBuffer);
-		this.vInfo.populateFamiliarVoltage({...this.state});
+		//voltDisplay.copyVolts(this.space.voltageBuffer, this.exampleBuffer);
+		this.space.vDisp.setFamiliarVoltage(this.state);
 
+		console.log(`SetVoltageTab.setVoltage: %o %O`, this.state, this.state);
 		// only NOW do we set it in the localStorage
+		debugger;
 		storeAGroup('voltageParams', this.state);
-		this.updateVoltageArea();
+		this.props.tellMeWhenVoltsChanged(this.state);
+		//this.updateVoltageArea();
 	};
 
 	/* *************************************************************** rendering for the Tab */
@@ -194,7 +200,11 @@ debugger;
 			<div className='voltageTitlePanel'>
 				<h3>Set Voltage</h3>
 				{this.renderBreedSelector()}
-				<button onClick={this.setVoltage} >Set Voltage</button>
+				<button onClick={ev => {
+					debugger;
+					this.setVoltage();
+					}
+					} >Set Voltage</button>
 			</div>
 
 			<div className='divider' ></div>
