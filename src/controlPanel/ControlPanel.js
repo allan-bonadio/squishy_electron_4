@@ -63,7 +63,7 @@ export class ControlPanel extends React.Component {
 			lowPassFilter: getASetting('frameSettings', 'lowPassFilter'),
 
 			// state for voltage resets - control panel only, populateFamiliarVoltage()  see below;...
-			//potentialBreed: getASetting('voltageParams', 'potentialBreed'),
+			//voltageBreed: getASetting('voltageParams', 'voltageBreed'),
 			//valleyPower: getASetting('voltageParams', 'valleyPower'),
 			//valleyScale: getASetting('voltageParams', 'valleyScale'),
 			//valleyOffset: getASetting('voltageParams', 'valleyOffset'),

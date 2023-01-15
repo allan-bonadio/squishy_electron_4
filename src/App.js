@@ -101,7 +101,7 @@ class App extends React.Component {
 		else {
 			// spinner tells ppl we're working on it
 			sqPanel= <div id='theSquishPanel' >
-				<img className='spinner' alt='spinner' src='images/eclipseOnTransparent.gif' />;
+				<img className='spinner' alt='spinner' src='images/eclipseOnTransparent.gif' />
 			</div>;
 		}
 

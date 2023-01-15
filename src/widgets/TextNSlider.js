@@ -41,6 +41,8 @@ function TextNSlider(props) {
 
 	function handleText(ev) {
 		const el = ev.currentTarget;
+		if (! isFinite(el.value))
+			debugger;
 		p.handleChange(limit(+el.value));
 	}
 

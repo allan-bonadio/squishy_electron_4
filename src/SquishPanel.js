@@ -51,7 +51,7 @@ export class SquishPanel extends React.Component {
 
 		if (SquishPanel.squishPanelConstructed) {
 			// should not be called twice!
-			console.log(`annoying hot reload; continue to really reload page...`);
+			console.log(`annoying hot reload; continue to really reload page...🙄  👿 🤢 😵 🤬 😭 😠`);
 			debugger;
 			location = location;  // eslint-disable-line no-restricted-globals
 		}
