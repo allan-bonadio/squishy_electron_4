@@ -200,7 +200,7 @@
 			padding: 1em 0;
 		}
 
-		.voltageValleyPanel {
+		.voltageCanyonPanel {
 			float: left;
 			width: 24em;
 		}
@@ -212,12 +212,12 @@
 			gap: .5em;
 			width: 450px;
 
-			.valleyScale, .valleyPower {
+			.canyonScale, .canyonPower {
 				appearance: slider-vertical;
 				width: 2.5em;
 			}
 
-			.valleyOffset {
+			.canyonOffset {
 				height: 20px;
 			}
 

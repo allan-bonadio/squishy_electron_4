@@ -64,9 +64,9 @@ export class ControlPanel extends React.Component {
 
 			// state for voltage resets - control panel only, populateFamiliarVoltage()  see below;...
 			//voltageBreed: getASetting('voltageParams', 'voltageBreed'),
-			//valleyPower: getASetting('voltageParams', 'valleyPower'),
-			//valleyScale: getASetting('voltageParams', 'valleyScale'),
-			//valleyOffset: getASetting('voltageParams', 'valleyOffset'),
+			//canyonPower: getASetting('voltageParams', 'canyonPower'),
+			//canyonScale: getASetting('voltageParams', 'canyonScale'),
+			//canyonOffset: getASetting('voltageParams', 'canyonOffset'),
 
 			showingTab: getASetting('miscSettings', 'showingTab'),
 
@@ -179,13 +179,13 @@ export class ControlPanel extends React.Component {
 
 
 	// fills in the voltage buffer with values according to the voltageParams
-	// called when user clicks Valley voltage or Flat voltage
+	// called when user clicks Canyon voltage or Flat voltage
 	//setVoltageHandler =
 	//() => {
-	//	const {valleyPower, valleyScale, valleyOffset} = this.state;
+	//	const {canyonPower, canyonScale, canyonOffset} = this.state;
 	//
 	//	// actually sets buffer
-	//	this.props.populateFamiliarVoltage({valleyPower, valleyScale, valleyOffset});
+	//	this.props.populateFamiliarVoltage({canyonPower, canyonScale, canyonOffset});
 	//
 	//}
 
@@ -241,7 +241,7 @@ export class ControlPanel extends React.Component {
 		const p = this.props;
 		const s = this.state;
 		const {waveBreed, waveFrequency, pulseWidth, pulseOffset} = s;
-		const {valleyPower, valleyScale, valleyOffset} = s;
+		const {canyonPower, canyonScale, canyonOffset} = s;
 
 		switch (s.showingTab) {
 		case 'wave':
@@ -257,7 +257,7 @@ export class ControlPanel extends React.Component {
 		case 'voltage':
 		// setVoltageHandler={this.setVoltageHandler}
 			return <SetVoltageTab
-				voltageParams={{ valleyPower, valleyScale, valleyOffset,}}
+				voltageParams={{ canyonPower, canyonScale, canyonOffset,}}
 				setCPState={this.setCPState}
 				toggleShowVoltage={p.toggleShowVoltage}
 				showVoltage={p.showVoltage}

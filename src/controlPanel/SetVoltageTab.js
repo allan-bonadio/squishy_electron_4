@@ -31,10 +31,10 @@ class SetVoltageTab extends React.Component {
 		showVoltage: PropTypes.bool.isRequired,
 
 		//voltageParams: PropTypes.shape({
-		//	voltageBreed: PropTypes.oneOf(['flat', 'valley', 'double']),
-		//	valleyPower: PropTypes.number.isRequired,
-		//	valleyScale: PropTypes.number.isRequired,  // NOT the same as voltageFactor; this is JS only
-		//	valleyOffset: PropTypes.number.isRequired,  // centered at X
+		//	voltageBreed: PropTypes.oneOf(['flat', 'canyon', 'double']),
+		//	canyonPower: PropTypes.number.isRequired,
+		//	canyonScale: PropTypes.number.isRequired,  // NOT the same as voltageFactor; this is JS only
+		//	canyonOffset: PropTypes.number.isRequired,  // centered at X
 		//}).isRequired,
 	};
 
@@ -90,9 +90,9 @@ debugger;
 			</label>
 			<br />
 			<label>
-				<input type='radio' className='valleyBreed' checked={'valley' == breed}
-					onChange={ev => this.setState({voltageBreed: 'valley'})}/>
-				Valley - |<var>x</var>|<sup><var>n</var></sup>
+				<input type='radio' className='canyonBreed' checked={'canyon' == breed}
+					onChange={ev => this.setState({voltageBreed: 'canyon'})}/>
+				Canyon - |<var>x</var>|<sup><var>n</var></sup>
 			</label>
 		</div>;
 	}
@@ -110,14 +110,14 @@ debugger;
 
 		// You see, if I did an autorange, the scale will seem to have no effect.  So do this crude version.
 		v.heightVolts = 10;
-		if (s.valleyScale < 0)
+		if (s.canyonScale < 0)
 			v.bottomVolts = -10;
-		else if (s.valleyScale > 0)
+		else if (s.canyonScale > 0)
 			v.bottomVolts = 0;
 		else {
 			v.bottomVolts = -5;
 		}
-		if (s.valleyPower < 0) {
+		if (s.canyonPower < 0) {
 			v.heightVolts /= 100;
 			v.bottomVolts /= 100;
 		}
@@ -140,7 +140,7 @@ debugger;
 		let disabled= 'flat' == s.voltageBreed;
 
 		// vertical sliders have zero on the top
-		let scaleDisplayN = -(s.valleyScale ?? 0);
+		let scaleDisplayN = -(s.canyonScale ?? 0);
 		let scaleDisplay = scaleDisplayN.toFixed(3);
 		if (scaleDisplayN < 0) scaleDisplay = `(${scaleDisplay})`;
 
@@ -148,34 +148,34 @@ debugger;
         // each ignore the other
 		return <div className='miniGraphPanel'>
 			{/* this is a grid.  first row. */}
-			<input type='range' className='valleyPower' orient='vertical' disabled={disabled}
-				value={s.valleyPower ?? 0}
-				min={vMinsMaxes.valleyPower.min} max={vMinsMaxes.valleyPower.max}
+			<input type='range' className='canyonPower' orient='vertical' disabled={disabled}
+				value={s.canyonPower ?? 0}
+				min={vMinsMaxes.canyonPower.min} max={vMinsMaxes.canyonPower.max}
 				step={.5}
-				onChange={ev => this.setState({valleyPower: ev.target.valueAsNumber})}
+				onChange={ev => this.setState({canyonPower: ev.target.valueAsNumber})}
 			/>
 
 			{this.renderMiniGraph()}
 
-			<input type='range' className='valleyScale' orient='vertical' disabled={disabled}
-				value={-(s.valleyScale ?? 0)}
-				min={vMinsMaxes.valleyScale.min}
-				max={vMinsMaxes.valleyScale.max}
+			<input type='range' className='canyonScale' orient='vertical' disabled={disabled}
+				value={-(s.canyonScale ?? 0)}
+				min={vMinsMaxes.canyonScale.min}
+				max={vMinsMaxes.canyonScale.max}
 				step='.01'
-				onChange={ev => this.setState({valleyScale: -ev.target.valueAsNumber})}
+				onChange={ev => this.setState({canyonScale: -ev.target.valueAsNumber})}
 			/>
 
 			{/* second row. */}
 			<div className='powerDisplay'>
-				<var>x</var><sup> {(s.valleyPower ?? 0).toFixed(1)}</sup>
+				<var>x</var><sup> {(s.canyonPower ?? 0).toFixed(1)}</sup>
 			</div>
 
-			<input type='range' className='valleyOffset' disabled={disabled}
-				value={s.valleyOffset ?? 0}
-				min={vMinsMaxes.valleyOffset.min}
-				max={vMinsMaxes.valleyOffset.max}
+			<input type='range' className='canyonOffset' disabled={disabled}
+				value={s.canyonOffset ?? 0}
+				min={vMinsMaxes.canyonOffset.min}
+				max={vMinsMaxes.canyonOffset.max}
 				step={.1}
-				onChange={ev => this.setState({valleyOffset: ev.target.valueAsNumber})}
+				onChange={ev => this.setState({canyonOffset: ev.target.valueAsNumber})}
 			/>
 
 			<div className='scaleDisplay'>

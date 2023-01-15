@@ -225,36 +225,36 @@ export class voltDisplay {
 		this.saveScroll();
 	}
 
-	// set a valley, flat or double voltage potential in the given array, according to params.
+	// set a canyon, flat or double voltage potential in the given array, according to params.
 	// No space needed.
 	setFamiliarVoltage(voltageParams) {
 		//const {start, end, N} = space.startEnd;
-		let {valleyPower, valleyScale, valleyOffset, voltageBreed} = voltageParams;
-		if (valleyPower == undefined || valleyScale == undefined || valleyOffset == undefined)
-			throw `bad Voltage params: valleyPower=${valleyPower}, valleyScale=${valleyScale},
-				valleyOffset=${valleyOffset}`;
+		let {canyonPower, canyonScale, canyonOffset, voltageBreed} = voltageParams;
+		if (canyonPower == undefined || canyonScale == undefined || canyonOffset == undefined)
+			throw `bad Voltage params: canyonPower=${canyonPower}, canyonScale=${canyonScale},
+				canyonOffset=${canyonOffset}`;
 
 		if (traceFamiliar)
 			console.log(`starting setFamiliarVoltage(`, voltageParams);
-		const offset = valleyOffset * (this.end - this.start) / 100;
+		const offset = canyonOffset * (this.end - this.start) / 100;
 		if ('flat' == voltageBreed) {
 			for (let ix = this.start; ix < this.end; ix++)
 				this.voltageBuffer[ix] = 0;
 		}
 		else {
 			for (let ix = this.start; ix < this.end; ix++) {
-				let pot = Math.pow(Math.abs(ix - offset), valleyPower) * (valleyScale * VALLEY_FACTOR);  // * VALLEY_FACTOR);
+				let pot = Math.pow(Math.abs(ix - offset), canyonPower) * (canyonScale * VALLEY_FACTOR);  // * VALLEY_FACTOR);
 
 				if (isNaN(pot)) {
 					// wait i know this situation - pow generates NaN when it should generate ±∞
-					if (valleyPower < 0)
-						pot = Infinity * valleyScale;
+					if (canyonPower < 0)
+						pot = Infinity * canyonScale;
 					else {
 						console.warn(`voltage ${pot} not finite at x=${ix} ${JSON.stringify(voltageParams)}
 							ix - offset=${ix - offset}
-							x ** ${valleyPower}=${Math.pow(ix - offset, valleyPower)}
-							x ** ${valleyPower} * ${valleyScale}=
-							${Math.pow(ix - offset, valleyPower) * valleyScale}`);
+							x ** ${canyonPower}=${Math.pow(ix - offset, canyonPower)}
+							x ** ${canyonPower} * ${canyonScale}=
+							${Math.pow(ix - offset, canyonPower) * canyonScale}`);
 					}
 				}
 				this.voltageBuffer[ix] = pot;
