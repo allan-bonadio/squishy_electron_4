@@ -173,11 +173,11 @@ export class eSpace {
 
 	// completely wipe out the quantum voltage and replace it with one of our familiar patterns.
 	// Called upon set voltage in voltage tab
-	populateFamiliarVoltage =
-	(voltageParams) => {
-		// sets the numbers
-		this.vInfo.setFamiliarVoltage(voltageParams);
-	}
+//	populateFamiliarVoltage =
+//	(voltageParams) => {
+//		// sets the numbers
+//		this.vInfo.setFamiliarVoltage(voltageParams);
+//	}
 
 	// voltage area needs to be told when the data changes.  can't put the whole voltage buffer in the state!
 //	setUpdateVoltageArea =

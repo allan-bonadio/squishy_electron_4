@@ -6,23 +6,24 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-import {scaleLinear} from 'd3-scale';
+//import {scaleLinear} from 'd3-scale';
 //import {path as d3path} from 'd3-path';
 
 // eslint-disable-next-line no-unused-vars
-import {setFamiliarVoltage, dumpVoltage} from '../utils/voltageUtils.js';
-import eSpace from '../engine/eSpace.js';
-import TextNSlider from '../widgets/TextNSlider.js';
-import {storeASetting, getASetting, alternateMinMaxs} from '../utils/storeSettings.js';
+import voltInfo from '../utils/voltInfo.js';
+//import eSpace from '../engine/eSpace.js';
+//import TextNSlider from '../widgets/TextNSlider.js';
+import {storeASetting, getAGroup, storeAGroup, alternateMinMaxs} from '../utils/storeSettings.js';
+import {eSpaceCreatedPromise} from '../engine/eEngine.js';
 
-let miniWidth = 200;
-let miniHeight = 100;
-let miniDomain = 100;
+let miniWidth = 400;
+let miniHeight = 200;
+
 
 // the tab that user sets voltage with
 class SetVoltageTab extends React.Component {
 	static propTypes = {
-		space: PropTypes.instanceOf(eSpace),
+		//space: PropTypes.instanceOf(eSpace),
 
 		// actually sets the one in use by the algorithm
 		//setVoltageHandler: PropTypes.func.isRequired,
@@ -30,7 +31,7 @@ class SetVoltageTab extends React.Component {
 		showVoltage: PropTypes.bool.isRequired,
 
 		//voltageParams: PropTypes.shape({
-		//	potentialBreed: PropTypes.oneOf(['flat', 'valley', 'double']),
+		//	voltageBreed: PropTypes.oneOf(['flat', 'valley', 'double']),
 		//	valleyPower: PropTypes.number.isRequired,
 		//	valleyScale: PropTypes.number.isRequired,  // NOT the same as voltageFactor; this is JS only
 		//	valleyOffset: PropTypes.number.isRequired,  // centered at X
@@ -40,115 +41,148 @@ class SetVoltageTab extends React.Component {
 	constructor(props) {
 		super(props);
 
-		// you can use the state as a voltageParams object
+		// This is exactly the voltageParams object.  THEREFORE,
+		// don't stick some other stuff into the state!
 		this.state = {
-			potentialBreed: getASetting('voltageParams', 'potentialBreed'),
-			valleyPower: getASetting('voltageParams', 'valleyPower'),
-			valleyScale: getASetting('voltageParams', 'valleyScale'),
-			valleyOffset: getASetting('voltageParams', 'valleyOffset'),
 		};
 
-		this.voltProto = new Float64Array(miniDomain);
-		// ?? this.setScales();
+		// be prepared.  If this isn't an object, punt
+		this.miniVolts = null;
+		eSpaceCreatedPromise.then(space => {
+debugger;
+			this.space = space;
+
+			// used for depicting what the user's selected.  Copy from live one.
+			this.exampleBuffer = new Float64Array(space.nPoints);
+			voltInfo.copyVolts(this.exampleBuffer, space.voltageBuffer);
+			this.miniVolts = new voltInfo(space.start, space.end,
+				this.exampleBuffer, getAGroup('voltageSettings'));
+
+			// only now set the state, when we're prepared to render
+			this.setState(getAGroup('voltageParams'));
+		})
 	}
 
-	setScales(minVolts, maxVolts) {
-		// x domain is always 0...100 here, regardless of how many data points
-		this.xScale = scaleLinear().domain([0, miniDomain]).range([0, miniWidth]);
-
-		// the domain has to be dynamic to autorange the current settings
-		this.yScale = scaleLinear().domain([minVolts, maxVolts]).range([0, miniHeight]);
-	}
-
-	drawMiniGraph() {
-		// someday...
-		setFamiliarVoltage(this.space.start, this.space.end, this.voltProto, this.state);
-
-		// yawn ... draw it.  I guess I should rip off some code from VoltageArea huh?
-	}
-
-	/* *************************************************************** short term setters */
-	// the state keeps the settings before user clicks 'flat' or 'valley'
-	setValleyPower =
-	valleyPower => {
-		this.setState({valleyPower});
-		this.drawMiniGraph();
-	}
-	setValleyScale =
-	valleyScale => {
-		this.space({valleyScale});
-		this.drawMiniGraph();
-	}
-	setValleyOffset =
-	valleyOffset => {
-		this.space({valleyOffset});
-		this.drawMiniGraph();
-	}
-
-	setFlatVoltageHandler =
+	// Set Voltage button
+	setVoltage=
 	(ev) => {
-		this.setState({potentialBreed: 'flat'});
+		if (!this.vInfo)
+			return;
+debugger;
+		voltInfo.copyVolts(this.space.voltageBuffer, this.exampleBuffer);
+		this.vInfo.populateFamiliarVoltage({...this.state});
 
 		// only NOW do we set it in the localStorage
-		storeASetting('voltageParams', 'potentialBreed', 0);
-		this.props.space.populateFamiliarVoltage();
-
+		storeAGroup('voltageParams', this.state);
 		this.updateVoltageArea();
-	};
-
-	setValleyVoltageHandler =
-	(ev) => {
-		this.props.space.populateFamiliarVoltage();
-
-		// only NOW do we set it in the localStorage
-		storeASetting('voltageParams', 'potentialBreed', 0);
-		storeASetting('voltageParams', 'valleyPower', 0);
-		storeASetting('voltageParams', 'valleyScale', 0);
-		storeASetting('voltageParams', 'valleyOffset', 50);
-
-		this.updateVoltageArea();
-	};
-
-	setDoubleVoltageHandler =
-	(ev) => {
-		// not yet implemented
 	};
 
 	/* *************************************************************** rendering for the Tab */
 
-	renderSliders() {
-		const pp = this.props.voltageParams;
-		return <>
-			<TextNSlider className='powerSlider'  label='Power'
-				value={+pp.valleyPower}
-				min={alternateMinMaxs.voltageParams.valleyPower.min}
-				max={alternateMinMaxs.voltageParams.valleyPower.max}
-				step={.01}
-				style={{width: '8em'}}
-				handleChange={this.setValleyPower}
+	renderBreedSelector() {
+		const s = this.state;
+		const breed = s.voltageBreed ?? 'flat';
+		return <div className='breedSelector'>
+			<label>
+				<input type='radio' className='flatBreed' checked={'flat' == breed}
+					onChange={ev => this.setState({voltageBreed: 'flat'}) }/>
+				Flat - zero everywhere
+			</label>
+			<br />
+			<label>
+				<input type='radio' className='valleyBreed' checked={'valley' == breed}
+					onChange={ev => this.setState({voltageBreed: 'valley'})}/>
+				Valley - |<var>x</var>|<sup><var>n</var></sup>
+			</label>
+		</div>;
+	}
+
+	renderMiniGraph() {
+		// even if you can't draw it, at least reserve the space
+		if (!this.miniVolts)
+			return <svg width={miniWidth} height={miniHeight} />;
+		const s = this.state;
+		const v = this.miniVolts;
+		//debugger;
+
+		// grab the latest params to fill the buffer
+		v.setFamiliarVoltage(this.state);
+
+		// You see, if I did an autorange, the scale will seem to have no effect.  So do this crude version.
+		v.heightVolts = 10;
+		if (s.valleyScale < 0)
+			v.bottomVolts = -10;
+		else if (s.valleyScale > 0)
+			v.bottomVolts = 0;
+		else {
+			v.bottomVolts = -5;
+		}
+		if (s.valleyPower < 0) {
+			v.heightVolts /= 100;
+			v.bottomVolts /= 100;
+		}
+
+		v.setVoltScales(miniWidth, miniHeight, this.space.nPoints);
+		let path = v.makeVoltagePathAttribute();
+
+		return <svg className='miniGraph' width={miniWidth} height={miniHeight}  >
+			<rect x={0} y={0} width={miniWidth} height={miniHeight} fill='#000' />
+			<path d={path} />
+		</svg>;
+
+	}
+
+	// wrap the minigraph with sliders on 3 sides
+	renderMiniGraphPanel() {
+		const p = this.props;
+		const s = this.state;
+		let vMinsMaxes = alternateMinMaxs.voltageParams;
+		let disabled= 'flat' == s.voltageBreed;
+
+		// vertical sliders have zero on the top
+		let scaleDisplayN = -(s.valleyScale ?? 0);
+		let scaleDisplay = scaleDisplayN.toFixed(3);
+		if (scaleDisplayN < 0) scaleDisplay = `(${scaleDisplay})`;
+
+        // for vertical sliders, firefox requires orient=vertical; chrome/safari appearance:slider-vertical.
+        // each ignore the other
+		return <div className='miniGraphPanel'>
+			{/* this is a grid.  first row. */}
+			<input type='range' className='valleyPower' orient='vertical' disabled={disabled}
+				value={s.valleyPower ?? 0}
+				min={vMinsMaxes.valleyPower.min} max={vMinsMaxes.valleyPower.max}
+				step={.5}
+				onChange={ev => this.setState({valleyPower: ev.target.valueAsNumber})}
 			/>
 
-			<br/>
-			<TextNSlider className='scaleSlider'  label='Scale'
-				value={+pp.valleyScale}
-				min={alternateMinMaxs.voltageParams.valleyScale.min}
-				max={alternateMinMaxs.voltageParams.valleyScale.max}
-				step={.01}
-				style={{width: '8em'}}
-				handleChange={this.setValleyScale}
+			{this.renderMiniGraph()}
+
+			<input type='range' className='valleyScale' orient='vertical' disabled={disabled}
+				value={-(s.valleyScale ?? 0)}
+				min={vMinsMaxes.valleyScale.min}
+				max={vMinsMaxes.valleyScale.max}
+				step='.01'
+				onChange={ev => this.setState({valleyScale: -ev.target.valueAsNumber})}
 			/>
 
-			<br/>
-			<TextNSlider className='offsetSlider'  label='Offset %'
-				value={+pp.valleyOffset}
-				min={alternateMinMaxs.voltageParams.valleyOffset.min}
-				max={alternateMinMaxs.voltageParams.valleyOffset.max}
+			{/* second row. */}
+			<div className='powerDisplay'>
+				<var>x</var><sup> {(s.valleyPower ?? 0).toFixed(1)}</sup>
+			</div>
+
+			<input type='range' className='valleyOffset' disabled={disabled}
+				value={s.valleyOffset ?? 0}
+				min={vMinsMaxes.valleyOffset.min}
+				max={vMinsMaxes.valleyOffset.max}
 				step={.1}
-				style={{width: '8em'}}
-				handleChange={this.setValleyOffset}
+				onChange={ev => this.setState({valleyOffset: ev.target.valueAsNumber})}
 			/>
-			<br/>
-		</>;
+
+			<div className='scaleDisplay'>
+				×{scaleDisplay}  {/* that's a multiply symbol, not letter x */}
+			</div>
+
+		</div>;
 	}
 
 
@@ -159,24 +193,13 @@ class SetVoltageTab extends React.Component {
 		return <div className='setVoltageTab'>
 			<div className='voltageTitlePanel'>
 				<h3>Set Voltage</h3>
-				<button className='zeroVoltageButton round'
-					onClick={this.setFlatVoltageHandler}>
-						Reset Voltage
-				</button>
-
+				{this.renderBreedSelector()}
+				<button onClick={this.setVoltage} >Set Voltage</button>
 			</div>
+
 			<div className='divider' ></div>
 
-			<div className='voltageValleyPanel'>
-				{this.renderSliders()}
-
-				<button className='valleyVoltageButton round'
-					onClick={p.setValleyVoltageHandler} >
-						Set to Valley Voltage
-				</button>
-			</div>
-			<div className='MiniGraph' style={{marginLeft: '500px', color: 'yellow'}}>pot. mini graph goes here</div>
-			<div style={{clear: 'left'}} />
+			{this.renderMiniGraphPanel()}
 
 			<label style={{float:'right'}}>
 				<input type='checkbox' checked={p.showVoltage} onChange={p.toggleShowVoltage} />

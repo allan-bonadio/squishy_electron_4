@@ -10,17 +10,18 @@ import {scaleLinear} from 'd3-scale';
 
 import qe from '../engine/qe.js';
 import eSpace from '../engine/eSpace.js';
-import {dumpVoltage} from '../utils/voltageUtils.js';
+//import {dumpVoltage, makeVoltagePathAttribute} from '../utils/voltInfo.js';
 
 // I dunno but the voltages I'm generating are too strong.
 // So I reduced it by this factor, but still have to magnify it to make it visible.
 export const spongeFactor = 100;
 
 let traceVoltageArea = false;
-let tracePathAttribute = false;
+//let tracePathAttribute = false;
 
 let traceRendering = false;
-let traceDragging = true;
+let traceDragging = false;
+
 
 // ultimately, this is a <svg node with a <path inside it
 export class VoltageArea extends React.Component {
@@ -28,17 +29,11 @@ export class VoltageArea extends React.Component {
 		// for first couple of renders, space and idunno are null
 		space: PropTypes.instanceOf(eSpace),
 
-		// this can be null if stuff isn't ready
-		// these are now determined by css
-		//canvasWidth: PropTypes.object,////
+		// this can be null if stuff isn't ready.  these are now determined by css.
 		height: PropTypes.number,
 
 		// includes scrollSetting, heightVolts, voltMin, voltMax, xScale, yScale
-		volts: PropTypes.object,
-		//scrollSetting: PropTypes.number.isRequired,
-		//heightVolts: PropTypes.number.isRequired,
-		//xScale: PropTypes.func,
-		//yScale: PropTypes.func,
+		vInfo: PropTypes.object,
 
 		// this component is always rendered so it retains its state,
 		// but won't draw anything if the checkbox is off
@@ -68,73 +63,22 @@ export class VoltageArea extends React.Component {
 	// sheesh this is passed up and down so much; should figure out who and where needs it and simplify stuff.
 	updateVoltageArea =
 	() => {
-		const p = this.props;
-
-		// btw, everybody needs to know the min and max voltage in use, so we can always show it
-//		let v = this.props.volts;
-//		let space = this.props.space;
-//		let voltageBuffer = space.voltageBuffer;
-//		let {start, end} = space.startEnd;
-
-		p.findVoltExtremes();
-
+		//const space = this.props.space;
+		this.props.vInfo?.findVoltExtremes();
 		this.forceUpdate();
 	}
 
-	// make the sequence of coordinates the white line needs to draw
-	// as compressed as possible.  Returns one long string.
-	makePathAttribute(start, end) {
-		const p = this.props;
-		let v = p.volts;
-		if (tracePathAttribute)
-			console.log(`👆 👆 VoltageArea.makePathAttribute(${start}, ${end})`);
-
-		// yawn too early
-		if (! p.space) throw new Error(`makePathAttribute(): no functioning space`);
-		if (! p.yScale) {
-			// I still haven't figured out the best time to call setVoltScales()
-			//if (!this.setVoltScales())
-				return `M0,0`;  // too early
-		}
-
-		const space = p.space;
-		const voltageBuffer = this.voltageBuffer = space.voltageBuffer;
-
-		// array to collect small snippets of text
-		const points = new Array(this.nPoints);
-		let y = v.yScale(voltageBuffer[start]);  //qe.get1DVoltage(dim.start);
-		let x = v.xScale(start);
-		points[start] = `M${x},${y.toFixed(1)}L `;
-
-		for (let ix = start+1; ix < end; ix++) {
-			y = v.yScale(voltageBuffer[ix]);
-			x = v.xScale(ix);
-			if ((x==null) || !isFinite(x) || (y==null) || !isFinite(y) || Math.abs(y) > 10_000)
-				debugger;
-			points[ix] = `${x.toFixed(1)},${y.toFixed(1)} `;
-		}
-
-		// if this is a continuum, chop off the ends
-		if (start) {
-			points.pop();
-			points.shift();
-		}
-		if (tracePathAttribute) {
-			console.log(`👆 👆 VoltageArea.makePathAttribute: done`, points.join(''));
-			console.log(`     from:`, points);
-		}
-		return points.join('');
-	}
-
+	// the main path is the voltage, but for WELL we also draw end blocks, and also...
 	renderPaths() {
 		const p = this.props;
+		const v = p.vInfo;
 		if (!p.space) return <></>;
 		//const wholeRect = p.wholeRect;
 
-		let {start, end, continuum} = p.space.startEnd;
+		//let {start, end, continuum} = p.space.startEnd;
 		let paths = [];
 
-		switch (continuum) {
+		switch (p.space.dimensions[0].continuum) {
 			case qe.contWELL:
 				// stone slabs on each end on the borders vaguely means 'quantum well'.
 				paths.push(
@@ -150,7 +94,7 @@ export class VoltageArea extends React.Component {
 				break;
 
 			case qe.contENDLESS:
-				// full width including boundaries?  can you drag the boundaries?!?!  no.
+				// full width including boundaries?  can you drag the boundaries?!?!  no.  So no line thru boundaries.
 				break;
 
 			default: throw new Error(`bad continuum ${p.space.dimensions.continuum}`);
@@ -158,7 +102,8 @@ export class VoltageArea extends React.Component {
 
 		// the lines themselves: exactly overlapping.  tactile wider than visible.
 		if (p.showVoltage) {
-			const pathAttribute = this.makePathAttribute(start, end);
+			const pathAttribute = v.makeVoltagePathAttribute();
+			//const pathAttribute = this.makePathAttribute(start, end);
 
 			// this one actually draws the white line
 			paths.push(
@@ -218,7 +163,7 @@ export class VoltageArea extends React.Component {
 	// returns false if it failed and needs to be done again.  True means it succeeded.
 	changeVoltage(ev, title) {
 		const p = this.props;
-		const v = this.props.volts;
+		const v = p.vInfo;
 		//if (!p.canvasWidth)
 		//return false;
 
@@ -238,11 +183,11 @@ export class VoltageArea extends React.Component {
 			console.log(`👆 👆 mouse %s on point (%f,%f) voltage @ ix=%d changing from %f to %f`,
 				title,
 				ev.clientX, ev.clientY,
-				ix, this.voltageBuffer[ix], newVoltage);
+				ix, v.voltageBuffer[ix], newVoltage);
 
 		if (undefined == this.latestIx) {
 			// the first time, all you can do is the one point
-			this.voltageBuffer[ix] = newVoltage;
+			v.voltageBuffer[ix] = newVoltage;
 		}
 		else {
 			// other times, draw a straight linear line through.  scaleLinear from d3
@@ -255,7 +200,7 @@ export class VoltageArea extends React.Component {
 			for (let ixx = lo; ixx <= hi; ixx++) {
 				if (traceDragging)
 					console.log(`👆 👆 tweening: set point [${ixx}] to ${tweenScale(ixx).toFixed(4)}`)
-				this.voltageBuffer[ixx] = tweenScale(ixx);
+				v.voltageBuffer[ixx] = tweenScale(ixx);
 			}
 			if (traceDragging) console.log(`👆 👆 tweening done`)
 		}
@@ -269,7 +214,12 @@ export class VoltageArea extends React.Component {
 
 	mouseDown =
 	(ev) => {
-		// a hit! otherwise we wouldn't be calling the event handler.
+		ev.preventDefault();
+		ev.stopPropagation();
+
+		const v = this.props.vInfo;
+
+		// a hit! otherwise we wouldn't be here.
 		this.changeVoltage(ev, 'Down');
 		this.dragging = true;
 
@@ -279,21 +229,21 @@ export class VoltageArea extends React.Component {
 		// must figure out pointer offset; diff between mousedown pot and the neareest piece of line
 		// remember that clientY is in pix units
 		const p = this.props;
-		let chosenVoltage = p.yScale.invert(ev.clientY);
+		let chosenVoltage = v.yScale.invert(ev.clientY);
 		this.mouseYOffset = chosenVoltage - this.latestVoltage;
 		if (traceDragging) {
 			console.log(`👆 👆 🎯  Y numbers: mouseYOffset(${this.mouseYOffset}) =
 				chosenVoltage(${chosenVoltage}) - latestVoltage(${this.latestVoltage})
 				from client X=${ev.clientX}    Y=${ev.clientY}`);
 		}
-
-		ev.preventDefault();
-		ev.stopPropagation();
 	}
 
 	// this one and mouseUp are attached to the whole SVG cuz user can drag all over
 	mouseMove =
 	(ev) => {
+		ev.preventDefault();
+		ev.stopPropagation();
+
 		if (! this.dragging) return;
 
 		if (ev.buttons) {
@@ -304,14 +254,16 @@ export class VoltageArea extends React.Component {
 		else {
 			this.mouseUp(ev);
 		}
-		ev.preventDefault();
-		ev.stopPropagation();
 	}
 
 	// called upon mouseup or a move without mouse dow
 	mouseUp =
 	(ev) => {
+		ev.preventDefault();
+		ev.stopPropagation();
+
 		const p = this.props;
+		const v = p.vInfo;
 		this.dragging = false;  // the ONLY place this can be set false
 
 		// must also switch the svg to pass thru mouse events otherwise other stuff can't get clicks
@@ -320,18 +272,17 @@ export class VoltageArea extends React.Component {
 		if (traceDragging) {
 			console.log(`👆 👆 mouse UP on point (%f,%f) voltage @ ix=%d stopped at %f`,
 				ev.clientX, ev.clientY,
-				this.latestIx, this.voltageBuffer[this.latestIx]);
+				this.latestIx, v.voltageBuffer[this.latestIx]);
 		}
 
 		// remind everybody that this episode is over.  Tune in next week.  next mousedown.
 		this.latestIx = this.latestVoltage = undefined;
 
 		if (traceDragging)
-			dumpVoltage(p.space, this.voltageBuffer, 8);
-		ev.preventDefault();
-		ev.stopPropagation();
+			v.dumpVoltage(p.space, v.voltageBuffer, 8);
 	}
 
 }
 
 export default VoltageArea;
+

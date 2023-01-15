@@ -202,9 +202,9 @@ export function createStoreSettings() {
 	makeParam('waveParams', 'pulseOffset', 30, {min: 0, max: 100});
 
 	/* ************************************ voltageParams */
-	makeParam('voltageParams', 'potentialBreed', 'flat', ['flat', 'valley', 'double']);
-	makeParam('voltageParams', 'valleyPower', 0, {min: -4, max: 4});
-	makeParam('voltageParams', 'valleyScale', 0, {min: -10, max: 10});
+	makeParam('voltageParams', 'voltageBreed', 'flat', ['flat', 'valley', 'double']);
+	makeParam('voltageParams', 'valleyPower', 2, {min: -2, max: 4});
+	makeParam('voltageParams', 'valleyScale', 1, {min: -10, max: 10});
 	makeParam('voltageParams', 'valleyOffset', 50, {min: 0, max: 100});
 
 	makeParam('voltageSettings', 'showVoltage', true, [true, false]);

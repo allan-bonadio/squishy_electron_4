@@ -11,7 +11,7 @@
 
 import React from 'react';
 import PropTypes from 'prop-types';
-import {scaleLinear} from 'd3-scale';
+//import {scaleLinear} from 'd3-scale';
 
 import eSpace from '../engine/eSpace.js';
 //import eAvatar from '../engine/eAvatar.js';
@@ -21,20 +21,18 @@ import qe from '../engine/qe.js';
 import './view.scss';
 // import {abstractViewDef} from './abstractViewDef.js';
 // import flatDrawingViewDef from './flatDrawingViewDef.js';
-import {getASetting, storeASetting} from '../utils/storeSettings.js';
+import {getAGroup, getASetting, storeASetting} from '../utils/storeSettings.js';
+
+import voltInfo from '../utils/voltInfo.js';
 import VoltageArea from './VoltageArea.js';
 import VoltageSidebar from './VoltageSidebar.js';
 import GLView from '../gl/GLView.js';
 import {eSpaceCreatedPromise} from '../engine/eEngine.js';
 
 
-//import {listOfViewClasses} from './listOfViewClasses.js';
-
-//import {dumpJsStack} from '../utils/errors.js';
-
 let traceScaling = true;
 let traceDragCanvasHeight = false;
-let traceVoltageArea = true;
+//let traceVoltageArea = true;
 let traceWidth = true;
 
 // size of the size box at lower right of canvas; also width of the voltage sidebar
@@ -42,17 +40,17 @@ const sizeBoxSize = 24;
 const voltageSidebarWidth = 32;  // passed down to VoltageSidebar.  Seems to want to be 32
 
 // how much to zoom in/out each click (rounded if it's not an integer power)
-const zoomFactor = Math.sqrt(2);
-const logZoomFactor = Math.log(zoomFactor);
+//const zoomFactor = Math.sqrt(2);
+//const logZoomFactor = Math.log(zoomFactor);
 
 
-const isOK = (c) => {
-	if (c == null || !isFinite(c)) {
-		console.error(`bad value`, c);
-		debugger;
-	}
-}
-
+//const isOK = (c) => {
+//	if (c == null || !isFinite(c)) {
+//		console.error(`bad value`, c);
+//		debugger;
+//	}
+//}
+//
 
 export class WaveView extends React.Component {
 	static propTypes = {
@@ -77,12 +75,12 @@ export class WaveView extends React.Component {
 
 			// No!  dom and he row flex decides canvasWidth: props.width - (props.showVoltage * voltageSidebarWidth),
 
-			//voltageScroll:
-			//voltageZoom: getASetting('voltageSettings', 'voltageZoom'),
+			// These are in
+			vInfo: null,
 		}
 		// facts: directly measured Canvas dimensions
-		this.canvasFacts = {width: 0, // temporary
-			height: 0};
+		this.canvasFacts = {width: 0, height: 0};  // temporary
+
 		//this.canvasFacts = {width: props.width, // temporary
 		//	height: this.state.height};
 
@@ -90,7 +88,8 @@ export class WaveView extends React.Component {
 		this.formerHeight = this.state.height;
 		this.formerShowVoltage = props.showVoltage;
 
-		//this.adjustDimensions();
+		// make the proptypes shuddup about it being undefined
+		this.vInfo = null;
 
 		eSpaceCreatedPromise
 		.then(space => {
@@ -101,46 +100,17 @@ export class WaveView extends React.Component {
 			this.space = space;
 			this.grinder = space.grinder;
 			this.mainEAvatar = space.mainEAvatar;
+
+			this.vInfo = new voltInfo(space.start, space.end, space.voltageBuffer,
+				getAGroup('voltageSettings'));
+			this.setState({vInfo: this.vInfo});////
 		})
 		.catch(ex => {
 			console.error(`eSpaceCreatedPromise failed`, ex);
 			debugger;
 		});
 
-		this.initVolts();
-	}
-
-	// call this when the width or height of the canvas has changed either by window sizebox or showVoltage
-	//adjustDimensions() {
-	//	const p = this.props;
-	//	const s = this.state;
-	//	this.canvasWidth = p.width - 16;
-	//	if (p.showVoltage)
-	//		this.canvasWidth -= voltageSidebarWidth;
-	//
-	//	if (this.waveViewEl)
-	//		this.top = this.waveViewEl.getBoundingClientRect().top;
-	//
-	//	// the canvas and all other apparatus needs to be updated, if it's not too early
-	//	if (this.gl && this.canvas) {
-	//		this.canvas.width = this.canvasWidth;
-	//		this.canvas.height = s.height;
-	//		this.gl.viewport(0, 0, this.canvasWidth, s.height);
-	//	}
-	//	// makes no diff this.setState({canvasWidth: this.canvasWidth});
-	//	if (traceScaling) {
-	//		console.log(`🏄 🏄  WaveView.adjustDimensions(): canvasWidth=${this.canvasWidth}
-	//			wv height=${s.height}  wv width=${p.width}  sidebarWid=${voltageSidebarWidth}
-	//			on window (${window.innerWidth} wide, ${window.innerHeight}) tall`);
-	//	}
-	//
-	//	this.formerWidth = p.width;
-	//	this.formerHeight = s.height;
-	//	this.formerShowVoltage = p.showVoltage;
-	//}
-
-	componentDidMount() {
-		//this.adjustDimensions();
+		//this.initVolts();
 	}
 
 	componentDidUpdate() {
@@ -163,7 +133,7 @@ export class WaveView extends React.Component {
 			this.formerShowVoltage = p.showVoltage;
 
 			//this.adjustDimensions();
-			this.setVoltScales();
+			this.vInfo.setVoltScales(this.canvasFacts.width, s.height, p.space.nPoints);
 		}
 	}
 
@@ -218,129 +188,19 @@ export class WaveView extends React.Component {
 
 	/* ************************************************************************ volts */
 
-	// actually measure the voltage signal, get min & max
-	findVoltExtremes =
-	() => {
-		// if there's no space, there's no voltageBuffer or any of this other stuff
-		if (!this.space) return;
-
-		const v = this.volts;
-		let voltageBuffer = this.space.voltageBuffer;
-		let {start, end} = this.space.startEnd;
-		let mini = Infinity, maxi = -Infinity;
-		for (let ix = start; ix < end; ix++) {
-			mini = Math.min(voltageBuffer[ix], mini);
-			maxi = Math.max(voltageBuffer[ix], maxi)
-		}
-		v.voltMin = mini;
-		v.voltMax = maxi;
-	}
-
-	initVolts() {
-		// keeps many variables affecting voltage area and voltage sidebar, passed in as props
-		this.volts = {
-			// actual voltage buffer, min & max
-			//voltMin: 0, voltMax: 0,
-
-			// the scroll position of the voltage area, in volts, is where the bottom edge of the Volt Area is.
-			scrollSetting: +getASetting('voltageSettings', 'scrollSetting'),
-
-			// how many volts higher the top edge of the view is.  Zoom increases/decreases this.
-			heightVolts: +getASetting('voltageSettings', 'heightVolts'),
-
-			// the range over which the user can slide the scrollSetting up and down.
-			// These change values when the user does a zoom.
-			scrollMin: +getASetting('voltageSettings', 'scrollMin'),
-			scrollMax: +getASetting('voltageSettings', 'scrollMax'),
-
-			xScale: () => 0,  // see setVoltScales
-			yScale: () => 0,  // see setVoltScales
-		};
-		this.findVoltExtremes();
-	}
-
-	// scales to transform coords.  Call after user scrolls it up ordown, or
-	// user changes height or width of ccanvas.
-	// yScale is function that transforms from volts to pixels.
-	// yScale.invert()) goes the other way.  xScale transforms from ix to
-	// pixels.  Used for clicking and for display.
-	setVoltScales() {
-		const p = this.props;
-		const s = this.state;
-		const v = this.volts;
-		if (!p.width || !s.height || !s.space) {
-			debugger;
-			return false; // early on, avoid dividing by zero (?)
-		}
-		isOK(v.scrollSetting); isOK(v.heightVolts); isOK(s.height); isOK(this.canvasFacts.width);
-
-		v.yScale = scaleLinear([v.scrollSetting, v.scrollSetting + v.heightVolts], [0, s.height]);
-		v.xScale = scaleLinear([0, s.space.nPoints-1], [0, this.canvasFacts.width]);
-
-		if (traceVoltageArea) {
-			console.log(
-				`🏄 🏄  volt.setVoltScales():done, scrollSetting=${v.scrollSetting}
-				heightVolts=${v.heightVolts} type ${typeof v.heightVolts}`);
-			console.log(
-				`    voltagearea.setVoltScales():done, domains: x&y:`,
-				v.xScale.domain(), v.yScale.domain());
-			console.log(`                   ranges: x&y:`, v.xScale.range(), v.yScale.range());
-		}
-		return true;
-	}
-
-	// after user has done something to change the scrollMin/Max or zoom
-	// recalculate everything so setVoltScales() can work right.  Then setVoltScales().
-	//adjustVoltLimits() {
-	//	// voltage zoom is sortof the height the user asked for, but if the
-	//	// actual range of voltage is beyond, widen it so user can see
-	//	const s = this.state;
-	//	const v = this.volts;
-	//	v.heightVolts = s.voltageZoom + (v.max - v.min);
-	//
-	//	// then put the voltage line in the middle somewhere
-	//	this.scrollTop = (v.max + v.min + voltageScrollHeight) / 2;
-	//	this.scrollSetting = (v.max + v.min - voltageScrollHeight) / 2;
-	//
-	//	setVoltScales();
-	//}
-
-	scrollHandler =
-	ev => {
-		let target = ev.currentTarget;
-		let scrollSetting = this.volts.scrollSetting = target.valueAsNumber;
-		this.setState({voltScrollSetting: scrollSetting});
-		storeASetting('voltageSettings', 'scrollSetting', scrollSetting);
-
-		this.setVoltScales();
+	scrollVoltHandler =
+	bottomVolts => {
+		this.setState({bottomVolts: bottomVolts});
+		this.vInfo.setVoltScales(this.canvasFacts.width, this.state.height, this.props.space.nPoints);
 	}
 
 	// handles zoom in/out buttons    They pass +1 or -1.  heightVolts will usually be an integer power of zoomFactor.
-	zoomHandler =
+	zoomVoltHandler =
 	upDown => {
-		//debugger;
-		//const p = this.props;
-		const v = this.volts;
-		let newLogZoom = Math.log(v.heightVolts) / logZoomFactor;
-		newLogZoom = Math.round(newLogZoom - upDown);  // round off to integer power of zoom Factor
-		v.heightVolts = zoomFactor ** newLogZoom;
+		const v = this.vInfo;
+		v.changeZoom(upDown);
 		this.setState({heightVolts: v.heightVolts});
-
-		// got to set the scrolling top and bottom voltages.  When someone zooms, in or out,
-		// center the voltage line (middle).  By scrolling, user can see 3x heightVolts overall.
-		// That means scrollMin and scrollMax are separated by 2x heightVolts.
-		// scrollSetting is at the BOTTOM of heightVolts, remember.
-		let middleVolts = (v.voltMin + v.voltMax) / 2;
-		v.scrollSetting = middleVolts - .5 * v.heightVolts;
-		v.scrollMin = middleVolts - 1.5 * v.heightVolts;
-		v.scrollMax = middleVolts + .5 * v.heightVolts;
-
-		storeASetting('voltageSettings', 'scrollSetting', v.scrollSetting);
-		storeASetting('voltageSettings', 'heightVolts', +v.heightVolts);
-		storeASetting('voltageSettings', 'scrollMin', v.scrollMin);
-		storeASetting('voltageSettings', 'scrollMax', v.scrollMax);
-
-		this.setVoltScales();
+		this.vInfo.setVoltScales(this.canvasFacts.width, this.state.height, this.props.space.nPoints);
 	}
 
 	/* ************************************************************************ render */
@@ -397,6 +257,13 @@ export class WaveView extends React.Component {
 			`  parent.clientWidth: ${this.waveViewEl?.parentNode.clientWidth}   widthToUse=${widthToUse}`);
 		}
 
+		//findVoltExtremes={this.findVoltExtremes}
+		//bottomVolts={this.vInfo.bottomVolts}
+		//heightVolts={this.vInfo.heightVolts}
+		//xScale={this.vInfo.xScale} yScale={this.vInfo.yScale}
+		//bottomVolts={this.vInfo.bottomVolts}
+		//scrollMin={this.vInfo.scrollMin} scrollMax={this.vInfo.scrollMax}
+
 		return (
 		<div className='WaveView'  ref={el => this.waveViewEl = el}
 				style={{height: `${s.height}px`}}>
@@ -407,6 +274,7 @@ export class WaveView extends React.Component {
 					viewClassName='flatDrawingViewDef' viewName='mainView'
 					canvasFacts={this.canvasFacts}
 					width={widthToUse}
+					height={s.height}
 				/>
 
 				<section className='viewOverlay' >
@@ -427,21 +295,16 @@ export class WaveView extends React.Component {
 				<VoltageArea
 					space={s.space} canvas={this.canvas}
 					height={s.height}
-					findVoltExtremes={this.findVoltExtremes}
 					showVoltage={p.showVoltage}
-					scrollSetting={this.volts.scrollSetting}
-					heightVolts={this.volts.heightVolts}
-					xScale={this.volts.xScale} yScale={this.volts.yScale}
-					volts={this.volts}
+					vInfo={this.vInfo}
 					canvasFacts={this.canvasFacts}
 				/>
 			</div>
 			<VoltageSidebar width={voltageSidebarWidth} height={s.height}
+				vInfo={this.vInfo}
 				showVoltage={p.showVoltage}
-				scrollSetting={this.volts.scrollSetting}
-				scrollMin={this.volts.scrollMin} scrollMax={this.volts.scrollMax}
-				scrollHandler={this.scrollHandler}
-				zoomHandler={this.zoomHandler}
+				scrollVoltHandler={this.scrollVoltHandler}
+				zoomVoltHandler={this.zoomVoltHandler}
 			/>
 
 		</div>
@@ -451,3 +314,4 @@ export class WaveView extends React.Component {
 }
 
 export default WaveView;
+

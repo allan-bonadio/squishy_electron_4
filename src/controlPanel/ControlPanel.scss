@@ -196,20 +196,50 @@
 			width: 14em;
 		}
 
+		.breedSelector {
+			padding: 1em 0;
+		}
+
 		.voltageValleyPanel {
 			float: left;
 			width: 24em;
 		}
 
-		.miniGraph {
-			//float: left;
-			width: 300px;
-			height: 150px;
-			border: #aaa 1px outset;
-			stroke: common.$voltageColor;
-			stroke-width: 1;
-			pointer-events: none;
-			background-color: #000;
+		.miniGraphPanel {
+			display: grid;
+			grid-template-columns: auto auto auto;
+			grid-template-rows: auto auto;
+			gap: .5em;
+			width: 450px;
+
+			.valleyScale, .valleyPower {
+				appearance: slider-vertical;
+				width: 2.5em;
+			}
+
+			.valleyOffset {
+				height: 20px;
+			}
+
+			.powerDisplay {
+				width: 2.5em;
+				text-align: center;
+			}
+
+			.scaleDisplay {
+				width: 4em;
+				text-align: center;
+				font-size: .7em;
+			}
+
+			.miniGraph {
+				// width and height passed in from JS
+				border: #aaa 1px outset;
+				stroke: common.$voltageColor;
+				stroke-width: 1;
+				pointer-events: none;
+				background-color: #000;
+			}
 		}
 	}
 
