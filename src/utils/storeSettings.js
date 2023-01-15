@@ -41,6 +41,11 @@ export let alternateMinMaxs = {};
 
 export let alternateStore = {};  // try this again?
 
+// no, try making it a function.  That way webpack can't forget it.
+export function storeSettings() {}
+// in fact, nodes all up and down the tree can be functions that return or set the value(s)
+// at that point in the setting hierarchy.  cool.  not really necessary...
+
 
 // somehow webpack fumbles this if it's extern, in SquishPanel
 // no doesn't seem to make a diff
@@ -203,7 +208,7 @@ export function createStoreSettings() {
 
 	/* ************************************ voltageParams */
 	makeParam('voltageParams', 'voltageBreed', 'flat', ['flat', 'canyon', 'double']);
-	makeParam('voltageParams', 'canyonPower', 2, {min: -2, max: 4});
+	makeParam('voltageParams', 'canyonPower', 2, {min: 0, max: 6});
 	makeParam('voltageParams', 'canyonScale', 1, {min: -10, max: 10});
 	makeParam('voltageParams', 'canyonOffset', 50, {min: 0, max: 100});
 
@@ -248,9 +253,20 @@ export function getAGroup(groupName) {
 	return group;
 }
 
-// cuz of some magical bad ju-ju, this shit just doesn't owrk and i have to do it by hand.
+// store a whole group.  Eliminates values that aren't official, defaults missing ones.
+// Cleaned up value object returned.
 export function storeAGroup(groupName, newGroup) {
-	localStorage.setItem(groupName,  JSON.stringify(newGroup));
+	// only set those that are official
+	let toSet = {};
+	const asg = alternateStore[groupName];
+	for (let varName in asg) {
+		if (newGroup[varName] == undefined)
+			toSet[varName] = asg[varName].default;
+		else
+			toSet[varName] = newGroup[varName];
+	}
+	localStorage.setItem(groupName,  JSON.stringify(toSet));
+	return toSet;
 }
 
 // cuz of some magical bad ju-ju, this shit just doesn't owrk and i have to do it by hand.
