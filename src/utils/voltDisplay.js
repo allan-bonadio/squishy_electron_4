@@ -9,11 +9,12 @@ import {scaleLinear} from 'd3-scale';
 //import {getASetting} from '../utils/storeSettings.js';
 import {getAGroup, storeASetting} from '../utils/storeSettings.js';
 
-let traceFamiliar = true;
-let tracePathAttribute = true;
+let traceFamiliar = false;
+let tracePathAttribute = false;
 
 let traceVoltArithmetic = false;
 let traceVoltScales = false;
+let traceScrolling = false;
 
 // raw numbers ~ 100 are way too big and throw it all into chaos
 const VALLEY_FACTOR = .001;
@@ -64,7 +65,7 @@ export class voltDisplay {
 	}
 
 	// create a voltDisplay the way the app needs it
-	static voltInfoFromSettingsSpace(space) {
+	static newForSpace(space) {
 		return new voltDisplay(
 			space.start, space.end,
 			space.voltageBuffer,
@@ -78,6 +79,7 @@ export class voltDisplay {
 			toArray[ix] = fromArray[ix];
 	}
 
+	// dumps voltageArray
 	dumpVoltage(space, voltageArray, nPerRow = 1, skipAllButEvery = 1) {
 		//const {start, end, N} = space.startEnd;
 		let N = this.end - this.start;
@@ -95,11 +97,12 @@ export class voltDisplay {
 		console.log(`${txt}\n`);
 	}
 
-	dumpVoltInfo(title) {
-		console.log(`⚡️ dumpVoltInfo: ${title}
-		voltage range: ${this.voltMin} ... ${this.voltMax},
-		scroll: ${this.scrollMin} ... ${this.scrollMax}  ... ${this.actualMax}
-		heightVolts: ${this.heightVolts}    bottomVolts: ${this.bottomVolts}`);
+	// all of our tedious properties
+	dumpVoltDisplay(title) {
+		console.log(`⚡️ dumpVoltDisplay: ${title}
+			voltage range: ${this.voltMin} ... ${this.voltMax},
+			scroll: ${this.scrollMin}sm ... ${this.scrollMax}sm  ... ${this.actualMax}am
+			heightVolts: ${this.heightVolts}    bottomVolts: ${this.bottomVolts}`);
 	}
 
 	// actually measure the voltage signal, get min & max
@@ -132,8 +135,8 @@ export class voltDisplay {
 		// make sure some part of the current voltage is visible somewhere - adjust bottomVolts if needed
 		this.findVoltExtremes();
 
-		// flat voltage, default.  Otherwise, we'd have min == max.
-		if (this.voltMax <= this.voltMin || this.heightVolts == 0) {
+		// this would be trouble, so come up with something
+		if (this.heightVolts == 0) {
 			// these will change... first, decide a heightVolts
 			let approx = Math.abs(this.voltMin) + Math.abs(this.voltMax);
 			this.heightVolts = (approx || 8) / 8;
@@ -142,7 +145,7 @@ export class voltDisplay {
 			// this is bs... guessing at numbers that could be anywhere
 			this.scrollMin = this.voltMin - this.heightVolts/2;
 			this.setMaxMaxBottom();
-			this.dumpVoltInfo('adjustScrollBounds: set to defaults');
+			this.dumpVoltDisplay('adjustScrollBounds: set to defaults');
 			return;
 		}
 
@@ -153,7 +156,7 @@ export class voltDisplay {
 		if (traceVoltArithmetic) {
 			console.log(`⚡️ ⚡️ adjustScrollBounds: almostMin=${almostMin} almostMax=${almostMax}`);
 			//dumpJsStack('adjustScrollBounds');
-			this.dumpVoltInfo('before adjustment, if any, @adjustScrollBounds');
+			this.dumpVoltDisplay('before adjustment, if any, @adjustScrollBounds');
 		}
 
 		// check and adjust if out of bounds.
@@ -161,7 +164,7 @@ export class voltDisplay {
 			this.scrollMin = this.voltMin;
 			this.heightVolts = (this.voltMax - this.voltMin) / 2;
 			this.setMaxMaxBottom();
-			this.dumpVoltInfo('adjustScrollBounds: sorry had to adjust');
+			this.dumpVoltDisplay('adjustScrollBounds: sorry had to adjust');
 			return;
 		}
 	}
@@ -171,6 +174,7 @@ export class voltDisplay {
 	setVoltScales(canvasWidth, canvasHeight, nPoints) {
 		isOK(this.bottomVolts); isOK(this.heightVolts); isOK(canvasHeight); isOK(canvasWidth);
 
+		// these are used to draw the voltage path line in VoltageArea
 		this.yScale = scaleLinear([this.bottomVolts, this.bottomVolts + this.heightVolts], [0, canvasHeight]);
 		this.xScale = scaleLinear([0, nPoints-1], [0, canvasWidth]);
 
@@ -206,13 +210,13 @@ export class voltDisplay {
 	}
 
 	// called when user scrolls up or down.  can't get past the mins/maxes
-	// frac = 0...1
+	// frac = 1=scrolled to top, 0=scrolled to bottom
 	changeScroll(frac) {
-		console.info(`changeScroll(${frac})`);
-		let bVolts = Math.min(1, Math.max(0, frac)) * this.heightVolts + this.scrollMin;
-		this.bottomVolts = bVolts;  //Math.min(this.actualMax, Math.max(this.scrollMin, bVolts));
-		storeASetting('voltageSettings', 'bottomVolts', bVolts);
-		return bVolts;
+		this.bottomVolts = Math.min(1, Math.max(0, frac)) * this.heightVolts + this.scrollMin;
+		storeASetting('voltageSettings', 'bottomVolts', this.bottomVolts);
+		if (traceScrolling)
+			console.info(`changeScroll(frac=${frac}) => bottomVolts=${this.bottomVolts}`);
+		return this.bottomVolts;
 	}
 
 	// called when human zooms in or out.  pass +1 or -1.  heightVolts will usually be an integer power of zoomFactor.
