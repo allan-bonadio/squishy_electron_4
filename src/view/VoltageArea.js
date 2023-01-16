@@ -55,7 +55,6 @@ export class VoltageArea extends React.Component {
 		//if (props.setUpdateVoltageArea)
 		//	props.setUpdateVoltageArea(this.updateVoltageArea);
 
-		debugger;
 		props.gimmeVoltageArea(this);
 
 		if (traceVoltageArea) console.log(`👆 👆 VoltageArea  constructor done`);
@@ -67,7 +66,7 @@ export class VoltageArea extends React.Component {
 	// sheesh this is passed up and down so much; should figure out who and where needs it and simplify stuff.
 	updateVoltageArea =
 	voltageParams => {
-		console.log(`VoltageArea.updateVoltageArea: %O`, voltageParams);
+		//console.log(`VoltageArea.updateVoltageArea:`, voltageParams);
 		//const space = this.props.space;
 		this.props.vDisp?.findVoltExtremes();
 		this.forceUpdate();
@@ -233,7 +232,7 @@ export class VoltageArea extends React.Component {
 
 		// must figure out pointer offset; diff between mousedown pot and the neareest piece of line
 		// remember that clientY is in pix units
-		const p = this.props;
+		//const p = this.props;
 		let chosenVoltage = v.yScale.invert(ev.clientY);
 		this.mouseYOffset = chosenVoltage - this.latestVoltage;
 		if (traceDragging) {

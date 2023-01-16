@@ -13,11 +13,11 @@ import PropTypes from 'prop-types';
 import voltDisplay from '../utils/voltDisplay.js';
 //import eSpace from '../engine/eSpace.js';
 //import TextNSlider from '../widgets/TextNSlider.js';
-import {storeASetting, getAGroup, storeAGroup, alternateMinMaxs} from '../utils/storeSettings.js';
+import {getAGroup, storeAGroup, alternateMinMaxs} from '../utils/storeSettings.js';
 import {eSpaceCreatedPromise} from '../engine/eEngine.js';
 
-let miniWidth = 400;
-let miniHeight = 200;
+let miniWidth = 300;
+let miniHeight = 150;
 
 
 // the tab that user sets voltage with
@@ -71,13 +71,11 @@ class SetVoltageTab extends React.Component {
 	(ev) => {
 		if (!this.miniVolts)
 			return;
-debugger;
 		//voltDisplay.copyVolts(this.space.voltageBuffer, this.exampleBuffer);
 		this.space.vDisp.setFamiliarVoltage(this.state);
 
-		console.log(`SetVoltageTab.setVoltage: %o %O`, this.state, this.state);
+		//console.log(`SetVoltageTab.setVoltage: %o %O`, this.state, this.state);
 		// only NOW do we set it in the localStorage
-		debugger;
 		storeAGroup('voltageParams', this.state);
 		this.props.tellMeWhenVoltsChanged(this.state);
 		//this.updateVoltageArea();
@@ -140,7 +138,7 @@ debugger;
 
 	// wrap the minigraph with sliders on 3 sides
 	renderMiniGraphPanel() {
-		const p = this.props;
+		//const p = this.props;
 		const s = this.state;
 		let vMinsMaxes = alternateMinMaxs.voltageParams;
 		let disabled= 'flat' == s.voltageBreed;
@@ -200,11 +198,7 @@ debugger;
 			<div className='voltageTitlePanel'>
 				<h3>Set Voltage</h3>
 				{this.renderBreedSelector()}
-				<button onClick={ev => {
-					debugger;
-					this.setVoltage();
-					}
-					} >Set Voltage</button>
+				<button onClick={this.setVoltage} >Set Voltage</button>
 			</div>
 
 			<div className='divider' ></div>

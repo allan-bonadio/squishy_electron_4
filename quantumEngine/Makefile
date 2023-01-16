@@ -15,7 +15,7 @@ clean :
 	rm -fv wasm/quantumEngine.js wasm/quantumEngine.wasm wasm/quantumEngine.wasm.map
 	rm -frv wasm/cppuTestBin wasm/cppuTestBin.dSYM
 	rm -fv commonConstants.h building/exports.json $SQUISH_ROOT/src/engine/qe.js
-	echo 'byte size and file count:' `du -sh .; ls -lR | grep -E '^-' | wc -l`
+	echo total C++ code:  `du -sh .` bytes    '   '  ` ls -lR | grep -E '^-' | wc -l` files
 
 
 test :

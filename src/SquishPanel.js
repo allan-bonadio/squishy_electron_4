@@ -28,9 +28,9 @@ let tracePromises = false;
 let traceSquishPanel = false;
 let traceIntegration = false;
 let traceIntegrateEssentials = false;
-let traceWidth = true;
+let traceWidth = false;
 
-let verifyTickTimes = true;
+let verifyTickTimes = false;
 let areBenchmarking = false;
 
 const DEFAULT_VIEW_CLASS_NAME = 'flatDrawingViewDef';
@@ -412,18 +412,16 @@ export class SquishPanel extends React.Component {
 //		() => console.log(`frame period is now set to ${this.state.framePeriod}`));
 
 	// SetVoltageTab goes and changes the voltage.  VoltageArea needs to know when it changes.
-	// So pass this down and it'll return the va instance.
+	// So pass this down and it'll give us the va instance.
 	gimmeVoltageArea =
 	(vArea) => {
-		debugger;
 		this.voltageArea = vArea;
 	}
 
 	// something tells me that this isn't the way to do it in React
 	tellMeWhenVoltsChanged =
 	voltageParams => {
-		console.log(`SquishPanel.tellMeWhenVoltsChanged:`, voltageParams);
-		debugger;
+		//console.log(`SquishPanel.tellMeWhenVoltsChanged:`, voltageParams);
 		this.voltageArea?.updateVoltageArea(voltageParams);
 	}
 

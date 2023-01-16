@@ -13,7 +13,7 @@ import eThread from './eThread.js';
 
 // all of these must be attached to window to  get called by c++
 
-let traceStartup = true;
+let traceStartup = false;
 let tracePromises = false;
 
 /* ****************************************************** app startup */

@@ -104,9 +104,9 @@ qSpectrum *qGrinder::getSpectrum(void) {
 };
 
 void qGrinder::copyFromAvatar(qAvatar *avatar) {
-	printf("qGrinder(%p)::copyFromAvatar(qAvatar *%p) \n", this, avatar);
-	printf("    qAvatar-  qwave=%p   voltageFactor=%lf  label=%s\n", avatar->qwave, avatar->voltageFactor, avatar->label);
-	printf("    qGrinder-    qflick=%p   voltageFactor=%lf  label=%s \n", this->qflick, this->voltageFactor, this->label);
+	//printf("qGrinder(%p)::copyFromAvatar(qAvatar *%p) \n", this, avatar);
+	//printf("    qAvatar-  qwave=%p   voltageFactor=%lf  label=%s\n", avatar->qwave, avatar->voltageFactor, avatar->label);
+	//printf("    qGrinder-    qflick=%p   voltageFactor=%lf  label=%s \n", this->qflick, this->voltageFactor, this->label);
 	qflick->copyBuffer(qflick, avatar->qwave);
 }
 

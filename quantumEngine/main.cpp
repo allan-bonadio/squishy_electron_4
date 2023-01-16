@@ -26,7 +26,7 @@ EM_JS(int, qeStarted, (int max_dimensions, int max_label_len),
 		if (window.quantumEngineHasStarted)
 			window.quantumEngineHasStarted(max_dimensions, max_label_len);
 		else {
-			console.log(" ☀️ restart the page cuz hot-reloading sabotaged me again      🙄  👿 🤢 😵 🤬 😭 😠");
+			console.log(" 🐣 restart the page cuz hot-reloading sabotaged me again      🙄  👿 🤢 😵 🤬 😭 😠");
 			setTimeout(() => location = location, 1000);
 		}
 	}, 50);
@@ -37,7 +37,7 @@ EM_JS(int, qeStarted, (int max_dimensions, int max_label_len),
 
 // emscripten calls main() when the whole C++ is all set up.  Tell the JS guys.
 int main() {
-	printf(" ☀️ bonjour le monde!\n");
+	printf(" 🐣 bonjour le monde!\n");
 
 	// returns 1.  pfft.  std::thread::hardware_concurrency();
 
