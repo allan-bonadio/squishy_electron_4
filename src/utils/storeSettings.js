@@ -208,7 +208,7 @@ export function createStoreSettings() {
 
 	/* ************************************ voltageParams */
 	makeParam('voltageParams', 'voltageBreed', 'flat', ['flat', 'canyon', 'double']);
-	makeParam('voltageParams', 'canyonPower', 2, {min: 0, max: 6});
+	makeParam('voltageParams', 'canyonPower', 2, {min: -4, max: 6});
 	makeParam('voltageParams', 'canyonScale', 1, {min: -10, max: 10});
 	makeParam('voltageParams', 'canyonOffset', 50, {min: 0, max: 100});
 
