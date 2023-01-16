@@ -21,36 +21,22 @@ import qe from '../engine/qe.js';
 import './view.scss';
 // import {abstractViewDef} from './abstractViewDef.js';
 // import flatDrawingViewDef from './flatDrawingViewDef.js';
-import {getAGroup, getASetting, storeASetting} from '../utils/storeSettings.js';
+import {getASetting, storeASetting} from '../utils/storeSettings.js';
 
-import voltDisplay from '../utils/voltDisplay.js';
+//import voltDisplay from '../utils/voltDisplay.js';
 import VoltageArea from './VoltageArea.js';
 import VoltageSidebar from './VoltageSidebar.js';
 import GLView from '../gl/GLView.js';
 import {eSpaceCreatedPromise} from '../engine/eEngine.js';
 
 
-let traceScaling = true;
+let traceScaling = false;
 let traceDragCanvasHeight = false;
-//let traceVoltageArea = true;
-let traceWidth = true;
+let traceWidth = false;
 
 // size of the size box at lower right of canvas; also width of the voltage sidebar
 const sizeBoxSize = 24;
 const voltageSidebarWidth = 32;  // passed down to VoltageSidebar.  Seems to want to be 32
-
-// how much to zoom in/out each click (rounded if it's not an integer power)
-//const zoomFactor = Math.sqrt(2);
-//const logZoomFactor = Math.log(zoomFactor);
-
-
-//const isOK = (c) => {
-//	if (c == null || !isFinite(c)) {
-//		console.error(`bad value`, c);
-//		debugger;
-//	}
-//}
-//
 
 export class WaveView extends React.Component {
 	static propTypes = {
@@ -102,8 +88,7 @@ export class WaveView extends React.Component {
 			this.grinder = space.grinder;
 			this.mainEAvatar = space.mainEAvatar;
 
-			this.vDisp = new voltDisplay(space.start, space.end, space.voltageBuffer,
-				getAGroup('voltageSettings'));
+			this.vDisp = space.vDisp;  //new voltDisplay(space.start, space.end, space.voltageBuffer,getAGroup('voltageSettings'));
 			this.setState({vDisp: this.vDisp});////
 		})
 		.catch(ex => {
@@ -118,16 +103,17 @@ export class WaveView extends React.Component {
 		const p = this.props;
 		const s = this.state;
 
-		// only need this when the WaveView outer dims change, either a user resize
-		// or show/hide the voltage.  On that occasion, we have to adjust a lot, including resizing the canvas.
+		// only need this when the WaveView outer dims change, either a user
+		// resize or show/hide the voltage.  On that occasion, we have to adjust
+		// a lot, including resizing the canvas.
 		if (this.mainEAvatar && (this.formerShowVoltage != p.showVoltage
 					|| this.formerWidth != this.waveViewEl.clientWidth
 					|| this.formerHeight != s.height) ) {
 			if (traceScaling) {
-				console.log(`🏄 🏄 mainEAvatar=${this.mainEAvatar.label}`);
-				console.log(`    formerShowVoltage=${this.formerShowVoltage}   showVoltage=${p.showVoltage} `);
-				console.log(`    formerWidth=${this.formerWidth}   wv.clientWidth=${this.waveViewEl.clientWidth} `);
-				console.log(`    formerHeight=${this.formerHeight}   height=${s.height}`);
+				console.log(`🏄 🏄 mainEAvatar=${this.mainEAvatar.label}
+				formerShowVoltage=${this.formerShowVoltage}   showVoltage=${p.showVoltage}
+				formerWidth=${this.formerWidth}   wv.clientWidth=${this.waveViewEl.clientWidth}
+				formerHeight=${this.formerHeight}   height=${s.height}`);
 			}
 			this.formerWidth = p.width;
 			this.formerHeight = s.height;
@@ -189,6 +175,7 @@ export class WaveView extends React.Component {
 
 	/* ************************************************************************ volts */
 
+	// the actual bottomVolts is ignored; what's important is to tell us that it changed
 	scrollVoltHandler =
 	bottomVolts => {
 		this.setState({bottomVolts: bottomVolts});
