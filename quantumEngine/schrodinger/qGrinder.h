@@ -81,9 +81,10 @@ struct qGrinder {
 	// multiple steps; ≈ stepsPerFrame
 	void oneIntegration(void);
 
-	// visscher
-	void stepReal(qCx *newW, qCx *oldW, double dt);
-	void stepImaginary(qCx *newW, qCx *oldW, double dt);
+	// visscher.  Calculate new from old; use hamiltonian to calculate d𝜓
+	// often oldW and hamiltonianW are the same
+	void stepReal(qCx *newW, qCx *oldW, qCx *hamiltW, double dt);
+	void stepImaginary(qCx *newW, qCx *oldW, qCx *hamiltW, double dt);
 	//void oneVisscherStep(qWave *newQWave, qWave *oldQWave);
 
 	// kill high frequencies via FFTs

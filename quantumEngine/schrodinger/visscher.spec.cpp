@@ -49,8 +49,8 @@ TEST(visscher, VisscherOneStep4)
 
 	double dt = 0.01;
 	if (traceOneStep) grinder->dumpObj("⚛️ before : one Visscher Step");
-	grinder->stepReal(newWave4->wave, oldWave4->wave, dt);
-	grinder->stepImaginary(newWave4->wave, oldWave4->wave, dt);
+	grinder->stepReal(newWave4->wave, oldWave4->wave, oldWave4->wave, dt);
+	grinder->stepImaginary(newWave4->wave, oldWave4->wave, oldWave4->wave, dt);
 	if (traceOneStep) printf("⚛️ after : one Visscher Step\n");
 
 

@@ -87,23 +87,24 @@ other way: 1nm = 1e-9m   square = 1e-18 m^2 times that number = 1.72759854921802
 
 // first step: advance the 𝜓r a dt, from t to t + dt
 // oldW points to buffer with real = 𝜓r(t)    imag = 𝜓i(t + dt/2)
-// newW points to buffer with real = 𝜓r(t + dt)   imag unchanged = 𝜓i(t + dt/2)
+// newW points to buffer that will have real = 𝜓r(t + dt)   imag unchanged = 𝜓i(t + dt/2)
+// hamiltW is what we calculate the derivitives from
 // here we will calculate the 𝜓r(t + dt) values in a new buffer only, and fill them in.
-// the 𝜓i values in buffer 0 are still uncalculated
-void qGrinder::stepReal(qCx *newW, qCx *oldW, double dt) {
+// the 𝜓i values in old buffer are still uncalculated
+void qGrinder::stepReal(qCx *newW, qCx *oldW, qCx *hamiltW, double dt) {
 	qDimension *dims = space->dimensions;
 	if (traceRealStep) printf("⚛️ start of stepReal nStates=%d, nPoints=%d, start=%d, end=%d\n",
 			space->nStates, space->nPoints, dims->start, dims->end);
 
 	for (int ix = dims->start; ix < dims->end; ix++) {
 		// second deriv wrt x of psi
-		double d2𝜓i = oldW[ix-1].im + oldW[ix+1].im - oldW[ix].im * 2;
+		double d2𝜓i = hamiltW[ix-1].im + hamiltW[ix+1].im - hamiltW[ix].im * 2;
 		if (traceRealStep) printf("⚛️ stepReal ix=%d\n", ix);
 
 		// total hamiltonian including voltage
-		double H𝜓 = d2𝜓i + voltage[ix] * voltageFactor * oldW[ix].re;
+		double H𝜓 = d2𝜓i + voltage[ix] * voltageFactor * hamiltW[ix].re;
 
-		// note subtraction
+		// new = old + 𝛥 dt   note subtraction
 		if (traceRealStep) printf("⚛️ stepReal ix=%d\n", ix);
 		newW[ix].re = oldW[ix].re - dt * H𝜓;
 		if (traceRealStep) printf("⚛️ stepReal ix=%d\n", ix);
@@ -117,21 +118,20 @@ void qGrinder::stepReal(qCx *newW, qCx *oldW, double dt) {
 	// add this either in the Re or in the Im, not both!
 	elapsedTime += dt;
 
-
 	if (traceRealStep) printf("⚛️ end of stepReal:");
 }
 
 // second step: advance the Imaginaries of 𝜓 a dt, from dt/2 to 3dt/2
 // given the reals we just generated in stepReal() but don't change them
-void qGrinder::stepImaginary(qCx *newW, qCx *oldW, double dt) {
+void qGrinder::stepImaginary(qCx *newW, qCx *oldW, qCx *hamiltW, double dt) {
 	qDimension *dims = space->dimensions;
 
 	for (int ix = dims->start; ix < dims->end; ix++) {
 		// second deriv d2𝜓r / dx**2
-		double d2𝜓r = oldW[ix-1].re + oldW[ix+1].re - oldW[ix].re * 2;
+		double d2𝜓r = hamiltW[ix-1].re + hamiltW[ix+1].re - hamiltW[ix].re * 2;
 
 		// total hamiltonian
-		double H𝜓 = d2𝜓r + voltage[ix] * voltageFactor * oldW[ix].im;
+		double H𝜓 = d2𝜓r + voltage[ix] * voltageFactor * hamiltW[ix].im;
 
 		// note addition
 		newW[ix].im = oldW[ix].im + dt * H𝜓;

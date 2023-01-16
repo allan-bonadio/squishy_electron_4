@@ -215,30 +215,31 @@ void qGrinder::oneIntegration() {
 
 
 	// half step in beginning to move Im forward dt/2
-	// cuz outside of here, re and im are for the same time.
-	// Note here the latest is in [1]; frame continues this,
-	// and the halfwave at the end moves it back to [0]].
+	// cuz outside of here, re and im are synchronized.
 	qflick->fixThoseBoundaries(wave0);
-	stepReal(wave1, wave0, 0);
-	stepImaginary(wave1, wave0, dt/2);
+	elapsedTime += dt/2;  // just like stepReal with dt=0
+	//stepReal(wave1, wave0, wave0, 0);
+	stepImaginary(wave1, wave0, wave0, dt/2);
+
+	// now the latest is in wave1; the loop continues this,
 
 	int doubleSteps = stepsPerFrame / 2;
 	for (int step = 0; step < doubleSteps; step++) {
 
 		qflick->fixThoseBoundaries(wave1);
-		stepReal(wave0, wave1, dt);
-		stepImaginary(wave0, wave1, dt);
+		stepReal(wave0, wave1, wave1, dt);
+		stepImaginary(wave0, wave1, wave1, dt);
 
 		qflick->fixThoseBoundaries(wave0);
-		stepReal(wave1, wave0, dt);
-		stepImaginary(wave1, wave0, dt);
+		stepReal(wave1, wave0, wave0, dt);
+		stepImaginary(wave1, wave0, wave0, dt);
 	}
 
-	// half step at completion to move Re forward dt/2
-	// and copy back to Main
+	// and the halfwave at the end moves it back to [0]].
 	qflick->fixThoseBoundaries(wave1);
-	stepReal(wave0, wave1, dt/2);
-	stepImaginary(wave0, wave1, 0);
+	stepReal(wave0, wave1, wave1, dt/2);
+	elapsedTime += dt/2;  // just like stepImaginary with dt=0
+	//stepImaginary(wave0, wave1, wave1, 0);
 
 
 	// ok the algorithm tends to diverge after thousands of frames.  Hose it down.
