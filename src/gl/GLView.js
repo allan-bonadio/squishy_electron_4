@@ -19,12 +19,14 @@ import {listOfViewClasses} from './listOfViewClasses.js';
 //import {eSpaceCreatedPromise} from '../engine/eEngine.js';
 import {tooOldTerminate} from '../utils/errors.js';
 
-let traceSetup = true;
+let traceSetup = false;
 let tracePainting = false;
-let traceGeometry = true;
+let traceGeometry = false;
 
-// true to try v2 before v1; either or both might fail.  never tried.
-let tryWebGL2 = false;
+// true to try v2 before v1; either or both might fail.
+let tryWebGL2 = true;
+
+// make colors brighter?  never tried.  should hack on cx to rgb
 let trySRGB = false;
 
 
@@ -220,12 +222,6 @@ class GLView extends React.Component {
 			/>
 		)
 		// took out style={{width: `${p.width}px`, height: `${p.height}px`}}
-	}
-
-	componentDidMount() {
-		// maybe, don't do this... canvas won't exist the first time
-		//this.componentDidUpdate();
-		console.info(`hey, child, the GLView ${this.viewName} did mount`);////
 	}
 
 	componentDidUpdate() {
