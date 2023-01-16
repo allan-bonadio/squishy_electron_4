@@ -12,7 +12,7 @@ import {getAGroup} from '../utils/storeSettings.js';
 import {interpretCppException} from '../utils/errors.js';
 import {MAX_DIMENSIONS} from './eEngine.js';
 
-let traceSpace = true;
+let traceSpace = false;
 let traceFamiliarWave = false;
 
 /* **************************************************************** eDimension */
@@ -65,8 +65,7 @@ export class eSpace {
 		// direct access into the voltage buffer
 		this.voltageBuffer = new Float64Array(window.Module.HEAPF64.buffer,
 				this._voltage, this.nPoints);;
-		let voltageSettings = getAGroup('voltageSettings');
-		this.vDisp = new voltDisplay(this.start, this.end, this.voltageBuffer, voltageSettings);
+		this.vDisp = voltDisplay.newForSpace(this);
 		let voltageParams = getAGroup('voltageParams');
 		this.vDisp.setFamiliarVoltage(voltageParams);
 
