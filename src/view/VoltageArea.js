@@ -171,9 +171,10 @@ export class VoltageArea extends React.Component {
 		//if (!p.canvasWidth)
 		//return false;
 
-		// shift key gives you steady voltage as you drag across
+		// shift key gives you steady voltage as you drag across, but if you do it on the first
+		// click, we don't know where to start
 		let newVoltage = this.latestVoltage;
-		if (! ev.shiftKey) {
+		if (! ev.shiftKey || title == 'Down') {
 			let top = this.svgElement.getBoundingClientRect().top;
 			newVoltage = v.yScale.invert(p.height - ev.clientY + top);
 		}
