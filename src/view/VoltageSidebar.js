@@ -121,7 +121,9 @@ export function VoltageSidebar(props) {
 
 	let v = props.vDisp;
 	if (!v) return '';  // too early or first render
-	if (! props.showVoltage) return '';  // not showing
+	if (! props.showVoltage) return '';  // not showingd
+
+	if (!v.heightVolts  || v.heightVolts <= 0) throw `bad heightVolts ${v.heightVolts}`
 
 	if (railEl && thumbEl) {
 		railHeight = railEl.clientHeight;  // changed if user resized canvas

@@ -162,7 +162,7 @@ export class voltDisplay {
 		// check and adjust if out of bounds.
 		if (this.scrollMin > almostMax ||  this.actualMax < almostMin) {
 			this.scrollMin = this.voltMin;
-			this.heightVolts = (this.voltMax - this.voltMin) / 2;
+			this.heightVolts = Math.max(this.heightVolts, (this.voltMax - this.voltMin) / 2);
 			this.setMaxMaxBottom();
 			this.dumpVoltDisplay('adjustScrollBounds: sorry had to adjust');
 			return;
