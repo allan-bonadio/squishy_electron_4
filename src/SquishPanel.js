@@ -36,13 +36,21 @@ let areBenchmarking = false;
 const DEFAULT_VIEW_CLASS_NAME = 'flatDrawingViewDef';
 
 
+/* ************************************************ Context */
+
+// this will be available all over the squish panel.  so maybe I don't have to
+// mess around with these props so much. how did i go so long without learning
+// contexts?
+const SpaceContext = React.createContext({space: null});
+
+/* ************************************************ construction & reconstruction */
+
 export class SquishPanel extends React.Component {
 	static propTypes = {
 		id: PropTypes.string.isRequired,
 		width: PropTypes.number,
 	};
 
-	/* ************************************************ construction & reconstruction */
 	static squishPanelConstructed = 0;
 
 	constructor(props) {
@@ -114,7 +122,7 @@ export class SquishPanel extends React.Component {
 
 			// space will end up in the state but meanwhile we need it now
 			this.space = space;
-			this.setState({space});
+			this.setState({space});  // maybe i don't need this if it's in the context?
 
 			this.mainEAvatar = space.mainEAvatar;
 			this.grinder = space.grinder;
@@ -380,7 +388,7 @@ export class SquishPanel extends React.Component {
 		return <div className='runningOneCycle' style={{display: 'block'}}>
 			<span>total frames: {s.runningCycleIntegrateSerial.toFixed(0)} &nbsp;
 				elapsed vtime: {s.runningCycleElapsedTime.toFixed(3)} &nbsp;</span>
-			<button className='round' onClick={this.startRunningOneCycle}>start running 1 cycle</button>
+			<button onClick={this.startRunningOneCycle}>start running 1 cycle</button>
 		</div>
 	}
 
@@ -451,38 +459,37 @@ export class SquishPanel extends React.Component {
 		//setUpdateVoltageArea={this.setUpdateVoltageArea}
 		//populateFamiliarVoltage={this.populateFamiliarVoltage}
 		return (
-			<div id={this.props.id} className="SquishPanel">
-				<WaveView
-					width={p.width}
-					space={this.space}
-					showVoltage={s.showVoltage}
-					gimmeVoltageArea={this.gimmeVoltageArea}
-				/>
-				<ControlPanel
-					frameAnimate={(shouldAnimate, freq) => this.frameAnimate(shouldAnimate, freq)}
+			<SpaceContext.Provider value={{space: s.space}}>
+				<div id={this.props.id} className="SquishPanel">
+					<WaveView
+						width={p.width}
+						space={this.space}
+						showVoltage={s.showVoltage}
+						gimmeVoltageArea={this.gimmeVoltageArea}
+					/>
+					<ControlPanel
+						frameAnimate={(shouldAnimate, freq) => this.frameAnimate(shouldAnimate, freq)}
 
-					setFramePeriod={this.setFramePeriod}
+						setFramePeriod={this.setFramePeriod}
 
-					toggleShowVoltage={this.toggleShowVoltage}
-					showVoltage={s.showVoltage}
+						toggleShowVoltage={this.toggleShowVoltage}
+						showVoltage={s.showVoltage}
 
-					redrawWholeMainWave={this.redrawWholeMainWave}
+						redrawWholeMainWave={this.redrawWholeMainWave}
 
-					iStats={this.iStats}
-					refreshStats={this.refreshStats}
+						iStats={this.iStats}
+						refreshStats={this.refreshStats}
 
-					tellMeWhenVoltsChanged={this.tellMeWhenVoltsChanged}
-				/>
-				{this.renderRunningOneCycle()}
-			</div>
+						tellMeWhenVoltsChanged={this.tellMeWhenVoltsChanged}
+					/>
+					{this.renderRunningOneCycle()}
+				</div>
+			</SpaceContext.Provider>
 		);
-
-		// 					{/*setFrameFrequency={freq => this.setFrameFrequency(freq)}*/}
-//							frameFrequency={1000 / s.framePeriod}
-//					setFrameFrequency={freq => this.setFrameFrequency(freq)}
-
 
 	}
 }
+
+SquishPanel.contextType = SpaceContext;
 
 export default SquishPanel;
