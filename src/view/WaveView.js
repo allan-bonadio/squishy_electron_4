@@ -47,10 +47,8 @@ export class WaveView extends React.Component {
 
 		width: PropTypes.number,  // handed in, pixels, depends on window width
 
-		//setUpdateVoltageArea: PropTypes.func,
-
 		showVoltage: PropTypes.bool.isRequired,
-		gimmeVoltageArea: PropTypes.func.isRequired,
+		//gimmeVoltageArea: PropTypes.func.isRequired,
 	};
 
 	constructor(props) {
@@ -261,7 +259,6 @@ export class WaveView extends React.Component {
 					showVoltage={p.showVoltage}
 					vDisp={this.vDisp}
 					canvasFacts={this.canvasFacts}
-					gimmeVoltageArea={p.gimmeVoltageArea}
 				/>
 			</div>
 			<VoltageSidebar width={voltageSidebarWidth} height={s.height}

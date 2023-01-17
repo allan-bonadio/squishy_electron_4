@@ -40,46 +40,56 @@ export class VoltageArea extends React.Component {
 		showVoltage: PropTypes.bool.isRequired,
 
 		canvasFacts: PropTypes.object,
-		gimmeVoltageArea: PropTypes.func.isRequired,
+		//gimmeVoltageArea: PropTypes.func.isRequired,
 	};
 
 	constructor(props) {
 		super(props);
 		this.state = {
 			// should just use forceUpdate on our comp obj instead!
+			// I guess I am.  The state for this is the voltDisp obj and the voltageBuffer,
+			// which have internal changes but the obj ref never changes.
 			changeSerial: 0,
 		};
 		if (traceVoltageArea) console.log(`👆 👆 the new VoltageArea:`, this);
 
-		// should just use forceUpdate on our comp obj instead!
-		//if (props.setUpdateVoltageArea)
-		//	props.setUpdateVoltageArea(this.updateVoltageArea);
-
-		props.gimmeVoltageArea(this);
+		//props.gimmeVoltageArea(this);
+		console.log(`👆 👆  VoltageArea constructor. izzer space? ${props.space}.  Is there  vDisp?  ${props.vDisp}`);
 
 		if (traceVoltageArea) console.log(`👆 👆 VoltageArea  constructor done`);
 	}
 
 	/* *************************************************** drawing */
 
-	// tell the VoltageArea (that;s us) that something in the space.voltageBuffer changed.  Sometimes called from above.
-	// sheesh this is passed up and down so much; should figure out who and where needs it and simplify stuff.
+	// tell the VoltageArea (that;s us) that something in the
+	// space.voltageBuffer changed.  Sometimes called from above. This gets set
+	// into the space, when it's available.
 	updateVoltageArea =
-	voltageParams => {
-		//console.log(`VoltageArea.updateVoltageArea:`, voltageParams);
+	() => {
+		console.log(`VoltageArea.updateVoltageArea`);
 		//const space = this.props.space;
 		this.props.vDisp?.findVoltExtremes();
 		this.forceUpdate();
 	}
 
+	componentDidUpdate() {
+		// the constructor probably won't have space, but here it will.  should.
+		const p = this.props;
+		if (p.space)
+			p.space.updateVoltageArea = this.updateVoltageArea;
+		else
+			console.log(`👆 👆  VoltageArea, no space! ${p.space}.  Is there also no vDisp?  ${p.vDisp}`);
+	}
+
+
 	// the main path is the voltage, but for WELL we also draw end blocks, and also...
 	renderPaths() {
 		const p = this.props;
 		const v = p.vDisp;
-		if (!p.space) return <></>;
-		//const wholeRect = p.wholeRect;
+		if (!p.space)
+			return <></>;
 
-		//let {start, end, continuum} = p.space.startEnd;
+		// collects ALL svg to be rendered
 		let paths = [];
 
 		switch (p.space.dimensions[0].continuum) {

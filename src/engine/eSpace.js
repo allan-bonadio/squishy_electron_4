@@ -165,26 +165,7 @@ export class eSpace {
 			continuum: dim.continuum};
 	}
 
-
-
-	/* **************************** Voltage Potential */
-
-
-	// completely wipe out the quantum voltage and replace it with one of our familiar patterns.
-	// Called upon set voltage in voltage tab
-//	populateFamiliarVoltage =
-//	(voltageParams) => {
-//		// sets the numbers
-//		this.vDisp.setFamiliarVoltage(voltageParams);
-//	}
-
-	// voltage area needs to be told when the data changes.  can't put the whole voltage buffer in the state!
-//	setUpdateVoltageArea =
-//	(updateVoltageArea) => {
-//		this.updateVoltageArea = updateVoltageArea;
-//	};
-
-
+	updateVoltageArea = null;  // will be filled in in VoltageArea.js
 }
 
 export default eSpace;

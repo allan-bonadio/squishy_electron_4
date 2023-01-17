@@ -421,17 +421,17 @@ export class SquishPanel extends React.Component {
 
 	// SetVoltageTab goes and changes the voltage.  VoltageArea needs to know when it changes.
 	// So pass this down and it'll give us the va instance.
-	gimmeVoltageArea =
-	(vArea) => {
-		this.voltageArea = vArea;
-	}
+	//gimmeVoltageArea =
+	//(vArea) => {
+	//	this.voltageArea = vArea;
+	//}
 
 	// something tells me that this isn't the way to do it in React
-	tellMeWhenVoltsChanged =
-	voltageParams => {
-		//console.log(`SquishPanel.tellMeWhenVoltsChanged:`, voltageParams);
-		this.voltageArea?.updateVoltageArea(voltageParams);
-	}
+	//tellMeWhenVoltsChanged =
+	//voltageParams => {
+	//	//console.log(`SquishPanel.tellMeWhenVoltsChanged:`, voltageParams);
+	//	this.voltageArea?.updateVoltageArea(voltageParams);
+	//}
 
 	/* ******************************************************* rendering */
 	// call this when you change both the GL and iter and elapsed time
@@ -479,8 +479,6 @@ export class SquishPanel extends React.Component {
 
 						iStats={this.iStats}
 						refreshStats={this.refreshStats}
-
-						tellMeWhenVoltsChanged={this.tellMeWhenVoltsChanged}
 					/>
 					{this.renderRunningOneCycle()}
 				</div>

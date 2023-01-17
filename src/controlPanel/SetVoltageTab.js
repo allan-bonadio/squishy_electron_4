@@ -30,7 +30,7 @@ class SetVoltageTab extends React.Component {
 		toggleShowVoltage: PropTypes.func.isRequired,
 		showVoltage: PropTypes.bool.isRequired,
 
-		tellMeWhenVoltsChanged: PropTypes.func.isRequired,
+		//tellMeWhenVoltsChanged: PropTypes.func.isRequired,
 
 		//voltageParams: PropTypes.shape({
 		//	voltageBreed: PropTypes.oneOf(['flat', 'canyon', 'double']),
@@ -77,8 +77,8 @@ class SetVoltageTab extends React.Component {
 		//console.log(`SetVoltageTab.setVoltage: %o %O`, this.state, this.state);
 		// only NOW do we set it in the localStorage
 		storeAGroup('voltageParams', this.state);
-		this.props.tellMeWhenVoltsChanged(this.state);
-		//this.updateVoltageArea();
+		//this.props.tellMeWhenVoltsChanged(this.state);
+		this.space.updateVoltageArea();
 	};
 
 	/* *************************************************************** rendering for the Tab */
