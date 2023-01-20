@@ -1,3 +1,39 @@
+
+
+
+
+
+2022 jan 18 ============================================= ClickNDrag library
+
+common code should do:
+
+handlers:
+- mouseDown is a React-placed handler on a specific element.
+	Only on Target element.
+- mouse move, up, leave installed and removed on mouseup/leave
+	Probably installed and removed on the body or window
+	body.addEventListener('mousemove', thumbSlide);
+	body.addEventListener('mouseleave', mouseUp);
+	body.addEventListener('mouseup', mouseUp);
+	body.removeEventListener('mousemove', thumbSlide);
+	body.removeEventListener('mouseleave', mouseUp);
+	body.removeEventListener('mouseup', mouseUp);
+- should only drag while ev.buttons and also isDragging are true
+
+- App specifies intended frame dragging should be allowed in
+- but also needs ability to drag outside it eg for voltage area
+- Must nail down all the coords for a variety of uses
+
+
+- All ev handlers do preventDefault & stopPropagation
+- application-specific handler for each move event.  args:
+	- mouse click coords relative to target
+	- time of event
+- passive?
+
+
+
+
 ====================================================== the site
 
 Notice the use of %PUBLIC_URL% in the tags above.
@@ -50,6 +86,7 @@ WebGL 1: most browsers 2010 thru 2016, android maybe 2016
 WebGL 2: chrome & firefox Jan '17, Safari (both) & Edge 2020-2021
 
 WebGL 2 if you enable experimental features: Chrome & Safari 2015-2017
+including iPhone 5 iOS
 
 WebAssembly: most browsers 2017, on android maybe 2018
 
@@ -58,6 +95,8 @@ safari & Firefox & Chrome 2009 to early 2010
 Edge July 2015
 Safari ios 2012
 Android 2013 - 2022
+
+SharedArrayBuffer - this might be the big breaking feature.
 
 in general, Android browsers lag the rest, although I'm not sure which browsers they use.  Maybe Chrome, then Samsung, then Edge then Firefox.
 
