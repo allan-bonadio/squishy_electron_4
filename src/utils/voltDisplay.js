@@ -9,7 +9,7 @@ import {scaleLinear} from 'd3-scale';
 //import {getASetting} from '../utils/storeSettings.js';
 import {getAGroup, storeASetting} from '../utils/storeSettings.js';
 
-let traceFamiliar = true;
+let traceFamiliar = false;
 let tracePathAttribute = false;
 
 let traceVoltArithmetic = false;
