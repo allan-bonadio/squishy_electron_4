@@ -48,7 +48,7 @@ export class ControlPanel extends React.Component {
 		}),
 		refreshStats: PropTypes.func.isRequired,
 
-		tellMeWhenVoltsChanged: PropTypes.func.isRequired,
+		//tellMeWhenVoltsChanged: PropTypes.func.isRequired,
 	}
 
 	constructor(props) {
@@ -142,7 +142,7 @@ export class ControlPanel extends React.Component {
 		ControlPanel.stopAnimating();
 	}
 
-	/* ********************************************** wave & pot */
+	/* ********************************************** wave */
 
 	// used to set any familiarParam value, pass eg {pulseWidth: 40}
 	// Sets state in control panel only, eg setWave panel settings
@@ -150,6 +150,7 @@ export class ControlPanel extends React.Component {
 	setCPState =
 	(obj) => {
 		this.setState(obj);
+		console.error(`hey, boy, you shouldn't be using setCPState()!!  ControlPanel 153'`)
 	}
 
 	// given these params, put it into effect and display it
@@ -165,7 +166,7 @@ export class ControlPanel extends React.Component {
 		p.redrawWholeMainWave();
 	}
 
-	// toolbar: reset wave button.  Display it from saved params
+	// toolbar: reset Voltage button.  Display it from wave params
 	resetMainWave =
 	() => {
 		let waveParams = getAGroup('waveParams');
@@ -179,17 +180,15 @@ export class ControlPanel extends React.Component {
 		storeAGroup('waveParams', waveParams);
 	}
 
+	/* ********************************************** volts & tab */
 
-	// fills in the voltage buffer with values according to the voltageParams
-	// called when user clicks Canyon voltage or Flat voltage
-	//setVoltageHandler =
-	//() => {
-	//	const {canyonPower, canyonScale, canyonOffset} = this.state;
-	//
-	//	// actually sets buffer
-	//	this.props.populateFamiliarVoltage({canyonPower, canyonScale, canyonOffset});
-	//
-	//}
+	// fills in the voltage buffer with values most recently set for voltageParams
+	// called when user clicks reset voltage on cptoolbar
+	resetVoltage =
+	() => {
+		this.space.vDisp.setFamiliarVoltage(getAGroup('voltageParams'));
+		this.space.updateVoltageArea();
+	}
 
 	setShowingTab =
 	tabCode => {
@@ -257,13 +256,12 @@ export class ControlPanel extends React.Component {
 			/>;
 
 		case 'voltage':
-		// setVoltageHandler={this.setVoltageHandler}
+			// setVoltageHandler={this.setVoltageHandler}
+			//setVoltageAndUpdate={this.setVoltageAndUpdate}
 			return <SetVoltageTab
 				voltageParams={{ canyonPower, canyonScale, canyonOffset,}}
-				setCPState={this.setCPState}
 				toggleShowVoltage={p.toggleShowVoltage}
 				showVoltage={p.showVoltage}
-				tellMeWhenVoltsChanged={p.tellMeWhenVoltsChanged}
 			/>;
 
 		case 'space':
@@ -306,7 +304,8 @@ export class ControlPanel extends React.Component {
 				isTimeAdvancing={ControlPanel.isTimeAdvancing}
 
 				resetMainWave={this.resetMainWave}
-				toggleShowVoltage={p.toggleShowVoltage}
+				resetVoltage={this.resetVoltage}
+				toggleShowVoltage={ev => {debugger;p.toggleShowVoltage(ev)}}
 				showVoltage={p.showVoltage}
 
 				N={this.N}

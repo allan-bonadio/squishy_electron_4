@@ -210,7 +210,7 @@ class SetWaveTab extends React.Component {
 					{glView}
 				</div>
 
-				<button className='setWaveButton round' onClick={ev => this.saveMainWave(this.state)}>
+				<button className='setWaveButton' onClick={ev => this.saveMainWave(this.state)}>
 						Set Wave
 				</button>
 

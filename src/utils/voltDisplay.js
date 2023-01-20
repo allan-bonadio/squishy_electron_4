@@ -9,7 +9,7 @@ import {scaleLinear} from 'd3-scale';
 //import {getASetting} from '../utils/storeSettings.js';
 import {getAGroup, storeASetting} from '../utils/storeSettings.js';
 
-let traceFamiliar = false;
+let traceFamiliar = true;
 let tracePathAttribute = false;
 
 let traceVoltArithmetic = false;
@@ -66,11 +66,13 @@ export class voltDisplay {
 
 	// create a voltDisplay the way the app needs it
 	static newForSpace(space) {
-		return new voltDisplay(
+		let vDisp = new voltDisplay(
 			space.start, space.end,
 			space.voltageBuffer,
 			getAGroup('voltageSettings')
 		);
+		vDisp.space = space;
+		return vDisp;
 	}
 
 	// straight clone (does not do boundaries that are unused anyway)
@@ -80,15 +82,14 @@ export class voltDisplay {
 	}
 
 	// dumps voltageArray
-	dumpVoltage(space, voltageArray, nPerRow = 1, skipAllButEvery = 1) {
-		//const {start, end, N} = space.startEnd;
+	dumpVoltage(title, voltageArray = this.voltageBuffer, nPerRow = 1, skipAllButEvery = 1) {
 		let N = this.end - this.start;
 		if (! skipAllButEvery)
 			skipAllButEvery = Math.ceil(N / 40);
 		if (! nPerRow)
 			nPerRow =  Math.ceil(N / 10);
 
-		let txt = '⚡️ dumpVoltage buffer:  ';
+		let txt = `⚡️ dumpVoltage buffer: ${title} `;
 		for (let ix = this.start; ix < this.end; ix++) {
 			txt += voltageArray[ix].toFixed(6).padStart(10);
 			if (ix % skipAllButEvery == 0)
@@ -162,7 +163,7 @@ export class voltDisplay {
 		// check and adjust if out of bounds.
 		if (this.scrollMin > almostMax ||  this.actualMax < almostMin) {
 			this.scrollMin = this.voltMin;
-			this.heightVolts = (this.voltMax - this.voltMin) / 2;
+			this.heightVolts = Math.max(this.heightVolts, (this.voltMax - this.voltMin) / 2);
 			this.setMaxMaxBottom();
 			this.dumpVoltDisplay('adjustScrollBounds: sorry had to adjust');
 			return;
@@ -265,6 +266,8 @@ export class voltDisplay {
 			}
 		}
 
+		if (traceFamiliar)
+			this.dumpVoltage(`done with setFamiliarVoltage()`);
 	}
 
 	// make the value for the 'd' attribute on a <path element

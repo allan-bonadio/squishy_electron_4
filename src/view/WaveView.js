@@ -47,10 +47,8 @@ export class WaveView extends React.Component {
 
 		width: PropTypes.number,  // handed in, pixels, depends on window width
 
-		//setUpdateVoltageArea: PropTypes.func,
-
 		showVoltage: PropTypes.bool.isRequired,
-		gimmeVoltageArea: PropTypes.func.isRequired,
+		//gimmeVoltageArea: PropTypes.func.isRequired,
 	};
 
 	constructor(props) {
@@ -88,8 +86,8 @@ export class WaveView extends React.Component {
 			this.grinder = space.grinder;
 			this.mainEAvatar = space.mainEAvatar;
 
-			this.vDisp = space.vDisp;  //new voltDisplay(space.start, space.end, space.voltageBuffer,getAGroup('voltageSettings'));
-			this.setState({vDisp: this.vDisp});////
+			this.vDisp = space.vDisp;
+			this.setState({vDisp: this.vDisp});  // not needed if it's in the context?
 		})
 		.catch(ex => {
 			console.error(`eSpaceCreatedPromise failed`, ex);
@@ -214,26 +212,8 @@ export class WaveView extends React.Component {
 			frameSerial = thousands(this.grinder.frameSerial);
 		}
 
-		// does this ever show?
 		const spinner = qe.cppLoaded ? ''
 			: <img className='spinner' alt='spinner' src='images/eclipseOnTransparent.gif' />;
-
-		// make room for voltage sidebar
-		//this.canvasWidth = p.width;
-		//if (p.showVoltage) {
-		//	this.canvasWidth -= voltageSidebarWidth;
-		//	if (p.width && s.height)
-		//		wholeRect -= voltageSidebarWidth;
-		//}
-		//	<div className='viewArea' style={{width: `${this.canvasWidth}px`}}>
-			//	style={{width: `${p.width}px`, height: `${s.height}px`}}>
-			// style={{width: `${this.canvasWidth}px`}}
-			//					style={{width: `${this.canvasWidth}px`, height: `${s.height}px`}}>
-				//style={{width: `${p.width}px`, height: `${s.height}px`}}>
-
-
-		// voNorthWest/East are populated during frame
-		// Always generate the VoltageArea so it keeps its state, but it won't always draw
 
 		// sometimes a fraction of a pixel causes the horiz scroll bar to kick in.  avoid that without messing up everything.
 		let widthToUse = p.width - .5;
@@ -244,13 +224,6 @@ export class WaveView extends React.Component {
 			console.log(`🏄 🏄WaveView render, width=${this.waveViewEl?.clientWidth}`+
 			`  parent.clientWidth: ${this.waveViewEl?.parentNode.clientWidth}   widthToUse=${widthToUse}`);
 		}
-
-		//findVoltExtremes={this.findVoltExtremes}
-		//bottomVolts={this.vDisp.bottomVolts}
-		//heightVolts={this.vDisp.heightVolts}
-		//xScale={this.vDisp.xScale} yScale={this.vDisp.yScale}
-		//bottomVolts={this.vDisp.bottomVolts}
-		//scrollMin={this.vDisp.scrollMin} scrollMax={this.vDisp.scrollMax}
 
 		return (
 		<div className='WaveView'  ref={el => this.waveViewEl = el}
@@ -286,7 +259,6 @@ export class WaveView extends React.Component {
 					showVoltage={p.showVoltage}
 					vDisp={this.vDisp}
 					canvasFacts={this.canvasFacts}
-					gimmeVoltageArea={p.gimmeVoltageArea}
 				/>
 			</div>
 			<VoltageSidebar width={voltageSidebarWidth} height={s.height}

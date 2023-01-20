@@ -13,7 +13,7 @@ import ResolutionDialog from './ResolutionDialog.js';
 
 function SetResolutionTab(props) {
 	return (<div className='SetResolutionTab'>
-		<button className='setResolutionButton  round'
+		<button className='setResolutionButton'
 			onClick={ev => ResolutionDialog.openResolutionDialog()}>
 				Change Space
 				<div style={{fontSize: '.7em'}}>

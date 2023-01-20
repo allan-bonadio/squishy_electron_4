@@ -25,6 +25,7 @@ function setPT() {
 		space: PropTypes.instanceOf(eSpace),
 
 		resetMainWave: PropTypes.func.isRequired,
+		resetVoltage: PropTypes.func.isRequired,
 		toggleShowVoltage: PropTypes.func.isRequired,
 		showVoltage: PropTypes.bool.isRequired,
 
@@ -105,23 +106,24 @@ function CPToolbar(props) {
 					resolution {props.N ?? '...'} &nbsp;
 				</div>
 
-				<button className='round' onClick={props.resetMainWave}>Reset Wave</button>
+				<button onClick={props.resetMainWave}>Reset Wave</button>
 				&nbsp;
 
-				<button className='round' onClick={props.setVoltageHandler}>
+				<button onClick={props.resetVoltage}>
 					Reset Voltage
 				</button>
 				&nbsp;
 			</div>
 
 			<div className='toolbarRow'>
-				<button className='round' onClick={ev => clickOnFFT(props.space)}>
+				<button onClick={ev => clickOnFFT(props.space)}>
 					FFT
 				</button>
 				&nbsp;
 
 				<label>
-					<input type='checkbox' checked={props.showVoltage} onChange={props.toggleShowVoltage} />
+					<input type='checkbox' checked={props.showVoltage}
+						onChange={ev =>props.toggleShowVoltage} />
 					Show Voltage
 				</label>
 			</div>

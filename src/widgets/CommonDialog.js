@@ -14,7 +14,7 @@ import {interpretCppException} from '../utils/errors.js';
 function SimpleDialog(props) {
 	return (<section id='SimpleDialog' >
 		<details>{props.text}</details>
-		<nav><button className='round' onClick={CommonDialog.startClosingDialog} >OK</button></nav>
+		<nav><button onClick={CommonDialog.startClosingDialog} >OK</button></nav>
 	</section>);
 }
 
@@ -52,7 +52,7 @@ function ErrorDialog(props) {
 		<h2><big>🧯</big> Error</h2>
 		<h3>(probably not your fault)</h3>
 		{prepError(ex)}
-		<nav><button className='round' onClick={CommonDialog.startClosingDialog} >OK</button></nav>
+		<nav><button onClick={CommonDialog.startClosingDialog} >OK</button></nav>
 	</article>;
 }
 

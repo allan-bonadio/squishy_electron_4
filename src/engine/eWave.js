@@ -325,8 +325,8 @@ class eWave {
 		let gaussian = new Float64Array(2 * N);
 		const s2 = pulseWidth ** -2;  // 1/stddev**2 sortof
 		for (let ix = 0; ix < 2 * N; ix++) {
-			const 𝜟 = ix - N;
-			gaussian[ix] = Math.exp(-𝜟 * 𝜟 * s2);
+			const delta = ix - N;
+			gaussian[ix] = Math.exp(-delta * delta * s2);
 		}
 
 		// there's a problem when you chop it off at the ends for Endless.  You
