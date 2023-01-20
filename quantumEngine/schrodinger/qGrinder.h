@@ -87,6 +87,11 @@ struct qGrinder {
 	void stepImaginary(qCx *newW, qCx *oldW, qCx *hamiltW, double dt);
 	//void oneVisscherStep(qWave *newQWave, qWave *oldQWave);
 
+	// just one after the other
+	void stepRealImaginary(qCx *newW, qCx *oldW, qCx *hamiltW, double dt);
+
+	void stepMidpoint(qCx *newW, qCx *oldW, qCx *scratch, double dt);
+
 	// kill high frequencies via FFTs
 	void fourierFilter(int lowPassFilter);
 };

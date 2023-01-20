@@ -144,6 +144,17 @@ void qGrinder::stepImaginary(qCx *newW, qCx *oldW, qCx *hamiltW, double dt) {
 	qflick->fixThoseBoundaries(newW);
 }
 
+// this is what will be replaced to make Midpoint.  except midpoint also uses this.
+// Cuz, you can't really do two Real steps in a row; must do an Imag step in between.  And vice versa.
+void qGrinder::stepRealImaginary(qCx *newW, qCx *oldW, qCx *hamiltW, double dt) {
+	qflick->fixThoseBoundaries(oldW);
+	if (oldW != hamiltW)
+		qflick->fixThoseBoundaries(hamiltW);
+
+	stepReal(newW, oldW, hamiltW, dt);
+	stepImaginary(newW, oldW, hamiltW, dt);
+}
+
 // form the new wave from the old wave, in separate buffers, chosen by our caller.
 // notreally gonna use this; see oneIntegration()
 //void qGrinder::oneVisscherStep(qWave *newQWave, qWave *oldQWave) {

@@ -33,6 +33,7 @@ static bool traceSpace = false;  // prints info about the space in the grinder c
 static bool traceEachFFSquelch = false;
 static bool traceEndingFFSpectrum = false;
 
+#define MIDPOINT_METHOD
 
 /* *********************************************************************************** qGrinder */
 
@@ -45,7 +46,8 @@ qGrinder::qGrinder(qSpace *sp, qAvatar *av, const char *lab)
 
 	magic = 'Grin';
 
-	qflick = new qFlick(space, this, 2, 2);
+	// number of waves; number of threads
+	qflick = new qFlick(space, this, 3, 2);
 
 	// so wave in the flick points to the zero-th wave
 
@@ -194,24 +196,39 @@ void qGrinder::dumpObj(const char *title) {
 	printf("        ==== end of qGrinder ====\n\n");
 }
 
+/* ********************************************************** midpoint method */
+
+// this will
+void qGrinder::stepMidpoint(qCx *newW, qCx *oldW, qCx *scratch, double dt) {
+	// first calculate the normal step taking derivatives at the beginning of dt
+	qflick->fixThoseBoundaries(oldW);
+	stepReal(scratch, oldW, oldW, dt);
+	stepImaginary(scratch, oldW, oldW, dt);
+
+	// now do it again with the derivatives at the end
+	qflick->fixThoseBoundaries(scratch);
+	stepReal(newW, oldW, scratch, dt);
+	stepImaginary(newW, oldW, scratch, dt);
+
+	// now average them into new
+	qDimension *dims = space->dimensions;
+	for (int ix = dims->start; ix < dims->end; ix++) {
+		newW[ix] = (newW[ix] + scratch[ix]) / 2;
+	}
+
+	// and that's the midpoint method
+}
+
 /* ********************************************************** doing Integration */
 
-// return elapsed real time since last page reload, in seconds, only for tracing
-// seems like it's down to miliseconds or even a bit smaller
-//double getTimeDouble()
-//{
-//    struct timespec ts;
-//    clock_gettime(CLOCK_MONOTONIC, &ts);
-//    return ts.tv_sec + ts.tv_nsec / 1e9;
-//}
-
-// Does several visscher steps (eg 100 or 500). Actually does
+// Does several visscher steps (eg 10 or 100 or 500). Actually does
 // stepsPerFrame+1 steps; half steps at start and finish to adapt and
-// deadapt to Visscher timing
+// de-adapt to Visscher timing
 void qGrinder::oneIntegration() {
 	isIntegrating = doingIntegration = true;
 	qCx *wave0 = qflick->waves[0];
 	qCx *wave1 = qflick->waves[1];
+	qCx *wave2 = qflick->waves[2];
 
 
 	// half step in beginning to move Im forward dt/2
@@ -225,13 +242,21 @@ void qGrinder::oneIntegration() {
 	int doubleSteps = stepsPerFrame / 2;
 	for (int step = 0; step < doubleSteps; step++) {
 
-		qflick->fixThoseBoundaries(wave1);
-		stepReal(wave0, wave1, wave1, dt);
-		stepImaginary(wave0, wave1, wave1, dt);
+		#ifdef MIDPOINT_METHOD
+		stepMidpoint(wave0, wave1, wave2, dt);
+		stepMidpoint(wave1, wave0, wave2, dt);
+		#else
+		stepRealImaginary(wave0, wave1, wave1, dt);
+		stepRealImaginary(wave1, wave0, wave0, dt);
+		#endif
 
-		qflick->fixThoseBoundaries(wave0);
-		stepReal(wave1, wave0, wave0, dt);
-		stepImaginary(wave1, wave0, wave0, dt);
+//		qflick->fixThoseBoundaries(wave1);
+//		stepReal(wave0, wave1, wave1, dt);
+//		stepImaginary(wave0, wave1, wave1, dt);
+//
+//		qflick->fixThoseBoundaries(wave0);
+//		stepReal(wave1, wave0, wave0, dt);
+//		stepImaginary(wave1, wave0, wave0, dt);
 	}
 
 	// and the halfwave at the end moves it back to [0]].
