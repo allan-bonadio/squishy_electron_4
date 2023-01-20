@@ -68,7 +68,7 @@ export class VoltageArea extends React.Component {
 	() => {
 		console.log(`VoltageArea.updateVoltageArea`);
 		//const space = this.props.space;
-		this.props.vDisp?.findVoltExtremes();
+		this.props.vDisp.findVoltExtremes();
 		this.forceUpdate();
 	}
 

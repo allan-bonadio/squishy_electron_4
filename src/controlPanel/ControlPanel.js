@@ -182,11 +182,11 @@ export class ControlPanel extends React.Component {
 
 	/* ********************************************** volts & tab */
 
-	// fills in the voltage buffer with values according to the voltageParams
-	// called when user clicks Canyon voltage or Flat voltage
+	// fills in the voltage buffer with values most recently set for voltageParams
+	// called when user clicks reset voltage on cptoolbar
 	resetVoltage =
 	() => {
-		this.space.vDisp.setFamiliarVoltage(this.state);
+		this.space.vDisp.setFamiliarVoltage(getAGroup('voltageParams'));
 		this.space.updateVoltageArea();
 	}
 
@@ -256,10 +256,10 @@ export class ControlPanel extends React.Component {
 			/>;
 
 		case 'voltage':
-		// setVoltageHandler={this.setVoltageHandler}
+			// setVoltageHandler={this.setVoltageHandler}
+			//setVoltageAndUpdate={this.setVoltageAndUpdate}
 			return <SetVoltageTab
 				voltageParams={{ canyonPower, canyonScale, canyonOffset,}}
-				setCPState={this.setCPState}
 				toggleShowVoltage={p.toggleShowVoltage}
 				showVoltage={p.showVoltage}
 			/>;
