@@ -19,6 +19,7 @@ then
 	exit 55
 fi
 
+export EMSDK_QUIET=1
 . $qEMSCRIPTEN/emsdk/emsdk_env.sh
 
 # this lists all c++ files, except main.cpp and the testing files.
