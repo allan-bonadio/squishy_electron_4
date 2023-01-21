@@ -99,15 +99,17 @@
 		display: flex;
 		flex-direction: column;
 
+		border: 1px #666 outset;
+
 		// but particpates in its parent's row flex box.  Width and display set by code in WaveView.render()
 		text-align: center;
 		flex: 0 0;
 
-		background-color: common.$voltageColor;
+		background-color: common.$voltageDarkerColor;
 
 		// zoom in/out buttons
 		button {
-			background-color: common.$voltageColor;
+			background-color: common.$voltageDarkerColor;
 			border: none;
 			flex: 0 0;
 			display: block;
@@ -119,7 +121,7 @@
 			}
 		}
 		button:hover {
-			background-color: common.$voltageLighterColor;
+			background-color: common.$voltageColor;
 		}
 		button:active {
 			background-color: #44f;
@@ -130,7 +132,7 @@
 			flex: 1 1;
 			margin: 2px;
 			border: 1px inset #aaa;
-			background-color: common.$voltageDarkerColor;
+			background-color: common.$voltageColor;
 
 			.voltThumb {
 				position: absolute;
@@ -141,7 +143,7 @@
 				cursor: ns-resize;
 
 				border: 1px outset #aaa;
-				background-color: common.$voltageColor;
+				background-color: common.$voltageDarkerColor;
 
 				text-align: center;
 			}
