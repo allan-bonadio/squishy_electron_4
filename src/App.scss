@@ -24,6 +24,10 @@ var {
 	// default italic
 }
 
+small {
+	font-size: .7em;
+}
+
 /* **************************************** app outer components */
 
 h2.App-header {
@@ -86,9 +90,6 @@ input[type=range] {
 		}
 
 		.middle {
-			flex: 2 0 1em;
-			text-align: center;  // does it do anything?
-
 			flex: 2 0 10em;
 			text-align: center;
 		}
@@ -200,7 +201,7 @@ button {
 	}
 
 	button {
-		margin: 2em;
+		margin: .5em;
 	}
 
 	tr td {

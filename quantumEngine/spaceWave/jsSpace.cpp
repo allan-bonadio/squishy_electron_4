@@ -74,9 +74,9 @@ qSpace *startNewSpace(const char *label) {
 
 // call this from JS to add one or more dimensions
 // nobody uses this return value either.
-void addSpaceDimension(int N, int continuum, const char *label) {
+void addSpaceDimension(int N, int continuum, double dx, const char *label) {
 	if (traceSpaceCreation) printf("🚀 addSpaceDimension(%d, %d, %s)\n", N, continuum, label);
-	theSpace->addDimension(N, continuum, label);
+	theSpace->addDimension(N, continuum, dx, label);
 }
 
 // call this from JS to finish the process for the qSpace, create and add the avatars & voltage
