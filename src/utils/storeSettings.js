@@ -190,9 +190,9 @@ export function createStoreSettings() {
 
 	// see also resolution dialog for the slider
 	makeParam('spaceParams', 'N', 64,  N => isPowerOf2(N) );
-
 	makeParam('spaceParams', 'continuum', qe.contENDLESS,
 		[qe.contDISCRETE, qe.contWELL, qe.contENDLESS]);
+	makeParam('spaceParams', 'spaceLength', 16, {min: 1e-3, max: 1e9});
 
 	/* ************************************ waveParams */
 

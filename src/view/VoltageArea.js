@@ -150,7 +150,7 @@ export class VoltageArea extends React.Component {
 		const p = this.props;
 		if (! p.space)
 			return '';  // too early
-		this.barWidth = p.canvasFacts.width / this.nPoints;
+		this.barWidth = p.canvasFacts.width / p.space.nPoints;
 
 		let returnV = (
 			<svg className='VoltageArea'

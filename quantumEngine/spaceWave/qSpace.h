@@ -31,6 +31,9 @@ public:
 	// includes boundaries.
 	int nPoints;
 
+	// nanometers separating data points
+	double dx;
+
 	// size for Fourier transforms, or zero if not yet calculated.  ON THIS DIMENSION ONLY!
 	// Often a power of two.  no boundaries.
 	void chooseSpectrumLength(void);
@@ -114,7 +117,7 @@ public:
 extern "C" {
 	// create
 	qSpace *startNewSpace(const char *name = "a space");
-	void addSpaceDimension(int N, int continuum, const char *label);
+	void addSpaceDimension(int N, int continuum, double dx, const char *label);
 	qSpace *completeNewSpace(void);
 
 	// destroy

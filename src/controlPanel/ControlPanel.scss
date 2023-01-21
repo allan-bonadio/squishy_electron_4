@@ -111,7 +111,7 @@
 			display: block;
 			border: outset #abc 2px;
 			border-radius: .5em 0 0 .5em;
-			padding: .2em .5em .2em 2em;
+			padding: .2em .5em .2em 1em;
 			width: calc(7em + 2px);
 			margin: 0 0 .2em .5em;
 			text-align: right;
@@ -184,6 +184,10 @@
 		width: calc( 50em + 200px );
 		height: 8em;
 
+		input[type=range]{
+			accent-color: common.$voltageDarkerColor;
+		}
+
 		.divider {
 			float: left;
 			height: 6em;
@@ -246,21 +250,15 @@
 	}
 
 
-	/* **************************************** Set Resolution tab/dialog */
+	/* **************************************** Set Resolution tab */
 
+
+	/* button in control panel */
 	.setResolutionButton {
 		float: right;
 	}
 
-	/* button in control panel */
-	.setResolutionOKButton {
-		flex: 0 0 15em;
-		margin: 1em;
-		/*height: 6em;*/
-	}
-
-
-	/* **************************************** Set Integration tab/dialog */
+	/* **************************************** Set Integration tab */
 
 	.SetIntegrationTab {
 		.sliderBlock, .iStats {
@@ -293,13 +291,49 @@
 
 }
 
+	/* **************************************** Set Resolution dialog */
 
 .ResolutionDialog {
-	margin: 0 25% 0;
+	display: grid;
+	grid-template-columns: 25% 25% 25% 25%;
+	gap: .5em;
 
-	button {
-		padding: 1em;
+	width: 40em;
+	margin: 0 auto;
+	line-height: 1.2;
+	label {
+		margin: .5em;
+	}
+
+	h3 {
+		margin-top: 0;
+		grid-area: 1 / 1 / 2 / 5
+	}
+
+	.NSlider {
+		grid-area: 2 / 1 / 3 / 5
+	}
+
+	.continuumRadios {
+		grid-area: 3 / 1 / 5 / 3;
+	}
+
+	.spaceLength {
+		grid-area: 3 / 3 / 4 / 5;
+		input {
+			width: 6em;
+			text-align: right;
+		}
+	}
+
+	.buttons {
+		grid-area: 4 / 3 / 5 / 5;
+	}
+
+	.okButton {
+		flex: 0 0 15em;
+		margin: 1em;
+		/*height: 6em;*/
 	}
 }
-
 

@@ -36,6 +36,7 @@ export default class ResolutionDialog extends React.Component {
 			powerIndex: powerToIndex(16, N),
 			continuum: getASetting('spaceParams', 'continuum'),
 			origN: N,
+			spaceLength: getASetting('spaceParams', 'spaceLength'),
 		};
 	}
 
@@ -86,6 +87,7 @@ export default class ResolutionDialog extends React.Component {
 				recreateMainSpace(finalParams);
 
 				// do i really have to wait?  I think the promise only works the first time.
+				// In fact, don't all components vaporize as a result of this?
 				eSpaceCreatedPromise
 				.then(space => {
 					ControlPanel.isTimeAdvancing = timeWasAdvancing;
@@ -138,22 +140,25 @@ export default class ResolutionDialog extends React.Component {
 		const onChange = ev => this.setState({continuum: +ev.target.value});
 		return <>
 			what kind of space:
-			<label  key='contENDLESS'><input type='radio' name='continuum'  value={qe.contENDLESS}
+			<label  key='contENDLESS'>
+				<input type='radio' name='continuum'  value={qe.contENDLESS}
 					checked={s.continuum == qe.contENDLESS}
 					onChange={onChange}
 					style={{fontWeight:
 						(this.props.continuum == qe.contENDLESS)
 						? 'bold'
 						: 'normal'}}/>
-				Endless, wrapping around</label>
-			<label  key='contWELL'><input type='radio' name='continuum'  value={qe.contWELL}
+				Endless
+				<br /><small>wrapping around from end to start</small>
+			</label>
+			<label  key='contWELL'>
+				<input type='radio' name='continuum'  value={qe.contWELL}
 					checked={s.continuum == qe.contWELL}
 					onChange={onChange}
-					style={{fontWeight:
-						(this.props.continuum == qe.contWELL)
-						? 'bold'
-						: 'normal'}}/>
-				Well with Walls</label>
+					style={{fontWeight: (this.props.continuum == qe.contWELL) ? 'bold' : 'normal'}}/>
+				Well
+				<br /><small>with walls on the ends that wave packet will bounce against</small>
+			</label>
 			{/* <label  key='contDISCRETE'><input type='radio' name='continuum'  value={qe.contDISCRETE}
 					checked={s.continuum == qe.contDISCRETE}
 					onChange={onChange}
@@ -166,27 +171,41 @@ export default class ResolutionDialog extends React.Component {
 		</>;
 	}
 
+//					style={{float: 'left', width: '45%', paddingRight: '2em'}} >
+//					style={{float: 'left', width: '45%', paddingRight: '2em'}} >
+
+
+
 	render() {
 		return (
 			<article className='dialog ResolutionDialog'>
 
 				<h3>Reconfigure the Space</h3>
 
-				<section className='dialogSection' key='NSlider'>
+				<section className='dialogSection NSlider' key='NSlider'>
 					{this.renderNSlider()}
 				</section>
 
-				<section className='dialogSection'  key='continuumRadios'
-					style={{float: 'left', width: '45%', paddingRight: '2em'}} >
+				<section className='dialogSection continuumRadios'  key='continuumRadios'>
 					{this.renderContinuum()}
 				</section>
 
-				<section className='dialogSection' key='setButton'
-					style={{padding: '1em', margin: '1em', textAlign: 'right'}}>
+				<section className='dialogSection spaceLength'  key='spaceLength'>
+					<label>Space Length: &nbsp;
+						<input value={this.state.spaceLength} placeholder='Fill in length'
+							onChange={ev => this.setState({spaceLength: ev.target.value}) } />
+						<br />
+						<small>Total length, in nanometers, of space, resulting
+						in {(this.state.spaceLength /(this.state.N - 1)).toPrecision(3)}nm
+						separation between points</small>
+					</label>
+				</section>
+
+				<section className='dialogSection buttons' key='buttons' >
 					<button className='cancelButton' onClick={this.cancel}>
 							Cancel
 					</button>
-					<button className='setResolutionOKButton'
+					<button className='okButton'
 						onClick={this.OK}>
 							Recreate Space
 					</button>

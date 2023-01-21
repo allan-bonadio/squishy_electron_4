@@ -70,8 +70,7 @@ let exportsSrc  = [
 // remember you don't have to export your func like this, you can do one-offs for testing with ccall():
 // https://emscripten.org/docs/api_reference/preamble.js.html#calling-compiled-c-functions-from-javascript
 
-// hey, how about common constants between C++ and JS?
-// no strings.  Probably all ints.
+// common constants between C++ and JS
 let commonConstants = [
 	{name: 'contDISCRETE', cppType: 'int', value: 0},
 	{name: 'contWELL', cppType: 'int', value: 1},

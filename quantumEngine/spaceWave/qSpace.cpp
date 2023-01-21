@@ -42,7 +42,7 @@ qSpace::qSpace(const char *lab)
 }
 
 // after the contructor, call this to add each dimension up to MAX_DIMENSIONS
-void qSpace::addDimension(int N, int continuum, const char *label) {
+void qSpace::addDimension(int N, int continuum, double dx, const char *label) {
 	if (nDimensions >= MAX_DIMENSIONS) {
 		printf("🚀 🚀 Error dimensions: %d\n", nDimensions);
 		throw std::runtime_error("🚀 🚀 too many dimensions");
@@ -52,6 +52,7 @@ void qSpace::addDimension(int N, int continuum, const char *label) {
 	qDimension *dims = dimensions + nDimensions;
 	dims->N = N;
 	dims->continuum = continuum;
+	dims->dx = dx;
 
 	dims->start = continuum ? 1 : 0;
 	dims->end = N + dims->start;
@@ -121,6 +122,7 @@ void qSpace::formatDirectOffsets(void) {
 
 	makeNamedIntGetter(N, dimensions[0].N);  // until 2nd D
 	makeNamedIntGetter(continuum, dimensions[0].continuum);  // until 2nd D
+	makeNamedIntGetter(dx, dimensions[0].dx);  // until 2nd D
 	makeNamedIntGetter(start, dimensions[0].start);  // until 2nd D
 	makeNamedIntGetter(end, dimensions[0].end);  // until 2nd D
 	makeNamedIntGetter(nStates0, dimensions[0].nStates);
