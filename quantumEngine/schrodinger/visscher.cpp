@@ -11,16 +11,14 @@
 
 
 static bool traceRealStep = false;  // in detail
+static bool traceImaginaryStep = false;  // in detail
 static bool traceVischerBench = false;
 
 /*
+reinterpreted from the article
 A fast explicit algorithm for the time-dependent Schrodinger equation
 P. B. Visscher (emeritus)
 Department of Physics and Astronomy, University of Alabama, Tuscaloosa, Alabama 35487-0324
-
-reinterpreted from the article
-" A fast explicit algorithm for the time-dependent Schrodinger Equation"
-Computers in Physics 5, 596 (1991); doi: 10.1063/1.168415
 
 The present algorithm is motivated by writing the Schrodinger equation in terms
 of the real and imaginary parts R and I of the wave function.
@@ -31,16 +29,16 @@ We will define
 so that in our buffers of complex numbers, the Im part is dt/2 ahead of the Re part:
 
               real components    imag components
-initial wave:   𝜓r(t)              𝜓i(t + dt/2)
-1st iter wave:  𝜓r(t + dt)         𝜓i(t + 3dt/2)
+initial wave:   𝜓.re(t)              𝜓.im(t + dt/2)
+1st iter wave:  𝜓.re(t + dt)         𝜓.im(t + 3dt/2)
 
 The natural discretization of Eqs. 6 (visscher paper) is therefore
-	𝜓r(t + dt) = 𝜓r(t) + dt H 𝜓i(t + dt/2)
+	𝜓.re(t + dt) = 𝜓.re(t) + dt H 𝜓.im(t + dt/2)
 
 Half a tick later, at a half odd integer multiple of dt,
-	𝜓i(t + dt/2) = 𝜓i(t - dt/2) - dt H 𝜓r(t)
+	𝜓.im(t + dt/2) = 𝜓.im(t - dt/2) - dt H 𝜓.re(t)
 or
-	𝜓i(t + 3dt/2) = 𝜓i(t + dt/2) - dt H 𝜓r(t + dt)
+	𝜓.im(t + 3dt/2) = 𝜓.im(t + dt/2) - dt H 𝜓.re(t + dt)
 
 where H is hamiltonian, typically ( potential + ∂2/∂x2 )
 We do the hamiltonian custom here instead of using the function in hamiltonian.cpp
@@ -85,12 +83,12 @@ other way: 1nm = 1e-9m   square = 1e-18 m^2 times that number = 1.72759854921802
 
 // ******************************************************** Grinder methods
 
-// first step: advance the 𝜓r a dt, from t to t + dt
-// oldW points to buffer with real = 𝜓r(t)    imag = 𝜓i(t + dt/2)
-// newW points to buffer with real = 𝜓r(t + dt)   imag unchanged = 𝜓i(t + dt/2)
-// here we will calculate the 𝜓r(t + dt) values in a new buffer only, and fill them in.
-// the 𝜓i values in buffer 0 are still uncalculated
-void qGrinder::stepReal(qCx *newW, qCx *oldW, double dt) {
+// first step: advance the 𝜓.re a dt, from t to t + dt
+// oldW points to buffer with real = 𝜓.re(t)    imag = 𝜓.im(t + dt/2)
+// newW points to buffer with real = 𝜓.re(t + dt)   imag unchanged = 𝜓.im(t + dt/2)
+// here we will calculate the 𝜓.re(t + dt) values in a new buffer only, and fill them in.
+// the 𝜓.im values in buffer oldW are still uncalculated
+void qGrinder::stepReal(qCx *newW, qCx *oldW, double dt_) {
 	qDimension *dims = space->dimensions;
 	if (traceRealStep) printf("⚛️ start of stepReal nStates=%d, nPoints=%d, start=%d, end=%d\n",
 			space->nStates, space->nPoints, dims->start, dims->end);
@@ -105,68 +103,47 @@ void qGrinder::stepReal(qCx *newW, qCx *oldW, double dt) {
 
 		// note subtraction
 		if (traceRealStep) printf("⚛️ stepReal ix=%d\n", ix);
-		newW[ix].re = oldW[ix].re - dt * H𝜓;
+		newW[ix].re = oldW[ix].re - dt_ * H𝜓;
 		if (traceRealStep) printf("⚛️ stepReal ix=%d\n", ix);
 
 		qCheck(newW[ix], "vischer stepReal", ix);
 	}
-	if (traceVischerBench) printf("      stepReal, on to fix boundaries: time=%lf\n",
-		getTimeDouble());
 	qflick->fixThoseBoundaries(newW);
+	elapsedTime += dt_/2;  // could be 0 or already dt_/2
 
-	// add this either in the Re or in the Im, not both!
-	elapsedTime += dt;
-
-
+	if (traceVischerBench) printf("      stepReal, done: time=%lf\n",
+		getTimeDouble());
 	if (traceRealStep) printf("⚛️ end of stepReal:");
 }
 
-// second step: advance the Imaginaries of 𝜓 a dt, from dt/2 to 3dt/2
-// given the reals we just generated in stepReal() but don't change them
-void qGrinder::stepImaginary(qCx *newW, qCx *oldW, double dt) {
+// second step: advance the Imaginaries of 𝜓 a dt, from dt/2 to 3 dt/2
+// given the reals we just generated in stepReal(), but don't change them
+void qGrinder::stepImaginary(qCx *newW, qCx *oldW, double dt_) {
 	qDimension *dims = space->dimensions;
+	if (traceImaginaryStep) printf("⚛️ start of stepImaginary nStates=%d, nPoints=%d, start=%d, end=%d\n",
+			space->nStates, space->nPoints, dims->start, dims->end);
 
 	for (int ix = dims->start; ix < dims->end; ix++) {
-		// second deriv d2𝜓r / dx**2
+		// second deriv d2𝜓.re / dx**2
 		double d2𝜓r = oldW[ix-1].re + oldW[ix+1].re - oldW[ix].re * 2;
+		if (traceImaginaryStep) printf("⚛️ stepImaginary ix=%d\n", ix);
 
 		// total hamiltonian
 		double H𝜓 = d2𝜓r + voltage[ix] * voltageFactor * oldW[ix].im;
 
 		// note addition
-		newW[ix].im = oldW[ix].im + dt * H𝜓;
+		if (traceImaginaryStep) printf("⚛️ stepImaginary ix=%d\n", ix);
+		newW[ix].im = oldW[ix].im + dt_ * H𝜓;
+		if (traceImaginaryStep) printf("⚛️ stepImaginary ix=%d\n", ix);
 
 		qCheck(newW[ix], "vischer stepImaginary", ix);
 	}
-	if (traceVischerBench) printf("      stepImaginary, on to fix boundaries: time=%lf\n",
-		getTimeDouble());
 
 	qflick->fixThoseBoundaries(newW);
-}
+	elapsedTime += dt_/2;  // could be 0 or already dt_/2
 
-// form the new wave from the old wave, in separate buffers, chosen by our caller.
-// notreally gonna use this; see oneIntegration()
-//void qGrinder::oneVisscherStep(qWave *newQWave, qWave *oldQWave) {
-//	qWave *oldQW = oldQWave;
-//	qCx *oldW = oldQWave->wave;
-//	qWave *newQW = newQWave;
-//	qCx *newW = newQWave->wave;
-//
-//	if (traceVischerBench) printf("❇️ oneVisscherStep, start: time=%lf\n",
-//		getTimeDouble());
-//
-//	if (traceOneStep) oldQW->dump("starting oneVisscherStep: old wave", true);
-//
-//	stepReal(newW, oldW, dt);
-//	stepImaginary(newW, oldW, dt);
-//
-//	elapsedTime += dt;
-//
-//	if (traceOneStep) {
-//		char msg[100];
-//		snprintf(msg, 100, "at end of Visscher:new, frame %1.0lf | ", frameSerial);
-//		newQW->dump(msg, true);
-//	}
-//	if (traceVischerBench) printf("         oneVisscherStep, done: time=%lf\n", getTimeDouble());
-//}
+	if (traceVischerBench) printf("      stepImaginary done: time=%lf\n",
+		getTimeDouble());
+	if (traceImaginaryStep) printf("⚛️ end of stepImaginary:");
+}
 
