@@ -35,7 +35,7 @@ function createGoodPowers(spd, mini, maxi) {
 	const minIx = powerToIndex(spd, mini);
 	const maxIx = powerToIndex(spd, maxi);
 	let valz = [];
-	for (let ix = minIx; ix <= maxIx; ix += 10) {
+	for (let ix = minIx; ix <= maxIx; ix++) {
 		valz.push(<option key={ix} value={ix} >{ix}</option>);
 	}
 	return valz;
