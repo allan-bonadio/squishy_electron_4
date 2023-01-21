@@ -69,7 +69,8 @@ export function create1DMainSpace(spaceParams) {
 // spaceParams is as above.  Liquidate/Delete the existing space, blink the SquishPanel,
 // and start again just like the app starts over.
 export function recreateMainSpace(spaceParams) {
-	if (traceStartup) console.log(`recreateMainSpace 🐣  started`);
+	if (traceStartup) console.log(`recreateMainSpace 🐣  started, N=${spaceParams.N}, `
+		+`continuum=${spaceParams.continuum}, spaceLength: ${spaceParams.spaceLength}`);
 	resetSpaceCreatedPromise();
 
 	App.blinkSquishPanel(() => {
