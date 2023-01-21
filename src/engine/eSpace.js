@@ -51,7 +51,7 @@ export class eSpace {
 		// make each dimension (someday there'll be more than 1)
 		//let nPoints = 1, nStates = 1;
 		this.dimensions = dims.map(d => {
-				qe.addSpaceDimension(d.N, d.continuum, d.label);  // c++
+				qe.addSpaceDimension(d.N, d.continuum, d.spaceLength, d.label);  // c++
 
 				let dim = new eDimension(d)
 				//nStates *= dim.N;
@@ -129,22 +129,23 @@ export class eSpace {
 	get _voltage() { return this.ints[1]; }
  	get voltageFactor() { return this.doubles[1]; }
 
-	get N() { return this.ints[4]; }
+ 	get N() { return this.ints[4]; }
  	get continuum() { return this.ints[5]; }
+ 	get dx() { return this.ints[10]; }
  	get start() { return this.ints[6]; }
  	get end() { return this.ints[7]; }
  	get nStates0() { return this.ints[8]; }
  	get nPoints0() { return this.ints[9]; }
- 	get spectrumLength0() { return this.ints[10]; }
- 	get _label0() { return this.pointer + 44; }
- 	get nDimensions() { return this.ints[26]; }
- 	get nStates() { return this.ints[27]; }
- 	get nPoints() { return this.ints[28]; }
- 	get spectrumLength() { return this.ints[29]; }
- 	get _mainAvatar() { return this.ints[30]; }
- 	get _miniGraphAvatar() { return this.ints[31]; }
- 	get _grinder() { return this.ints[32]; }
- 	get _label() { return this.pointer + 132; }
+ 	get spectrumLength0() { return this.ints[12]; }
+ 	get _label0() { return this.pointer + 52; }
+ 	get nDimensions() { return this.ints[32]; }
+ 	get nStates() { return this.ints[33]; }
+ 	get nPoints() { return this.ints[34]; }
+ 	get spectrumLength() { return this.ints[35]; }
+ 	get _mainAvatar() { return this.ints[36]; }
+ 	get _miniGraphAvatar() { return this.ints[37]; }
+ 	get _grinder() { return this.ints[38]; }
+ 	get _label() { return this.pointer + 156; }
 
 	/* **************************** end of direct accessors */
 

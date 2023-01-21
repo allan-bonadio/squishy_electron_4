@@ -29,7 +29,7 @@ let exportsSrc  = [
 
 	// recreating the space
 	{name: 'startNewSpace', args: ['string'], retType: 'number'},
-	{name: 'addSpaceDimension', args: ['number', 'number', 'string'], retType: null},
+	{name: 'addSpaceDimension', args: ['number', 'number', 'number', 'string'], retType: null},
 	{name: 'completeNewSpace', args: [], retType: 'number'},
 	{name: 'deleteTheSpace', args: ['number'], retType: null},
 

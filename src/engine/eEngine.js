@@ -107,6 +107,7 @@ function quantumEngineHasStarted(maxDims, maxLab) {
 		create1DMainSpace({
 			N: getASetting('spaceParams', 'N'),
 			continuum: getASetting('spaceParams', 'continuum'),
+			spaceLength: getASetting('spaceParams', 'spaceLength'),
 			label: 'main'});
 		if (traceStartup) console.log(`main space 🐣  created`);
 
