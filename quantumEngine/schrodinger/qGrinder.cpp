@@ -196,15 +196,6 @@ void qGrinder::dumpObj(const char *title) {
 
 /* ********************************************************** doing Integration */
 
-// return elapsed real time since last page reload, in seconds, only for tracing
-// seems like it's down to miliseconds or even a bit smaller
-//double getTimeDouble()
-//{
-//    struct timespec ts;
-//    clock_gettime(CLOCK_MONOTONIC, &ts);
-//    return ts.tv_sec + ts.tv_nsec / 1e9;
-//}
-
 // Does several visscher steps (eg 100 or 500). Actually does
 // stepsPerFrame+1 steps; half steps at start and finish to adapt and
 // deadapt to Visscher timing
@@ -212,16 +203,16 @@ void qGrinder::oneIntegration() {
 	isIntegrating = doingIntegration = true;
 	qCx *wave0 = qflick->waves[0];
 	qCx *wave1 = qflick->waves[1];
-
+	double dt_ = dt;  // don't change even if user slides it
 
 	// half step in beginning to move Im forward dt/2
 	// cuz outside of here, re and im are for the same time.
-	// Note here the latest is in [1]; frame continues this,
-	// and the halfwave at the end moves it back to [0]].
 	qflick->fixThoseBoundaries(wave0);
 	stepReal(wave1, wave0, 0);
-	stepImaginary(wave1, wave0, dt/2);
+	stepImaginary(wave1, wave0, dt / 2);
 
+	// Note here the latest is in [1]; frame continues this,
+	// and the halfwave at the end moves it back to [0]].
 	int doubleSteps = stepsPerFrame / 2;
 	for (int step = 0; step < doubleSteps; step++) {
 
@@ -234,12 +225,11 @@ void qGrinder::oneIntegration() {
 		stepImaginary(wave1, wave0, dt);
 	}
 
-	// half step at completion to move Re forward dt/2
+	// half step at completion to move Re forward dt / 2
 	// and copy back to Main
 	qflick->fixThoseBoundaries(wave1);
-	stepReal(wave0, wave1, dt/2);
+	stepReal(wave0, wave1, dt / 2);
 	stepImaginary(wave0, wave1, 0);
-
 
 	// ok the algorithm tends to diverge after thousands of frames.  Hose it down.
 	if (this->pleaseFFT) analyzeWaveFFT(qflick, "before fourierFilter()");
