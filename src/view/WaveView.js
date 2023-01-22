@@ -191,12 +191,6 @@ export class WaveView extends React.Component {
 
 	/* ************************************************************************ render */
 
-	gimmeGlCanvas =
-	(gl, canvas) => {
-		this.gl = gl;
-		this.canvas = canvas;
-	}
-
 	render() {
 		const p = this.props;
 		const s = this.state;
@@ -231,7 +225,6 @@ export class WaveView extends React.Component {
 			<div className='viewArea' >
 				<GLView
 					space={this.space} avatar={this.mainEAvatar}
-					gimmeGlCanvas={this.gimmeGlCanvas}
 					viewClassName='flatDrawingViewDef' viewName='mainView'
 					canvasFacts={this.canvasFacts}
 					width={widthToUse}
@@ -254,7 +247,7 @@ export class WaveView extends React.Component {
 				</section>
 
 				<VoltageArea
-					space={s.space} canvas={this.canvas}
+					space={s.space}
 					height={s.height}
 					showVoltage={p.showVoltage}
 					vDisp={this.vDisp}

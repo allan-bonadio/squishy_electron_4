@@ -9,12 +9,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-//import qe from '../engine/qe.js';
-//import {abstractViewDef} from './abstractViewDef.js';
-//import flatDrawingViewDef from './flatDrawingViewDef.js';
-//import {getASetting, storeASetting} from '../utils/storeSettings.js';
-
-import eAvatar from '../engine/eAvatar.js';
 import {listOfViewClasses} from './listOfViewClasses.js';
 //import {eSpaceCreatedPromise} from '../engine/eEngine.js';
 import {tooOldTerminate} from '../utils/errors.js';
@@ -42,11 +36,9 @@ class GLView extends React.Component {
 		width: PropTypes.number,
 		height: PropTypes.number,
 
-		avatar: PropTypes.instanceOf(eAvatar),  // undefined early on
-		space: PropTypes.object,
-
-		// passing gl to higher levels
-		gimmeGlCanvas: PropTypes.func,
+		// both undefined early on
+		avatar: PropTypes.shape({ewave: PropTypes.object, vBuffer: PropTypes.array}),
+		space: PropTypes.shape({mainEAvatar: PropTypes.object, mainVBuffer: PropTypes.array}),
 
 		// the width and height we measure
 		canvasFacts: PropTypes.object.isRequired,
@@ -120,8 +112,6 @@ class GLView extends React.Component {
 
 		canvas.glview = this;
 		canvas.viewName = p.viewName;
-		if (p.gimmeGlCanvas)
-			p.gimmeGlCanvas(this.gl, this.canvas);
 
 		if (traceSetup) console.log(`🖼 🖼 GLView ${p.viewName}: setGLCanvas done`);
 	}
@@ -147,16 +137,6 @@ class GLView extends React.Component {
 		// never helps this.doRepaint();
 
 	}
-
-	// this is attached to the avatar so WebView can call it.
-	// It, in turn, calls the function on the viewDef.
-	//setGlViewport =
-	//() => {
-	//	if (this.effectiveView) {
-	//		this.effectiveView.setGlViewport();
-	//		if (tracePainting) console.log(`🖼 🖼 GLView:${this.props.viewName}  ${this.props.avatar.label} did setGlViewport`);
-	//	}
-	//}
 
 	// repaint whole GL image.  This is not 'render' as in React;
 	// this is repainting a canvas with GL.   returns an object with perf stats.
