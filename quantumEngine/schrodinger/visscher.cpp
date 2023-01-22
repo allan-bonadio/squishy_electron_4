@@ -89,7 +89,7 @@ other way: 1nm = 1e-9m   square = 1e-18 m^2 times that number = 1.72759854921802
 // hamiltW is what we calculate the derivitives from
 // here we will calculate the 𝜓.re(t + dt) values in a new buffer only, and fill them in.
 // the 𝜓.im values in buffer oldW are still uncalculated
-void qGrinder::stepReal(qCx *newW, qCx *oldW, qCx *hamiltW, double dt) {
+void qGrinder::stepReal(qCx *newW, qCx *oldW, qCx *hamiltW, double dt_) {
 	qDimension *dims = space->dimensions;
 	if (traceRealStep) printf("⚛️ start of stepReal nStates=%d, nPoints=%d, start=%d, end=%d\n",
 			space->nStates, space->nPoints, dims->start, dims->end);
@@ -119,7 +119,7 @@ void qGrinder::stepReal(qCx *newW, qCx *oldW, qCx *hamiltW, double dt) {
 
 // second step: advance the Imaginaries of 𝜓 a dt, from dt/2 to 3 dt/2
 // given the reals we just generated in stepReal(), but don't change them
-void qGrinder::stepImaginary(qCx *newW, qCx *oldW, qCx *hamiltW, double dt) {
+void qGrinder::stepImaginary(qCx *newW, qCx *oldW, qCx *hamiltW, double dt_) {
 	qDimension *dims = space->dimensions;
 	if (traceImaginaryStep) printf("⚛️ start of stepImaginary nStates=%d, nPoints=%d, start=%d, end=%d\n",
 			space->nStates, space->nPoints, dims->start, dims->end);
