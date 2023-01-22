@@ -73,9 +73,10 @@ qSpace *startNewSpace(const char *label) {
 }
 
 // call this from JS to add one or more dimensions
-// nobody uses this return value either.
-void addSpaceDimension(int N, int continuum, double dx, const char *label) {
-	if (traceSpaceCreation) printf("🚀 addSpaceDimension(%d, %d, %s)\n", N, continuum, label);
+void addSpaceDimension(int N, int continuum, double spaceLength, const char *label) {
+	double dx = spaceLength / (N - 1);  // shouldn't this be N instead of N-1?
+	if (traceSpaceCreation) printf("🚀 addSpaceDimension(%d, %d, %lf=>%lf, %s)\n",
+		N, continuum, spaceLength, dx, label);
 	theSpace->addDimension(N, continuum, dx, label);
 }
 

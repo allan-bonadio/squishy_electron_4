@@ -58,7 +58,7 @@ public:
 	~qSpace(void);
 
 	// additional for space creation
-	void addDimension(int N, int continuum, const char *label);
+	void addDimension(int N, int continuum, double dx, const char *label);
 	private:
 		void tallyDimensions(void);
 	public:

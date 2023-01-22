@@ -101,6 +101,7 @@ struct qGrinder {
 
 // for JS to call.  Defined in jsSpace and elsewhere.
 extern "C" {
+	// rename to initThreadIntegration
 	void grinder_initIntegrationLoop(qGrinder *grinder, int nStage, int nnn, int mmms);
 	void grinder_oneIntegration(qGrinder *grinder);
 

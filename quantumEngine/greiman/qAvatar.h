@@ -34,6 +34,7 @@ struct qAvatar {
 	struct qViewBuffer *qvBuffer;
 	float *vBuffer;  // aligned by 4, not 8
 
+	// rename to initThreadIntegration
 	void initIntegrationLoop(int xxx, int nThreads, int nStages);
 
 	// for alignment: put the rest of these last

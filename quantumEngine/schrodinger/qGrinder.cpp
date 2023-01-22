@@ -229,7 +229,7 @@ void qGrinder::oneIntegration() {
 	qCx *wave0 = qflick->waves[0];
 	qCx *wave1 = qflick->waves[1];
 	qCx *wave2 = qflick->waves[2];
-
+	double dt_ = dt;  // don't change even if user slides it
 
 	// half step in beginning to move Im forward dt/2
 	// cuz outside of here, re and im are synchronized.
@@ -237,33 +237,25 @@ void qGrinder::oneIntegration() {
 	stepReal(wave1, wave0, wave0, 0);
 	stepImaginary(wave1, wave0, wave0, dt/2);
 
-	// now the latest is in wave1; the loop continues this,
-
+	// Note here the latest is in [1]; frame continues this,
+	// and the halfwave at the end moves it back to [0]].
 	int doubleSteps = stepsPerFrame / 2;
 	for (int step = 0; step < doubleSteps; step++) {
 
 		#ifdef MIDPOINT_METHOD
-		stepMidpoint(wave0, wave1, wave2, dt);
-		stepMidpoint(wave1, wave0, wave2, dt);
+		stepMidpoint(wave0, wave1, wave2, dt_);
+		stepMidpoint(wave1, wave0, wave2, dt_);
 		#else
-		stepRealImaginary(wave0, wave1, wave1, dt);
-		stepRealImaginary(wave1, wave0, wave0, dt);
+		stepRealImaginary(wave0, wave1, wave1, dt_);
+		stepRealImaginary(wave1, wave0, wave0, dt_);
 		#endif
-
-//		qflick->fixThoseBoundaries(wave1);
-//		stepReal(wave0, wave1, wave1, dt);
-//		stepImaginary(wave0, wave1, wave1, dt);
-//
-//		qflick->fixThoseBoundaries(wave0);
-//		stepReal(wave1, wave0, wave0, dt);
-//		stepImaginary(wave1, wave0, wave0, dt);
 	}
 
-	// and the halfwave at the end moves it back to [0]].
+	// half step at completion to move Re forward dt / 2
+	// and copy back to Main
 	qflick->fixThoseBoundaries(wave1);
 	stepReal(wave0, wave1, wave1, dt/2);
 	stepImaginary(wave0, wave1, wave1, 0);
-
 
 	// ok the algorithm tends to diverge after thousands of frames.  Hose it down.
 	if (this->pleaseFFT) analyzeWaveFFT(qflick, "before fourierFilter()");
@@ -351,6 +343,7 @@ void grinder_askForFFT(qGrinder *pointer) { pointer->askForFFT(); }
 void grinder_oneIntegration(qGrinder *pointer) { pointer->oneIntegration(); }
 
 
+// rename to initThreadIntegration
 void qGrinder::initIntegrationLoop(int a, int b, int c) {
 	// to e imprelmented
 }
