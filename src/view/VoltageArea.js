@@ -59,118 +59,6 @@ export class VoltageArea extends React.Component {
 		if (traceVoltageArea) console.log(`👆 👆 VoltageArea  constructor done`);
 	}
 
-	/* *************************************************** drawing */
-
-	// tell the VoltageArea (that;s us) that something in the
-	// space.voltageBuffer changed.  Sometimes called from above. This gets set
-	// into the space, when it's available.
-	updateVoltageArea =
-	() => {
-		console.log(`VoltageArea.updateVoltageArea`);
-		//const space = this.props.space;
-		this.props.vDisp.findVoltExtremes();
-		this.forceUpdate();
-	}
-
-	componentDidUpdate() {
-		// the constructor probably won't have space, but here it will.  should.
-		const p = this.props;
-		if (p.space)
-			p.space.updateVoltageArea = this.updateVoltageArea;
-		else
-			console.log(`👆 👆  VoltageArea, no space! ${p.space}.  Is there also no vDisp?  ${p.vDisp}`);
-	}
-
-
-	// the main path is the voltage, but for WELL we also draw end blocks, and also...
-	renderPaths() {
-		const p = this.props;
-		const v = p.vDisp;
-		if (!p.space)
-			return <></>;
-
-		// collects ALL svg to be rendered
-		let paths = [];
-
-		switch (p.space.dimensions[0].continuum) {
-			case qe.contWELL:
-				// stone slabs on each end on the borders vaguely means 'quantum well'.
-				paths.push(
-					<rect className='left wellSlab' key='left'
-						x={0} y={0} width={this.barWidth} height={p.height}
-					/>
-				);
-				paths.push(
-					<rect className='right wellSlab' key='right'
-						x={p.canvasFacts.width - this.barWidth} y={0} width={this.barWidth} height={p.height}
-					/>
-				);
-				break;
-
-			case qe.contENDLESS:
-				// full width including boundaries?  can you drag the boundaries?!?!  no.  So no line thru boundaries.
-				break;
-
-			default: throw new Error(`bad continuum ${p.space.dimensions.continuum}`);
-		}
-
-		// the lines themselves: exactly overlapping.  tactile wider than visible.
-		if (p.showVoltage) {
-			const pathAttribute = v.makeVoltagePathAttribute();
-			//const pathAttribute = this.makePathAttribute(start, end);
-
-			// this one actually draws the white line
-			paths.push(
-				<path className='visibleLine' key='visible'
-					d={pathAttribute}
-					fill="transparent"
-				/>
-			);
-
-			// you click on this one
-			paths.push(
-				<path className='tactileLine' key='tactile'
-					d={pathAttribute}
-					stroke='#fff4'
-					fill="transparent"
-					onMouseDown={ev => this.mouseDown(ev)}
-				/>
-			);
-		}
-		return paths
-	}
-
-	render() {
-		if (traceRendering)
-			console.log(`👆 👆 VoltageArea.render()`);
-
-		// some of the math we do can be eliminated if we just do this
-		//this.setVoltScales();
-
-		const p = this.props;
-		if (! p.space)
-			return '';  // too early
-		this.barWidth = p.canvasFacts.width / p.space.nPoints;
-
-		let returnV = (
-			<svg className='VoltageArea'
-				viewBox={`0 0 ${p.canvasFacts.width} ${p.canvasFacts.height}`}
-					width={p.canvasFacts.width} height={p.canvasFacts.height}
-					onMouseMove={ev => this.mouseMove(ev)}
-					onMouseUp={ev => this.mouseUp(ev)}
-					ref={el => this.svgElement = el}
-			 	>
-
-				{this.renderPaths()}
-			</svg>
-		);
-		if (traceRendering)
-			console.log(`👆 👆 VoltageArea render done`);
-
-		return returnV;
-	}
-
-
 	/* ***************************************************  click & drag */
 
 	// every time user changes one datapoint.  Also set points interpolated between.
@@ -296,6 +184,118 @@ export class VoltageArea extends React.Component {
 		if (traceDragging)
 			v.dumpVoltage(p.space, v.voltageBuffer, 8);
 	}
+
+	/* *************************************************** rendering */
+
+	// tell the VoltageArea (that;s us) that something in the
+	// space.voltageBuffer changed.  Sometimes called from above. This gets set
+	// into the space, when it's available.
+	updateVoltageArea =
+	() => {
+		console.log(`VoltageArea.updateVoltageArea`);
+		//const space = this.props.space;
+		this.props.vDisp.findVoltExtremes();
+		this.forceUpdate();
+	}
+
+	componentDidUpdate() {
+		// the constructor probably won't have space, but here it will.  should.
+		const p = this.props;
+		if (p.space)
+			p.space.updateVoltageArea = this.updateVoltageArea;
+		else
+			console.log(`👆 👆  VoltageArea, no space! ${p.space}.  Is there also no vDisp?  ${p.vDisp}`);
+	}
+
+
+	// the main path is the voltage, but for WELL we also draw end blocks, and also...
+	renderPaths() {
+		const p = this.props;
+		const v = p.vDisp;
+		if (!p.space)
+			return <></>;
+
+		// collects ALL svg to be rendered
+		let paths = [];
+
+		switch (p.space.dimensions[0].continuum) {
+			case qe.contWELL:
+				// stone slabs on each end on the borders vaguely means 'quantum well'.
+				paths.push(
+					<rect className='left wellSlab' key='left'
+						x={0} y={0} width={this.barWidth} height={p.height}
+					/>
+				);
+				paths.push(
+					<rect className='right wellSlab' key='right'
+						x={p.canvasFacts.width - this.barWidth} y={0} width={this.barWidth} height={p.height}
+					/>
+				);
+				break;
+
+			case qe.contENDLESS:
+				// full width including boundaries?  can you drag the boundaries?!?!  no.  So no line thru boundaries.
+				break;
+
+			default: throw new Error(`bad continuum ${p.space.dimensions.continuum}`);
+		}
+
+		// the lines themselves: exactly overlapping.  tactile wider than visible.
+		if (p.showVoltage) {
+			const pathAttribute = v.makeVoltagePathAttribute();
+			//const pathAttribute = this.makePathAttribute(start, end);
+
+			// this one actually draws the white line
+			paths.push(
+				<path className='visibleLine' key='visible'
+					d={pathAttribute}
+					fill="transparent"
+				/>
+			);
+
+			// you click on this one
+			paths.push(
+				<path className='tactileLine' key='tactile'
+					d={pathAttribute}
+					stroke='#fff4'
+					fill="transparent"
+					onMouseDown={ev => this.mouseDown(ev)}
+				/>
+			);
+		}
+		return paths
+	}
+
+	render() {
+		if (traceRendering)
+			console.log(`👆 👆 VoltageArea.render()`);
+
+		// some of the math we do can be eliminated if we just do this
+		//this.setVoltScales();
+
+		const p = this.props;
+		if (! p.space)
+			return '';  // too early
+		this.barWidth = p.canvasFacts.width / p.space.nPoints;
+
+		let returnV = (
+			<svg className='VoltageArea'
+				viewBox={`0 0 ${p.canvasFacts.width} ${p.canvasFacts.height}`}
+					width={p.canvasFacts.width} height={p.canvasFacts.height}
+					onMouseMove={ev => this.mouseMove(ev)}
+					onMouseUp={ev => this.mouseUp(ev)}
+					ref={el => this.svgElement = el}
+			 	>
+
+				{this.renderPaths()}
+			</svg>
+		);
+		if (traceRendering)
+			console.log(`👆 👆 VoltageArea render done`);
+
+		return returnV;
+	}
+
 
 }
 
