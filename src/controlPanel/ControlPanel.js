@@ -305,7 +305,7 @@ export class ControlPanel extends React.Component {
 
 				resetMainWave={this.resetMainWave}
 				resetVoltage={this.resetVoltage}
-				toggleShowVoltage={ev => {debugger;p.toggleShowVoltage(ev)}}
+				toggleShowVoltage={p.toggleShowVoltage}
 				showVoltage={p.showVoltage}
 
 				N={this.N}

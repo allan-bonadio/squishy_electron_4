@@ -123,7 +123,7 @@ function CPToolbar(props) {
 
 				<label>
 					<input type='checkbox' checked={props.showVoltage}
-						onChange={ev =>props.toggleShowVoltage} />
+						onChange={props.toggleShowVoltage} />
 					Show Voltage
 				</label>
 			</div>
