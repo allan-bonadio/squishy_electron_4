@@ -21,15 +21,14 @@
 // somehow there's a race condition where this isn't set soon enough... sometimes
 EM_JS(int, qeStarted, (int max_dimensions, int max_label_len),
 {
-	// maybe we can tighten this up a bit someday
-	setTimeout(() =>{
-		if (window.quantumEngineHasStarted)
-			window.quantumEngineHasStarted(max_dimensions, max_label_len);
-		else {
-			console.log(" 🐣 restart the page cuz hot-reloading sabotaged me again      🙄  👿 🤢 😵 🤬 😭 😠");
-			setTimeout(() => location = location, 1000);
+	document.addEventListener('DOMContentLoaded', ev => {
+		if (!window.quantumEngineHasStarted) {
+			debugger;
+			throw(" 🐣 quantumEngineHasStarted() not available on startup!      🙄  👿 🤢 😵 🤬 😭 😠");
 		}
-	}, 50);
+
+		window.quantumEngineHasStarted(max_dimensions, max_label_len);
+	});
 	return navigator.hardwareConcurrency;
 }
 );
@@ -42,7 +41,7 @@ int main() {
 	// returns 1.  pfft.  std::thread::hardware_concurrency();
 
 	int hardwareConcurrency = qeStarted(MAX_DIMENSIONS, MAX_LABEL_LEN);
-	printf("hardwareConcurrency=%d  \n", hardwareConcurrency);
+	printf(" 🐣 hardwareConcurrency=%d  \n", hardwareConcurrency);
 	return 0;
 }
 

@@ -6,7 +6,13 @@
 
 import React from 'react';
 import PropTypes from 'prop-types';
-import {scaleLinear} from 'd3-scale';
+
+import {scaleLinear as d3_scaleLinear} from 'd3-scale';
+import {select as d3_select} from 'd3-selection';
+//import {line as d3_line} from 'd3-shape';
+import {axisLeft as d3_axisLeft} from 'd3-axis';
+
+import ReactFauxDOM from 'react-faux-dom';
 
 import qe from '../engine/qe.js';
 import eSpace from '../engine/eSpace.js';
@@ -14,7 +20,7 @@ import eSpace from '../engine/eSpace.js';
 
 // I dunno but the voltages I'm generating are too strong.
 // So I reduced it by this factor, but still have to magnify it to make it visible.
-export const spongeFactor = 100;
+//export const spongeFactor = 100;
 
 let traceVoltageArea = false;
 //let tracePathAttribute = false;
@@ -93,9 +99,9 @@ export class VoltageArea extends React.Component {
 			v.voltageBuffer[ix] = newVoltage;
 		}
 		else {
-			// other times, draw a straight linear line through.  scaleLinear from d3
+			// other times, draw a straight linear line through.  d3_scaleLinear from d3
 			// cuz sometimes mouse skips.
-			let tweenScale = scaleLinear([this.latestIx, ix], [this.latestVoltage, newVoltage]);
+			let tweenScale = d3_scaleLinear([this.latestIx, ix], [this.latestVoltage, newVoltage]);
 
 			// do it to each point in between
 			let hi = Math.max(this.latestIx, ix);
@@ -218,23 +224,26 @@ export class VoltageArea extends React.Component {
 		// collects ALL svg to be rendered
 		let paths = [];
 
+		// we want the bumpers on the end to show even if we're not showing 'voltage'
 		switch (p.space.dimensions[0].continuum) {
 			case qe.contWELL:
 				// stone slabs on each end on the borders vaguely means 'quantum well'.
 				paths.push(
 					<rect className='left wellSlab' key='left'
-						x={0} y={0} width={this.barWidth} height={p.height}
+						x={0} y={0}
+						width={this.barWidth +'px'} height={p.canvasFacts.height +'px'}
 					/>
 				);
 				paths.push(
 					<rect className='right wellSlab' key='right'
-						x={p.canvasFacts.width - this.barWidth} y={0} width={this.barWidth} height={p.height}
+						x={(p.canvasFacts.width - this.barWidth) +'px'} y={0}
+						width={this.barWidth +'px'} height={p.canvasFacts.height +'px'}
 					/>
 				);
+				console.info(`installed slabs: width=${p.canvasFacts.width} height=${p.canvasFacts.height}  this.barWidth=${this.barWidth}`);
 				break;
 
 			case qe.contENDLESS:
-				// full width including boundaries?  can you drag the boundaries?!?!  no.  So no line thru boundaries.
 				break;
 
 			default: throw new Error(`bad continuum ${p.space.dimensions.continuum}`);
@@ -245,23 +254,38 @@ export class VoltageArea extends React.Component {
 			const pathAttribute = v.makeVoltagePathAttribute();
 			//const pathAttribute = this.makePathAttribute(start, end);
 
-			// this one actually draws the white line
+			// this one actually draws the voltage line
 			paths.push(
-				<path className='visibleLine' key='visible'
+				<path className='visibleLine' key='visibleLine'
 					d={pathAttribute}
-					fill="transparent"
 				/>
 			);
 
 			// you click on this one
 			paths.push(
-				<path className='tactileLine' key='tactile'
+				<path className='tactileLine' key='tactileLine'
 					d={pathAttribute}
-					stroke='#fff4'
-					fill="transparent"
 					onMouseDown={ev => this.mouseDown(ev)}
 				/>
 			);
+
+
+			// axis for voltage.  Makes no sense if no axis there.
+			//debugger;
+			let axis = d3_axisLeft(v.yInverted);
+			axis.ticks(2);
+
+			let voltageAxis = ReactFauxDOM.createElement('g');
+			//let voltageAxis = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+			let vAx = d3_select(voltageAxis);
+			vAx.attr('class', 'voltageAxis');
+
+			let txX = p.canvasFacts.width - this.barWidth;
+			let txY = p.canvasFacts.height;
+			vAx.attr('transform', `translate(${txX}, ${txY})`);
+			vAx.call(axis);
+			//debugger;
+			paths.push(voltageAxis.toReact());
 		}
 		return paths
 	}
@@ -269,21 +293,20 @@ export class VoltageArea extends React.Component {
 	render() {
 		if (traceRendering)
 			console.log(`👆 👆 VoltageArea.render()`);
-
-		// some of the math we do can be eliminated if we just do this
-		//this.setVoltScales();
-
 		const p = this.props;
 		if (! p.space)
 			return '';  // too early
 		this.barWidth = p.canvasFacts.width / p.space.nPoints;
 
-		let returnV = (
+		let v = p.vDisp;
+		v.setVoltScales(p.canvasFacts.width, p.canvasFacts.height, p.space.N);
+
+		let vArea = (
 			<svg className='VoltageArea'
 				viewBox={`0 0 ${p.canvasFacts.width} ${p.canvasFacts.height}`}
 					width={p.canvasFacts.width} height={p.canvasFacts.height}
-					onMouseMove={ev => this.mouseMove(ev)}
-					onMouseUp={ev => this.mouseUp(ev)}
+					onMouseMove={this.mouseMove}
+					onMouseUp={this.mouseUp}
 					ref={el => this.svgElement = el}
 			 	>
 
@@ -293,7 +316,7 @@ export class VoltageArea extends React.Component {
 		if (traceRendering)
 			console.log(`👆 👆 VoltageArea render done`);
 
-		return returnV;
+		return vArea;
 	}
 
 

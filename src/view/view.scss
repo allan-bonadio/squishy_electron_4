@@ -75,13 +75,15 @@
 
 			path.visibleLine {
 				stroke: common.$voltageColor;
-				stroke-width: 3;
+				stroke-width: 3px;
+				fill: transparent;
 				pointer-events: none;
 			}
 
 			path.tactileLine {
 				stroke: none;
-				stroke-width: 20;
+				stroke-width: 20px;
+				fill: transparent;
 				pointer-events: stroke;  // but this is sensitive
 				cursor: pointer;
 			}
@@ -89,6 +91,18 @@
 			rect.wellSlab {
 				fill: common.$voltageColor;
 
+			}
+
+			.voltageAxis {
+				stroke: common.$voltageColor;
+				fill: none;
+				font: verdana, helvetica, sans-serif .7em;
+
+				// for some reason, the labels that d3 generates have all the text upside down.
+				// also have to offset them the height of the canvas...
+				g {
+					scale: 1 -1;
+				}
 			}
 		}  // end of VoltageArea
 	}  // end of viewArea
