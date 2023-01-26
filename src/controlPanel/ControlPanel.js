@@ -53,6 +53,7 @@ export class ControlPanel extends React.Component {
 
 	constructor(props) {
 		super(props);
+		//debugger;
 		ControlPanel.me = this;
 
 		// most of the state is kept here.  But, also, in the store settings

@@ -37,8 +37,8 @@ class GLView extends React.Component {
 		height: PropTypes.number,
 
 		// both undefined early on
-		avatar: PropTypes.shape({ewave: PropTypes.object, vBuffer: PropTypes.array}),
-		space: PropTypes.shape({mainEAvatar: PropTypes.object, mainVBuffer: PropTypes.array}),
+		avatar: PropTypes.object,
+		space: PropTypes.object,
 
 		// the width and height we measure
 		canvasFacts: PropTypes.object.isRequired,

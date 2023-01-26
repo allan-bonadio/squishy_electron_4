@@ -104,7 +104,7 @@ export class voltDisplay {
 	dumpVoltDisplay(title) {
 		console.log(`⚡️ dumpVoltDisplay: ${title}
 			voltage range: ${this.voltMin} ... ${this.voltMax},
-			scroll: ${this.scrollMin}sm ... ${this.scrollMax}sm  ... ${this.actualMax}am
+			scroll: ${this.scrollMin}smn ... ${this.scrollMax}smx  ... ${this.actualMax}amx
 			heightVolts: ${this.heightVolts}    bottomVolts: ${this.bottomVolts}`);
 	}
 
@@ -180,7 +180,7 @@ export class voltDisplay {
 
 		// these are used to draw the voltage path line in VoltageArea
 		this.yScale = scaleLinear([this.bottomVolts, this.bottomVolts + this.heightVolts], [0, canvasHeight]);
-		this.yInverted = scaleLinear([this.bottomVolts, this.bottomVolts + this.heightVolts], [canvasHeight, 0]);
+		this.yUpsideDown = scaleLinear([this.bottomVolts, this.bottomVolts + this.heightVolts], [canvasHeight, 0]);
 		this.xScale = scaleLinear([0, nPoints-1], [0, canvasWidth]);
 
 		if (traceVoltScales) {

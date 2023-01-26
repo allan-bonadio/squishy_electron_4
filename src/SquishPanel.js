@@ -465,7 +465,6 @@ export class SquishPanel extends React.Component {
 						width={p.width}
 						space={this.space}
 						showVoltage={s.showVoltage}
-						gimmeVoltageArea={this.gimmeVoltageArea}
 					/>
 					<ControlPanel
 						frameAnimate={(shouldAnimate, freq) => this.frameAnimate(shouldAnimate, freq)}
