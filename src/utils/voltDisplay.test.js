@@ -21,7 +21,7 @@ function tryOutConsistency(vDisp) {
 	expect(vDisp.bottomVolts).toBeGreaterThan(-1000);
 	expect(vDisp.bottomVolts).toBeLessThan(1000);
 
-	expect(vDisp.voltMax).toBeGreaterThanOrEqual(vDisp.voltMin);
+	expect(vDisp.measuredMaxVolts).toBeGreaterThanOrEqual(vDisp.measuredMinVolts);
 }
 
 let volts16;
@@ -33,7 +33,7 @@ describe(`findVoltExtremes() method`, () => {
 		// shouldn't matter what the settings passed in are
 		volts16 = new Float64Array(16);  // all zeroes, right?
 		vDisp = new voltDisplay(0, 16, volts16,
-			{showVoltage: true, scrollMin: 0, heightVolts: 0, bottomVolts: 0,});
+			{showVoltage: true, minBottom: 0, heightVolts: 0, bottomVolts: 0,});
 
 	})
 
@@ -49,8 +49,8 @@ describe(`findVoltExtremes() method`, () => {
 		volts16[2] = at2;
 		volts16[9] = at9;
 		vDisp.findVoltExtremes();
-		expect(vDisp.voltMin).toEqual(mini);
-		expect(vDisp.voltMax).toEqual(maxi);
+		expect(vDisp.measuredMinVolts).toEqual(mini);
+		expect(vDisp.measuredMaxVolts).toEqual(maxi);
 	})
 });
 
@@ -72,35 +72,35 @@ describe(`voltage creation & consistency`, () => {
 
 	test.each([
 		// sorry, we can't have a zero range
-		[{scrollMin: 0, heightVolts: 0, bottomVolts: 0,}, null,
-			{scrollMin: -.5, scrollMax: .5, actualMax: 1.5, heightVolts: 1, bottomVolts: -.25,}],
+		[{minBottom: 0, heightVolts: 0, bottomVolts: 0,}, null,
+			{minBottom: -.5, maxBottom: .5, maxTop: 1.5, heightVolts: 1, bottomVolts: -.25,}],
 
 		// these bottomVolts pass thru cuz it's within range
-		[{scrollMin: 0, heightVolts: 1, bottomVolts: 0,}, null,
-			{scrollMin: 0, scrollMax: 1, actualMax: 2, heightVolts: 1, bottomVolts: 0,}],
-		[{scrollMin: 0, heightVolts: 1, bottomVolts: 1,}, null,
-			{scrollMin: 0, scrollMax: 1, actualMax: 2, heightVolts: 1, bottomVolts: 1,}],
-		[{scrollMin: -1, heightVolts: 5, bottomVolts: 0,}, null,
-			{scrollMin: -1, scrollMax: 4, actualMax: 9, heightVolts: 5, bottomVolts: 0,}],
+		[{minBottom: 0, heightVolts: 1, bottomVolts: 0,}, null,
+			{minBottom: 0, maxBottom: 1, maxTop: 2, heightVolts: 1, bottomVolts: 0,}],
+		[{minBottom: 0, heightVolts: 1, bottomVolts: 1,}, null,
+			{minBottom: 0, maxBottom: 1, maxTop: 2, heightVolts: 1, bottomVolts: 1,}],
+		[{minBottom: -1, heightVolts: 5, bottomVolts: 0,}, null,
+			{minBottom: -1, maxBottom: 4, maxTop: 9, heightVolts: 5, bottomVolts: 0,}],
 
 		// these need a nudge cuz settings are way out.  Results are ALL the
 		// same cuz all numbers are replaced.
-		[{scrollMin: -1, heightVolts: 2, bottomVolts: 0}, munger,
-			{scrollMin: 13, scrollMax: 15, actualMax: 17, heightVolts: 2, bottomVolts: 13.5,}],
-		[{scrollMin: 100, heightVolts: 50, bottomVolts: 135}, munger,
-			{scrollMin: 13, scrollMax: 15, actualMax: 17, heightVolts: 2, bottomVolts: 13.5,}],
+		[{minBottom: -1, heightVolts: 2, bottomVolts: 0}, munger,
+			{minBottom: 13, maxBottom: 15, maxTop: 17, heightVolts: 2, bottomVolts: 13.5,}],
+		[{minBottom: 100, heightVolts: 50, bottomVolts: 135}, munger,
+			{minBottom: 13, maxBottom: 15, maxTop: 17, heightVolts: 2, bottomVolts: 13.5,}],
 
 		// but don't change anything if it all fits in the existing data
-		[{scrollMin: 14, heightVolts: 1, bottomVolts: 15}, munger,
-			{scrollMin: 14, scrollMax: 15, actualMax: 16, heightVolts: 1, bottomVolts: 15,}],
+		[{minBottom: 14, heightVolts: 1, bottomVolts: 15}, munger,
+			{minBottom: 14, maxBottom: 15, maxTop: 16, heightVolts: 1, bottomVolts: 15,}],
 
 		// these overlap at least part of the range so they won't be changed
-		[{scrollMin: 14, heightVolts: 7, bottomVolts: 15}, munger,
-			{scrollMin: 14, scrollMax: 21, actualMax: 28, heightVolts: 7, bottomVolts: 15,}],
-		[{scrollMin: -5, heightVolts: 10, bottomVolts: 2}, munger,
-			{scrollMin: -5, scrollMax: 5, actualMax: 15, heightVolts: 10, bottomVolts: 2,}],
-		[{scrollMin: 6, heightVolts: 10, bottomVolts: 8}, munger,
-			{scrollMin: 6, scrollMax: 16, actualMax: 26, heightVolts: 10, bottomVolts: 8,}],
+		[{minBottom: 14, heightVolts: 7, bottomVolts: 15}, munger,
+			{minBottom: 14, maxBottom: 21, maxTop: 28, heightVolts: 7, bottomVolts: 15,}],
+		[{minBottom: -5, heightVolts: 10, bottomVolts: 2}, munger,
+			{minBottom: -5, maxBottom: 5, maxTop: 15, heightVolts: 10, bottomVolts: 2,}],
+		[{minBottom: 6, heightVolts: 10, bottomVolts: 8}, munger,
+			{minBottom: 6, maxBottom: 16, maxTop: 26, heightVolts: 10, bottomVolts: 8,}],
 
 	])(`voltDisplay created w/%j  munger? %p should yield %o`, (settings, mungeFunc, expected) => {
 		mungeFunc?.();
@@ -108,9 +108,9 @@ describe(`voltage creation & consistency`, () => {
 			{showVoltage: true, ...settings});
 		tryOutConsistency(vDisp);
 
-		expect(vDisp.scrollMin).toEqual(expected.scrollMin);
-		expect(vDisp.scrollMax).toEqual(expected.scrollMax);
-		expect(vDisp.actualMax).toEqual(expected.actualMax);
+		expect(vDisp.minBottom).toEqual(expected.minBottom);
+		expect(vDisp.maxBottom).toEqual(expected.maxBottom);
+		expect(vDisp.maxTop).toEqual(expected.maxTop);
 		expect(vDisp.heightVolts).toEqual(expected.heightVolts);
 		expect(vDisp.bottomVolts).toEqual(expected.bottomVolts);
 	});

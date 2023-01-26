@@ -45,7 +45,7 @@ let thumbY;
 
 let railHeight;
 
-// scrollMax - scrollMin in pixels
+// maxBottom - minBottom in pixels
 let thumbFreedom;
 
 // putting them here so they don't have to be recompiled every render
@@ -136,11 +136,11 @@ export function VoltageSidebar(props) {
 	}
 
 	// so how far down is the thumb from top of rail in pix?
-	thumbY = thumbFreedom * (1 - (v.bottomVolts - v.scrollMin) / v.heightVolts)
+	thumbY = thumbFreedom * (1 - (v.bottomVolts - v.minBottom) / v.heightVolts)
 
 	if (traceVoltageSidebar) {
 		console.log(`🍟 🍟 V Sidebar rend: width=${sidebarWidth}  heightVolts=${v.heightVolts}hv
-		🍟 🍟    ${v.scrollMin}sm ... ${v.bottomVolts}bv ... ${v.scrollMax}sm ||| ${v.actualMax}am`);
+		🍟 🍟    ${v.minBottom}sm ... ${v.bottomVolts}bv ... ${v.maxBottom}sm ||| ${v.maxTop}am`);
 	}
 
 	// render.  The buttons are almost square.

@@ -47,7 +47,7 @@ export class VoltageArea extends React.Component {
 		// this can be null if stuff isn't ready.  these are now determined by css.
 		height: PropTypes.number,
 
-		// includes scrollSetting, heightVolts, voltMin, voltMax, xScale, yScale
+		// includes scrollSetting, heightVolts, measuredMinVolts, measuredMaxVolts, xScale, yScale
 		vDisp: PropTypes.object,
 
 		// this component is always rendered so it retains its state,
@@ -98,33 +98,33 @@ export class VoltageArea extends React.Component {
 			let howMuch = (v.bottomVolts - newVoltage) / v.heightVolts * howLong;
 			if (traceScrollStretch)
 				console.log(`strayOutside down howMuch=${howMuch} `);
-			if (newVoltage < v.scrollMin) {
+			if (newVoltage < v.minBottom) {
 				// stretch heightVolts
 				v.heightVolts += v.heightVolts * howMuch;
 			}
 			// scroll in either case
 			v.bottomVolts -= v.heightVolts * howMuch;
-			if (v.bottomVolts < v.scrollMin)
-				v.bottomVolts = v.scrollMin
+			if (v.bottomVolts < v.minBottom)
+				v.bottomVolts = v.minBottom
 			v.setMaxMax();
 			if (traceScrollStretch)
 				v.dumpVoltDisplay('   after stretching up');
 
 			this.lastDragOutside = now;
 		}
-		else if (newVoltage > v.actualMax) {
+		else if (newVoltage > v.maxTop) {
 			// dragging up
-			let howMuch = (newVoltage - v.actualMax) / v.heightVolts * howLong;
+			let howMuch = (newVoltage - v.maxTop) / v.heightVolts * howLong;
 			if (traceScrollStretch)
 				console.log(`strayOutside up  howMuch=${howMuch} `)
-			if (newVoltage > v.actualMax) {
+			if (newVoltage > v.maxTop) {
 				// stretch heightVolts
 				v.heightVolts += v.heightVolts * howMuch;
 			}
 			// scroll in either case
 			v.bottomVolts += v.heightVolts * howMuch;
-			if (v.bottomVolts > v.scrollMax)
-				v.bottomVolts = v.scrollMax;
+			if (v.bottomVolts > v.maxBottom)
+				v.bottomVolts = v.maxBottom;
 			v.setMaxMax();
 			if (traceScrollStretch)
 				v.dumpVoltDisplay('   after stretching up');

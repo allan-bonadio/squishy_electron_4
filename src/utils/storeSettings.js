@@ -215,8 +215,8 @@ export function createStoreSettings() {
 	makeParam('voltageSettings', 'showVoltage', true, [true, false]);
 	makeParam('voltageSettings', 'bottomVolts', -.25, {min: -256, max: 256});
 	makeParam('voltageSettings', 'heightVolts', 1, {min: 1/64, max: 256});
-	makeParam('voltageSettings', 'scrollMin', -.5, {min: -256, max: 256});
-	// always = min + 2 * heightVolts makeParam('voltageSettings', 'scrollMax', 16, {min: -256, max: 256});
+	makeParam('voltageSettings', 'minBottom', -.5, {min: -256, max: 256});
+	// always = min + 2 * heightVolts makeParam('voltageSettings', 'maxBottom', 16, {min: -256, max: 256});
 
 	/* ************************************ frameSettings */
 	makeParam('frameSettings', 'isTimeAdvancing', false,  [false, true]);
