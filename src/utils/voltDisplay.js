@@ -15,6 +15,7 @@ let tracePathAttribute = false;
 let traceVoltArithmetic = false;
 let traceVoltScales = false;
 let traceScrolling = false;
+let traceZooming = false;
 
 // raw numbers ~ 100 are way too big and throw it all into chaos
 const VALLEY_FACTOR = .001;
@@ -23,6 +24,7 @@ const TOO_MANY_VOLTS = 1e30;
 
 // zooming in or out, changes the heightVolts by this factor either way.
 // If it's not an even power, it'll round off to the nearest integer power.
+//const zoomFactor = 2;
 const zoomFactor = Math.sqrt(2);
 const logZoomFactor = Math.log(zoomFactor);
 
@@ -46,24 +48,26 @@ export class voltDisplay {
 		this.start = start;
 		this.end = end;
 
-		this.minBottom = settings.minBottom;
+		if (settings) {
+			this.minBottom = settings.minBottom;
+			this.heightVolts = settings.heightVolts;
+			// try NOT storing the bottom; it's always on the fly and often set to this default
+			this.setMaxMaxBottom();
+			//this.setMaxMax();
 
-		// how many volts higher the top edge of the view is from bottomVolts.
-		// Zoom increases/decreases this.
-		this.heightVolts = settings.heightVolts;
-		// try NOT storing the bottom; it's always on teh fly and often set to this default
-		this.setMaxMaxBottom();
-		//this.setMaxMax();
+			// where the bottom of the viewable voltage window is.  in volts.
+			// Scrolling changes this.
+			// ???
+			//this.bottomVolts = settings.bottomVolts;
 
-		// where the bottom of the viewable voltage window is.  in volts.
-		// Scrolling changes this.
-		this.bottomVolts = settings.bottomVolts;
+			// adjust the range over which the user can slide the bottomVolts,
+			// in case the numbers are crazy
+			this.makeNumbersSane();
+		}
+	}
 
-		// adjust the range over which the user can slide the bottomVolts, and
-		// therefore the view, up and down. These also are recalculated when
-		// zooming, but not when scrolling. minBottom is the lowest the
-		// bottomVolts can be.  maxBottom is the highest.
-		this.adjustScrollBounds();
+	setSettings(from) {
+		Object.assign(this, from);
 	}
 
 	// create a voltDisplay the way the app needs it
@@ -102,9 +106,9 @@ export class voltDisplay {
 
 	// all of our tedious properties
 	dumpVoltDisplay(title) {
-		console.log(`⚡️ dumpVoltDisplay: ${title}
+		console.log(`⚡️ voltD: ${title}
 			voltage range: ${this.measuredMinVolts} ... ${this.measuredMaxVolts},
-			scroll: ${this.minBottom}smn ... ${this.maxBottom}smx  ... ${this.maxTop}amx
+			scroll: ${this.minBottom}mnBot ... ${this.maxBottom}mxBot  ... ${this.maxTop}mxTop
 			heightVolts: ${this.heightVolts}    bottomVolts: ${this.bottomVolts}`);
 	}
 
@@ -133,14 +137,14 @@ export class voltDisplay {
 		this.bottomVolts = this.minBottom + this.heightVolts / 4;
 	}
 
-
+	// call this after loading these settings from somewhere, if you're not confident about them.
 	// make sure mins an maxes enclose at least part of the existing voltage - redo if not
-	adjustScrollBounds() {
+	makeNumbersSane() {
 		// make sure some part of the current voltage is visible somewhere - adjust bottomVolts if needed
 		this.findVoltExtremes();
 
 		// this would be trouble, so come up with something
-		if (this.heightVolts == 0) {
+		if (this.heightVolts <= 0) {
 			// these will change... first, decide a heightVolts
 			let approx = Math.abs(this.measuredMinVolts) + Math.abs(this.measuredMaxVolts);
 			this.heightVolts = (approx || 8) / 8;
@@ -149,7 +153,7 @@ export class voltDisplay {
 			// this is bs... guessing at numbers that could be anywhere
 			this.minBottom = this.measuredMinVolts - this.heightVolts/2;
 			this.setMaxMaxBottom();
-			this.dumpVoltDisplay('adjustScrollBounds: set to defaults');
+			this.dumpVoltDisplay('makeNumbersSane: set to defaults');
 			return;
 		}
 
@@ -158,9 +162,9 @@ export class voltDisplay {
 		let almostMin = (this.measuredMaxVolts + 19 * this.measuredMinVolts) / 20;
 
 		if (traceVoltArithmetic) {
-			console.log(`⚡️ ⚡️ adjustScrollBounds: almostMin=${almostMin} almostMax=${almostMax}`);
-			//dumpJsStack('adjustScrollBounds');
-			this.dumpVoltDisplay('before adjustment, if any, @adjustScrollBounds');
+			console.log(`⚡️ ⚡️ makeNumbersSane: almostMin=${almostMin} almostMax=${almostMax}`);
+			//dumpJsStack('makeNumbersSane');
+			this.dumpVoltDisplay('before adjustment, if any, @makeNumbersSane');
 		}
 
 		// check and adjust if out of bounds.
@@ -168,7 +172,7 @@ export class voltDisplay {
 			this.minBottom = this.measuredMinVolts;
 			this.heightVolts = Math.max(this.heightVolts, (this.measuredMaxVolts - this.measuredMinVolts) / 2);
 			this.setMaxMaxBottom();
-			this.dumpVoltDisplay('adjustScrollBounds: sorry had to adjust');
+			this.dumpVoltDisplay('makeNumbersSane: sorry had to adjust');
 			return;
 		}
 	}
@@ -202,7 +206,7 @@ export class voltDisplay {
 		// middleVolts should be the middle of the highest and lowest voltage in the buffer.
 		this.heightVolts = heightVolts;
 		let middleVolts = (this.measuredMinVolts + this.measuredMaxVolts) / 2;
-		this.bottomVolts = middleVolts - .5 * heightVolts;  // near bottom of the visible area
+		//this.bottomVolts = middleVolts - .5 * heightVolts;  // near bottom of the visible area
 		this.minBottom = middleVolts - heightVolts;
 		this.setMaxMaxBottom();
 	}
@@ -216,30 +220,40 @@ export class voltDisplay {
 
 	// called when user scrolls up or down.  can't get past the mins/maxes
 	// frac = 1=scrolled to top, 0=scrolled to bottom
-	changeScroll(frac) {
+	userScroll(frac) {
 		this.bottomVolts = Math.min(1, Math.max(0, frac)) * this.heightVolts + this.minBottom;
 		//storeASetting('voltageSettings', 'bottomVolts', this.bottomVolts);
 		if (traceScrolling)
-			console.info(`changeScroll(frac=${frac}) => bottomVolts=${this.bottomVolts}`);
+			console.info(`userScroll(frac=${frac}) => bottomVolts=${this.bottomVolts}`);
 		return this.bottomVolts;
 	}
 
-	// called when human zooms in or out.  pass +1 or -1.  heightVolts will usually be an integer power of zoomFactor.
-	changeZoom(upDown) {
+	// called when human zooms in or out.  pass +1 or -1.  heightVolts will
+	// usually be an integer power of zoomFactor.  but not always
+	userZoom(upDown) {
+		// keep looking at same place
+		let midView = this.bottomVolts + this.heightVolts/2;
+
+		// want to keep the scrollbar in the same place.
+		let scrollFraction = (this.bottomVolts - this.minBottom) / this.heightVolts;
+
+		if (traceZooming)
+			this.dumpVoltDisplay(`zoom START ${upDown}: old midView=${midView}  sFrac=${scrollFraction}`);
+
+		// zoom in/out to int powers of ZoomFactor.
 		let newLogZoom = Math.log(this.heightVolts) / logZoomFactor;
-		newLogZoom = Math.round(newLogZoom - upDown);  // round off to integer power of zoom Factor
+		newLogZoom = Math.round(newLogZoom - upDown);  // round off to integer power of ZoomFactor
 		this.heightVolts = zoomFactor ** newLogZoom;
 
-//		if (upDown < 0) {
-//			// zoom out.
-//			this.
-//		}
-//		else {
-//
-//		}
+		// the rests of this is exactly the same no matter which direction
+		this.bottomVolts = midView - this.heightVolts / 2;
+		this.minBottom = this.bottomVolts - scrollFraction * this.heightVolts;
 
-		this.setMaxMaxBottom();
-		//this.centerVariables(heightVolts);
+		this.setMaxMax();
+
+		if (traceZooming)
+			this.dumpVoltDisplay(`zoom: DONE  ${upDown} new midView=${ this.bottomVolts + this.heightVolts/2}, scrollFraction=${(this.bottomVolts - this.minBottom) / this.heightVolts};`);
+
 		this.saveScroll();
 	}
 
