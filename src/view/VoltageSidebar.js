@@ -61,7 +61,7 @@ const mouseDown =
 
 	// only registered while dragging
 	body.addEventListener('mousemove', thumbSlide);
-	body.addEventListener('mouseleave', mouseUp);
+	//body.addEventListener('mouseleave', mouseUp);
 	body.addEventListener('mouseup', mouseUp);
 }
 
@@ -76,8 +76,8 @@ const thumbSlide =
 		thumbY = Math.min(thumbFreedom, Math.max(0, ev.pageY - offsetInsideThumb - topOfRail));
 		let frac = 1 - thumbY / thumbFreedom;  // 1=scrolled to top, 0=scrolled to bottom
 
-		// scrollVoltHandler() changes VoltageArea scales, changeScroll() calcs and changes bottomVolts
-		savedProps.scrollVoltHandler(savedProps.vDisp.changeScroll(frac));
+		// scrollVoltHandler() changes VoltageArea scales, userScroll() calcs and changes bottomVolts
+		savedProps.scrollVoltHandler(savedProps.vDisp.userScroll(frac));
 		if (traceDragging) {
 			savedProps.vDisp.dumpVoltDisplay(
 				`🍟 mouse Move thumbY=${thumbY} thumbFreedom=${thumbFreedom} shd be constant`);
@@ -92,7 +92,7 @@ const mouseUp =
 	offsetTop = null;  // says mouse is up
 
 	body.removeEventListener('mousemove', thumbSlide);
-	body.removeEventListener('mouseleave', mouseUp);
+	//body.removeEventListener('mouseleave', mouseUp);
 	body.removeEventListener('mouseup', mouseUp);
 }
 
