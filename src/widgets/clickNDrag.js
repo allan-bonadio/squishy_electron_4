@@ -24,15 +24,20 @@ let traceDrag = false;
 // You are resposible for changing or moving the target, or any animation
 // this does NOT do drag-n-drop, although maybe you could do it thru handlers
 // or use d3.
+//
+// options: {
+// outsideWindow: true,  // doesn't stop  dragging if user drags beyond win boundaries
+// }
 class clickNDrag {
 	// onEvent is like onMove but is run for Down, Move and Up
 	// Up is also run on mouse out of window
-	constructor(onDown, onEvent, onUp) {
+	constructor(onDown, onEvent, onUp, options) {
 		this.dragging = false;
 
 		this.onDown = onDown ?? (() => {});
 		this.onEvent = onEvent ?? (() => {});
 		this.onUp = onUp ?? (() => {});
+		this.options = options ?? {};
 
 		// if you want to disable clicks/drags, turn this on for the duration.
 		// Will not pick up moves/mouseups if no clickdown happend with this on.
@@ -131,8 +136,9 @@ class clickNDrag {
 				this.dragging = true;
 				let b = document.body;
 				b.addEventListener('mousemove', this.mouseMove);
-				b.addEventListener('mouseleave', this.mouseUp);
 				b.addEventListener('mouseup', this.mouseUp);
+				if (!this.options.outsideWindow)
+					b.addEventListener('mouseleave', this.mouseUp);
 
 				this.onDown(this, ev);
 				this.eachEvent(ev);
@@ -203,8 +209,10 @@ class clickNDrag {
 
 			let b = document.body;
 			b.removeEventListener('mousemove', this.mouseMove);
-			b.removeEventListener('mouseleave', this.mouseUp);
 			b.removeEventListener('mouseup', this.mouseUp);
+			if (!this.options.outsideWindow)
+					b.removeEventListener('mouseleave', this.mouseUp);
+
 			this.dragging = false;
 		} catch (ex) {
 			this.catchEventException(ex, 'Up');
