@@ -184,7 +184,7 @@ export class WaveView extends React.Component {
 	zoomVoltHandler =
 	upDown => {
 		const v = this.vDisp;
-		v.changeZoom(upDown);
+		v.userZoom(upDown);
 		this.setState({heightVolts: v.heightVolts});
 		this.vDisp.setVoltScales(this.canvasFacts.width, this.state.height, this.props.space.nPoints);
 	}

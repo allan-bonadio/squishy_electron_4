@@ -32,7 +32,7 @@ let traceDragging = false;
 let traceTweening = false;
 
 let traceSlabs = false;
-let traceScrollStretch = true;
+let traceScrollStretch = false;
 
 // how long it takes, in milliseconds, dragging outside of the main voltage area,
 // to double the scroll or heightVolts
