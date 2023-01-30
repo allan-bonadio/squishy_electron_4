@@ -24,7 +24,7 @@ static void tryOutWave(int N) {
 
 	qWave *waveWave = new qWave(space);
 
-	LONGS_EQUAL_TEXT('wave', waveWave->magic, "qWave magic");
+	LONGS_EQUAL_TEXT('Wave', waveWave->magic, "qWave magic");
 	CHECK_TEXT(waveWave->wave, "qWave wave");
 	CHECK_TEXT(waveWave->dynamicallyAllocated, "qWave dynamicallyAllocated");
 

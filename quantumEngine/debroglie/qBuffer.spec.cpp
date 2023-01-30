@@ -20,7 +20,7 @@ static void testABufferLength(int length, qCx *useThisBuffer = NULL) {
 	//printf("🧨: testing %d point buffer with %p\n", length, useThisBuffer);
 
 	qBuffer *qBuf = new qBuffer();
-	LONGS_EQUAL_TEXT('buff', qBuf->magic, "qBuffer magic");
+	LONGS_EQUAL_TEXT('Buff', qBuf->magic, "qBuffer magic");
 	POINTERS_EQUAL_TEXT(NULL, qBuf->wave, "qBuffer wave null");
 
 	qBuf->initBuffer(length, useThisBuffer);
