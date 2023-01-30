@@ -14,7 +14,7 @@
 #include "CppUTest/TestHarness.h"
 
 static bool traceOneStep = false;
-static bool traceoneIntegration = false;
+static bool traceOneFrame = false;
 
 TEST_GROUP(visscher)
 {
@@ -62,75 +62,69 @@ TEST(visscher, VisscherOneStep4)
 /* ****************************************************************** one integration */
 
 static qCx expectedArray[34] = {
-qCx(    0.1719177767,     -0.0411565048),  // 0
-qCx(    0.1766435610,     -0.0068256990),  // 1
-qCx(    0.1745810323,      0.0277674145),  // 2
-qCx(    0.1658094525,      0.0612934419),  // 3
-qCx(    0.1506659083,      0.0924639967),  // 4
-qCx(    0.1297323579,      0.1200812119),  // 5
-qCx(    0.1038132656,      0.1430837736),  // 6
-qCx(    0.0739046878,      0.1605877060),  // 7
-qCx(    0.0411559943,      0.1719203429),  // 8
-qCx(    0.0068256990,      0.1766461775),  // 9
-qCx(   -0.0277669041,      0.1745835986),  // 10
-qCx(   -0.0612924406,      0.1658118698),  // 11
-qCx(   -0.0924625430,      0.1506680839),  // 12
-qCx(   -0.1200793618,      0.1297342081),  // 13
-qCx(   -0.1430815980,      0.1038147193),  // 14
-qCx(   -0.1605852886,      0.0739056891),  // 15
-qCx(   -0.1719177767,      0.0411565048),  // 16
-qCx(   -0.1766435610,      0.0068256990),  // 17
-qCx(   -0.1745810323,     -0.0277674145),  // 18
-qCx(   -0.1658094525,     -0.0612934419),  // 19
-qCx(   -0.1506659083,     -0.0924639967),  // 20
-qCx(   -0.1297323579,     -0.1200812119),  // 21
-qCx(   -0.1038132656,     -0.1430837736),  // 22
-qCx(   -0.0739046878,     -0.1605877060),  // 23
-qCx(   -0.0411559943,     -0.1719203429),  // 24
-qCx(   -0.0068256990,     -0.1766461775),  // 25
-qCx(    0.0277669041,     -0.1745835986),  // 26
-qCx(    0.0612924406,     -0.1658118698),  // 27
-qCx(    0.0924625430,     -0.1506680839),  // 28
-qCx(    0.1200793618,     -0.1297342081),  // 29
-qCx(    0.1430815980,     -0.1038147193),  // 30
-qCx(    0.1605852886,     -0.0739056891),  // 31
-qCx(    0.1719177767,     -0.0411565048),  // 32
-qCx(    0.1766435610,     -0.0068256990),  // 33
+qCx(    0.1719177765,     -0.0411565053),  // 0
+qCx(    0.1766435609,     -0.0068256995),  // 1
+qCx(    0.1745810324,      0.0277674140),  // 2
+qCx(    0.1658094526,      0.0612934415),  // 3
+qCx(    0.1506659086,      0.0924639963),  // 4
+qCx(    0.1297323582,      0.1200812116),  // 5
+qCx(    0.1038132660,      0.1430837733),  // 6
+qCx(    0.0739046883,      0.1605877058),  // 7
+qCx(    0.0411559948,      0.1719203428),  // 8
+qCx(    0.0068256995,      0.1766461775),  // 9
+qCx(   -0.0277669036,      0.1745835987),  // 10
+qCx(   -0.0612924401,      0.1658118700),  // 11
+qCx(   -0.0924625426,      0.1506680842),  // 12
+qCx(   -0.1200793614,      0.1297342084),  // 13
+qCx(   -0.1430815977,      0.1038147197),  // 14
+qCx(   -0.1605852884,      0.0739056896),  // 15
+qCx(   -0.1719177765,      0.0411565053),  // 16
+qCx(   -0.1766435609,      0.0068256995),  // 17
+qCx(   -0.1745810324,     -0.0277674140),  // 18
+qCx(   -0.1658094526,     -0.0612934415),  // 19
+qCx(   -0.1506659086,     -0.0924639963),  // 20
+qCx(   -0.1297323582,     -0.1200812116),  // 21
+qCx(   -0.1038132660,     -0.1430837733),  // 22
+qCx(   -0.0739046883,     -0.1605877058),  // 23
+qCx(   -0.0411559948,     -0.1719203428),  // 24
+qCx(   -0.0068256995,     -0.1766461775),  // 25
+qCx(    0.0277669036,     -0.1745835987),  // 26
+qCx(    0.0612924401,     -0.1658118700),  // 27
+qCx(    0.0924625426,     -0.1506680842),  // 28
+qCx(    0.1200793614,     -0.1297342084),  // 29
+qCx(    0.1430815977,     -0.1038147197),  // 30
+qCx(    0.1605852884,     -0.0739056896),  // 31
+qCx(    0.1719177765,     -0.0411565053),  // 32
+qCx(    0.1766435609,     -0.0068256995),  // 33
 };
 
-static void regenerateOutput(qCx *psi, int nPoints) {
-	printf("static qCx expectedArray[34] = {\n");
-	for (int ix = 0; ix < nPoints; ix++) {
-		printf("\tqCx(%16.10lf,  %16.10lf),  // %d\n",
-			psi[ix].re, psi[ix].im, ix);
-	}
-	printf("};\n");
-
-}
 
 // everything turns into nans.  dunno what's wrong.
-TEST(visscher, VisscherOneIntegration32)
+TEST(visscher, VisscherOneFrame32)
 {
 	// simulate the app starting up
 	qSpace *space = makeFullSpace(32);
-	qAvatar *av = theSpace->mainAvatar;
-	qGrinder *grinder = theSpace->grinder;
-	grinder->qflick->setCircularWave(1.);
+	qAvatar *av = space->mainAvatar;
+	qGrinder *grinder = space->grinder;
+	qFlick *fl = grinder->qflick;
+	fl->setCircularWave(1.);
+	for (int ix = fl->start; ix < fl->end; ix++) space->voltage[ix] = 0;
 
-	grinder->qflick->dump("VisscherOneIntegration, before", true);
+	//fl->dump("VisscherOneFrame, before", true);
 
 	// simulate the app taking one iter = 100 steps
 	grinder->stepsPerFrame = 100;
-	//grinder->stepsPerFrame = 100;
 	grinder->dt = .01;
-	grinder->lowPassFilter = 10;
+	grinder->lowPassFilter = 10;  // num freqs to eliminate on each side
 
-	grinder->oneIntegration();
+	// one frame
+	grinder->oneFrame();
 
-	grinder->qflick->dump("VisscherOneIntegration, after", true);
+	//fl->dump("VisscherOneFrame, after", true);
 
-	// use this to regenerate the table, if needed
-	regenerateOutput(grinder->qflick->wave, space->nPoints);
+	// dumps the wave in case you want to paste it back in here
+	// probably you should comment it out for normal use
+	//dumpWaveInitializer("expectedArray", fl->wave, space->nPoints);
 
 	// we'll use this to compare against
 	qWave *expectedQWave = new qWave(space, expectedArray);
@@ -138,7 +132,7 @@ TEST(visscher, VisscherOneIntegration32)
 	delete expectedQWave;
 
 	// simulate the app ... will also delete avatar and grinder.
-	deleteTheSpace(space);
+	deleteFullSpace(space);
 
 	// anything i'm forgetting?
 }
