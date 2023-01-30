@@ -62,7 +62,7 @@ struct qGrinder {
 	char label[MAX_LABEL_LEN + 1];
 
 
-	// true if frame is running; set/unset in ::oneIntegration()
+	// true if frame is running; set/unset in ::oneFrame()
 	// For the interactive simulation switch, see isTimeAdvancing in JS.
 	bool isIntegrating;
 
@@ -79,7 +79,7 @@ struct qGrinder {
 	// make sure the subsequent fields are aligned!  or frame is painfully slow.
 
 	// multiple steps; ≈ stepsPerFrame
-	void oneIntegration(void);
+	void oneFrame(void);
 
 	// visscher.  Calculate new from old; use hamiltonian to calculate d𝜓
 	// often oldW and hamiltonianW are the same
@@ -103,7 +103,7 @@ struct qGrinder {
 extern "C" {
 	// rename to initThreadIntegration
 	void grinder_initIntegrationLoop(qGrinder *grinder, int nStage, int nnn, int mmms);
-	void grinder_oneIntegration(qGrinder *grinder);
+	void grinder_oneFrame(qGrinder *grinder);
 
 	void grinder_askForFFT(qGrinder *grinder);
 

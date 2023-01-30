@@ -159,3 +159,26 @@ void qGrinder::stepRealImaginary(qCx *newW, qCx *oldW, qCx *hamiltW, double dt) 
 	stepImaginary(newW, oldW, hamiltW, dt);
 }
 
+/* ********************************************************** midpoint method */
+
+// this will go forward calculating dPsi based on derivatives at the front AND back of dx
+void qGrinder::stepMidpoint(qCx *newW, qCx *oldW, qCx *scratch, double dt) {
+	// first calculate the normal step taking derivatives at the beginning of dt
+	qflick->fixThoseBoundaries(oldW);
+	stepReal(scratch, oldW, oldW, dt);
+	stepImaginary(scratch, oldW, oldW, dt);
+
+	// now do it again with the derivatives at the end
+	qflick->fixThoseBoundaries(scratch);
+	stepReal(newW, oldW, scratch, dt);
+	stepImaginary(newW, oldW, scratch, dt);
+
+	// now average them into new
+	qDimension *dims = space->dimensions;
+	for (int ix = dims->start; ix < dims->end; ix++) {
+		newW[ix] = (newW[ix] + scratch[ix]) / 2;
+	}
+
+	// and that's the midpoint method
+}
+

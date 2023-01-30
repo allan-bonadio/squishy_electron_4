@@ -196,35 +196,12 @@ void qGrinder::dumpObj(const char *title) {
 	printf("        ==== end of qGrinder ====\n\n");
 }
 
-/* ********************************************************** midpoint method */
-
-// this will
-void qGrinder::stepMidpoint(qCx *newW, qCx *oldW, qCx *scratch, double dt) {
-	// first calculate the normal step taking derivatives at the beginning of dt
-	qflick->fixThoseBoundaries(oldW);
-	stepReal(scratch, oldW, oldW, dt);
-	stepImaginary(scratch, oldW, oldW, dt);
-
-	// now do it again with the derivatives at the end
-	qflick->fixThoseBoundaries(scratch);
-	stepReal(newW, oldW, scratch, dt);
-	stepImaginary(newW, oldW, scratch, dt);
-
-	// now average them into new
-	qDimension *dims = space->dimensions;
-	for (int ix = dims->start; ix < dims->end; ix++) {
-		newW[ix] = (newW[ix] + scratch[ix]) / 2;
-	}
-
-	// and that's the midpoint method
-}
-
 /* ********************************************************** doing Integration */
 
 // Does several visscher steps (eg 10 or 100 or 500). Actually does
 // stepsPerFrame+1 steps; half steps at start and finish to adapt and
 // de-adapt to Visscher timing
-void qGrinder::oneIntegration() {
+void qGrinder::oneFrame() {
 	isIntegrating = doingIntegration = true;
 	qCx *wave0 = qflick->waves[0];
 	qCx *wave1 = qflick->waves[1];
@@ -290,6 +267,7 @@ void qGrinder::oneIntegration() {
 
 	frameSerial++;
 	isIntegrating = doingIntegration = false;
+	qCheckReset();
 }
 
 
@@ -297,11 +275,12 @@ void qGrinder::oneIntegration() {
 
 
 // FFT the wave, cut down the high frequencies, then iFFT it back.
-// lowPassFilter is .. kinda changes but maybe #frequencies we zero out
+// lowPassFilter (aka lpf) is  #frequencies we zero out
 // Can't we eventually find a simple convolution to do this instead of FFT/iFFT?
-// maye after i get more of this working and fine toon it
+// maybe after i get more of this working and fine tune it.
+// Or maybe FFT is the fastest way anyway?
 // lowPassFilter = number of freqs to squelch on BOTH sides, excluding nyquist
-// range 0...N/2-1
+// which is always filtered out.  range 0...N/2-1
 void qGrinder::fourierFilter(int lowPassFilter) {
 	qspect = getSpectrum();
 	qspect->generateSpectrum(qflick);
@@ -340,7 +319,7 @@ void qGrinder::askForFFT(void) {
 // If stopped, fft current wave. now.
 void grinder_askForFFT(qGrinder *pointer) { pointer->askForFFT(); }
 
-void grinder_oneIntegration(qGrinder *pointer) { pointer->oneIntegration(); }
+void grinder_oneFrame(qGrinder *pointer) { pointer->oneFrame(); }
 
 
 // rename to initThreadIntegration
