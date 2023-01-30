@@ -3,6 +3,7 @@
 ** Copyright (C) 2022-2023 Tactile Interactive, all rights reserved
 */
 
+#include <cstring>
 
 #include "../spaceWave/qSpace.h"
 #include "../greiman/qAvatar.h"
@@ -14,6 +15,7 @@
 
 #include "CppUTest/TestHarness.h"
 
+static bool traceFourierFilter = false;
 
 TEST_GROUP(qGrinder)
 {
@@ -55,10 +57,10 @@ TEST(qGrinder, CheckGrinderConstructor)
 
 	LONGS_EQUAL(false, grinder->isIntegrating);
 	LONGS_EQUAL(false, grinder->needsIntegration);
-	LONGS_EQUAL(false, grinder->doingIntegration);
+	LONGS_EQUAL(true, grinder->doingIntegration);
 	LONGS_EQUAL(false, grinder->pleaseFFT);
 
-	STRCMP_EQUAL("myGrinder", grinder->label);
+	STRCMP_EQUAL("myGrind", grinder->label);
 
 	delete grinder;
 	delete avatar;
@@ -67,9 +69,39 @@ TEST(qGrinder, CheckGrinderConstructor)
 
 
 /* ******************************************************************************************** FourierFilter */
-static bool traceFourierFilter = false;
 
-// try out FF on a mix of frequencies goodFreq & badFreq, should filter
+// need this to verify waves have a certain specific frequency.  Do this to the spectrum.
+static void isAllZeroesExceptFor(qBuffer *qwave, int except1, bool shouldFail, const char *msg) {
+	qCx *wave = qwave->wave;
+	int start = qwave->start;
+	int end = qwave->end;
+	char buf[100];
+
+	for (int ix = start; ix < end; ix++) {
+		qCx cx = wave[ix];
+
+		// prepare for a possible error message.  but cppu throws away this message!
+		sprintf(buf, "\n wave at [%d]  😢 value = %8.8lf %8.8lf  ",
+			ix, cx.re, cx.im);
+
+		if (ix != except1) {
+			if ((cx != 0) ^ shouldFail) {
+				strcat(buf, "not zero, should be\n");
+				FAIL(buf);
+			}
+		}
+		else {
+			if ((cx.norm() < ERROR_RADIUS) ^ shouldFail) {
+				strcat(buf, "is zero, shouldn't be\n");
+				FAIL(buf);
+			}
+		}
+	}
+
+}
+
+
+// try out FF on a mix of frequencies goodFreq & badFreq, then filter.
 // goodFreq should stay there, while badFreq should be filtered out.
 static void tryFourierFilter(int N, int goodFreq, int badFreq, int lowPassFilter, bool shouldFail)
 {
@@ -99,7 +131,7 @@ static void tryFourierFilter(int N, int goodFreq, int badFreq, int lowPassFilter
 	if (traceFourierFilter)
 		rainbow->dumpSpectrum("after fourierFilter()");
 
-	CHECK(shouldFail ^ isAllZeroesExceptFor(rainbow, goodFreq));
+	isAllZeroesExceptFor(rainbow, goodFreq, shouldFail, "unfiltered frequency");
 
 	delete addOn;
 	delete grinder;
