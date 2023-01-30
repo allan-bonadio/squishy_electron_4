@@ -18,7 +18,7 @@
 #include "CppUTest/TestHarness.h"
 
 static bool traceDumpWaves = false;
-static bool tracing = false;
+static bool traceWhichParams = false;
 
 TEST_GROUP(fft)
 {
@@ -28,11 +28,11 @@ TEST_GROUP(fft)
 /* **************************************************** fft of various pure e^ix waves */
 
 static void tryOutFFT(int N, double freq) {
-	if (tracing) printf("\n🌈 🌈 starting tryOutFFT(%d, %1.2lf) line%d\n", N, freq, __LINE__);
+	if (traceWhichParams) printf("\n🌈 🌈 starting tryOutFFT(%d, %1.2lf) line%d\n", N, freq, __LINE__);
 
 	// this also tests contDISCRETE a little
 	qSpace *space = makeBareSpace(N, contDISCRETE);
-\
+
 	qWave *original = new qWave(space);
 	original->setCircularWave(freq);
 	if (traceDumpWaves) original->dump("    tryOutFFT:  orignal wave set", true);
@@ -49,7 +49,7 @@ static void tryOutFFT(int N, double freq) {
 		pos = round(N + freq);
 	else
 		pos = round(freq);
-	if (tracing) printf("     tryOutFFT: ... pos=%d  expected=%lf\n", pos, expected);
+	if (traceWhichParams) printf("     tryOutFFT: ... pos=%d  expected=%lf\n", pos, expected);
 
 	// now verify that
 	qCx *sw = qspect->wave;
@@ -70,7 +70,7 @@ static void tryOutFFT(int N, double freq) {
 	delete original;
 	delete qspect;
 	delete space;
-	if (tracing) printf("     finished tryOutFFT\n");
+	if (traceWhichParams) printf("     finished tryOutFFT\n");
 }
 
 TEST(fft, SpectrumFFT8_1) { tryOutFFT(8, 1.); }
@@ -89,7 +89,7 @@ TEST(fft, SpectrumFFT64_2) { tryOutFFT(64., 2); }
 /* ********************************************************************** Square Wave */
 
 static void trySquareWaveFFT(int N) {
-	if (tracing) printf("\n🌈 🌈 starting trySquareWaveFFT(%d)\n", N);
+	if (traceWhichParams) printf("\n🌈 🌈 starting trySquareWaveFFT(%d)\n", N);
 
 	// this also tests contDISCRETE a little
 	qSpace *space = makeBareSpace(N, contDISCRETE);
@@ -135,7 +135,7 @@ static void trySquareWaveFFT(int N) {
 	delete original;
 	delete qspect;
 	delete space;
-	if (tracing) printf("      finished trySquareWaveFFT\n");
+	if (traceWhichParams) printf("      finished trySquareWaveFFT\n");
 }
 
 
@@ -152,7 +152,7 @@ TEST(fft, SquareWaveFFT32) {trySquareWaveFFT(32);}
 // take a 'random' wave, then FFT and IFFT it, and make sure they equal.
 // seed = 0...1   The wave is a random walk rather than purely random.
 static void tryInverseFFT(int N, double seed) {
-	if (tracing) printf("\n🌈 🌈 starting tryInverseFFT(%d, %lf)\n", N, seed);
+	if (traceWhichParams) printf("\n🌈 🌈 starting tryInverseFFT(%d, %lf)\n", N, seed);
 	rando = seed;
 
 	qSpace *space = makeBareSpace(N, contDISCRETE);
@@ -191,7 +191,7 @@ static void tryInverseFFT(int N, double seed) {
 	delete original;
 	delete qspect;
 	delete space;
-	if (tracing) printf("     finished tryInverseFFT\n");
+	if (traceWhichParams) printf("     finished tryInverseFFT\n");
 }
 
 // a variety of situations
