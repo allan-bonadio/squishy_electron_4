@@ -21,16 +21,18 @@ extern double getTimeDouble(void);
 
 #ifdef qDEV_VERSION
 	extern void qCheck(qCx aCx, const char *where = "", int index = -999999999);
+	extern void qCheckReset(void);
 #else
 	#define qCheck(where, ...)
+	#define qCheckReset(where, ...)
 #endif
 
 // use this for tracing without needing the debugger.
 #define FOOTPRINT  printf("FOOTPRINT 🦶 %s() in %s:%d\n", __FUNCTION__, __FILE__, __LINE__);
 
 // Uncomment only the first line below, for normal operation.
-// When you change some field arrangements or sizes for the major objects
-// proxied in JS, uncomment only the second line, below, to re-do the offsets, so all constructors
+// When you change some field arrangements or sizes for the major objects that are
+// proxied in JS, uncomment only the second line, below, to re-calc the offsets, so all constructors
 // print out JS code. Then run in the browser (not C++ cppu tests, they use
 // 64bit ptrs), and take the generated JS and paste it into the corresponding JS
 // files, in src/engine, where indicated. Remove the line numbers that the browsers stick in!

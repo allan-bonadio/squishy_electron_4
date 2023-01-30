@@ -3,10 +3,10 @@
 ** Copyright (C) 2021-2023 Tactile Interactive, all rights reserved
 */
 
-extern class qSpace *theSpace;
-extern double *theVoltage;
+//extern class qSpace *theSpace;
+//extern double *theVoltage;
 
-extern qCx hamiltonian(qCx *wave, int x);
+extern qCx hamiltonian(struct qSpace *space, qCx *wave, int x);
 //extern void qeStarted(void);
 
 /* *************************************** one for each DIMENSION of the wave array */
@@ -117,10 +117,10 @@ public:
 extern "C" {
 	// create
 	qSpace *startNewSpace(const char *name = "a space");
-	void addSpaceDimension(int N, int continuum, double dx, const char *label);
-	qSpace *completeNewSpace(void);
+	void addSpaceDimension(qSpace *space, int N, int continuum, double dx, const char *label);
+	qSpace *completeNewSpace(qSpace *space);
 
 	// destroy
-	void deleteTheSpace(qSpace *space);
+	void deleteFullSpace(qSpace *space);
 }
 

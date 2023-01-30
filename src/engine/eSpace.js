@@ -51,7 +51,7 @@ export class eSpace {
 		// make each dimension (someday there'll be more than 1)
 		//let nPoints = 1, nStates = 1;
 		this.dimensions = dims.map(d => {
-				qe.addSpaceDimension(d.N, d.continuum, d.spaceLength, d.label);  // c++
+				qe.addSpaceDimension(this.pointer, d.N, d.continuum, d.spaceLength, d.label);  // c++
 
 				let dim = new eDimension(d)
 				//nStates *= dim.N;
@@ -60,7 +60,7 @@ export class eSpace {
 			}
 		);
 
-		qe.completeNewSpace();
+		qe.completeNewSpace(this.pointer);
 
 		// direct access into the voltage buffer
 		this.voltageBuffer = new Float64Array(window.Module.HEAPF64.buffer,
@@ -115,7 +115,7 @@ export class eSpace {
 
 			// finally, get rid of the C++ object
 			if (traceSpace) console.log(`🚀  done  eSpace:`, this);
-			qe.deleteTheSpace(this.pointer);
+			qe.deleteFullSpace(this.pointer);
 		} catch (ex) {
 			// eslint-disable-next-line no-ex-assign
 			ex = interpretCppException(ex);

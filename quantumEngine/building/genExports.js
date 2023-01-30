@@ -29,15 +29,15 @@ let exportsSrc  = [
 
 	// recreating the space
 	{name: 'startNewSpace', args: ['string'], retType: 'number'},
-	{name: 'addSpaceDimension', args: ['number', 'number', 'number', 'string'], retType: null},
-	{name: 'completeNewSpace', args: [], retType: 'number'},
-	{name: 'deleteTheSpace', args: ['number'], retType: null},
+	{name: 'addSpaceDimension', args: ['number', 'number', 'number', 'number', 'string'], retType: null},
+	{name: 'completeNewSpace', args: ['number'], retType: 'number'},
+	{name: 'deleteFullSpace', args: ['number'], retType: null},
 
 	// gets
 	{name: 'getCppExceptionMessage', args: ['number'], retType: 'number'},
 
 	// the voltage
-	{name: 'qSpace_dumpVoltage', args: ['string'], retType: 'number'},
+	{name: 'qSpace_dumpVoltage', args: ['number', 'string'], retType: 'number'},
 
 	// accept an integer pointer to the qWave as first arg
 	{name: 'wave_normalize', args: ['number'], retType: null},
@@ -48,16 +48,10 @@ let exportsSrc  = [
 	{name: 'avatar_loadViewBuffer', args: ['number'], retType:  'number'},
 	{name: 'avatar_dumpViewBuffer', args: ['number', 'string'], retType: null},
 
-	// ************************* avatar versions - will go away
-	//{name: 'avatar_initIntegrationLoop', args: ['number', 'number', 'number'], retType: null},
-	//{name: 'avatar_oneIntegration', args: ['number'], retType: null},
-	//
-	//{name: 'avatar_askForFFT', args: ['number'], retType: null},
 
-
-	// ************************* grinder versions
+	// ************************* grinder
 	{name: 'grinder_initIntegrationLoop', args: ['number', 'number', 'number'], retType: null},
-	{name: 'grinder_oneIntegration', args: ['number'], retType: null},
+	{name: 'grinder_oneFrame', args: ['number'], retType: null},
 
 	{name: 'grinder_askForFFT', args: ['number'], retType: null},
 

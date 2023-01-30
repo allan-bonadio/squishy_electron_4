@@ -4,6 +4,7 @@
 */
 
 #include <stdexcept>
+#include <cstring>
 
 #include "../debroglie/qWave.h"
 #include "../fourier/qSpectrum.h"
@@ -66,7 +67,12 @@ int main(int ac, char** av)
 // this only displays complex if a failure, for the message.
 SimpleString StringFrom(const qCx value) {
 	char buffer[100];
-	snprintf(buffer, 100, "%13.10lf %+13.10lf•i", value.re, value.im);
+	snprintf(buffer, 100, "%13.8lf %+13.8lf•i", value.re, value.im);
+
+	// funny i gotta do it, thought it would just compare like strings
+	for (int j = strlen(buffer); j < 100; j++)
+		buffer[j] = 0;
+
 	SimpleString buf = SimpleString(buffer);
 	return buf;
 }
@@ -76,22 +82,20 @@ SimpleString StringFrom(const qCx value) {
 
 static bool traceMakeSpace = false;
 
-// make a new 1d space with N state locations along x, in theSpace, along with whatever else
+// make a new 1d space with N state locations along x, in space, along with whatever else
 // the way JS does it.  Needed for lots of tests.
-// You are (usually) responsible for deleting it with deleteTheSpace(space).
-// Space generated in theSpace.  Old theSpace triggers error if you don't deleteTheSpace().
-// frees and reallocates theVoltage and the ViewBuffer
+// You are (usually) responsible for deleting it with deleteFullSpace(space).
 qSpace *makeFullSpace(int N) {
 	if (traceMakeSpace) printf("🧨 🧨  starting makeFullSpace(%d), about to startNewSpace\n", N);
 
 	qSpace *space = startNewSpace(MAKEFULLSPACE_LABEL);
 	if (traceMakeSpace) printf("        finished startNewSpace(), on to add\n");
-	addSpaceDimension(N, contENDLESS, "x");
+	addSpaceDimension(space, N, contENDLESS, 10, "x");
 	if (traceMakeSpace) printf("        finished addSpaceDimension(), on to complete\n");
-	completeNewSpace();
+	completeNewSpace(space);
 
 	if (traceMakeSpace) printf("        finished makeFullSpace(%d)\n", N);
-	return theSpace;
+	return space;
 }
 
 // 1d space, not with all the crud from above.
@@ -101,8 +105,9 @@ qSpace *makeBareSpace(int N, int continuum) {
 	if (traceMakeSpace) printf("🧨 🧨 makeBareSpace(%d)\n", N);
 
 	qSpace *space = new qSpace(MAKEBARESPACE_LABEL);
-	if (traceMakeSpace) printf("    makeBareSpace: sizeof(qSpace) = %ld    space* = %p\n", sizeof(qSpace), space);
-	space->addDimension(N, continuum, MAKEBARE1DDIM_LABEL);
+	if (traceMakeSpace) printf("    makeBareSpace: sizeof(qSpace) = %ld    space* = %p\n",
+		sizeof(qSpace), space);
+	space->addDimension(N, continuum, .37, MAKEBARE1DDIM_LABEL);
 	if (traceMakeSpace) printf("    makeBareSpace: did Add, about to Init\n");
 	space->initSpace();
 
@@ -146,44 +151,26 @@ void compareWaves(qBuffer *qexpected, qBuffer *qactual) {
 
 	// do the WHOLE THING including boundaries
 	for (int ix = 0; ix < qexpected->nPoints; ix++) {
-		// we can't use DOUBLES_EQUAL() cuz these aren't doubles, they're complex!
-		CHECK_EQUAL(expected[ix], actual[ix]);
+		// should use complexEqualText()
+		DOUBLES_EQUAL(expected[ix].re, actual[ix].re, 1e-10);
+		DOUBLES_EQUAL(expected[ix].im, actual[ix].im, 1e-10);
 	}
+}
+
+// take a wave, and print out a C++ declaration and initializer that you can paste back into your spec file
+void dumpWaveInitializer(const char *varName, qCx *psi, int nPoints) {
+	printf("static qCx %s[%d] = {\n", varName, nPoints);
+	for (int ix = 0; ix < nPoints; ix++) {
+		printf("qCx(%16.10lf,  %16.10lf),  // %d\n",
+			psi[ix].re, psi[ix].im, ix);
+	}
+	printf("};\n");
 }
 
 
 static void complexEqualText(qCx cx1, qCx cx2, const char *msg) {
 	DOUBLES_EQUAL_TEXT(cx1.re, cx2.re, ERROR_RADIUS, msg);
 	DOUBLES_EQUAL_TEXT(cx1.im, cx2.im, ERROR_RADIUS, msg);
-}
-
-// need this to verify waves have a certain specific frequency.  Do this to the spectrum.
-// returns TRUE if OK, false if not
-bool isAllZeroesExceptFor(qBuffer *qwave, int except1, int except2) {
-	qCx *wave = qwave->wave;
-	int start = qwave->start;
-	int end = qwave->end;
-	char buf[100];
-
-	for (int ix = start; ix < end; ix++) {
-		qCx cx = wave[ix];
-		sprintf(buf, "\nwave at [%d]  😢 bad value = %8.8lf %8.8lf\n",
-			ix, cx.re, cx.im);
-
-		if (ix != except1 && ix != except2) {
-			if (cx != 0) {
-				printf("not zero %s", buf);
-				return false;
-			}
-		}
-		else {
-			if (cx.norm() < ERROR_RADIUS) {
-				printf("is zero %s", buf);
-				return false;
-			}
-		}
-	}
-	return true;
 }
 
 /* ********************************************** my favorite pseudo random number generator */

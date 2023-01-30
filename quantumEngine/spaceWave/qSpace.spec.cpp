@@ -42,8 +42,43 @@ TEST(qSpace, qSpace_BareGauntlet)
 }
 
 
-// just the constructor; it's not even fully created
-TEST(qSpace, qSpace_ConstructorGauntlet)
+// the 3-part constructor, full test
+TEST(qSpace, qSpace_1DConstructorGauntlet)
+{
+	qSpace *space = new qSpace("AliBaba");
+	STRCMP_EQUAL("AliBaba", space->label);
+
+	LONGS_EQUAL(0, space->nDimensions);
+	// hmm must be something else to test...
+	LONGS_EQUAL_TEXT('Spac', space->magic, "qSpace magic");
+
+
+	// should change one of these to discrete someday or
+	// make a func to try combinations
+	space->addDimension(64, contENDLESS, 2.2, "x");
+	LONGS_EQUAL(1, space->nDimensions);
+
+	space->initSpace();
+
+	LONGS_EQUAL(64, space->nStates);
+	LONGS_EQUAL(66, space->nPoints);
+
+	qDimension *dims = space->dimensions;
+
+	LONGS_EQUAL(64, dims[0].nStates);
+	LONGS_EQUAL(66, dims[0].nPoints);
+	LONGS_EQUAL(64, dims[0].N);
+	LONGS_EQUAL(1, dims[0].start);
+	LONGS_EQUAL(65, dims[0].end);
+	LONGS_EQUAL(contENDLESS, dims[0].continuum);
+	DOUBLES_EQUAL(2.2, dims[0].dx, ERROR_RADIUS)
+	STRCMP_EQUAL("x", dims[0].label);
+
+	delete space;
+}
+
+// the 3-part constructor, creating a 2D space, not even using that yet!
+TEST(qSpace, qSpace_2DConstructorGauntlet)
 {
 	qSpace *space = new qSpace("ShowRoo");
 	STRCMP_EQUAL("ShowRoo", space->label);
@@ -55,10 +90,10 @@ TEST(qSpace, qSpace_ConstructorGauntlet)
 
 	// should change one of these to discrete someday or
 	// make a func to try combinations
-	space->addDimension(16, contENDLESS, "x");
+	space->addDimension(16, contENDLESS, 11, "x");
 	LONGS_EQUAL(1, space->nDimensions);
 
-	space->addDimension(8, contENDLESS, "y");
+	space->addDimension(8, contENDLESS, 7, "y");
 	LONGS_EQUAL(2, space->nDimensions);
 
 	space->initSpace();
@@ -83,8 +118,6 @@ TEST(qSpace, qSpace_ConstructorGauntlet)
 	LONGS_EQUAL(9, dims[1].end);
 	LONGS_EQUAL(contENDLESS, dims[1].continuum);
 	STRCMP_EQUAL("y", dims[1].label);
-
-
 
 	delete space;
 }
@@ -112,15 +145,15 @@ void completeNewSpaceGauntlet(int N) {
 	LONGS_EQUAL_TEXT(1, space->nDimensions, "space nDimensions");
 
 	// lets see if the buffers are all large enough
-	proveItsMine(theSpace->voltage, nPoints * sizeof(double));
+	proveItsMine(space->voltage, nPoints * sizeof(double));
 
 	// and the avatars' waves and vbufs
-	proveItsMine(theSpace->mainAvatar->qwave->wave, nPoints * sizeof(qCx));
-	proveItsMine(theSpace->mainAvatar->vBuffer, nPoints * 8 * sizeof(float));
-	proveItsMine(theSpace->miniGraphAvatar->qwave->wave, nPoints * sizeof(qCx));
-	proveItsMine(theSpace->miniGraphAvatar->vBuffer, nPoints * 8 * sizeof(float));
+	proveItsMine(space->mainAvatar->qwave->wave, nPoints * sizeof(qCx));
+	proveItsMine(space->mainAvatar->vBuffer, nPoints * 8 * sizeof(float));
+	proveItsMine(space->miniGraphAvatar->qwave->wave, nPoints * sizeof(qCx));
+	proveItsMine(space->miniGraphAvatar->vBuffer, nPoints * 8 * sizeof(float));
 
-	deleteTheSpace(space);
+	deleteFullSpace(space);
 
 //	printf("🧨 🧨       completeNewSpaceGauntlet() completed\n");
 }
