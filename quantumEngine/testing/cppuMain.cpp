@@ -11,7 +11,7 @@
 #include "../greiman/qAvatar.h"
 #include "../greiman/qViewBuffer.h"
 #include "../schrodinger/qGrinder.h"
-#include "../spaceWave/qSpace.h"
+#include "../hilbert/qSpace.h"
 
 #include "CppUTest/TestHarness.h"
 #include "CppUTest/CommandLineTestRunner.h"

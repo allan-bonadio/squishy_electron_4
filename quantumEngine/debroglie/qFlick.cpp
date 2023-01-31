@@ -5,7 +5,7 @@
 
 #include <cstring>
 #include <stdexcept>
-#include "../spaceWave/qSpace.h"
+#include "../hilbert/qSpace.h"
 #include "qFlick.h"
 
 static bool traceConstruction = false;
@@ -13,29 +13,75 @@ static bool traceConstruction = false;
 // here ix still points to the x location in the wave
 // but serial points to which wave in the flick
 
-/* ************************************************************ boundaries */
+/* ************************************************************ edges */
 
 // set to 'not yet encountered'
-void segmentBoundary::init(void) {
+void edge::init(void) {
 	lock = 0;
 	boundary = -1;
 	loDone = hiDone = false;
+	isFixed = false;
 }
 
-int segmentBoundary::claim(void) {
+int edge::claim(void) {
 	return 0;
 }
 
-void segmentBoundary::iterate(void) {
+void edge::iterate(void) {
 
 }
 
+
+/* ************************************************************ threadProgress */
+
+worker::worker(qFlick *fl) {
+	flick = fl;
+}
+
+void worker::next(void) {
+	// advance the behind
+	edge *nextBehind = behind + flick->nWorkers;
+
+	behind = nextBehind;
+
+
+
+	ahead += flick->nWorkers;
+}
+
+/* ************************************************************ integration on the flick */
+
+// set up our edges and threads to get ready for a new integration
+void qFlick::setup(void) {
+	edge *endEdge = edges + nEdges;
+
+	for (int b = 0; b < nEdges; b++) {
+		edges[b].init();
+	}
+
+	// for WELL dimensions, fix the 0-th edge for each wave
+	if (contWELL == space->dimensions[0].continuum) {
+		for (edge *e = edges; e < endEdge; e += nWorkers)
+			e->isFixed = true;
+	}
+
+	// the workers all point to the edges that concern them
+	// edges for the 0-th wave
+	for (int w = 0; w < nWorkers; w++) {
+		worker *work = workers + w;
+		work->behind = edges + w;
+		work->ahead = edges + w + 1;
+
+		// this should span the wave with rougly equal boundaries
+		edges[w].boundary =  w * space->nStates / nWorkers;
+	}
+}
 
 /* ************************************************************ birth & death & basics */
 
 // each buffer is initialized to zero bytes therefore 0.0 everywhere
 qFlick::qFlick(qSpace *space, qGrinder *gr, int nW, int nThr) :
-	qWave(space), qgrinder(gr), nWaves(nW), nThreads(nThr), currentWave(0)
+	qWave(space), qgrinder(gr), nWaves(nW), nWorkers(nThr), currentWave(0)
 {
 	if (! space)
 		throw std::runtime_error("qSpectrum::qSpectrum null space");
@@ -53,12 +99,10 @@ qFlick::qFlick(qSpace *space, qGrinder *gr, int nW, int nThr) :
 	for (int w = 1; w < nWaves; w++)
 		waves[w] = allocateWave(nPoints);
 
-	// all the boundaries
-	nBoundaries = nThreads * nWaves;
-	boundaries = (segmentBoundary *) malloc(nBoundaries * sizeof(segmentBoundary));
-	for (int b = 0; b < nBoundaries; b++) {
-		boundaries[b].init();
-	}
+	// all the edges, and all the workers, in big arrays
+	nEdges = nWorkers * nWaves;
+	edges = (edge *) malloc(nEdges * sizeof(edge));
+	workers = (worker *) malloc(nWorkers * sizeof(edge));
 }
 
 qFlick::~qFlick() {
@@ -382,7 +426,7 @@ void qFlick::setCurrent(int newSerial) {
 //		wave[ix] = qCx(cos(angle), sin(angle + vGap));
 ////		printf("        wave[%3d] =%lf, %lf\n", ix, wave[ix].re, wave[ix].im);
 //	}
-////	printf("flick, before boundaries, 1 copy");
+////	printf("flick, before edges, 1 copy");
 //	fixBoundaries();
 ////	printf("flick, freshly generated, 1 copy");
 ////	dumpThatWave(wave, true);

@@ -4,7 +4,7 @@
 */
 
 
-#include "../spaceWave/qSpace.h"
+#include "../hilbert/qSpace.h"
 #include "../greiman/qAvatar.h"
 #include "./qGrinder.h"
 

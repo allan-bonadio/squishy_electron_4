@@ -8,7 +8,7 @@
 //#include <cmath>
 
 
-#include "spaceWave/qSpace.h"
+#include "hilbert/qSpace.h"
 #include "greiman/qAvatar.h"
 #include "schrodinger/qGrinder.h"
 #include "fourier/fftMain.h"

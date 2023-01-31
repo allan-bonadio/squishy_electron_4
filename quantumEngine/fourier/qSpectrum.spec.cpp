@@ -4,7 +4,7 @@
 */
 
 #include "qSpectrum.h"
-#include "../spaceWave/qSpace.h"
+#include "../hilbert/qSpace.h"
 #include "../greiman/qAvatar.h"
 #include "../schrodinger/qGrinder.h"
 #include "../testing/cppuMain.h"

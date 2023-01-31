@@ -10,7 +10,7 @@ schrodinger/hamiltonian.cpp
 greiman/qAvatar.cpp
 schrodinger/qThread.cpp
 schrodinger/visscher.cpp
-spaceWave/jsSpace.cpp
-spaceWave/qSpace.cpp
+hilbert/jsSpace.cpp
+hilbert/qSpace.cpp
 greiman/qViewBuffer.cpp
 misc.cpp

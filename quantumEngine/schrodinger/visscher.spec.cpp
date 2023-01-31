@@ -5,7 +5,7 @@
 
 
 #include "../debroglie/qWave.h"
-#include "../spaceWave/qSpace.h"
+#include "../hilbert/qSpace.h"
 #include "../testing/cppuMain.h"
 #include "../greiman/qAvatar.h"
 #include "qGrinder.h"

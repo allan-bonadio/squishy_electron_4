@@ -3,29 +3,31 @@
 ** Copyright (C) 2021-2023 Tactile Interactive, all rights reserved
 */
 
+#include <atomic>
 #include "qWave.h"
 
 // one of these for every segment, for every wave.
 // Segment starts at this boundary, extends to next boundary.
+// wraps around after nWorkers segments.
 // each thread is concerned with the same two serial segments for each wave
 // eg thread 3 is concerned with segmentBoundaries 3 and 4
 // and integrates the points between them
-struct segmentBoundary {
-	// start of this segment as an ix index, or -1 if not yet decided.
-	// Decided by first thread who gets here. Wraps around modulo N,
-	// but always has start added in.
-	short boundary;
-
+struct edge {
 	// true to protect boundary, loDone and hiDone while being set/read
 	// read/write lock?  0=unlocked, 1=readLock, 3=writeLock
 	// maybe not; the pthreads book describes how complex they are.
 	// meanwhile, only two threads will contend for a given boundary.
-	int lock;
+	std::atomic_int lock;
 	//short nReadLocks;
+
+	// start of this segment as an ix index into the wave, or -1 if not yet decided.
+	// Decided by first thread who gets here. Wraps around modulo N,
+	// but always has start added in.
+	short boundary;
 
 	// tells if the point at [boundary-1] and [boundary] are done iterating
 	// if so, the ahead thread doesn't have to change the boundary to claim it.
-	bool loDone;
+	bool loDone;  // [boundary-1]
 	bool hiDone;
 
 	void init(void);  // restarts it as boundary=-1 (undecided) and unlocked
@@ -35,15 +37,31 @@ struct segmentBoundary {
 	// or just a bool?
 	int claim(void);
 
-	// locks the two boundaries, and iterates all points in between
+	// true if we have WELL continuum and this is edge 0 for a given wave
+	bool isFixed;
+
+	bool reserved1;
+	short reserved2;
+
+	// locks the two edges, and iterates all points in between
 	void iterate(void);
 };
 
+// one for each thread, keeps track of where it is.
+struct worker {
+	worker(struct qFlick *flick);
+
+	struct qFlick *flick;
+	edge *behind;  // we are the 'hi' end of this boundary
+	edge *ahead; // we are the 'lo' end of this boundary
+
+	void next();
+};
 
 // Multiple complex buffers identical to the single qWave buffer.
 // The qBuffer 'wave' var points to whichever wave in the sequence is the 'it' wave
 struct qFlick : public qWave {
-	qFlick(qSpace *space, qGrinder *qgr, int nWaves, int nThreads);
+	qFlick(qSpace *space, qGrinder *qgr, int nWaves, int nWorkers);
 	~qFlick();
 
 	qGrinder *qgrinder;
@@ -59,11 +77,13 @@ struct qFlick : public qWave {
 	qCx **waves;
 	int nWaves;
 
-	// array of nThreads x nWaves segmentBoundaries
-	segmentBoundary *boundaries;
-	int nBoundaries;
+	// array of nWorkers x nWaves segmentBoundaries
+	int nEdges;
+	edge *edges;
 
-	int nThreads;
+	// list of workers
+	int nWorkers;
+	worker *workers;
 
 	// create and add a new buffer, zeroed, at the 0 position, pushing the others up
 	void pushWave(void);
@@ -87,5 +107,7 @@ struct qFlick : public qWave {
 	double magnitude(int ix = 1) { return magnitude(1, ix); }
 	qCx value(int ix = 1) { return value(1, ix); }
 
+	// set up our edges and threads to get ready for a new integration
+	void setup(void);
 };
 

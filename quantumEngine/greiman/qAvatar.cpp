@@ -8,7 +8,7 @@
 #include <limits>
 #include <cfenv>
 
-#include "../spaceWave/qSpace.h"
+#include "../hilbert/qSpace.h"
 #include "qAvatar.h"
 #include "../schrodinger/qGrinder.h"
 #include "../debroglie/qWave.h"

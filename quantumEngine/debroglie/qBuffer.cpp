@@ -18,7 +18,7 @@ qFlick - object that owns a list of waves, and points to its space
 #include <cstring>
 #include <stdexcept>
 
-#include "../spaceWave/qSpace.h"
+#include "../hilbert/qSpace.h"
 #include "qBuffer.h"
 
 static bool traceInnerProduct = false;

@@ -19,9 +19,9 @@ echo "node args; they will be passed through."
 # create a space-sep list of ALL the cpp files (almost all)
 allCpp=`cat building/allCpp.list`
 
-mt=" testing/main.test.cpp testing/spaceWave/qCx.test.cpp "
-et=" testing/rk2.test.cpp testing/spaceWave/vissFlicks.test.cpp "
-swt="testing/spaceWave/space.test.cpp  testing/spaceWave/wave.test.cpp "
+mt=" testing/main.test.cpp testing/hilbert/qCx.test.cpp "
+et=" testing/rk2.test.cpp testing/hilbert/vissFlicks.test.cpp "
+swt="testing/hilbert/space.test.cpp  testing/hilbert/wave.test.cpp "
 allTesters=" $mt $et $swt "
 
 # note that main.cpp is NOT included in the .cpp files; that's for web use only
