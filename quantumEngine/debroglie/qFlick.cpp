@@ -5,7 +5,9 @@
 
 #include <cstring>
 #include <stdexcept>
+
 #include "../hilbert/qSpace.h"
+#include "../schrodinger/qGrinder.h"
 #include "qFlick.h"
 
 static bool traceConstruction = false;
@@ -15,12 +17,24 @@ static bool traceConstruction = false;
 
 /* ************************************************************ edges */
 
+// no constructor cuz always created as part of array
+
 // set to 'not yet encountered'
-void edge::init(void) {
-	lock = 0;
-	boundary = -1;
+void edge::init(qFlick *fl, int ser) {
+	flick = fl;
+	serial = ser;
+}
+
+// before every frame, reset ALL the edges
+void edge::reset(void) {
+	lock = UNLOCKED;
+	boundary = UNDECIDED;
 	loDone = hiDone = false;
 	isFixed = false;
+}
+
+void edge::dump(void) {
+	printf("edge: %p %d\n", flick, serial);
 }
 
 int edge::claim(void) {
@@ -28,60 +42,134 @@ int edge::claim(void) {
 }
 
 void edge::iterate(void) {
-
 }
 
 
 /* ************************************************************ threadProgress */
 
-worker::worker(qFlick *fl) {
+// no constructor cuz always created as part of array
+
+// upon creation
+void tProgress::init(qFlick *fl, int ser)  {
 	flick = fl;
+	serial = ser;
 }
 
-void worker::next(void) {
+// before every frame
+void tProgress::reset(edge *b, edge *a) {
+	behind = b;
+	ahead = a;
+}
+
+void tProgress::dump(void) {
+	printf("tProgress: %p %d\n", flick, serial);
+	printf("\t");
+	behind->dump();
+	printf("\t");
+	ahead->dump();
+}
+
+void tProgress::next(void) {
+	// since I'm done with this wave, the edge->boundary has been set on both edges,
+	// so I can read them without locking.
+
 	// advance the behind
-	edge *nextBehind = behind + flick->nWorkers;
+	edge *nextBehind = behind + flick->nTProgresses;
 
 	behind = nextBehind;
 
 
 
-	ahead += flick->nWorkers;
+	edge *nextAhead = ahead + flick->nTProgresses;
+	ahead = nextAhead;
 }
+
+/* loop must look kinda like this:
+
+## Integrate
+1) quickly integrate edge points, so neighboring threads can proceed
+	- realStep lowest 2 points, behind->hi->boundary, boundary+1
+	- realStep highest 2 points, ahead->lo->boundary-2, boundary-1
+
+	- imagStep lowest point, , behind->hi->boundary, then set hiDone in behind edge
+	- imagStep highest point, ahead->lo->boundary-1, then set loDone in ahead edge
+
+	- correctly handle cases where boundaries are <4 apart
+	:: need stepOneReal(), stepOneImaginary(), and integrateEdgePoints() for a thread
+
+2) do the rest of integration
+	- realStep all the points in between, behind->boundary+2 thru ahead->lo->boundary-3
+	- imagStep all the points in between, behind->hi->boundary+1 thru ahead->lo->boundary-2
+	:: need integrateInnerPoints() to do this
+
+3) Claim edges in next generation/wave
+	- if this-gen behind->loDone, set next-gen behind->boundary to this-gen behind-boundary
+		unless already set
+	- else, set next-gen behind->boundary to this-gen behind-boundary + 1
+	- if this-gen ahead->hiDone, set next-gen ahead->boundary to this-gen behind-boundary
+		unless already set
+	- else, set next-gen ahead->boundary to this-gen ahead-boundary - 1
+	:: need claimBehind() and claimAhead()
+
+## Midpoint:
+Actually, need to make some distinctions between different generations for midpoint method.
+A) integrate generation G, hamiltonian at G, to product G+1
+B) integrate generation G, hamiltonian at G+1, to product G+2
+C) average G+1 and G+2 into G+3.  Can't reuse G+2 cuz neighboring threads need originals.
+	part C should be exactly same boundaries as part B, should be ready to go (?)
+
+## etc
+- number of waves may or may not be stepsPerFrame so the whole buffer does one frame
+- if nWaves are shorter than stepsPerFrame, need a mechanism to loop around to 0-th wave again
+- need to call qFlick::reset upon start of frame
+- need mechanism to stop threads when they finish their last generation
+- need mechanism to stop a thread if its boundaries shrink the segment to 1 or 0 length,
+	then restart it when others pass it.
+
+*/
 
 /* ************************************************************ integration on the flick */
 
-// set up our edges and threads to get ready for a new integration
-void qFlick::setup(void) {
-	edge *endEdge = edges + nEdges;
+// set up our edges and tProgresses to get ready for a new integration
+void qFlick::reset(void) {
 
-	for (int b = 0; b < nEdges; b++) {
-		edges[b].init();
-	}
+	for (int b = 0; b < nEdges; b++)
+		edges[b].reset();
 
 	// for WELL dimensions, fix the 0-th edge for each wave
 	if (contWELL == space->dimensions[0].continuum) {
-		for (edge *e = edges; e < endEdge; e += nWorkers)
+		for (edge *e = edges; e < endEdge; e += nTProgresses)
 			e->isFixed = true;
 	}
 
-	// the workers all point to the edges that concern them
+	// the tProgresses all point to the edges that concern them
 	// edges for the 0-th wave
-	for (int w = 0; w < nWorkers; w++) {
-		worker *work = workers + w;
-		work->behind = edges + w;
-		work->ahead = edges + w + 1;
+	for (int w = 0; w < nTProgresses; w++) {
+		tProgresses[w].reset(&edges[w], &edges[(w + 1) & mask]);
 
-		// this should span the wave with rougly equal boundaries
-		edges[w].boundary =  w * space->nStates / nWorkers;
+		// this should span the wave with roughly equal segments.  for starters.
+		edges[w].boundary =  w * space->nStates / nTProgresses;
 	}
+}
+
+void qFlick::dumpEdges(int start, int end) {
+	if (end > nEdges)
+		end = nEdges;
+	for (int e = 0; e < nTProgresses; e++)
+		edges[e].dump();
+}
+
+void qFlick::dumpTProgress(void) {
+	for (int w = 0; w < nTProgresses; w++)
+		tProgresses[w].dump();
+
 }
 
 /* ************************************************************ birth & death & basics */
 
 // each buffer is initialized to zero bytes therefore 0.0 everywhere
-qFlick::qFlick(qSpace *space, qGrinder *gr, int nW, int nThr) :
-	qWave(space), qgrinder(gr), nWaves(nW), nWorkers(nThr), currentWave(0)
+qFlick::qFlick(qSpace *space, qGrinder *gr, int nW, int nThr)
+	: qWave(space), qgrinder(gr), nWaves(nW), nTProgresses(nThr), currentWave(0)
 {
 	if (! space)
 		throw std::runtime_error("qSpectrum::qSpectrum null space");
@@ -91,19 +179,31 @@ qFlick::qFlick(qSpace *space, qGrinder *gr, int nW, int nThr) :
 	magic = 'Flic';
 
 	// array of waves, just the pointers to them
-	waves = (qCx **) malloc(nWaves * sizeof(qCx *));
+	waves = (qCx **) calloc(nPoints, sizeof(qCx *));
 
 	// being a qWave, we already have one, just need the rest.  For many purposes,
-	// waves[0] === wave so use qFlick just like it was a qWave
 	waves[0] = wave;
 	for (int w = 1; w < nWaves; w++)
 		waves[w] = allocateWave(nPoints);
 
-	// all the edges, and all the workers, in big arrays
-	nEdges = nWorkers * nWaves;
-	edges = (edge *) malloc(nEdges * sizeof(edge));
-	workers = (worker *) malloc(nWorkers * sizeof(edge));
+	tProgresses = new tProgress[nTProgresses];
+	for (int w = 0; w < nTProgresses; w++)
+		tProgresses[w].init(this, w);
+
+	// all the edges, and all the tProgresses, in big arrays
+	nEdges = nTProgresses * nWaves;
+	edges = new edge[nEdges];
+	for (int e = 0; e < nTProgresses; e++)
+		edges[e].init(this, e);
+	endEdge = edges + nEdges;
+
+	mask = space->nStates - 1;
+
+
+	reset();
+	dumpTProgress();
 }
+
 
 qFlick::~qFlick() {
 	if (traceConstruction)
@@ -115,10 +215,10 @@ qFlick::~qFlick() {
 		freeWave(waves[i]);
 		waves[i] = NULL;
 	}
+	delete waves;
 	if (traceConstruction)
 		printf("    freed most of the buffers...\n");
 
-	free(waves);
 	waves = NULL;
 	if (traceConstruction)
 		printf("    freed waves..done with qFlick destructor..\n");
