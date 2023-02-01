@@ -143,13 +143,8 @@ static bool traceConstruction = false;
 /* ************************************************************ birth & death & basics */
 
 // each buffer is initialized to zero bytes therefore 0.0 everywhere
-<<<<<<< Updated upstream
-qFlick::qFlick(qSpace *space, qGrinder *gr, int nW, int nThr) :
-	qWave(space), qgrinder(gr), nWaves(nW), nWorkers(nThr), currentWave(0)
-=======
 qFlick::qFlick(qSpace *space, int nW)
 	: qWave(space), nWaves(nW), currentWave(0)
->>>>>>> Stashed changes
 {
 	if (! space)
 		throw std::runtime_error("qFlick::qFlick null space");
@@ -166,14 +161,6 @@ qFlick::qFlick(qSpace *space, int nW)
 	waves[0] = wave;
 	for (int w = 1; w < nWaves; w++)
 		waves[w] = allocateWave(nPoints);
-<<<<<<< Updated upstream
-
-	// all the edges, and all the workers, in big arrays
-	nEdges = nWorkers * nWaves;
-	edges = (edge *) malloc(nEdges * sizeof(edge));
-	workers = (worker *) malloc(nWorkers * sizeof(edge));
-=======
->>>>>>> Stashed changes
 }
 
 qFlick::~qFlick() {
@@ -186,15 +173,12 @@ qFlick::~qFlick() {
 		freeWave(waves[i]);
 		waves[i] = NULL;
 	}
-<<<<<<< Updated upstream
-=======
 	free(waves);
->>>>>>> Stashed changes
+	waves = NULL;
+
 	if (traceConstruction)
 		printf("    freed most of the buffers...\n");
 
-	free(waves);
-	waves = NULL;
 	if (traceConstruction)
 		printf("    freed waves..done with qFlick destructor..\n");
 }
