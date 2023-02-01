@@ -51,7 +51,7 @@ let importantWorkerStuff = {reactBuildType: null,serial: null, avatarPointer: nu
 //console.info(` 🧽   WebAssembly?.Module?.cwrap:`,WebAssembly?.Module?.cwrap );
 
 // copied out of qe.js
-//const avatar_oneIntegration = WebAssembly?.Module?.cwrap('avatar_oneIntegration', null, ['number']);
+//const avatar_oneFrame = WebAssembly?.Module?.cwrap('avatar_oneFrame', null, ['number']);
 
 postMessage({verb: 'ping', message: `the thread lives!`});
 
@@ -147,7 +147,7 @@ debugger;
 function frame(msg) {
 	// time to frame again!  will start After any current frame finishes
 	console.log(`time to frame again!  will start After any current frame finishes`);
-	// wait for it ... avatar_oneIntegration?.(msg.avatarPointer);
+	// wait for it ... avatar_oneFrame?.(msg.avatarPointer);
 }
 
 

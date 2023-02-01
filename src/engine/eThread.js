@@ -118,7 +118,7 @@ class eThread {
 	}
 
 	// tell the thread(s) to do 1 frame, like we did synchronously but now done by the thread(s)
-	static oneIntegration(avatar) {
+	static oneFrame(avatar) {
 		// i have to think of what to do if there's no workers available...
 		if (eThread.doingThreads) {
 			if (traceIntegration)
@@ -128,7 +128,7 @@ class eThread {
 		else {
 			if (traceIntegration)
 				console.log(`⛏ eThread postMessage directly cuz no threads`);
-			qe.grinder_oneIntegration(avatar.pointer);
+			qe.grinder_oneFrame(avatar.pointer);
 		}
 	}
 

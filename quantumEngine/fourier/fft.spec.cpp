@@ -13,6 +13,8 @@
 #include "../schrodinger/qGrinder.h"
 #include "../debroglie/qWave.h"
 #include "qSpectrum.h"
+
+#include "../testing/testingHelpers.h"
 #include "../testing/cppuMain.h"
 
 #include "CppUTest/TestHarness.h"

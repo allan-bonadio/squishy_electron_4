@@ -16,75 +16,143 @@ static bool traceConstruction = false;
 /* ************************************************************ edges */
 
 // set to 'not yet encountered'
-void edge::init(void) {
-	lock = 0;
-	boundary = -1;
-	loDone = hiDone = false;
-	isFixed = false;
-}
+//<<<<<<< Updated upstream
+//void edge::init(void) {
+//	lock = 0;
+//	boundary = -1;
+//	loDone = hiDone = false;
+//	isFixed = false;
+//}
+//
+//int edge::claim(void) {
+//	return 0;
+//}
+//
+//void edge::iterate(void) {
+//
+//}
 
-int edge::claim(void) {
-	return 0;
-}
-
-void edge::iterate(void) {
-
-}
+//void edge::init(qFlick *fl, int ser) {
+//	flick = fl;
+//	serial = ser;
+//}
+//
+//// before every frame, reset ALL the edges
+//void edge::reset(void) {
+//	lock = UNLOCKED;
+//	boundary = UNDECIDED;
+//	loDone = hiDone = false;
+//	isFixed = false;
+//}
+//
+//void edge::dump(void) {
+//	printf("edge: %p %d\n", flick, serial);
+//}
+//
+//int edge::claim(void) {
+//	return 0;
+//}
+//
+//void edge::iterate(void) {
+//}
 
 
 /* ************************************************************ threadProgress */
 
-worker::worker(qFlick *fl) {
-	flick = fl;
-}
+//worker::worker(qFlick *fl) {
+//	flick = fl;
+//}
+//
+//void worker::next(void) {
+//	// advance the behind
+//	edge *nextBehind = behind + flick->nWorkers;
+//
+//	behind = nextBehind;
+//
+//
+//
+//	ahead += flick->nWorkers;
+//}
+//
+///* ************************************************************ integration on the flick */
+//
+//// set up our edges and threads to get ready for a new integration
+//void qFlick::setup(void) {
+//	edge *endEdge = edges + nEdges;
+//
+//	for (int b = 0; b < nEdges; b++) {
+//		edges[b].init();
+//	}
+//
+//	// for WELL dimensions, fix the 0-th edge for each wave
+//	if (contWELL == space->dimensions[0].continuum) {
+//		for (edge *e = edges; e < endEdge; e += nWorkers)
+//			e->isFixed = true;
+//	}
+//
+//	// the workers all point to the edges that concern them
+//	// edges for the 0-th wave
+//	for (int w = 0; w < nWorkers; w++) {
+//		worker *work = workers + w;
+//		work->behind = edges + w;
+//		work->ahead = edges + w + 1;
+//
+//		// this should span the wave with rougly equal boundaries
+//		edges[w].boundary =  w * space->nStates / nWorkers;
+//	}
+//}
 
-void worker::next(void) {
-	// advance the behind
-	edge *nextBehind = behind + flick->nWorkers;
+// no constructor cuz always created as part of array
 
-	behind = nextBehind;
-
-
-
-	ahead += flick->nWorkers;
-}
-
-/* ************************************************************ integration on the flick */
-
-// set up our edges and threads to get ready for a new integration
-void qFlick::setup(void) {
-	edge *endEdge = edges + nEdges;
-
-	for (int b = 0; b < nEdges; b++) {
-		edges[b].init();
-	}
-
-	// for WELL dimensions, fix the 0-th edge for each wave
-	if (contWELL == space->dimensions[0].continuum) {
-		for (edge *e = edges; e < endEdge; e += nWorkers)
-			e->isFixed = true;
-	}
-
-	// the workers all point to the edges that concern them
-	// edges for the 0-th wave
-	for (int w = 0; w < nWorkers; w++) {
-		worker *work = workers + w;
-		work->behind = edges + w;
-		work->ahead = edges + w + 1;
-
-		// this should span the wave with rougly equal boundaries
-		edges[w].boundary =  w * space->nStates / nWorkers;
-	}
-}
+// upon creation
+//void tProgress::init(qFlick *fl, int ser)  {
+//	flick = fl;
+//	serial = ser;
+//}
+//
+//// before every frame
+//void tProgress::reset(edge *b, edge *a) {
+//	behind = b;
+//	ahead = a;
+//}
+//
+//void tProgress::dump(void) {
+//	printf("tProgress: %p %d\n", flick, serial);
+//	printf("\t");
+//	behind->dump();
+//	printf("\t");
+//	ahead->dump();
+//}
+//
+//void tProgress::next(void) {
+//	// since I'm done with this wave, the edge->boundary has been set on both edges,
+//	// so I can read them without locking.
+//
+//	// advance the behind
+//	edge *nextBehind = behind + flick->nTProgresses;
+//
+//	behind = nextBehind;
+//
+//
+//
+//	edge *nextAhead = ahead + flick->nTProgresses;
+//	ahead = nextAhead;
+//}
+//
 
 /* ************************************************************ birth & death & basics */
 
 // each buffer is initialized to zero bytes therefore 0.0 everywhere
+<<<<<<< Updated upstream
 qFlick::qFlick(qSpace *space, qGrinder *gr, int nW, int nThr) :
 	qWave(space), qgrinder(gr), nWaves(nW), nWorkers(nThr), currentWave(0)
+=======
+qFlick::qFlick(qSpace *space, int nW)
+	: qWave(space), nWaves(nW), currentWave(0)
+>>>>>>> Stashed changes
 {
 	if (! space)
-		throw std::runtime_error("qSpectrum::qSpectrum null space");
+		throw std::runtime_error("qFlick::qFlick null space");
 	if (nWaves < 2) throw std::runtime_error("nWaves must be at least 2");
 	if (nWaves > 1000) throw std::runtime_error("nWaves is too big, sure you want that?");
 
@@ -98,11 +166,14 @@ qFlick::qFlick(qSpace *space, qGrinder *gr, int nW, int nThr) :
 	waves[0] = wave;
 	for (int w = 1; w < nWaves; w++)
 		waves[w] = allocateWave(nPoints);
+<<<<<<< Updated upstream
 
 	// all the edges, and all the workers, in big arrays
 	nEdges = nWorkers * nWaves;
 	edges = (edge *) malloc(nEdges * sizeof(edge));
 	workers = (worker *) malloc(nWorkers * sizeof(edge));
+=======
+>>>>>>> Stashed changes
 }
 
 qFlick::~qFlick() {
@@ -115,6 +186,10 @@ qFlick::~qFlick() {
 		freeWave(waves[i]);
 		waves[i] = NULL;
 	}
+<<<<<<< Updated upstream
+=======
+	free(waves);
+>>>>>>> Stashed changes
 	if (traceConstruction)
 		printf("    freed most of the buffers...\n");
 

@@ -6,10 +6,12 @@
 
 #include "../debroglie/qWave.h"
 #include "../hilbert/qSpace.h"
-#include "../testing/cppuMain.h"
 #include "../greiman/qAvatar.h"
 #include "qGrinder.h"
 #include "../debroglie/qFlick.h"
+
+#include "../testing/testingHelpers.h"
+#include "../testing/cppuMain.h"
 
 #include "CppUTest/TestHarness.h"
 

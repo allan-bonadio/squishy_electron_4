@@ -28,7 +28,7 @@ extern double getTimeDouble(void);
 #endif
 
 // use this for tracing without needing the debugger.
-#define FOOTPRINT  printf("FOOTPRINT 🦶 %s() in %s:%d\n", __FUNCTION__, __FILE__, __LINE__);
+#define FOOTPRINT  printf("🦶 FOOTPRINT 🦶 %s() in %s:%d 🦶\n", __FUNCTION__, __FILE__, __LINE__);
 
 // Uncomment only the first line below, for normal operation.
 // When you change some field arrangements or sizes for the major objects that are

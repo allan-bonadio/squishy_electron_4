@@ -6,6 +6,10 @@
 //extern class qSpace *theSpace;
 //extern double *theVoltage;
 
+#ifndef __QSPACE_H__
+#define __QSPACE_H__
+
+// not even used these days
 extern qCx hamiltonian(struct qSpace *space, qCx *wave, int x);
 //extern void qeStarted(void);
 
@@ -124,3 +128,4 @@ extern "C" {
 	void deleteFullSpace(qSpace *space);
 }
 
+#endif

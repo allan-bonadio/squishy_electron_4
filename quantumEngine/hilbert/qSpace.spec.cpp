@@ -9,6 +9,8 @@
 #include "../schrodinger/qGrinder.h"
 #include "../debroglie/qWave.h"
 #include "../greiman/qViewBuffer.h"
+
+#include "../testing/testingHelpers.h"
 #include "../testing/cppuMain.h"
 
 #include "CppUTest/TestHarness.h"
@@ -155,7 +157,7 @@ void completeNewSpaceGauntlet(int N) {
 
 	deleteFullSpace(space);
 
-//	printf("🧨 🧨       completeNewSpaceGauntlet() completed\n");
+	//printf("🧨 🧨       deleteFullSpace() completed\n");
 }
 
 TEST(qSpace, qSpace_CompleteNewSpaceGauntlet4096) { completeNewSpaceGauntlet(4096); }

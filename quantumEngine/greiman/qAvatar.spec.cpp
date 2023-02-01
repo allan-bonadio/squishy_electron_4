@@ -9,8 +9,10 @@
 #include "../schrodinger/qGrinder.h"
 #include "../debroglie/qWave.h"
 #include "qViewBuffer.h"
-#include "../testing/cppuMain.h"
 #include "../fourier/qSpectrum.h"
+
+#include "../testing/testingHelpers.h"
+#include "../testing/cppuMain.h"
 
 #include "CppUTest/TestHarness.h"
 

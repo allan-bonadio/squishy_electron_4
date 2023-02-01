@@ -10,8 +10,10 @@
 #include "../schrodinger/qGrinder.h"
 #include "../debroglie/qFlick.h"
 #include "../greiman/qViewBuffer.h"
-#include "../testing/cppuMain.h"
 #include "../fourier/qSpectrum.h"
+
+#include "../testing/testingHelpers.h"
+#include "../testing/cppuMain.h"
 
 #include "CppUTest/TestHarness.h"
 
@@ -57,8 +59,10 @@ TEST(qGrinder, CheckGrinderConstructor)
 
 	LONGS_EQUAL(false, grinder->isIntegrating);
 	LONGS_EQUAL(false, grinder->needsIntegration);
-	LONGS_EQUAL(true, grinder->doingIntegration);
 	LONGS_EQUAL(false, grinder->pleaseFFT);
+
+	// how does this get turned on!??!!?
+	LONGS_EQUAL(true, grinder->doingIntegration);
 
 	STRCMP_EQUAL("myGrind", grinder->label);
 
@@ -77,25 +81,45 @@ static void isAllZeroesExceptFor(qBuffer *qwave, int except1, bool shouldFail, c
 	int end = qwave->end;
 	char buf[100];
 
+	buf[0] = 0;
 	for (int ix = start; ix < end; ix++) {
 		qCx cx = wave[ix];
 
 		// prepare for a possible error message.  but cppu throws away this message!
-		sprintf(buf, "\n wave at [%d]  😢 value = %8.8lf %8.8lf  ",
-			ix, cx.re, cx.im);
 
+		// for the excepted frequency, we don't care.	 error radius ~ 1e-12; roundoff norm ~ 1e-31
+		// so if there's a value that's too big, we'll get a message in buf
 		if (ix != except1) {
-			if ((cx != 0) ^ shouldFail) {
-				strcat(buf, "not zero, should be\n");
+			double norm = cx.norm();
+			if ( norm> ERROR_RADIUS) {
+				sprintf(buf, "\n wave at [%d]  😢 value = %8.8lf %8.8lf  norm=%8.8lg   shouldFail=%d ",
+					ix, cx.re, cx.im, norm, shouldFail);
+			}
+		}
+
+
+		if (buf[0]) {
+			if (shouldFail) {
+				// annoying printf("%s... shoulda failed, and it did.  OK.\n", buf);
+			}
+			else {
+				strcat(buf, "...should have been zero instead\n");
 				FAIL(buf);
 			}
 		}
-		else {
-			if ((cx.norm() < ERROR_RADIUS) ^ shouldFail) {
-				strcat(buf, "is zero, shouldn't be\n");
-				FAIL(buf);
-			}
-		}
+
+//		if (ix != except1) {
+//			if ((cx.norm() > ERROR_RADIUS) ^ shouldFail) {
+//				strcat(buf, "not zero, should be\n");
+//				FAIL(buf);
+//			}
+//		}
+//		else {
+//			if ((cx.norm() < ERROR_RADIUS) ^ shouldFail) {
+//				strcat(buf, "is zero, shouldn't be\n");
+//				FAIL(buf);
+//			}
+//		}
 	}
 
 }

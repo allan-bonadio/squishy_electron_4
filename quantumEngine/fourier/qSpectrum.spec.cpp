@@ -7,6 +7,8 @@
 #include "../hilbert/qSpace.h"
 #include "../greiman/qAvatar.h"
 #include "../schrodinger/qGrinder.h"
+
+#include "../testing/testingHelpers.h"
 #include "../testing/cppuMain.h"
 
 #include "CppUTest/TestHarness.h"

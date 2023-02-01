@@ -38,9 +38,11 @@ alias qqa='cd $SQUISH_ROOT/articles'
 
 alias qqq='cd $SQUISH_ROOT/quantumEngine'
 alias qqqb='cd $SQUISH_ROOT/quantumEngine/building'
+alias qqqd='cd $SQUISH_ROOT/quantumEngine/debroglie'
 alias qqqf='cd $SQUISH_ROOT/quantumEngine/fourier'
 alias qqqg='cd $SQUISH_ROOT/quantumEngine/greimer'
 alias qqqh='cd $SQUISH_ROOT/quantumEngine/hilbert'
+alias qqqs='cd $SQUISH_ROOT/quantumEngine/schrodinger'
 alias qqqt='cd $SQUISH_ROOT/quantumEngine/testing'
 alias qqqw='cd $SQUISH_ROOT/quantumEngine/wasm'
 

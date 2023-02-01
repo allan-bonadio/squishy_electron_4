@@ -206,7 +206,7 @@ export class SquishPanel extends React.Component {
 	static divergedBlurb = `Sorry, but your quantum wave diverged!  This isn't your fault; it's a bug or limitation of the mathematical engine - it's just not as accurate as the real thing, and sometimes it just runs off the rails.  Unfortunately, you'll have to start over with a new wave.  Click on the Reset Wave button.`;
 
 	// do one integration frame
-	crunchoneIntegration() {
+	crunchoneFrame() {
 		if (traceIntegration) console.log(`👑 SquishPanel. about to frame`);
 
 		try {
@@ -247,7 +247,7 @@ export class SquishPanel extends React.Component {
 		this.iStats.startIntegration = performance.now();  // absolute beginning of integrate frame
 		// could be slow.
 		if (shouldIntegrate) {
-			this.crunchoneIntegration();
+			this.crunchoneFrame();
 			needsRepaint = true;
 		}
 		this.iStats.endCalc = performance.now();

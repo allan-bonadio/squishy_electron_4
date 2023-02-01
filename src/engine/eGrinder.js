@@ -81,8 +81,8 @@ class eGrinder {
 
 	/* **************************** end of direct accessors */
 	// can throw std::runtime_error("divergence")
-	oneIntegration() {
-		qe.grinder_oneIntegration(this.pointer);
+	oneFrame() {
+		qe.grinder_oneFrame(this.pointer);
 	}
 
 	// thisis what upper levels call when another frame is needed.
@@ -102,7 +102,7 @@ class eGrinder {
 			if (traceIntegration)
 				console.log(`🪓             eGrinder.pleaseIntegrate doing oneItration`);
 			this.needsIntegration = false;
-			eThread.oneIntegration(this);
+			eThread.oneFrame(this);
 			return true;
 		}
 	}

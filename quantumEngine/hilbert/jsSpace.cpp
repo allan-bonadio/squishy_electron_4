@@ -10,7 +10,7 @@
 #include "../greiman/qAvatar.h"
 #include "../schrodinger/qGrinder.h"
 #include "../debroglie/qWave.h"
-#include "../debroglie/qFlick.h"
+//#include "../debroglie/qFlick.h"
 #include "../greiman/qViewBuffer.h"
 
 static bool traceSpaceCreation = false;

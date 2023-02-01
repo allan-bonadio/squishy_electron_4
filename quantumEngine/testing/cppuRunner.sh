@@ -66,7 +66,7 @@ g++ -o wasm/cppuTestBin -Wno-tautological-undefined-compare  \
 	-include $CPPUTEST_HOME/include/CppUTest/MemoryLeakDetectorNewMacros.h \
 	-L$CPPUTEST_HOME/lib -lCppUTest -lCppUTestExt \
 	-include squish.h \
-	testing/cppuMain.cpp */*.spec.cpp \
+	testing/cppuMain.cpp testing/testingHelpers.cpp */*.spec.cpp \
 	$allCpp \
 	|| exit $?
 set +x
