@@ -49,7 +49,7 @@ qGrinder::qGrinder(qSpace *sp, qAvatar *av, const char *lab)
 	// number of waves; number of threads
 	qflick = new qFlick(space, this, 3, 2);
 
-	// so wave in the flick points to the zero-th wave
+	// so wave in the qflick points to the zero-th wave
 
 	qspect = NULL;  // until used
 
@@ -94,8 +94,8 @@ qGrinder::~qGrinder(void) {
 };
 
 // no - deleteSpace() deletes this
-//void grinder_delete(qGrinder *grinder) {
-//	delete grinder;
+//void grinder_delete(qGrinder *qgrinder) {
+//	delete qgrinder;
 //}
 
 // some uses never need this so wait till they do
@@ -329,7 +329,7 @@ void qGrinder::initIntegrationLoop(int a, int b, int c) {
 
 void grinder_initIntegrationLoop(qGrinder *pointer, int a, int b, int c) {pointer ->initIntegrationLoop(a, b, c);}
 
-void grinder_copyFromAvatar(qGrinder *grinder, qAvatar *avatar) {grinder->copyFromAvatar(avatar);}
-//	printf("grinder_copyFromAvatar; grinder='%s', avatar='%s'\n", (char *) grinder, (char *) avatar);
+void grinder_copyFromAvatar(qGrinder *qgrinder, qAvatar *avatar) {qgrinder->copyFromAvatar(avatar);}
+//	printf("grinder_copyFromAvatar; qgrinder='%s', avatar='%s'\n", (char *) qgrinder, (char *) avatar);
 
-void grinder_copyToAvatar(qGrinder *grinder, qAvatar *avatar) {grinder->copyToAvatar(avatar);}
+void grinder_copyToAvatar(qGrinder *qgrinder, qAvatar *avatar) {qgrinder->copyToAvatar(avatar);}

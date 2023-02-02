@@ -28,41 +28,43 @@ TEST(qGrinder, CheckGrinderConstructor)
 {
 	qSpace *space = makeBareSpace(8, contENDLESS);
 	qAvatar *avatar = new qAvatar(space, "grindAway");
-	qGrinder *grinder = new qGrinder(space, avatar, "myGrinder");
+	qGrinder *qgrinder = new qGrinder(space, avatar, "myGrinder");
 
-	LONGS_EQUAL('Grin', grinder->magic);
-	POINTERS_EQUAL(space, grinder->space);
-	POINTERS_EQUAL(avatar, grinder->avatar);
+	LONGS_EQUAL('Grin', qgrinder->magic);
+	POINTERS_EQUAL(space, qgrinder->space);
+	POINTERS_EQUAL(avatar, qgrinder->avatar);
 
-	DOUBLES_EQUAL(0., grinder->elapsedTime, ERROR_RADIUS);
-	DOUBLES_EQUAL(0., grinder->frameSerial, ERROR_RADIUS);
-	DOUBLES_EQUAL(1e-3, grinder->dt, ERROR_RADIUS);
-
-
-	LONGS_EQUAL(1, grinder->lowPassFilter);
-	LONGS_EQUAL(100, grinder->stepsPerFrame);
-
-	LONGS_EQUAL(space->nPoints, grinder->qflick->nPoints);
-	proveItsMine(grinder->qflick->waves[0], space->nPoints * sizeof(qCx));
-	proveItsMine(grinder->qflick->waves[1], space->nPoints * sizeof(qCx));
-
-	POINTERS_EQUAL(space->voltage, grinder->voltage);
-	DOUBLES_EQUAL(space->voltageFactor, grinder->voltageFactor, ERROR_RADIUS);
-
-	POINTERS_EQUAL(NULL, grinder->qspect);
-	qSpectrum *spect = grinder->getSpectrum();
-	POINTERS_EQUAL(spect, grinder->qspect);
-	proveItsMine(grinder->qspect->wave, space->nStates * sizeof(qCx));
+	DOUBLES_EQUAL(0., qgrinder->elapsedTime, ERROR_RADIUS);
+	DOUBLES_EQUAL(0., qgrinder->frameSerial, ERROR_RADIUS);
+	DOUBLES_EQUAL(1e-3, qgrinder->dt, ERROR_RADIUS);
 
 
-	LONGS_EQUAL(false, grinder->isIntegrating);
-	LONGS_EQUAL(false, grinder->needsIntegration);
-	LONGS_EQUAL(true, grinder->doingIntegration);
-	LONGS_EQUAL(false, grinder->pleaseFFT);
+	LONGS_EQUAL(1, qgrinder->lowPassFilter);
+	LONGS_EQUAL(100, qgrinder->stepsPerFrame);
 
-	STRCMP_EQUAL("myGrind", grinder->label);
+	LONGS_EQUAL(space->nPoints, qgrinder->qflick->nPoints);
+	proveItsMine(qgrinder->qflick->waves[0], space->nPoints * sizeof(qCx));
+	proveItsMine(qgrinder->qflick->waves[1], space->nPoints * sizeof(qCx));
 
-	delete grinder;
+	POINTERS_EQUAL(space->voltage, qgrinder->voltage);
+	DOUBLES_EQUAL(space->voltageFactor, qgrinder->voltageFactor, ERROR_RADIUS);
+
+	POINTERS_EQUAL(NULL, qgrinder->qspect);
+	qSpectrum *spect = qgrinder->getSpectrum();
+	POINTERS_EQUAL(spect, qgrinder->qspect);
+	proveItsMine(qgrinder->qspect->wave, space->nStates * sizeof(qCx));
+
+
+	LONGS_EQUAL(false, qgrinder->isIntegrating);
+	LONGS_EQUAL(false, qgrinder->needsIntegration);
+	LONGS_EQUAL(false, qgrinder->pleaseFFT);
+
+	// how does this get turned on!??!!?
+	LONGS_EQUAL(true, qgrinder->doingIntegration);
+
+	STRCMP_EQUAL("myGrind", qgrinder->label);
+
+	delete qgrinder;
 	delete avatar;
 	delete space;
 }
@@ -110,10 +112,10 @@ static void tryFourierFilter(int N, int goodFreq, int badFreq, int lowPassFilter
 
 	qSpace *space = makeBareSpace(N, contENDLESS);
 	qAvatar *avatar = new qAvatar(space, "tryFourierAva");
-	qGrinder *grinder = new qGrinder(space, avatar, "tryFourierGri");
-	qFlick *qf = grinder->qflick;
+	qGrinder *qgrinder = new qGrinder(space, avatar, "tryFourierGri");
+	qFlick *qf = qgrinder->qflick;
 	qWave *addOn = new qWave(space);
-	qSpectrum *rainbow = grinder->getSpectrum();
+	qSpectrum *rainbow = qgrinder->getSpectrum();
 
 	qf->setCircularWave(goodFreq);
 	addOn->setCircularWave(badFreq);
@@ -124,7 +126,7 @@ static void tryFourierFilter(int N, int goodFreq, int badFreq, int lowPassFilter
 		rainbow->dumpSpectrum("spectrum before FourierFilter(), input wave:");
 
 	// now the actual filter, do it!
-	grinder->fourierFilter(lowPassFilter);
+	qgrinder->fourierFilter(lowPassFilter);
 
 	// now take a look at what we got
 	rainbow->generateSpectrum(qf);
@@ -134,7 +136,7 @@ static void tryFourierFilter(int N, int goodFreq, int badFreq, int lowPassFilter
 	isAllZeroesExceptFor(rainbow, goodFreq, shouldFail, "unfiltered frequency");
 
 	delete addOn;
-	delete grinder;
+	delete qgrinder;
 	delete avatar;
 	delete space;
 }
@@ -177,7 +179,7 @@ TEST(qGrinder, fourFilt16_1_LPFscan7) { tryFourierFilter(16, 1, 5, 7, true); }
 static void fourierExperiments(int N) {
 	qSpace *space = makeBareSpace(N, contENDLESS);
 	qAvatar *avatar = new qAvatar(space, "fourExpAv");
-	qGrinder *grinder = new qGrinder(space, avatar, "fourExpGrind");
+	qGrinder *qgrinder = new qGrinder(space, avatar, "fourExpGrind");
 
 	qSpectrum *allOnes = new qSpectrum(space);
 	allOnes->fill();
@@ -192,7 +194,7 @@ static void fourierExperiments(int N) {
 
 	delete allOnes;
 	delete onesWave;
-	delete grinder;
+	delete qgrinder;
 	delete space;
 }
 

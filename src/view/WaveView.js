@@ -83,7 +83,7 @@ export class WaveView extends React.Component {
 
 			// easy access
 			this.space = space;
-			this.grinder = space.grinder;
+			this.grinder = space.qgrinder;
 			this.mainEAvatar = space.mainEAvatar;
 
 			this.vDisp = space.vDisp;
