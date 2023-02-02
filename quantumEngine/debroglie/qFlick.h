@@ -94,17 +94,9 @@ struct qFlick : public qWave {
 	qCx **waves;
 	int nWaves;
 
-	// array of nTProgresses x nWaves segmentBoundaries
-	int nEdges;
-	edge *edges;
-	edge *endEdge;
-
-	// list of tProgresses
-	int nTProgresses;
-	tProgress *tProgresses;
-
-	// used to calculate mod N easily
-	int mask;
+	// how long waves array really is.  Unused entries are nulled out.
+	int allocWaves;
+	void setNWaves(int newNW);
 
 	// create and add a new buffer, zeroed, at the 0 position, pushing the others up
 	void pushWave(void);

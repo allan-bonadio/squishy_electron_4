@@ -11,6 +11,7 @@
 #include "qFlick.h"
 
 static bool traceConstruction = false;
+static bool traceSetNWaves = false;
 
 // here ix still points to the x location in the wave
 // but serial points to which wave in the flick
@@ -168,11 +169,11 @@ void qFlick::dumpTProgress(void) {
 /* ************************************************************ birth & death & basics */
 
 // each buffer is initialized to zero bytes therefore 0.0 everywhere
-qFlick::qFlick(qSpace *space, qGrinder *gr, int nW, int nThr)
-	: qWave(space), qgrinder(gr), nWaves(nW), nTProgresses(nThr), currentWave(0)
+qFlick::qFlick(qSpace *space, int nW)
+	: qWave(space), nWaves(nW),  allocWaves(nW), currentWave(0)
 {
 	if (! space)
-		throw std::runtime_error("qSpectrum::qSpectrum null space");
+		throw std::runtime_error("qFlick::qFlick NULL space");
 	if (nWaves < 2) throw std::runtime_error("nWaves must be at least 2");
 	if (nWaves > 1000) throw std::runtime_error("nWaves is too big, sure you want that?");
 
@@ -223,6 +224,34 @@ qFlick::~qFlick() {
 	if (traceConstruction)
 		printf("    freed waves..done with qFlick destructor..\n");
 }
+
+void qFlick::setNWaves(int newNW) {
+	// to we have to stretch the allocation?
+	if (newNW >nWaves) {
+		if (newNW > allocWaves) {
+			waves = (qCx **) realloc(waves, newNW * sizeof(qCx *));
+			for (int w = allocWaves; w < newNW; w++)
+				waves[w] = NULL;
+			allocWaves = newNW;
+		}
+		for (int w = nWaves; w < newNW; w++)
+			waves[w] = allocateWave(nPoints);
+	}
+	else {
+		for (int w = newNW; w < nWaves; w++) {
+			freeWave(waves[w]);
+			waves[w] = NULL;
+		}
+	}
+	if (traceSetNWaves) {
+		printf(" setNWaves from %d to %d\n", nWaves, newNW);
+		for (int w = 0; w < allocWaves; w++)
+			printf("waves[%d]:%p; ", w, waves[w]);
+		printf("\n");
+
+	}
+	nWaves = newNW;
+};
 
 /* ******************************************************** diagnostic dump **/
 

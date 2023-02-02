@@ -9,6 +9,10 @@ commonConstants.h
 cppuTestBin
 cppuTestBin.dSYM
 
+# abacus lab
+abacusLab
+abacusLab.dSYM
+
 # the old, pre cppu test objects
 quantumTest.js
 quantumTest.wasm
