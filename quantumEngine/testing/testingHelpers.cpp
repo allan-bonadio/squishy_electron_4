@@ -1,85 +1,21 @@
 /*
-** cppu main -- cppu Unit Test main source, top level
-** Copyright (C) 2022-2023 Tactile Interactive, all rights reserved
+** testing helpers -- C++ general utilities to help with unit tests and other tests
+** Copyright (C) 2023-2023 Tactile Interactive, all rights reserved
 */
 
 #include <stdexcept>
 #include <cstring>
 
 #include "../debroglie/qWave.h"
-#include "../debroglie/qFlick.h"
 #include "../fourier/qSpectrum.h"
 #include "../greiman/qAvatar.h"
 #include "../greiman/qViewBuffer.h"
 #include "../schrodinger/qGrinder.h"
-#include "../schrodinger/abacus.h"
 #include "../hilbert/qSpace.h"
-
-#include "CppUTest/TestHarness.h"
-#include "CppUTest/CommandLineTestRunner.h"
-#include "CppUTest/SimpleString.h"
-
-#include "./cppuMain.h"
+#include "testingHelpers.h"
 
 
 static bool traceRando = false;
-
-
-
-// how do initializers in C++ work?  need them for mocks
-static void initExperiments(void) {
-//	int n0{};
-//	int n1{1};
-//
-//	int nn0 = {0};
-//	int nn1 = {1};
-////	int nn2 = {1, 2};
-//
-//	qCx zombie[2] = {qCx(1.0, 2.0)};
-//	qCx zoot[2] = {qCx(6.0, 7.0), qCx(3.0, 4.0)};
-//	printf("initializers in C++\n"
-//		"| scalar vars;  empty init:%d   one initializer 1:%d nn0: %d   nn1: %d  \n"
-//		"| arrays of cx: twoW1init: [0]%lf, %lf  [1]]%lf, %lf   2with2inits: [0]%lf, %lf  [1]]%lf, %lf\n",
-//		n0, n1, nn0, nn1,
-//		zombie[0].re, zombie[0].im, zombie[1].re, zombie[1].im,
-//		zoot[0].re, zoot[0].im, zoot[1].re, zoot[1].im
-//		);
-}
-
-// for memory leaks that cppu conveniently gives us, some clues:
-static void dumpSizes(void) {
-	printf("byte sizes... sz(qSpace)=%lu  sz(qWave)=%lu  sz(qBuffer)=%lu  sz(qSpectrum)=%lu  \n"
-		"sz(qFlick)=%lu  sz(qViewBuffer)=%lu  sz(qAvatar)=%lu  sz(qGrinder)=%lu\n"
-		"sz(abacus)=%lu  sz(edge)=%lu  sz(progress)=%lu\n\n",
-		sizeof(qSpace), sizeof(qWave), sizeof(qBuffer), sizeof(qSpectrum),
-		sizeof(qFlick), sizeof(qViewBuffer), sizeof(qAvatar), sizeof(qGrinder),
-		sizeof(abacus), sizeof(edge), sizeof(progress));
-}
-
-
-int main(int ac, char** av)
-{
-	initExperiments();
-	dumpSizes();
-
-    return CommandLineTestRunner::RunAllTests(ac, av);
-}
-
-/* ******************************************************** helpers - cppu */
-
-// cppuTest's CHECK_EQUAL() figures complex equality using our == operator.
-// this only displays complex if a failure, for the message.
-SimpleString StringFrom(const qCx value) {
-	char buffer[100];
-	snprintf(buffer, 100, "%13.8lf %+13.8lf•i", value.re, value.im);
-
-	// funny i gotta do it, thought it would just compare like strings
-	for (int j = strlen(buffer); j < 100; j++)
-		buffer[j] = 0;
-
-	SimpleString buf = SimpleString(buffer);
-	return buf;
-}
 
 
 /* ******************************************************** helpers - spaces */
@@ -119,6 +55,7 @@ qSpace *makeBareSpace(int N, int continuum) {
 	return space;
 }
 
+
 /* ******************************************************** helpers - waves */
 
 // turn this off to see if a bug goes away when we avoid stomping on memory
@@ -142,25 +79,6 @@ void proveItsMine(void *buf, size_t size) {
 		buffer[i] = 0xAB ^ buffer[i];  // read And write
 }
 
-// make sure these two qBuffers have the same values (within ERROR_RADIUS absolute)
-// if not, test fails
-void compareWaves(qBuffer *qexpected, qBuffer *qactual) {
-	qCx *expected = qexpected->wave;
-	qCx *actual = qactual -> wave;
-
-	// these should not be way way out
-	LONGS_EQUAL_TEXT(qexpected->nPoints, qactual->nPoints, "Waves have different nPoints");
-	LONGS_EQUAL_TEXT(qexpected->start, qactual->start, "Waves have different starts");
-	LONGS_EQUAL_TEXT(qexpected->end, qactual->end, "Waves have different ends");
-
-	// do the WHOLE THING including boundaries
-	for (int ix = 0; ix < qexpected->nPoints; ix++) {
-		// should use complexEqualText()
-		DOUBLES_EQUAL(expected[ix].re, actual[ix].re, 1e-10);
-		DOUBLES_EQUAL(expected[ix].im, actual[ix].im, 1e-10);
-	}
-}
-
 // take a wave, and print out a C++ declaration and initializer that you can paste back into your spec file
 void dumpWaveInitializer(const char *varName, qCx *psi, int nPoints) {
 	printf("static qCx %s[%d] = {\n", varName, nPoints);
@@ -169,12 +87,6 @@ void dumpWaveInitializer(const char *varName, qCx *psi, int nPoints) {
 			psi[ix].re, psi[ix].im, ix);
 	}
 	printf("};\n");
-}
-
-
-static void complexEqualText(qCx cx1, qCx cx2, const char *msg) {
-	DOUBLES_EQUAL_TEXT(cx1.re, cx2.re, ERROR_RADIUS, msg);
-	DOUBLES_EQUAL_TEXT(cx1.im, cx2.im, ERROR_RADIUS, msg);
 }
 
 /* ********************************************** my favorite pseudo random number generator */
