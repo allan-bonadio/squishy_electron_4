@@ -73,6 +73,8 @@
     "jest-circus": "26.6.0",
     "jest-resolve": "26.6.0",
     "jest-watch-typeahead": "0.6.1",
+    "marked": "^4.2.12",
+    "marked-katex-extension": "^1.0.2",
     "postcss-flexbugs-fixes": "4.2.1",
     "postcss-loader": "3.0.0",
     "postcss-normalize": "8.0.1",

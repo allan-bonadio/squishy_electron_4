@@ -46,6 +46,9 @@ alias qqqs='cd $SQUISH_ROOT/quantumEngine/schrodinger'
 alias qqqt='cd $SQUISH_ROOT/quantumEngine/testing'
 alias qqqw='cd $SQUISH_ROOT/quantumEngine/wasm'
 
+alias qqd='cd $SQUISH_ROOT/docGen'
+alias qqds='cd $SQUISH_ROOT/docGen/docSrc'
+
 alias qqn='cd $SQUISH_ROOT/node_modules'
 alias qqm='cd $SQUISH_ROOT/maint'
 alias qqp='cd $SQUISH_ROOT/public'
