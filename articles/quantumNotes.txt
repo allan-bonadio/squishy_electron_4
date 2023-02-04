@@ -1,6 +1,45 @@
 
+2022 Feb 2 ============================================= Extensions WebGL
+
+double floats in WebGL
+need this ext with WebGL2:
+ARB_gpu_shader_fp64
+- not Khronos ratified WebGL Extensions
+- not Community approved WebGL Extensions
 
 
+OES_element_index_uint
+allows an index for data row in v shader.  Free with webgl2, ext with webgl1
+No, allows a int32 for values in attributes
+
+2022 Feb 2 ============================================= documentation
+
+Equation Formatter: MathJax
+https://www.mathjax.org/#demo
+
+Embed in md, parsers:
+• Mark D - https://github.com/markedjs/marked
+• TeXMe - https://github.com/susam/texme#render-markdown-and-latex
+• StrapDown.js - https://naereen.github.io/StrapDown.js/index.html
+• dingus - related to original site below.  https://daringfireball.net/projects/markdown/dingus
+
+original, old MarkDown (in Perl) site https://daringfireball.net/projects/markdown/
+
+Review of many - https://css-tricks.com/choosing-right-markdown-parser/
+this compares different parsers online: https://babelmark.github.io/
+
+JavaScript parsers; 	CommonMark, Marked, Markdown-it, Remarkable, Showdown
+
+maybe not showdown
+
+required features:
+- embedded images
+- embedded math
+- embedded videos and other html stuff
+- tables
+
+nice to have features:
+Fenced Codeblocks
 
 
 2022 jan 30 ============================================= atomic funcs available
