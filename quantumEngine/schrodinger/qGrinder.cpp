@@ -47,7 +47,7 @@ qGrinder::qGrinder(qSpace *sp, qAvatar *av, const char *lab)
 	magic = 'Grin';
 
 	// number of waves; number of threads
-	qflick = new qFlick(space, 3);
+	qflick = new qFlick(space, this, 3, 0);
 
 	// so wave in the qflick points to the zero-th wave
 

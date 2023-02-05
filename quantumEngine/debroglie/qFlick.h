@@ -28,7 +28,8 @@ struct edge {
 	// 0-254 to indicate locked by thread lock.
 	// protect boundary, loDone and hiDone while being atomically set/read
 	// not really sure what i'm gonna do with this
-	std::atomic_uchar lock;
+	bool lock;
+	//std::atomic_uchar lock;
 
 	// true if we have WELL continuum and this is edge 0 for a given wave
 	bool isFixed;

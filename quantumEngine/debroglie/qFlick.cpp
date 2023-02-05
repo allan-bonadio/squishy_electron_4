@@ -195,42 +195,42 @@ C) average G+1 and G+2 into G+3.  Can't reuse G+2 cuz neighboring threads need o
 // set up our edges and tProgresses to get ready for a new integration
 void qFlick::reset(void) {
 
-	for (int b = 0; b < nEdges; b++)
-		edges[b].reset();
+//	for (int b = 0; b < nEdges; b++)
+//		edges[b].reset();
 
 	// for WELL dimensions, fix the 0-th edge for each wave
-	if (contWELL == space->dimensions[0].continuum) {
-		for (edge *e = edges; e < endEdge; e += nTProgresses)
-			e->isFixed = true;
-	}
+//	if (contWELL == space->dimensions[0].continuum) {
+//		for (edge *e = edges; e < endEdge; e += nTProgresses)
+//			e->isFixed = true;
+//	}
 
 	// the tProgresses all point to the edges that concern them
 	// edges for the 0-th wave
-	for (int w = 0; w < nTProgresses; w++) {
-		tProgresses[w].reset(&edges[w], &edges[(w + 1) & mask]);
-
-		// this should span the wave with roughly equal segments.  for starters.
-		edges[w].boundary =  w * space->nStates / nTProgresses;
-	}
+//	for (int w = 0; w < nTProgresses; w++) {
+//		tProgresses[w].reset(&edges[w], &edges[(w + 1) & mask]);
+//
+//		// this should span the wave with roughly equal segments.  for starters.
+//		edges[w].boundary =  w * space->nStates / nTProgresses;
+//	}
 }
 
-void qFlick::dumpEdges(int start, int end) {
-	if (end > nEdges)
-		end = nEdges;
-	for (int e = 0; e < nTProgresses; e++)
-		edges[e].dump();
-}
-
-void qFlick::dumpTProgress(void) {
-	for (int w = 0; w < nTProgresses; w++)
-		tProgresses[w].dump();
-
-}
+//void qFlick::dumpEdges(int start, int end) {
+//	if (end > nEdges)
+//		end = nEdges;
+//	for (int e = 0; e < nTProgresses; e++)
+//		edges[e].dump();
+//}
+//
+//void qFlick::dumpTProgress(void) {
+//	for (int w = 0; w < nTProgresses; w++)
+//		tProgresses[w].dump();
+//
+//}
 
 /* ************************************************************ birth & death & basics */
 
 // each buffer is initialized to zero bytes therefore 0.0 everywhere
-qFlick::qFlick(qSpace *space, int nW)
+qFlick::qFlick(qSpace *space, qGrinder *qgr, int nW, int nTProgresses)
 	: qWave(space), nWaves(nW),  allocWaves(nW), currentWave(0)
 {
 	if (! space)
@@ -248,22 +248,26 @@ qFlick::qFlick(qSpace *space, int nW)
 	for (int w = 1; w < nWaves; w++)
 		waves[w] = allocateWave(nPoints);
 
-	tProgresses = new tProgress[nTProgresses];
-	for (int w = 0; w < nTProgresses; w++)
-		tProgresses[w].init(this, w);
 
-	// all the edges, and all the tProgresses, in big arrays
-	nEdges = nTProgresses * nWaves;
-	edges = new edge[nEdges];
-	for (int e = 0; e < nTProgresses; e++)
-		edges[e].init(this, e);
-	endEdge = edges + nEdges;
-
-	mask = space->nStates - 1;
+	// never saves nTProgresses?
 
 
-	reset();
-	dumpTProgress();
+//	tProgresses = new tProgress[nTProgresses];
+//	for (int w = 0; w < nTProgresses; w++)
+//		tProgresses[w].init(this, w);
+//
+//	// all the edges, and all the tProgresses, in big arrays
+//	nEdges = nTProgresses * nWaves;
+//	edges = new edge[nEdges];
+//	for (int e = 0; e < nTProgresses; e++)
+//		edges[e].init(this, e);
+//	endEdge = edges + nEdges;
+//
+//	mask = space->nStates - 1;
+//
+//
+//	reset();
+//	dumpTProgress();
 }
 
 
