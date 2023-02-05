@@ -70,8 +70,8 @@
 			height: 100%;
 			z-index: 30;
 			transform: scale(1, -1);
-
-			pointer-events: none;  // need to click through for size box
+			pointer-events: all;
+			// hmmm lemme think about this... pointer-events: none;  // need to click through for size box
 
 			path.visibleLine {
 				stroke: common.$voltageColor;

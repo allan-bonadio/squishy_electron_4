@@ -70,6 +70,7 @@ export class VoltageArea extends React.Component {
 
 		this.cnDrag = new clickNDrag(this.mouseDown, this.onEvent, this.mouseUp);
 
+
 		console.log(`👆 👆  VoltageArea constructor. izzer space? ${props.space}.  Is there  vDisp?  ${props.vDisp}`);
 
 		if (traceVoltageArea) console.log(`👆 👆 VoltageArea  constructor done`);
@@ -138,7 +139,7 @@ export class VoltageArea extends React.Component {
 	mouseDown =
 	(cnDrag, ev) => {
 		// set svg area to accept mouse events
-		cnDrag.arenaEl.style.pointerEvents = 'visible';  // auto all none
+		// no gotta catch wheel events cnDrag.arenaEl.style.pointerEvents = 'visible';  // auto all none
 	}
 
 	// every time user changes one datapoint.  Also set points interpolated between.
@@ -248,7 +249,7 @@ export class VoltageArea extends React.Component {
 		const v = p.vDisp;
 
 		// must also switch the svg to pass thru mouse events otherwise other stuff can't get clicks
-		cnDrag.arenaEl.style.pointerEvents = 'none';
+		// no gotta catch wheel events  cnDrag.arenaEl.style.pointerEvents = 'none';
 
 		if (traceDragging) {
 			console.log(`👆 👆 mouse UP on point (%f,%f) voltage @ ix=%d stopped at %f`,
@@ -261,6 +262,36 @@ export class VoltageArea extends React.Component {
 
 		if (traceDragging)
 			v.dumpVoltage(p.space, v.voltageBuffer, 8);
+	}
+
+	wheelHandler =
+	(ev) => {
+		let v = this.props.vDisp;
+		let deltaAmount;
+
+		// the scrollHeight change at any time so calculate it on the fly
+		switch (ev.deltaMode) {
+		case WheelEvent.DOM_DELTA_PIXEL:
+			deltaAmount = ev.deltaY;
+			break;
+
+		case WheelEvent.DOM_DELTA_PIXEL:
+			deltaAmount = ev.deltaY * Math.sqrt(v.scrollHeight);
+			break;
+
+		case WheelEvent.DOM_DELTA_PIXEL:
+			deltaAmount = ev.deltaY * v.scrollHeight;
+			break;
+		}
+
+		// convert pixels delta to voltage delta to fraction delta
+		let fracAmount = v.yScale.invert(deltaAmount) / v.heightVolts;
+		v.userScroll(fracAmount);
+		console.log(`wheel event: deltaY=${ev.deltaY}  deltaMode=${ev.deltaMode} scaled delta=${v.yScale.invert(deltaAmount)} fracAmount=${fracAmount}`, ev);
+		// i gotta get rid of this frac shit, it should scroll in volts like you would expect!
+
+		// can't cuz it's passive ev.preventDefault();
+		ev.stopPropagation();
 	}
 
 	/* *************************************************** rendering */
@@ -381,6 +412,7 @@ export class VoltageArea extends React.Component {
 				viewBox={`0 0 ${p.canvasFacts.width} ${p.canvasFacts.height}`}
 				width={p.canvasFacts.width} height={p.canvasFacts.height}
 				ref={this.cnDrag.refArena}
+				onWheel={this.wheelHandler}
 			>
 
 				{this.renderPaths()}
