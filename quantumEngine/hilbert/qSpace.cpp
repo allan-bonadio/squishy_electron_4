@@ -140,7 +140,7 @@ void qSpace::formatDirectOffsets(void) {
 
 	makePointerGetter(mainAvatar);
 	makePointerGetter(miniGraphAvatar);
-	makePointerGetter(grinder);
+	makePointerGetter(qgrinder);
 
 	makeStringPointer(label);
 

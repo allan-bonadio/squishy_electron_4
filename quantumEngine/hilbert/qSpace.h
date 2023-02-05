@@ -91,7 +91,7 @@ public:
 
 	struct qAvatar *mainAvatar;
 	struct qAvatar *miniGraphAvatar;
-	struct qGrinder *grinder;
+	struct qGrinder *qgrinder;
 
 	char label[MAX_LABEL_LEN+1];
 
@@ -114,7 +114,7 @@ public:
 //	float *miniGraphVBuffer;
 //	struct qAvatar *miniGraphAvatar;
 //
-//	struct qGrinder *grinder;
+//	struct qGrinder *qgrinder;
 //};
 
 // for JS to call

@@ -93,7 +93,7 @@ qSpace *completeNewSpace(qSpace *space) {
 	qAvatar *mainAvatar = space->mainAvatar = new qAvatar(space, "mainAvatar");
 	if (traceAvatarDetail) printf("🚀 created mainAvatar\n");
 
-	qGrinder *grinder = space->grinder = new qGrinder(space, mainAvatar, "mainGrinder");
+	qGrinder *qgrinder = space->qgrinder = new qGrinder(space, mainAvatar, "mainGrinder");
 
 	space->miniGraphAvatar = new qAvatar(space, "miniGraph");
 
@@ -122,8 +122,8 @@ void deleteFullSpace(qSpace *space) {
 		delete space->miniGraphAvatar;
 		space->miniGraphAvatar = NULL;
 
-		delete space->grinder;
-		space->grinder = NULL;
+		delete space->qgrinder;
+		space->qgrinder = NULL;
 	}
 
 	// voltage going to be deleted cuz it's part of the space
