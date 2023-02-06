@@ -41,8 +41,7 @@ or
 	𝜓.im(t + 3dt/2) = 𝜓.im(t + dt/2) - dt H 𝜓.re(t + dt)
 
 where H is hamiltonian, typically ( potential + ∂2/∂x2 )
-We do the hamiltonian custom here instead of using the function in hamiltonian.cpp
-and sometimes omit the potential
+We do the hamiltonian custom here and sometimes omit the potential
  */
 
 /*
@@ -65,18 +64,9 @@ no do it this way
 wait try this, ℏ = 1, right, so 1 / 2m_e = 1  and m_e = 1/2 = 9.1093837015e-31 kg
 and 1 kg = 5.4888455287888166e+29
 
-... ok i'm confused again... the whole eq is units of energy, kg m^2 / s^2
-Definitely, dx is always 1 in our units.
+See definitionOfUnits in docGen/docSrc for latest believable work.
+Here, we use dx=1 for ease of calculation, and fold the conversion factors into other nubmers.
 
-so schrodinger's eq, just units, is kindof like d/dt = d^2/dx^2 or dt = dx^2
-every step, dx=1 is used to calculate a rate of change over dt.
-
-therefore, 1s = 5.78838180e-5 m^2   ???
-and 1ps = 1e-12s = 5.78838180e-17 m^2 - yeah i think so.
-or 1ns corresponds to 5.78838180e-14 m^2
-or  2.4059056091210226e-7 m or about 241 µm ??
-
-other way: 1nm = 1e-9m   square = 1e-18 m^2 times that number = 1.7275985492180218e-14 seconds.  thisi isn't right.
 */
 
 

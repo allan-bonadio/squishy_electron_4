@@ -31,27 +31,27 @@ static bool traceConstruction = false;
 
 ## Integrate step
 1) quickly integrate edge points, and set doneLo and doneHi, so neighboring threads can proceed
-	- realStep lowest 2 points, behind->hi->boundary, boundary+1
-	- realStep highest 2 points, ahead->lo->boundary-2, boundary-1
+	- realStep lowest 2 points, behind->hi->border, border+1
+	- realStep highest 2 points, ahead->lo->border-2, border-1
 
-	- imagStep lowest point, , behind->hi->boundary, then set hiDone in behind edge
-	- imagStep highest point, ahead->lo->boundary-1, then set loDone in ahead edge
+	- imagStep lowest point, , behind->hi->border, then set hiDone in behind edge
+	- imagStep highest point, ahead->lo->border-1, then set loDone in ahead edge
 
 	- correctly handle cases where boundaries are <4 apart
 	:: need stepOneReal(), stepOneImaginary(), and integrateEdgePoints() for a thread
 
 2) do the rest of integration
-	- realStep all the points in between, behind->boundary+2 thru ahead->lo->boundary-3
-	- imagStep all the points in between, behind->hi->boundary+1 thru ahead->lo->boundary-2
+	- realStep all the points in between, behind->border+2 thru ahead->lo->border-3
+	- imagStep all the points in between, behind->hi->border+1 thru ahead->lo->border-2
 	:: need integrateInnerPoints() to do this
 
 3) Claim edges in next generation/wave
-	- if this-gen behind->loDone, set next-gen behind->boundary to this-gen behind-boundary
+	- if this-gen behind->loDone, set next-gen behind->border to this-gen behind-border
 		unless already set
-	- else, set next-gen behind->boundary to this-gen behind-boundary + 1
-	- if this-gen ahead->hiDone, set next-gen ahead->boundary to this-gen behind-boundary
+	- else, set next-gen behind->border to this-gen behind-border + 1
+	- if this-gen ahead->hiDone, set next-gen ahead->border to this-gen behind-border
 		unless already set
-	- else, set next-gen ahead->boundary to this-gen ahead-boundary - 1
+	- else, set next-gen ahead->border to this-gen ahead-border - 1
 	:: need claimBehind() and claimAhead()
 
 ## Midpoint:
@@ -72,6 +72,7 @@ C) average G+1 and G+2 into G+3.  Can't reuse G+2 cuz neighboring threads need o
 */
 
 
+
 /* ************************************************************ edges */
 
 // no constructor/destructor cuz always created as part of array
@@ -85,14 +86,14 @@ void edge::init(abacus *aba, int ser) {
 // before every frame, reset ALL the edges
 void edge::reset(void) {
 	lock = UNLOCKED;
-	boundary = UNDECIDED;
+	border = UNDECIDED;
 	loDone = hiDone = false;
 	isFixed = false;
 }
 
 // 'this' cannot be null; language prevents it
 void edge::dump(void) {
-	printf("edge %p: abac=%p #%d -- |%d| %s %s %s\n", this, abac, serial, boundary,
+	printf("edge %p: abac=%p #%d -- |%d| %s %s %s\n", this, abac, serial, border,
 		isFixed ? "fixed" : "", loDone ? "lo" : "", hiDone ? "hi" : "");
 }
 
@@ -116,7 +117,7 @@ void spinUnock(void) {
 	emscripten_atomic_store_u8(&lock, false);
 }
 
-/* ************************************************************ threadProgress */
+/* ************************************************************ thread Progress */
 
 // no constructor/destructor cuz always created as part of array
 
@@ -126,7 +127,8 @@ void progress::init(abacus *aba, int ser)  {
 	serial = ser;
 }
 
-// start of every frame
+// start of every frame, reset all of these, called by abacus::reset()
+// pass the behind and ahead edge for each.
 void progress::reset(edge *b, edge *a) {
 	behind = b;
 	ahead = a;
@@ -152,19 +154,21 @@ void progress::dump(void) {
 // quickly integrate the points right against the borders and set the flags so
 void integrateEdges() {
 	int gap = (ahead->border - behind->border) & abac->statesMask;
-	if (gap < 4) {
+	if (gap < 3) {
 		// short - just do them all
 		for (int ix = behind->border; ix < ahead->border; ix++) {
-			abac->stepOneReal(nextWave, thisWave, thisWave)
+			abac->stepOneReal(ix, nextWave, thisWave, thisWave)
 		}
 	}
 	else {
 		// do the behind, do the ahead
+		abac->stepOneReal(behind->border, nextWave, thisWave, thisWave)
+		abac->stepOneReal(ahead->border, nextWave, thisWave, thisWave)
 	}
 }
 
 void progress::next(void) {
-	// since I'm done with this wave, the edge->boundary has been set on both edges,
+	// since I'm done with this wave, the edge->border has been set on both edges,
 	// so I can read them without locking.
 
 	edge *nextBehind = behind + abac->nThreads;
@@ -288,7 +292,7 @@ void abacus::reset(void) {
 		progresses[w].reset(&edges[w], &edges[w + 1]);
 
 		// this should span the wave with roughly equal segments.  for starters.
-		edges[w].boundary =  w * space->nStates / nThreads;
+		edges[w].border =  w * space->nStates / nThreads;
 	}
 	progresses[nThreads-1].ahead = &edges[0];  // edges[0] wraparound
 }
