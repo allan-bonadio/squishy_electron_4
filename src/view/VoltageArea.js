@@ -289,6 +289,8 @@ export class VoltageArea extends React.Component {
 		v.userScroll(fracAmount);
 		console.log(`wheel event: deltaY=${ev.deltaY}  deltaMode=${ev.deltaMode} scaled delta=${v.yScale.invert(deltaAmount)} fracAmount=${fracAmount}`, ev);
 		// i gotta get rid of this frac shit, it should scroll in volts like you would expect!
+		// meanwhile, the yScale is an absolute converter; I need a relative converter.
+		// try converting delta + bottom in pixels into volts and subtract bottom volts
 
 		// can't cuz it's passive ev.preventDefault();
 		ev.stopPropagation();
