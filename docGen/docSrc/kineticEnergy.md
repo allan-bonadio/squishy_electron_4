@@ -9,7 +9,7 @@
 
 Kinetic Energy is the energy a particle has because of its velocity, it's speed.  The faster it's going, the more kinetic energy it has.  Usually, you can figure
 
-<p>K = 1/2 m v^2
+$K = 1/2 m v^2$
 
 <p>As it rolls uphill and gains altitude, that kinetic energy will be converted to <a href=voltageEnergy.html>Potential Energy</a>.
 

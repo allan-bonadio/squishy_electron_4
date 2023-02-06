@@ -97,6 +97,14 @@ struct qGrinder {
 };
 
 
+/* ************************************************************ Units and Phys Constants */
+// distances measured in nanometers, nm
+// time measured in picoseconds, ps
+// emergy measured in eV
+// 1 kg = 6.241509074460763e+24 eV ps^2 / nm^2
+
+
+
 /* ************************************************************ JS interface */
 
 // for JS to call.  Defined in jsSpace and elsewhere.
