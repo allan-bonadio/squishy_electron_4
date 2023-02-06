@@ -2,15 +2,32 @@
 
 import fs from 'node:fs';
 import fsp from 'node:fs/promises';
-import { exec } from 'node:child_process';
+import {exec, execSync} from 'node:child_process';
+import readline from 'node:readline';
 
 import {marked} from 'marked';
 import markedKatex from 'marked-katex-extension';
+
+let traceDetails = false;
+let traceWhatTime = false;
+let traceFinalDocDir = true;
+let traceFinalPromiseResult = false;
+
+/*
+** The documentation is served from the public/doc directory, which contains mostly .html files.
+** during writing, the docGen directory serves as a proxy.  Both have symlinks into the
+** katex directory for the katex.css file and the fonts.
+*/
+
+const whatTime =
+(where) => traceWhatTime && console.log(`⏱  ${where} ${performance.now()}`);
+whatTime('start of app running');
 
 const markdOptions = {
 	gfm: true,
 	headerIds: true,
 	headerPrefix: 'doc',
+	smartypants: true,  // i may be asking for trouble
 };
 
 const katexOptions = {output: 'mathml'};
@@ -19,7 +36,7 @@ marked.use(markedKatex(katexOptions));
 
 // this will wrap each compiled MD piece
 let template;
-let nDirsWalked, nFilesTried, nMDFilesCompiled;
+let nDirsWalked, nFilesTried, nFilesPassedThru, nMDFilesCompiled;
 
 console.log(`•••••••••• compile docs with Markd + katex`);
 
@@ -29,6 +46,14 @@ if (!process.env.SQUISH_ROOT) {
 }
 process.chdir(process.env.SQUISH_ROOT +`/docGen`);
 
+/*
+**  Most of these functions return Promises.  They settle when it's task is done.
+**  It's all asynchronous and very fast.
+**
+**  Don't break the chain by returning nothing!  .then() will turn it into
+**  an immediately-resolved promise resolving in undefined.
+**  Then, your function probably won't get a chance to run!
+*/
 
 /* ************************************************************* traversing and compiling */
 
@@ -42,7 +67,7 @@ function makeOutputPath(inputPath, suffix = '') {
 }
 
 // standard, start to read a file and return promise
-const readAFile =
+const readTextFile =
 (filePath) => fsp.readFile(filePath, {encoding: 'utf8'});
 
 // for promise catchers
@@ -55,44 +80,72 @@ const catchException =
 // a .md file
 function compileAnMDFile(mdPath) {
 	let htmlPath = makeOutputPath(mdPath, 'html');
-	console.log(`about to compile md file ${mdPath} to html file ${htmlPath}`);
+	if (traceDetails)
+		console.log(`about to compile md file ${mdPath} to html file ${htmlPath}`);
 
-	return readAFile(mdPath)
+	return readTextFile(mdPath, {encoding: 'utf8'})
 	.then(contents => {
-		console.log(`read the md file ${mdPath}!  ${contents.length} bytes.`);
+		if (traceDetails)
+			console.log(`read the md file ${mdPath}!  ${contents.length} bytes.`);
 		let html = marked.parse(contents, markdOptions);
+		let title = mdPath.replace(/^([^.]*)\./).replace(/_/, ' ');
 
 		html = template
 			.replace('〖body〗', html)
-			.replace('〖title〗', 'info')
+			.replace('〖title〗', title)
 			.replace('〖fromFile〗', mdPath)
 			.replace('〖description〗', 'info for squishy electron')
 			.replace('〖buildTime〗', (new Date()).toLocaleString());
-		console.log(`txlated the md file ${mdPath}! for html ${html.length} bytes.`);
+		if (traceDetails) console.log(`txlated the md file ${mdPath}! for html ${html.length} bytes.`);
 
-		return fsp.writeFile(htmlPath, html)
-		.then(rv => console.log(`wrote the HTML file ${htmlPath}!  returning ${rv}`));
+		return fsp.writeFile(htmlPath, html, {encoding: 'utf8'})
+		.then(rv => {
+			if (traceDetails)
+				console.log(`wrote the HTML file ${htmlPath}`);
+		});
 	})
-	.then(res => {
-		console.log(`compiled ${mdPath} to ${htmlPath}`);
+	.then(contents => {
+		if (traceDetails)
+			console.log(`read ${mdPath} to ${htmlPath}`);
 		nMDFilesCompiled++;
+		return `${mdPath.replace('docSrc/', '')} → ${htmlPath.replace('../public/doc/', '')}`;
 	})
 	.catch(ex => catchException(ex, `compiling  ${mdPath} to ${htmlPath}`));
 }
 
 
-// something else, passthru.  not really implemented
-function compileATextFile(textPath) {
-	let outputPath = makeOutputPath(textPath);
-	console.warn(`about to compile non-MD file ${textPath}[ to ${outputPath} ??]`);
+// something else, passthru.
+function copyOverFile(filePath) {
+	let outputPath = makeOutputPath(filePath);
+	if (traceDetails)
+		console.log(`about to copy file ${filePath} to file ${outputPath}`);
 
-	// just return a promise, i dunno...
-	return readAFile(textPath)
+	// read it in binary, a Buffer
+	//return readTextFile(filePath, {encoding: null})// no turns into utf8
+	return fsp.readFile(filePath)
+	.then(contents  => {
+		if (traceDetails) {
+			let type = typeof contents;
+			if (contents == 'object')
+				type = contents.constructor.name;
+			console.log(`read the file ${filePath} which yields a ${type} of  ${contents.length} bytes.`);
+		}
+
+		return fsp.writeFile(outputPath, contents, {encoding: null})
+		.then(rv => {
+			nFilesPassedThru++;
+			if (traceDetails)
+				console.log(`wrote the file ${outputPath}`);
+			return `${filePath.replace('docSrc/', '')} → ${outputPath.replace('../public/doc/', '')}`;
+		});
+	});
 }
 
 
 // it's a file, but what kind?  trust the suffix.
 function compileAFile(filePath) {
+	if (filePath.endsWith('.DS_Store'))
+		return `${filePath} avoided`;
 	let dot = filePath.lastIndexOf('.');
 	if (dot < 0)
 		return Promise.reject(`file ${filePath} has no dot in name`);
@@ -103,8 +156,10 @@ function compileAFile(filePath) {
 		return compileAnMDFile(filePath);
 
 	// maybe someday there will be more file types?
+
+	// copy over image files, video files, ...
 	default:
-		return compileATextFile(filePath);
+		return copyOverFile(filePath);
 	}
 }
 
@@ -148,10 +203,10 @@ function compileFileOrDir(path) {
 		throw `Cannot find file ${path} in docGen`;
 
 	// from man 7 inode
-	// this is (mode & S_IFMT) == S_IFREG or S_IFDIR
-	if ((info.mode & 0o0170000) == 0o100000)
+	const fsc = fs.constants;
+	if ((info.mode & fsc.S_IFMT) == fsc.S_IFREG)
 		return compileAFile(path);
-	else if ((info.mode & 0o0170000) == 0o40000)
+	else if ((info.mode & fsc.S_IFMT) == fsc.S_IFDIR)
 		return compileADir(path);
 	else
 		console.error(`${path} is not a file or dir, punting on this one`);
@@ -161,6 +216,8 @@ function compileFileOrDir(path) {
 
 // main, runs only after the frags have been loaded
 function main() {
+	whatTime('start of main');
+
 	// futz with argv cuz sometimes node is argv[0] and other times this script is
 	let argv = [...process.argv];
 	argv.shift()
@@ -168,47 +225,80 @@ function main() {
 	if (second && !second.includes('compileDocs'))
 		argv.unshift(second);
 
-	nFilesTried = nMDFilesCompiled = nDirsWalked = 0;
+	nFilesTried = nFilesPassedThru = nMDFilesCompiled = nDirsWalked = 0;
 	if (argv.length > 0) {
 		// process just the listed files
-		for (arg of argv)
-			compileFileOrDir(arg);
+		return Promise.allSettled(
+			argv.map(arg => compileFileOrDir(arg))
+		);
 	}
+
 	else {
 		// do it all
-		compileFileOrDir('docSrc');
+		return compileFileOrDir('docSrc');
 	}
-	console.log(`${nDirsWalked} directories scanned, ${nFilesTried} files examined,
-		${nMDFilesCompiled} MarkDown files compiled`);
 }
 
 function readInitFiles() {
 	let proms = [
-		readAFile('template.html'),
+		readTextFile('template.html'),
 	];
 
 	return Promise.all(proms)
 	.then(contentz => {
 		[template] = contentz;
-		main();
+		return main();
 	})
 	.catch(ex => catchException(ex, `loading something in compileDocs`));
 }
 
-// this runs first
-readInitFiles()
-.then(() => {
-	setTimeout(() => {
-		const opts = {cwd: '../public/doc'}
-		exec(`ls -l`, opts, (error, stdout, stderr) => {
-			console.log('resulting doc dir:\n' + stdout);
-			if (error || stderr) {
-				console.error(stderr, error);
-				process.exit(7);
-			}
-			else
-				process.exit(0);
-		});
-	}, 50_000);
-});
+
+function generate() {
+	readInitFiles()
+	.then(mainResults => {
+		whatTime('finished promises');
+
+		console.log(`${nDirsWalked} directories scanned`);
+		console.log(`${nFilesTried} files read`);
+		console.log(`${nFilesPassedThru} files copied verbatim to the doc directory`);
+		console.log(`${nMDFilesCompiled} MarkDown files compiled to HTML`);
+		console.log(`main results:`, mainResults);
+
+		if (traceFinalDocDir) {
+			const opts = {cwd: '../public/doc'};
+			exec(`ls -l`, opts, (error, stdout, stderr) => {
+				console.log('resulting doc dir:\n' + stdout);
+				if (error || stderr) {
+					console.error(stderr, error);
+					process.exit(7);
+				}
+				else {
+					whatTime('done with exec ls');
+					process.exit(0);
+				}
+			});
+		}
+	})
+	.catch(ex => catchException(ex, 'compileDocs program'));
+}
+
+/* ************************************************************* startup */
+// this runs first.  prompt so I don't delete a bunch of files by accident.
+console.log(execSync('ls -l *',
+	{cwd: `${process.env.SQUISH_ROOT}/public/doc`, encoding: 'utf8'}));
+
+// prompt doesn't seem to work
+console.log(`We're going to delete this.  continue? or ^C  `);
+const rl = readline.createInterface({input: process.stdin, output: process.stdout,
+	prompt: `We're going to delete this.  continue? or ^C  `,});
+
+rl.on('SIGINT', () => process.exit(0));
+
+rl.on('line', line => {
+	// I sure hope I don't shoot myself in the foot with this.
+	console.log(execSync('rm -rfv *',
+		{cwd: `${process.env.SQUISH_ROOT}/public/doc`, encoding: 'utf8'}));
+
+	generate();
+})
 

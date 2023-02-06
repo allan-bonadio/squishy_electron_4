@@ -49,10 +49,11 @@ alias qqqw='cd $SQUISH_ROOT/quantumEngine/wasm'
 alias qqd='cd $SQUISH_ROOT/docGen'
 alias qqds='cd $SQUISH_ROOT/docGen/docSrc'
 
-alias qqn='cd $SQUISH_ROOT/node_modules'
 alias qqm='cd $SQUISH_ROOT/maint'
+alias qqn='cd $SQUISH_ROOT/node_modules'
 alias qqp='cd $SQUISH_ROOT/public'
 alias qqpe='cd $SQUISH_ROOT/public/qEng'
+alias qqpd='cd $SQUISH_ROOT/public/doc'
 
 alias qqs='cd $SQUISH_ROOT/src'
 alias qqsc='cd $SQUISH_ROOT/src/controlPanel'
