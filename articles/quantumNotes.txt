@@ -1,18 +1,58 @@
 
-2022 Feb 2 ============================================= Extensions WebGL
+2023 Feb 7 ============================================= Release Testing List
+
+prep:
+- delete all localStorage
+- surf to app.  Should come up, showing some sort of gaussian wave packet.
+- maybe even running.
+
+check:
+- start/stop works.  Single step works.
+- Reset Wave
+- frame rate
+- resolution display
+
+check voltage:
+- Show Voltage
+- drag voltage line
+- Reset Voltage
+
+set wave:
+- frequency changes instantly on minigraph
+- pulse width changes instantly on minigraph
+- offset changes instantly on minigraph
+- breed works
+- SetWave sets main wave
+- Reset Wave returns to recently set wave
+
+set voltage:
+- frequency changes instantly on minigraph
+- pulse width changes instantly on minigraph
+- offset changes instantly on minigraph
+- breed works
+- SetWave sets main wave
+- Reset Voltage returns to recently set voltage
+
+set resolution:
+- can set Endless, walls disappear, wave wraps around
+- can set Well, walls appear, wave bounces
+- can set to different resolution, does it
+- space length can be changed
+
+2023 Feb 2 ============================================= Extensions WebGL
 
 double floats in WebGL
 need this ext with WebGL2:
 ARB_gpu_shader_fp64
-- not Khronos ratified WebGL Extensions
-- not Community approved WebGL Extensions
-
+- not in Khronos ratified WebGL Extensions
+- not in Community approved WebGL Extensions
+so, I guess, WebGL 3, if it ever comes out
 
 OES_element_index_uint
 allows an index for data row in v shader.  Free with webgl2, ext with webgl1
 No, allows a int32 for values in attributes
 
-2022 Feb 2 ============================================= documentation
+2023 Feb 2 ============================================= documentation
 
 Equation Formatter: MathJax
 https://www.mathjax.org/#demo
@@ -42,7 +82,7 @@ nice to have features:
 Fenced Codeblocks
 
 
-2022 jan 30 ============================================= atomic funcs available
+2023 jan 30 ============================================= atomic funcs available
 
 typedef enum memory_order {
   memory_order_relaxed = __ATOMIC_RELAXED,
@@ -72,7 +112,7 @@ but I need a way to wait
 
 
 
-2022 jan 18 ============================================= ClickNDrag library
+2023 jan 18 ============================================= ClickNDrag library
 
 common code should do:
 
@@ -120,7 +160,7 @@ user's mobile device or desktop. See https://developers.google.com/web/fundament
 
 ====================================================== Dec 24 2022
 
-the potential is Vψ, sortof, must be units of energy.  So that expr says V=units of energy.  1 volt = 1 joule (of work) per 1 coulomb (of charge).
+the potential is Vψ, sortof, must be units of energy.  So that expr says V=units of energy.  1 volt = 1 joule (of work) per 1 coulomb (of charge).  Really it should be eVψ where e=charge of electron.
 
 1 eV = 1.602176634×10−19 J
 meaning the charge of an electron is 1.602176634×10−19 coulomb, exactly.
