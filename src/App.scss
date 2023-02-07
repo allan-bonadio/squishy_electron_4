@@ -179,6 +179,13 @@ dialog#CommonDialog {
 	padding: 0;
 	line-height: 1.5em;
 
+	// google recommends this for their polyfill to 'center' it in the screen
+	// except it should be 1/3 of the way down, not 1/2
+	position: fixed;
+	top: 33%;  // move to 1/3 down
+	transform: translate(0, -33%);  // then make that location 1/3 of the way down the dialog
+
+
 	border: none;
 	background-color: transparent;
 	color: black;
@@ -187,6 +194,12 @@ dialog#CommonDialog {
 	&::backdrop {
 		background-color: #8888;
 	}
+
+	// dialogPolyfill
+	+ .backdrop {
+		background-color: #8888;
+	}
+
 
 	label {
 		display: block;
@@ -222,8 +235,8 @@ dialog#CommonDialog {
 
 	// the insides of various dialogs
 	#SimpleDialog, #ErrorDialog {
-		padding: 3em;
-		border: 1px #aaa outset;
+		padding: 2em;
+		border: 1px #ddd outset;
 		box-shadow: 10px 5px 5px #0007;
 		height: 100%;
 
