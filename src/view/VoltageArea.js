@@ -269,17 +269,17 @@ export class VoltageArea extends React.Component {
 		let v = this.props.vDisp;
 		let deltaAmount;
 
-		// the scrollHeight change at any time so calculate it on the fly
+		// the scrollHeight changes at any time so calculate it on the fly
 		switch (ev.deltaMode) {
 		case WheelEvent.DOM_DELTA_PIXEL:
 			deltaAmount = ev.deltaY;
 			break;
 
-		case WheelEvent.DOM_DELTA_PIXEL:
+		case WheelEvent.DOM_DELTA_LINE:
 			deltaAmount = ev.deltaY * Math.sqrt(v.scrollHeight);
 			break;
 
-		case WheelEvent.DOM_DELTA_PIXEL:
+		case WheelEvent.DOM_DELTA_PAGE:
 			deltaAmount = ev.deltaY * v.scrollHeight;
 			break;
 		}
@@ -295,6 +295,7 @@ export class VoltageArea extends React.Component {
 		// can't cuz it's passive ev.preventDefault();
 		ev.stopPropagation();
 	}
+
 
 	/* *************************************************** rendering */
 
