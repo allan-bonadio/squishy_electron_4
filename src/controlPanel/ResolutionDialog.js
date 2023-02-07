@@ -61,14 +61,14 @@ export default class ResolutionDialog extends React.Component {
 	OK =
 	ev => {
 		ResolutionDialog.okCallback(this.state);
-		CommonDialog.startClosingDialog();
+		CommonDialog.closeDialog();
 	}
 
 	// called when user clicks Cancel, before dialog is hidden in App
 	cancel =
 	ev => {
 		ResolutionDialog.cancelCallback();
-		CommonDialog.startClosingDialog();
+		CommonDialog.closeDialog();
 	}
 
 
@@ -132,13 +132,14 @@ export default class ResolutionDialog extends React.Component {
 			powerIndex: +powerIndex,
 			N: +N,
 		});
-		console.info(`handleResChange(N=${N}, powerIndex=$powerIndex) `)
+		console.info(`handleResChange, not effective yet (N=${N}, powerIndex=${powerIndex}) `)
 	}
 
+	// Endless or Well
 	renderContinuum() {
 		const s = this.state;
 		const onChange = ev => this.setState({continuum: +ev.target.value});
-		return <>
+		return <div className='continuum'>
 			what kind of space:
 			<label  key='contENDLESS'>
 				<input type='radio' name='continuum'  value={qe.contENDLESS}
@@ -149,7 +150,7 @@ export default class ResolutionDialog extends React.Component {
 						? 'bold'
 						: 'normal'}}/>
 				Endless
-				<br /><small>wrapping around from end to start</small>
+				<br /><small>wrapping around from right to left</small>
 			</label>
 			<label  key='contWELL'>
 				<input type='radio' name='continuum'  value={qe.contWELL}
@@ -168,7 +169,7 @@ export default class ResolutionDialog extends React.Component {
 						: 'normal'}}
 						disabled />
 				Discreet Quanta (not developed yet)</label> */}
-		</>;
+		</div>;
 	}
 
 //					style={{float: 'left', width: '45%', paddingRight: '2em'}} >
@@ -194,6 +195,7 @@ export default class ResolutionDialog extends React.Component {
 					<label>Space Length: &nbsp;
 						<input value={this.state.spaceLength} placeholder='Fill in length'
 							onChange={ev => this.setState({spaceLength: ev.target.value}) } />
+						nm
 						<br />
 						<small>Total length, in nanometers, of space, resulting
 						in {(this.state.spaceLength /(this.state.N - 1)).toPrecision(3)}nm

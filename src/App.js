@@ -20,8 +20,10 @@ class App extends React.Component {
 		this.state = {
 			//clientWidth: document.body.clientWidth,  // window width as of constructor
 			squishPanelExists: true,  // briefly cycles off and on when user changes resolution
-			isDialogShowing: false,
 			cppRunning: false,
+
+			// non-null when dialog is showing
+			dialogContent: null,
 		};
 
 		eSpaceCreatedPromise.then(space => this.setState({cppRunning: true}));
@@ -55,14 +57,11 @@ class App extends React.Component {
 
 	/* ************************************************ CommonDialog */
 
-	// this is called before the ResolutionDialog has been instantiated
-	static showDialog() {
-		App.me.setState({isDialogShowing: true});
-	}
-
-	static hideDialog() {
-		App.me.setState({isDialogShowing: false});
-		CommonDialog.finishClosingDialog();
+	// To show the dialog, set the cent comp to something other than null
+	// To hide it again, set it to null.  This function does each.
+	setDialog =
+	(centComp) => {
+		this.setState({dialogContent: centComp});
 	}
 
 	/* ************************************************ re-creation */
@@ -105,8 +104,6 @@ class App extends React.Component {
 			</div>;
 		}
 
-		const sqDialog = s.isDialogShowing ? <CommonDialog  /> : null;
-
 		return (
 			<div className="App" ref={el => this.appEl = el}>
 				<h2 className="App-header">
@@ -117,7 +114,7 @@ class App extends React.Component {
 				</h2>
 
 				{sqPanel}
-				{sqDialog}
+				<CommonDialog  dialogContent={s.dialogContent} setDialog={this.setDialog} />
 				<footer>
 					<img id='emscriptenLogo' src='logos/emscriptenLogo.svg' alt='powered by Emscripten'/>
 					<img id='webassemblyLogo' src='logos/webassemblyLogo.svg'  alt='powered by WebAssembly'/>

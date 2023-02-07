@@ -25,7 +25,11 @@ var {
 }
 
 small {
-	font-size: .7em;
+	font-size: .8em;
+}
+
+big {
+	font-size: 1.25em;
 }
 
 /* **************************************** app outer components */
@@ -166,23 +170,27 @@ button {
 	width: 100%;
 	height: 100%;
 
-	padding-top: 10%;
+	padding-top: 10%;  // ??
 }
 
-.dialog {
+dialog#CommonDialog {
+	// let the specific kind of dialog decide the border, padding, background, etc
 	flex: 0 0 50em;
-	padding: 2em;
+	padding: 0;
 	line-height: 1.5em;
-	height: 30em;
 
-	border: 5px ridge #888;
-	background-color: #111;
-	color: #eee;
-	box-shadow: 5px 5px 5px 5px #0008;
+	border: none;
+	background-color: transparent;
+	color: black;
+	box-shadow: 5px 5px 5px #0008;
+
+	&::backdrop {
+		background-color: #8888;
+	}
 
 	label {
 		display: block;
-		margin: 0;
+		margin: 1em 0;
 	}
 
 	input[type=radio] {
@@ -212,37 +220,38 @@ button {
 		margin: 1em 0 0 0;
 	}
 
-}
+	// the insides of various dialogs
+	#SimpleDialog, #ErrorDialog {
+		padding: 3em;
+		border: 1px #aaa outset;
+		box-shadow: 10px 5px 5px #0007;
+		height: 100%;
 
-#SimpleDialog, #ErrorDialog {
-	margin: 5em 25%;
-	padding: 2em;
-	border: 1px white solid;
-	box-shadow: 10px 5px 5px #0007;
-
-	p {
-		min-width: 30em;
-	}
-	nav {
-		text-align: right;
-		button {
-			margin-top: 2em;
-			padding: 1em 5em;
+		p {
+			min-width: 30em;
+		}
+		nav {
+			text-align: right;
+			button {
+				text-align: center;
+				margin-top: 2em;
+				padding: 1em 4em;
+			}
 		}
 	}
+
+	#SimpleDialog {
+		background: #444;
+		color: #fff;
+	}
+	#ErrorDialog {
+		background: #800;
+		color: #ffe;
+	}
+
 }
 
-#SimpleDialog {
-	background: #777;
-	color: #fff;
-}
-#ErrorDialog {
-	background: #800;
-	color: #ffc;
-	border-color: #000;
-	box-shadow: 1em 1em 1em #0008;
-}
-
+// this strange experiment that I haven't touched in at least a year
 .runningOneCycle {
 	float: right;
 	margin: 1em;
