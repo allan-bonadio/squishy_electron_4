@@ -207,7 +207,7 @@ export class WaveView extends React.Component {
 		}
 
 		const spinner = qe.cppLoaded ? ''
-			: <img className='spinner' alt='spinner' src='images/eclipseOnTransparent.gif' />;
+			: <img className='spinner' alt='spinner' src='/images/eclipseOnTransparent.gif' />;
 
 		// sometimes a fraction of a pixel causes the horiz scroll bar to kick in.  avoid that without messing up everything.
 		let widthToUse = p.width - .5;
@@ -239,7 +239,7 @@ export class WaveView extends React.Component {
 						frame <span className='voNorthEast'>{frameSerial}</span>
 					</div>
 
-					<img className='sizeBox' src='images/sizeBox4.png' alt='size box'
+					<img className='sizeBox' src='/images/sizeBox4.png' alt='size box'
 						onMouseDown={this.mouseDown}
 						style={{width: `${sizeBoxSize}px`, height: `${sizeBoxSize}px`}} />
 

@@ -148,12 +148,12 @@ export function VoltageSidebar(props) {
 
 		<button className='zoomIn'
 				onClick={ev => props.zoomVoltHandler(+1)} style={{flexBasis: sidebarWidth}} >
-			<img src='images/zoomInIcon.png' alt='zoom in' />
+			<img src='/images/zoomInIcon.png' alt='zoom in' />
 		</button>
 
 		<button className='zoomOut'
 				onClick={ev => props.zoomVoltHandler(-1)} style={{flexBasis: sidebarWidth}} >
-			<img src='images/zoomOutIcon.png' alt='zoom out' />
+			<img src='/images/zoomOutIcon.png' alt='zoom out' />
 		</button>
 
 		<div className='voltRail' ref={el => railEl = el}>
