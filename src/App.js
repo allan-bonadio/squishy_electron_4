@@ -8,6 +8,7 @@ import './App.scss';
 
 import SquishPanel from './SquishPanel.js';
 import CommonDialog from './widgets/CommonDialog.js';
+import DocReader from './widgets/DocReader.js';
 import {eSpaceCreatedPromise} from './engine/eEngine.js';
 
 let traceResize = false;
@@ -53,15 +54,23 @@ class App extends React.Component {
 				console.log(`🍦 mounting resize cuz scrollbar: ${this.state.clientWidth} --> ${bodyClientWidth} `);
 			//debugger;
 		}
+
+		// if they got the URL with ?intro=1 on the end, open the introduction
+		if ('?intro=1' == location.search) {    // eslint-disable-line no-restricted-globals
+			debugger;
+			setTimeout(() => {
+				DocReader.openWithUri('/intro/intro1.html');
+			}, 5000);
+		}
 	}
 
 	/* ************************************************ CommonDialog */
 
-	// To show the dialog, set the cent comp to something other than null
+	// To show the dialog, set the central component and dialog style to something other than null
 	// To hide it again, set it to null.  This function does each.
 	setDialog =
-	(centComp) => {
-		this.setState({dialogContent: centComp});
+	(dialogContent, dialogStyle) => {
+		this.setState({dialogContent, dialogStyle});
 	}
 
 	/* ************************************************ re-creation */
@@ -100,14 +109,14 @@ class App extends React.Component {
 		else {
 			// spinner tells ppl we're working on it
 			sqPanel= <div id='theSquishPanel' >
-				<img className='spinner' alt='spinner' src='images/eclipseOnTransparent.gif' />
+				<img className='spinner' alt='spinner' src='/images/eclipseOnTransparent.gif' />
 			</div>;
 		}
 
 		return (
 			<div className="App" ref={el => this.appEl = el}>
 				<h2 className="App-header">
-					<img className='splatImage' src='images/splat.png'
+					<img className='splatImage' src='/images/splat.png'
 						width='100px' alt='squishy icon'/>
 					&nbsp; &nbsp;
 					Squishy Electron

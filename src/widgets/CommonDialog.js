@@ -13,6 +13,7 @@ import 'dialog-polyfill/dist/dialog-polyfill.css';
 //import App from '../App.js';
 import {interpretCppException} from '../utils/errors.js';
 
+
 // how to use:
 //    CommonDialog.openSimpleDialog("Elvis has left the building.");
 // That makes a simple (non-error) dialog with that text and an OK button.
@@ -42,14 +43,25 @@ import {interpretCppException} from '../utils/errors.js';
 // set prop types
 function setPT() {
 	CommonDialog.propTypes = {
+		// stuff that goes inside the <dialog>
+		dialogContent: PropTypes.object,
+
+		// style on the <dialog>, including BG color
+		dialogStyles: PropTypes.object,
+	};
+
+	CommonDialog.defaultProps = {
+		dialogContent: <div>empty dialog</div>,
+		dialogStyles: {backgroundColor: '#333'},
 	};
 }
 
+// ref function when we finally render
 const setDialogElement =
 (el) => {
-	CommonDialog.dialogElement ??= el;
+	CommonDialog.dialogElement = el;  // the raw DOM object
 
-	// google's polyfill for the <dialog element
+	// google's polyfill for the <dialog element; harmless if a modern browser
 	if (el)
 		dialogPolyfill.registerDialog(el);
 }
@@ -60,7 +72,7 @@ function CommonDialog(props) {
 	// I want to use this someday, nonmodal... CommonDialog.dialogElement.show();
 
 	return (
-		<dialog id='CommonDialog' ref={el => setDialogElement(el)}>
+		<dialog id='CommonDialog' ref={el => setDialogElement(el)} style={props.dialogStyles}>
 			{props.dialogContent}
 		</dialog>
 	);
@@ -69,11 +81,11 @@ setPT();
 
 
 CommonDialog.openDialog =
-(dialogContent) => {
+(dialogContent, dialogStyles) => {
 	// tells App to show the dialog.  The App holds the state.
 	// So we, here, send the content to App, who saves it in its state,
 	// only to pass it down here in CommonDialog's props
-	CommonDialog.setDialog(dialogContent);
+	CommonDialog.setDialog(dialogContent, dialogStyles);
 	if (CommonDialog.dialogElement) {
 		try {
 			// will throw if dialog already up
@@ -90,11 +102,10 @@ CommonDialog.openDialog =
 // called by client sw (whoever called us) after user clicks OK or Cancel.
 CommonDialog.closeDialog =
 () => {
-	CommonDialog.setDialog(null);
+	CommonDialog.setDialog(null, null);
 	if (CommonDialog.dialogElement)
 		CommonDialog.dialogElement.close();
 }
-
 
 /* *********************************************************** SimpleDialog  component */
 
@@ -113,7 +124,7 @@ function SimpleDialog(props) {
 
 CommonDialog.openSimpleDialog =
 (text) => {
-	CommonDialog.openDialog(<SimpleDialog text={text} />);
+	CommonDialog.openDialog(<SimpleDialog text={text}/>,  {backgroundColor: '#ddd'});
 }
 
 /* *********************************************************** ErrorDialog component */
@@ -162,7 +173,8 @@ function ErrorDialog(props) {
 
 CommonDialog.openErrorDialog =
 (ex, where) => {
-	CommonDialog.openDialog(<ErrorDialog error={ex} where={where} />);
+	CommonDialog.openDialog(<ErrorDialog error={ex} where={where} />,
+			{backgroundColor: '#a00'});
 }
 
 // for testing
