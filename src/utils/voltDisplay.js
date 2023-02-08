@@ -368,6 +368,3 @@ export class voltDisplay {
 }
 
 export default voltDisplay;
-
-//			if ((x==null) || !isFinite(x) || (y==null) || !isFinite(y))
-//				debugger;

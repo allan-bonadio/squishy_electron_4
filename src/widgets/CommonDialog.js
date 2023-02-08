@@ -27,6 +27,17 @@ import {interpretCppException} from '../utils/errors.js';
 // If you don't close dialog before another dialog opens,
 // it'll print an error on the console but actually the 2nd dialog will still work.
 
+// to test the polyfill, try changing 'dialog' to a 'footer' element
+//		- here in this file
+//		- also in node_modules/dialog-polyfill/dist/dialog-polyfill.esm.js
+//			global search-replace /'dialog'/ to /'footer'/
+//		- also in node_modules/dialog-polyfill/dist/dialog-polyfill.css
+//			replace /dialog/ to /footer/ with WHOLE WORD on, ie  NOT in _dialog_overlay
+// 	- optional: change also in App.scss; or just realize that non-essential styles will be omitted
+// You'll have to kill and restart npm start; it caches the node_modules and doesn't check for changes.
+// and set them BACK when you're done!
+
+
 /* *********************************************************** CommonDialog */
 // set prop types
 function setPT() {
@@ -46,14 +57,7 @@ const setDialogElement =
 function CommonDialog(props) {
 	CommonDialog.setDialog = props.setDialog;  // method on App
 
-	// early on, this hasn't been set yet, so can't start the app with dialog open.
-//	if (CommonDialog.dialogElement) {
-//		if (props.dialogContent)
-//		else
-//			CommonDialog.dialogElement.close();
-
-		// I want to use this someday, nonmodal... CommonDialog.dialogElement.show();
-	//}
+	// I want to use this someday, nonmodal... CommonDialog.dialogElement.show();
 
 	return (
 		<dialog id='CommonDialog' ref={el => setDialogElement(el)}>
@@ -79,7 +83,7 @@ CommonDialog.openDialog =
 			console.log(ex);
 		}
 	}
-	}
+
 	// so... is this dialog going to 'flash' previous contents when it shows?!?!?!?!
 }
 
@@ -90,11 +94,6 @@ CommonDialog.closeDialog =
 	if (CommonDialog.dialogElement)
 		CommonDialog.dialogElement.close();
 }
-
-// called when App finishes closing it.  No - nobody calls this.
-//CommonDialog.finishClosingDialog() {
-//	CommonDialog.centralComponent = null;
-//}
 
 
 /* *********************************************************** SimpleDialog  component */
