@@ -5,6 +5,8 @@ import fsp from 'node:fs/promises';
 import {exec, execSync} from 'node:child_process';
 import readline from 'node:readline';
 
+import YAML from 'yaml';
+
 import {marked} from 'marked';
 import markedKatex from 'marked-katex-extension';
 
@@ -36,7 +38,7 @@ marked.use(markedKatex(katexOptions));
 
 // this will wrap each compiled MD piece
 let template;
-let nDirsWalked, nFilesTried, nFilesPassedThru, nMDFilesCompiled;
+let nDirsWalked, nFilesTried, nFilesPassedThru, nFilesSymlinked, nMDFilesCompiled;
 
 console.log(`•••••••••• compile docs with Markd + katex`);
 
@@ -58,7 +60,7 @@ process.chdir(process.env.SQUISH_ROOT +`/docGen`);
 /* ************************************************************* traversing and compiling */
 
 // figure out where this compiled file should go.
-// suffix should NOT have a dot
+// suffix should NOT have a dot; we'll add one
 function makeOutputPath(inputPath, suffix = '') {
 	let out = inputPath.replace(/docSrc/, '../public/doc')
 	if (suffix)
@@ -77,6 +79,60 @@ const catchException =
 	debugger;
 }
 
+// take the conte3nts of an md file, and other info, and plug stuff into the
+// template, to get the resulting .html file contents.
+function populateMDTemplate(contents, mdPath) {
+	debugger;
+	let variables = {
+		// the Actual MD  converted to HTML
+		body : marked.parse(contents, markdOptions),
+
+		// default title comes from filename - \w chars before the suffix
+		title: mdPath.replace(/^docSrc.+?(\w+)\.md$/, '')
+			.replace(/_/, ' '),
+
+		fromFile: mdPath,
+
+		buildTime: (new Date()).toLocaleString(),
+	};
+
+	// the metadata.  Opening and closing HTML comment syntax must each be
+	// on a line on its own.  Must start at start of file.  Lines in between
+	// are YAML.  (To match all chars, use [^] or else use . with the /s flag)
+	let yaml = contents.replace(/^<!--\n(.*)\n-->\n.*$/s, '$1');
+
+	// but that doesn't mean the yaml is correct syntax
+	let js = {};
+	console.info(`the yaml: ''${yaml}''`);
+	if (yaml) {
+		try {
+			// if present, that yaml block can override any other variables
+			let js = YAML.parse(yaml);
+			console.info(`the resulting object: `, js);
+		} catch (ex) {
+			js = {description: ex.message};
+			console.error(`parsing yaml, ${ex.message}, but parsing will continue`);
+		}
+		Object.assign(variables, js);
+	}
+
+	// final templating plugins.  Any var that's not in the template never shows up.
+	let html = template;
+	for (let key in variables) {
+		html = html.replace(`〖${key}〗`, variables[key]);
+	}
+	//html = template
+	//	.replace('〖body〗', html)
+	//	.replace('〖title〗', title)
+	//	.replace('〖fromFile〗', mdPath)
+	//	.replace('〖description〗', 'info for squishy electron')
+	//	.replace('〖buildTime〗', (new Date()).toLocaleString());
+	if (traceDetails)
+		console.log(`txlated the md file ${mdPath}! for html ${html.length} bytes.`);
+	return html;
+}
+
+
 // a .md file
 function compileAnMDFile(mdPath) {
 	let htmlPath = makeOutputPath(mdPath, 'html');
@@ -87,16 +143,8 @@ function compileAnMDFile(mdPath) {
 	.then(contents => {
 		if (traceDetails)
 			console.log(`read the md file ${mdPath}!  ${contents.length} bytes.`);
-		let html = marked.parse(contents, markdOptions);
-		let title = mdPath.replace(/^([^.]*)\./).replace(/_/, ' ');
 
-		html = template
-			.replace('〖body〗', html)
-			.replace('〖title〗', title)
-			.replace('〖fromFile〗', mdPath)
-			.replace('〖description〗', 'info for squishy electron')
-			.replace('〖buildTime〗', (new Date()).toLocaleString());
-		if (traceDetails) console.log(`txlated the md file ${mdPath}! for html ${html.length} bytes.`);
+		let html = populateMDTemplate(contents, mdPath);
 
 		return fsp.writeFile(htmlPath, html, {encoding: 'utf8'})
 		.then(rv => {
@@ -114,7 +162,7 @@ function compileAnMDFile(mdPath) {
 }
 
 
-// something else, passthru.
+// something else, passthru.  actually not used.
 function copyOverFile(filePath) {
 	let outputPath = makeOutputPath(filePath);
 	if (traceDetails)
@@ -142,6 +190,23 @@ function copyOverFile(filePath) {
 }
 
 
+// Actually some of these are like megabyte videos; do it with a symlink.  npm
+// build will copy over to the build directory either way.  returns a promise
+// like all other functions around here.
+function symlinkFile(filePath) {
+	let outputPath = makeOutputPath(filePath);
+	if (traceDetails)
+		console.log(`about to symlink file ${filePath} to file ${outputPath}`);
+
+	nFilesSymlinked++;
+
+	// so the symlink path needs to be relative to the output symlink file.
+	// up 2 public/doc, to the repo root, then across into the docSrc dir
+	// boy so much simpler.
+	return fsp.symlink(`../../docGen/${filePath}`, outputPath);
+}
+
+
 // it's a file, but what kind?  trust the suffix.
 function compileAFile(filePath) {
 	if (filePath.endsWith('.DS_Store'))
@@ -159,7 +224,7 @@ function compileAFile(filePath) {
 
 	// copy over image files, video files, ...
 	default:
-		return copyOverFile(filePath);
+		return symlinkFile(filePath);
 	}
 }
 
@@ -167,7 +232,10 @@ function compileAFile(filePath) {
 function compileADir(dirPath) {
 	let docPath = makeOutputPath(dirPath);
 
-	return fsp.readdir(dirPath, {withFileTypes: true})
+	// don't forget to actually CREATE the directory!
+	// "Calling .mkdir() when path exists doesn't error when recursive is true."
+	return fsp.mkdir(docPath, {recursive: true})
+	.then(() => fsp.readdir(dirPath, {withFileTypes: true}))
 	.then(list => {
 		let promz = [];
 		for (let dirent of list) {
@@ -178,6 +246,7 @@ function compileADir(dirPath) {
 			else //if (dirent.isSymbolicLink())
 				promz.push(Promise.reject(`Sorry, can't deal with a symlink or other
 					kind of file besides a dir or regular file, yet`));
+			// you'll need fsPromises.realpath(path[, options]) to do this right
 		}
 		nDirsWalked++;
 
@@ -225,7 +294,8 @@ function main() {
 	if (second && !second.includes('compileDocs'))
 		argv.unshift(second);
 
-	nFilesTried = nFilesPassedThru = nMDFilesCompiled = nDirsWalked = 0;
+	nFilesTried = nFilesPassedThru = nFilesSymlinked =
+		nMDFilesCompiled = nDirsWalked = 0;
 	if (argv.length > 0) {
 		// process just the listed files
 		return Promise.allSettled(
@@ -261,8 +331,12 @@ function generate() {
 		console.log(`${nDirsWalked} directories scanned`);
 		console.log(`${nFilesTried} files read`);
 		console.log(`${nFilesPassedThru} files copied verbatim to the doc directory`);
+		console.log(`${nFilesSymlinked} files symlinked into the doc directory`);
+
 		console.log(`${nMDFilesCompiled} MarkDown files compiled to HTML`);
-		console.log(`main results:`, mainResults);
+
+		if (traceFinalPromiseResult)
+			console.log(`main results:`, mainResults);
 
 		if (traceFinalDocDir) {
 			const opts = {cwd: '../public/doc'};
@@ -284,14 +358,12 @@ function generate() {
 
 /* ************************************************************* startup */
 // this runs first.  prompt so I don't delete a bunch of files by accident.
-console.log(execSync('ls -l *',
+console.log(execSync('ls -m *',
 	{cwd: `${process.env.SQUISH_ROOT}/public/doc`, encoding: 'utf8'}));
 
-// prompt doesn't seem to work
-console.log(`We're going to delete this.  continue? or ^C  `);
-const rl = readline.createInterface({input: process.stdin, output: process.stdout,
-	prompt: `We're going to delete this.  continue? or ^C  `,});
-
+// prompt: doesn't seem to work
+console.log(`We're going to delete those ⬆︎ files in public/doc.  continue? or ^C  `);
+const rl = readline.createInterface({input: process.stdin, output: process.stdout});
 rl.on('SIGINT', () => process.exit(0));
 
 rl.on('line', line => {
