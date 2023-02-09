@@ -58,13 +58,11 @@ class DocReader extends React.Component {
 		let src = s.docUri ? `/doc/${s.docUri}` : 'about:blank';
 		return (
 			<article id='DocReader' >
+				<button className='x_close_box' onClick={CommonDialog.closeDialog} >×</button>
 				<iframe src={src} name='DocReader' title='about squishy electron'
 					allow='fullscreen' referrerPolicy='no-referrer'
 					width={frameWidth} height={frameHeight} >
 				</iframe>
-				<nav>
-					<button onClick={CommonDialog.closeDialog} >done</button>
-				</nav>
 			</article>
 		);
 

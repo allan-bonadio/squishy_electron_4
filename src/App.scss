@@ -265,6 +265,19 @@ dialog#CommonDialog {
 
 }
 
+.x_close_box {
+	position: absolute;
+	top: 0;
+	right: 0;
+	font-size: 2em;
+	padding: 0;
+	border: none;
+	border-radius: 0;
+	line-height: .5em;
+	margin: .5em;
+	background-color: transparent;
+}
+
 // this strange experiment that I haven't touched in at least a year
 .runningOneCycle {
 	float: right;
