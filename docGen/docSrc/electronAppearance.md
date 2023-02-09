@@ -1,3 +1,7 @@
+<!--
+title: Electron Appearance
+description: What does an electron look like?
+-->
 
 Q: what does an electron look like?
 

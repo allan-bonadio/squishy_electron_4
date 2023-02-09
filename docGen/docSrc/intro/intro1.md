@@ -1,3 +1,8 @@
+<!--
+title: my Squishy Electron project
+description: Overview and some results from Squishy Electron
+-->
+
 <!doctype html>
 <html>
 <head>
@@ -14,9 +19,6 @@
 		.video-wrap {
 			overflow-x: hidden;
 			/*float: left;*/
-		}
-		aside {
-			margin:1em;
 		}
 		img {
 			display: block;

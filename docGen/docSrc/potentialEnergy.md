@@ -1,3 +1,7 @@
+<!--
+title: Potential Energy
+description: Explanation of Potential Energy Physics & Mathematics
+-->
 <title>Potential Energy</title>
 <link rel=stylesheet href=docs.css />
 <h1>Potential Energy</h1>

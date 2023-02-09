@@ -1,4 +1,8 @@
-How this was Built
+<!--
+title: my Squishy Electron project
+description: Overview and some results from Squishy Electron
+-->
+# How this was Built
 
 This runs in a browser, so there's a limit to what the code can do.  Even though, there's pretty butch tools available as of 2021.
 

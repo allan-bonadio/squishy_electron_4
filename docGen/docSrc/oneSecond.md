@@ -1,3 +1,7 @@
+<!--
+title: One Second
+description: How this Project Got Started
+-->
 "What are you trying to do?", asked the professor.
 
 I was in the 'computer room' in Upson Hall, at college.  The Computer wasn't actually there; it was out "by the airport".  Years before, student Vietnam war protesters had taken over a few buildings in a nationally televised, several-day incident.  The Computer was very expensive, so they figured that it would be safer out there.  I'd never been to that airport; I got to school by greyhound bus or car.

@@ -1,3 +1,7 @@
+<!--
+title: Physical Units
+description: Physical Units of Measure in Squishy Electron
+-->
 # Physical Units of Measure in Squishy Electron
 
 In order to deal properly with units,

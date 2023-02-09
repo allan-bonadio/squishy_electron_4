@@ -1,3 +1,8 @@
+<!--
+title: Kinetic Energy
+description: Explanation of Kinetic Energy Physics & Mathematics
+-->
+<meta name="description" content="The quick brown fox jumped over the lazy dog.">
 <title>Kinetic Energy</title>
 <link rel=stylesheet href=docs.css />
 <h1>Kinetic Energy</h1>

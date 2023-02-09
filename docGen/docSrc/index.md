@@ -1,3 +1,7 @@
+<!--
+title: Overview of Documentation
+description: what have I got, what do I need
+-->
 topics I need:
 
 - sci notation & powers of 10
@@ -8,6 +12,7 @@ topics I need:
 - equations - arghhhh!
 - classical mechanics - arghhhh!
 
+- tooltip help for the app
 
 <a href=electronAppearance.html> Electron Appearance </a>
 <a href=oneSecond.html> One Second </a>

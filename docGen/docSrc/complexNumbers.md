@@ -1,3 +1,7 @@
+<!--
+title: my Squishy Electron project
+description: Overview and some results from Squishy Electron
+-->
 <title>Complex Numbers</title>
 <link rel=stylesheet href=docs.css />
 <h1>Complex Number refresher</h1>

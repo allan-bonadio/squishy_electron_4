@@ -1,3 +1,7 @@
+<!--
+title: Waves
+description: Explanation of Wave Physics & Mathematics
+-->
 
 Waves
 =======================

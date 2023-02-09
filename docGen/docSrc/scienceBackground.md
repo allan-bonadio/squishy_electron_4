@@ -1,3 +1,7 @@
+<!--
+title: my Squishy Electron project
+description: Overview and some results from Squishy Electron
+-->
 What is Science?  stupid, nobody cares.
 
 What is Physics?  Physics is the science of things that aren't alive, or if they are, we don't care.  This applies to things that are very large or very small or anything in between.  Astrophysics or Astronomy is the physics of very large things (planets, galaxies) up to the size of the universe.  Quantum Mechanics is the study of very tiny things = the tiniest.  The smallest particles they've found on the frontiers of physics, all follow the rules of Quantum Mechanics.

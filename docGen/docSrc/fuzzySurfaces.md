@@ -1,3 +1,7 @@
+<!--
+title: Fuzzy Surfaces
+description: Why Macroscopic Objects look different from Microscopic Objects
+-->
 
 So, I'm grabbing a can.  A piece of steel, that's used to wrap food, in this case, refried beans.  The outside of the can is cool and solid; I just took it out of the refrigerator.  I ripped off the paper label, so the metal underneath feels cool and solid.  Maybe it's galvanized, plated in tin, just a thin latyer.  It's steel, mostly iron metal.  It  feels smooth and solid.  Actually, it's got ribs around the circumference of the can, maybe to make it stronger yet.  It feels to me like a perfectly smooth surface.
 
