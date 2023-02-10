@@ -15,6 +15,7 @@ echo you can do either make build or npm build, same
 echo "🎁 🔨  starting initial clean"
 cd quantumEngine
 make clean
+cd ..
 rm -rf build build.zip
 cd $SQUISH_ROOT
 echo "🎁 🔨  initial clean Completed"
@@ -41,10 +42,16 @@ then
 	node_modules/.bin/react-scripts build || exit 37
 	mv /tmp/quantumEngine.wasm.map public/qEng/
 else
-	node_modules/.bin/react-scripts build || exit 37
+	node_modules/.bin/react-scripts build || exit 39
 fi
 echo
 echo "🎁 🔨  NPM Build Completed"
+
+
+echo "🎁 🔨  starting Docs build"
+docGen/compileDocs --batch
+echo
+echo "🎁 🔨  Docs Build Completed"
 
 
 echo "🎁 🔨  starting final cleanup"
