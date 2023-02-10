@@ -27,6 +27,8 @@ class DocReader extends React.Component {
 
 		this.state = {
 			docUri: DocReader.startingUri,  // null = hide.  a URL means show.
+
+			...this.getOurDimensions(),
 		};
 		if (traceReader) console.log(`📘 📘 doc reader constructed for '${DocReader.startingUri}'`);
 
@@ -38,10 +40,11 @@ class DocReader extends React.Component {
 	static openWithUri(uri) {
 		// am i doing this right?!?!
 		if (DocReader.me)
-			DocReader.me.setState({docUri: uri});
+			DocReader.me.setState({docUri: uri});  // doesn't exist yet
 		else
 			DocReader.startingUri = uri;
-		CommonDialog.openDialog(<DocReader/>, {balckgroundColor: '#fff'});
+		CommonDialog.openDialog(<DocReader/>,
+			{backgroundColor: '#fff', top: '50px', transform: 'none'});
 	}
 
 	static close(uri) {
@@ -49,26 +52,47 @@ class DocReader extends React.Component {
 		CommonDialog.close()
 	}
 
+	// App will call this if the user resizes the window
+	static setDimensions(width) {
+		if (! DocReader.me)
+			return;
+
+		// actually we don't use that width, but at least we're
+		// notified.  The body isn't always as high as the whole window, it
+		// wraps the content.  Also, it might be taller; it's the content, not
+		// the window
+		DocReader.me.setState(DocReader.me.getOurDimensions());
+	}
+
+	// want to fit inside the window, whatever its size
+	getOurDimensions() {
+		return {
+			width: window.innerWidth - 100,
+			height: window.innerHeight - 100,
+		}
+	}
+
 	render() {
 		let s = this.state;
 
-		// figure out the size the iframe should be, based on the viewport size
-		let frameWidth = window.innerWidth - 100;
-		let frameHeight = window.innerHeight - 200;
+		// figure out the size the iframe should be, based on the viewport size.
+		//  iframe needs height and width as attributes.
+		let dims = this.getOurDimensions();
 		let src = s.docUri ? `/doc/${s.docUri}` : 'about:blank';
 		return (
 			<article id='DocReader' >
 				<button className='x_close_box' onClick={CommonDialog.closeDialog} >×</button>
 				<iframe src={src} name='DocReader' title='about squishy electron'
 					allow='fullscreen' referrerPolicy='no-referrer'
-					width={frameWidth} height={frameHeight} >
+					width={dims.width} height={dims.height} >
 				</iframe>
 			</article>
 		);
 
-		// someday, add in the
+		// someday, maybe add in the
 		// sandbox='allow-forms allow-modals allow-same-origin allow-scripts allow-storage-access-by-user-activation'
 		// attribute for the iframe
+		// or, maybe doesn't matter, these are security things, and it's all ours
 	}
 
 

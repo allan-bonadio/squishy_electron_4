@@ -13,6 +13,8 @@ import 'dialog-polyfill/dist/dialog-polyfill.css';
 //import App from '../App.js';
 import {interpretCppException} from '../utils/errors.js';
 
+let traceKeystrokes = true;
+let traceTestSimpleError = true;
 
 // how to use:
 //    CommonDialog.openSimpleDialog("Elvis has left the building.");
@@ -21,7 +23,7 @@ import {interpretCppException} from '../utils/errors.js';
 //    CommonDialog.openErrorDialog(new Error("sorry, luser, you screwed up!  Don't ever do that again!"), 'SetWavePanel');
 // That makes a error dialog with stack or message and an OK button.
 //
-//    CommonDialog.openDialog(<MyGargantuanDialogContent />);
+//    CommonDialog.openDialog(<MyGargantuanDialogContent />, {style: for, dialog: element});
 // Makes a complex dialog given that component.  Call CommonDialog.closeDialog() when it
 // should dismiss itself.  You're responsible for everything else.
 //
@@ -113,7 +115,7 @@ CommonDialog.closeDialog =
 function SimpleDialog(props) {
 	// There is one and only one CommonDialog, so I can use IDs in it
 	return (
-		<article id='SimpleDialog' >
+		<article id='SimpleDialog' onKeyDown={CommonDialog.returnEscapeKeyDown} >
 			<p>{props.text}</p>
 			<nav>
 				<button onClick={CommonDialog.closeDialog} autoFocus={true} >OK</button>
@@ -126,6 +128,24 @@ CommonDialog.openSimpleDialog =
 (text) => {
 	CommonDialog.openDialog(<SimpleDialog text={text}/>,  {backgroundColor: '#ddd'});
 }
+
+// dismiss the dialog upon a return or escape keystroke.  (for any simple dialog, esp SimpleDialog)
+// we put this on the article to catch keystrokes wherever they are focused
+CommonDialog.returnEscapeKeyDown =
+(ev) => {
+	ev.preventDefault();
+	ev.stopPropagation();
+	if (traceKeystrokes)
+		console.log(`Keystroke: ev.key=${ev.key}  ev.code=${ev.code}`, ev);
+
+	if (ev.isComposing || ev.keyCode === 229)
+		return;
+
+	if ('Enter' == ev.key || 'Escape' == ev.key)
+		CommonDialog.dialogElement.close();
+
+}
+
 
 /* *********************************************************** ErrorDialog component */
 
@@ -161,11 +181,11 @@ function ErrorDialog(props) {
 	console.error('ErrorDialog displays: ', ex);
 	let where = props.where ? ` at ${props.where}` : '';
 	return (
-		<article id='ErrorDialog' >
+		<article id='ErrorDialog' onKeyDown={CommonDialog.returnEscapeKeyDown} >
 			<h2><big>💥</big> Error {where}</h2>
 			{prepError(ex)}
 			<nav>
-				<button onClick={CommonDialog.closeDialog} autoFocus={true} >OK</button>
+				<button onClick={CommonDialog.closeDialog}  autoFocus={true} >OK</button>
 			</nav>
 		</article>
 	);
@@ -179,5 +199,14 @@ CommonDialog.openErrorDialog =
 
 // for testing
 window.CommonDialog = CommonDialog;
+if (traceTestSimpleError) {
+	let div = document.createElement('div');
+	div.innerHTML = `<button
+		onclick='CommonDialog.openSimpleDialog("hi howarya")'>
+		simple</button>
+		<button onclick='CommonDialog.openErrorDialog(new Error("Penny has left the stable"),
+		"the stable")'>error</button>`;
+	document.body.append(div);
+}
 
 export default CommonDialog;

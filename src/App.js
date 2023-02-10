@@ -19,7 +19,10 @@ class App extends React.Component {
 		App.me = this;
 
 		this.state = {
+			// somehow if we set these, we get strange sizing problems with the scroll bar.
 			//clientWidth: document.body.clientWidth,  // window width as of constructor
+			//clientHeight: document.body.clientHeight,
+
 			squishPanelExists: true,  // briefly cycles off and on when user changes resolution
 			cppRunning: false,
 
@@ -42,7 +45,10 @@ class App extends React.Component {
 			console.assert(ev.currentTarget === window, `ev.currentTarget =?== window`);
 
 			// if we don't set the state here, nobody redraws.  Otherwise, get body.clientWidth directly.
-			this.setState({clientWidth: bodyClientWidth})
+			this.setState({clientWidth: bodyClientWidth});
+
+			// the doc reader tries to track the window size
+			DocReader.setDimensions(bodyClientWidth);
 		});
 
 		// meanwhile, sometimes the first render starts before the vertical scrollbar kicks in,
@@ -57,10 +63,9 @@ class App extends React.Component {
 
 		// if they got the URL with ?intro=1 on the end, open the introduction
 		if ('?intro=1' == location.search) {    // eslint-disable-line no-restricted-globals
-			debugger;
 			setTimeout(() => {
 				DocReader.openWithUri('/intro/intro1.html');
-			}, 5000);
+			}, 500);
 		}
 	}
 
@@ -70,6 +75,7 @@ class App extends React.Component {
 	// To hide it again, set it to null.  This function does each.
 	setDialog =
 	(dialogContent, dialogStyle) => {
+		// where does this style go to?!?!?!
 		this.setState({dialogContent, dialogStyle});
 	}
 
