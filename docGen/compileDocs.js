@@ -10,10 +10,11 @@ import YAML from 'yaml';
 import {marked} from 'marked';
 import markedKatex from 'marked-katex-extension';
 
-let traceDetails = false;
+let traceControlFlow = false;
 let traceWhatTime = false;
-let traceFinalDocDir = true;
+let traceFinalDocDir = false;
 let traceFinalPromiseResult = false;
+let traceMetadata = false;
 
 /*
 ** The documentation is served from the public/doc directory, which contains mostly .html files.
@@ -28,7 +29,7 @@ whatTime('start of app running');
 const markdOptions = {
 	gfm: true,
 	headerIds: true,
-	headerPrefix: 'doc',
+	headerPrefix: 'doc,',
 	smartypants: true,  // i may be asking for trouble
 };
 
@@ -40,7 +41,11 @@ marked.use(markedKatex(katexOptions));
 let template;
 let nDirsWalked, nFilesTried, nFilesPassedThru, nFilesSymlinked, nMDFilesCompiled;
 
-console.log(`•••••••••• compile docs with Markd + katex`);
+console.log(`•••••••••• compile docs with Markd + katex ••••••••••
+compileDocs # prompts to delete the public/doc contents, then does all
+compileDocs --batch # no prompt, no delete, does all
+compileDocs colophon.md intro/intro1.md  # just does those two files
+`);
 
 if (!process.env.SQUISH_ROOT) {
 	console.error(`Must define env var SQUISH_ROOT!`);
@@ -48,23 +53,14 @@ if (!process.env.SQUISH_ROOT) {
 }
 process.chdir(process.env.SQUISH_ROOT +`/docGen`);
 
-/*
-**  Most of these functions return Promises.  They settle when it's task is done.
-**  It's all asynchronous and very fast.
-**
-**  Don't break the chain by returning nothing!  .then() will turn it into
-**  an immediately-resolved promise resolving in undefined.
-**  Then, your function probably won't get a chance to run!
-*/
-
-/* ************************************************************* traversing and compiling */
 
 // figure out where this compiled file should go.
 // suffix should NOT have a dot; we'll add one
 function makeOutputPath(inputPath, suffix = '') {
-	let out = inputPath.replace(/docSrc/, '../public/doc')
+	let out = inputPath.replace(/docSrc/, '../public/doc');
 	if (suffix)
 		out = out.replace(/\.\w+$/, `.${suffix}`);
+	//console.log(`makeOutputPath(${inputPath}) --> '${out}'`);
 	return out;
 }
 
@@ -79,10 +75,20 @@ const catchException =
 	debugger;
 }
 
-// take the conte3nts of an md file, and other info, and plug stuff into the
+/*
+**  Most of these functions from here on return Promises.  They settle
+**  when it's task is done.  It's all asynchronous and very fast.
+**
+**  Don't break the chain by returning nothing!  .then() will turn it into
+**  an immediately-resolved promise resolving in undefined.
+**  Then, your function might not get a chance to run!
+*/
+
+/* ************************************************************* Markdown Files */
+
+// take the contents of an md file, and other info, and plug stuff into the
 // template, to get the resulting .html file contents.
 function populateMDTemplate(contents, mdPath) {
-	debugger;
 	let variables = {
 		// the Actual MD  converted to HTML
 		body : marked.parse(contents, markdOptions),
@@ -103,12 +109,14 @@ function populateMDTemplate(contents, mdPath) {
 
 	// but that doesn't mean the yaml is correct syntax
 	let js = {};
-	console.info(`the yaml: ''${yaml}''`);
+	if (traceMetadata)
+		console.info(`the yaml: ''${yaml}''`);
 	if (yaml) {
 		try {
 			// if present, that yaml block can override any other variables
 			let js = YAML.parse(yaml);
-			console.info(`the resulting object: `, js);
+			if (traceMetadata)
+				console.info(`the resulting object: `, js);
 		} catch (ex) {
 			js = {description: ex.message};
 			console.error(`parsing yaml, ${ex.message}, but parsing will continue`);
@@ -117,17 +125,16 @@ function populateMDTemplate(contents, mdPath) {
 	}
 
 	// final templating plugins.  Any var that's not in the template never shows up.
-	let html = template;
-	for (let key in variables) {
-		html = html.replace(`〖${key}〗`, variables[key]);
-	}
-	//html = template
-	//	.replace('〖body〗', html)
-	//	.replace('〖title〗', title)
-	//	.replace('〖fromFile〗', mdPath)
-	//	.replace('〖description〗', 'info for squishy electron')
-	//	.replace('〖buildTime〗', (new Date()).toLocaleString());
-	if (traceDetails)
+	//for (let key in variables) {
+	//	html = html.replace(`〖${key}〗`, variables[key]);
+	//}
+	let html = template
+		.replace('〖body〗', variables.body)
+		.replace('〖title〗', variables.title)
+		.replace('〖fromFile〗', variables.mdPath)
+		.replace('〖description〗', variables.description)
+		.replace('〖buildTime〗', (new Date()).toLocaleString());
+	if (traceControlFlow)
 		console.log(`txlated the md file ${mdPath}! for html ${html.length} bytes.`);
 	return html;
 }
@@ -136,43 +143,47 @@ function populateMDTemplate(contents, mdPath) {
 // a .md file
 function compileAnMDFile(mdPath) {
 	let htmlPath = makeOutputPath(mdPath, 'html');
-	if (traceDetails)
+	if (traceControlFlow)
 		console.log(`about to compile md file ${mdPath} to html file ${htmlPath}`);
 
 	return readTextFile(mdPath, {encoding: 'utf8'})
 	.then(contents => {
-		if (traceDetails)
+		if (traceControlFlow)
 			console.log(`read the md file ${mdPath}!  ${contents.length} bytes.`);
 
 		let html = populateMDTemplate(contents, mdPath);
 
 		return fsp.writeFile(htmlPath, html, {encoding: 'utf8'})
 		.then(rv => {
-			if (traceDetails)
+			if (traceControlFlow)
 				console.log(`wrote the HTML file ${htmlPath}`);
 		});
 	})
 	.then(contents => {
-		if (traceDetails)
+		if (traceControlFlow)
 			console.log(`read ${mdPath} to ${htmlPath}`);
 		nMDFilesCompiled++;
+
+		// return value is what these promises resolve to, for trace msg
 		return `${mdPath.replace('docSrc/', '')} → ${htmlPath.replace('../public/doc/', '')}`;
 	})
 	.catch(ex => catchException(ex, `compiling  ${mdPath} to ${htmlPath}`));
 }
 
 
+/* ******************************************************************* files */
+
 // something else, passthru.  actually not used.
 function copyOverFile(filePath) {
 	let outputPath = makeOutputPath(filePath);
-	if (traceDetails)
+	if (traceControlFlow)
 		console.log(`about to copy file ${filePath} to file ${outputPath}`);
 
 	// read it in binary, a Buffer
 	//return readTextFile(filePath, {encoding: null})// no turns into utf8
 	return fsp.readFile(filePath)
 	.then(contents  => {
-		if (traceDetails) {
+		if (traceControlFlow) {
 			let type = typeof contents;
 			if (contents == 'object')
 				type = contents.constructor.name;
@@ -182,7 +193,7 @@ function copyOverFile(filePath) {
 		return fsp.writeFile(outputPath, contents, {encoding: null})
 		.then(rv => {
 			nFilesPassedThru++;
-			if (traceDetails)
+			if (traceControlFlow)
 				console.log(`wrote the file ${outputPath}`);
 			return `${filePath.replace('docSrc/', '')} → ${outputPath.replace('../public/doc/', '')}`;
 		});
@@ -195,15 +206,18 @@ function copyOverFile(filePath) {
 // like all other functions around here.
 function symlinkFile(filePath) {
 	let outputPath = makeOutputPath(filePath);
-	if (traceDetails)
+
+	// what goes into the symlink, which is at the outputPath.
+	// Must start with how many directories deep the symlink is.
+	let targetPath = `../docGen/${filePath}`
+	let m = filePath.matchAll(/\//g);
+	for (let stuff of m) targetPath = '../' + targetPath;
+
+	if (traceControlFlow)
 		console.log(`about to symlink file ${filePath} to file ${outputPath}`);
 
 	nFilesSymlinked++;
-
-	// so the symlink path needs to be relative to the output symlink file.
-	// up 2 public/doc, to the repo root, then across into the docSrc dir
-	// boy so much simpler.
-	return fsp.symlink(`../../docGen/${filePath}`, outputPath);
+	return fsp.symlink(targetPath, outputPath);
 }
 
 
@@ -227,6 +241,8 @@ function compileAFile(filePath) {
 		return symlinkFile(filePath);
 	}
 }
+
+/* ************************************************************* directories */
 
 // without a slash on the front or end of path
 function compileADir(dirPath) {
@@ -283,41 +299,80 @@ function compileFileOrDir(path) {
 
 /* ************************************************************* main */
 
+// prompt so I don't delete a bunch of files by accident.
+// these things don't do promises so we have to make our own.
+function promptAndDelete() {
+	return new Promise((succeed, fail) => {
+		exec('ls -mFA .',
+			{cwd: `${process.env.SQUISH_ROOT}/public/doc`, encoding: 'utf8'},
+			(err, lsResult, stderr) => {
+				if (err) {
+					console.error(stderr);
+					throw err;
+				}
+				console.log(lsResult);
+
+				// ask user if that's ok to delete.  prompt: doesn't seem to work
+				console.log(`We're going to delete those ⬆︎ files in public/doc.
+				Return to continue? or ^C to avoid the whole thing  `);
+				const rl = readline.createInterface({input: process.stdin, output: process.stdout});
+				rl.on('SIGINT', () => process.exit(0));
+				rl.on('line', line => {
+					// user has assented
+					// I sure hope I don't shoot myself in the foot with this.
+					console.log(execSync('rm -rfv *',
+						{cwd: `${process.env.SQUISH_ROOT}/public/doc`, encoding: 'utf8'}));
+
+					succeed();
+				});
+			}
+		);
+
+	});
+}
+
+
 // main, runs only after the frags have been loaded
-function main() {
-	whatTime('start of main');
+function processArgv() {
+	whatTime('start of processArgv');
 
 	// futz with argv cuz sometimes node is argv[0] and other times this script is
 	let argv = [...process.argv];
 	argv.shift()
 	let second = argv.shift();
-	if (second && !second.includes('compileDocs'))
+	if (second && !second.includes('docGen/compileDocs.js'))
 		argv.unshift(second);
 
 	nFilesTried = nFilesPassedThru = nFilesSymlinked =
 		nMDFilesCompiled = nDirsWalked = 0;
-	if (argv.length > 0) {
+	if ('--batch' == argv[0]) {
+		// during production build
+		return compileADir('docSrc');
+	}
+	else if (argv.length <= 0) {
+		// do it all, interactively
+		return promptAndDelete()
+		.then(() => compileADir('docSrc'));
+	}
+	else {
 		// process just the listed files
 		return Promise.allSettled(
 			argv.map(arg => compileFileOrDir(arg))
 		);
 	}
-
-	else {
-		// do it all
-		return compileFileOrDir('docSrc');
-	}
 }
 
 function readInitFiles() {
+	// read ALL of the general files (other than sources) we'll need to do this
 	let proms = [
+		// i guess there's only one right now
 		readTextFile('template.html'),
 	];
 
 	return Promise.all(proms)
 	.then(contentz => {
 		[template] = contentz;
-		return main();
+		return processArgv();
 	})
 	.catch(ex => catchException(ex, `loading something in compileDocs`));
 }
@@ -325,7 +380,7 @@ function readInitFiles() {
 
 function generate() {
 	readInitFiles()
-	.then(mainResults => {
+	.then(processArgvResults => {
 		whatTime('finished promises');
 
 		console.log(`${nDirsWalked} directories scanned`);
@@ -340,7 +395,7 @@ function generate() {
 
 		if (traceFinalDocDir) {
 			const opts = {cwd: '../public/doc'};
-			exec(`ls -l`, opts, (error, stdout, stderr) => {
+			exec(`ls -lR`, opts, (error, stdout, stderr) => {
 				console.log('resulting doc dir:\n' + stdout);
 				if (error || stderr) {
 					console.error(stderr, error);
@@ -352,25 +407,12 @@ function generate() {
 				}
 			});
 		}
+		else {
+			process.exit(0);
+		}
 	})
 	.catch(ex => catchException(ex, 'compileDocs program'));
 }
 
-/* ************************************************************* startup */
-// this runs first.  prompt so I don't delete a bunch of files by accident.
-console.log(execSync('ls -m *',
-	{cwd: `${process.env.SQUISH_ROOT}/public/doc`, encoding: 'utf8'}));
-
-// prompt: doesn't seem to work
-console.log(`We're going to delete those ⬆︎ files in public/doc.  continue? or ^C  `);
-const rl = readline.createInterface({input: process.stdin, output: process.stdout});
-rl.on('SIGINT', () => process.exit(0));
-
-rl.on('line', line => {
-	// I sure hope I don't shoot myself in the foot with this.
-	console.log(execSync('rm -rfv *',
-		{cwd: `${process.env.SQUISH_ROOT}/public/doc`, encoding: 'utf8'}));
-
-	generate();
-})
+generate();
 
