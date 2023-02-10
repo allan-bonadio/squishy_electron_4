@@ -8,7 +8,7 @@ echo you can do either make deploy or npm deploy, same
 
 # make sure it's there & compiled
 echo "🎁 🛫 make sure the build is there"
-for fn in index.html 'logos/logo|𝒆⟩3.png' qEng/quantumEngine.js qEng/quantumEngine.wasm qEng/quantumEngine.wasm.map
+for fn in index.html 'logos/logoKetE.png' qEng/quantumEngine.js qEng/quantumEngine.wasm qEng/quantumEngine.wasm.map
 do
 	if ! [ -f build/$fn ]
 	then
