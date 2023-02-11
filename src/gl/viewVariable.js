@@ -147,6 +147,10 @@ export class viewAttribute extends viewVariable {
 
 		// attach GPU buffer to our GL
 		const glBuffer = this.glBuffer = gl.createBuffer();
+
+		// does this do anything?  not sure.
+		//drawing.tagObject(glBuffer, `${drawing.drawingName}-${varName}-attrBuf`);
+
 		gl.bindBuffer(gl.ARRAY_BUFFER, glBuffer);
 
 		// now attach some data to it, with CPU-side arrays.  Since we have to do bufferData

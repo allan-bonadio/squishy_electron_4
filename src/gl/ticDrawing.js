@@ -31,7 +31,7 @@ let pointSize = alsoDrawPoints ? `gl_PointSize = 10.;` : '';
 
 /*
 ** data format of attributes:  2 column table of floats
-** x and y coords x 3 pairs in sequence, each a triangle
+** x and y coords x 4 pairs in sequence, each a tiny rectangle
 */
 
 // make the line number for the start correspond to this JS file line number - the NEXT line
@@ -79,7 +79,20 @@ export class ticDrawing extends abstractDrawing {
 	createVariables() {
 		if (traceTicDrawing) console.log(`➤ ➤ ➤ ticDrawing ${this.viewName}: creatingVariables`);
 
+
+
+		// this works but it's bad
 		this.vao = this.gl.createVertexArray();
+
+		// this is doing it all wrong.  ticDraw shouldn't be making its own vao,
+		// it should be sharing with flatViewDef and flatDraw.
+
+		// webgl2 funds: https://webgl2fundamentals.org/webgl/lessons/webgl1-to-webgl2.html
+		// search for bindAttribLocation.  THis is what I need to do, for each
+		// program (drawing), after compiling and before linking.
+		// maybe instead of fancy smancy automaitc everything,
+		// maybe I just have another handler that does that.
+
 
 		this.cornerFloats = 2;
 		this.cornerAttr = new viewAttribute('corner', this, this.cornerFloats, () => {
@@ -104,9 +117,9 @@ export class ticDrawing extends abstractDrawing {
 		nTics = this.nTics = Math.min(nTics, 100);
 		if (this.roomForNTics <= nTics) {
 			let nuTics = Math.ceil(nTics * 1.3 + 1);  // room for some more but not too many
-			console.warn(`➤ ➤ ➤ highest=${highest.toFixed(4)}, nTics=${nTics}  `+
-				`  exceeds roomForNTics=${this.roomForNTics} . `+
-				` Expanding buffer... new roomForNTics=${nuTics}`);
+			//console.warn(`➤ ➤ ➤ highest=${highest.toFixed(4)}, nTics=${nTics}  `+
+			//	`  exceeds roomForNTics=${this.roomForNTics} . `+
+			//	` Expanding buffer... new roomForNTics=${nuTics}`);
 			this.roomForNTics = nuTics;
 			this.coordBuffer = new Float32Array(this.roomForNTics * FLOATS_PER_TIC);
 		}
@@ -158,7 +171,6 @@ export class ticDrawing extends abstractDrawing {
 
 		if (alsoDrawLines) {
 			gl.lineWidth(1);  // it's the only option anyway
-
 			gl.drawArrays(gl.LINE_STRIP, start, len);  // gl.LINE_STRIP, gl.LINES, gl.LINE_LOOP
 		}
 

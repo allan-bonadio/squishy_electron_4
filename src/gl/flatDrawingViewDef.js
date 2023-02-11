@@ -19,8 +19,11 @@ class flatDrawingViewDef extends abstractViewDef {
 			throw  `flatDrawingViewDef: being created without space or avatar`;
 		}
 
-		// create relevant drawings.  Somehow I can't get the tics to work with the flat.
-		this.drawings = [new flatDrawing(this)];
+		// create relevant drawings.
+		this.drawings = [
+			new flatDrawing(this),
+			new ticDrawing(this),
+		];
 
 
 	}

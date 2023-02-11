@@ -9,6 +9,9 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
+// is this how you do it?
+import 'webgl-lint';
+
 import {listOfViewClasses} from './listOfViewClasses.js';
 //import {eSpaceCreatedPromise} from '../engine/eEngine.js';
 import {tooOldTerminate} from '../utils/errors.js';
@@ -17,12 +20,9 @@ let traceSetup = false;
 let tracePainting = false;
 let traceGeometry = false;
 
-// true to try v2 before v1; either or both might fail.
+// true to try v2 before v1; false for v1 before v2
+// either or both might fail.
 let tryWebGL2 = true;
-
-// make colors brighter?  never tried.  should hack on cx to rgb
-let trySRGB = false;
-
 
 // For each GLView, there's one:
 // - canvas, and one gl context
@@ -63,12 +63,10 @@ class GLView extends React.Component {
 			return null;
 		this.gl = gl;
 
+		// notin webgl1, avail as an extention
 		let vaoExt = this.vaoExt = gl.getExtension("OES_vertex_array_object");
 		if (!vaoExt)
 			return null;
-		if (trySRGB) {
-			this.srgbExt = this.srgbExt = gl.getExtension("EXT_sRGB");  // make colors brighter?
-		}
 
 		// backfill these methods for consistent usage
 		gl.createVertexArray = vaoExt.createVertexArrayOES.bind(vaoExt);
@@ -109,6 +107,20 @@ class GLView extends React.Component {
 			this.setupGL2();
 		if (!this.gl)
 			tooOldTerminate(`Sorry, your browser's WebGL is kinidof old.`);
+
+		// webgl-lint extension, needs import at top of this file
+		let webglLint = this.webglLint = this.gl.getExtension('GMAN_debug_helper');
+		if (webglLint) {
+			webglLint.setConfiguration({
+				maxDrawCalls: 2000,
+				failUnsetSamplerUniforms: true,
+			});
+			this.tagObject = webglLint.tagObject.bind(webglLint)
+		}
+		else {
+			// ext doesn't work i guess
+			this.tagObject = () => {};
+		}
 
 		canvas.glview = this;
 		canvas.viewName = p.viewName;

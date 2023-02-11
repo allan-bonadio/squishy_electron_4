@@ -24,7 +24,7 @@ drawings must include:
 let traceAttrNames = false;
 
 // a superclass for  drawings,
-// handles some common tasks.  For every drawing, there's a program and a vao
+// handles some common tasks.  For every drawing, there's a program
 export class abstractDrawing {
 
 	/* ************************************************** construction */
@@ -38,7 +38,10 @@ export class abstractDrawing {
 		this.viewVariables = [];  // vars for this drawing ONLY
 
 		this.gl = viewDef.gl;
-		//this.vaoExt = viewDef.vaoExt;
+		this.tagObject = viewDef.tagObject;
+
+		// if per-drawing, it'll be created below.  If not, use the viewdef's
+		this.vao = viewDef.vao;
 
 		this.space = viewDef.space;
 		this.avatar = viewDef.avatar;
@@ -52,7 +55,7 @@ export class abstractDrawing {
 	// tell GL that this is the vao and program to use
 	setDrawing() {
 		const gl = this.gl;
-		gl.useProgram(this.program);////
+		gl.useProgram(this.program);
 		gl.bindVertexArray(this.vao);
 	}
 
@@ -60,7 +63,15 @@ export class abstractDrawing {
 	compileShader(type, srcString) {
 		const {gl} = this;
 
-		var shader = gl.createShader(type);
+		let vType = (gl.VERTEX_SHADER == type)
+			? 'vertex'
+			: gl.FRAGMENT_SHADER == type
+				? 'fragment'
+				: 'unknown type ';
+
+		let shader = gl.createShader(type);
+		this.tagObject(shader, `${this.viewName}-${this.drawingName}-${vType}-sh`);
+
 		gl.shaderSource(shader, srcString);
 		gl.compileShader(shader);
 		var success = gl.getShaderParameter(shader, gl.COMPILE_STATUS);
@@ -68,12 +79,7 @@ export class abstractDrawing {
 
 		const msg = gl.getShaderInfoLog(shader);
 		gl.deleteShader(shader);
-		type = (gl.VERTEX_SHADER == type)
-			? 'vertex'
-			: gl.FRAGMENT_SHADER == type
-				? 'fragment'
-				: 'unknown type ';
-		throw new Error(`Error compiling ${type} shader for ${this.viewName}: ${msg}`);
+		throw new Error(`Error compiling ${vType} shader for ${this.viewName}: ${msg}`);
 	}
 
 	// call this with your sources in setShaders().
@@ -83,9 +89,16 @@ export class abstractDrawing {
 	compileProgram() {
 		const {gl} = this;
 
-		// create program and vao for this drawing, and put them into use
+		// create program (and vao?) for this drawing, and put them into use
 		const program = gl.createProgram();
-		this.vao = this.gl.createVertexArray();
+		this.tagObject(program, `${this.viewName}-${this.drawingName}-pgm`);
+
+		// if not per drawing, this.vao already points to viewDef's
+		if (this.viewDef.perDrawingVAO) {
+			this.vao = this.gl.createVertexArray();
+			this.tagObject(this.vao, `${this.drawingName}-vao`);
+		}
+
 		this.setDrawing();
 
 		const vertexShader = this.compileShader(gl.VERTEX_SHADER, this.vertexShaderSrc);
@@ -114,88 +127,12 @@ export class abstractDrawing {
 		// somehow failed compile.  So, no program
 		const msg = gl.getProgramInfoLog(program);
 		gl.deleteProgram(program);
-		throw new Error(`Error linking program abstractDrawing for`+
-			` ${this.viewDef.viewName} ${this.drawingName}: ${msg}`);
+		throw new Error(`Error linking program for
+			${this.viewDef.viewName} ${this.drawingName}: ${msg}`);
 	}
 
-	/* ********************************************************************************* dumping */
-	// this sure doesn't enlighten any.
-
-	// used for dump below
-	static atInfos = ['ARRAY_BUFFER_BINDING', 'ARRAY_ENABLED', 'ARRAY_SIZE', 'ARRAY_STRIDE',
-		'ARRAY_TYPE', 'ARRAY_NORMALIZED', ];
-	static atTypes = null;
-
-	// this works on the current vao, or the static thing if none
-	dumpOneAttr(id, name = '') {
-		const gl = this.gl;
-		console.log(`    𒑐attr ${id} ${name}`);
-		abstractDrawing.atInfos.forEach(ai => {
-			let res = gl.getVertexAttrib(id, gl[`VERTEX_ATTRIB_${ai}`]);
-			if ('ARRAY_TYPE' == ai)
-				res = abstractDrawing.atTypes[res] ?? res;
-			console.log(`        𒑐${ai} = `, res);
-		});
-
-		console.log(`        𒑐CURRENT_VERTEX_ATTRIB = `,
-			gl.getVertexAttrib(id, gl.CURRENT_VERTEX_ATTRIB));
-	}
-
-	// this works on the current vao, or the static thing if none
-	dumpAttrNames(title) {
-		const gl = this.gl;
-
-		// need a real GL to do this
-		if (!abstractDrawing.atTypes)
-			abstractDrawing.atTypes = {[gl.BYTE]: 'Byte', [gl.UNSIGNED_BYTE]: 'Unsigned_Byte', [gl.SHORT]: 'Short',
-					[gl.UNSIGNED_SHORT]: 'Unsigned_Short', [gl.FLOAT]: 'Float',};
-		console.log(`abstractDrawing.atTypes=`, abstractDrawing.atTypes);
-
-		console.log(`𒑐 dumpAttrNames for viewdef ${this.viewName} drawing ${this.drawingName}: ${title}`);
-		//this.viewDef.attrVariableNames
-		//this.this.gl.getAttribLocation(drawing.program, varName);
-
-		// go thru all the names that should be there
-//		this.viewDef.attrVariableNames.forEach(name => {
-//			let id = gl.getAttribLocation(this.program, name);
-//			if (id < 0)
-//				console.log(`    𒑐dumpAttrNames: sorry, attr '${name}' not found`);
-//			else
-//				this.dumpOneAttr(id, name);
-//		});
-
-		console.log(`    𒑐 dumpAttrNames each id:`);
-		// try the first several ids that should be there
-		for (let id = 0; id < 5; id++) {
-			this.dumpOneAttr(id);
-			//gl.CURRENT_VERTEX_ATTRIB
-			//Returns a Float32Array (with 4 elements) representing the current value of the vertex attribute at the given index.
-		}
-	}
 
 	/* **************************************************  old examples */
-	// these are example functions that actually work as a Drawing.  Draw one dot i think.
-
-	// abstract supermethod: write your setShaders() function to compile your two GLSL sources
-//	setShaders() {
-//		this.vertexShaderSrc = `
-//		void main() {
-//			gl_Position = vec4(0., 0., 0., 1.);
-//			gl_PointSize = 10.;
-//		}
-//		`;
-//
-//		this.fragmentShaderSrc = `
-//		precision highp float;
-//
-//		void main() {
-//			// bright purple
-//			gl_FragColor = vec4(1., .5, 1., 1);
-//		}
-//		`;
-//
-//		this.compileProgram();
-//	}
 
 	// abstract supermethod: all drawings should write their own createVariables() method.
 	// mostly, creating viewVariables that can be dynamically changed.
@@ -210,28 +147,6 @@ export class abstractDrawing {
 //		this.aPointAttr = new viewUniform('aNumber', this);
 //	}
 
-
-	// abstract supermethod: another dummy submethod... write yer  own
-//	draw() {
-//		const gl = this.gl;
-//
-//		// dark magenta bg
-//		gl.clearColor(.5, 0, .5, 1.);
-//		gl.clear(gl.COLOR_BUFFER_BIT);
-//
-//		//gl.useProgram(this.program);  // not needed viewdef does this
-//
-//		// one purple dot
-//		gl.drawArrays(gl.POINTS, 0, 1);
-//	}
-
-
-	/* ************************************************** interactivity */
-	// abstract supermethod: another dummy submethod... write yer  own
-	// supposed to set click/touch/keystroke handlers and stuff
-	// maybe i should get rid of this
-	domSetup() {
-	}
 }
 
 export default abstractDrawing;

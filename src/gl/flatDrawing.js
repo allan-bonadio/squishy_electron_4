@@ -95,8 +95,8 @@ export class flatDrawing extends abstractDrawing {
 
 	// one time set up of variables for this drawing, every time canvas and viewDef is recreated
 	createVariables() {
-//		this.vao = this.gl.createVertexArray();
-//		done in abstract drawing compileProgram  this.gl.bindVertexArray(this.vao);
+		//		this.vao = this.gl.createVertexArray();
+		//		done in abstract drawing compileProgram  this.gl.bindVertexArray(this.vao);
 
 		if (traceFlatDrawing)
 			console.log(`flatDrawing ${this.viewName}: creatingVariables`);
@@ -129,7 +129,7 @@ export class flatDrawing extends abstractDrawing {
 			return this.avatar.vBuffer;
 		});
 
-		this.gl.bindVertexArray(null);
+		//this.gl.bindVertexArray(null);
 	}
 
 	draw() {
