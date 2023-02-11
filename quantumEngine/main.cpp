@@ -3,11 +3,6 @@
 ** Copyright (C) 2021-2023 Tactile Interactive, all rights reserved
 */
 
-//#include "squish.h"
-//#include <stdio.h>
-//#include <cmath>
-
-
 #include "hilbert/qSpace.h"
 #include "greiman/qAvatar.h"
 #include "schrodinger/qGrinder.h"

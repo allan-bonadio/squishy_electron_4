@@ -26,9 +26,6 @@ struct qViewBuffer {
 	void dumpViewBuffer(const char *title = NULL);
 };
 
-// 'the' being the only one sometimes
-//extern qViewBuffer *theQViewBuffer;
-
 // JS interface
 extern "C" {
 	void avatar_dumpViewBuffer(qAvatar *avatar, const char *title = NULL);

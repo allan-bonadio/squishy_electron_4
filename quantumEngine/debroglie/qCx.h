@@ -3,15 +3,6 @@
 ** Copyright (C) 2021-2023 Tactile Interactive, all rights reserved
 */
 
-
-//#include <stdlib.h>
-//#include <stdint.h>
-//#include <stdio.h>
-//#include <string.h>
-
-//#include <float.h>
-
-
 #define byte unsigned char
 #define char16 char16_t
 
@@ -22,7 +13,7 @@
 #define PI_4          0.78539816339744830962  /* pi/4 */
 
 // got this from ... somewhere in case I ever do long doubles
-//const pi = 3.1415926535897932384626433832795029L;
+// const pi = 3.1415926535897932384626433832795029L;
 
 // useful in cmath: isnan(double) isinf(double) NAN INFINITY  isfinite()
 // ilogb(double)

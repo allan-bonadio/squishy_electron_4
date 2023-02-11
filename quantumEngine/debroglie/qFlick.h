@@ -29,7 +29,6 @@ struct edge {
 	// protect boundary, loDone and hiDone while being atomically set/read
 	// not really sure what i'm gonna do with this
 	bool lock;
-	//std::atomic_uchar lock;
 
 	// true if we have WELL continuum and this is edge 0 for a given wave
 	bool isFixed;

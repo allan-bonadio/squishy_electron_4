@@ -21,17 +21,6 @@ double getTimeDouble(void)
 
 /* ***************************************************************************************************** exceptions */
 
-// there's TWO copies of this
-// this is from https://emscripten.org/docs/porting/Debugging.html#handling-c-exceptions-from-javascript
-// it's only called from genExports for JS to get a textual error message from C++
-// nobody in C++ calls it
-//std::string getCppExceptionMessage(intptr_t exceptionPtr) {
-//	printf("calling std::string getCppExceptionMessage(%ld) in misc.cpp\n", exceptionPtr);
-//
-//	return std::string(reinterpret_cast<std::exception *>(exceptionPtr)->what());
-//}
-
-// there's TWO copies of this
 // Given the mysterious number thrown when C++ barfs, get a real error message.  this is loosely from
 // https://emscripten.org/docs/porting/Debugging.html#handling-c-exceptions-from-javascript
 extern "C" const char * getCppExceptionMessage(intptr_t exceptionPtrInt) {
@@ -45,7 +34,6 @@ extern "C" const char * getCppExceptionMessage(intptr_t exceptionPtrInt) {
 		 reinterpret_cast<std::exception *>(exceptionPtrInt)->what());
 	return reinterpret_cast<std::exception *>(exceptionPtrInt)->what();
 }
-//extern "C" std::string getCppExceptionMessage(intptr_t exceptionPtrInt);
 
 #define LAST_WHERE_LENTH 99
 static char lastWhere[LAST_WHERE_LENTH+1];

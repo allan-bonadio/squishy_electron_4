@@ -8,7 +8,6 @@
 #define __SQUISH_H__
 
 #include <cstdio>
-//#include <cstdlib>
 #include <cmath>
 #include <stdexcept>
 
@@ -37,6 +36,6 @@ extern double getTimeDouble(void);
 // 64bit ptrs), and take the generated JS and paste it into the corresponding JS
 // files, in src/engine, where indicated. Remove the line numbers that the browsers stick in!
 #define FORMAT_DIRECT_OFFSETS
-//#define FORMAT_DIRECT_OFFSETS  formatDirectOffsets()
+// #define FORMAT_DIRECT_OFFSETS  formatDirectOffsets()
 
 #endif

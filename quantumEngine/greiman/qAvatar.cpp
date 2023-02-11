@@ -80,24 +80,6 @@ qAvatar::~qAvatar(void) {
 	qvBuffer = NULL;
 };
 
-// never called from JS
-//void avatar_delete(qAvatar *avatar) {
-//	delete avatar;
-//}
-
-// some uses never need these so wait till they do
-//qWave *qAvatar::getScratchWave(void) {
-//	if (!scratchQWave)
-//		scratchQWave = new qWave(space);
-//	return scratchQWave;
-//};
-//
-//qSpectrum *qAvatar::getSpectrum(void) {
-//	if (!qspect)
-//		qspect = new qSpectrum(space);
-//	return qspect;
-//};
-
 // need these numbers for the js interface to this object, to figure out the offsets.
 // see eAvatar.js ;  usually this function isn't called.
 // Insert this into the constructor and run this once.  Copy text output.

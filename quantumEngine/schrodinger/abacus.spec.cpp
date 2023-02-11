@@ -78,8 +78,7 @@ void setProgsEdges(void) {
 TEST(abacus_creation, progressFresh) {
 	aba = new abacus(space, qgrinder, 3, 3);
 
-	//printf("---------------------------- thread progresses fresh\n");
-	//aba->dumpProgress();
+		//aba->dumpProgress();
 
 	setProgsEdges();
 	POINTERS_EQUAL(aba, prog0->abac);

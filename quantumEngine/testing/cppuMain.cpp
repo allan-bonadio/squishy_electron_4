@@ -21,30 +21,6 @@
 
 #include "./cppuMain.h"
 
-
-
-
-
-// how do initializers in C++ work?  need them for mocks
-static void initExperiments(void) {
-//	int n0{};
-//	int n1{1};
-//
-//	int nn0 = {0};
-//	int nn1 = {1};
-////	int nn2 = {1, 2};
-//
-//	qCx zombie[2] = {qCx(1.0, 2.0)};
-//	qCx zoot[2] = {qCx(6.0, 7.0), qCx(3.0, 4.0)};
-//	printf("initializers in C++\n"
-//		"| scalar vars;  empty init:%d   one initializer 1:%d nn0: %d   nn1: %d  \n"
-//		"| arrays of cx: twoW1init: [0]%lf, %lf  [1]]%lf, %lf   2with2inits: [0]%lf, %lf  [1]]%lf, %lf\n",
-//		n0, n1, nn0, nn1,
-//		zombie[0].re, zombie[0].im, zombie[1].re, zombie[1].im,
-//		zoot[0].re, zoot[0].im, zoot[1].re, zoot[1].im
-//		);
-}
-
 // for memory leaks that cppu conveniently gives us, some clues:
 static void dumpSizes(void) {
 	printf("byte sizes... sz(qSpace)=%lu  sz(qWave)=%lu  sz(qBuffer)=%lu  sz(qSpectrum)=%lu  \n"

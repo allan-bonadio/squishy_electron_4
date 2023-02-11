@@ -126,9 +126,6 @@ TEST(qSpace, qSpace_2DConstructorGauntlet)
 
 // this tests the whole shebang, as it is created from JS
 void completeNewSpaceGauntlet(int N) {
-//	printf("🧨 🧨 starting completeNewSpaceGauntlet(N=%d)\n",
-//		N);
-
 	qSpace *space = makeFullSpace(N);
 	int nPoints = space->nPoints;
 
@@ -156,8 +153,6 @@ void completeNewSpaceGauntlet(int N) {
 	proveItsMine(space->miniGraphAvatar->vBuffer, nPoints * 8 * sizeof(float));
 
 	deleteFullSpace(space);
-
-	//printf("🧨 🧨       deleteFullSpace() completed\n");
 }
 
 TEST(qSpace, qSpace_CompleteNewSpaceGauntlet4096) { completeNewSpaceGauntlet(4096); }

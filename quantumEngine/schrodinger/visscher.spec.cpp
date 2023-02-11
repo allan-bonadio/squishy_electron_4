@@ -22,8 +22,6 @@ TEST_GROUP(visscher)
 {
 };
 
-
-
 /* ****************************************************************** one step */
 
 // created once and never freed; cppuTest won't notice they're never freed.
@@ -112,7 +110,8 @@ TEST(visscher, VisscherOneFrame32)
 	fl->setCircularWave(1.);
 	for (int ix = fl->start; ix < fl->end; ix++) space->voltage[ix] = 0;
 
-	//fl->dump("VisscherOneFrame, before", true);
+	if (traceOneFrame)
+		fl->dump("VisscherOneFrame, before", true);
 
 	// simulate the app taking one iter = 100 steps
 	qgrinder->stepsPerFrame = 100;
@@ -122,11 +121,13 @@ TEST(visscher, VisscherOneFrame32)
 	// one frame
 	qgrinder->oneFrame();
 
-	//fl->dump("VisscherOneFrame, after", true);
+	if (traceOneFrame)
+		fl->dump("VisscherOneFrame, after", true);
 
 	// dumps the wave in case you want to paste it back in here
 	// probably you should comment it out for normal use
-	//dumpWaveInitializer("expectedArray", fl->wave, space->nPoints);
+	if (traceOneFrame)
+		dumpWaveInitializer("expectedArray", fl->wave, space->nPoints);
 
 	// we'll use this to compare against
 	qWave *expectedQWave = new qWave(space, expectedArray);

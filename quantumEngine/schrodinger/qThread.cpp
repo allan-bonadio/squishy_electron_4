@@ -23,23 +23,8 @@ qThread::~qThread() {
 
 }
 
-
 // each thread does this upon startup to show it's alive
 void qThread::threadStarts() {
 
 }
 
-
-
-/* ********************************************************************************** misc */
-
-// init up the whole thing.  Called once upon app startup.
-// start and run the frame loop, that runs parallel to the heartbeat in squishPanel
-//void qAvatar::initIntegrationLoop(int nThreads, int nStages) {
-//
-//	qFlick *stages = qFlick::flick = new qFlick(space, nStages);
-//	threads = qThread::threads = new qThread[nThreads];
-//	// allocate the buffer stages
-//
-//	// light it off (?)
-//}

@@ -93,11 +93,6 @@ qGrinder::~qGrinder(void) {
 	qspect = NULL;
 };
 
-// no - deleteSpace() deletes this
-//void grinder_delete(qGrinder *qgrinder) {
-//	delete qgrinder;
-//}
-
 // some uses never need this so wait till they do
 qSpectrum *qGrinder::getSpectrum(void) {
 	if (!qspect)
@@ -106,9 +101,6 @@ qSpectrum *qGrinder::getSpectrum(void) {
 };
 
 void qGrinder::copyFromAvatar(qAvatar *avatar) {
-	//printf("qGrinder(%p)::copyFromAvatar(qAvatar *%p) \n", this, avatar);
-	//printf("    qAvatar-  qwave=%p   voltageFactor=%lf  label=%s\n", avatar->qwave, avatar->voltageFactor, avatar->label);
-	//printf("    qGrinder-    qflick=%p   voltageFactor=%lf  label=%s \n", this->qflick, this->voltageFactor, this->label);
 	qflick->copyBuffer(qflick, avatar->qwave);
 }
 

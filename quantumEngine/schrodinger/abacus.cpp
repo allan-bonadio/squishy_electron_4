@@ -5,15 +5,12 @@
 
 // abacus: a matrix-like device used for calculation
 
-//#include <cstring>
-//#include <stdexcept>
 #include <atomic>
 
 #include "../hilbert/qSpace.h"
 #include "qGrinder.h"
 #include "../debroglie/qFlick.h"
 #include "abacus.h"
-//#include "../debroglie/qFlick.h"
 
 // see if this vomits...  no, it compiles!
 #include <emscripten/threading.h>
@@ -244,9 +241,6 @@ abacus::abacus(qSpace *sp, qGrinder *gr, int nW, int nThr)
 		progresses[w].init(this, w);
 
 	statesMask = space->nStates - 1;
-
-	// will be done by algorithm  reset();
-	//dumpProgress();
 }
 
 
@@ -258,7 +252,7 @@ abacus::~abacus() {
 	delete[] edges;
 	delete[] progresses;
 
-	// no!  the qFlick does this.
+	// we'll have to do this eventually when we allocate real/imag buffers.
 	//for (int i = 0; i < nWaves; i++) {
 	//	freeWave(waves[i]);
 	//	waves[i] = NULL;

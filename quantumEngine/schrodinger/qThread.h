@@ -3,8 +3,6 @@
 ** Copyright (C) 2022-2023 Tactile Interactive, all rights reserved
 */
 
-//#include "../debroglie/qWave.h"
-
 struct qSpace;
 
 // one for each html5 Worker
@@ -14,7 +12,6 @@ struct qThread {
 	static qThread *threads;
 
 	void threadStarts();
-
 };
 
 // one for each qWave being worked on during grinding
@@ -26,5 +23,3 @@ struct qStage : public qWave {
 	int onStage;
 };
 
-//extern qStage *stages;
-//extern qThread *threads;

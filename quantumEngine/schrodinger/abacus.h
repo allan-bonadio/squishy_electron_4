@@ -3,8 +3,6 @@
 ** Copyright (C) 2023-2023 Tactile Interactive, all rights reserved
 */
 
-//#include "../debroglie/qFlick.h"
-
 #define UNLOCKED  255
 #define MAX_THREADS 254
 #define UNDECIDED -1
@@ -38,7 +36,6 @@ struct edge {
 	bool lock;
 	bool spinLock();  // delays until it's gotten the lock
 	bool spinUnlock();  // releases the lock; almost no overhead
-	//std::atomic_uchar lock;
 
 	// true if we have WELL continuum and this is edge 0 for a given wave
 	bool isFixed;

@@ -3,36 +3,16 @@
 ** Copyright (C) 2021-2023 Tactile Interactive, all rights reserved
 */
 
-//#include <string.h>
 #include <stdexcept>
 
 #include "qSpace.h"
 #include "../greiman/qAvatar.h"
 #include "../schrodinger/qGrinder.h"
 #include "../debroglie/qWave.h"
-//#include "../debroglie/qFlick.h"
 #include "../greiman/qViewBuffer.h"
 
 static bool traceSpaceCreation = false;
 static bool traceAvatarDetail = false;
-
-// 'the' globals are for the one and only SquishPanel being displayed on this
-// curent, preliminary version of SquishyElectron.  Along with various other
-// important objects.  Someday we'll get the JS to hold these.
-//class qSpace *theSpace = NULL;
-//double *theVoltage = NULL;
-
-
-/* ********************************************************** wave stuff */
-//
-//// after the initSpace() call, allocate the buffers.
-//void allocWaves(void) {
-//	// we make our own voltage
-//}
-//
-//// call to destroy them
-//static void freeWaves(void) {
-//}
 
 /* ********************************************************** glue functions for js */
 
@@ -55,11 +35,6 @@ void wave_normalize(qWave *qwave) {
 qSpace *startNewSpace(const char *label) {
 	if (traceSpaceCreation)
 		printf("\n🚀 🚀 🚀  startNewSpace(%s), \n", label);
-//theSpace=%p (should be zero)
-
-	// use theSpace as a way of detecting if they were freed before.
-//	if (theSpace)
-//		throw std::runtime_error("Trying to start a new space when one already exists!");
 
 	qSpace *space = new qSpace(label);
 

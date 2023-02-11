@@ -85,7 +85,6 @@ struct qGrinder {
 	// often oldW and hamiltonianW are the same
 	void stepReal(qCx *newW, qCx *oldW, qCx *hamiltW, double dt);
 	void stepImaginary(qCx *newW, qCx *oldW, qCx *hamiltW, double dt);
-	//void oneVisscherStep(qWave *newQWave, qWave *oldQWave);
 
 	// just one after the other
 	void stepRealImaginary(qCx *newW, qCx *oldW, qCx *hamiltW, double dt);

@@ -3,9 +3,6 @@
 ** Copyright (C) 2022-2023 Tactile Interactive, all rights reserved
 */
 
-//#include <string>
-//#include "qCx.h"
-//#include <cmath>
 #include "../hilbert/qSpace.h"
 #include "../greiman/qAvatar.h"
 #include "../schrodinger/qGrinder.h"

@@ -9,6 +9,8 @@
 
 #include "CppUTest/TestHarness.h"
 
+bool traceBufLen = false;
+
 TEST_GROUP(qBuffer)
 {
 };
@@ -17,8 +19,8 @@ TEST_GROUP(qBuffer)
 // in the middle, check several values that should be right
 // and make sure we own the bytes we think we do.
 static void testABufferLength(int length, qCx *useThisBuffer = NULL) {
-	// uncomment this if you want to see which one failed
-	//printf("🧨: testing %d point buffer with %p\n", length, useThisBuffer);
+	if (traceBufLen)
+		printf("🧨: testing %d point buffer with %p\n", length, useThisBuffer);
 
 	qBuffer *qBuf = new qBuffer();
 	LONGS_EQUAL_TEXT('Buff', qBuf->magic, "qBuffer magic");

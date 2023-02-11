@@ -3,7 +3,6 @@
 ** Copyright (C) 2021-2023 Tactile Interactive, all rights reserved
 */
 
-//#include <cmath>
 #include <stdexcept>
 
 #include "../hilbert/qSpace.h"
@@ -103,28 +102,7 @@ void qWave::forEachState(void (*callback)(qCx, int) ) {
 	for (int ix = dims->start; ix < end; ix++) {
 		callback(wave[ix], ix);
 	}
-
 }
-
-/* ******************************************************** diagnostic dump **/
-// only a wave knows how to traverse its states
-
-// this is wave-independent.  This prints N+2 lines:
-// one for the 0 element if it's a continuum
-// the complete set of states
-// one for the N+1 if continuum
-//void qSpace::dumpThatWave(qCx *wave, bool withExtras) {
-//	qSpace *ss = this;
-//	if (NULL == ss) throw std::runtime_error("🌊🌊 qSpace::dumpThatWave() with null this");
-//	if (nPoints <= 0) throw std::runtime_error("🌊🌊 qSpace::dumpThatWave() with zero points");
-//
-//
-//
-//	const qDimension *dims = dimensions;
-//	qBuffer::dumpSegment(wave, withExtras, dims->start, dims->end, dims->continuum);
-//}
-
-
 
 /* ************************************************* bad ideas I might revisit?  */
 

@@ -6,9 +6,6 @@
 // formerly called: Manifestation, Incarnation, Timeline, ... formerly part of qSpace
 // see also JS eAvatar
 
-//struct qThread;
-//struct qStage;
-
 struct qAvatar {
 	qAvatar(qSpace *, const char *label);
 	~qAvatar(void);
@@ -43,12 +40,4 @@ struct qAvatar {
 	char label[MAX_LABEL_LEN + 1];
 
 };
-
-
-/* ************************************************************ JS interface */
-
-// for JS to call.  Defined in jsSpace and elsewhere.
-//extern "C" {
-//}
-
 

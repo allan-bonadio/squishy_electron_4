@@ -3,15 +3,11 @@
 ** Copyright (C) 2021-2023 Tactile Interactive, all rights reserved
 */
 
-//extern class qSpace *theSpace;
-//extern double *theVoltage;
-
 #ifndef __QSPACE_H__
 #define __QSPACE_H__
 
 // not even used these days
 extern qCx hamiltonian(struct qSpace *space, qCx *wave, int x);
-//extern void qeStarted(void);
 
 /* *************************************** one for each DIMENSION of the wave array */
 struct qDimension {
@@ -99,23 +95,6 @@ public:
 };
 
 /* ************************************************************ JS interface */
-
-//this gets passed back to the JS after the space is created, so it can
-//construct stuff just a one-off struct; JS will access it via Uint32Array Note:
-//the wave buffer fields should be eliminated cuz JS can get to them from the
-//eAvatar
-//struct salientPointersType {
-//	qSpace *space;
-//	double *voltageBuffer;
-//
-//	float *mainVBuffer;  // raw float[4][2] array
-//	struct qAvatar *mainAvatar;
-//
-//	float *miniGraphVBuffer;
-//	struct qAvatar *miniGraphAvatar;
-//
-//	struct qGrinder *qgrinder;
-//};
 
 // for JS to call
 extern "C" {

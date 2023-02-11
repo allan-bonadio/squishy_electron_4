@@ -3,12 +3,9 @@
 ** Copyright (C) 2022-2023 Tactile Interactive, all rights reserved
 */
 
-
+// buffer sizes ONLY POWERS OF 2
 // adapted from
 // https://tfetimes.com/c-fast-fourier-transform/
-
-/* *************************************************** only powers of 2 */
-//#include <cmath>
 
 #include "../hilbert/qSpace.h"
 #include "../greiman/qAvatar.h"
@@ -17,9 +14,7 @@
 #include "qSpectrum.h"
 #include "fftMain.h"
 
-
-
-//const double PI = 3.141592653589793238460;
+// in case I ever need it const long double PI = 3.141592653589793238460;
 
 
 // Cooley–Tukey FFT from src to dest
@@ -32,7 +27,7 @@ void cooleyTukeyFFT(qCx *dest, qCx *src, int N)
 	// divide
 	int N2 = N/2;
 	qCx even[N2];
-	qCx odd[N2];  //; = src[std::slice(1, N/2, 2)];
+	qCx odd[N2];
 	for (size_t k = 0; k < N; k++) {  // do this two rows at a time
 		if (k & 1)
 			odd[(k-1)/2] = src[k];
