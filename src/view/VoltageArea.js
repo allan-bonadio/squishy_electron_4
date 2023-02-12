@@ -25,7 +25,6 @@ import clickNDrag from '../widgets/clickNDrag.js';
 //export const spongeFactor = 100;
 
 let traceVoltageArea = false;
-//let tracePathAttribute = false;
 
 let traceRendering = false;
 let traceDragging = false;
@@ -71,9 +70,8 @@ export class VoltageArea extends React.Component {
 		this.cnDrag = new clickNDrag(this.mouseDown, this.onEvent, this.mouseUp);
 
 
-		console.log(`👆 👆  VoltageArea constructor. izzer space? ${props.space}.  Is there  vDisp?  ${props.vDisp}`);
-
-		if (traceVoltageArea) console.log(`👆 👆 VoltageArea  constructor done`);
+		if (traceVoltageArea)
+			console.log(`👆 👆 VoltageArea  constructor done`);
 	}
 
 	componentWillUnmount() {

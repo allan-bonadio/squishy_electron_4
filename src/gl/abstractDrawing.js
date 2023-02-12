@@ -101,11 +101,13 @@ export class abstractDrawing {
 
 		this.setDrawing();
 
-		const vertexShader = this.compileShader(gl.VERTEX_SHADER, this.vertexShaderSrc);
+		const vertexShader = this.compileShader(gl.VERTEX_SHADER,
+			this.vertexShaderSrc);
 		gl.attachShader(program, vertexShader);
 		this.vertexShader = vertexShader;
 
-		const fragmentShader = this.compileShader(gl.FRAGMENT_SHADER, this.fragmentShaderSrc);
+		const fragmentShader = this.compileShader(gl.FRAGMENT_SHADER,
+			this.fragmentShaderSrc);
 		gl.attachShader(program, fragmentShader);
 		this.fragmentShader = fragmentShader;
 
