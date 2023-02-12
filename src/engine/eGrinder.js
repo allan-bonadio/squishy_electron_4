@@ -2,11 +2,8 @@
 ** eGrinder - the JS interface to c++ numbercrunching the Schrodinger's equation
 ** Copyright (C) 2023-2023 Tactile Interactive, all rights reserved
 */
-//import qe from './qe.js';
+
 import {prepForDirectAccessors} from '../utils/directAccessors.js';
-//import {cppObjectRegistry, prepForDirectAccessors} from '../utils/directAccessors.js';
-//import eWave from './eWave.js';
-//import eSpace from './eSpace.js';
 import qe from './qe.js';
 import eThread from './eThread.js';
 

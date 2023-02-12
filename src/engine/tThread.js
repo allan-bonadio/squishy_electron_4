@@ -9,7 +9,7 @@
 // So this will import the raw qe.js file
 // actually a symlink in the public directory
 
-//import qe from './qe.js';
+// import qe from './qe.js';
 
 // this does nothing now but proves that we can do workers
 

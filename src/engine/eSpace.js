@@ -4,7 +4,6 @@
 */
 import qe from './qe.js';
 import {prepForDirectAccessors} from '../utils/directAccessors.js';
-//import eWave from './eWave.js';
 import voltDisplay from '../utils/voltDisplay.js';
 import eAvatar from './eAvatar.js';
 import eGrinder from './eGrinder.js';
