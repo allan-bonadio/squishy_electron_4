@@ -7,20 +7,15 @@
 
 import {qe} from './qe.js';
 import cxToColor from '../gl/cxToColor/cxToColor.txlated.js';
-//import cxToRgb from '../view/cxToRgb.js';
 import {cppObjectRegistry, prepForDirectAccessors} from '../utils/directAccessors.js';
 import eSpace from './eSpace.js';
 
 let traceSetFamiliarWave = false;
 let traceSetFamiliarWaveResult = false;
 
-// emscripten sabotages this?  the log & info, but not error & warn?
-//const consoleLog = console.log.bind(console);
-
 const _ = num => num.toFixed(4).padStart(9);
 const atan2 = Math.atan2;
 const abs = Math.abs;
-//const floor = Math.floor;
 const π = Math.PI;
 
 // generate string for this one cx value, w, at location ix
@@ -320,7 +315,7 @@ class eWave {
 			`  offset=${offsetUi}% => ${offset}   pulseWidth=${pulseWidthUi}% => ${pulseWidth.toFixed(4)}`)
 
 		// first, make the gaussian.  For Endless, need to wrap it around.
-		// Either way, make it 2 x nStates long, with the peak in the middle (at
+		// Whether or not, make it 2 x nStates long, with the peak in the middle (at
 		// edge between first N and second N).  But, real.
 		let gaussian = new Float64Array(2 * N);
 		const s2 = pulseWidth ** -2;  // 1/stddev**2 sortof
@@ -336,9 +331,24 @@ class eWave {
 		let first = (4 * gaussian[1] - gaussian[2]) / 3;
 		gaussian[0] = first;
 
-		// wrap it around; we have 2N points right now
+		if (traceSetFamiliarWave) {
+			// Float64Array.map() results in another Float64Array; we want Array
+			console.log(`bare gaussian, before wraparound: `
+				+ (Array.from(gaussian)).map(
+					(val, ix) => `[${ix}]:${val.toFixed(4)}`
+				).join('  '));
+		}
+
+		// wrap it around; convert 2N points to N
 		for (let ix = 0; ix < N; ix++)
 			gaussian[ix] += gaussian[ix + N];
+
+		if (traceSetFamiliarWave) {
+			console.log(`bare gaussian, after wraparound: `
+				+ (Array.from(gaussian))
+					.filter((val, ix) => (ix < N/2))
+					.map((val, ix) => `[${ix}]:${val.toFixed(4)}`).join('  '));
+		}
 
 		// then, take a circular wave
 		this.setCircularWave(freq);
@@ -395,13 +405,14 @@ class eWave {
 
 	// set one of the above canned waveforms, according to the waveParams object's values
 	setFamiliarWave(waveParams) {
+		waveParams = {...waveParams};
 		waveParams.pulseWidth = Math.max(1, waveParams.pulseWidth);  // emergency!!  this gets really slow
 		if (traceSetFamiliarWaveResult) {
 			console.log(`setFamiliarWave() starts, wave params: `+
 			`waveBreed=${waveParams.waveBreed}   `+
-			`waveFrequency=${waveParams.waveFrequency.toFixed(2)}   `+
-			`pulseWidth=${waveParams.pulseWidth.toFixed(2)}   `+
-			`pulseOffset=${waveParams.pulseOffset.toFixed(2)}`);
+			`waveFrequency UI=${waveParams.waveFrequency.toFixed(2)}/N   `+
+			`pulseWidth UI=${waveParams.pulseWidth.toFixed(2)}%   `+
+			`pulseOffset UI=${waveParams.pulseOffset.toFixed(2)}%`);
 		}
 
 		switch (waveParams.waveBreed) {
