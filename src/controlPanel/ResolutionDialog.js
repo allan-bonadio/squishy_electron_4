@@ -17,10 +17,6 @@ import {getASetting} from '../utils/storeSettings.js';
 import ControlPanel from './ControlPanel.js';
 
 
-// yeah, these are IN ADDITION TO the storeSettings criteria, cuz that's only powers of 2
-const MIN_2SLIDER_RES = process.env.NODE_ENV == 'development' ? 4 : 32;
-const MAX_2SLIDER_RES = 1024;
-
 export default class ResolutionDialog extends React.Component {
 	static propTypes = {
 	};
@@ -115,8 +111,8 @@ export default class ResolutionDialog extends React.Component {
 
 				current={s.N}
 				original={s.origN}
-				sliderMin={MIN_2SLIDER_RES}
-				sliderMax={MAX_2SLIDER_RES}
+				sliderMin={window.isDevel ? 4 : 32 /* evaluate now to make sure isDevel defined */}
+				sliderMax={1024 /* MAX_SLIDER_RES */}
 
 				stepsPerDecade={16}
 				willRoundPowers={true}

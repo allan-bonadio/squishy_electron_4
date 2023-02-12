@@ -70,11 +70,7 @@ class ErrorBoundary extends React.Component {
 
 		// this numbers them if there's more than one exception (different Error instances)
 		this.serial = 0;
-
-		// 'development' vs 'production'
-		this.devMode = process.env.NODE_ENV == 'development';
 	}
-
 
 	/* **************************************************** Exception Catchers */
 
@@ -175,7 +171,7 @@ class ErrorBoundary extends React.Component {
 		// maybe we have a jumpStart handler
 		const { jumpStartDev, jumpStartProd } = this.props;
 		let jumpStartButton = null;
-		const jumpStartCallback = this.devMode ? jumpStartDev : jumpStartProd;
+		const jumpStartCallback = window.isDevel ? jumpStartDev : jumpStartProd;
 		if (jumpStartCallback) {
 			jumpStartButton =
 				<button onClick={ev => this.jumpStart(errorObj, infoObj)}>
@@ -227,7 +223,7 @@ class ErrorBoundary extends React.Component {
 	// THIS triggers the dialog6
 	componentDidUpdate() {
 		// production: just restart.  turn off the error condition & roll back whatever
-		if (this.state.errorObj && !this.devMode) {
+		if (this.state.errorObj && !window.isDevel) {
 			setTimeout(() => {
 				this.jumpStart();
 				// soon it'll rerender, starting over
@@ -252,7 +248,7 @@ class ErrorBoundary extends React.Component {
 
 		// decide which callback, and call it safely
 		const { jumpStartDev, jumpStartProd } = this.props;
-		const jsFunc = this.devMode ? jumpStartDev : jumpStartProd;
+		const jsFunc = window.isDevel ? jumpStartDev : jumpStartProd;
 		let rv;
 		try {
 			// call it!  if it's there
@@ -285,9 +281,9 @@ class ErrorBoundary extends React.Component {
 		let ermsgs = '';
 
 		if (terminalErrorObj)
-			ermsgs = this.devMode ? this.renderDev(terminalErrorObj) : this.renderProd(terminalErrorObj);
+			ermsgs = window.isDevel ? this.renderDev(terminalErrorObj) : this.renderProd(terminalErrorObj);
 		if (errorObj)
-			ermsgs += this.devMode ? this.renderDev(errorObj) : this.renderProd(errorObj);
+			ermsgs += window.isDevel ? this.renderDev(errorObj) : this.renderProd(errorObj);
 		if (infoObj)
 			ermsgs += JSON.stringify(infoObj, null, '\t');
 

@@ -62,10 +62,6 @@ React swallowing exceptions:
 ErrorBoundary implemented based on this page from ReactJS.org: https://reactjs.org/docs/error-boundaries.html
 */
 
-// 'development' vs 'production'
-const devMode = true;
-
-
 class ErrorBoundary extends React.Component {
 	static propTypes = {
 		howToRecover: PropTypes.func,
@@ -203,7 +199,7 @@ class ErrorBoundary extends React.Component {
 		// maybe we have a jumpStart handler
 		const { jumpStartDev, jumpStartProd } = this.props;
 		let jumpStartButton = null;
-		const jumpStartCallback = devMode ? jumpStartDev : jumpStartProd;
+		const jumpStartCallback = window.isDevel ? jumpStartDev : jumpStartProd;
 		if (jumpStartCallback) {
 			jumpStartButton =
 				<button onClick={ev => this.jumpStart(errorObj, infoObj)}>
@@ -258,7 +254,7 @@ class ErrorBoundary extends React.Component {
 
 	NEWcomponentDidUpdate() {
 		// production: just restart.  turn off the error condition & roll back whatever
-		if (this.state.errorObj && !devMode) {
+		if (this.state.errorObj && !window.isDevel) {
 			setTimeout(() => {
 				this.jumpStart();
 				// soon it'll rerender, starting over
@@ -277,7 +273,7 @@ class ErrorBoundary extends React.Component {
 
 		// decide which callback, and call it safely
 		const { jumpStartDev, jumpStartProd } = this.props;
-		const jsFunc = devMode ? jumpStartDev : jumpStartProd;
+		const jsFunc = window.isDevel ? jumpStartDev : jumpStartProd;
 		let rv;
 		try {
 			// call it!  if it's there
@@ -308,9 +304,9 @@ class ErrorBoundary extends React.Component {
 	NEWrender() {
 		const { errorObj, infoObj, terminalErrorObj } = this.state;
 		if (terminalErrorObj)
-			return devMode ? this.renderDev(terminalErrorObj) : this.renderProd(terminalErrorObj);
+			return window.isDevel ? this.renderDev(terminalErrorObj) : this.renderProd(terminalErrorObj);
 		if (errorObj)
-			return devMode ? this.renderDev(errorObj) : this.renderProd(errorObj);
+			return window.isDevel ? this.renderDev(errorObj) : this.renderProd(errorObj);
 
 		if (infoObj.diptheria)
 			console.log("Hey joe, where ya going with that gun in your hand?");
