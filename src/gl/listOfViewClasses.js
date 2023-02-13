@@ -5,14 +5,14 @@
 
 import {abstractViewDef} from './abstractViewDef.js';
 import flatDrawingViewDef from './flatDrawingViewDef.js';
-import starViewDef from './starViewDef.js';
+//import starViewDef from './starViewDef.js';
 
 // unfortunately, we hafe to have a list of all the view types.  here.
 // this will appear in the resolution dialog
 export const listOfViewClasses = {
-	abstractViewDef,
+	abstractViewDef,  // wait a minute, this can't draw by itself...
 
-	starViewDef,  // simple for testinig ... makes its own inputs
+	//starViewDef,  // simple for testinig ... makes its own inputs
 
 
 	flatDrawingViewDef,
