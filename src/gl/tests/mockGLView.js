@@ -70,19 +70,15 @@ export class mockGLView {
 	testViewClasses = {
 	}
 
-	// instantiate all the view classes we'll use
+	// instantiate the view class we'll use
 	initViewClass(viewClassName) {
 		console.log(`initViewClass(${viewClassName})`);
 
 		this.viewClassName = viewClassName;
+		let vClass = viewClassNamez[viewClassName];
 		this.testViewClasses[viewClassName] =
 			this.effectiveView =
-			new viewClassNamez[viewClassName](
-				viewClassName,
-				this,
-				mockSpace,
-				mockAvatar
-			)
+			new vClass(viewClassName, this, mockSpace, mockAvatar);
 		this.effectiveView.completeView();
 		this.avatar.doRepaint = this.doRepaint;
 
