@@ -178,7 +178,7 @@ function prepError(ex) {
 function ErrorDialog(props) {
 	let ex = props.error;
 
-	console.error('ErrorDialog displays: ', ex);
+	console.error('Error Dialog: ', ex);
 	let where = props.where ? ` at ${props.where}` : '';
 	return (
 		<article id='ErrorDialog' onKeyDown={CommonDialog.returnEscapeKeyDown} >
