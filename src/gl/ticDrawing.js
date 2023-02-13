@@ -77,22 +77,8 @@ export class ticDrawing extends abstractDrawing {
 
 	// one time set up of variables for this drawing, every time canvas and viewDef is recreated
 	createVariables() {
+		this.setDrawing();
 		if (traceTicDrawing) console.log(`➤ ➤ ➤ ticDrawing ${this.viewName}: creatingVariables`);
-
-
-
-		// this works but it's bad
-		this.vao = this.gl.createVertexArray();
-
-		// this is doing it all wrong.  ticDraw shouldn't be making its own vao,
-		// it should be sharing with flatViewDef and flatDraw.
-
-		// webgl2 funds: https://webgl2fundamentals.org/webgl/lessons/webgl1-to-webgl2.html
-		// search for bindAttribLocation.  THis is what I need to do, for each
-		// program (drawing), after compiling and before linking.
-		// maybe instead of fancy smancy automaitc everything,
-		// maybe I just have another handler that does that.
-
 
 		this.cornerFloats = 2;
 		this.cornerAttr = new viewAttribute('corner', this, this.cornerFloats, () => {
@@ -157,10 +143,10 @@ export class ticDrawing extends abstractDrawing {
 
 	draw() {
 		const gl = this.gl;
+		this.setDrawing();
 		if (traceTicDrawing)
 			console.log(`➤ ➤ ➤ ticDrawing '${this.viewName}, ${this.avatarLabel}': start draw`);
 
-		this.setDrawing();
 		this.viewVariables.forEach(v => v.reloadVariable());
 
 
