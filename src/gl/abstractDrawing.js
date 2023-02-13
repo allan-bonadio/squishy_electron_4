@@ -32,22 +32,27 @@ export class abstractDrawing {
 	// Constructor of subclasses passes in the drawingName; a literal, it isn't one of their arguments
 	constructor(viewDef, drawingName) {
 		this.viewDef = viewDef;
-		this.viewName = viewDef.viewName;
-		this.drawingName = drawingName;
-
-		this.viewVariables = [];  // vars for this drawing ONLY
-
 		this.gl = viewDef.gl;
+		this.viewName = viewDef.viewName;
 		this.tagObject = viewDef.tagObject;
-
-		// if per-drawing, it'll be created below.  If not, use the viewdef's
-		this.vao = viewDef.vao;
-
 		this.space = viewDef.space;
 		this.avatar = viewDef.avatar;
 		this.avatarLabel = viewDef.avatar.label;
 
-		// no.  viewDef does this by just setting the drawings array with the drawings it wants.  viewDef.drawings.push(this);
+		this.drawingName = drawingName;
+
+		this.perDrawingVAO = viewDef.perDrawingVAO
+		if (this.perDrawingVAO) {
+			this.vao = this.gl.createVertexArray();
+			this.tagObject(this.vao, `${this.drawingName}-vao`);
+		}
+		else {
+			this.vao = viewDef.vao;
+		}
+
+		this.viewVariables = [];  // vars for this drawing ONLY
+
+		// the specific viewDef will put the drawing instances  into the array in its creator
 	}
 
 	/* ************************************************** Shader Creation/Compile */
@@ -59,7 +64,7 @@ export class abstractDrawing {
 		gl.bindVertexArray(this.vao);
 	}
 
-	// used only by compileProgram()
+	// compile one or the other shader; used only by compileProgram()
 	compileShader(type, srcString) {
 		const {gl} = this;
 
@@ -88,18 +93,12 @@ export class abstractDrawing {
 	// also program, for use with useProgram(), if it all compiles
 	compileProgram() {
 		const {gl} = this;
+		this.setDrawing();
 
 		// create program (and vao?) for this drawing, and put them into use
 		const program = gl.createProgram();
 		this.tagObject(program, `${this.viewName}-${this.drawingName}-pgm`);
 
-		// if not per drawing, this.vao already points to viewDef's
-		if (this.viewDef.perDrawingVAO) {
-			this.vao = this.gl.createVertexArray();
-			this.tagObject(this.vao, `${this.drawingName}-vao`);
-		}
-
-		this.setDrawing();
 
 		const vertexShader = this.compileShader(gl.VERTEX_SHADER,
 			this.vertexShaderSrc);
@@ -134,20 +133,6 @@ export class abstractDrawing {
 	}
 
 
-	/* **************************************************  old examples */
-
-	// abstract supermethod: all drawings should write their own createVariables() method.
-	// mostly, creating viewVariables that can be dynamically changed.
-	// called 1ce at view init.  It will set up callbacks to set new values
-	// see viewVariable for routines to make unis and attrs
-//	createVariables() {
-//		// gotta have at least one attr?  this is just a dummy.
-//		this.aPointAttr = new viewAttribute('aPoint', this);
-//		this.aPoint = new Float32Array([0, 0, 0., 1.]);
-//		this.aPointAttr.attachArray(this.aPoint, 4);
-//
-//		this.aPointAttr = new viewUniform('aNumber', this);
-//	}
 
 }
 

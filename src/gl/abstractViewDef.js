@@ -34,12 +34,12 @@ export class abstractViewDef {
 		this.avatar = avatar;
 
 		// should have one VAO per viewdef, or per drawing?  can't decide myself.
-		// But keep this in case we want to go back and forth.
-		this.perDrawingVAO = false;
-		//this.perDrawingVAO = true;
+		// But keep this so we can go back and forth.
+		//this.perDrawingVAO = false;
+		this.perDrawingVAO = true;
 
-		// vao for all drawings in this viewdef
 		if (!this.perDrawingVAO) {
+			// vao for all drawings in this viewdef
 			this.vao = this.gl.createVertexArray();
 			this.tagObject(this.vao, 'theVAO');
 		}
@@ -52,7 +52,7 @@ export class abstractViewDef {
 	// the final call to set it up does all viewClassName-specific stuff
 	// other subclassers override what they want
 	completeView() {
-		this.setShadersOnDrawings();
+		this.compileShadersOnDrawings();
 		this.createVariablesOnDrawings();
 
 		// call again if canvas outer dimensions change
@@ -77,7 +77,7 @@ export class abstractViewDef {
 	// this does shaders and inputs, integrating thru the list of drawings
 	// see abstractDrawing
 	// drawings have their glsl scripts in their constructors
-	setShadersOnDrawings() {
+	compileShadersOnDrawings() {
 		this.drawings.forEach(drawing => {
 			drawing.compileProgram();
 		});
@@ -90,7 +90,6 @@ export class abstractViewDef {
 	// NOT upon every repaint!!
 	createVariablesOnDrawings() {
 		this.drawings.forEach(drawing => {
-			drawing.setDrawing();
 			drawing.createVariables();
 		});
 	}
@@ -133,6 +132,7 @@ export class abstractViewDef {
 		this.drawings.forEach(drawing => {
 			drawing.setDrawing();
 			drawing.viewVariables.forEach(v => v.reloadVariable());
+
 			drawing.draw();
 		});
 	}
