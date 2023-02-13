@@ -44,7 +44,7 @@ attribute vec2 corner;
 
 // always returns 0...1
 float scramble(float a) {
-	return fract(exp(a + 7.12));
+	return fract(exp(a/8. + 1.12));
 }
 
 void main() {
