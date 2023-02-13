@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<!-- runner -- WebGL testing for Squishy Electron
+		Copyright (C) 2023-2023 Tactile Interactive, all rights reserved
+			try to replicate index.html as much as possible -->
+<html lang=en>
+<head>
+	<meta charset=utf-8 />
+	<link rel=icon href=tests/sq.png type=image/png sizes=any>
+	<!-- error msgs meta name=viewport content=width='device-width, initial-scale=1'  / -->
+	<meta name=theme-color content=#000000ff />
+	<meta name=description content='testing Squishy Electron gl infrastructure' />
+	<title>GL Test Runner</title>
+
+	<style>
+		* {
+			box-sizing: border-box;
+		}
+
+		body {
+			background-color: #222;
+			font-size: 14px;
+			font-family: verdana, helvetica, sans-serif;
+			color: #eee;
+			margin: 0;
+			padding: 0;
+		}
+		h3 {
+			text-align: center;
+		}
+		canvas {
+			display: block;
+			float: right;
+			border: 1px dashed #f8f;
+			margin: 0 1em 1em 1em ;
+		}
+		article {
+			margin: 1em;
+			display: grid;
+			grid-template-columns: 1fr 1fr 1fr;
+		}
+		p {
+			margin: .5em;
+		}
+		#startButton {
+			padding: 1em;
+			border-radius: 1em;
+		}
+		fieldset label {
+			display: block;
+		}
+	</style>
+	<!--script src="https://greggman.github.io/webgl-lint/webgl-lint.js" crossorigin></script-->
+	<script src=tests/testsRunner.js type=module></script>
+</head>
+<body>
+
+<h3>GL Test Runner</h3>
+<canvas className=GLView width=700 height=500 ></canvas>
+
+
+<article>
+<p>
+	<status>not even started running testRunner.js</status>
+</p>
+
+<fieldset>
+	<legend>general</legend>
+	<p>
+		choose WebGL version<br>
+		<label><input type=radio name=selectVersion value=1 checked >WebGL 1</label>
+		<label><input type=radio name=selectVersion value=2 >WebGL 2</label>
+	</p>
+
+	<p>
+		viewClass to draw:
+		<label><input type=radio name=viewClass value=star>star</option>
+		<label><input type=radio name=viewClass value=flat>flat</option>
+	</p>
+</fieldset>
+
+<fieldset>
+	<legend>for Flat Squish</legend>
+	<p>
+		N =
+		<label><input type=radio name=N value=4>4</label>
+		<label><input type=radio name=N value=8>8</label>
+		<label><input type=radio name=N value=16 selected>16</label>
+		<label><input type=radio name=N value=32>32</label>
+		<label><input type=radio name=N value=64>64</label>
+		<label><input type=radio name=N value=128>128</label>
+		<label><input type=radio name=N value=256>256</label>
+		<label><input type=radio name=N value=512>512</label>
+		<label><input type=radio name=N value=1024>1024</label>
+	</p>
+
+	<p>
+		choose continuum:<br>
+		<label><input type=radio name=continuum value=well checked >Well</label>
+		<label><input type=radio name=continuum value=endless >Endless</label>
+	</p>
+</fieldset>
+
+
+<fieldset>
+	<legend>for Star</legend>
+	<p id=drawingType>
+		<div>choose drawing types for star:</div>
+
+			<div> — points — </div>
+				<label><input type=checkbox name=drawingType value=POINTS>POINTS</label>
+			<div> — lines — </div>
+				<label><input type=checkbox name=drawingType value=LINES>LINES</label>
+				<label><input type=checkbox name=drawingType value=LINE_STRIP>LINE_STRIP</label>
+				<label><input type=checkbox name=drawingType value=LINE_LOOP>LINE_LOOP</label>
+			<div> — triangles — </div>
+				<label><input type=checkbox name=drawingType value=TRIANGLES>TRIANGLES</label>
+				<label><input type=checkbox name=drawingType value=TRIANGLE_STRIP>TRIANGLE_STRIP</label>
+				<label><input type=checkbox name=drawingType value=TRIANGLE_FAN>TRIANGLE_FAN</label>
+			</optgroup>
+		</select>
+		</label>
+	</p>
+
+</fieldset>
+
+
+<p>
+	<button id=startButton>Go</button>
+</p>
+
+</article>
+
+
+
+</body>
+</html>
