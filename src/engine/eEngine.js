@@ -24,20 +24,21 @@ export let MAX_DIMENSIONS, MAX_LABEL_LEN;
 // this promise resolves when the main space is created.
 // Create the promise tout de suite when app starts, so everybody can get at it.
 // Recreate it when you know you're about to recreate the space and everything.
-export let eSpaceCreatedPromise;
 
 let eSpaceCreatedSucceed, eSpaceCreatedFail;
 function resetSpaceCreatedPromise() {
-	eSpaceCreatedPromise = new Promise((succeed, fail) => {
+	let prom = new Promise((succeed, fail) => {
 		eSpaceCreatedSucceed = succeed;
 		eSpaceCreatedFail = fail;
 		if (tracePromises) console.info(`🐥 eSpaceCreatedPromise (re)created:`, succeed, fail);
 	});
 	if (traceStartup) console.log(`spaceCreatedPromise 🐣 ... created`);
+	return prom;
 }
-resetSpaceCreatedPromise();  // for the first time when app starts up
+// for the first time when app starts up
+export let eSpaceCreatedPromise = resetSpaceCreatedPromise();
 
-// export this?  shouldn't have to.
+// export this?  shouldn't have to.  GET RID OF THIS!!
 let theSpace;
 
 // called during startup, and also upon every
@@ -78,6 +79,7 @@ export function recreateMainSpace(spaceParams) {
 		create1DMainSpace(spaceParams);
 	});
 
+	// GET RID OF theSpace!!
 	theSpace.liquidate();
 
 	resetObjectRegistry();  // this will hang on to them otherwise!!
