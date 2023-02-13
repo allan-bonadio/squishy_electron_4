@@ -54,7 +54,7 @@ function startGLView() {
 
 	// initViewClass() really done in a componentDidUpdate()
 	// but we don't have the complications
-	glView.initViewClass(localStorage.viewClass);
+	glView.initViewClass(localStorage.viewClass ?? 'star');
 
 	/// try it?
 	glView.doRepaint();
@@ -80,20 +80,20 @@ function selectContinuum(ev) {
 
 starViewDef.typesList = [];
 
-function setupDrawingTypes() {
-	let typesList = starViewDef.typesList = localStorage.drawingType;
+function setupPenTypes() {
+	let typesList = starViewDef.typesList = localStorage.penType;
 	if (typesList)
 		typesList = typesList.split(' ').filter(c => c);
 	else
 		typesList = [];
-	$$(`[name=drawingType]`).forEach(check => {
+	$$(`[name=penType]`).forEach(check => {
 		check.checked = typesList.includes(check.value);
-		check.addEventListener('click', selectDrawingTypes);
+		check.addEventListener('click', selectPenTypes);
 	});
 	starViewDef.typesList = typesList;
 }
 // menu for drawing type(s)
-function selectDrawingTypes(ev) {
+function selectPenTypes(ev) {
 	let target = ev.target;
 	if (target.checked) {
 		starViewDef.typesList.push(target.value);
@@ -103,7 +103,7 @@ function selectDrawingTypes(ev) {
 		if (pos >= 0)
 			starViewDef.typesList.splice(pos, 1);
 	}
-	localStorage.drawingType = starViewDef.typesList.join(' ');
+	localStorage.penType = starViewDef.typesList.join(' ');
 }
 
 // the radio buttons for well/endless
@@ -118,13 +118,13 @@ function selectDrawingTypes(ev) {
 window.addEventListener('DOMContentLoaded', ev => {
 	$('status').innerHTML = `DOMContentLoaded, waiting for page to come to front...`;
 	try {
-		setHandlersOnAll(`version`, selectVersion, localStorage.preferWebGL2);
+		setHandlersOnAll(`version`, selectVersion, localStorage.version);
 		setHandlersOnAll(`viewClass`, selectViewClass, localStorage.viewClass ?? 'star');
 
 		setHandlersOnAll(`N`, selectN, localStorage.N ?? 16);
 		setHandlersOnAll(`continuum`, selectContinuum, localStorage.continuum ?? '1');
 
-		setupDrawingTypes();
+		setupPenTypes();
 
 		$(`#startButton`).addEventListener('click', startGLView);
 
