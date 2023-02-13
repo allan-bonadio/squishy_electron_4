@@ -9,12 +9,9 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-// is this how you do it?
-import 'webgl-lint';
-
 import {listOfViewClasses} from './listOfViewClasses.js';
+import glAux from './glAux.js';
 //import {eSpaceCreatedPromise} from '../engine/eEngine.js';
-import {tooOldTerminate} from '../utils/errors.js';
 
 let traceSetup = false;
 let tracePainting = false;
@@ -22,7 +19,7 @@ let traceGeometry = false;
 
 // true to try v2 before v1; false for v1 before v2
 // either or both might fail.
-let tryWebGL2 = true;
+// NO!  see in glAux   export let preferWebGL2 = true;
 
 // For each GLView, there's one:
 // - canvas, and one gl context
@@ -54,36 +51,6 @@ class GLView extends React.Component {
 		if (traceSetup) console.log(`🖼 🖼 GLView:${props.viewName}: constructor done`);
 	}
 
-	// try to set up GL1, return falsy if it can't.  Also shim the vao methods
-	setupGL1() {
-		let gl = this.canvas.getContext("webgl");  // gl.VERSION: 7938
-		if (! gl)
-			gl = this.canvas.getContext("experimental-webgl");  // really old
-		if (!gl)
-			return null;
-		this.gl = gl;
-
-		// notin webgl1, avail as an extention
-		let vaoExt = this.vaoExt = gl.getExtension("OES_vertex_array_object");
-		if (!vaoExt)
-			return null;
-
-		// backfill these methods for consistent usage
-		gl.createVertexArray = vaoExt.createVertexArrayOES.bind(vaoExt);
-		gl.deleteVertexArray = vaoExt.deleteVertexArrayOES.bind(vaoExt);
-		gl.bindVertexArray = vaoExt.bindVertexArrayOES.bind(vaoExt);
-		return gl;
-	}
-
-	// try to set up GL2, return falsy if it can't
-	setupGL2() {
-		const gl = this.canvas.getContext("webgl2");
-		if (!gl)
-			return null;
-		this.gl = gl;
-		return gl;
-	}
-
 	// When you know <canvas element, pass it here.
 	// Called every time canvas is created (or recreated) in a render
 	setGLCanvas =
@@ -99,28 +66,9 @@ class GLView extends React.Component {
 		this.canvas = canvas;  // immediately available
 
 		// get the gl, figuring out which versions of GL we have, preferrinig 1 or 2
-		if (tryWebGL2)
-			this.setupGL2();
-		if (!this.gl)
-			this.setupGL1();
-		if (!tryWebGL2 && !this.gl)
-			this.setupGL2();
-		if (!this.gl)
-			tooOldTerminate(`Sorry, your browser's WebGL is kinidof old.`);
-
-		// webgl-lint extension, needs import at top of this file
-		let webglLint = this.webglLint = this.gl.getExtension('GMAN_debug_helper');
-		if (webglLint) {
-			webglLint.setConfiguration({
-				maxDrawCalls: 2000,
-				failUnsetSamplerUniforms: true,
-			});
-			this.tagObject = webglLint.tagObject.bind(webglLint)
-		}
-		else {
-			// ext doesn't work i guess
-			this.tagObject = () => {};
-		}
+		this.glAux = new glAux(canvas);
+		this.gl = this.glAux.gl ;
+		this.tagObject = this.glAux.tagObject ;
 
 		canvas.glview = this;
 		canvas.viewName = p.viewName;
@@ -144,10 +92,6 @@ class GLView extends React.Component {
 		// intrinsic to avatar p.avatar.reStartDrawing = this.reStartDrawing;
 		//p.avatar.setGlViewport = this.setGlViewport;
 		if (traceSetup) console.log(`🖼 🖼 GLView ${p.viewName} ${p.avatar.label}: done with initViewClass`);
-
-		// BTW, since there hasn't been a doRepaint() func, I betcha it needs to be done right now.
-		// never helps this.doRepaint();
-
 	}
 
 	// repaint whole GL image.  This is not 'render' as in React;
@@ -165,7 +109,7 @@ class GLView extends React.Component {
 			p.avatar.ewave.dump(`🖼 🖼 GLView ${p.viewName}: got the ewave right here`);
 
 		// copy from latest wave to view buffer (c++) & pick up highest
-		p.avatar.loadViewBuffer()
+		p.avatar.loadViewBuffer();
 		if (tracePainting)
 			p.avatar.dumpViewBuffer(`🖼 🖼 GLView ${p.viewName}: loaded ViewBuffer`);
 

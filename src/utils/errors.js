@@ -28,7 +28,7 @@ window.dAssert = dAssert;
 
 /* ****************************************************** error/exception handling from C++ */
 
-// c++ will set this in exceptions.cpp
+// c++ will set this in exceptions.cpp someday
 window.cppErrorStack = '';
 
 // class of errors that come from inside C++
@@ -68,17 +68,17 @@ export function catchEx(func, where) {
 
 /* ****************************************************** Too Old */
 
-
-const tryWebGL = `<p>Or if you can't, and you have an old browser, you can try (desktop):
-	<p>Enable WebGL in Firefox by setting the about:config preference
-	webgl.enable-prototype-webgl2 to true
-
-	<p>Enable WebGL  in Chrome by passing the "--enable-unsafe-es3-apis"
-	flag when starting the browser through the command line
-	OR: chrome://flags/#enable-webgl-draft-extensions in Chromium based browsers (Chrome, Opera).
-
-	<p>Enable WebGL Safari in the "Experimental Features" developer menu
-`;
+// we don't even use this anymore...
+//const tryWebGL = `<p>Or if you can't, and you have an old browser, you can try (desktop):
+//	<p>Enable WebGL in Firefox by setting the about:config preference
+//	webgl.enable-prototype-webgl2 to true
+//
+//	<p>Enable WebGL  in Chrome by passing the "--enable-unsafe-es3-apis"
+//	flag when starting the browser through the command line
+//	OR: chrome://flags/#enable-webgl-draft-extensions in Chromium based browsers (Chrome, Opera).
+//
+//	<p>Enable WebGL Safari in the "Experimental Features" developer menu
+//`;
 
 // call this if the browser/machine are just way too old to support the stuff we use:
 // what = 'WebGL' at least v1, 'WebAssembly', dedicated 'WebWorkers', ...
@@ -93,8 +93,8 @@ export function tooOldTerminate(what) {
 			<a href=https://www.microsoft.com/en-us/edge>MS Edge</a>.
 			If your machine is old, you might be able to download an older ('legacy') version.
 	`;
-	if ('WebGL' == what)
-		tooOldMessage += tryWebGL;
+	//if ('WebGL' == what)
+	//	tooOldMessage += tryWebGL;
 	let inHere = document.querySelector('#theSquishPanel') || document.body;
 	inHere.innerHTML = tooOldMessage;
 	inHere.style.backgroundColor = '#f44' ;
