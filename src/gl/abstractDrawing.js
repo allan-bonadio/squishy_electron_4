@@ -44,7 +44,7 @@ export class abstractDrawing {
 		this.perDrawingVAO = viewDef.perDrawingVAO
 		if (this.perDrawingVAO) {
 			this.vao = this.gl.createVertexArray();
-			this.tagObject(this.vao, `${this.drawingName}-vao`);
+			this.tagObject(this.vao, `${this.avatarLabel}-${this.drawingName}-vao`);
 		}
 		else {
 			this.vao = viewDef.vao;
@@ -75,7 +75,7 @@ export class abstractDrawing {
 				: 'unknown type ';
 
 		let shader = gl.createShader(type);
-		this.tagObject(shader, `${this.viewName}-${this.drawingName}-${vType}-sh`);
+		this.tagObject(shader, `${this.avatarLabel}-${this.drawingName}-${vType}-sh`);
 
 		gl.shaderSource(shader, srcString);
 		gl.compileShader(shader);
@@ -97,7 +97,7 @@ export class abstractDrawing {
 
 		// create program (and vao?) for this drawing, and put them into use
 		const program = gl.createProgram();
-		this.tagObject(program, `${this.viewName}-${this.drawingName}-pgm`);
+		this.tagObject(program, `${this.avatarLabel}-${this.drawingName}-pgm`);
 
 
 		const vertexShader = this.compileShader(gl.VERTEX_SHADER,

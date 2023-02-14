@@ -9,7 +9,7 @@ import 'https://greggman.github.io/webgl-lint/webgl-lint.js';
 
 //import {tooOldTerminate} from '../utils/errors.js';
 
-let tracePainting = false;
+let traceVersion = true;
 
 /* ********************************************************** too old error */
 
@@ -78,6 +78,8 @@ class glAux {
 		gl.createVertexArray = vaoExt.createVertexArrayOES.bind(vaoExt);
 		gl.deleteVertexArray = vaoExt.deleteVertexArrayOES.bind(vaoExt);
 		gl.bindVertexArray = vaoExt.bindVertexArrayOES.bind(vaoExt);
+		if (traceVersion)
+			console.log(`enabled original WebGL 1`);
 		return gl;
 	}
 
@@ -87,6 +89,8 @@ class glAux {
 		if (!gl)
 			return null;
 		this.gl = gl;
+		if (traceVersion)
+			console.log(`enabled WebGL 2`);
 		return gl;
 	}
 

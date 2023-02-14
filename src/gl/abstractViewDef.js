@@ -41,7 +41,7 @@ export class abstractViewDef {
 		if (!this.perDrawingVAO) {
 			// vao for all drawings in this viewdef
 			this.vao = this.gl.createVertexArray();
-			this.tagObject(this.vao, 'theVAO');
+			this.tagObject(this.vao, `${avatar.label}-${this.drawingName}-vao`);
 		}
 
 		// all of the drawings in this view
@@ -122,6 +122,7 @@ export class abstractViewDef {
 		// debugging ... gl.clearColor(.8, .6, .4, 1);
 		gl.clearDepth(1);  // default anyway
 		gl.clearColor(0, 0, 0, 1);
+		//gl.clear(gl.COLOR_BUFFER_BIT);
 		gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 	}
 

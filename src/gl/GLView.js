@@ -14,7 +14,7 @@ import glAux from './glAux.js';
 //import {eSpaceCreatedPromise} from '../engine/eEngine.js';
 
 let traceSetup = false;
-let tracePainting = false;
+let tracePainting = true;
 let traceGeometry = false;
 
 // true to try v2 before v1; false for v1 before v2
@@ -68,7 +68,7 @@ class GLView extends React.Component {
 		// get the gl, figuring out which versions of GL we have, preferrinig 1 or 2
 		this.glAux = new glAux(canvas);
 		this.gl = this.glAux.gl ;
-		this.tagObject = this.glAux.tagObject ;
+		this.tagObject = this.glAux.tagObject;
 
 		canvas.glview = this;
 		canvas.viewName = p.viewName;

@@ -10,8 +10,8 @@ import cxToColor from '../gl/cxToColor/cxToColor.txlated.js';
 import {cppObjectRegistry, prepForDirectAccessors} from '../utils/directAccessors.js';
 import eSpace from './eSpace.js';
 
-let traceSetFamiliarWave = false;
-let traceSetFamiliarWaveResult = false;
+let traceSetFamiliarWave = true;
+let traceSetFamiliarWaveResult = true;
 
 const _ = num => num.toFixed(4).padStart(9);
 const atan2 = Math.atan2;

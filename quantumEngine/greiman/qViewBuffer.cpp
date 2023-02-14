@@ -12,8 +12,8 @@
 #include "../debroglie/qWave.h"
 #include "qViewBuffer.h"
 
-static const bool traceViewBuffer = false;
-static const bool traceHighest = false;
+static const bool traceViewBuffer = true;
+static const bool traceHighest = true;
 static const bool traceInDetail = false;
 
 // August Ferdinand Möbius invented homogenous coordinates
