@@ -5,7 +5,7 @@
 
 let traceGLCalls = false;
 let traceUniforms = false;
-let traceAttributes = false;
+let traceAttributes = true;
 
 // attr arrays and uniforms that can change on every frame.
 // you can set a static value or a function that'll return it
@@ -18,6 +18,8 @@ export class viewVariable {
 	constructor(varName, drawing, getFunc) {
 		this.drawing = drawing;
 		this.gl = drawing.gl;
+		this.tagObject = drawing.tagObject;
+
 		this.getFunc = getFunc;
 
 		this.varName = varName;
@@ -123,11 +125,13 @@ export class viewUniform extends viewVariable {
 // coordinates and color for that point
 
 // create this as many times as you have buffers as input to vec shader
-// always float32.  getFunc must return a Float32TypedArray with a property
-// 'nTuples' that gives the number of rows used, each tupleWidth number of floats
+// always float32.  getFunc must return a Float32TypedArray with a non-array property
+// 'nTuples' that gives the number of rows or vertices used, each tupleWidth number of floats
+// eg for x & y, tupleWidth=2.  sequence of several tuples gets draw, however.
 export class viewAttribute extends viewVariable {
 	constructor(varName, drawing, tupleWidth, getFunc = () => {}) {
 		super(varName, drawing, getFunc);
+		const gl = this.gl;
 		this.tupleWidth = tupleWidth;  // num of float32s in each row/tuple
 
 		// small integer indicating which attr this is.  Set by compileProgram() for each drawing in the view def
@@ -135,47 +139,19 @@ export class viewAttribute extends viewVariable {
 
 		if (attrLocation < 0)
 			throw new Error(`𒐿 viewAttribute:attr loc for '${varName}' is bad: `+ attrLocation);
-//	}
-//
-// 	// call after construction.  has <floatArray> data input,
-//	// broken into rows of <stride> Bytes,
-//	// but we only use the <tupleWidth> number of Floats from each row,
-//	// <offset> from the start of each row.  tupleWidth=1,2,3 or 4,
-//	// to make an attr that's a scalar, vec2, vec3 or vec4
-//	attachArray(floatArray, tupleWidth, stride = tupleWidth * 4, offset = 0) {
-		const gl = this.gl;
 
 		// attach GPU buffer to our GL
 		const glBuffer = this.glBuffer = gl.createBuffer();
-
-		// does this do anything?  not sure.
-		//drawing.tagObject(glBuffer, `${drawing.drawingName}-${varName}-attrBuf`);
+		this.tagObject(glBuffer, `${drawing.avatarLabel}-${drawing.drawingName}-${varName}-va`);
 
 		gl.bindBuffer(gl.ARRAY_BUFFER, glBuffer);
-
-		// now attach some data to it, with CPU-side arrays.  Since we have to do bufferData
-		// before each frame, maybe bag that rigth now
-//		this.floatArray = this.drawing.floatArray = floatArray;
-//		gl.bufferData(gl.ARRAY_BUFFER, floatArray, gl.DYNAMIC_DRAW);
-
 		gl.enableVertexAttribArray(this.attrLocation);
 
 		gl.vertexAttribPointer(
 				this.attrLocation,
 				tupleWidth, gl.FLOAT,
+				false, tupleWidth * 4, 0);  // normalize, stride, offset
 
-				// normalize, stride, offset
-				false, tupleWidth * 4, 0);
-
-
-		// again?  gl.enableVertexAttribArray(this.attrLocation);
-
-//		var vao = this.vao = vaoExt.createVertexArrayOES();
-//		vaoExt.bindVertexArrayOES(vao);
-//		vao;
-//		gl.enableVertexAttribArray(this.attrLocation);
-//
-//		gl.vertexAttribPointer(this.attrLocation, tupleWidth, gl.FLOAT, false, stride, offset);
 		if (traceGLCalls) console.log(`𒐿  viewAttribute '${this.varName}' set to tupleWidth=${tupleWidth}`);
 
 		this.reloadVariable();
