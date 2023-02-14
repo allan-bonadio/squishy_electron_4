@@ -11,7 +11,7 @@ import {viewUniform, viewAttribute} from '../viewVariable.js';
 let corners;
 
 // create this table the way viewAttribute likes it
-function createCorners() {
+function createVertices() {
 	// create the data for the corners attribute
 	const sin = Math.sin;
 	const cos = Math.cos;
@@ -95,12 +95,7 @@ export class starDrawing extends abstractDrawing {
 				}
 			);
 
-//		const cornerAttributeLocation = gl.getAttribLocation(this.program, 'corner');
-//		const cornerBuffer = gl.createBuffer();  // actual ram in GPU chip
-//		gl.bindBuffer(gl.ARRAY_BUFFER, cornerBuffer);
-
-
-		createCorners();
+		createVertices();
 
 		this.cornerAttr = new viewAttribute('corner', this, 2, () => corners);
 		//this.cornerAttr.attachArray(corners, 2);
