@@ -10,14 +10,9 @@ import {viewUniform, viewAttribute} from './viewVariable.js';
 //import SquishPanel from '../SquishPanel.js';
 //import {eSpaceCreatedPromise} from '../engine/eEngine.js';
 
-let dumpViewBufAfterDrawing = false;
+let dumpViewBufAfterDrawing = true;
 let traceHighest = false;
 let traceFlatDrawing = false;
-
-// normally autoranging would put the highest peak at the exact bottom.
-// but we want some extra space.  not much.
-let PADDING_ON_BOTTOM = 1.02;
-
 
 // diagnostic purposes
 let alsoDrawPoints = false;
@@ -112,7 +107,7 @@ export class flatDrawing extends abstractDrawing {
 					console.log(`flatDrawing reloading ${this.viewName}: highest=${this.avatar.highest.toFixed(5)}  smoothHighest=${this.avatar.smoothHighest.toFixed(5)}`);
 
 				// add in a few percent
-				return {value: this.avatar.smoothHighest * PADDING_ON_BOTTOM, type: '1f'};
+				return {value: this.avatar.smoothHighest * this.viewDef.PADDING_ON_BOTTOM, type: '1f'};
 			}
 		);
 
@@ -132,10 +127,12 @@ export class flatDrawing extends abstractDrawing {
 	}
 
 	draw() {
+		if (traceFlatDrawing) console.log(`flatDrawing ${this.viewName}, ${this.avatarLabel}: `+
+			` drawing ${this.vertexCount/2} points`);
 		const gl = this.gl;
 		this.setDrawing();
-		if (traceFlatDrawing) console.log(`flatDrawing ${this.viewName}, ${this.avatarLabel}: drawing`);
 
+		this.viewVariables.forEach(v => v.reloadVariable());
 		gl.drawArrays(gl.TRIANGLE_STRIP, 0, this.vertexCount);
 
 		if (alsoDrawLines) {

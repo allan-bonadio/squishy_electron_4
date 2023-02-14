@@ -19,6 +19,10 @@ class flatDrawingViewDef extends abstractViewDef {
 			throw  `flatDrawingViewDef: being created without space or avatar`;
 		}
 
+		// normally autoranging would put the highest peak at the exact bottom.
+		// but we want some extra space.  not much.
+		this.PADDING_ON_BOTTOM = 1.02;
+
 		// create relevant drawings.
 		this.drawings = [
 			new flatDrawing(this),
