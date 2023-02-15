@@ -68,14 +68,14 @@ export class abstractDrawing {
 	compileShader(type, srcString) {
 		const {gl} = this;
 
-		let vType = (gl.VERTEX_SHADER == type)
+		let shType = (gl.VERTEX_SHADER == type)
 			? 'vertex'
 			: gl.FRAGMENT_SHADER == type
 				? 'fragment'
 				: 'unknown type ';
 
 		let shader = gl.createShader(type);
-		this.tagObject(shader, `${this.avatarLabel}-${this.drawingName}-${vType}-sh`);
+		this.tagObject(shader, `${this.avatarLabel}-${this.drawingName}-${shType}-sh`);
 
 		gl.shaderSource(shader, srcString);
 		gl.compileShader(shader);
@@ -84,7 +84,7 @@ export class abstractDrawing {
 
 		const msg = gl.getShaderInfoLog(shader);
 		gl.deleteShader(shader);
-		throw new Error(`Error compiling ${vType} shader for ${this.viewName}: ${msg}`);
+		throw new Error(`Error compiling ${shType} shader for ${this.viewName}: ${msg}`);
 	}
 
 	// call this with your sources in setShaders().

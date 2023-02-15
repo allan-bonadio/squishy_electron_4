@@ -14,7 +14,7 @@ import glAux from './glAux.js';
 //import {eSpaceCreatedPromise} from '../engine/eEngine.js';
 
 let traceSetup = false;
-let tracePainting = true;
+let tracePainting = false;
 let traceGeometry = false;
 
 // true to try v2 before v1; false for v1 before v2

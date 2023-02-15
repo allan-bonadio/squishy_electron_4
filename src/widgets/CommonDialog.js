@@ -13,8 +13,8 @@ import 'dialog-polyfill/dist/dialog-polyfill.css';
 //import App from '../App.js';
 import {interpretCppException} from '../utils/errors.js';
 
-let traceKeystrokes = true;
-let traceTestSimpleError = true;
+let traceKeystrokes = false;
+let traceTestSimpleError = false;
 
 // how to use:
 //    CommonDialog.openSimpleDialog("Elvis has left the building.");

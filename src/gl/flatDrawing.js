@@ -10,17 +10,15 @@ import {viewUniform, viewAttribute} from './viewVariable.js';
 //import SquishPanel from '../SquishPanel.js';
 //import {eSpaceCreatedPromise} from '../engine/eEngine.js';
 
-let dumpViewBufAfterDrawing = true;
+let traceViewBufAfterDrawing = false;
 let traceHighest = false;
 let traceFlatDrawing = false;
 
 // diagnostic purposes
-let alsoDrawPoints = false;
-let alsoDrawLines = false;
-//alsoDrawLines =0;
+let traceDrawPoints = false;
+let traceDrawLines = false;
 
-//let pointSize = alsoDrawPoints ? `gl_PointSize = (row.w+1.) * 5.;` : '';
-let pointSize = alsoDrawPoints ? `gl_PointSize = 10.;` : '';
+let pointSize = traceDrawPoints ? `gl_PointSize = 10.;` : '';
 
 /* ******************************************************* flat drawing */
 
@@ -135,20 +133,20 @@ export class flatDrawing extends abstractDrawing {
 		this.viewVariables.forEach(v => v.reloadVariable());
 		gl.drawArrays(gl.TRIANGLE_STRIP, 0, this.vertexCount);
 
-		if (alsoDrawLines) {
+		if (traceDrawLines) {
 			gl.lineWidth(1);  // it's the only option anyway
 
 			gl.drawArrays(gl.LINES, 0, this.vertexCount);
 		}
 
-		if (alsoDrawPoints)
+		if (traceDrawPoints)
 			gl.drawArrays(gl.POINTS, 0, this.vertexCount);
 
 		// i think this is problematic
-		if (dumpViewBufAfterDrawing) {
+		if (traceViewBufAfterDrawing) {
 			this.avatar.dumpViewBuffer(`finished drawing ${this.viewName} in flatDrawing.js; drew buf:`);
-			console.log(`barWidthUniform=${this.barWidthUniform.staticValue}    `
-				+`maxHeightUniform=`, this.maxHeightUniform.getFunc());
+			console.log(`barWidthUniform=${this.barWidthUniform.getFunc()}    `
+				+`maxHeightUniform=${this.maxHeightUniform.getFunc()}`);
 		}
 		// ?? this.gl.bindVertexArray(null);
 	}

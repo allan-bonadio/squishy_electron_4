@@ -10,8 +10,8 @@ import cxToColor from '../gl/cxToColor/cxToColor.txlated.js';
 import {cppObjectRegistry, prepForDirectAccessors} from '../utils/directAccessors.js';
 import eSpace from './eSpace.js';
 
-let traceSetFamiliarWave = true;
-let traceSetFamiliarWaveResult = true;
+let traceSetFamiliarWave = false;
+let traceSetFamiliarWaveResult = false;
 
 const _ = num => num.toFixed(4).padStart(9);
 const atan2 = Math.atan2;
@@ -275,7 +275,7 @@ class eWave {
 	// make a superposition of two waves in opposite directions.
 	// n 'should' be an integer to make it meet up on ends if wraparound
 	// oh yeah, the walls on the sides are nodes in this case so we'll split by N+2 in that case.
-	// pass negative to make it upside down.
+	// pass negative to make it backwardsd.
 	setStandingWave(n) {
 		let {start2, end2, N} = this.space.startEnd2;
 		const wave = this.wave;
