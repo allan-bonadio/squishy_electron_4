@@ -48,7 +48,8 @@ class clickNDrag {
 	// mouseDown handler. not imperative but I think it leaks.
 	liquidate() {
 		// mouseDownHandler is unique for each instance
-		this.targetEl.removeEventListener('mousedown', this.mouseDownHandler);
+		if (this.targetEl)
+			this.targetEl.removeEventListener('mousedown', this.mouseDownHandler);
 	}
 
 	/* **************************************************** rectangles */
