@@ -5,10 +5,17 @@
 
 //import {abstractDrawing} from './abstractDrawing.js';
 
+// should have one VAO per viewdef, or per drawing?
+// per drawing seems to be the winner.
+// But keep this so we can go back and forth.
+let perDrawingVAO = true;   // false;
 
-// Each abstractViewDef subclass is a definition of a kind of view; one per each
-// kind of view. A WaveView owns an instance of the def and is a React
-// component enclosing the canvas.
+
+// Each abstractViewDef subclass is a definition of a kind of picture or view;
+// one per each kind of view. Each drawing is a definition of a part of a view
+// (usually drawn with 1 program).  A ViewDef has one or more drawings in it.  A
+// WaveView hosts an instance of the ViewDef and is a React component enclosing
+// the canvas.
 
 /* ****************************************  */
 
@@ -17,7 +24,6 @@
 // viewName is not the viewClassName, which is one of flatViewDef, garlandView, ...
 // there should be ONE of these per canvas, so each WaveView should have 1.
 export class abstractViewDef {
-	static displayName = 'Abstract View';
 
 	/* ************************************************** construction */
 	// viewName: personal name for the viewDef instance, for error msgs
@@ -33,15 +39,12 @@ export class abstractViewDef {
 		this.space = space;
 		this.avatar = avatar;
 
-		// should have one VAO per viewdef, or per drawing?  can't decide myself.
-		// But keep this so we can go back and forth.
-		//this.perDrawingVAO = false;
-		this.perDrawingVAO = true;
+		this.perDrawingVAO = perDrawingVAO;
 
 		if (!this.perDrawingVAO) {
 			// vao for all drawings in this viewdef
 			this.vao = this.gl.createVertexArray();
-			this.tagObject(this.vao, `${avatar.label}-${this.drawingName}-vao`);
+			this.tagObject(this.vao, `${this.constructor.name}-${avatar.label}-vao`);
 		}
 
 		// all of the drawings in this view
@@ -122,7 +125,6 @@ export class abstractViewDef {
 		// debugging ... gl.clearColor(.8, .6, .4, 1);
 		gl.clearDepth(1);  // default anyway
 		gl.clearColor(0, 0, 0, 1);
-		//gl.clear(gl.COLOR_BUFFER_BIT);
 		gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 	}
 
