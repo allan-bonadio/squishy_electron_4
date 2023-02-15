@@ -189,11 +189,11 @@ class SetWaveTab extends React.Component {
 					onChange={ev => this.setBreed('gaussian')} />
 			</label>
 
-			<label>
+			{/* sorry don't have time to fix this now     <label>
 				chord pulse
 				<input type='radio'  checked={'chord' == breed}
 					onChange={ev => this.setBreed('chord')} />
-			</label>
+			</label>*/}
 		</div>;
 
 		return <div className='SetWaveTab'>
