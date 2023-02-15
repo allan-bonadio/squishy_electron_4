@@ -10,7 +10,7 @@ import {viewUniform, viewAttribute} from './viewVariable.js';
 let traceDumpVertices = false;
 let traceTicDrawing = false;
 let traceHighest = false;
-let traceBufferEnlargement = false;
+let traceBufferEnlargement = true;
 
 // diagnostic purposes
 let traceDrawPoints = false;
@@ -78,26 +78,41 @@ export class ticDrawing extends abstractDrawing {
 
 		// we always use this for our coordinates, generated on the fly
 		// dynamically expanded as needed
-		this.roomForNTics = INITIAL_BUFFER_NTICS
-		this.coordBuffer = new Float32Array(this.roomForNTics * FLOATS_PER_TIC);  // n of floats
+		if (traceBufferEnlargement)
+			console.log(`➤ ➤ ➤ Creating buffer with ${INITIAL_BUFFER_NTICS}`);
+		this.recreateBuffer(INITIAL_BUFFER_NTICS);
+		//this.roomForNTics = INITIAL_BUFFER_NTICS
+		//this.coordBuffer = new Float32Array(this.roomForNTics * FLOATS_PER_TIC);  // n of floats
 
 		this.vertexShaderSrc = vertexSrc;
 		this.fragmentShaderSrc = fragmentSrc;
 	}
 
+	recreateBuffer =
+	(size) => {
+		//if (traceBufferEnlargement)
+		//	console.log(`➤ ➤ ➤ recreateBuffer ${this.roomForNTics} -> ${size}`);
+		this.roomForNTics = size;
+		this.coordBuffer = new Float32Array(this.roomForNTics * FLOATS_PER_TIC);
+	}
+
 	// one time set up of variables for this drawing, every time canvas and viewDef is recreated
 	createVariables() {
 		this.setDrawing();
-		if (traceTicDrawing) console.log(`➤ ➤ ➤ ticDrawing ${this.viewName}: creatingVariables`);
+		if (traceTicDrawing)
+			console.log(`➤ ➤ ➤ ticDrawing ${this.viewName}: creatingVariables`);
 
 		// same as in flatDrawing, y is in units of ψ
 		this.maxHeightUniform = new viewUniform('maxHeight', this,
 			() => {
 				if (traceHighest)
-					console.log(`ticDrawing reloading ${this.viewName}: highest=${this.avatar.highest.toFixed(5)}  smoothHighest=${this.avatar.smoothHighest.toFixed(5)}`);
+					console.log(`ticDrawing reloading ${this.viewName}: `+
+						` highest=${this.avatar.highest?.toFixed(5)} `+
+						` smoothHighest=${this.avatar.smoothHighest?.toFixed(5)}`);
 
 				// add in a few percent
-				return {value: this.avatar.smoothHighest * this.viewDef.PADDING_ON_BOTTOM, type: '1f'};
+				return {value: this.avatar.smoothHighest * this.viewDef.PADDING_ON_BOTTOM,
+					type: '1f'};
 			}
 		);
 
@@ -112,9 +127,9 @@ export class ticDrawing extends abstractDrawing {
 		let ticOrigin = -1;
 
 		if (traceHighest)
-			console.log(`➤ ➤ ➤ ticDrawing '${this.viewName}, ${this.avatarLabel}':`+
-				` highest is ${this.avatar.highest.toFixed(6)}`);
-
+			console.log(`➤ ➤ ➤ ticDrawing ${this.viewName}, ${this.avatarLabel}:`+
+				` highest is ${this.avatar.highest?.toFixed(6)}, `+
+				` roomForNTics=${this.roomForNTics}`);
 
 		// number of tics on left side, comes from the flatDrawing scalebut handle it if it isn't drawing
 		let avgψ = 1 /  this.avatar.space.nStates;
@@ -124,18 +139,19 @@ export class ticDrawing extends abstractDrawing {
 
 		// this is number of tics should be, except we skip the one at zero
 		let nTics = Math.floor(TICS_PER_AVG_ψ * highestInAvgψs - .1);
-		//let nTics = Math.floor(highest * this.avatar.space.nStates * TICS_PER_AVG_ψ - .1);
-		nTics = this.nTics = Math.min(nTics, 100);
-		let realNTics = nTics - 1;
-		if (this.roomForNTics <= realNTics) {
-			let nuTics = Math.ceil(nTics * 2 + 1);  // room for some more
-			if (traceBufferEnlargement) {
-				console.warn(`➤ ➤ ➤ highest=${highest.toFixed(4)}, nTics=${nTics}  `+
+		nTics = this.nTics = Math.min(nTics, 100) - 1;
+		if (this.roomForNTics <= nTics) {
+			let nuTics = nTics * 2 + 1;
+			//let nuTics = nTics + 1;  // for debugging
+			if (traceBufferEnlargement || traceHighest) {
+				console.warn(`➤ ➤ ➤ Expanding buffer... `+
+				` highest=${highest.toFixed(4)}, nTics=${nTics}  `+
 				`  exceeds roomForNTics=${this.roomForNTics} . `+
-				` Expanding buffer... new roomForNTics=${nuTics}`);
+				` new roomForNTics=${nuTics}`);
 			}
-			this.roomForNTics = nuTics;
-			this.coordBuffer = new Float32Array(this.roomForNTics * FLOATS_PER_TIC);
+			this.recreateBuffer(nuTics);
+			//this.roomForNTics = nuTics;
+			//this.coordBuffer = new Float32Array(this.roomForNTics * FLOATS_PER_TIC);
 		}
 
 		// now fill it in.  avoid tic 0 cuz it's always at the edge.  Buffer starts at tic 1.
@@ -154,11 +170,11 @@ export class ticDrawing extends abstractDrawing {
 			],  (t-1) * FLOATS_PER_TIC);
 		}
 
-		this.vertexCount = realNTics * VERTICES_PER_TIC;
+		this.vertexCount = nTics * VERTICES_PER_TIC;
 		if (traceDumpVertices) {
-			console.log(`➤ ➤ ➤ ticDrawing '${this.viewName}, ${this.avatarLabel}':`+
+			console.log(`➤ ➤ ➤ generateTics ${this.viewName}, ${this.avatarLabel}:`+
 				` created ${this.vertexCount} vertices for ${nTics} tics`);
-			for (let t = 0; t < realNTics; t++) {
+			for (let t = 0; t < nTics; t++) {
 				let f = t * FLOATS_PER_TIC;
 				let dump = `    ➤ ➤ ➤ tic [${t}] `;
 				for (let j = 0; j < FLOATS_PER_TIC; j += 2)
@@ -172,7 +188,7 @@ export class ticDrawing extends abstractDrawing {
 
 	draw() {
 		if (traceTicDrawing)
-			console.log(`➤ ➤ ➤ ticDrawing '${this.viewName}, ${this.avatarLabel}': `+
+			console.log(`➤ ➤ ➤ ticDrawing drawing ${this.viewName}, ${this.avatarLabel}: `+
 				` start draw ${this.vertexCount/2} tics`);
 		if (this.vertexCount <= 0)
 			return;
