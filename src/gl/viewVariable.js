@@ -5,7 +5,7 @@
 
 let traceGLCalls = false;
 let traceUniforms = false;
-let traceAttributes = true;
+let traceAttributes = false;
 
 // attr arrays and uniforms that can change on every frame.
 // you can set a static value or a function that'll return it
@@ -59,30 +59,6 @@ export class viewUniform extends viewVariable {
 
 		this.reloadVariable();
 	}
-
-	// change the value, sortof, by one of these two ways:
-	// - changing the function that returns it.  Pass function in.
-	//         the func should return an object eg {value:1.234, type:'1f'}
-	// - just setting the static Value.  Set any non-function value, and a type.
-	// types you can use: 1f=1 float single.  1i=1 int 32 bit.
-	// 2fv, 3fv, 4fv=vec2, 3, 4; Must pass in an array value if type includes 'v'.
-	// must return in an array value, typed or not.  Same for 2iv, etc.
-	// Matrix2fv, 3, 4: square matrices, col major order.  must be typed!
-	// there are non-square variants, but only in webgl2
-//	setValue(valueVar, type) {
-//		if (typeof valueVar == 'function') {
-//			this.getFunc = valueVar;
-//			this.staticValue = this.staticType = undefined;
-//			if (traceUniforms) console.log(`𒐿 set function value on viewUniform '${this.varName}'`);
-//		}
-//		else {
-//			this.staticValue = valueVar;
-//			this.staticType = type;
-//			this.getFunc = undefined;
-//			if (traceUniforms) console.log(`𒐿 set static value ${valueVar} type ${type} on viewUniform '${this.varName}'`);
-//		}
-//		this.reloadVariable();
-//	}
 
 	// set the uniform to it - upload latest value to GPU
 	// call this when the uniform's value changes, to reload it into the GPU
@@ -166,6 +142,14 @@ export class viewAttribute extends viewVariable {
 		// get the latest
 		let floatArray = this.floatArray = this.getFunc();
 		this.nTuples = floatArray.nTuples
+
+		// see if the SharedBuffer is the problem.  Seems not.
+//		if (! this.liasonBuffer)
+//			this.liasonBuffer = floatArray.slice();
+//		else
+//			this.liasonBuffer.set(floatArray, 0);
+//		floatArray = this.floatArray = this.liasonBuffer;
+
 
 		this.drawing.setDrawing();
 
