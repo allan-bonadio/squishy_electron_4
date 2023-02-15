@@ -268,7 +268,7 @@ export class ControlPanel extends React.Component {
 		case 'space':
 			return <SetResolutionTab />;
 
-		case 'integrate':
+		case 'integration':
 			return <SetIntegrationTab
 				deltaT={s.deltaT}
 				setDeltaT={this.setDeltaT}
@@ -320,8 +320,8 @@ export class ControlPanel extends React.Component {
 						onClick={ev => this.setShowingTab('voltage')}>Voltage</li>
 					<li  className={s.showingTab == 'space' ? 'selected' : ''} key='space'
 						onClick={ev => this.setShowingTab('space')}>Space</li>
-					<li  className={s.showingTab == 'integrate' ? 'selected' : ''} key='integrate'
-						onClick={ev => this.setShowingTab('integrate')}>Integration</li>
+					<li  className={s.showingTab == 'integration' ? 'selected' : ''} key='integration'
+						onClick={ev => this.setShowingTab('integration')}>Integration</li>
 				</ul>
 				<div className='tabFrame'>
 					{showingTabHtml}

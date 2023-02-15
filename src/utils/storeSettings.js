@@ -226,7 +226,7 @@ export function createStoreSettings() {
 	makeParam('frameSettings', 'lowPassFilter', 50, {min: 0, max: 75});
 
 	/* ************************************miscSettings */
-	makeParam('miscSettings', 'showingTab', 'wave', ['wave', 'voltage', 'space', 'integrate']);
+	makeParam('miscSettings', 'showingTab', 'wave', ['wave', 'voltage', 'space', 'integration']);
 	makeParam('miscSettings', 'waveViewHeight', 400, {min: 50, max: 1e4});
 
 }
