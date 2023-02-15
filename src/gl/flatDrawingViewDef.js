@@ -3,13 +3,14 @@
 ** Copyright (C) 2021-2023 Tactile Interactive, all rights reserved
 */
 
+// this should be renamed to flatViewDef
+
 import {abstractViewDef} from './abstractViewDef.js';
 import {flatDrawing} from './flatDrawing.js';
 // eslint-disable-next-line no-unused-vars
 import {ticDrawing} from './ticDrawing.js';
 
 class flatDrawingViewDef extends abstractViewDef {
-	static displayName = 'Flat View';
 
 	constructor(viewName, glview, space, avatar) {
 		super(viewName, glview, space, avatar);
@@ -23,10 +24,11 @@ class flatDrawingViewDef extends abstractViewDef {
 		// but we want some extra space.  not much.
 		this.PADDING_ON_BOTTOM = 1.02;
 
-		// create relevant drawings.
+		// create relevant drawings.  Do not change this order;
+		// spent a long time on this.
 		this.drawings = [
-			new flatDrawing(this),
 			new ticDrawing(this),
+			new flatDrawing(this),
 		];
 
 
