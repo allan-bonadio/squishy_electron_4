@@ -9,7 +9,7 @@
 // the gl Tests aren't tuned in to node_modules; use the https form for those.
 // the app is fine with it, so use the regular form.
 // Or comment out both, to disable webgl-lint entirely.
-//import 'webgl-lint';
+import 'webgl-lint';
 //import 'https://greggman.github.io/webgl-lint/webgl-lint.js';
 
 //import {tooOldTerminate} from '../utils/errors.js';
@@ -53,18 +53,18 @@ class glAux {
 
 		// webgl-lint extension, needs import at top of this file.  Otherwise,
 		// getExtension returns null and tagObject() is an empty function, so no probs.
-//		let webglLint = this.webglLint = this.gl.getExtension('GMAN_debug_helper');
-//		if (webglLint) {
-//			webglLint.setConfiguration({
-//				maxDrawCalls: 2000,
-//				failUnsetSamplerUniforms: true,
-//			});
-//			this.tagObject = webglLint.tagObject.bind(webglLint)
-//		}
-//		else {
-//			// ext doesn't work i guess
-		this.tagObject = () => {};
-//		}
+		let webglLint = this.webglLint = window.isDevel && this.gl.getExtension('GMAN_debug_helper');
+		if (webglLint) {
+			webglLint.setConfiguration({
+				maxDrawCalls: 2000,
+				failUnsetSamplerUniforms: true,
+			});
+			this.tagObject = webglLint.tagObject.bind(webglLint)
+		}
+		else {
+			// ext doesn't work i guess
+			this.tagObject = () => {};
+		}
 
 	}
 

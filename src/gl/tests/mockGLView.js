@@ -3,7 +3,7 @@
 ** Copyright (C) 2023-2023 Tactile Interactive, all rights reserved
 */
 
-//import webglLint from './node_modules_symlink/webgl-lint/webgl-lint.js';
+import webglLint from './node_modules_symlink/webgl-lint/webgl-lint.js';
 import 'https://greggman.github.io/webgl-lint/webgl-lint.js';
 import glAux from '../glAux.js';
 import abstractViewDef from '../abstractViewDef.js';
