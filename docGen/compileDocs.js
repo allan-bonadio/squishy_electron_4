@@ -33,7 +33,12 @@ const markdOptions = {
 	smartypants: true,  // i may be asking for trouble
 };
 
-const katexOptions = {output: 'mathml'};
+// see also https://katex.org/docs/options.html
+const katexOptions = {
+	output: 'mathml',
+	throwOnError: false,
+	strict: 'ignore',
+};
 marked.use(markedKatex(katexOptions));
 
 
