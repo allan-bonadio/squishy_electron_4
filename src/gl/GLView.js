@@ -17,10 +17,6 @@ let traceSetup = false;
 let tracePainting = false;
 let traceGeometry = false;
 
-// true to try v2 before v1; false for v1 before v2
-// either or both might fail.
-// NO!  see in glAux   export let preferWebGL2 = true;
-
 // For each GLView, there's one:
 // - canvas, and one gl context
 // - one viewdef that encloses one or more drawings
