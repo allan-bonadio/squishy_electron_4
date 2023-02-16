@@ -66,13 +66,19 @@ export class viewUniform extends viewVariable {
 	reloadVariable() {
 		// is passed the previous value
 		const {value, type} =  this.getFunc(this.value);
-		if (traceUniforms) console.log(
-			`𒐿 re-loading uniform ${this.varName} with value=${value} type ${type}`);
+		if (traceUniforms)
+			console.log(`𒐿 re-loading uniform ${this.varName} with value=${value} type ${type}`);
 
-		// you can't pass null or undefined
-		if (null == value || null == type)
-			throw new Error(`𒐿 uniform variable has no value(${value}) or no type(${type})`);
+		// you can't pass null or undefined to webgl, but remember this
 		this.value = value;
+		if (null == value || !isFinite(value) || null == type) {
+			// this means, we won't draw this particular drawing this time around.
+			// better luck next time.
+			debugger;
+			//throw new Error(`𒐿 uniform variable has no value(${value}) or no type(${type})`);
+			this.drawing.skipDrawing = true;
+			return;
+		}
 
 		const gl = this.gl;
 		this.uniformLoc = gl.getUniformLocation(this.drawing.program, this.varName);

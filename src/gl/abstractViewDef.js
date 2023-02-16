@@ -93,6 +93,9 @@ export class abstractViewDef {
 	// NOT upon every repaint!!
 	createVariablesOnDrawings() {
 		this.drawings.forEach(drawing => {
+			// skipDrawing really isn't important here cuz we're not drawing,
+			// but a drawing's reloadVarable() methods might set it
+			drawing.skipDrawing = false;
 			drawing.createVariables();
 		});
 	}
@@ -133,10 +136,13 @@ export class abstractViewDef {
 		this.drawBackground();
 
 		this.drawings.forEach(drawing => {
+			// individual uniforms (and others?) can abort drawing if they're like NaN etc
+			drawing.skipDrawing = false;
 			drawing.setDrawing();
 			drawing.viewVariables.forEach(v => v.reloadVariable());
 
-			drawing.draw();
+			if (!drawing.skipDrawing)
+				drawing.draw();
 		});
 	}
 
