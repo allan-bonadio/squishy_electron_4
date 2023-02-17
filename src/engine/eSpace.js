@@ -53,8 +53,6 @@ export class eSpace {
 				qe.addSpaceDimension(this.pointer, d.N, d.continuum, d.spaceLength, d.label);  // c++
 
 				let dim = new eDimension(d)
-				//nStates *= dim.N;
-				//nPoints *= dim.start + dim.end;
 				return dim;
 			}
 		);
