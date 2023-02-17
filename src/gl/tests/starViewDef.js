@@ -130,7 +130,7 @@ export class starViewDef extends abstractViewDef {
 		super(viewName, glview, space, avatar);
 
 		if (! this.space || !this.avatar) {
-			throw  new Error(`flatDrawingViewDef: being created without space or avatar`);
+			throw  new Error(`starViewDef: being created without space or avatar`);
 		}
 
 		// create relevant drawings

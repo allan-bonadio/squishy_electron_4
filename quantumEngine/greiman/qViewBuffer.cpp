@@ -3,7 +3,7 @@
 ** Copyright (C) 2021-2023 Tactile Interactive, all rights reserved
 */
 
-// this should be merged into Avatar
+// TODO merge qViewBuffer into qAvatar
 
 #include <stdexcept>
 

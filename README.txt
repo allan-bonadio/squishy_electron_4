@@ -94,8 +94,7 @@ source $SQUISH_ROOT/maint/aliases.sh
 
 it'll define some aliases to quickly zip around among the important directories in the terminal.
 
-quantumEngine
-=============
+## quantumEngine
 
 This is C++ code that runs directly in the browser.  It relies on WebAssembly.
 https://developer.mozilla.org/en-US/docs/WebAssembly/Concepts
@@ -105,9 +104,9 @@ https://emscripten.org/docs
 
 Export qEMSCRIPTEN to point to the directory in one of your login files like .profile :
 export qEMSCRIPTEN=/opt/dvl/emscripten
+The scripts will be expecting it.
 
-
-## operation
+## internal operation
 
 
 - a 'Space' describes where the electron travels.  (Classes qSpace in C++ or eSpace in JS.)  Most important parts:
@@ -116,18 +115,17 @@ continuum = int enum that describes the edges of the space: wall or wrap-round
 These two values dictate the wave buffers allocated all over.  If the user changes either, everything is tossed and reallocated.
 
 - a 'Wave' is an array of N psi  values, each a complex number (two doubles, class qCx).  There's actually several classes:
-	- qWave and eWave is a quantum system state
-	- qSpectrum is an FFT of a qWave
+	- qWave and eWave is a quantum system state; wrapped array of complex nums
+	- qSpectrum is an FFT of a qWave; wrapped array of complex nums
 	- qBuffer is the superclass of the qWave and qSpectrum
-	- qWaves have an extra point on each end to aid in calculations, so if N=32, there's 66 double floats in the buffer.  Methods named fixBoundaries() automatically implements the details.
+	- qWaves usually have an extra point on each end to aid in calculations, so if N=32, there's 66 double floats in the buffer.  Methods named fixBoundaries() automatically implement the details.
 
-- an 'Avatar' manages display of a Wave.  There's two per space; the second one is for the Set Wave minigraph.  It owns a qViewBuffer, which is ultimately handed to WebGL.
+- an 'Avatar' manages display of a Wave.  There's two per space; the second one is for the Set Wave minigraph.  It owns a qViewBuffer, which is ultimately handed to WebGL.  (to be merged into avatar)
 
 - a 'Grinder' integrates the differential equation.
 
 
-emscripten
-==========
+## emscripten
 
 Follow the directions on this page to install it somewhere:
 https://emscripten.org/docs/getting_started/downloads.html
@@ -156,4 +154,18 @@ get the installed version numbers:
 this is automatically done in the build scripts so you don't have to put them into your .profile or whatever files:
 
 . /dvl/emscripten/emsdk/emsdk_env.sh
+
+## serving
+
+These two headers must be sent with (some or) all of the files from the server:
+
+Cross-Origin-Opener-Policy: same-origin
+Cross-Origin-Embedder-Policy: require-corp
+
+If not, the thread stuff can't start up, the page can't start up, and it all goes down the tubes.  (until you fix it, that is.)  See also:
+https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Security-Policy/script-src
+
+for nginx:
+			add_header Cross-Origin-Opener-Policy same-origin;
+			add_header Cross-Origin-Embedder-Policy require-corp;
 

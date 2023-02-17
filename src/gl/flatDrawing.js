@@ -5,10 +5,7 @@
 
 import {abstractDrawing} from './abstractDrawing.js';
 import cxToColorGlsl from './cxToColor/cxToColor.glsl.js';
-//import qe from '../engine/qe.js';
 import {viewUniform, viewAttribute} from './viewVariable.js';
-//import SquishPanel from '../SquishPanel.js';
-//import {eSpaceCreatedPromise} from '../engine/eEngine.js';
 
 let traceViewBufAfterDrawing = false;
 let traceHighest = false;

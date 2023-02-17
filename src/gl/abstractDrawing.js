@@ -28,7 +28,7 @@ let traceAttrNames = false;
 export class abstractDrawing {
 
 	/* ************************************************** construction */
-	// viewDef is eg flatDrawingViewDef instance.  Here we add ourselves to the ViewDef list of drawings.
+	// viewDef is eg flatViewDef instance.  Here we add ourselves to the ViewDef list of drawings.
 	// Constructor of subclasses passes in the drawingName; a literal, it isn't one of their arguments
 	constructor(viewDef, drawingName) {
 		this.viewDef = viewDef;

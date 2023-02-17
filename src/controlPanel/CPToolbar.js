@@ -7,7 +7,6 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import qe from '../engine/qe.js';
 import eSpace from '../engine/eSpace.js';
-//import SquishPanel from '../SquishPanel.js';
 import ControlPanel from './ControlPanel.js';
 import {catchEx} from '../utils/errors.js';
 
