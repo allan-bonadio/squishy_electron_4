@@ -3,7 +3,7 @@
 ** Copyright (C) 2023-2023 Tactile Interactive, all rights reserved
 */
 
-import glAux from '../glAux.js';
+import glContext from '../glContext.js';
 import {mockSpace, mockAvatar, mockGLView} from './mockGLView.js';
 import {starViewDef} from './starViewDef.js';
 
@@ -30,7 +30,7 @@ function setHandlersOnAll(name, handler, initialValue) {
 
 /* ************************************************************* global handlers */
 
-// it's now on glAux
+// it's now on glContext
 //preferWebGL2
 //export let preferWebGL2 = true;
 

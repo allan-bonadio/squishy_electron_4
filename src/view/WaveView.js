@@ -14,16 +14,11 @@ import PropTypes from 'prop-types';
 //import {scaleLinear} from 'd3-scale';
 
 import eSpace from '../engine/eSpace.js';
-//import eAvatar from '../engine/eAvatar.js';
 import {thousands} from '../utils/formatNumber.js';
 import qe from '../engine/qe.js';
-//import {interpretCppException} from '../utils/errors.js';
 import './view.scss';
-// import {abstractViewDef} from './abstractViewDef.js';
-// import flatDrawingViewDef from './flatDrawingViewDef.js';
 import {getASetting, storeASetting} from '../utils/storeSettings.js';
 
-//import voltDisplay from '../utils/voltDisplay.js';
 import VoltageArea from './VoltageArea.js';
 import VoltageSidebar from './VoltageSidebar.js';
 import GLView from '../gl/GLView.js';
@@ -225,7 +220,7 @@ export class WaveView extends React.Component {
 			<div className='viewArea' >
 				<GLView
 					space={this.space} avatar={this.mainEAvatar}
-					viewClassName='flatDrawingViewDef' viewName='mainView'
+					viewClassName='flatViewDef' viewName='mainView'
 					canvasFacts={this.canvasFacts}
 					width={widthToUse}
 					height={s.height}

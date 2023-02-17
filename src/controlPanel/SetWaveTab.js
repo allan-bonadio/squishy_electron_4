@@ -165,7 +165,7 @@ class SetWaveTab extends React.Component {
 		if (s.space) {
 			glView = <GLView width={miniWidth} height={miniHeight}
 						space={s.space} avatar={this.miniGraphAvatar}
-						viewClassName='flatDrawingViewDef' viewName='setWaveMiniGraph'
+						viewClassName='flatViewDef' viewName='setWaveMiniGraph'
 						canvasFacts={{/* ignored */}}
 					/>
 		}

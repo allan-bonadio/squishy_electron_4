@@ -1,23 +1,21 @@
 /*
-** flatDrawingViewDef -- main viewDef for 2d image of 1d space
+** flatViewDef -- main viewDef for 2d image of 1d space
 ** Copyright (C) 2021-2023 Tactile Interactive, all rights reserved
 */
-
-// this should be renamed to flatViewDef
 
 import {abstractViewDef} from './abstractViewDef.js';
 import {flatDrawing} from './flatDrawing.js';
 // eslint-disable-next-line no-unused-vars
 import {ticDrawing} from './ticDrawing.js';
 
-class flatDrawingViewDef extends abstractViewDef {
+class flatViewDef extends abstractViewDef {
 
 	constructor(viewName, glview, space, avatar) {
 		super(viewName, glview, space, avatar);
 
 		if (! this.space || !this.avatar) {
 			debugger;
-			throw  `flatDrawingViewDef: being created without space or avatar`;
+			throw  `flatViewDef: being created without space or avatar`;
 		}
 
 		// normally autoranging would put the highest peak at the exact bottom.
@@ -35,5 +33,5 @@ class flatDrawingViewDef extends abstractViewDef {
 	}
 }
 
-export default flatDrawingViewDef;
+export default flatViewDef;
 

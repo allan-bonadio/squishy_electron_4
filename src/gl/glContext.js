@@ -1,5 +1,5 @@
 /*
-** glAux -- additional code for GLView shared  with testsRunner.html
+** glContext -- additional code for GLView shared  with testsRunner.html
 ** Copyright (C) 2023-2023 Tactile Interactive, all rights reserved
 */
 
@@ -31,10 +31,10 @@ export function tooOldTerminate(what) {
 	throw `So long, and thanks for all the fish!`;
 }
 
-/* ********************************************************** actual glAux class */
+/* ********************************************************** actual glContext class */
 
 // create one of these for each canvas, to get the gl context, and other prep.
-class glAux {
+class glContext {
 	// this decides it - feel free to change this
 	static preferWebGL2 = true;
 
@@ -42,11 +42,11 @@ class glAux {
 		this.canvas = canvas;
 		this.attachEventHandlers();  // might return errors about context creation/loss
 
-		if (glAux.preferWebGL2)
+		if (glContext.preferWebGL2)
 			this.setupGL2(canvas);
 		if (!this.gl)
 			this.setupGL1(canvas);
-		if (!glAux.preferWebGL2 && !this.gl)
+		if (!glContext.preferWebGL2 && !this.gl)
 			this.setupGL2(canvas);
 		if (!this.gl)
 			tooOldTerminate(`Sorry, your browser's WebGL is kinidof old.`);
@@ -117,5 +117,5 @@ class glAux {
 };
 
 
-export default glAux;
+export default glContext;
 

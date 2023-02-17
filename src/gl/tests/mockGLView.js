@@ -5,10 +5,10 @@
 
 import webglLint from './node_modules_symlink/webgl-lint/webgl-lint.js';
 import 'https://greggman.github.io/webgl-lint/webgl-lint.js';
-import glAux from '../glAux.js';
+import glContext from '../glContext.js';
 import abstractViewDef from '../abstractViewDef.js';
 
-import flatDrawingViewDef from '../flatDrawingViewDef.js';
+import flatViewDef from '../flatViewDef.js';
 import starViewDef from './starViewDef.js';
 
 // this mostly replicates GLView in a lame sortof way
@@ -31,12 +31,12 @@ export const mockSpace = {
 };
 
 const viewClassNamez = {
-	flat: flatDrawingViewDef,
+	flat: flatViewDef,
 	star: starViewDef,
 }
 
 
-// now it's on glAux object   export let preferWebGL2 = true;
+// now it's on glContext object   export let preferWebGL2 = true;
 
 
 export class mockGLView {
@@ -60,9 +60,9 @@ export class mockGLView {
 		this.canvas = canvas;
 
 		// note deffault is wgl1
-		glAux.preferWebGL2 = (localStorage.version == '2');
+		glContext.preferWebGL2 = (localStorage.version == '2');
 
-		this.aux = new glAux(canvas);
+		this.aux = new glContext(canvas);
 		this.gl = this.aux.gl;
 		this.tagObject = this.aux.tagObject;
 	}

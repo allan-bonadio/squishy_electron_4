@@ -4,7 +4,7 @@
 */
 
 import {abstractViewDef} from './abstractViewDef.js';
-import flatDrawingViewDef from './flatDrawingViewDef.js';
+import flatViewDef from './flatViewDef.js';
 //import starViewDef from './starViewDef.js';
 
 // unfortunately, we hafe to have a list of all the view types.  here.
@@ -15,7 +15,7 @@ export const listOfViewClasses = {
 	//starViewDef,  // simple for testinig ... makes its own inputs
 
 
-	flatDrawingViewDef,
+	flatViewDef,
 };
 
 //console.log(`list of view classes:`, listOfViewClasses);
