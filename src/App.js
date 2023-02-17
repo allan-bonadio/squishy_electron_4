@@ -6,7 +6,7 @@
 import React from 'react';
 import './App.scss';
 
-import SquishPanel from './SquishPanel.js';
+import SquishPanel from './sPanel/SquishPanel.js';
 import CommonDialog from './widgets/CommonDialog.js';
 import DocReader from './widgets/DocReader.js';
 import {eSpaceCreatedPromise} from './engine/eEngine.js';

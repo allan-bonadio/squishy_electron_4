@@ -10,16 +10,16 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-import ControlPanel from './controlPanel/ControlPanel.js';
+import ControlPanel from '../controlPanel/ControlPanel.js';
 
-import {eSpaceCreatedPromise} from './engine/eEngine.js';
+import {eSpaceCreatedPromise} from '../engine/eEngine.js';
 
-import {interpretCppException} from './utils/errors.js';
-import WaveView from './view/WaveView.js';
-import CommonDialog from './widgets/CommonDialog.js';
+import {interpretCppException} from '../utils/errors.js';
+import WaveView from '../view/WaveView.js';
+import CommonDialog from '../widgets/CommonDialog.js';
 
-import {getASetting, storeASetting} from './utils/storeSettings.js';
-import {tooOldTerminate} from './utils/errors.js';
+import {getASetting, storeASetting} from '../utils/storeSettings.js';
+import {tooOldTerminate} from '../utils/errors.js';
 
 
 // runtime debugging flags - you can change in the debugger or here
@@ -33,7 +33,7 @@ let traceWidth = false;
 let verifyTickTimes = false;
 let areBenchmarking = false;
 
-const DEFAULT_VIEW_CLASS_NAME = 'flatDrawingViewDef';
+const DEFAULT_VIEW_CLASS_NAME = 'flatViewDef';
 
 
 /* ************************************************ Context */
