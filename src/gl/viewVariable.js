@@ -74,7 +74,7 @@ export class viewUniform extends viewVariable {
 		if (null == value || !isFinite(value) || null == type) {
 			// this means, we won't draw this particular drawing this time around.
 			// better luck next time.
-			debugger;
+			//debugger;
 			//throw new Error(`𒐿 uniform variable has no value(${value}) or no type(${type})`);
 			this.drawing.skipDrawing = true;
 			return;
@@ -115,6 +115,7 @@ export class viewAttribute extends viewVariable {
 		super(varName, drawing, getFunc);
 		const gl = this.gl;
 		this.tupleWidth = tupleWidth;  // num of float32s in each row/tuple
+		this.drawing.setDrawing();
 
 		// small integer indicating which attr this is.  Set by compileProgram() for each drawing in the view def
 		const attrLocation = this.attrLocation = this.gl.getAttribLocation(drawing.program, varName);
@@ -122,52 +123,53 @@ export class viewAttribute extends viewVariable {
 		if (attrLocation < 0)
 			throw new Error(`𒐿 viewAttribute:attr loc for '${varName}' is bad: `+ attrLocation);
 
-		// attach GPU buffer to our GL
+		// create gl GPU buffer
 		const glBuffer = this.glBuffer = gl.createBuffer();
 		this.tagObject(glBuffer, `${drawing.avatarLabel}-${drawing.drawingName}-${varName}-va`);
 
-		gl.bindBuffer(gl.ARRAY_BUFFER, glBuffer);
-		gl.enableVertexAttribArray(this.attrLocation);
+		// connect  ARRAY_BUFFER to glBuffer.  do I have to do this if I'm not (yet) attaching the JS-space array?
+		gl.bindBuffer(gl.ARRAY_BUFFER, this.glBuffer);
 
+		// our attribute here, connect it to that glBuffer
+		gl.enableVertexAttribArray(this.attrLocation);
 		gl.vertexAttribPointer(
 				this.attrLocation,
 				tupleWidth, gl.FLOAT,
 				false, tupleWidth * 4, 0);  // normalize, stride, offset
+		if (traceGLCalls) console.log(`𒐿  viewAttribute '${this.varName}' connected to its glBuffer to tupleWidth=${tupleWidth}`);
 
-		if (traceGLCalls) console.log(`𒐿  viewAttribute '${this.varName}' set to tupleWidth=${tupleWidth}`);
-
+		// we haven't touched the actual JS data yet, this does it
 		this.reloadVariable();
 	}
 
 	// call this when the array's values change, to reload them into the GPU.
 	// getFunc() gets past the previous array (or undefined first time)
-	// must return another Float32Array (or same) with JS property 'nTuples'
+	// must return another Float32Array (or same) with extra JS property 'nTuples'
 	reloadVariable() {
 		const gl = this.gl;
-
-		// get the latest
-		let floatArray = this.floatArray = this.getFunc();
-		this.nTuples = floatArray.nTuples
-
-		// see if the SharedBuffer is the problem.  Seems not.
-//		if (! this.liasonBuffer)
-//			this.liasonBuffer = floatArray.slice();
-//		else
-//			this.liasonBuffer.set(floatArray, 0);
-//		floatArray = this.floatArray = this.liasonBuffer;
-
-
 		this.drawing.setDrawing();
 
-		// must do a bufferData() every frame now with our own personal vao?
+		// get the latest from the real world.
+		// WebGL2Fundamentals said we don't have to do this if it's the same buffer (w/diff values) every time.
+		// if I understood them correctly.  afraid to try...
+		let floatArray = this.floatArray = this.getFunc();
+		//if (this.floatArray !== newFloatArray) {
+		//	gl.bindBuffer(gl.ARRAY_BUFFER, this.glBuffer);
+		//	gl.bufferData(gl.ARRAY_BUFFER, newFloatArray, gl.DYNAMIC_DRAW);
+		//	this.floatArray  = newFloatArray;
+		//}
+		this.nTuples = this.floatArray.nTuples;
+
+		// must do a bufferData() every frame now with our own personal vao?  maybe not
 		gl.bufferData(gl.ARRAY_BUFFER, floatArray, gl.DYNAMIC_DRAW);
 
 		if (traceAttributes) {
-			console.log(`𒐿 viewAttribute '${this.varName}' reloaded, ${this.nTuples} tuples of ${this.tupleWidth} floats each:`);
+			console.log(`𒐿 viewAttribute '${this.varName}' reloaded, ${this.nTuples}`
+				+ ` tuples of ${this.tupleWidth} floats each:`);
 			for (let t = 0; t < this.nTuples; t++) {
 				let line = `[${t}]  `;
 				for (let f = 0; f < this.tupleWidth; f++)
-					line += `  ${floatArray[t * this.tupleWidth + f].toFixed(6)}`;
+					line += `  ${this.floatArray[t * this.tupleWidth + f].toFixed(6)}`;
 				console.log(line);
 			}
 		}
