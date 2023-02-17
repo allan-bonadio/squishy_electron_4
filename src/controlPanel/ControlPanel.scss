@@ -250,15 +250,6 @@
 	}
 
 
-	/* **************************************** Set Resolution tab & dialog */
-
-	.setResolutionButton {
-		float: right;
-	}
-
-	.ResolutionDialog {
-	}
-
 	/* **************************************** Set Integration tab */
 
 	.SetIntegrationTab {
@@ -292,49 +283,78 @@
 
 }
 
-	/* **************************************** Set Resolution dialog */
+/* **************************************** Set Resolution tab & dialog */
+
+.setResolutionButton {
+	float: right;
+}
 
 .ResolutionDialog {
-	display: grid;
-	grid-template-columns: 25% 25% 25% 25%;
-	gap: .5em;
-
-	width: 40em;
-	margin: 0 auto;
-	line-height: 1.2;
-	label {
-		margin: .5em;
-	}
-
-	h3 {
-		margin-top: 0;
-		grid-area: 1 / 1 / 2 / 5
-	}
-
-	.NSlider {
-		grid-area: 2 / 1 / 3 / 5
-	}
-
-	.continuumRadios {
-		grid-area: 3 / 1 / 5 / 3;
-	}
-
+	h3 { margin-top: 0; }
 	.spaceLength {
-		grid-area: 3 / 3 / 4 / 5;
 		input {
 			width: 6em;
 			text-align: right;
 		}
 	}
-
-	.buttons {
-		grid-area: 4 / 3 / 5 / 5;
+	padding: 1em;
+	margin: 0 auto;
+	label {
+		margin: .5em;
 	}
 
-	.okButton {
-		flex: 0 0 15em;
-		margin: 1em;
-		/*height: 6em;*/
+	background-color: black;
+	color: white;
+
+	display: grid;
+	gap: .5em;
+	h3 {
+		grid-area: header;
+		text-align: center;
 	}
+	.resolutionSlider { grid-area: resolutionSlider }
+	.continuum {
+		grid-area: continuum;
+		label.contENDLESS {  }
+		label.contWELL {  }
+	}
+	.spaceLength { grid-area: spaceLength; }
+	.cancelButton { grid-area: cancelButton }
+	.okButton { grid-area: okButton }
+	@media screen and (max-width: 599px) {
+		grid-template-columns: auto auto;
+		grid-template-areas:
+			"header header"
+			"resolutionSlider resolutionSlider"
+			"continuum continuum"
+			"cancelButton okButton";
+
+		.spaceLength { display: none; }
+		.continuum {
+			.continuumTitle { display: none};
+			display: flex;
+			label {flex: 1 1 0;}
+		}
+		label {
+			padding: 0;
+			small { display: none }
+		}
+	}
+	@media screen and (min-width: 600px) {
+		grid-template-columns: auto auto auto ;
+		grid-template-areas:
+			"header header header header"
+			"resolutionSlider resolutionSlider resolutionSlider resolutionSlider"
+			"continuum .   spaceLength spaceLength"
+			"continuum .  spaceLength spaceLength"
+			". . cancelButton okButton ";
+
+		.continuum label {
+			display: block;
+			padding: 0;
+			small { display: block }
+		}
+	}
+
 }
 

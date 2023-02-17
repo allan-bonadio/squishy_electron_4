@@ -14,7 +14,7 @@ import 'dialog-polyfill/dist/dialog-polyfill.css';
 import {interpretCppException} from '../utils/errors.js';
 
 let traceKeystrokes = false;
-let traceTestSimpleError = false;
+let traceTestSimpleNError = true;
 
 // how to use:
 //    CommonDialog.openSimpleDialog("Elvis has left the building.");
@@ -54,7 +54,7 @@ function setPT() {
 
 	CommonDialog.defaultProps = {
 		dialogContent: <div>empty dialog</div>,
-		dialogStyles: {backgroundColor: '#333'},
+		dialogStyles: {},
 	};
 }
 
@@ -74,7 +74,8 @@ function CommonDialog(props) {
 	// I want to use this someday, nonmodal... CommonDialog.dialogElement.show();
 
 	return (
-		<dialog id='CommonDialog' ref={el => setDialogElement(el)} style={props.dialogStyles}>
+		<dialog id='CommonDialog' ref={el => setDialogElement(el)}
+				style={props.dialogStyles}>
 			{props.dialogContent}
 		</dialog>
 	);
@@ -197,9 +198,11 @@ CommonDialog.openErrorDialog =
 			{backgroundColor: '#a00'});
 }
 
+/* *********************************************************** interactive testing */
+
 // for testing
 window.CommonDialog = CommonDialog;
-if (traceTestSimpleError) {
+if (traceTestSimpleNError) {
 	let div = document.createElement('div');
 	div.innerHTML = `<button
 		onclick='CommonDialog.openSimpleDialog("hi howarya")'>

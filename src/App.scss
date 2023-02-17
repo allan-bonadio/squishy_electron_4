@@ -161,29 +161,15 @@ button {
 
 /* **************************************** CommonDialog */
 
-// old, pre <dialog
-//.backdrop {
-//	z-index: 20;
-//	background-color: #8888;
-//	position: fixed;
-//	left: 0;
-//	top: 0;
-//	width: 100%;
-//	height: 100%;
-//
-//	padding-top: 10%;  // ??
-//}
-
 dialog#CommonDialog {
 	// let the specific kind of dialog decide the border, padding, background, etc
-	flex: 0 0 50em;
 	padding: 0;
 	line-height: 1.5em;
 
 	// google recommends this for their polyfill to 'center' it in the screen
 	// except it should be 1/3 of the way down, not 1/2
-	top: 40%;  // move to 1/3 down.  Well, actually more because of the menu bar title bar...
-	transform: translate(0, -33%);  // then make that location 1/3 of the way down the dialog
+	top: 40%;  // move to 1/3 down.  Well, actually more
+	transform: translate(0, -33%);  // then make that location 1/3 of the way down the page
 
 	margin-top: 0;  // by default this is like -145!?!?!
 
@@ -198,7 +184,7 @@ dialog#CommonDialog {
 
 	// dialogPolyfill
 	+ .backdrop {
-		background-color: #8888;
+		background-color: #ddd8;
 	}
 
 
@@ -256,7 +242,7 @@ dialog#CommonDialog {
 
 	#SimpleDialog {
 		background: #444;
-		color: #fff;
+		color: #ddd;
 	}
 	#ErrorDialog {
 		background: #800;
@@ -265,6 +251,7 @@ dialog#CommonDialog {
 
 }
 
+// add this to the upper right of dialogs
 .x_close_box {
 	position: absolute;
 	top: 0;

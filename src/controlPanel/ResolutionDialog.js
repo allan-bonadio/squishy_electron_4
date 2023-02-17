@@ -42,7 +42,7 @@ export default class ResolutionDialog extends React.Component {
 	static me = this;
 
 	// open the Resolution dialog specifically, passing in the callbacks
-	static openResDialog(okCallback, cancelCallback) {
+	static openResDialog(okCallback, cancelCallback = () => {}) {
 		// there is no more than 1 resolution dialog open at a time so I can store this stuff here
 		ResolutionDialog.okCallback = okCallback;
 		ResolutionDialog.cancelCallback = cancelCallback;
@@ -135,9 +135,9 @@ export default class ResolutionDialog extends React.Component {
 	renderContinuum() {
 		const s = this.state;
 		const onChange = ev => this.setState({continuum: +ev.target.value});
-		return <div className='continuum'>
-			what kind of space:
-			<label  key='contENDLESS'>
+		return <section className='continuum'>
+			<div className='continuumTitle'>what kind of space:</div>
+			<label  className='contENDLESS'  key='contENDLESS'>
 				<input type='radio' name='continuum'  value={qe.contENDLESS}
 					checked={s.continuum == qe.contENDLESS}
 					onChange={onChange}
@@ -146,15 +146,16 @@ export default class ResolutionDialog extends React.Component {
 						? 'bold'
 						: 'normal'}}/>
 				Endless
-				<br /><small>wrapping around from right to left</small>
+				<small>wrapping around from right to left</small>
 			</label>
-			<label  key='contWELL'>
+			<label  className='contWELL'  key='contWELL'>
 				<input type='radio' name='continuum'  value={qe.contWELL}
 					checked={s.continuum == qe.contWELL}
 					onChange={onChange}
 					style={{fontWeight: (this.props.continuum == qe.contWELL) ? 'bold' : 'normal'}}/>
 				Well
-				<br /><small>with walls on the ends that wave packet will bounce against</small>
+				<small>with walls on the ends that a
+				<br/>wave packet will bounce against</small>
 			</label>
 			{/* <label  key='contDISCRETE'><input type='radio' name='continuum'  value={qe.contDISCRETE}
 					checked={s.continuum == qe.contDISCRETE}
@@ -165,49 +166,44 @@ export default class ResolutionDialog extends React.Component {
 						: 'normal'}}
 						disabled />
 				Discreet Quanta (not developed yet)</label> */}
-		</div>;
+		</section>;
 	}
 
-//					style={{float: 'left', width: '45%', paddingRight: '2em'}} >
-//					style={{float: 'left', width: '45%', paddingRight: '2em'}} >
+
+	renderSpaceLength() {
+		//const s = this.state;
+		return <section className='spaceLength'>
+			<label className='spaceLengthLabel'>
+				Space Length: &nbsp;
+				<input value={this.state.spaceLength} placeholder='Fill in length'
+					onChange={ev => this.setState({spaceLength: ev.target.value}) } />
+				nm
+				<small>
+					<br/>Total length, in nanometers, of space,
+					<br/>resulting in
+					{(this.state.spaceLength /(this.state.N - 1)).toPrecision(3)}nm
+					separation between points
+				</small>
+			</label>
+		</section>;
+	}
 
 
-
+	// this is just the stuff INSIDE the dialog
 	render() {
 		return (
 			<article className='dialog ResolutionDialog'>
-
+				{/* all these are a big grid */}
 				<h3>Reconfigure the Space</h3>
-
-				<section className='dialogSection NSlider' key='NSlider'>
-					{this.renderNSlider()}
-				</section>
-
-				<section className='dialogSection continuumRadios'  key='continuumRadios'>
-					{this.renderContinuum()}
-				</section>
-
-				<section className='dialogSection spaceLength'  key='spaceLength'>
-					<label>Space Length: &nbsp;
-						<input value={this.state.spaceLength} placeholder='Fill in length'
-							onChange={ev => this.setState({spaceLength: ev.target.value}) } />
-						nm
-						<br />
-						<small>Total length, in nanometers, of space, resulting
-						in {(this.state.spaceLength /(this.state.N - 1)).toPrecision(3)}nm
-						separation between points</small>
-					</label>
-				</section>
-
-				<section className='dialogSection buttons' key='buttons' >
-					<button className='cancelButton' onClick={this.cancel}>
-							Cancel
-					</button>
-					<button className='okButton'
-						onClick={this.OK}>
-							Recreate Space
-					</button>
-				</section>
+				{this.renderNSlider()}
+				{this.renderContinuum()}
+				{this.renderSpaceLength()}
+				<button className='cancelButton' onClick={this.cancel}>
+						Cancel
+				</button>
+				<button className='okButton' onClick={this.OK}>
+						Recreate Space
+				</button>
 
 			</article>
 		);
