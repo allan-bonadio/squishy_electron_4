@@ -8,7 +8,7 @@ import qe from '../engine/qe.js';
 /* ****************************************************** diagnostics */
 
 // this is global so we can use it anywhere in JS
-window.isDevel = (process.env.NODE_ENV === 'development');
+window.isDevel = ('development' == process.env.NODE_ENV);
 
 
 export function dumpJsStack(where = 'somewhere') {
@@ -65,6 +65,12 @@ export function catchEx(func, where) {
 		console.error(`error ${where}: `, ex.stack ?? ex.message ?? ex);
 	}
 }
+
+// TODO: should make a general purpose promise catcher
+// see this in error.js: catchEventException(ex, handlerTitle)
+// maybe there should be different versions based on how to handle it -
+// an ErrorDialog?  or a CanvasDialog?
+
 
 /* ****************************************************** Too Old */
 

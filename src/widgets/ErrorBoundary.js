@@ -3,6 +3,8 @@
 ** Copyright (C) 2021-2023 Tactile Interactive, all rights reserved
 */
 
+// TODO this needs some cleanup and testing.  needs to use ErrorDialog
+
 import React from 'react';
 import PropTypes from 'prop-types';
 import './ErrorBoundary.scss';

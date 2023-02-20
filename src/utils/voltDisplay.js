@@ -147,7 +147,7 @@ export class voltDisplay {
 		if (this.heightVolts <= 0) {
 			// i will change my mind on this...
 			// first, decide a heightVolts.  Potential might be zero everywhere, therefore zero difference.  Potential might have some range to it, if so, enclose that.
-			let diff = Math.abs(this.measuredMaxVolts - this.measuredMinVolts);
+			//let diff = Math.abs(this.measuredMaxVolts - this.measuredMinVolts);
 			let approx = Math.abs(this.measuredMaxVolts) + Math.abs(this.measuredMinVolts);
 			this.heightVolts = (approx || 8) / 8;
 			// (also, make sure that a zero potential results in the voltageSettings defaults)

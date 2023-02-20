@@ -124,8 +124,6 @@ export class starDrawing extends abstractDrawing {
 
 
 export class starViewDef extends abstractViewDef {
-	static displayName = 'Star View';
-
 	constructor(viewName, glview, space, avatar) {
 		super(viewName, glview, space, avatar);
 

@@ -27,7 +27,7 @@ let exportsSrc  = [
 	// of those with multiple calls or a typed array.
 	{name: 'main', args: [], retType: 'number'},
 
-	// recreating the space
+	// creating the space
 	{name: 'startNewSpace', args: ['string'], retType: 'number'},
 	{name: 'addSpaceDimension', args: ['number', 'number', 'number', 'number', 'string'], retType: null},
 	{name: 'completeNewSpace', args: ['number'], retType: 'number'},

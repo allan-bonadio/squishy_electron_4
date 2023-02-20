@@ -63,7 +63,7 @@ struct qGrinder {
 
 
 	// true if frame is running; set/unset in ::oneFrame()
-	// For the interactive simulation switch, see isTimeAdvancing in JS.
+	// For the interactive simulation switch, see isRunning in JS.
 	bool isIntegrating;
 
 	bool needsIntegration;
