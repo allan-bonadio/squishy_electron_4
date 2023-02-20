@@ -12,7 +12,7 @@ import {powerToIndex} from '../utils/powers.js';
 import LogSlider from '../widgets/LogSlider.js';
 import {recreateMainSpace, eSpaceCreatedPromise} from '../engine/eEngine.js';
 import {getASetting} from '../utils/storeSettings.js';
-import ControlPanel from './ControlPanel.js';
+//import ControlPanel from './ControlPanel.js';
 
 
 export default class ResolutionDialog extends React.Component {
@@ -41,7 +41,7 @@ export default class ResolutionDialog extends React.Component {
 
 	// open the Resolution dialog specifically, passing in the callbacks
 	static openResDialog(okCallback, cancelCallback = () => {}) {
-		// there is no more than 1 resolution dialog open at a time so I can store this stuff here
+		// no more than 1 resolution dialog open at a time so I can store this stuff here
 		ResolutionDialog.okCallback = okCallback;
 		ResolutionDialog.cancelCallback = cancelCallback;
 
@@ -67,10 +67,10 @@ export default class ResolutionDialog extends React.Component {
 
 
 	// puts up the resolution dialog, starting with the values from the state
-	static openResolutionDialog() {
+	static openResolutionDialog(cPanel) {
 		// freeze the frame while this is going on ...
-		const timeWasAdvancing = ControlPanel.isTimeAdvancing;
-		ControlPanel.isTimeAdvancing = false;
+		const timeWasAdvancing = cPanel.isRunning;
+		cPanel.isRunning = false;
 
 		// pass our state upward to load into the dialog
 		ResolutionDialog.openResDialog(
@@ -82,15 +82,16 @@ export default class ResolutionDialog extends React.Component {
 
 				// do i really have to wait?  I think the promise only works the first time.
 				// In fact, don't all components vaporize as a result of this?
+				// TODO run some timing checks to see what's up
 				eSpaceCreatedPromise
 				.then(space => {
-					ControlPanel.isTimeAdvancing = timeWasAdvancing;
+					cPanel.isRunning = timeWasAdvancing;
 				});
 			},  // end of OK callback
 
 			// cancel callback
 			() => {
-				ControlPanel.isTimeAdvancing = timeWasAdvancing;
+				cPanel.isRunning = timeWasAdvancing;
 			}
 		);
 	}
@@ -140,7 +141,7 @@ export default class ResolutionDialog extends React.Component {
 					checked={s.continuum == qe.contENDLESS}
 					onChange={onChange}
 					style={{fontWeight:
-						(this.props.continuum == qe.contENDLESS)
+						(s.continuum == qe.contENDLESS)
 						? 'bold'
 						: 'normal'}}/>
 				Endless
@@ -150,7 +151,7 @@ export default class ResolutionDialog extends React.Component {
 				<input type='radio' name='continuum'  value={qe.contWELL}
 					checked={s.continuum == qe.contWELL}
 					onChange={onChange}
-					style={{fontWeight: (this.props.continuum == qe.contWELL) ? 'bold' : 'normal'}}/>
+					style={{fontWeight: (s.continuum == qe.contWELL) ? 'bold' : 'normal'}}/>
 				Well
 				<small>with walls on the ends that a
 				<br/>wave packet will bounce against</small>
@@ -159,7 +160,7 @@ export default class ResolutionDialog extends React.Component {
 					checked={s.continuum == qe.contDISCRETE}
 					onChange={onChange}
 					style={{fontWeight:
-						(this.props.continuum == qe.contDISCRETE)
+						(s.continuum == qe.contDISCRETE)
 						? 'bold'
 						: 'normal'}}
 						disabled />

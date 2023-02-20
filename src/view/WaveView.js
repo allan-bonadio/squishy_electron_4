@@ -44,10 +44,16 @@ export class WaveView extends React.Component {
 
 		showVoltage: PropTypes.bool.isRequired,
 		//gimmeVoltageArea: PropTypes.func.isRequired,
+
+		sPanel: PropTypes.object.isRequired,
+		//sPanel: PropTypes.instanceOf(SquishPanel).isRequired,
+
 	};
 
 	constructor(props) {
 		super(props);
+		this.sPanel = props.sPanel;
+		this.sPanel.wView = this;
 
 		this.state = {
 			height: getASetting('miscSettings', 'waveViewHeight'),  // pixels

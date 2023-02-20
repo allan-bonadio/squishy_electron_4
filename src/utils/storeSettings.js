@@ -219,7 +219,7 @@ export function createStoreSettings() {
 	// always = min + 2 * heightVolts makeParam('voltageSettings', 'maxBottom', 16, {min: -256, max: 256});
 
 	/* ************************************ frameSettings */
-	makeParam('frameSettings', 'isTimeAdvancing', false,  [false, true]);
+	makeParam('frameSettings', 'isRunning', false,  [false, true]);
 	makeParam('frameSettings', 'framePeriod', 50, {min: 16, max: 60_001});
 	makeParam('frameSettings', 'deltaT', 1, {min: .01, max: 100.0, });
 	makeParam('frameSettings', 'stepsPerFrame', 100, {min: 10, max: 1e5});

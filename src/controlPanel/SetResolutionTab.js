@@ -3,18 +3,19 @@
 ** Copyright (C) 2021-2023 Tactile Interactive, all rights reserved
 */
 
-//import PropTypes from 'prop-types';
+import PropTypes from 'prop-types';
 import ResolutionDialog from './ResolutionDialog.js';
 
-//function setPT() {
-//	SetResolutionTab.propTypes = {
-//	};
-//}
+function setPT() {
+	SetResolutionTab.propTypes = {
+		cPanel: PropTypes.object.isRequired,
+	};
+}
 
 function SetResolutionTab(props) {
 	return (<div className='SetResolutionTab'>
 		<button className='setResolutionButton'
-			onClick={ev => ResolutionDialog.openResolutionDialog()}>
+			onClick={ev => ResolutionDialog.openResolutionDialog(props.cPanel)}>
 				Change Space
 				<div style={{fontSize: '.7em'}}>
 					(will reset current wave)</div>
@@ -29,6 +30,6 @@ function SetResolutionTab(props) {
 
 	</div>);
 }
-//setPT();
+setPT();
 
 export default SetResolutionTab;

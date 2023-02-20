@@ -5,14 +5,12 @@
 
 import React from 'react';
 import PropTypes from 'prop-types';
-import qe from '../engine/qe.js';
+//import qe from '../engine/qe.js';
 import eSpace from '../engine/eSpace.js';
-import ControlPanel from './ControlPanel.js';
-import {catchEx} from '../utils/errors.js';
+//import ControlPanel from './ControlPanel.js';
 
 
 //import eThread from '../engine/eThread.js';
-
 
 function setPT() {
 	CPToolbar.propTypes = {
@@ -28,26 +26,12 @@ function setPT() {
 		toggleShowVoltage: PropTypes.func.isRequired,
 		showVoltage: PropTypes.bool.isRequired,
 
-		isTimeAdvancing: PropTypes.bool.isRequired,  // make sure start/stop button updates
+		isRunning: PropTypes.bool.isRequired,  // make sure start/stop button updates
 	};
 }
 
-function clickOnFFT(space)
-{
-	catchEx(() => {
-		// space not there until space promise, but that should happen before anybody clicks on this
-		if (space) {
-			console.info(`ControlPanel.isTimeAdvancing=`, ControlPanel.isTimeAdvancing);
-			if (ControlPanel.isTimeAdvancing)
-				space.grinder.pleaseFFT = true;  // remind me after next iter
-			else
-				qe.grinder_askForFFT(space.grinder.pointer);  // do it now
-		}
-	});
-}
-
-
 function CPToolbar(props) {
+	console.info(`CPToolbar(props)  props=`, props);
 	const {frameFrequency, setFrameFrequency} = props;
 
 	const repRates = <>
@@ -86,14 +70,20 @@ function CPToolbar(props) {
 		<span className='toolSpacer' style={{width: '.3em'}}></span>
 
 		<button className={`startStopToggle startStopTool`}
-			onClick={ControlPanel.startStop}>
-			{ ControlPanel.isTimeAdvancing
+			onClick={ev => {
+				console.info(`CPToolbar props.cPanel.startStop -> (props)  props=`, props);
+				props.cPanel.startStop(ev)
+			}}>
+			{ props.isRunning
 				? <span><big>&nbsp;</big>▐▐ <big>&nbsp;</big></span>
 				: <big>►</big> }
 		</button>
 
 		<button className={`stepButton startStopTool`}
-			onClick={ControlPanel.singleFrame}>
+			onClick={ev=>{
+				console.info(`CPToolbar props.cPanel.singleFrame -> (props)  props=`, props);
+				props.cPanel.singleFrame(ev);
+			}}>
 			<big>►</big> ▌
 		</button>
 
@@ -115,7 +105,7 @@ function CPToolbar(props) {
 			</div>
 
 			<div className='toolbarRow'>
-				<button onClick={ev => clickOnFFT(props.space)}>
+				<button onClick={ev => this.cPanel.clickOnFFT(props.space)}>
 					FFT
 				</button>
 				&nbsp;

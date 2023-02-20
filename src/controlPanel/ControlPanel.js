@@ -12,40 +12,45 @@ import SetWaveTab from './SetWaveTab.js';
 import SetVoltageTab from './SetVoltageTab.js';
 import SetResolutionTab from './SetResolutionTab.js';
 import SetIntegrationTab from './SetIntegrationTab.js';
-import SquishPanel from '../sPanel/SquishPanel.js';
+//import SquishPanel from '../sPanel/SquishPanel.js';
 import {getASetting, storeASetting, getAGroup, storeAGroup} from '../utils/storeSettings.js';
 import {eSpaceCreatedPromise} from '../engine/eEngine.js';
 import qe from '../engine/qe.js';
-import {interpretCppException} from '../utils/errors.js';
-
+import {interpretCppException, catchEx} from '../utils/errors.js';
 
 let traceSetPanels = false;
 
-
-// integrations always need specific numbers of steps.  But there's always one more.
-// maybe this should be defined in the grinder.  Hey, isn't this really 1/2 step?  cuz it's always dt/2
+// integrations always need specific numbers of steps.  But there's always one
+// more. maybe this should be defined in the grinder.  Hey, isn't this really
+// 1/2 step?  cuz it's always dt/2
 const N_EXTRA_STEPS = 0.5;
-
 
 export class ControlPanel extends React.Component {
 	static propTypes = {
-		frameAnimate: PropTypes.func.isRequired,
+		//frameAnimate: PropTypes.func.isRequired,
 
 		// these are the actual functions that change the main qWave and ultimately
 		// the WaveView on the screen
 		// when user chooses 'set wave'
 		//// this should move into controlPanel from squishPanel
 		//populateFamiliarVoltage: PropTypes.func.isRequired,
+
+		// the showVoltage bool is kept by the Squish Panel; probably should by the WaveView
+		// oh wait the checkbox in the SetVoltage panel
 		toggleShowVoltage: PropTypes.func.isRequired,
 		showVoltage: PropTypes.bool.isRequired,
 
 		redrawWholeMainWave: PropTypes.func.isRequired,
 
+		// the integration statistics shown in the Integration tab
 		iStats: PropTypes.shape({
 			startIntegration: PropTypes.number.isRequired,
 			endDraw: PropTypes.number.isRequired,
 		}),
-		refreshStats: PropTypes.func.isRequired,
+
+		animator: PropTypes.object,
+
+		sPanel: PropTypes.object.isRequired,
 
 		//tellMeWhenVoltsChanged: PropTypes.func.isRequired,
 	}
@@ -53,9 +58,11 @@ export class ControlPanel extends React.Component {
 	constructor(props) {
 		super(props);
 		//debugger;
-		ControlPanel.me = this;
+		ControlPanel.me = this;  // TODO get rid of this
+		this.sPanel = props.sPanel;
+		this.sPanel.cPanel = this;
 
-		// most of the state is kept here.  But, also, in the store settings
+		// most of the state is kept here.  But, also, in the store settings for the next page reload.
 		this.state = {
 			framePeriod: getASetting('frameSettings', 'framePeriod'),
 
@@ -74,6 +81,7 @@ export class ControlPanel extends React.Component {
 
 			// waveParams & voltage params - see below
 		}
+		this.framePeriod = this.state.framePeriod;  // everybody uses this one
 
 		// pour these directly into the initial state.  The control panel saves
 		// these params in its state, but they're not saved in localStorage until a user clicks
@@ -96,50 +104,55 @@ export class ControlPanel extends React.Component {
 			debugger;
 		});
 
-		// the static declaration down below fills its variable before an actual
-		// instance is created, so the storeSettings hasn't been initiated yet.
-		// This constructor, on the other hand, can only happen after the
-		// spacePromise has resolved.
-		ControlPanel.isTimeAdvancing = getASetting('frameSettings', 'isTimeAdvancing');
+		// This constructor can only happen after the spacePromise has resolved.
+		this.isRunning = getASetting('frameSettings', 'isRunning');
 	}
 
 	/* ******************************************************* start/stop */
 
 	// set freq of frame, which is 1, 2, 4, 8, ... some float number of times per second you want frames.
 	// freq is how the CPToolbar handles it, but we keep the period in the ControlPanel state,
-	// also in frameSettings:framePeriod
 	setFrameFrequency =
 	freq =>{
 		// set it in the settings, controlpanel state, and SquishPanel's state, too.
-		let period = 1000. / +freq;
-		this.setState({framePeriod: storeASetting('frameSettings', 'framePeriod', period)});
-		this.props.setFramePeriod(period);  // so squish panel can adjust the heartbeat
-		// NO!  the grinder doesn't use this; squishpanel does.  this.grinder.framePeriod = period;
+		this.framePeriod = 1000. / +freq;
+		this.setState({framePeriod: storeASetting('frameSettings', 'framePeriod', this.framePeriod)});
+		this.props.setFramePeriod(this.framePeriod);  // so squish panel can adjust the heartbeat
+		// NO!  the grinder doesn't use this; squishpanel does.  this.grinder.framePeriod = this.framePeriod;
 	}
 
+	// the central authority as to whether we're animating or not.
 	// the first time, we get it from the settings.  in the constructor.
-	static isTimeAdvancing = false;
+	isRunning = false;
 
-	static startAnimating() {
-		ControlPanel.isTimeAdvancing = storeASetting('frameSettings', 'isTimeAdvancing', true);;
-		ControlPanel.me.setState({isTimeAdvancing: true});
+	startAnimating =
+	(ev) => {
+		console.info(`startAnimating starts`);
+		this.isRunning = storeASetting('frameSettings', 'isRunning', true);;
+		this.setState({isRunning: true});
 	}
 
-	static stopAnimating() {
-		ControlPanel.isTimeAdvancing = storeASetting('frameSettings', 'isTimeAdvancing', false);
-		ControlPanel.me.setState({isTimeAdvancing: false});
+	stopAnimating =
+	(ev) => {
+		console.info(`stopAnimating starts`);
+		this.isRunning = storeASetting('frameSettings', 'isRunning', false);
+		this.setState({isRunning: false});
 	}
 
-	static startStop() {
-		if (ControlPanel.isTimeAdvancing)
-			ControlPanel.stopAnimating();
+	startStop =
+	(ev) => {
+		console.info(`startStop starts, this.isRunning=${this.isRunning}`);
+		if (this.isRunning)
+			this.stopAnimating();
 		else
-			ControlPanel.startAnimating();
+			this.startAnimating();
 	}
 
-	static singleFrame() {
-		SquishPanel.me.integrateOneFrame(true);
-		ControlPanel.stopAnimating();
+	singleFrame =
+	(ev) => {
+		console.info(`singleFrame starts`);
+		this.sPanel.animator.integrateOneFrame(true);
+		this.stopAnimating();
 	}
 
 	/* ********************************************** wave */
@@ -147,11 +160,12 @@ export class ControlPanel extends React.Component {
 	// used to set any familiarParam value, pass eg {pulseWidth: 40}
 	// Sets state in control panel only, eg setWave panel settings
 	// obsolete; get rid of this someday////
-	setCPState =
-	(obj) => {
-		this.setState(obj);
-		console.error(`hey, boy, you shouldn't be using setCPState()!!  ControlPanel 153'`)
-	}
+	//setCPState =
+	//(obj) => {
+	//	debugger;  // this is deprecated
+	//	this.setState(obj);
+	//	console.error(`hey, boy, you shouldn't be using setCPState()!!  ControlPanel 153'`)
+	//}
 
 	// given these params, put it into effect and display it
 	setAndPaintMainWave =
@@ -179,6 +193,23 @@ export class ControlPanel extends React.Component {
 		this.setAndPaintMainWave(waveParams);
 		storeAGroup('waveParams', waveParams);
 	}
+
+	// generate an FFT of the wave.  In the JS console.  TODO: make a real GL view out of this
+	clickOnFFT(space)
+	{
+		catchEx(() => {
+			// space not there until space promise, but that should happen
+			// before anybody clicks on this
+			if (space) {
+				console.info(`props.isRunning=`, this.isRunning);
+				if (this.isRunning)
+					space.grinder.pleaseFFT = true;  // remind me after next iter
+				else
+					qe.grinder_askForFFT(space.grinder.pointer);  // do it now
+			}
+		});
+	}
+
 
 	/* ********************************************** volts & tab */
 
@@ -215,8 +246,7 @@ export class ControlPanel extends React.Component {
 		} catch (ex) {
 			// eslint-disable-next-line no-ex-assign
 			ex = interpretCppException(ex);
-			console.error(`setStepsPerFrame error:`,
-				ex.stack ?? ex.message ?? ex);
+			console.error(`setStepsPerFrame error:`, ex.stack ?? ex.message ?? ex);
 			////debugger;
 		}
 	}
@@ -265,7 +295,7 @@ export class ControlPanel extends React.Component {
 			/>;
 
 		case 'space':
-			return <SetResolutionTab />;
+			return <SetResolutionTab cPanel={this}/>;
 
 		case 'integration':
 			return <SetIntegrationTab
@@ -301,7 +331,7 @@ export class ControlPanel extends React.Component {
 				frameFrequency={1000. / s.framePeriod}
 				setFrameFrequency={this.setFrameFrequency}
 
-				isTimeAdvancing={ControlPanel.isTimeAdvancing}
+				isRunning={this.isRunning}
 
 				resetMainWave={this.resetMainWave}
 				resetVoltage={this.resetVoltage}
@@ -310,6 +340,7 @@ export class ControlPanel extends React.Component {
 
 				N={this.N}
 				space={this.space}
+				cPanel={this}
 			/>
 			<div className='cpSecondRow'>
 				<ul className='TabBar' >
