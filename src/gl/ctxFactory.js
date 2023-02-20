@@ -1,7 +1,10 @@
 /*
-** glContext -- additional code for GLView shared  with testsRunner.html
+** ctxFactory -- additional code for GLView shared  with testsRunner.html
 ** Copyright (C) 2023-2023 Tactile Interactive, all rights reserved
 */
+
+// TODO: you can't name this ctxFactory, that's always the thing I call 'gl'.
+// So rename this to ctxFactory cuz that's what it does.
 
 // webgl-lint: sigh.
 // the gl Tests aren't tuned in to node_modules; use the https form for those.
@@ -42,10 +45,10 @@ export function tooOldTerminate(what) {
 	throw `So long, and thanks for all the fish!`;
 }
 
-/* ********************************************************** actual glContext class */
+/* ********************************************************** actual ctxFactory class */
 
 // create one of these for each canvas, to get the gl context, and other prep.
-class glContext {
+class ctxFactory {
 	// this decides it - feel free to change this
 	static preferWebGL2 = true;
 
@@ -53,11 +56,11 @@ class glContext {
 		this.canvas = canvas;
 		this.attachEventHandlers();  // might return errors about context creation/loss
 
-		if (glContext.preferWebGL2)
+		if (ctxFactory.preferWebGL2)
 			this.setupGL2(canvas);
 		if (!this.gl)
 			this.setupGL1(canvas);
-		if (!glContext.preferWebGL2 && !this.gl)
+		if (!ctxFactory.preferWebGL2 && !this.gl)
 			this.setupGL2(canvas);
 		if (!this.gl)
 			tooOldTerminate(`Sorry, your browser's WebGL is kinidof old.`);
@@ -133,5 +136,5 @@ class glContext {
 };
 
 
-export default glContext;
+export default ctxFactory;
 

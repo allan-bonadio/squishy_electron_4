@@ -10,7 +10,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 
 import {listOfViewClasses} from './listOfViewClasses.js';
-import glContext from './glContext.js';
+import ctxFactory from './ctxFactory.js';
 //import {eSpaceCreatedPromise} from '../engine/eEngine.js';
 import {eSpaceCreatedPromise} from '../engine/eEngine.js';
 
@@ -84,11 +84,11 @@ class GLView extends React.Component {
 		this.canvas = canvas;  // immediately available
 
 		// get the gl, figuring out which versions of GL we have, preferrinig 1 or 2
-		this.glContext = new glContext(canvas);
-		this.glContext.glProm
+		this.ctxFactory = new ctxFactory(canvas);
+		this.ctxFactory.glProm
 		.then(gl => {
 			this.gl = gl;
-			this.tagObject = this.glContext.tagObject;
+			this.tagObject = this.ctxFactory.tagObject;
 
 			canvas.glview = this;
 			canvas.viewName = this.viewName = p.viewName;
