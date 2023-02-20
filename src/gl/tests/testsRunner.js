@@ -6,6 +6,7 @@
 import glContext from '../glContext.js';
 import {mockSpace, mockAvatar, mockGLView} from './mockGLView.js';
 import {starViewDef} from './starViewDef.js';
+import {noiseViewDef} from './noiseViewDef.js';
 
 // pretend jquery
 window.$ = document.querySelector.bind(document);
@@ -47,6 +48,15 @@ function selectViewClass(ev) {
 export let glView;
 
 function startGLView() {
+	let canvas = $('canvas');
+	let width = $('input[name="canvasWidth"]').value;
+	canvas.setAttribute('width', width);
+	canvas.style.width = width + 'px';
+
+	let height = $('input[name="canvasWidth"]').value;
+	canvas.setAttribute('height', height);
+	canvas.style.height = height + 'px';
+
 	glView = new mockGLView();
 
 	// really set as a ref by React when page renders first time

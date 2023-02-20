@@ -48,6 +48,9 @@
 		fieldset label {
 			display: block;
 		}
+		button { background: #ffe; }
+		button:hover { background: #eef; }
+		button:active { background: #ff0; font-size: 2em;}
 	</style>
 	<!--script src="https://greggman.github.io/webgl-lint/webgl-lint.js" crossorigin></script-->
 	<script src=tests/testsRunner.js type=module></script>
@@ -59,12 +62,9 @@
 
 
 <article>
-<p>
-	<status>not even started running testRunner.js</status>
-</p>
-
 <fieldset>
 	<legend>general</legend>
+	<status>not even started running testRunner.js</status>
 	<p>
 		choose WebGL version<br>
 		<label><input type=radio name=selectVersion value=1 checked >WebGL 1</label>
@@ -73,8 +73,14 @@
 
 	<p>
 		viewClass to draw:
-		<label><input type=radio name=viewClass value=star>star</option>
-		<label><input type=radio name=viewClass value=flat>flat</option>
+		<label><input type=radio name=viewClass value=star>star</label>
+		<label><input type=radio name=viewClass value=flat>flat</label>
+		<label><input type=radio name=viewClass value=noise>noise</label>
+	</p>
+	<p>
+		dimensions:
+		<label>width:<input name=canvasWidth value=700 size=6></label>
+		<label>height<input name=canvasHeight value=500 size=6></label>
 	</p>
 </fieldset>
 
@@ -116,11 +122,13 @@
 				<label><input type=checkbox name=penType value=TRIANGLES>TRIANGLES</label>
 				<label><input type=checkbox name=penType value=TRIANGLE_STRIP>TRIANGLE_STRIP</label>
 				<label><input type=checkbox name=penType value=TRIANGLE_FAN>TRIANGLE_FAN</label>
-			</optgroup>
-		</select>
-		</label>
 	</p>
 
+</fieldset>
+
+<fieldset>
+	<legend>for Noise</legend>
+	No Options
 </fieldset>
 
 
