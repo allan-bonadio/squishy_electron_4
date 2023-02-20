@@ -3,9 +3,9 @@
 ** Copyright (C) 2023-2023 Tactile Interactive, all rights reserved
 */
 
-import webglLint from './node_modules_symlink/webgl-lint/webgl-lint.js';
+//import webglLint from './node_modules_symlink/webgl-lint/webgl-lint.js';
 import 'https://greggman.github.io/webgl-lint/webgl-lint.js';
-import glContext from '../glContext.js';
+import ctxFactory from '../ctxFactory.js';
 import abstractViewDef from '../abstractViewDef.js';
 
 import flatViewDef from '../flatViewDef.js';
@@ -36,16 +36,17 @@ const viewClassNamez = {
 }
 
 
-// now it's on glContext object   export let preferWebGL2 = true;
+// now it's on ctxFactory object   export let preferWebGL2 = true;
 
 
 export class mockGLView {
-	constructor(vcName) {
+	constructor(viewClassName, viewName) {
 		this.state = {canvas: null};
 		this.space = mockSpace;
 		this.avatar = mockAvatar;
 
-		this.testViewClassName = vcName;
+		this.viewName = viewName;
+		this.viewClassName = viewClassName;
 	}
 
 	// just pretend
@@ -60,25 +61,41 @@ export class mockGLView {
 		this.canvas = canvas;
 
 		// note deffault is wgl1
-		glContext.preferWebGL2 = (localStorage.version == '2');
+		ctxFactory.preferWebGL2 = (localStorage.version == '2');
 
-		this.aux = new glContext(canvas);
-		this.gl = this.aux.gl;
-		this.tagObject = this.aux.tagObject;
+		this.ctxFactory = new ctxFactory(canvas);
+		this.ctxFactory.glProm
+		.then(gl => {
+			this.gl = gl;
+			this.tagObject = this.ctxFactory.tagObject;
+
+			canvas.glview = this;
+			canvas.viewName = this.viewName;
+
+			//p.canvasFacts.width = this.canvas.clientWidth;
+			//p.canvasFacts.height = this.canvas.clientHeight;
+
+			this.initViewClass();
+
+			// finally!
+			console.log(`🖼 🖼 mockGLView ${this.viewName}: created!`);
+		})
+//		this.gl = this.ctxFactory.gl;
+//		this.tagObject = this.ctxFactory.tagObject;
 	}
 
 	testViewClasses = {
 	}
 
 	// instantiate the view class we'll use
-	initViewClass(viewClassName) {
-		console.log(`initViewClass(${viewClassName})`);
+	initViewClass() {
+		console.log(`initViewClass: viewClassName=${this.viewClassName} viewName${this.viewName}`);
 
-		this.viewClassName = viewClassName;
-		let vClass = viewClassNamez[viewClassName];
-		this.testViewClasses[viewClassName] =
+		// already got it this.viewClassName = viewClassName;
+		let vClass = viewClassNamez[this.viewClassName];
+		this.testViewClasses[this.viewClassName] =
 			this.effectiveView =
-			new vClass(viewClassName, this, mockSpace, mockAvatar);
+			new vClass(this.viewClassName, this, mockSpace, mockAvatar);
 		this.effectiveView.completeView();
 		this.avatar.doRepaint = this.doRepaint;
 

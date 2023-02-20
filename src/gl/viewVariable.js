@@ -46,6 +46,19 @@ export class viewVariable {
 
 /* ************************************************** uniforms for variables */
 
+function isFiniteAr(value) {
+	if (typeof value == 'object') {
+		// they ALL must be finite
+		for (let v of value) {
+			if (!isFiniteAr(v))
+				return false;
+		}
+		return true;
+	}
+	else
+		return isFinite(value);
+}
+
 // uniforms don't vary from one vertex to another
 // create this as many times as you have uniforms as input to either or both shaders
 export class viewUniform extends viewVariable {
@@ -71,7 +84,7 @@ export class viewUniform extends viewVariable {
 
 		// you can't pass null or undefined to webgl, but remember this
 		this.value = value;
-		if (null == value || !isFinite(value) || null == type) {
+		if (null == value || !isFiniteAr(value) || null == type) {
 			// this means, we won't draw this particular drawing this time around.
 			// better luck next time.
 			//debugger;

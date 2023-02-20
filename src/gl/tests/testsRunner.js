@@ -3,7 +3,7 @@
 ** Copyright (C) 2023-2023 Tactile Interactive, all rights reserved
 */
 
-import glContext from '../glContext.js';
+import ctxFactory from '../ctxFactory.js';
 import {mockSpace, mockAvatar, mockGLView} from './mockGLView.js';
 import {starViewDef} from './starViewDef.js';
 import {noiseViewDef} from './noiseViewDef.js';
@@ -31,7 +31,7 @@ function setHandlersOnAll(name, handler, initialValue) {
 
 /* ************************************************************* global handlers */
 
-// it's now on glContext
+// it's now on ctxFactory
 //preferWebGL2
 //export let preferWebGL2 = true;
 
@@ -57,17 +57,25 @@ function startGLView() {
 	canvas.setAttribute('height', height);
 	canvas.style.height = height + 'px';
 
-	glView = new mockGLView();
+	glView = new mockGLView(localStorage.viewClass ?? 'star', 'mockGLView Runner');
 
 	// really set as a ref by React when page renders first time
 	glView.setGLCanvas($('canvas'));
 
-	// initViewClass() really done in a componentDidUpdate()
-	// but we don't have the complications
-	glView.initViewClass(localStorage.viewClass ?? 'star');
 
-	/// try it?
-	glView.doRepaint();
+	// too soon so ...
+	setTimeout(() => {
+		// just for kicks, erase it to some stupid color
+		const gl = glView.gl;
+
+		// solid opaque black.  Erase for both 2d and 3d.
+		// debugging ... gl.clearColor(.8, .6, .4, 1);
+		gl.clearDepth(1);  // default anyway
+		gl.clearColor(.3, .7, .5, 1);
+		gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+
+		glView.doRepaint()
+	}, 1000)
 }
 
 
