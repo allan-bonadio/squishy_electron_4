@@ -12,8 +12,9 @@ import PropTypes from 'prop-types';
 import {listOfViewClasses} from './listOfViewClasses.js';
 import glContext from './glContext.js';
 //import {eSpaceCreatedPromise} from '../engine/eEngine.js';
+import {eSpaceCreatedPromise} from '../engine/eEngine.js';
 
-let traceSetup = false;
+let traceSetup = true;
 let tracePainting = false;
 let traceGeometry = false;
 
@@ -42,7 +43,28 @@ class GLView extends React.Component {
 
 	constructor(props) {
 		super(props);
-		this.state = {canvas: null};
+		this.state = {
+			canvas: null
+		};
+
+		// long story but webglLint debugging package3 has to be loaded asynchronously.
+		// AND, the setGLCanvas call will happen sometime later anyway.
+		// Inquiring minds want to know when all of that's done.  This promise does it.
+		//this.canvasReadyProm = new Promise((succeed, fail) => {
+		//	this.canvasReadySucceed = succeed;
+		//});
+		//
+		//this.readyProm = new Promise((succeed, fail) => {
+		//
+		//});
+		//
+		//this.readyProm = new Promise((succeed, fail) => {
+		//
+		//});
+		//
+		//this.renderedProm = new Promise((succeed, fail) => {
+		//	this.renderedSucceed = succeed;
+		//});
 
 		if (traceSetup) console.log(`🖼 🖼 GLView:${props.viewName}: constructor done`);
 	}
@@ -63,13 +85,26 @@ class GLView extends React.Component {
 
 		// get the gl, figuring out which versions of GL we have, preferrinig 1 or 2
 		this.glContext = new glContext(canvas);
-		this.gl = this.glContext.gl ;
-		this.tagObject = this.glContext.tagObject;
+		this.glContext.glProm
+		.then(gl => {
+			this.gl = gl;
+			this.tagObject = this.glContext.tagObject;
 
-		canvas.glview = this;
-		canvas.viewName = p.viewName;
+			canvas.glview = this;
+			canvas.viewName = this.viewName = p.viewName;
 
-		if (traceSetup) console.log(`🖼 🖼 GLView ${p.viewName}: setGLCanvas done`);
+			p.canvasFacts.width = this.canvas.clientWidth;
+			p.canvasFacts.height = this.canvas.clientHeight;
+
+			eSpaceCreatedPromise
+			.then(space => {
+				this.space = space;
+				this.initViewClass();
+
+				// finally!
+				if (traceSetup) console.log(`🖼 🖼 GLView ${p.viewName}: canvas, gl, view and the drawing done`);
+			});
+		})
 	}
 
 	// must do this after the canvas AND the space exist.
@@ -80,7 +115,7 @@ class GLView extends React.Component {
 		let vClass = listOfViewClasses[p.viewClassName];
 
 		// MUST use the props.avatar!  we can't get it from the space, cuz which one?
-		this.effectiveView = new vClass(p.viewName, this, p.space, p.avatar);
+		this.effectiveView = new vClass(p.viewName, this, this.space, p.avatar);
 		this.effectiveView.completeView();
 
 		// now that there's an avatar, we can set these functions so everybody can use them.
@@ -157,29 +192,31 @@ class GLView extends React.Component {
 	}
 
 	componentDidUpdate() {
-		const p = this.props;
+		//const p = this.props;
 		//const s = this.state;
 
-		if (this.canvas) {
-			// do this only when the dust has settled, other parts of the code depend on canvasFacts
-			//let cRect = this.canvas.getBoundingClientRect();
-			p.canvasFacts.width = this.canvas.clientWidth;
-			p.canvasFacts.height = this.canvas.clientHeight;
-		}
-		else
-			console.warn(`oops no canvas in GLView.componentDidUpdate()`)
+		//renderedSucceed
+
+//		if (this.canvas) {
+//			// do this only when the dust has settled, other parts of the code depend on canvasFacts
+//			//let cRect = this.canvas.getBoundingClientRect();
+//			p.canvasFacts.width = this.canvas.clientWidth;
+//			p.canvasFacts.height = this.canvas.clientHeight;
+//		}
+//		else
+//			console.warn(`oops no canvas in GLView.componentDidUpdate()`)
 
 		// a one-time initialization.  but upon page load, neither the avatar,
 		// space or canvas are there yet.  Don't worry, when the space comes in,
 		// we'll all initViewClass.
-		if (traceSetup && !this.effectiveView) {
-			console.log(`🖼 🖼 GLView:${p.viewName}: time to init?  avatar=${p.avatar?.label}  `+
-				`space=${p.space?.nPoints}  canvas=${this.canvas?.nodeName}  `+
-				`effectiveView=${this.effectiveView?.viewName}`);
-		}
-		if (p.avatar && p.space && this.canvas && !this.effectiveView) {
-			this.initViewClass();
-		}
+//		if (traceSetup && !this.effectiveView) {
+//			console.log(`🖼 🖼 GLView:${p.viewName}: time to init?  avatar=${p.avatar?.label}  `+
+//				`space=${p.space?.nPoints}  canvas=${this.canvas?.nodeName}  `+
+//				`effectiveView=${this.effectiveView?.viewName}`);
+//		}
+//		if (p.avatar && p.space && this.canvas && !this.effectiveView) {
+//			this.initViewClass();
+//		}
 	}
 }
 

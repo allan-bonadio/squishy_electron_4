@@ -3,14 +3,25 @@
 ** Copyright (C) 2023-2023 Tactile Interactive, all rights reserved
 */
 
-// this should be renamed to 'glContext' or similar
-
 // webgl-lint: sigh.
 // the gl Tests aren't tuned in to node_modules; use the https form for those.
 // the app is fine with it, so use the regular form.
-// Or comment out both, to disable webgl-lint entirely.
-import 'webgl-lint';
-//import 'https://greggman.github.io/webgl-lint/webgl-lint.js';
+let webglLintProm;
+if (typeof process == 'undefined') {
+	// no webpack; must be testRunner.html, so no node_modules
+	webglLintProm = import('https://greggman.github.io/webgl-lint/webgl-lint.js');
+}
+else {
+	// don't know what order files are loaded in otherwise we'd use window.isDevel
+	if ('development' == process.env.NODE_ENV) {
+		// development; this should already be set up (?)
+		webglLintProm = import('webgl-lint');
+	}
+	else {
+		// else there's NO webglLint!  production.
+		webglLintProm = Promise.resolved(undefined);
+	}
+}
 
 //import {tooOldTerminate} from '../utils/errors.js';
 
@@ -51,20 +62,25 @@ class glContext {
 		if (!this.gl)
 			tooOldTerminate(`Sorry, your browser's WebGL is kinidof old.`);
 
-		// webgl-lint extension, needs import at top of this file.  Otherwise,
-		// getExtension returns null and tagObject() is an empty function, so no probs.
-		let webglLint = this.webglLint = window.isDevel && this.gl.getExtension('GMAN_debug_helper');
-		if (webglLint) {
-			webglLint.setConfiguration({
-				maxDrawCalls: 2000,
-				failUnsetSamplerUniforms: true,
-			});
-			this.tagObject = webglLint.tagObject.bind(webglLint)
-		}
-		else {
-			// ext doesn't work i guess
-			this.tagObject = () => {};
-		}
+		// caller must wait for this before it's ready to go
+		this.glProm = webglLintProm
+		.then(wgll => {
+			// we actually don't care about the object itself, but it needs to be installed
+			// webgl-lint extension, possibly imported at top of this file.
+			let webglLint = this.gl.getExtension('GMAN_debug_helper');
+			if (webglLint) {
+				webglLint.setConfiguration({
+					//maxDrawCalls: 2000,
+					//failUnsetSamplerUniforms: true,
+				});
+				this.tagObject = webglLint.tagObject.bind(webglLint)
+			}
+			else {
+				// production, or ext doesn't work
+				this.tagObject = () => {};
+			}
+			return this.gl;
+		})
 
 	}
 
