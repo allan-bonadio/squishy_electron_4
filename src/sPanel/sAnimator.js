@@ -13,7 +13,7 @@ import SquishPanel from './SquishPanel.js';
 let traceStats = false;
 let traceTheViewBuffer = false;
 let traceHeartbeats = false;
-let traceIntegrations = true;
+let traceIntegrations = false;
 
 const onceInAWhile = 1023;
 const everySoOften = 1023;
