@@ -65,7 +65,7 @@ export class viewUniform extends viewVariable {
 	// actually, calls before each draw, always
 	reloadVariable() {
 		// is passed the previous value
-		const {value, type} =  this.getFunc(this.value);
+		const {value, type} =  this.getFunc();
 		if (traceUniforms)
 			console.log(`𒐿 re-loading uniform ${this.varName} with value=${value} type ${type}`);
 
