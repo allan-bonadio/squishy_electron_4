@@ -33,7 +33,7 @@ let exportsSrc  = [
 	{name: 'completeNewSpace', args: ['number'], retType: 'number'},
 	{name: 'deleteFullSpace', args: ['number'], retType: null},
 
-	// gets
+	// errors & exceptions
 	{name: 'getCppExceptionMessage', args: ['number'], retType: 'number'},
 
 	// the voltage

@@ -1,12 +1,10 @@
 #!/bin/bash
 ##
-## Makefile -- makefile for quantum engine, for compiling the C++
-## Copyright (C) 2021-2022 Tactile Interactive, all rights reserved
+## Build Development -- build script for quantum engine
+## Copyright (C) 2021-2023 Tactile Interactive, all rights reserved
 ##
 
-
-# build for development -- script to compile emscripten/C++ sources into WebAssembly
-# Copyright (C) 2021-2023 Tactile Interactive, all rights reserved
+# script to compile emscripten/C++ sources into WebAssembly
 
 # turn this on for profiling help
 #PROFILING=--profiling
@@ -28,14 +26,16 @@ fi
 export EMSDK_QUIET=1
 . $qEMSCRIPTEN/emsdk/emsdk_env.sh
 
-# this lists all c++ files, except main.cpp and the testing files.
-# omit those, so testing can also use this and compile & run itself (see testing/cppu*).
++# most c++ files, except main.cpp, testing files, worker files.
++# omit those, so testing can also use this and compile & run itself (see testing/cppu*).
 allCpp=`cat building/allCpp.list`
 
 # keep MAX_LABEL_LEN+1 a multiple of 4 or 8 for alignment, eg 7, 15 or 32
 MAX_LABEL_LEN=15
 MAX_DIMENSIONS=2
 
+# the real path to emcc (it's undefined for some reason in this em rev):
+export PATH=$EMSDK/upstream/emscripten:$PATH
 
 echo ℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏ compile
 # https://emscripten.org/docs/tools_reference/emcc.html
@@ -49,7 +49,7 @@ emcc -o wasm/quantumEngine.js -sLLD_REPORT_UNDEFINED \
 	-DqDEV_VERSION -DMAX_LABEL_LEN=$MAX_LABEL_LEN -DMAX_DIMENSIONS=$MAX_DIMENSIONS \
 	-I$qEMSCRIPTEN/emsdk/upstream/emscripten/cache/sysroot/include \
 	-include emscripten.h -include squish.h \
-	-ffast-math  -lembind \
+	-ffast-math  -lembind --proxy-to-worker \
 	main.cpp $allCpp || exit $?
 # changed -g to -g4 to -gsource-map --source-map-base / ; debugger can see into c++
 

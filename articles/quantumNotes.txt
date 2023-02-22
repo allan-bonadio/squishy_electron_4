@@ -1,5 +1,9 @@
 
-2023 Feb 17 ============================================= OneThread project
+2023 Feb 22 ============================================= proxy2worker branch
+
+
+
+2023 Feb 17 ============================================= aWorker branch
 ================ web server
 For top-level documents, two headers need to be set to cross-origin isolate your site:
 Cross-Origin-Opener-Policy with same-origin as value (protects your origin from attackers)
@@ -15,12 +19,6 @@ These two lines need to go in the nginx config file, in the server section that'
 serving Squish:
 			add_header Cross-Origin-Opener-Policy same-origin;
 			add_header Cross-Origin-Embedder-Policy require-corp;
-
-================ eeee
-================ eeee
-================ eeee
-================ eeee
-================ eeee
 
 
 

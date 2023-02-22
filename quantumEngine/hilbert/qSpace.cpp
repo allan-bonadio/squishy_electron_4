@@ -112,7 +112,7 @@ qSpace::~qSpace(void) {
 // Insert this into the constructor and run this once.  Copy text output.
 // Paste the output into class eGrinder, the class itself, to replace the existing ones
 void qSpace::formatDirectOffsets(void) {
-	printf("🪓 🪓 --------------- starting qSpace direct access JS getters & setters--------------\n\n");
+	printf("🚀 🚀--------------- starting qSpace direct access JS getters & setters--------------\n\n");
 
 	makePointerGetter(voltage);
 	makeDoubleGetter(voltageFactor);

@@ -1,19 +1,17 @@
 
 # compiled results
-quantumEngine.js
-quantumEngine.wasm
-quantumEngine.wasm.map
+wasm
 commonConstants.h
 
-# cppu test objects
-cppuTestBin
-cppuTestBin.dSYM
+# cppu test objects, now in wasm?
+#cppuTestBin
+#cppuTestBin.dSYM
 
 # abacus lab
-abacusLab
-abacusLab.dSYM
+schrodinger/abacusLab
+schrodinger/abacusLab.dSYM
 
 # the old, pre cppu test objects
-quantumTest.js
-quantumTest.wasm
+#quantumTest.js
+#quantumTest.wasm
 
