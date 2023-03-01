@@ -5,7 +5,7 @@
 
 import {qe, defineQEngineFuncs} from './qe.js';
 import App from '../App.js';
-import {interpretCppException} from '../utils/errors.js';
+import {interpretCppException, excRespond} from '../utils/errors.js';
 import {resetObjectRegistry} from '../utils/directAccessors.js';
 import {getASetting, storeASetting, createStoreSettings} from '../utils/storeSettings.js';
 import eSpace from './eSpace.js';
@@ -13,8 +13,8 @@ import eThread from './eThread.js';
 
 // all of these must be attached to window to  get called by c++
 
-let traceStartup = false;
-let tracePromises = false;
+let traceStartup = true;
+let tracePromises = true;
 
 /* ****************************************************** app startup */
 
@@ -32,7 +32,7 @@ function resetSpaceCreatedPromise() {
 		eSpaceCreatedFail = fail;
 		if (tracePromises) console.info(`🐥 eSpaceCreatedPromise (re)created:`, succeed, fail);
 	});
-	if (traceStartup) console.log(`spaceCreatedPromise 🐣 ... created`);
+	if (traceStartup) console.log(`spaceCreatedPromise 🐣 ... created but NOT YET RESOLVED`);
 	return prom;
 }
 // for the first time when app starts up
@@ -135,3 +135,74 @@ function quantumEngineHasStarted(maxDims, maxLab) {
 
 window.recreateMainSpace = recreateMainSpace;  // for debugging
 window.quantumEngineHasStarted = quantumEngineHasStarted;  // for emscripten
+
+/* ************************************************************************ what's really going on */
+
+// this starts the major pieces of squish  in the right order.  But it can't
+// happen immediately.  The content has to be loaded, and the C++ runtime has to
+// be ready to go.  (see below)
+function startUpEverything() {
+	if (traceStartup) console.log(`🐣  🐣  starting Up Everything! 🐣  🐣  `);
+
+	// create all the functions that JS uses to call into C++
+	defineQEngineFuncs();
+	if (traceStartup) console.log(`QEngineFuncs 🐣  defined`);
+
+	// create the system for storing prefs and settings
+	// must come After defineQEngineFuncs() cuz it uses continuum constants on qe
+	createStoreSettings();
+	if (traceStartup) console.log(`StoreSettings 🐣  created`);
+
+	//debugger;
+	qe.cppLoaded = true;
+
+	// Create The Space.  Asynchronous, then triggers the eSpaceCreatedPromise.
+	// This can't happen until we have the storeSettings and QEngine funcs, and...
+	create1DMainSpace({
+		N: getASetting('spaceParams', 'N'),
+		continuum: getASetting('spaceParams', 'continuum'),
+		spaceLength: getASetting('spaceParams', 'spaceLength'),
+		label: 'main'});
+	if (traceStartup) console.log(`main space 🐣  created`);
+
+	// startup threads need, like everything else, especially the space
+	eSpaceCreatedPromise
+	.then(space => {
+		eThread.createThreads(space.mainEAvatar);
+
+		if (traceStartup) console.log(`threads 🐣  created`);
+		if (tracePromises) console.log(
+			`🐥 quantumEngineHasStarted:  space created and resolving eSpaceCreatedPromise`);
+	})
+	.catch(ex => {
+		excRespond(ex, `creating threads`);
+		debugger;
+	});
+}
+//window.startUpEverything = startUpEverything;
+
+// startup: both of these: domContentLoaded and mainCppRuntimeInitialized must have
+// happened (and turned true) in order for us to start threads and space and C++
+// and everything.  Don't care which came first, but the second one runs
+// startUpEverything().
+
+let mainCppRuntimeInitialized = false, domContentLoaded = false;
+
+// trigger when all the dom stuff is loaded.  (React not totally up yet)
+document.addEventListener('DOMContentLoaded', ev => {
+	console.log(`🐣 DOMContentLoaded`);
+	domContentLoaded = true;
+	if (mainCppRuntimeInitialized)
+		window.startUpEverything();
+});
+
+
+// trigger when the C++ runtime is up.  (threads may or may not exist yet)
+window.cppRuntimeInitialized =
+ev => {
+	console.log(`🐣 cppRuntimeInitialized`);
+	mainCppRuntimeInitialized = true;
+	if (domContentLoaded)
+		startUpEverything();
+};
+

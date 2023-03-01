@@ -54,7 +54,10 @@ struct qGrinder {
 
 	struct qStage *stages;
 	struct qThread *threads;
-	void initIntegrationLoop(int xxx, int nThreads, int nStages);
+	void initThreadIntegration(int threadSerial);
+
+	// 1 if thread(s) should start a new integration asap, 0 if they should wait
+	int needsIntegration;
 
 	// for alignment: put the rest of these last
 
@@ -65,8 +68,6 @@ struct qGrinder {
 	// true if frame is running; set/unset in ::oneFrame()
 	// For the interactive simulation switch, see isRunning in JS.
 	bool isIntegrating;
-
-	bool needsIntegration;
 
 	// what's the diff between this and isIntegrating?  not much.
 	bool doingIntegration;
@@ -108,8 +109,7 @@ struct qGrinder {
 
 // for JS to call.  Defined in jsSpace and elsewhere.
 extern "C" {
-	// rename to initThreadIntegration
-	void grinder_initIntegrationLoop(qGrinder *grinder, int nStage, int nnn, int mmms);
+	void grinder_initThreadIntegration(qGrinder *grinder, int threadSerial);
 	void grinder_oneFrame(qGrinder *grinder);
 
 	void grinder_askForFFT(qGrinder *grinder);

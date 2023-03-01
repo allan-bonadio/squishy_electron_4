@@ -71,7 +71,7 @@ export class eSpace {
 		this.mainVBuffer = this.mainEAvatar.vBuffer;
 		this.mainEWave = this.mainEAvatar.ewave;
 
-		this.grinder = new eGrinder(this, this.mainEAvatar, this._grinder);
+		this.grinder = new eGrinder(this, this.mainEAvatar, this._qgrinder);
 
 		this.miniGraphAvatar = new eAvatar(this, this._miniGraphAvatar);
 		this.miniGraphVBuffer = this.miniGraphAvatar.vBuffer;
@@ -141,7 +141,7 @@ export class eSpace {
  	get spectrumLength() { return this.ints[35]; }
  	get _mainAvatar() { return this.ints[36]; }
  	get _miniGraphAvatar() { return this.ints[37]; }
- 	get _grinder() { return this.ints[38]; }
+ 	get _qgrinder() { return this.ints[38]; }
  	get _label() { return this.pointer + 156; }
 
 	/* **************************** end of direct accessors */

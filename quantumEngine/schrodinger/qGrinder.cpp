@@ -1,5 +1,5 @@
 /*
-** qGrinder -- the simulation of a quantum mechanical wave in a space
+** qGrinder -- the calculation of a simulation of a quantum mechanical wave
 ** Copyright (C) 2022-2023 Tactile Interactive, all rights reserved
 */
 #include <string.h>
@@ -7,6 +7,7 @@
 #include <limits>
 #include <cfenv>
 #include <stdexcept>
+#include <emscripten/threading.h>
 
 #include "../hilbert/qSpace.h"
 #include "../greiman/qAvatar.h"
@@ -18,7 +19,7 @@
 
 
 
-static bool traceIntegration = false;
+static bool traceIntegration = true;
 
 static bool traceJustWave = false;
 
@@ -27,11 +28,9 @@ static bool traceFourierFilter = false;
 static bool dumpFFHiResSpectums = false;
 static bool traceIProd = false;
 
-static bool traceSpace = false;  // prints info about the space in the grinder constructor
+static bool traceConstructor = true;  // prints info about the space in the grinder constructor
 
-// those apply to these tracing flags
-static bool traceEachFFSquelch = false;
-static bool traceEndingFFSpectrum = false;
+static bool traceThread = true;
 
 #define MIDPOINT_METHOD
 
@@ -62,18 +61,22 @@ qGrinder::qGrinder(qSpace *sp, qAvatar *av, const char *lab)
 	elapsedTime = 0.;
 	frameSerial = 0;
 
-	if (traceSpace) {
-		printf("the qSpace for 🪓 grinder %s:   magic=%c%c%c%c label=%s nDimesions=%d  "
-			"nStates=%d nPoints=%d voltage=%p voltageFactor=%lf spectrumLength=%d  \n",
+	if (traceConstructor) {
+		dumpObj(" 🪓 constructed");
+
+		printf("      the qSpace for 🪓 grinder %s:   magic=%c%c%c%c spacelabel=%s\n",
 			label,
 			space->magic >> 24,  space->magic >> 16, space->magic >> 8, space->magic,
-			space->label, space->nDimensions, space->nStates, space->nPoints,
+			space->label);
+		printf("         nDimesions=%d   nStates=%d nPoints=%d voltage=%p voltageFactor=%lf spectrumLength=%d  \n",
+			space->nDimensions, space->nStates, space->nPoints,
 			space->voltage, space->voltageFactor, space->spectrumLength);
+
 		qDimension *dims = space->dimensions;
-		printf("      its qDimension:   N=%d start=%d end=%d ",
+		printf("          its qDimension:   N=%d start=%d end=%d ",
 			dims->N, dims->start, dims->end);
-		printf("      nStates=%d nPoints=%d\n", dims->nStates, dims->nPoints);
-		printf("      its continuum=%d spectrumLength=%d label=%s\n",
+		printf("        nStates=%d nPoints=%d\n", dims->nStates, dims->nPoints);
+		printf("        its continuum=%d spectrumLength=%d label=%s\n",
 			dims->continuum, dims->spectrumLength, dims->label);
 	}
 
@@ -131,8 +134,10 @@ void qGrinder::formatDirectOffsets(void) {
 	makeBoolGetter(pleaseFFT);
 	makeBoolSetter(pleaseFFT);
 
-	makeBoolGetter(needsIntegration);
-	makeBoolSetter(needsIntegration);
+	makeIntGetter(needsIntegration);
+	makeIntSetter(needsIntegration);
+
+	makeOffset(needsIntegration)
 
 	makeBoolGetter(doingIntegration);
 	makeBoolSetter(doingIntegration);
@@ -175,7 +180,7 @@ void qGrinder::formatDirectOffsets(void) {
 void qGrinder::dumpObj(const char *title) {
 	printf("\n🪓🪓 ==== qGrinder | %s ", title);
 	printf("        magic: %c%c%c%c   qSpace=%p '%s'   \n",
-		magic>>3, magic>>2, magic>>1, magic, space, label);
+		magic>>24, magic>>16, magic>>8, magic, space, label);
 
 	printf("        elapsedTime %lf, frameSerial  %lf, dt  %lf, lowPassFilter %d, stepsPerFrame %d\n",
 		elapsedTime, frameSerial, dt, lowPassFilter, stepsPerFrame);
@@ -185,15 +190,17 @@ void qGrinder::dumpObj(const char *title) {
 
 	printf("        isIntegrating: %hhu   pleaseFFT=%hhu \n", isIntegrating, pleaseFFT);
 
-	printf("        ==== end of qGrinder ====\n\n");
+	printf("        ==== end of qGrinder::dumpObj(%s) ====\n\n", title);
 }
 
 /* ********************************************************** doing Integration */
 
 // Does several visscher steps (eg 10 or 100 or 500). Actually does
-// stepsPerFrame+1 steps; half steps at start and finish to adapt and
-// de-adapt to Visscher timing
+// stepsPerFrame+½ steps; one half step, partly at start and other part at
+// finish, to adapt and de-adapt to Visscher timing
 void qGrinder::oneFrame() {
+	if (traceIntegration)
+		qGrinder::dumpObj("starting oneFrame");
 	isIntegrating = doingIntegration = true;
 	qCx *wave0 = qflick->waves[0];
 	qCx *wave1 = qflick->waves[1];
@@ -201,13 +208,14 @@ void qGrinder::oneFrame() {
 	double dt_ = dt;  // don't change even if user slides it
 
 	// half step in beginning to move Im forward dt/2
-	// cuz outside of here, re and im are synchronized.
+	// cuz outside of here, re and im are interlaced.
 	qflick->fixThoseBoundaries(wave0);
 	stepReal(wave1, wave0, wave0, 0);
 	stepImaginary(wave1, wave0, wave0, dt/2);
 
 	// Note here the latest is in [1]; frame continues this,
 	// and the halfwave at the end moves it back to [0]].
+	// midpoint uses [2] in between.
 	int doubleSteps = stepsPerFrame / 2;
 	for (int step = 0; step < doubleSteps; step++) {
 
@@ -246,7 +254,6 @@ void qGrinder::oneFrame() {
 			throw std::runtime_error("diverged");  // js code intercepts this exact spelling
 		}
 	}
-
 
 	if (traceJustWave)
 		qflick->dump("      qGrinder traceJustWave at end of frame", true);
@@ -299,6 +306,54 @@ void qGrinder::fourierFilter(int lowPassFilter) {
 	if (dumpFFHiResSpectums) qflick->dumpHiRes("wave END fourierFilter() b4 normalize");
 }
 
+/* ********************************************************** threaded integration  */
+
+// This runs, endlessly in worker, to do integration as needed by main thread.
+// Use this for single-thread integration.
+void qGrinder::initThreadIntegration(int serial) {
+
+//	if (traceThread)
+//		printf("🪓🪓 qGrinder thread %d in grinder %p %s about to enter loop\n", serial, this, label);
+	while (true) {
+		if (traceThread)
+			printf("🪓🪓 qGrinder thread %d in grinder %p %s waiting for futex..\n.", serial, this, label);
+
+		// wait until the main thread needs us to do another.  (May have already
+		// happened by the time we get here.)
+		emscripten_futex_wait(&needsIntegration, 0, -1.);
+
+		if (traceThread)
+			printf("🪓🪓 qGrinder thread %d in got padst  futex..\n.", serial);
+
+//	printf("\n🪓🪓 ==== qGrinder | %s ", "blah blah blah");
+//	printf("        magic: %c%c%c%c \n",magic>>3, magic>>2, magic>>1, magic);
+//	printf("       qSpace=%p   \n",space);
+//	printf("        '%s'   \n",label);
+//	printf("        elapsedTime %lf, frameSerial  %lf, dt  %lf, lowPassFilter %d, stepsPerFrame %d\n",
+//		elapsedTime, frameSerial, dt, lowPassFilter, stepsPerFrame);
+//	printf("        qflick %p, voltage  %p, voltageFactor  %lf, qspect %p\n",
+//		qflick, voltage, voltageFactor, qspect);
+//		if (traceIntegration)
+//			qGrinder::dumpObj("before starting oneFrame");
+
+
+		// then do it!
+		oneFrame();
+
+		if (traceThread)
+			printf("🪓🪓 qGrinder thread %d finished oneFrame(), continuing onward\n", serial);
+	}
+}
+
+void grinder_initThreadIntegration(qGrinder *grinder, int serial) {
+	printf("🪓🪓 grinder_initThreadIntegration divingf in, %p=this,  serial=%d \n",grinder,  serial);
+	grinder ->initThreadIntegration(serial);
+	printf("🪓🪓 grinder_initThreadIntegration came out other side, %p=this,  serial=%d \n",grinder,  serial);
+	//qGrinder::me ->initThreadIntegration(serial, b, c);
+}
+
+
+
 /* ********************************************************** misc  */
 
 
@@ -312,14 +367,6 @@ void qGrinder::askForFFT(void) {
 void grinder_askForFFT(qGrinder *pointer) { pointer->askForFFT(); }
 
 void grinder_oneFrame(qGrinder *pointer) { pointer->oneFrame(); }
-
-
-// rename to initThreadIntegration
-void qGrinder::initIntegrationLoop(int a, int b, int c) {
-	// to e imprelmented
-}
-
-void grinder_initIntegrationLoop(qGrinder *pointer, int a, int b, int c) {pointer ->initIntegrationLoop(a, b, c);}
 
 void grinder_copyFromAvatar(qGrinder *qgrinder, qAvatar *avatar) {qgrinder->copyFromAvatar(avatar);}
 //	printf("grinder_copyFromAvatar; qgrinder='%s', avatar='%s'\n", (char *) qgrinder, (char *) avatar);

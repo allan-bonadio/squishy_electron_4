@@ -10,14 +10,14 @@
 struct progress;
 struct abacus;
 
-// one of these for every segment, for every wave.
+// one of these for every segment of the buffer, for every wave, therefore nThreads * n generations
 // Segment starts at this boundary, extends to next boundary.
 // wraps around after nThreads segments.
-// each thread is concerned with the same two serial segments for each wave
-// eg thread 3 is concerned with segmentBoundaries 3 and 4
+// each thread is concerned with the same two edges of the wave
+// eg thread 3 is concerned with edges 3 and 4
 // and integrates the points between them
 struct edge {
-	// upon creation
+	// upon creation, edge #0 is the left most.  May move around as integration proceeds.
 	void init(abacus *, int serial);
 	void dump(void) ;
 
@@ -29,7 +29,7 @@ struct edge {
 
 	// start of this segment as an ix index into the wave, or -1 if not yet decided.
 	// Decided by first thread who gets here. Wraps around modulo N,
-	// but always has start added in.
+	// but always has start added in (eg 1-64 not 0-63).
 	short boundary;
 
 	// protect boundary, loDone and hiDone while being atomically set/read
@@ -65,7 +65,7 @@ struct progress {
 	void reset(edge *b, edge *a);
 
 	abacus *abac;
-	int serial;
+	int serial;  // thread serial #
 
 	edge *behind;  // we are the 'hi' end of this boundary
 	edge *ahead; // we are the 'lo' end of this boundary
@@ -79,8 +79,7 @@ struct progress {
 // creating an abacus, you can set your own functions to integrate one point re and im
 typedef 	void (*integrator)(qCx *newWave, qCx *oldWave, qCx *hamiltWave, double dt);
 
-// Multiple complex buffers identical to the single qWave buffer.
-// The qBuffer 'wave' var points to whichever wave in the sequence is the 'it' wave
+// Multiple real buffers for the real & im parts of  eg. a single qWave buffer.
 struct abacus {
 	abacus(qSpace *space, qGrinder *qgr, int nWaves, int nThreads);
 	~abacus();

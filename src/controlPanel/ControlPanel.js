@@ -16,7 +16,7 @@ import SetIntegrationTab from './SetIntegrationTab.js';
 import {getASetting, storeASetting, getAGroup, storeAGroup} from '../utils/storeSettings.js';
 import {eSpaceCreatedPromise} from '../engine/eEngine.js';
 import qe from '../engine/qe.js';
-import {interpretCppException, catchEx} from '../utils/errors.js';
+import {interpretCppException, wrapForExc} from '../utils/errors.js';
 
 let traceSetPanels = false;
 
@@ -197,7 +197,7 @@ export class ControlPanel extends React.Component {
 	// generate an FFT of the wave.  In the JS console.  TODO: make a real GL view out of this
 	clickOnFFT(space)
 	{
-		catchEx(() => {
+		wrapForExc(() => {
 			// space not there until space promise, but that should happen
 			// before anybody clicks on this
 			if (space) {
@@ -209,7 +209,6 @@ export class ControlPanel extends React.Component {
 			}
 		});
 	}
-
 
 	/* ********************************************** volts & tab */
 

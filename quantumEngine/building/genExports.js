@@ -50,14 +50,13 @@ let exportsSrc  = [
 
 
 	// ************************* grinder
-	{name: 'grinder_initIntegrationLoop', args: ['number', 'number', 'number'], retType: null},
+	{name: 'grinder_initThreadIntegration', args: ['number', 'number', 'number'], retType: null},
 	{name: 'grinder_oneFrame', args: ['number'], retType: null},
 
 	{name: 'grinder_askForFFT', args: ['number'], retType: null},
 
 	{name: 'grinder_copyFromAvatar', args: ['number', 'number'], retType: null},
 	{name: 'grinder_copyToAvatar', args: ['number', 'number'], retType: null},
-
 
 ];
 

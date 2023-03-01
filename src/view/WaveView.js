@@ -220,17 +220,21 @@ export class WaveView extends React.Component {
 			`  parent.clientWidth: ${this.waveViewEl?.parentNode.clientWidth}   widthToUse=${widthToUse}`);
 		}
 
+		// can't make a real GLView until we have the space!  until then, block out area on the page
+		let glView = <div style={{width: widthToUse, height: s.height}} />;
+		if (s.space) {
+			glView = <GLView width={widthToUse} height={s.height}
+				space={this.space} avatar={this.space.mainEAvatar}
+				viewClassName='flatViewDef' viewName='mainView'
+				canvasFacts={this.canvasFacts}
+			/>
+		}
+
 		return (
 		<div className='WaveView'  ref={el => this.waveViewEl = el}
 				style={{height: `${s.height}px`}}>
 			<div className='viewArea' >
-				<GLView
-					space={this.space} avatar={this.mainEAvatar}
-					viewClassName='flatViewDef' viewName='mainView'
-					canvasFacts={this.canvasFacts}
-					width={widthToUse}
-					height={s.height}
-				/>
+				{glView}
 
 				<section className='viewOverlay' >
 					<div className='northWestWrapper'>

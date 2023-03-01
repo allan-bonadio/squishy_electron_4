@@ -30,7 +30,7 @@ else {
 
 let traceVersion = false;
 
-/* ********************************************************** too old error */
+/* ********************************************************** browser-too-old error */
 
 // call this if the browser/machine are just way too old to support webgl
 export function tooOldTerminate(what) {
@@ -48,6 +48,8 @@ export function tooOldTerminate(what) {
 /* ********************************************************** actual ctxFactory class */
 
 // create one of these for each canvas, to get the gl context, and other prep.
+// Returns a promise because webgl-lint must load asynchronously.
+// Promise resolves with gl, when it's all ready.
 class ctxFactory {
 	// this decides it - feel free to change this
 	static preferWebGL2 = true;

@@ -54,22 +54,23 @@ export function interpretCppException(ex) {
 	return new cppError(ex);
 }
 
-// easier than writing out a try-catch all the time, this'll just guard a single function call
-// use this for event handlers and React lifecycle methods
-export function catchEx(func, where) {
-	try {
-		func();
-	} catch (ex) {
-		// eslint-disable-next-line no-ex-assign
-		ex = interpretCppException(ex);
-		console.error(`error ${where}: `, ex.stack ?? ex.message ?? ex);
-	}
+// general purpose exception reporter, use like this:
+//  try/catch:      ...} catch (ex) {excRespond(ex, `reindexing of alligator`)}
+//	promise:          .catch(ex => excRespond(ex, `reindexing of alligator`));
+export function excRespond(exc, where, andDebug) {
+	const ex = interpretCppException(exc);
+	console.error(`Error in ${where}: `, ex.stack ?? ex.message ?? ex);
+	if (andDebug)
+		debugger;
 }
 
-// TODO: should make a general purpose promise catcher
-// see this in error.js: catchEventException(ex, handlerTitle)
-// maybe there should be different versions based on how to handle it -
-// an ErrorDialog?  or a CanvasDialog?
+// easier than writing out a try-catch all the time, this'll just guard a single function call
+// use this for event handlers and React lifecycle methods where react swallows the exception
+export function wrapForExc(func, where, andDebug) {
+	try {
+		func();
+	} catch (ex) {excRespond(ex, where, andDebug)}
+}
 
 
 /* ****************************************************** Too Old */
@@ -110,4 +111,3 @@ export function tooOldTerminate(what) {
 	inHere.style.fontSize = '1.5em' ;
 	throw `So long, and thanks for all the fish!`;
 }
-

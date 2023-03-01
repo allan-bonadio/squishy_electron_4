@@ -11,16 +11,15 @@ import PropTypes from 'prop-types';
 
 import {listOfViewClasses} from './listOfViewClasses.js';
 import ctxFactory from './ctxFactory.js';
-//import {eSpaceCreatedPromise} from '../engine/eEngine.js';
-import {eSpaceCreatedPromise} from '../engine/eEngine.js';
 
-let traceSetup = true;
+let traceSetup = false;
 let tracePainting = false;
 let traceGeometry = false;
 
 // For each GLView, there's one:
 // - canvas, and one gl context
 // - one viewdef that encloses one or more drawings
+// Can NOT instantiate this until after the space promise has resolved
 class GLView extends React.Component {
 	static propTypes = {
 		viewClassName: PropTypes.string.isRequired,
@@ -30,9 +29,10 @@ class GLView extends React.Component {
 		width: PropTypes.number,
 		height: PropTypes.number,
 
-		// both undefined early on
-		avatar: PropTypes.object,
-		space: PropTypes.object,
+		// Our caller gets these from eSpaceCreatedPromise; so it must be resolved by now.
+		// We can't jut use the promise ourselves; we have to know which avatar
+		avatar: PropTypes.object.isRequired,
+		space: PropTypes.object.isRequired,
 
 		// the width and height we measure
 		canvasFacts: PropTypes.object.isRequired,
@@ -46,25 +46,6 @@ class GLView extends React.Component {
 		this.state = {
 			canvas: null
 		};
-
-		// long story but webglLint debugging package3 has to be loaded asynchronously.
-		// AND, the setGLCanvas call will happen sometime later anyway.
-		// Inquiring minds want to know when all of that's done.  This promise does it.
-		//this.canvasReadyProm = new Promise((succeed, fail) => {
-		//	this.canvasReadySucceed = succeed;
-		//});
-		//
-		//this.readyProm = new Promise((succeed, fail) => {
-		//
-		//});
-		//
-		//this.readyProm = new Promise((succeed, fail) => {
-		//
-		//});
-		//
-		//this.renderedProm = new Promise((succeed, fail) => {
-		//	this.renderedSucceed = succeed;
-		//});
 
 		if (traceSetup) console.log(`🖼 🖼 GLView:${props.viewName}: constructor done`);
 	}
@@ -96,14 +77,10 @@ class GLView extends React.Component {
 			p.canvasFacts.width = this.canvas.clientWidth;
 			p.canvasFacts.height = this.canvas.clientHeight;
 
-			eSpaceCreatedPromise
-			.then(space => {
-				this.space = space;
-				this.initViewClass();
+			this.initViewClass();
 
-				// finally!
-				if (traceSetup) console.log(`🖼 🖼 GLView ${p.viewName}: canvas, gl, view and the drawing done`);
-			});
+			// finally!
+			if (traceSetup) console.log(`🖼 🖼 GLView ${p.viewName}: canvas, gl, view and the drawing done`);
 		})
 	}
 
@@ -115,7 +92,7 @@ class GLView extends React.Component {
 		let vClass = listOfViewClasses[p.viewClassName];
 
 		// MUST use the props.avatar!  we can't get it from the space, cuz which one?
-		this.effectiveView = new vClass(p.viewName, this, this.space, p.avatar);
+		this.effectiveView = new vClass(p.viewName, this, p.space, p.avatar);
 		this.effectiveView.completeView();
 
 		// now that there's an avatar, we can set these functions so everybody can use them.
