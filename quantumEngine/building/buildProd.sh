@@ -9,15 +9,15 @@
 cd `dirname $0`
 cd ..
 
-if [ -z "$qEMSCRIPTEN" ]
+if [ -z "$EMSDK" ]
 then
-	echo 'You have to define qEMSCRIPTEN and SSQUISH_ROOT in your '
+	echo 'You have to define EMSDK and SQUISH_ROOT in your '
 	echo 'login stuff like .profile (or .bashrc) for this whole project'
 	exit 55
 fi
 
 export EMSDK_QUIET=1
-. $qEMSCRIPTEN/emsdk/emsdk_env.sh
+. $EMSDK/emsdk_env.sh
 
 # this lists all c++ files, except main.cpp and the testing files.
 # omit those, so testing can also use this and compile & run itself (see testing/cppu*).
@@ -39,7 +39,7 @@ emcc -o wasm/quantumEngine.js -sLLD_REPORT_UNDEFINED \
 	-sEXPORTED_RUNTIME_METHODS='["ccall","cwrap","UTF8ArrayToString","AsciiToString"]' \
 	$PROFILING \
 	-DMAX_LABEL_LEN=$MAX_LABEL_LEN -DMAX_DIMENSIONS=$MAX_DIMENSIONS \
-	-I$qEMSCRIPTEN/emsdk/upstream/emscripten/cache/sysroot/include \
+	-I$EMSDK/upstream/emscripten/cache/sysroot/include \
 	-include emscripten.h -include squish.h \
 	-ffast-math  -lembind \
 	main.cpp $allCpp || exit $?

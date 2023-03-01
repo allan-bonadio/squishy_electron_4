@@ -39,7 +39,7 @@ echo "Use -g groupname to test a whole group"
 export CPPUTEST_HOME=/opt/dvl/cpputest/cpputest-3.8
 
 # no enscriptm here!  just native C++.
-#. $qEMSCRIPTEN/emsdk/emsdk_env.sh
+#. $EMSDK/emsdk_env.sh
 
 # create a space-sep list of ALL the runtime cpp files (almost all)
 allCpp=`cat building/allCpp.list`
