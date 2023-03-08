@@ -39,7 +39,7 @@ if [ -z "$buildWithDev" ]
 then
 	# complains if any symlink points to a nonexistent file.  sigh.
 	mv public/qEng/quantumEngine.wasm.map /tmp
-	node_modules/.bin/react-scripts build || exit 37
+	craco build || exit 37
 	mv /tmp/quantumEngine.wasm.map public/qEng/
 else
 	node_modules/.bin/react-scripts build || exit 39
