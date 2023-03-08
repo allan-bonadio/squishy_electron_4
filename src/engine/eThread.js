@@ -44,11 +44,6 @@ class eThread {
 		this.setupEventHandlers();
 
 		if (traceThreadCreation)
-			console.log(`⛏ eThread constructor ${serial} handlers setup, about to post nacents`);
-
-		this.postNacentMessages(grinder);
-
-		if (traceThreadCreation)
 			console.log(`⛏ eThread constructor ${serial} Done.`);
 
 		// when is the worker alerted and when is the parent alerted?
@@ -134,22 +129,6 @@ class eThread {
 //		});
 
 		// for messages, see onCustomMessage in the .main.js and .thread.js files
-	}
-
-	// send messages, from the main thread, to a new worker as part of its initialization
-	postNacentMessages(grinder) {
-//		window.postCustomMessageToWorker(this, {
-//			verb: 'startGrinding',  // tells our new thread to call qGrinder::initThreadIntegration()
-//			qGrinderPtr: grinder.pointer,  // on this qGrinder
-//			pump: 'climate',
-//			produce: 'manages',
-//			magical: -77,
-//		});
-//
-//		console.log(`⛏ eThread done creating thread ${this.serial} (except for async stuff)`);
-
-		// for the heck of it
-		//this.worker.postMessage({verb: 'ping', message: `Welcome to reality, thread!`});
 	}
 
 }

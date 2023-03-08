@@ -243,7 +243,6 @@ export class ControlPanel extends React.Component {
 			this.setState({stepsPerFrame});
 			this.grinder.stepsPerFrame = stepsPerFrame;
 		} catch (ex) {
-			// eslint-disable-next-line no-ex-assign
 			ex = interpretCppException(ex);
 			console.error(`setStepsPerFrame error:`, ex.stack ?? ex.message ?? ex);
 			////debugger;
