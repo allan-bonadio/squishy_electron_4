@@ -7,7 +7,7 @@ import ControlPanel from '../controlPanel/ControlPanel.js';
 import {interpretCppException} from '../utils/errors.js';
 import SquishPanel from './SquishPanel.js';
 //import WaveView from '../view/WaveView.js';
-//import CommonDialog from '../widgets/CommonDialog.js';
+import CommonDialog from '../widgets/CommonDialog.js';
 //import {getASetting, storeASetting} from '../utils/storeSettings.js';
 
 let traceStats = false;
@@ -109,7 +109,7 @@ class sAnimator {
 			this.cPanel.stopAnimating();
 			// eslint-disable-next-line no-ex-assign
 			ex = interpretCppException(ex);
-			this.cPanel.openErrorDialog(
+			CommonDialog.openErrorDialog(
 				ex.message == 'diverged' ? SquishPanel.divergedBlurb : ex, 'while integrating');
 		}
 
