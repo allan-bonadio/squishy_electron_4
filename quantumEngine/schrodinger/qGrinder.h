@@ -70,7 +70,7 @@ struct qGrinder {
 	bool isIntegrating;
 
 	// what's the diff between this and isIntegrating?  not much.
-	bool doingIntegration;
+	bool integrationFrameInProgress;
 
 	// set pleaseFFt from JS (only if in the middle of frame)
 	void askForFFT(void);

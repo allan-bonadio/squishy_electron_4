@@ -62,7 +62,7 @@ TEST(qGrinder, CheckGrinderConstructor)
 	LONGS_EQUAL(false, qgrinder->pleaseFFT);
 
 	// how does this get turned on!??!!?
-	LONGS_EQUAL(true, qgrinder->doingIntegration);
+	LONGS_EQUAL(true, qgrinder->integrationFrameInProgress);
 
 	STRCMP_EQUAL("myGrind", qgrinder->label);
 
