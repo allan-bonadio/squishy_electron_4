@@ -139,8 +139,8 @@ void qGrinder::formatDirectOffsets(void) {
 
 	makeOffset(needsIntegration)
 
-	makeBoolGetter(doingIntegration);
-	makeBoolSetter(doingIntegration);
+	makeBoolGetter(integrationFrameInProgress);
+	makeBoolSetter(integrationFrameInProgress);
 	printf("\n");
 	makeDoubleGetter(dt);
 	makeDoubleSetter(dt);
@@ -201,7 +201,7 @@ void qGrinder::dumpObj(const char *title) {
 void qGrinder::oneFrame() {
 	if (traceIntegration)
 		qGrinder::dumpObj("starting oneFrame");
-	isIntegrating = doingIntegration = true;
+	isIntegrating = integrationFrameInProgress = true;
 	qCx *wave0 = qflick->waves[0];
 	qCx *wave1 = qflick->waves[1];
 	qCx *wave2 = qflick->waves[2];
@@ -265,7 +265,7 @@ void qGrinder::oneFrame() {
 		printf("      qGrinder frame done; elapsed time: %lf \n", getTimeDouble());
 
 	frameSerial++;
-	isIntegrating = doingIntegration = false;
+	isIntegrating = integrationFrameInProgress = false;
 	qCheckReset();
 }
 

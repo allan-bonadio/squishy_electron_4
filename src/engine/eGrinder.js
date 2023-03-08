@@ -54,8 +54,8 @@ class eGrinder {
  	set pleaseFFT(a) { this.bools[95] = a; }
  	get needsIntegration() { return this.bools[93]; }
  	set needsIntegration(a) { this.bools[93] = a; }
- 	get doingIntegration() { return this.bools[94]; }
- 	set doingIntegration(a) { this.bools[94] = a; }
+ 	get integrationFrameInProgress() { return this.bools[94]; }
+ 	set integrationFrameInProgress(a) { this.bools[94] = a; }
 
 
 	get dt() { return this.doubles[4]; }
@@ -88,7 +88,8 @@ class eGrinder {
 	pleaseIntegrate() {
 		if (traceIntegration)
 				console.log(`🪓 eGrinder ${this.label}: pleaseIntegrate()`);
-		if (this.doingIntegration) {
+		if (this.integrationFrameInProgress) {
+			// is actively in the middle of an integration frame
 			if (traceIntegration)
 				console.log(`🪓             eGrinder.pleaseIntegrate: needsIntegration = true cuz busy`);
 			// threads are busy but we'll get to it after we're done with this frame
@@ -99,7 +100,7 @@ class eGrinder {
 			if (traceIntegration)
 				console.log(`🪓             eGrinder.pleaseIntegrate doing oneItration`);
 			this.needsIntegration = false;
-			eThread.oneFrame(this);
+			this.oneFrame(this);
 			return true;
 		}
 	}

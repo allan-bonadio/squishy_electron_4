@@ -7,11 +7,11 @@
 // worker stuff in emscripten simply goes and calls the regular JS methods todo
 // the same things.  So C++ isn't the lowest level, JS is.  So call JS and have
 // full control.
-//import qe from './qe.js';
+import qe from './qe.js';
 
 let traceThreadCreation = true;
 let traceMessages = true;
-//let traceIntegration = true;
+let traceIntegration = true;
 
 console.log(`eThread: isSecureContext=${window.isSecureContext},`+
 	`crossOriginIsolated=${window.crossOriginIsolated}`);
@@ -24,7 +24,7 @@ console.log(`eThread: isSecureContext=${window.isSecureContext},`+
 class eThread {
 	static workers = [];  // instances of Worker
 	static threads = [];  // instances of eThread
-	static doingThreads = true;
+	static doingThreads = false;
 
 	constructor(serial, grinder) {
 		if (traceThreadCreation)
@@ -99,19 +99,20 @@ class eThread {
 
 	// tell the thread(s) to do 1 frame, like we did synchronously but now done by the thread(s)
 	// unused for now - qGrinder does it
-//	static oneFrame(grinder) {
-//		// i have to think of what to do if there's no workers available...
-//		if (eThread.doingThreads) {
-//			if (traceIntegration)
-//				console.log(`⛏ eThread postMessage toframe`);
-//			eThread.workers[0].postMessage({verb: 'integrate', grinderPointer: grinder.pointer});
-//		}
-//		else {
-//			if (traceIntegration)
-//				console.log(`⛏ eThread postMessage directly cuz no threads`);
-//			qe.grinder_oneFrame(grinder.pointer);
-//		}
-//	}
+	static oneFrame(grinder) {
+		// i have to think of what to do if there's no workers available...
+		if (eThread.doingThreads) {
+			if (traceIntegration)
+				console.log(`⛏ eThread postMessage toframe`);
+			// this isn't right
+			eThread.workers[0].postMessage({verb: 'integrate', grinderPointer: grinder.pointer});
+		}
+		else {
+			if (traceIntegration)
+				console.log(`⛏ eThread integrates directly cuz no threads`);
+			qe.grinder_oneFrame(grinder.pointer);
+		}
+	}
 
 	/* ******************************************************************* msgs & events */
 	// messages to main thread from whatever thread
