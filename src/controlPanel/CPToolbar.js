@@ -124,14 +124,3 @@ setPT();
 
 export default CPToolbar;
 
-
-//
-// 		<div className='algorithmBox'>
-// 			algorithm:
-// 			<select className='algorithmSelector' value={algorithm}
-// 					onChange={ev => setAlgorithm(ev.currentTarget.value)}>
-// 				<option value={algRK2}>RK2</option>
-// 				<option value={algRK4}>RK4</option>
-// 				<option value={algVISSCHER}>Visscher</option>
-// 			</select>
-// 		</div>

@@ -69,6 +69,7 @@ export function create1DMainSpace(spaceParams) {
 
 // spaceParams is as above.  Liquidate/Delete the existing space, blink the SquishPanel,
 // and start again just like the app starts over.
+// This is stupid and overcomplicated.  The app should just reload upon res changes.
 export function recreateMainSpace(spaceParams) {
 	if (traceStartup) console.log(`recreateMainSpace 🐣  started, N=${spaceParams.N}, `
 		+`continuum=${spaceParams.continuum}, spaceLength: ${spaceParams.spaceLength}`);
@@ -85,6 +86,10 @@ export function recreateMainSpace(spaceParams) {
 	resetObjectRegistry();  // this will hang on to them otherwise!!
 	if (traceStartup) console.log(`space 🐣  liquidated, obj registry reset`);
 }
+window.recreateMainSpace = recreateMainSpace;  // for debugging
+
+/* ************************************************************************ Start Up */
+redundant?  probably
 
 // Called by C++ when C++ has finally started up.  Once only, at page load.
 // do NOT export this; it's global cuz quantumEngine.js, the compiled C++ proxy,
@@ -136,12 +141,12 @@ function quantumEngineHasStarted(maxDims, maxLab) {
 window.recreateMainSpace = recreateMainSpace;  // for debugging
 window.quantumEngineHasStarted = quantumEngineHasStarted;  // for emscripten
 
-/* ************************************************************************ what's really going on */
+let domReady = false;
+let cppReady = false;
+let startedUp = false;
 
-// this starts the major pieces of squish  in the right order.  But it can't
-// happen immediately.  The content has to be loaded, and the C++ runtime has to
-// be ready to go.  (see below)
-function startUpEverything() {
+// create everything we know will be in production
+function startUpAlmostEverything() {
 	if (traceStartup) console.log(`🐣  🐣  starting Up Everything! 🐣  🐣  `);
 
 	// create all the functions that JS uses to call into C++
@@ -163,7 +168,67 @@ function startUpEverything() {
 		continuum: getASetting('spaceParams', 'continuum'),
 		spaceLength: getASetting('spaceParams', 'spaceLength'),
 		label: 'main'});
+
+	startedUp = true;
 	if (traceStartup) console.log(`main space 🐣  created`);
+}
+
+document.addEventListener('DOMContentLoaded', ev => domReady = true);
+
+// start up everything, but only when dom and C++ have started up, and only once.
+function startUpWhenReady() {
+	if (domReady && cppReady && !startedUp) {
+		startUpAlmostEverything();
+	}
+}
+
+// Called by main.cpp which doesn't get called if we're doing threads.  (hmmm
+// should reenable that.  keep changin my mind.) Called by C++ when C++ has
+// finally started up.  Once only, at page load. do NOT export this; it's global
+// cuz quantumEngine.js, the compiled C++ proxy, has to have access to it early
+// on, and it's CJS and can't reach JS module exports.
+function startUpFromCpp(maxDims, maxLab) {
+	MAX_DIMENSIONS = maxDims;
+	MAX_LABEL_LEN = maxLab;
+
+	// startup threads need, like everything else, the space
+	// I guess we're starting up with threads anyway
+	eSpaceCreatedPromise
+	.then(space => {
+		eThread.createThreads(space.grinder);
+
+		if (traceStartup) console.log(`threads 🐣  created`);
+		if (tracePromises) console.log(
+			`🐥 startUpFromCpp:  space created and resolving eSpaceCreatedPromise`);
+
+	})
+	.catch(ex => {
+		excRespond(ex, `creating threads`);
+		debugger;
+	});
+
+	// this will ultimately trigger the eSpaceCreatedPromise so lets get it rolling now
+	// get out from under emscripten/C++; otherwise,
+	// exceptions raised during initialization make a mess when it bubbles up there.
+	setTimeout(() => {
+		startUpWhenReady();
+
+	}, 0);
+
+};
+window.startUpFromCpp = startUpFromCpp;  // for emscripten
+
+// this starts the major pieces of squish  in the right order, if the
+// quantumEngine*.js files say we're doing threads.  .  But it can't happen
+// immediately.  The content has to be loaded, and the C++ runtime has to be
+// ready to go.
+function startUpWithThreads() {
+	// figure out some way to set these from the C++
+	MAX_DIMENSIONS = 2;
+	MAX_LABEL_LEN = 7;
+
+	cppReady = true;
+	startUpWhenReady();
 
 	// startup threads need, like everything else, especially the space
 	eSpaceCreatedPromise
@@ -172,19 +237,21 @@ function startUpEverything() {
 
 		if (traceStartup) console.log(`threads 🐣  created`);
 		if (tracePromises) console.log(
-			`🐥 quantumEngineHasStarted:  space created and resolving eSpaceCreatedPromise`);
+			`🐥 startUpFromCpp:  space created and resolving eSpaceCreatedPromise`);
 	})
 	.catch(ex => {
 		excRespond(ex, `creating threads`);
 		debugger;
 	});
 }
-//window.startUpEverything = startUpEverything;
+
+window.startUpWithThreads = startUpWithThreads;
+
 
 // startup: both of these: domContentLoaded and mainCppRuntimeInitialized must have
 // happened (and turned true) in order for us to start threads and space and C++
 // and everything.  Don't care which came first, but the second one runs
-// startUpEverything().
+// startUpWithThreads().
 
 let mainCppRuntimeInitialized = false, domContentLoaded = false;
 

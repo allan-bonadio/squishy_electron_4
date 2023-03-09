@@ -16,14 +16,12 @@
 // somehow there's a race condition where this isn't set soon enough... sometimes
 EM_JS(int, qeStarted, (int max_dimensions, int max_label_len),
 {
-	document.addEventListener('DOMContentLoaded', ev => {
-		if (!window.quantumEngineHasStarted) {
-			debugger;
-			throw(" 🐣 quantumEngineHasStarted() not available on startup!      🙄  👿 🤢 😵 🤬 😭 😠");
-		}
+	if (!window.startUpFromCpp) {
+		debugger;
+		throw(" 🐣 startUpFromCpp() not available on startup!      🙄  👿 🤢 😵 🤬 😭 😠");
+	}
 
-		window.quantumEngineHasStarted(max_dimensions, max_label_len);
-	});
+	window.startUpFromCpp(max_dimensions, max_label_len);
 	return navigator.hardwareConcurrency;
 }
 );

@@ -24,7 +24,7 @@ console.log(`eThread: isSecureContext=${window.isSecureContext},`+
 class eThread {
 	static workers = [];  // instances of Worker
 	static threads = [];  // instances of eThread
-	static doingThreads = false;
+	// eEngine turns this on or off; see.  static doingThreads = false;
 
 	constructor(serial, grinder) {
 		if (traceThreadCreation)
@@ -60,6 +60,7 @@ class eThread {
 	// shortly after page startup
 	static createThreads(grinder) {
 		this.nCores = navigator.hardwareConcurrency;
+//<<<<<<< Updated upstream
 		this.nThreads = 1;
 		this.workers = new Array(this.nThreads);
 		this.threads = new Array(this.nThreads);
@@ -85,6 +86,39 @@ class eThread {
 				// wait don't get discouraged so easily!
 				//workers.doingThreads = false;
 				break;
+//=======
+		this.nThreads = 5;
+
+		if (doingPTHreads) {
+			thread_startAllThreads()
+		}
+		else {
+			this.workers = new Array(this.nThreads);
+			this.threads = new Array(this.nThreads);
+			if (traceThreadCreation)
+				console.log(`⛏ eThread starting thread creation blitz`);
+
+			// now set up that many threads
+			for (let serial = 0; serial < this.nThreads; serial++) {
+				try {
+					console.log(`⛏ eThread creating thread ${serial}`);
+					this.threads[serial] = new eThread(serial, grinder);
+
+					// now, try it out a few times
+	//				setInterval(() => {
+	//					window.Atomics.notify(grinder.ints, grinder.needsIntegrationOffset, 1);
+	//				}, 2000);
+
+				} catch (ex) {
+					console.warn(`eThread: worker creation ${serial} failed: `,
+						ex.stack ?? ex.message ?? ex);
+					debugger;
+
+					// wait don't get discouraged so easily!
+					//workers.doingThreads = false;
+					break;
+				}
+//>>>>>>> Stashed changes
 			}
 		}
 

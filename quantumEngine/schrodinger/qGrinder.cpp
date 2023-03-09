@@ -7,7 +7,9 @@
 #include <limits>
 #include <cfenv>
 #include <stdexcept>
+
 #include <emscripten/threading.h>
+// looking for emscripten_futex_wait() - it's not here #include <emscripten/atomic.h>
 
 #include "../hilbert/qSpace.h"
 #include "../greiman/qAvatar.h"

@@ -58,6 +58,10 @@ let exportsSrc  = [
 	{name: 'grinder_copyFromAvatar', args: ['number', 'number'], retType: null},
 	{name: 'grinder_copyToAvatar', args: ['number', 'number'], retType: null},
 
+	// ************************* pthreads / qThread
+
+	{name: 'thread_startAllThreads', args: ['number'], retType: null},
+
 ];
 
 // remember you don't have to export your func like this, you can do one-offs for testing with ccall():
