@@ -1,53 +1,30 @@
 #!/bin/bash
 ##
-## Build Production -- build script for quantum engine
-## Copyright (C) 2021-2023 Tactile Interactive, all rights reserved
+## Build Production -- build script for quantum engine Production production
+## Copyright (C) 2022-2023 Tactile Interactive, all rights reserved
 ##
 
 # script to compile emscripten/C++ sources into WebAssembly
 
-cd `dirname $0`
-cd ..
-
-if [ -z "$EMSDK" ]
-then
-	echo 'You have to define EMSDK and SQUISH_ROOT in your '
-	echo 'login stuff like .profile (or .bashrc) for this whole project'
-	exit 55
-fi
-
-export EMSDK_QUIET=1
-. $EMSDK/emsdk_env.sh
-
-# this lists all c++ files, except main.cpp and the testing files.
-# omit those, so testing can also use this and compile & run itself (see testing/cppu*).
-allCpp=`cat building/allCpp.list`
-
 # keep MAX_LABEL_LEN+1 a multiple of 4 or 8 for alignment, eg 7, 15 or 31
-MAX_LABEL_LEN=31
-MAX_DIMENSIONS=2
+export MAX_LABEL_LEN=31
+
+# in the short term, keep some tracing stuff in; we'll be debugging the production version!
+export DEBUG='-gsource-map --source-map-base /qEng/ -sDEMANGLE_SUPPORT=1 '
+export OPTIMIZE='-O3 -flto --closure 1 '
+
+
 
 
 echo 🎁 🎁 🎁 🎁 🎁 🎁 🎁 🎁 🎁 🎁 🎁 🎁 🎁 🎁 🎁 🎁 🎁 🎁  compile
-# https://emscripten.org/docs/tools_reference/emcc.html
-# https://emscripten.org/docs/optimizing/Optimizing-Code.html
-emcc -o wasm/quantumEngine.js -sLLD_REPORT_UNDEFINED \
-	-O3 -flto --closure 1 \
-	-sASSERTIONS=2 -sSAFE_HEAP=1 -sSTACK_OVERFLOW_CHECK=2 \
-	-sDEMANGLE_SUPPORT=1 -sNO_DISABLE_EXCEPTION_CATCHING \
-	-sEXPORTED_FUNCTIONS=@building/exports.json \
-	-sEXPORTED_RUNTIME_METHODS='["ccall","cwrap","UTF8ArrayToString","AsciiToString"]' \
-	$PROFILING \
-	-DMAX_LABEL_LEN=$MAX_LABEL_LEN -DMAX_DIMENSIONS=$MAX_DIMENSIONS \
-	-I$EMSDK/upstream/emscripten/cache/sysroot/include \
-	-include emscripten.h -include squish.h \
-	-ffast-math  -lembind \
-	main.cpp $allCpp || exit $?
-# changed -g to -g4 to -gsource-map --source-map-base / ; debugger can see into c++
-
+building/buildCommon.sh
 echo 🎁 🎁 🎁 🎁 🎁 🎁 🎁 🎁 🎁 🎁 🎁 🎁 🎁 🎁 🎁 🎁 🎁 🎁  done
 
 exit 0
+
+
+# getting closer to production:
+# https://emscripten.org/docs/compiling/Deploying-Pages.html
 
 # see also buildDev.sh; these files are analogous.  Also look in testing dir.
 # and more notes at the bottom

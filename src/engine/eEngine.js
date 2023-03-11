@@ -181,9 +181,9 @@ function startUpEverything() {
 }
 //window.startUpEverything = startUpEverything;
 
-// startup: both of these: domContentLoaded and mainCppRuntimeInitialized must have
-// happened (and turned true) in order for us to start threads and space and C++
-// and everything.  Don't care which came first, but the second one runs
+// startup: both of these: domContentLoaded and mainCppRuntimeInitialized must
+// have happened (and turned true) in order for us to start threads and space
+// and C++ and everything.  Don't care which came first, but the second one runs
 // startUpEverything().
 
 let mainCppRuntimeInitialized = false, domContentLoaded = false;

@@ -15,17 +15,11 @@
 // Hand it some numbers from the builder script.
 // somehow there's a race condition where this isn't set soon enough... sometimes
 EM_JS(int, qeStarted, (int max_dimensions, int max_label_len),
-{
-	document.addEventListener('DOMContentLoaded', ev => {
-		if (!window.quantumEngineHasStarted) {
-			debugger;
-			throw(" 🐣 quantumEngineHasStarted() not available on startup!      🙄  👿 🤢 😵 🤬 😭 😠");
-		}
-
-		window.quantumEngineHasStarted(max_dimensions, max_label_len);
-	});
-	return navigator.hardwareConcurrency;
-}
+	{
+		// initialization is big and complex; don't run it from C++
+		setTimeout(() => window.cppRuntimeInitialized(max_dimensions, max_label_len), 0);
+		return navigator.hardwareConcurrency;
+	}
 );
 
 

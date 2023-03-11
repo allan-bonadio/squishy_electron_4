@@ -1,0 +1,10 @@
+[
+"ccall",
+"cwrap",
+"UTF8ArrayToString",
+"AsciiToString",
+"wasmMemory",
+
+"abort",
+"stackSave"
+]
