@@ -19,7 +19,7 @@
 
 
 
-static bool traceIntegration = true;
+static bool traceIntegration = false;
 
 static bool traceJustWave = false;
 
@@ -28,9 +28,9 @@ static bool traceFourierFilter = false;
 static bool dumpFFHiResSpectums = false;
 static bool traceIProd = false;
 
-static bool traceConstructor = true;  // prints info about the space in the grinder constructor
+static bool traceConstructor = false;
 
-static bool traceThread = true;
+static bool traceThread = false;
 
 #define MIDPOINT_METHOD
 

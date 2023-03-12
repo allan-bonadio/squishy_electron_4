@@ -352,6 +352,7 @@ function processArgv() {
 		nMDFilesCompiled = nDirsWalked = 0;
 	if ('--batch' == argv[0]) {
 		// during production build
+		console.log(`build docs for production`);
 		return compileADir('docSrc');
 	}
 	else if (argv.length <= 0) {

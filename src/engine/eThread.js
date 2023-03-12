@@ -9,9 +9,9 @@
 // full control.
 import qe from './qe.js';
 
-let traceThreadCreation = true;
-let traceMessages = true;
-let traceIntegration = true;
+let traceThreadCreation = false;
+let traceMessages = false;
+let traceIntegration = false;
 
 console.log(`eThread: isSecureContext=${window.isSecureContext},`+
 	`crossOriginIsolated=${window.crossOriginIsolated}`);
