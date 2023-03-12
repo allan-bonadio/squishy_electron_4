@@ -5,6 +5,8 @@
 ##
 
 # script to compile emscripten/C++ sources into WebAssembly
+cd `dirname $0`
+cd ..
 
 # keep MAX_LABEL_LEN+1 a multiple of 4 or 8 for alignment, eg 7, 15 or 31
 export MAX_LABEL_LEN=31
@@ -17,7 +19,7 @@ export OPTIMIZE='-O3 -flto --closure 1 '
 
 
 echo 🎁 🎁 🎁 🎁 🎁 🎁 🎁 🎁 🎁 🎁 🎁 🎁 🎁 🎁 🎁 🎁 🎁 🎁  compile
-building/buildCommon.sh
+building/buildCommon.sh || exit 91
 echo 🎁 🎁 🎁 🎁 🎁 🎁 🎁 🎁 🎁 🎁 🎁 🎁 🎁 🎁 🎁 🎁 🎁 🎁  done
 
 exit 0

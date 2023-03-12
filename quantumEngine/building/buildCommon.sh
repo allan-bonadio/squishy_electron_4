@@ -129,6 +129,9 @@ echo "window.nTHREADS = $nTHREADS" > wasm/quantumEngine.thread.js
 if [ "$nTHREADS" != 'none' ]
 then
 	cat js/pre-thread.js wasm/quantumEngine.worker.js js/post-thread.js >> wasm/quantumEngine.thread.js
+else
+	# oh, just make one so the scripts work
+	touch wasm/quantumEngine.thread.js
 fi
 
 ls -lt wasm

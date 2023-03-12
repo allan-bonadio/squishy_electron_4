@@ -29,7 +29,7 @@
     "testcppdb": "quantumEngine/testing/cppuRunner.sh db \"$@\" ",
     "cleanAll": "make cleanAll",
     "ejectdonteverdothis": "react-scripts eject",
-    "build": "maint/build.sh",
+    "build": "maint/productionBuild.sh",
     "deploy": "maint/deploy.sh"
   },
   "eslintConfig": {

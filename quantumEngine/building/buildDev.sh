@@ -5,6 +5,8 @@
 ##
 
 # script to compile emscripten/C++ sources into WebAssembly
+cd `dirname $0`
+cd ..
 
 # turn this on for profiling help
 #PROFILING=--profiling
@@ -33,8 +35,10 @@ export OPTIMIZE='-O0 '
 
 
 echo ℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏ compile
-building/buildCommon.sh
+building/buildCommon.sh || exit 93
 echo ℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏ done
+
+ls -l@ quantumEngine/wasm
 
 exit 0
 
