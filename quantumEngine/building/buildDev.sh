@@ -38,7 +38,7 @@ echo ℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏ
 building/buildCommon.sh || exit 93
 echo ℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏ done
 
-ls -l@ quantumEngine/wasm
+ls -l@ wasm
 
 exit 0
 

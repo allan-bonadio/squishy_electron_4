@@ -1,14 +1,17 @@
 #!/bin/bash
 
 echo "🎁 🛫 Deploy Production Squishy Electron" `date +%c`
-cd `dirname $0`
-cd ..
+cd $SQUISH_ROOT
 
 echo you can do either make deploy or npm deploy, same
 
 # make sure it's there & compiled
-echo "🎁 🛫 make sure the build is there"
-for fn in index.html 'logos/logoKetE.png' qEng/quantumEngine.js qEng/quantumEngine.wasm qEng/quantumEngine.wasm.map
+echo "🎁 🛫 make sure at least most of the build is there"
+WASMFILES="qEng/quantumEngine.main.js qEng/quantumEngine.wasm "
+IMAGES="images/eclipseOnTransparent.gif images/splat.png logos/logoKetE.png"
+DOCFILES="doc/index.html doc/intro/intro1.html"
+OTHERFILES="index.html manifest.json "
+for fn in index.html  $OTHERFILES $WASMFILES $IMAGES $DOCFILES
 do
 	if ! [ -f build/$fn ]
 	then
@@ -17,6 +20,7 @@ do
 		exit 77
 	fi
 done
+
 
 echo "🎁 🛫 a bit of cleanup:"
 xattr -cr build
@@ -43,7 +47,7 @@ sftp -p $NAKODA_SKEY  allan@nakoda <<PETULANT_OLIGARCHS
 
 	# get rid of any previous failures
 	rm build.zip
-	rm -R build
+	rm -r build
 	ls
 
 	put build.zip
