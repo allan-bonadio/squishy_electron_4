@@ -17,7 +17,14 @@
 EM_JS(int, qeStarted, (int max_dimensions, int max_label_len),
 	{
 		// initialization is big and complex; don't run it from C++
-		setTimeout(() => window.cppRuntimeInitialized(max_dimensions, max_label_len), 0);
+		// it has to happen after cppRuntimeInitialized() has been loaded
+		let trying = setInterval(() => {
+			if (window.cppRuntimeInitialized) {
+				clearInterval(trying);
+				window.cppRuntimeInitialized(max_dimensions, max_label_len);
+			
+			}
+		}, 250);
 		return navigator.hardwareConcurrency;
 	}
 );

@@ -5,8 +5,10 @@ description: Overview and some results from Squishy Electron
 ## Squishy Electron project
 
 
-This is a project I've been working on since 2021.
-It's a work in progress, but I can show you some preliminary videos.
+This is a project I've been working on since 2021, off and on in my free time.
+It's a work in progress, and this is the Alpha version here.
+Send feedback to
+[Send Feedback Here](mailto://squish@orgmgr.tactileint.org?subject=squishy_electron_feedback)
 
 When I was a physics major, I had trouble getting a 'feel' for quantum mechanics.
 I could do the math, I could visualize what was happening, but I kept on having a problem because things seemed so unintuitive.
@@ -69,7 +71,7 @@ If one is big, the other has to be small, and vice versa.
 
 ℏ is [Plank's reduced constant](https://en.wikipedia.org/wiki/Planck_constant).
 It's a really tiny number, $1.05×10^{-34} {kg m^2} \over s$, so in normal life,
-it seems like zero and you can have an object at a specific location going a specific speed.
+it seems like zero, and you can have an object at an exact location, going an exact speed.
 (Give or take a nanometer or so.)
 So, in order for an electron to have a more specific location, with a
 very narrow wave packet, it must also have a more uncertain velocity (speed) -
@@ -98,7 +100,7 @@ The other side of the coin is, if we have a very exact, specific velocity
 (momentum), the location is everywhere.
 This is such a wave.  It's unrealistic in practice, because it has an
 infinite length.  In Squishy Electron, the universe wraps around and is
-therefore, finite, and we can model it here.
+therefore, finite, so we can model it here.
 
 <video controls src=typicalCircular.mp4></video>
 
@@ -109,11 +111,11 @@ but they're all attracted to the protons in the nucleus.
 They have a fuzzy wave packet; but the packet is circling the nucleus endlessly.
 This is called an **electron shell**.
 In order to be stable, there has to be a whole number of cycles around
-the circumference of the orbit; zero cycles for ground-state hydrogen or
-helium, 1 cycle for the second and third rows of the periodic table, and
-2 cycles for the fourth and fifth row.
+the circumference of the orbit; zero cycles for ground-state hydrogen, 
+1 cycle for the first orbit up,
+2 cycles for the second orbit, and on up.
 This is where the word **quantum** comes from;
-the wavelength has to be quantized - a whole number of waves, with no fractions.
+the electron wavelength has to be quantized - a whole number of waves, with no fractions.
 
 
 

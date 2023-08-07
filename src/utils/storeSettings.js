@@ -179,7 +179,8 @@ function makeParam(groupName, varName, defaultValue, criterion) {
 /* ********************************************************************** Params & Settings */
 // settings are immediately effective
 // params are effective after user clicks some button to effect or commit changes
-// when referring to both, I use them interchangeably
+// when referring to both, I use them interchangeably.
+// To reset them all, just delete all the local storage for this app.  I shuld mkae a button...
 
 // unit tests want to recreate these from scratch
 export function createStoreSettings() {

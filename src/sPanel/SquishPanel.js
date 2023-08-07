@@ -51,7 +51,8 @@ export class SquishPanel extends React.Component {
 		super(props);
 
 		if (SquishPanel.squishPanelConstructed) {
-			// should not be called twice!
+			// should not be called twice!  now that i've got craco and space recreate relods the page,
+			// I shouldn't need this anymore, right ?!?!?!?!?  TODO
 			console.log(`annoying hot reload; continue to really reload page...🙄  👿 🤢 😵 🤬 😭 😠`);
 			debugger;
 			location = location;  // eslint-disable-line no-restricted-globals
@@ -74,10 +75,10 @@ export class SquishPanel extends React.Component {
 	}
 
 	// this squishPanelConstructed count will detect hot reloading screwing up the app,
-	// but the space dialog also wants to do this.  sigh.
-	static anticipateConstruction() {
-		SquishPanel.squishPanelConstructed = 0;
-	}
+	// but the space dialog also wants to do this.  sigh.  TODO: eliminate this
+// 	static anticipateConstruction() {
+// 		SquishPanel.squishPanelConstructed = 0;
+// 	}
 
 	/* ******************************************************* space & wave creation */
 

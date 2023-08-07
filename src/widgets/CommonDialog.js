@@ -50,6 +50,9 @@ function setPT() {
 
 		// style on the <dialog>, including BG color
 		dialogStyles: PropTypes.object,
+
+		// absent: click->close (not good or bad)    function->function callback
+		backdropAction: PropTypes.any,
 	};
 
 	CommonDialog.defaultProps = {
@@ -57,6 +60,19 @@ function setPT() {
 		dialogStyles: {},
 	};
 }
+
+
+function clickOnBackdrop(ev, props) {
+	if (ev.target !== ev.currentTarget || ev.target.localName !== 'dialog')
+		return;
+
+	const act = props.backdropAction;
+	if (!act)
+		CommonDialog.closeDialog();
+	else
+		act();  // probably wants some arguments...
+}
+
 
 // ref function when we finally render
 const setDialogElement =
@@ -75,7 +91,7 @@ function CommonDialog(props) {
 
 	return (
 		<dialog id='CommonDialog' ref={el => setDialogElement(el)}
-				style={props.dialogStyles}>
+				style={props.dialogStyles} onClick={ev => clickOnBackdrop(ev, props)} >
 			{props.dialogContent}
 		</dialog>
 	);

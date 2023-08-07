@@ -23,7 +23,7 @@ class App extends React.Component {
 			//clientWidth: document.body.clientWidth,  // window width as of constructor
 			//clientHeight: document.body.clientHeight,
 
-			squishPanelExists: true,  // briefly cycles off and on when user changes resolution
+			// always true squishPanelExists: true,  // briefly cycles off and on when user changes resolution
 			cppRunning: false,
 
 			// non-null when dialog is showing
@@ -81,21 +81,21 @@ class App extends React.Component {
 
 	/* ************************************************ re-creation */
 	// called when user changes dimensions (or maybe other cases?)
-	static blinkSquishPanel(createAgain) {
-		this.me.createAgain = createAgain
-		this.me.setState({squishPanelExists: false})
-	}
+// 	static blinkSquishPanel(createAgain) {
+// 		//this.me.createAgain = createAgain
+// // 		this.me.setState({squishPanelExists: false})
+// 	}
 
 	componentDidUpdate() {
-		if (!this.state.squishPanelExists) {
+// 		if (!this.state.squishPanelExists) {
 			// after res change and SquishPanel has been excluded from one render,
 			// that guarantees that all the other components have been freed.
 			// So now we can start over.  big hack, maybe after I figure out how to kill hot reload I can get rid of this crap.
-			SquishPanel.anticipateConstruction();
-
-			this.createAgain();
-			this.setState({squishPanelExists: true});
-		}
+// 			SquishPanel.anticipateConstruction();
+//
+// 			this.createAgain();
+// 			this.setState({squishPanelExists: true});
+// 		}
 	}
 
 	/* ************************************************ App */
@@ -107,7 +107,7 @@ class App extends React.Component {
 		let sqPanel;
 
 
-		if (s.cppRunning && s.squishPanelExists) {
+		if (s.cppRunning) {
 			// real squishpanel
 			sqPanel = <SquishPanel id='theSquishPanel'
 				width={this.appEl?.clientWidth ?? document.body.clientWidth}/>;
