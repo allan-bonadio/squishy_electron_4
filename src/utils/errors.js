@@ -73,19 +73,7 @@ export function wrapForExc(func, where, andDebug) {
 }
 
 
-/* ****************************************************** Too Old */
-
-// we don't even use this anymore...
-//const tryWebGL = `<p>Or if you can't, and you have an old browser, you can try (desktop):
-//	<p>Enable WebGL in Firefox by setting the about:config preference
-//	webgl.enable-prototype-webgl2 to true
-//
-//	<p>Enable WebGL  in Chrome by passing the "--enable-unsafe-es3-apis"
-//	flag when starting the browser through the command line
-//	OR: chrome://flags/#enable-webgl-draft-extensions in Chromium based browsers (Chrome, Opera).
-//
-//	<p>Enable WebGL Safari in the "Experimental Features" developer menu
-//`;
+/* ****************************************************** browser Too Old */
 
 // call this if the browser/machine are just way too old to support the stuff we use:
 // what = 'WebGL' at least v1, 'WebAssembly', dedicated 'WebWorkers', ...

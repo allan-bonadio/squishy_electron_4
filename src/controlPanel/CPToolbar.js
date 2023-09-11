@@ -19,7 +19,7 @@ function setPT() {
 		N: PropTypes.number,
 		space: PropTypes.instanceOf(eSpace),
 
-		resetMainWave: PropTypes.func.isRequired,
+		resetWave: PropTypes.func.isRequired,
 		resetVoltage: PropTypes.func.isRequired,
 		toggleShowVoltage: PropTypes.func.isRequired,
 		showVoltage: PropTypes.bool.isRequired,
@@ -96,7 +96,7 @@ function CPToolbar(props) {
 					resolution {props.N ?? '...'} &nbsp;
 				</div>
 
-				<button onClick={props.resetMainWave}>Reset Wave</button>
+				<button onClick={props.resetWave}>Start Over</button>
 				&nbsp;
 
 				<button onClick={props.resetVoltage}>

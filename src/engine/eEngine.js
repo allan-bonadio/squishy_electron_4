@@ -67,75 +67,6 @@ export function create1DMainSpace(spaceParams) {
 	}
 }
 
-// spaceParams is as above.  Liquidate/Delete the existing space, blink the SquishPanel,
-// and start again just like the app starts over.
-// export function recreateMainSpace(spaceParams) {
-// 	if (traceStartup) console.log(`recreateMainSpace 🐣  started, N=${spaceParams.N}, `
-// 		+`continuum=${spaceParams.continuum}, spaceLength: ${spaceParams.spaceLength}`);
-// 	resetSpaceCreatedPromise();
-//
-// 	App.blinkSquishPanel(() => {
-// 		if (traceStartup) console.log(`new space 🐣  triggered`);
-// 		create1DMainSpace(spaceParams);
-// 	});
-//
-// 	// GET RID OF theSpace!!
-// 	theSpace.liquidate();
-//
-// 	resetObjectRegistry();  // this will hang on to them otherwise!!
-// 	if (traceStartup) console.log(`space 🐣  liquidated, obj registry reset`);
-// }
-
-// OLD.  See qeStarted(), that's what's called by C++
-// Called by C++ when C++ has finally started up.  Once only, at page load.
-// do NOT export this; it's global cuz quantumEngine.js, the compiled C++ proxy,
-// has to have access to it early on, and it can't reach JS exports.
-// function quantumEngineHasStarted(maxDims, maxLab) {
-// 	MAX_DIMENSIONS = maxDims;
-// 	MAX_LABEL_LEN = maxLab;
-//
-// 	// get out from under emscripten/C++; otherwise,
-// 	// exceptions raised during initialization make a mess when it bubbles up there.
-// 	setTimeout(() => {
-// 		defineQEngineFuncs();
-// 		if (traceStartup) console.log(`QEngineFuncs 🐣  defined`);
-//
-// 		// must come After defineQEngineFuncs() cuz it uses continuum constants on qe
-// 		createStoreSettings();
-// 		if (traceStartup) console.log(`StoreSettings 🐣  created`);
-//
-// 		qe.cppLoaded = true;
-//
-// 		// and this can't happen until the storeSettings and QEngine funcs
-// 		create1DMainSpace({
-// 			N: getASetting('spaceParams', 'N'),
-// 			continuum: getASetting('spaceParams', 'continuum'),
-// 			spaceLength: getASetting('spaceParams', 'spaceLength'),
-// 			label: 'main'});
-// 		if (traceStartup) console.log(`main space 🐣  created`);
-//
-// 		// startup threads needs avatar
-// 		eSpaceCreatedPromise
-// 		.then(space => {
-// 			eThread.createThreads(space.mainEAvatar);
-//
-// 			if (traceStartup) console.log(`threads 🐣  created`);
-// 			if (tracePromises) console.log(
-// 				`🐥 quantumEngineHasStarted:  space created and resolving eSpaceCreatedPromise`);
-// 		})
-// 		.catch(ex => {
-// 			// help!  Mister Wizard!
-// 			// eslint-disable-next-line no-ex-assign
-// 			ex = interpretCppException(ex);
-// 			console.error(`eSpaceCreatedPromise failed`, ex);
-// 			debugger;
-// 		});
-// 	}, 0);
-//
-// };
-
-// window.recreateMainSpace = recreateMainSpace;  // for debugging
-//window.quantumEngineHasStarted = quantumEngineHasStarted;  // for emscripten
 
 /* ************************************************************************ what's really going on */
 
@@ -191,7 +122,7 @@ let mainCppRuntimeInitialized = false, domContentLoaded = false;
 
 // trigger when all the dom stuff is loaded.  (React not totally up yet)
 document.addEventListener('DOMContentLoaded', ev => {
-	console.log(`🐣 DOMContentLoaded`);
+	if (traceStartup) console.log(`🐣 DOMContentLoaded`);
 	domContentLoaded = true;
 	if (mainCppRuntimeInitialized)
 		window.startUpEverything();
@@ -201,7 +132,7 @@ document.addEventListener('DOMContentLoaded', ev => {
 // trigger when the C++ runtime is up.  (threads may or may not exist yet)
 window.cppRuntimeInitialized =
 ev => {
-	console.log(`🐣 cppRuntimeInitialized`);
+	if (traceStartup) console.log(`🐣 cppRuntimeInitialized`);
 	mainCppRuntimeInitialized = true;
 	if (domContentLoaded)
 		startUpEverything();

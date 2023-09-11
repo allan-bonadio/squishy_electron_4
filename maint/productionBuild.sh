@@ -72,3 +72,5 @@ ls -lR build
 
 
 echo "🎁 🔨  Build Completed"  `date +%c`
+echo "🎁 🔨  Next Step is to run deploy.sh:   maint/deploy.sh"
+

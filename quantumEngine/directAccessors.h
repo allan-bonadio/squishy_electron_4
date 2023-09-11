@@ -8,7 +8,7 @@
 // you want to export to JS. You should arrange the fields in the .h file from
 // wides (doubles) to narrows (bools) for safer alignment, or just count bytes.
 // Include or omit fields and setters depending on if you use these macros in
-// the JS proxy class.
+// the JS proxy class, in JS.
 
 // use for bool field, or anything 1 byte
 #define byteOffset(field)  (int) ((byte *) &this->field - (byte *) this)
@@ -38,15 +38,17 @@
 #define makeDoubleGetter(field)  printf("\tget " #field  "() { return this.doubles[%d]; }\n", doubleOffset(field));
 #define makeDoubleSetter(field)  printf("\tset " #field  "(a) { this.doubles[%d] = a; }\n", doubleOffset(field));
 
-
-// Uncomment only the first line below, for normal operation. When you change
-// some field arrangements or sizes for the major objects that are proxied in
-// JS, uncomment only the second line, below, to re-calc the offsets, in all
-// proxied objects, so all constructors print out JS code. Then run in the
-// browser (not C++ cppu tests, they use 64bit ptrs), and take the generated JS
-// and paste it into the corresponding JS files, in src/engine, where indicated.
-// (you'll have to global search/replace out 'quantumEngine.main.js:2412' or
-// whatever it is)
+// Uncomment only the first line below, for normal operation. When you
+// change some field arrangements or sizes for the major objects that
+// are proxied in JS, uncomment only the second line, below, to re-calc
+// the offsets, in all proxied objects, so all constructors print out JS
+// code. Then run in the browser (not C++ cppu tests, they use 64bit
+// ptrs), and take the generated JS and paste it into the corresponding
+// JS files, in src/engine, where indicated. Then, do a global
+// search/replace the string 'quantumEngine.main.js:2412' or whatever
+// your line number is; just change it to '', don't get rid of any
+// spaces. You should then have valid JS.  When it all works, you can
+// turn off FORMAT_DIRECT_OFFSETS and recompile.
 
 #define FORMAT_DIRECT_OFFSETS
 //#define FORMAT_DIRECT_OFFSETS  formatDirectOffsets()

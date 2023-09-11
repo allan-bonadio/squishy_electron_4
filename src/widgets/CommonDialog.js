@@ -196,7 +196,7 @@ function ErrorDialog(props) {
 	let ex = props.error;
 
 	console.error('Error Dialog: ', ex);
-	let where = props.where ? ` at ${props.where}` : '';
+	let where = props.where ? ` ${props.where}` : '';
 	return (
 		<article id='ErrorDialog' onKeyDown={CommonDialog.returnEscapeKeyDown} >
 			<h2><big>💥</big> Error {where}</h2>

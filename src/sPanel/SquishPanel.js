@@ -74,12 +74,6 @@ export class SquishPanel extends React.Component {
 		if (traceSquishPanel) console.log(`👑 SquishPanel constructor done`);
 	}
 
-	// this squishPanelConstructed count will detect hot reloading screwing up the app,
-	// but the space dialog also wants to do this.  sigh.  TODO: eliminate this
-// 	static anticipateConstruction() {
-// 		SquishPanel.squishPanelConstructed = 0;
-// 	}
-
 	/* ******************************************************* space & wave creation */
 
 	componentDidMount() {
@@ -172,6 +166,7 @@ export class SquishPanel extends React.Component {
 	//}
 
 	/* ******************************************************* rendering */
+	// Base function that draws the WebGL, whether during iteration, or during idle times if params change.
 	// call this when you change both the GL and iter and elapsed time
 	// we need it here in SquishPanel cuz it's often called in ControlPanel but affects WaveView
 	redrawWholeMainWave =
@@ -184,7 +179,7 @@ export class SquishPanel extends React.Component {
 		grinder.frameSerial = 0;
 
 		// directly redraw the GL
-		avatar.reStartDrawing();
+		avatar.smoothHighest = 0;
 		avatar.doRepaint();
 	}
 
