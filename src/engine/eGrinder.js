@@ -41,6 +41,7 @@ class eGrinder {
 	// are passed by pointer and you need to allocate them in JS (eg see
 	// eGrinder.constructor)
 
+
 	get _space() { return this.ints[1]; }
 
  	get elapsedTime() { return this.doubles[2]; }
@@ -48,17 +49,17 @@ class eGrinder {
  	get frameSerial() { return this.doubles[3]; }
  	set frameSerial(a) { this.doubles[3] = a; }
 
- 	get isIntegrating() { return this.bools[92]; }
- 	set isIntegrating(a) { this.bools[92] = a; }
- 	get pleaseFFT() { return this.bools[95]; }
- 	set pleaseFFT(a) { this.bools[95] = a; }
- 	get needsIntegration() { return this.bools[93]; }
- 	set needsIntegration(a) { this.bools[93] = a; }
- 	get integrationFrameInProgress() { return this.bools[94]; }
- 	set integrationFrameInProgress(a) { this.bools[94] = a; }
+ 	get isIntegrating() { return this.bools[104]; }
+ 	set isIntegrating(a) { this.bools[104] = a; }
+ 	get pleaseFFT() { return this.bools[106]; }
+ 	set pleaseFFT(a) { this.bools[106] = a; }
+ 	get needsIntegration() { return this.ints[21]; }
+ 	set needsIntegration(a) { this.ints[21] = a; }
+ 	needsIntegrationOffset = 21;
+ 	get integrationFrameInProgress() { return this.bools[105]; }
+ 	set integrationFrameInProgress(a) { this.bools[105] = a; }
 
-
-	get dt() { return this.doubles[4]; }
+ 	get dt() { return this.doubles[4]; }
  	set dt(a) { this.doubles[4] = a; }
  	get lowPassFilter() { return this.ints[10]; }
  	set lowPassFilter(a) { this.ints[10] = a; }
@@ -70,11 +71,12 @@ class eGrinder {
  	get _voltage() { return this.ints[13]; }
  	get voltageFactor() { return this.doubles[7]; }
  	set voltageFactor(a) { this.doubles[7] = a; }
+ 	get reversePercent() { return this.doubles[8]; }
 
- 	get _qspect() { return this.ints[16]; }
- 	get _stages() { return this.ints[17]; }
- 	get _threads() { return this.ints[18]; }
- 	get _label() { return this.pointer + 76; }
+ 	get _qspect() { return this.ints[18]; }
+ 	get _stages() { return this.ints[19]; }
+ 	get _threads() { return this.ints[20]; }
+ 	get _label() { return this.pointer + 88; }
 
 	/* **************************** end of direct accessors */
 	// can throw std::runtime_error("divergence")
@@ -113,6 +115,7 @@ class eGrinder {
 	deleteGrinder() {
 		qe.grinder_delete(this.pointer);
 	}
+
 }
 
 window.eGrinder = eGrinder;  // debugging
