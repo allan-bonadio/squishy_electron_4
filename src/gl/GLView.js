@@ -36,6 +36,7 @@ class GLView extends React.Component {
 
 		// the width and height we measure
 		canvasFacts: PropTypes.object.isRequired,
+		setCanvasFacts: PropTypes.func.isRequired,
 	}
 	static defaultProps = {
 		viewName: 'gl view',
@@ -74,8 +75,9 @@ class GLView extends React.Component {
 			canvas.glview = this;
 			canvas.viewName = this.viewName = p.viewName;
 
-			p.canvasFacts.width = this.canvas.clientWidth;
-			p.canvasFacts.height = this.canvas.clientHeight;
+// 			p.canvasFacts.width = this.canvas.clientWidth;
+// 			p.canvasFacts.height = this.canvas.clientHeight;
+			p.setCanvasFacts(this.canvas.clientWidth, this.canvas.clientHeight);
 
 			this.initViewClass();
 

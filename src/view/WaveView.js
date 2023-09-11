@@ -98,6 +98,14 @@ export class WaveView extends React.Component {
 		//this.initVolts();
 	}
 
+	// we finally have a canvas; rush its dimensions up here
+	setCanvasFacts =
+	(width, height) => {
+		this.canvasFacts.width = width;
+		this.canvasFacts.height = height;
+		this.setState({height: height});
+	}
+
 	componentDidUpdate() {
 		const p = this.props;
 		const s = this.state;
@@ -226,7 +234,7 @@ export class WaveView extends React.Component {
 			glView = <GLView width={widthToUse} height={s.height}
 				space={this.space} avatar={this.space.mainEAvatar}
 				viewClassName='flatViewDef' viewName='mainView'
-				canvasFacts={this.canvasFacts}
+				canvasFacts={this.canvasFacts}  setCanvasFacts={this.setCanvasFacts}
 			/>
 		}
 
