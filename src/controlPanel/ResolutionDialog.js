@@ -107,7 +107,7 @@ export default class ResolutionDialog extends React.Component {
 				current={s.N}
 				original={s.origN}
 				sliderMin={window.isDevel ? 4 : 32 /* evaluate now to make sure isDevel defined */}
-				sliderMax={1024 /* MAX_SLIDER_RES */}
+				sliderMax={256}
 
 				stepsPerDecade={16}
 				willRoundPowers={true}
