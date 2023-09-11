@@ -127,21 +127,21 @@ export class ControlPanel extends React.Component {
 
 	startAnimating =
 	(ev) => {
-		console.info(`startAnimating starts`);
+		//console.info(`startAnimating starts`);
 		this.isRunning = storeASetting('frameSettings', 'isRunning', true);;
 		this.setState({isRunning: true});
 	}
 
 	stopAnimating =
 	(ev) => {
-		console.info(`stopAnimating starts`);
+		//console.info(`stopAnimating starts`);
 		this.isRunning = storeASetting('frameSettings', 'isRunning', false);
 		this.setState({isRunning: false});
 	}
 
 	startStop =
 	(ev) => {
-		console.info(`startStop starts, this.isRunning=${this.isRunning}`);
+		//console.info(`startStop starts, this.isRunning=${this.isRunning}`);
 		if (this.isRunning)
 			this.stopAnimating();
 		else
@@ -150,7 +150,7 @@ export class ControlPanel extends React.Component {
 
 	singleFrame =
 	(ev) => {
-		console.info(`singleFrame starts`);
+		//console.info(`singleFrame starts`);
 		this.sPanel.animator.integrateOneFrame(true);
 		this.stopAnimating();
 	}
@@ -167,7 +167,8 @@ export class ControlPanel extends React.Component {
 	//	console.error(`hey, boy, you shouldn't be using setCPState()!!  ControlPanel 153'`)
 	//}
 
-	// given these params, put it into effect and display it
+	// given these params, put it into effect and display it on the wave view
+	// This is most of 'Reset Wave'  NOT for regular iteration
 	setAndPaintMainWave =
 	waveParams => {
 		const p = this.props;
@@ -175,13 +176,16 @@ export class ControlPanel extends React.Component {
 			return;
 
 		const mainEWave = this.space.mainEWave;
+		this.grinder.elapsedTime = 0;
+		this.grinder.frameSerial = 0;
+
 		mainEWave.setFamiliarWave(waveParams);  // eSpace does this initially
 		qe.grinder_copyFromAvatar(this.grinder.pointer, this.mainEAvatar.pointer);
 		p.redrawWholeMainWave();
 	}
 
-	// toolbar: reset Voltage button.  Display it from wave params
-	resetMainWave =
+	// toolbar: reset Wave button.  Display it from wave params
+	resetWave =
 	() => {
 		let waveParams = getAGroup('waveParams');
 		this.setAndPaintMainWave(waveParams);
@@ -201,7 +205,7 @@ export class ControlPanel extends React.Component {
 			// space not there until space promise, but that should happen
 			// before anybody clicks on this
 			if (space) {
-				console.info(`props.isRunning=`, this.isRunning);
+				//console.info(`props.isRunning=`, this.isRunning);
 				if (this.isRunning)
 					space.grinder.pleaseFFT = true;  // remind me after next iter
 				else
@@ -233,6 +237,7 @@ export class ControlPanel extends React.Component {
 		deltaT = storeASetting('frameSettings', 'deltaT', deltaT);
 		this.setState({deltaT});
 		this.grinder.dt = deltaT / (this.state.stepsPerFrame + N_EXTRA_STEPS);  // always one more!
+		//console.log(`setDeltaT: dt = ${this.grinder.dt} = deltaT ${deltaT} / spf+1=${ (this.state.stepsPerFrame + N_EXTRA_STEPS)}`)
 	}
 
 	setStepsPerFrame =
@@ -242,6 +247,10 @@ export class ControlPanel extends React.Component {
 			storeASetting('frameSettings', 'stepsPerFrame', stepsPerFrame);
 			this.setState({stepsPerFrame});
 			this.grinder.stepsPerFrame = stepsPerFrame;
+
+			// dt needs to be recalculated if either of these change
+			this.grinder.dt = this.state.deltaT / (stepsPerFrame + N_EXTRA_STEPS);
+			//console.log(`setStepsPerFrame: dt = ${this.grinder.dt} = deltaT ${this.state.deltaT} / spf+1=${ (stepsPerFrame + N_EXTRA_STEPS)}`)
 		} catch (ex) {
 			ex = interpretCppException(ex);
 			console.error(`setStepsPerFrame error:`, ex.stack ?? ex.message ?? ex);
@@ -331,7 +340,7 @@ export class ControlPanel extends React.Component {
 
 				isRunning={this.isRunning}
 
-				resetMainWave={this.resetMainWave}
+				resetWave={this.resetWave}
 				resetVoltage={this.resetVoltage}
 				toggleShowVoltage={p.toggleShowVoltage}
 				showVoltage={p.showVoltage}

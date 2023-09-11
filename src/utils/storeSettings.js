@@ -222,8 +222,8 @@ export function createStoreSettings() {
 	/* ************************************ frameSettings */
 	makeParam('frameSettings', 'isRunning', false,  [false, true]);
 	makeParam('frameSettings', 'framePeriod', 50, {min: 16, max: 60_001});
-	makeParam('frameSettings', 'deltaT', 1, {min: .01, max: 100.0, });
-	makeParam('frameSettings', 'stepsPerFrame', 100, {min: 10, max: 1e5});
+	makeParam('frameSettings', 'deltaT', 1, {min: .01, max: 1000.0, });
+	makeParam('frameSettings', 'stepsPerFrame', 50, {min: 2, max: 50});
 	makeParam('frameSettings', 'lowPassFilter', 50, {min: 0, max: 75});
 
 	/* ************************************miscSettings */
