@@ -11,36 +11,21 @@ import React from 'react';
 import {stepsPerDecadeStepFactors, indexToPower, powerToIndex} from '../utils/powers.js';
 import {thousands} from '../utils/formatNumber.js';
 
-// set a particular unique in this regex to trace its renders and stuff or use the second one to turn off
+// set a particular 'unique' in this regex to trace its renders and stuff or use the second one to turn off
 //let traceThisSlider = /stepsPerFrameSlider/;
 let traceThisSlider = {test: () => false};
-
-// save this for hwen i put ticks on the log slider
-// give me an array of JUST the even powers of 10 between the min and max, inclusive
-// The indices.  wait, this doesn't work... trana get where the tic marks are
-// function createGoodPowersOf10(spd, iMin, iMax) {
-// 	let po10 = [];
-//		// no this is wrong it'll make stepFactors of 10 starting at the min; should start at a power of 10
-// 	for (let p = iMin; p <= iMax; p += spd) {
-// 		po10.push(<option key={p}>{p}</option>);
-// //		po10.push(<option>{p + 3}</option>);
-// //		po10.push(<option>{p + 7}</option>);
-// 	}
-// 	return po10;
-// }
-
+//let traceThisSlider = /stepsPerFrameSlider/;
 
 // list of settings that are more better - not that simple!
-function createGoodPowers(spd, mini, maxi) {
-	const minIx = powerToIndex(spd, mini);
-	const maxIx = powerToIndex(spd, maxi);
+function createGoodPowers(spd, mini, maxi, substitutes) {
+	const minIx = powerToIndex(spd, mini, substitutes);
+	const maxIx = powerToIndex(spd, maxi, substitutes);
 	let valz = [];
 	for (let ix = minIx; ix <= maxIx; ix++) {
 		valz.push(<option key={ix} value={ix} >{ix}</option>);
 	}
 	return valz;
 }
-
 
 
 /* ****************************************************************** component */
@@ -52,9 +37,7 @@ class LogSlider extends React.Component {
 		label: PropTypes.string.isRequired,
 		minLabel: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
 		maxLabel: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
-
-
-
+		substitutes: PropTypes.array,
 
 		// these are powers, not indices
 		current: PropTypes.number.isRequired,
@@ -98,8 +81,8 @@ class LogSlider extends React.Component {
 		this.wasOriginal = p.original ? <small>&nbsp; (was {thousands(p.original)})</small> : '';
 
 		// these don't change dynamically i promise
-		this.minIndex = powerToIndex(p.stepsPerDecade, p.sliderMin);
-		this.maxIndex = powerToIndex(p.stepsPerDecade, p.sliderMax);
+		this.minIndex = powerToIndex(p.stepsPerDecade, p.sliderMin, p.substitutes);
+		this.maxIndex = powerToIndex(p.stepsPerDecade, p.sliderMax, p.substitutes);
 	}
 
 	mouseDown =
@@ -117,7 +100,7 @@ class LogSlider extends React.Component {
 
 		if (traceThisSlider.test(p.unique)) console.info(`handleChange ev=`, ev);
 		const ix = +ev.currentTarget.value;
-		const power = indexToPower(p.willRoundPowers, stepFactors, spd, ix);
+		const power = indexToPower(p.willRoundPowers, stepFactors, spd, ix, p.substitutes);
 		if (traceThisSlider.test(p.unique)) console.info(`handleChange  ix=${ix}  power=${power}`);
 		p.handleChange(power, ix);
 	}
@@ -131,10 +114,10 @@ class LogSlider extends React.Component {
 		const uniqueId = `LogSliderDataList-${p.unique.replace(/\W+/, '_')}`;
 
 		// right on the edge of transition, it can vibrate!  average this out. so it slides gently
-		let val = powerToIndex(spd, p.current);
+		let val = powerToIndex(spd, p.current, p.substitutes);
 
 		if (traceThisSlider.test(p.unique)) console.info(
-			`LogSlider render..  spd=${spd}, p.current=${p.current}   value=${val}`);
+			`LogSlider render..  spd=${spd}, p.current=${p.current}   value=${val} props=`, p);
 
 		try {
 			return <div className={`${p.className} LogSlider`}>
@@ -156,7 +139,7 @@ class LogSlider extends React.Component {
 					onInput={this.handleSlide}
 					onMouseDown={this.mouseDown}
 				/>
-				<datalist id={uniqueId} >{createGoodPowers(spd, p.sliderMin, p.sliderMax)}</datalist>
+				<datalist id={uniqueId} >{createGoodPowers(spd, p.sliderMin, p.sliderMax, p.substitutes)}</datalist>
 			</div>;
 		} catch (ex) {
 			console.error(`LogSlider.render() Crash: `, ex.stack ?? ex.message ?? ex);

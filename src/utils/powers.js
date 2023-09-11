@@ -3,6 +3,9 @@
 ** Copyright (C) 2021-2023 Tactile Interactive, all rights reserved
 */
 
+
+let tracePowerToIndex = false;
+
 /* ***************************************************************** powers
 	index (ix) is an integer that the input[type=range] operates with
 	power is a real that the user sees and the software outside of LogSlider deals with.
@@ -37,10 +40,15 @@ export const stepsPerDecadeStepFactors = {
 
 // convert eg 20, 21, 25, 30 into 100, 125, 300, 1000, the corresponding power
 // special case: pass spd=16 to get a power-of-2 setting
-// willRoundPowers = boolean, true if all values should be integers   stepFactors = element of stepsPerDecadeStepFactors
+// willRoundPowers = boolean, true if all values should be integers
+// stepFactors = element of stepsPerDecadeStepFactors
 // ix = actual index to convert to a power
-export function indexToPower(willRoundPowers, stepFactors, spd, ix) {
+// su stgitutes = array or obj mapping indexes to powers for exceptional cases
+export function indexToPower(willRoundPowers, stepFactors, spd, ix, substitutes) {
 	let whichDecade, decadePower, factor;
+
+	if (substitutes && substitutes[ix]) return substitutes[ix];
+
 	if (spd != 16) {
 		whichDecade = Math.floor(ix/spd);
 		decadePower = 10 ** whichDecade;
@@ -54,21 +62,30 @@ export function indexToPower(willRoundPowers, stepFactors, spd, ix) {
 	}
 	let power = factor * decadePower;
 	if (willRoundPowers) power = Math.round(power) ;
-	return power
+	return power;
 }
 
 // convert eg 100, 125, 300, 1000 into 20, 21, 25, 30
-export function powerToIndex(spd, power) {
+export function powerToIndex(spd, searchPower, substitutes) {
 	let logOf;
-	if (spd != 16) {
-		logOf = Math.log10(power) * spd;
-	}
-	else {
-		logOf = Math.log2(power);
+
+	if (substitutes) {
+		logOf = substitutes.findIndex(pw => pw && (Math.abs(pw - searchPower) / (pw + searchPower) < 1e-8));
+		if (logOf < 0)
+			logOf = undefined;
 	}
 
+	if (!logOf) {
+		if (spd != 16)
+			logOf = Math.log10(searchPower) * spd;
+		else
+			logOf = Math.log2(searchPower);
+	}
 
-	// now it's reasonable at this point to say why are we rounding vs flooring?  Well, try spd=3 and power=200;
+	if (tracePowerToIndex)
+		console.log(`powerToIndex(${spd}, ${searchPower}, ) => ${Math.round(logOf)}, subs==>`, substitutes);
+
+	// now it's reasonable at this point to say why are we rounding vs flooring?  Well, try spd=3 and searchPower=200;
 	// log*spd => 6.903 which falls down to 6 when it should be 7.
 	return Math.round(logOf);
 }
