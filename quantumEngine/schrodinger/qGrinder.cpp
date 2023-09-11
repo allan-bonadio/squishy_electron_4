@@ -31,6 +31,7 @@ static bool traceIProd = false;
 static bool traceConstructor = false;
 
 static bool traceThread = false;
+static bool traceReversals = false;
 
 #define MIDPOINT_METHOD
 
@@ -159,6 +160,8 @@ void qGrinder::formatDirectOffsets(void) {
 	makeDoubleGetter(voltageFactor);
 	makeDoubleSetter(voltageFactor);
 
+	makeDoubleGetter(reversePercent);
+
 //	printf("\n");
 //	makePointerGetter(scratchQWave);
 
@@ -195,8 +198,38 @@ void qGrinder::dumpObj(const char *title) {
 
 /* ********************************************************** doing Integration */
 
+static int tally = 0;
+
+// if these two reals differ in sign, increment the tally
+static void difft(double a, double b) {
+	if (a > 0 && b < 0) tally++;
+	if (b > 0 && a < 0) tally++;
+}
+
+// count up how many sign reversals in consecutive cells we have
+// should be about 4 * freq if healthy
+void qGrinder::tallyUpReversals(qWave *qwave) {
+	tally = 0;
+	qCx *wave = qwave->wave;
+	qCx prevOne = wave[qwave->start];
+	for (int ix = qwave->start + 1; ix < qwave->end; ix++) {
+		qCx thisOne = wave[ix];
+		difft(thisOne.re, prevOne.re);
+		difft(thisOne.im, prevOne.im);
+		prevOne = thisOne;
+	}
+
+	// figure rate.  ÷2 for real, imag
+	int N = qwave->end - qwave->start;
+	double percent = 100.0 * tally / N / 2.;
+	if (traceReversals)
+		printf("🖼 tallyUpReversals result: %d out of %d or %5.1f %%\n",
+			tally, N, percent);
+	this->reversePercent = percent;
+}
+
 // Does several visscher steps (eg 10 or 100 or 500). Actually does
-// stepsPerFrame+½ steps; one half step, partly at start and other part at
+// stepsPerFrame+1 steps; two half steps, at start and other part at
 // finish, to adapt and de-adapt to Visscher timing
 void qGrinder::oneFrame() {
 	if (traceIntegration)
@@ -245,6 +278,9 @@ void qGrinder::oneFrame() {
 	if (dumpFFHiResSpectums) qflick->dumpHiRes("wave END fourierFilter() after normalize");
 	if (traceIProd && ((int) frameSerial & 0xf) == 0)
 		printf("      qGrinder: iProd= %lf \n", iProd);
+
+	// just an expt: see how many alternating values we have
+	tallyUpReversals(qflick);
 
 	if (iProd > 1.01) {
 		char buf[64];
