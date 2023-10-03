@@ -28,14 +28,15 @@ rm -f build/.DS_Store build/*/.DS_Store build/*/*/.DS_Store
 
 echo "🎁 🛫 Contents of build dir:"
 ls -lF build/
+echo
 du -sh build
 echo
 
 echo "🎁 🛫 starting zip compression"
 rm -f build.zip
 zip -rq build.zip build
-echo "🎁 🛫 done with zipping"
-ls -lF build.zip
+echo "🎁 🛫 done with zipping, here it is:"
+ls -lhF build.zip
 echo
 
 
@@ -47,7 +48,7 @@ sftp -p $NAKODA_SKEY  allan@nakoda <<PETULANT_OLIGARCHS
 
 	# get rid of any previous failures
 	rm build.zip
-	rm -r build
+	rm -R build
 	ls
 
 	put build.zip

@@ -66,7 +66,7 @@ export class VoltageArea extends React.Component {
 			// which have internal changes but the obj ref never changes.
 			changeSerial: 0,
 		};
-		if (traceVoltageArea) 
+		if (traceVoltageArea)
 			console.log(`👆 👆 the new VoltageArea:`, this);
 
 		this.cnDrag = new clickNDrag(this.mouseDown, this.onEvent, this.mouseUp);
@@ -362,6 +362,8 @@ export class VoltageArea extends React.Component {
 		if (p.showVoltage) {
 			const pathAttribute = v.makeVoltagePathAttribute();
 			//const pathAttribute = this.makePathAttribute(start, end);
+			if (traceRendering)
+				console.log(`👆 👆 VoltageArea.pathAttribute: `, pathAttribute);
 
 			// this one actually draws the voltage line
 			paths.push(
@@ -401,9 +403,9 @@ export class VoltageArea extends React.Component {
 	}
 
 	render() {
-		if (traceRendering)
-			console.log(`👆 👆 VoltageArea.render()`);
 		const p = this.props;
+		if (traceRendering)
+			console.log(`👆 👆 VoltageArea.render()`, p.canvasFacts);
 		if (! p.space)
 			return '';  // too early
 		this.barWidth = p.canvasFacts.width / p.space.nPoints;

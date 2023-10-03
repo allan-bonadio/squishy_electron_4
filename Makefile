@@ -21,7 +21,7 @@ test :
 	npm run test
 
 build :
-	maint/build.sh
+	maint/productionBuild.sh
 
 deploy :
 	maint/deploy.sh
