@@ -25,7 +25,7 @@ import {tooOldTerminate} from '../utils/errors.js';
 // runtime debugging flags - you can change in the debugger or here
 let tracePromises = false;
 let traceSquishPanel = false;
-let traceWidth = false;
+let traceWidth = true;
 
 const DEFAULT_VIEW_CLASS_NAME = 'flatViewDef';
 

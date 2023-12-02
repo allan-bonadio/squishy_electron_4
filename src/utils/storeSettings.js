@@ -193,7 +193,7 @@ export function createStoreSettings() {
 	makeParam('spaceParams', 'N', 64,  N => isPowerOf2(N) );
 	makeParam('spaceParams', 'continuum', qe.contENDLESS,
 		[qe.contDISCRETE, qe.contWELL, qe.contENDLESS]);
-	makeParam('spaceParams', 'spaceLength', 16, {min: 1e-3, max: 1e9});
+	makeParam('spaceParams', 'spaceLength', 16, {min: 1e-3, max: 1e7});
 
 	/* ************************************ waveParams */
 
@@ -203,9 +203,9 @@ export function createStoreSettings() {
 	// THis also defines slider mins and maxes!  One source of truth.
 
 	makeParam('waveParams', 'waveBreed', 'gaussian', ['circular', 'standing', 'gaussian', 'chord']);
-	makeParam('waveParams', 'waveFrequency', 16, {min: -100, max: 100, step: 0.5});
-	makeParam('waveParams', 'pulseWidth', 20, {min: 1, max: 100});
-	makeParam('waveParams', 'pulseOffset', 30, {min: 0, max: 100});
+	makeParam('waveParams', 'waveFrequency', 6, {min: -100, max: 100, step: 0.5});
+	makeParam('waveParams', 'pulseWidth', 10, {min: 1, max: 100});
+	makeParam('waveParams', 'pulseOffset', 20, {min: 0, max: 100});
 
 	/* ************************************ voltageParams */
 	makeParam('voltageParams', 'voltageBreed', 'flat', ['flat', 'canyon', 'double']);
@@ -220,10 +220,10 @@ export function createStoreSettings() {
 	// always = min + 2 * heightVolts makeParam('voltageSettings', 'maxBottom', 16, {min: -256, max: 256});
 
 	/* ************************************ frameSettings */
-	makeParam('frameSettings', 'isRunning', false,  [false, true]);
+	makeParam('frameSettings', 'isRunning', true,  [false, true]);
 	makeParam('frameSettings', 'framePeriod', 50, {min: 16, max: 60_001});
 	makeParam('frameSettings', 'deltaT', 1, {min: .01, max: 1000.0, });
-	makeParam('frameSettings', 'stepsPerFrame', 50, {min: 2, max: 50});
+	makeParam('frameSettings', 'stepsPerFrame', 10, {min: 2, max: 50});
 	makeParam('frameSettings', 'lowPassFilter', 50, {min: 0, max: 75});
 
 	/* ************************************miscSettings */

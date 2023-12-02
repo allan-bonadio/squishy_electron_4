@@ -35,9 +35,10 @@ export EMSDK_QUIET=1
 # same for production/dev
 SAFETY="-sASSERTIONS=2 -sSAFE_HEAP=1 -sSTACK_OVERFLOW_CHECK=2  -sLLD_REPORT_UNDEFINED"
 
-# try taking this out; it only affects ex catching in C++, which we don't do.  OH!! yeah so take EC out
-#D_E_C="-sNO_DISABLE_EXCEPTION_CATCHING"
-D_E_C="-sDISABLE_EXCEPTION_CATCHING"
+# This sabotages exception throwing in C++
+D_E_C="-sNO_DISABLE_EXCEPTION_CATCHING"
+#D_E_C="-sDISABLE_EXCEPTION_CATCHING"
+
 FEATURES="-ffast-math  -lembind  $D_E_C"
 
 EXPORTS="-sEXPORTED_FUNCTIONS=@building/exports.json -sEXPORTED_RUNTIME_METHODS=@building/runMethods.json"

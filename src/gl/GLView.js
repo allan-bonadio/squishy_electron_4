@@ -138,7 +138,6 @@ class GLView extends React.Component {
 	// this just creates the canvas
 	render() {
 		const p = this.props;
-		//const s = this.state;
 
 		if (traceGeometry) {
 			// facts are filled in in componentDidUpdate() so the first render, tehre's none
@@ -155,9 +154,11 @@ class GLView extends React.Component {
 		if (this.canvas) {
 			cWidth = this.canvas.clientWidth;
 			cHeight = this.canvas.clientHeight;
-			//let cRect = this.canvas.getBoundingClientRect();
-			//cWidth = cRect.width;
-			//cHeight = cRect.height;
+		}
+		if (traceGeometry) {
+			// facts are filled in in componentDidUpdate() so the first render, tehre's none
+			let facts = p.canvasFacts;
+			console.log(`🖼 🖼 GLV final canvas.width: ${cWidth}      final .height: ${cHeight}`);
 		}
 
 		// but we override the size with CSS here.  Ultimately, bounding width will change to p.width

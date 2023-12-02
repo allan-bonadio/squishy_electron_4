@@ -11,7 +11,8 @@ import CommonDialog from './widgets/CommonDialog.js';
 import DocReader from './widgets/DocReader.js';
 import {eSpaceCreatedPromise} from './engine/eEngine.js';
 
-let traceResize = false;
+let traceResize = true;
+let traceCoords = true;
 
 class App extends React.Component {
 	constructor(props) {
@@ -46,6 +47,7 @@ class App extends React.Component {
 
 			// if we don't set the state here, nobody redraws.  Otherwise, get body.clientWidth directly.
 			this.setState({clientWidth: bodyClientWidth});
+			if (traceCoords) console.log(`🍦 AppMount: bodyClientWidth= ${bodyClientWidth}`);
 
 			// the doc reader tries to track the window size
 			DocReader.setDimensions(bodyClientWidth);

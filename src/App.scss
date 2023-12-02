@@ -16,6 +16,12 @@ body {
 	color: #eee;
 	margin: 0;
 	padding: 0;
+	
+	// some stupid plugin sets our fontto some crap
+	#root {
+		font-size: 16px;
+		font-family: verdana, helvetica, sans-serif;
+	}
 }
 
 // format as a variable

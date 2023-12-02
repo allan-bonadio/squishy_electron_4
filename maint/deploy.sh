@@ -71,9 +71,11 @@ WALKING_SPEED
 echo "🎁 🛫 should now be activated"
 
 
-echo "🎁 🛫 test to see if files are up there"
-curl http://squish.tactileint.org > /tmp/squish.html
-diff build/index.html /tmp/squish.html
-
-echo "🛫  Deploy Completed"  `date +%c`
-
+echo "🎁 🛫 test to see if files are up there - do a Diff"
+curl https://squish.tactileint.org > /tmp/squish.html
+if diff build/index.html /tmp/squish.html
+then echo "🛫  Deploy Completed, looks good!  😅"  `date +%c`
+	exit 0
+else echo "something's wrong, the diff didn't compare 🧐😒🙄😲🤕🫣"
+	exit 1
+fi

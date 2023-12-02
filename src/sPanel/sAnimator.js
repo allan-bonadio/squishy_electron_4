@@ -136,7 +136,7 @@ class sAnimator {
 
 	// Integrate the ODEs by one frame, or not.  and then repaint. called frame
 	// period in animateHeartbeat() while running, as often as the menu setting
-	// says.  Hmm I think TODO shouldIntegrate is always strue?
+	// says.  shouldIntegrate is false for like setting the wave and starting over.
 	integrateOneFrame(shouldIntegrate) {
 		if (traceStats) console.log(`time since last tic: ${performance.now() - this.iStats.startIntegration}ms`);
 		//debugger;

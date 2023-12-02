@@ -28,9 +28,9 @@ import {interpretCppException} from '../utils/errors.js';
 
 //let debugWaveTab = false;
 
-// fixed size, I hope
-const miniWidth = 300;
-const miniHeight = 150;
+// fixed size GLView
+const MINI_WIDTH = 300;
+const MINI_HEIGHT = 150;
 
 
 function setPT() {
@@ -84,7 +84,7 @@ class SetWaveTab extends React.Component {
 			debugger;
 		});
 	}
-	yScale = scaleLinear().range([0, miniHeight]);
+	yScale = scaleLinear().range([0, MINI_HEIGHT]);
 
 	// set the captive minGraph wave to the new settings, after user changed one.
 	// Since the state was also changed, we'll do a render.  but this will do a GL draw.
@@ -108,6 +108,9 @@ class SetWaveTab extends React.Component {
 	setPulseOffset = pulseOffset => {
 		this.setState({pulseOffset}, () => this.regenerateMiniGraphWave());
 	}
+
+	// canvasFacts is for the big view the the user resizes; the setWave GLView is fixed size
+	setCanvasFacts = () => {}
 
 	saveMainWave =
 	() => {
@@ -163,10 +166,11 @@ class SetWaveTab extends React.Component {
 
 		let glView = '';
 		if (s.space) {
-			glView = <GLView width={miniWidth} height={miniHeight}
+			glView = <GLView width={MINI_WIDTH} height={MINI_HEIGHT}
 						space={s.space} avatar={this.miniGraphAvatar}
 						viewClassName='flatViewDef' viewName='setWaveMiniGraph'
-						canvasFacts={{/* ignored */}}
+						canvasFacts={{width: MINI_WIDTH, height: MINI_HEIGHT}}
+						setCanvasFacts={this.setCanvasFacts}
 					/>
 		}
 
