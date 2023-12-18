@@ -5,6 +5,8 @@
 
 //const URL_PREFIX = 'https://developer.mozilla.org';
 
+// I think you have to run this from some HTML context
+
 function raceThruAll(gl, funcName, arg, kList) {
 	const wgl2 = !(gl.VERSION == 7938);  // for now
 
