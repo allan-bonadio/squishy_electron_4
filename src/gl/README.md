@@ -26,8 +26,8 @@ Roughly corresponds to an Avatar?  not really...
 
 ## misc drawing code
 * viewVariable.js - helps drawing modules with the variables passed into GL
-* cxToColor - convert a complex number to a RGB color + translator to .js
-* cxToColor/cxToColor.glsl.js - GLSL code to calculate colors based on complex numbers
+* cx2rgb - convert a complex number to a RGB color + translator to .js
+* cx2rgb/cx2rgb.glsl.js - GLSL code to calculate colors based on complex numbers
 
 # other
 * README.md - this file
