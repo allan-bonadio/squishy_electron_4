@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!doctype html>
 <!-- index -- top level for React app Squishy Electron
 		Copyright (C) 2021-2023 Tactile Interactive, all rights reserved -->
 <html lang="en">
@@ -24,7 +24,12 @@
 		</noscript>
 		<div id="root"></div>
 
-		<!-- one day move this up higher so it starts loading earlier.  maybe.  -->
-		<script async src='%PUBLIC_URL%/qEng/quantumEngine.main.js'></script>
+		<script>
+		// emscripten needs this    workerFile = 'quantumEngine.worker.js'
+		Module.locateFile = function(workerFile) {
+			return `/qEng/${workerFile}`;
+		}
+</script>
+		<script async src='%PUBLIC_URL%/qEng/quantumEngine.js'></script>
 	</body>
 </html>

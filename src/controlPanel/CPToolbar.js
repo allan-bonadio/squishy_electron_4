@@ -5,12 +5,10 @@
 
 import React from 'react';
 import PropTypes from 'prop-types';
-//import qe from '../engine/qe.js';
 import eSpace from '../engine/eSpace.js';
-//import ControlPanel from './ControlPanel.js';
 
+let traceCPToolbar = false;
 
-//import eThread from '../engine/eThread.js';
 
 function setPT() {
 	CPToolbar.propTypes = {
@@ -21,7 +19,7 @@ function setPT() {
 		N: PropTypes.number,
 		space: PropTypes.instanceOf(eSpace),
 
-		resetMainWave: PropTypes.func.isRequired,
+		resetWave: PropTypes.func.isRequired,
 		resetVoltage: PropTypes.func.isRequired,
 		toggleShowVoltage: PropTypes.func.isRequired,
 		showVoltage: PropTypes.bool.isRequired,
@@ -31,7 +29,8 @@ function setPT() {
 }
 
 function CPToolbar(props) {
-	console.info(`CPToolbar(props)  props=`, props);
+	if (traceCPToolbar)
+		console.info(`CPToolbar(props)  props=`, props);
 	const {frameFrequency, setFrameFrequency} = props;
 
 	const repRates = <>
@@ -71,7 +70,8 @@ function CPToolbar(props) {
 
 		<button className={`startStopToggle startStopTool`}
 			onClick={ev => {
-				console.info(`CPToolbar props.cPanel.startStop -> (props)  props=`, props);
+				if (traceCPToolbar)
+					console.info(`CPToolbar props.cPanel.startStop -> (props)  props=`, props);
 				props.cPanel.startStop(ev)
 			}}>
 			{ props.isRunning
@@ -81,7 +81,8 @@ function CPToolbar(props) {
 
 		<button className={`stepButton startStopTool`}
 			onClick={ev=>{
-				console.info(`CPToolbar props.cPanel.singleFrame -> (props)  props=`, props);
+				if (traceCPToolbar)
+					console.info(`CPToolbar props.cPanel.singleFrame -> (props)  props=`, props);
 				props.cPanel.singleFrame(ev);
 			}}>
 			<big>►</big> ▌
@@ -95,7 +96,7 @@ function CPToolbar(props) {
 					resolution {props.N ?? '...'} &nbsp;
 				</div>
 
-				<button onClick={props.resetMainWave}>Reset Wave</button>
+				<button onClick={props.resetWave}>Start Over</button>
 				&nbsp;
 
 				<button onClick={props.resetVoltage}>

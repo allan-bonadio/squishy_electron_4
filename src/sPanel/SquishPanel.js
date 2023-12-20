@@ -25,7 +25,7 @@ import {tooOldTerminate} from '../utils/errors.js';
 // runtime debugging flags - you can change in the debugger or here
 let tracePromises = false;
 let traceSquishPanel = false;
-let traceWidth = false;
+let traceWidth = true;
 
 const DEFAULT_VIEW_CLASS_NAME = 'flatViewDef';
 
@@ -51,7 +51,8 @@ export class SquishPanel extends React.Component {
 		super(props);
 
 		if (SquishPanel.squishPanelConstructed) {
-			// should not be called twice!
+			// should not be called twice!  now that i've got craco and space recreate relods the page,
+			// I shouldn't need this anymore, right ?!?!?!?!?  TODO
 			console.log(`annoying hot reload; continue to really reload page...🙄  👿 🤢 😵 🤬 😭 😠`);
 			debugger;
 			location = location;  // eslint-disable-line no-restricted-globals
@@ -71,12 +72,6 @@ export class SquishPanel extends React.Component {
 		this.framePeriod = getASetting('frameSettings', 'framePeriod');
 
 		if (traceSquishPanel) console.log(`👑 SquishPanel constructor done`);
-	}
-
-	// this squishPanelConstructed count will detect hot reloading screwing up the app,
-	// but the space dialog also wants to do this.  sigh.
-	static anticipateConstruction() {
-		SquishPanel.squishPanelConstructed = 0;
 	}
 
 	/* ******************************************************* space & wave creation */
@@ -171,6 +166,7 @@ export class SquishPanel extends React.Component {
 	//}
 
 	/* ******************************************************* rendering */
+	// Base function that draws the WebGL, whether during iteration, or during idle times if params change.
 	// call this when you change both the GL and iter and elapsed time
 	// we need it here in SquishPanel cuz it's often called in ControlPanel but affects WaveView
 	redrawWholeMainWave =
@@ -183,7 +179,7 @@ export class SquishPanel extends React.Component {
 		grinder.frameSerial = 0;
 
 		// directly redraw the GL
-		avatar.reStartDrawing();
+		avatar.smoothHighest = 0;
 		avatar.doRepaint();
 	}
 

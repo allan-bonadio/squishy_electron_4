@@ -87,8 +87,8 @@ void qWave::formatDirectOffsets(void) {
 /* never tested - might never work  */
 void qWave::forEachPoint(void (*callback)(qCx, int) ) {
 	qDimension *dims = space->dimensions;
-	qCx *wave = wave;
 	int end = dims->end + dims->start;
+	qCx *wave = wave;
 	for (int ix = 0; ix < end; ix++) {
 		callback(wave[ix], ix);
 	}

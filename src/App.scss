@@ -16,6 +16,12 @@ body {
 	color: #eee;
 	margin: 0;
 	padding: 0;
+	
+	// some stupid plugin sets our fontto some crap
+	#root {
+		font-size: 16px;
+		font-family: verdana, helvetica, sans-serif;
+	}
 }
 
 // format as a variable
@@ -25,11 +31,11 @@ var {
 }
 
 small {
-	font-size: .8em;
+	font-size: .8em;  // one step smaller
 }
 
 big {
-	font-size: 1.25em;
+	font-size: 1.25em;  // one step larger
 }
 
 /* **************************************** app outer components */
@@ -40,6 +46,19 @@ h2.App-header {
 	background-color: white;
 	background-image: linear-gradient(#fef, #fee, #ffe, #efe, #eff, #eef);
 	padding: 0 0;
+	position: relative;
+
+	.fontSizer {
+		position: absolute;
+		bottom: 0;
+		right: 6px;
+		font-weight: normal;
+		color: #aaa;
+		span {
+			cursor: pointer;
+		}
+	}
+
 }
 
 .splatImage {

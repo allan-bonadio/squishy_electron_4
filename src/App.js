@@ -11,7 +11,8 @@ import CommonDialog from './widgets/CommonDialog.js';
 import DocReader from './widgets/DocReader.js';
 import {eSpaceCreatedPromise} from './engine/eEngine.js';
 
-let traceResize = false;
+let traceResize = true;
+let traceCoords = true;
 
 class App extends React.Component {
 	constructor(props) {
@@ -23,7 +24,7 @@ class App extends React.Component {
 			//clientWidth: document.body.clientWidth,  // window width as of constructor
 			//clientHeight: document.body.clientHeight,
 
-			squishPanelExists: true,  // briefly cycles off and on when user changes resolution
+			// always true squishPanelExists: true,  // briefly cycles off and on when user changes resolution
 			cppRunning: false,
 
 			// non-null when dialog is showing
@@ -46,6 +47,7 @@ class App extends React.Component {
 
 			// if we don't set the state here, nobody redraws.  Otherwise, get body.clientWidth directly.
 			this.setState({clientWidth: bodyClientWidth});
+			if (traceCoords) console.log(`🍦 AppMount: bodyClientWidth= ${bodyClientWidth}`);
 
 			// the doc reader tries to track the window size
 			DocReader.setDimensions(bodyClientWidth);
@@ -67,8 +69,29 @@ class App extends React.Component {
 				DocReader.openWithUri('/intro/intro1.html');
 			}, 500);
 		}
+
+		// see font sizer, below
+		document.body.style.fontSize = localStorage.fontSize || '16px';
 	}
 
+	/* ************************************************ Font Sizer */
+	// make the font size of the clicked element the global size, and remember it
+	setFontSize(ev) {
+		let fontSize = ev.target.style.fontSize;
+		document.body.style.fontSize = fontSize;
+		localStorage.fontSize = fontSize;
+	}
+
+	// render all these letter buttons
+	renderFontSizer() {
+		return <aside className='fontSizer'>
+			<span style={{fontSize: '10.24px'}} onClick={this.setFontSize}>A</span>
+			<span style={{fontSize: '12.8px'}} onClick={this.setFontSize}>A</span>
+			<span style={{fontSize: '16px'}} onClick={this.setFontSize}>A</span>
+			<span style={{fontSize: '20px'}} onClick={this.setFontSize}>A</span>
+			<span style={{fontSize: '25px'}} onClick={this.setFontSize}>A</span>
+		</aside>
+	}
 	/* ************************************************ CommonDialog */
 
 	// To show the dialog, set the central component and dialog style to something other than null
@@ -77,25 +100,6 @@ class App extends React.Component {
 	(dialogContent, dialogStyle) => {
 		// where does this style go to?!?!?!
 		this.setState({dialogContent, dialogStyle});
-	}
-
-	/* ************************************************ re-creation */
-	// called when user changes dimensions (or maybe other cases?)
-	static blinkSquishPanel(createAgain) {
-		this.me.createAgain = createAgain
-		this.me.setState({squishPanelExists: false})
-	}
-
-	componentDidUpdate() {
-		if (!this.state.squishPanelExists) {
-			// after res change and SquishPanel has been excluded from one render,
-			// that guarantees that all the other components have been freed.
-			// So now we can start over.  big hack, maybe after I figure out how to kill hot reload I can get rid of this crap.
-			SquishPanel.anticipateConstruction();
-
-			this.createAgain();
-			this.setState({squishPanelExists: true});
-		}
 	}
 
 	/* ************************************************ App */
@@ -107,7 +111,7 @@ class App extends React.Component {
 		let sqPanel;
 
 
-		if (s.cppRunning && s.squishPanelExists) {
+		if (s.cppRunning) {
 			// real squishpanel
 			sqPanel = <SquishPanel id='theSquishPanel'
 				width={this.appEl?.clientWidth ?? document.body.clientWidth}/>;
@@ -120,8 +124,9 @@ class App extends React.Component {
 		}
 
 		return (
-			<div className="App" ref={el => this.appEl = el}>
+			<main className="App" ref={el => this.appEl = el}>
 				<h2 className="App-header">
+					{this.renderFontSizer()}
 					<img className='splatImage' src='/images/splat.png'
 						width='100px' alt='squishy icon'/>
 					&nbsp; &nbsp;
@@ -136,7 +141,7 @@ class App extends React.Component {
 					<img id='webglLogo' src='logos/webglLogo.svg'  alt='powered by WebGL'/>
 					<img id='openglLogo' src='logos/openglLogo.svg'  alt='powered by OpenGL'/>
 				</footer>
-			</div>
+			</main>
 		);
 	}
 }

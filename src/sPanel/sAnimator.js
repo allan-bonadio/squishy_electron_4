@@ -9,6 +9,7 @@ import SquishPanel from './SquishPanel.js';
 //import WaveView from '../view/WaveView.js';
 import CommonDialog from '../widgets/CommonDialog.js';
 //import {getASetting, storeASetting} from '../utils/storeSettings.js';
+import statGlobals from '../controlPanel/statGlobals.js';
 
 let traceStats = false;
 let traceTheViewBuffer = false;
@@ -50,12 +51,13 @@ class sAnimator {
 
 	/* ******************************************************* stats */
 
-	// constructor only calls this (?)
+	// the variables that actually mark the various times
+	// start them all at reasonable values
 	initStats(now) {
 		this.iStats = {
 			startIntegration: now,
 			endCalc: now,
-			endReloadVarsNBuffer: now,
+			//endReloadVarsNBuffer: now,
 			endDraw: now,
 			prevStartIntegration: now,
 		}
@@ -64,29 +66,30 @@ class sAnimator {
 	// update the stats, as displayed in the Integration tab
 	refreshStatsOnScreen() {
 		// given a stat name, value and precision, display it using oldschool DOM
-		// TODO: should get el refs via React, then don't need the query selector stuff
-		function show(cName, ms, nDigits = 2) {
-//			const el = document.querySelector(`#${p.id}.SquishPanel .ControlPanel .SetIntegrationTab .${cName}`);
-//			if (el) {
-//				// hard to see if it's jumping around a lot
-//		TODO		if (!el.iStatAvg)
-//					el.iStatAvg = ms;
-//				else
-//					el.iStatAvg = (ms + 31 * el.iStatAvg) / 32;
-//				el.innerHTML = el.iStatAvg.toFixed(nDigits);  // only if it's showing
-//			}
-		}
+
+// 		function show(cName, ms, nDigits = 2) {
+// 			const el = document.querySelector(`#${p.id}.SquishPanel .ControlPanel .SetIntegrationTab .${cName}`);
+// 			if (el) {
+// 				// hard to see if it's jumping around a lot
+// 				if (!el.iStatAvg)
+// 					el.iStatAvg = ms;
+// 				else
+// 					el.iStatAvg = (ms + 31 * el.iStatAvg) / 32;
+// 				el.innerHTML = el.iStatAvg.toFixed(nDigits);  // only if it's showing
+// 			}
+// 		}
 
 		const st = this.iStats;
-		show('frameCalcTime', st.endCalc - st.startIntegration);
-		show('reloadVarsNBuffer', st.endReloadVarsNBuffer - st.endCalc);
-		show('drawTime', st.endDraw - st.endReloadVarsNBuffer);
-//		show('reloadGlInputs', st.endReloadInputs - st.endReloadVarsNBuffer);
-//		show('drawTime', st.endDraw - st.endReloadInputs);
-		show('totalForIntegration', st.endDraw - st.startIntegration);
+		statGlobals.show('reversePercent', this.grinder.reversePercent);
+		statGlobals.show('frameCalcTime', st.endCalc - st.startIntegration);
+		//statGlobals.show('reloadVarsNBuffer', st.endReloadVarsNBuffer - st.endCalc);
+		statGlobals.show('drawTime', st.endDraw - st.endCalc);
+//		statGlobals.show('reloadGlInputs', st.endReloadInputs - st.endReloadVarsNBuffer);
+//		statGlobals.show('drawTime', st.endDraw - st.endReloadInputs);
+		statGlobals.show('totalForIntegration', st.endDraw - st.startIntegration);
 		const period = st.startIntegration - st.prevStartIntegration;
-		show('framePeriod', period);
-		show('framesPerSec', Math.round(1000 / period), 0)
+		statGlobals.show('framePeriod', period);
+		statGlobals.show('framesPerSec', Math.round(1000 / period), 0)
 	}
 
 
@@ -133,11 +136,10 @@ class sAnimator {
 
 	// Integrate the ODEs by one frame, or not.  and then repaint. called frame
 	// period in animateHeartbeat() while running, as often as the menu setting
-	// says.  Hmm I think TODO shouldIntegrate is always strue?
+	// says.  shouldIntegrate is false for like setting the wave and starting over.
 	integrateOneFrame(shouldIntegrate) {
 		if (traceStats) console.log(`time since last tic: ${performance.now() - this.iStats.startIntegration}ms`);
-// 		this.endCalc = this.startReloadViewBuffer = this.endReloadVarsNBuffer =
-// 			this.endIntegration = 0;
+		//debugger;
 		this.iStats.startIntegration = performance.now();  // absolute beginning of integrate frame
 
 		if (shouldIntegrate)
@@ -147,7 +149,8 @@ class sAnimator {
 		this.space.mainEAvatar.doRepaint?.();
 		this.showTimeNFrame();
 
-		this.iStats.endReloadVarsNBuffer = this.iStats.endDraw = performance.now();
+		//this.iStats.endReloadVarsNBuffer =
+		this.iStats.endDraw = performance.now();
 
 		// print out per-frame benchmarks.  This is now displayed in the Integrate tab.
 		//if (areBenchmarking) {

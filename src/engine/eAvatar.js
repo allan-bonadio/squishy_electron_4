@@ -66,11 +66,6 @@ class eAvatar {
 		qe.avatar_dumpViewBuffer(this.pointer, title)
 	}
 
-	reStartDrawing() {
-		// start the averaging over again
-		this.smoothHighest = 0;
-	}
-
 	loadViewBuffer() {
 		// flatDrawing will use this for tweaking the highest uniform
 		this.highest = qe.avatar_loadViewBuffer(this.pointer);

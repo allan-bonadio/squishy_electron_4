@@ -11,19 +11,26 @@
 // the app is fine with it, so use the regular form.
 let webglLintProm;
 if (typeof process == 'undefined') {
-	// no webpack; must be testRunner.html, so no node_modules
-	webglLintProm = import('https://greggman.github.io/webgl-lint/webgl-lint.js');
+//	// no webpack; must be testRunner.html, so no node_modules
+//	console.log(`because we think there's no 'process' variable, include webgl-lint from the net`);
+//	webglLintProm = import('https://greggman.github.io/webgl-lint/webgl-lint.js');
 }
 else {
-	// don't know what order files are loaded in otherwise we'd use window.isDevel
-	if ('development' == process.env.NODE_ENV) {
-		// development; this should already be set up (?)
-		webglLintProm = import('webgl-lint');
-	}
-	else {
-		// else there's NO webglLint!  production.
-		webglLintProm = Promise.resolved(undefined);
-	}
+//	// don't know what order files are loaded in otherwise we'd use window.isDevel
+//	console.log(`NODE_ENV=${process.env.NODE_ENV}     SQUISH_PROD_DEBUG=${process.env.SQUISH_PROD_DEBUG}`);
+//	if ('development' == process.env.NODE_ENV && !process.env.SQUISH_PROD_DEBUG) {
+//		// development; this should already be set up (?)
+//		console.log(`development, so we're including webgl-lint`);
+//		// oof!  react-scripts build somehow thinks this is ... i dunno.
+//		// "The target environment doesn't support dynamic import() syntax so it's
+//		// not possible to use external type 'module' within a script"
+//		// thqt message is from node_modules/webpack/lib/ExternalModule.js
+//		webglLintProm = import('webgl-lint');
+//	}
+//	else {
+//		console.log(`production, so we're omitting webgl-lint`);
+//		webglLintProm = Promise.resolve(undefined);
+//	}
 }
 
 //import {tooOldTerminate} from '../utils/errors.js';
@@ -68,25 +75,31 @@ class ctxFactory {
 			tooOldTerminate(`Sorry, your browser's WebGL is kinidof old.`);
 
 		// caller must wait for this before it's ready to go
-		this.glProm = webglLintProm
-		.then(wgll => {
-			// we actually don't care about the object itself, but it needs to be installed
-			// webgl-lint extension, possibly imported at top of this file.
-			let webglLint = this.gl.getExtension('GMAN_debug_helper');
-			if (webglLint) {
-				webglLint.setConfiguration({
-					//maxDrawCalls: 2000,
-					//failUnsetSamplerUniforms: true,
-				});
-				this.tagObject = webglLint.tagObject.bind(webglLint)
-			}
-			else {
-				// production, or ext doesn't work
-				this.tagObject = () => {};
-			}
-			return this.gl;
-		})
-
+		if (webglLintProm) {
+			this.glProm = webglLintProm
+			.then(wgll => {
+				// we actually don't care about the object itself, but it needs to be installed
+				// webgl-lint extension, possibly imported at top of this file.
+				let webglLint = this.gl.getExtension('GMAN_debug_helper');
+				if (webglLint) {
+					webglLint.setConfiguration({
+						//maxDrawCalls: 2000,
+						//failUnsetSamplerUniforms: true,
+					});
+					this.tagObject = webglLint.tagObject.bind(webglLint)
+				}
+				else {
+					// production, or ext doesn't work
+					this.tagObject = () => {};
+				}
+				return this.gl;
+			})
+		}
+		else {
+			// i just gotta put in a promise that resolves with the gl
+			this.glProm = Promise.resolve(this.gl);
+			this.tagObject = () => {};
+		}
 	}
 
 	// try to set up GL1, return falsy if it can't.  Also shim the vao methods

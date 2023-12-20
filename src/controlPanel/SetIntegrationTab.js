@@ -7,6 +7,7 @@ import PropTypes from 'prop-types';
 import LogSlider from '../widgets/LogSlider.js';
 import TextNSlider from '../widgets/TextNSlider.js';
 import {getASetting, alternateMinMaxs} from '../utils/storeSettings.js';
+import statGlobals from './statGlobals.js';
 
 let traceSliderChanges = false;
 
@@ -21,6 +22,7 @@ function setPT() {
 		setLowPassFilter: PropTypes.func.isRequired,
 	};
 }
+
 
 function SetIntegrationTab(props) {
 	// lowPassFilter, the number setting.  On the JS side, it's a percentage of N/2:
@@ -45,7 +47,7 @@ function SetIntegrationTab(props) {
 			<LogSlider
 				unique='deltaTSlider'
 				className='deltaTSlider cpSlider'
-				label='𝚫t each frame'
+				label='𝚫t each frame, ps'
 				minLabel='0.01'
 				maxLabel='100.0'
 
@@ -72,6 +74,10 @@ function SetIntegrationTab(props) {
 				sliderMax={alternateMinMaxs.frameSettings.stepsPerFrame.max}
 				stepsPerDecade={6}
 
+				// indices 2, 3 & 4 map to these numbers, next is [5]=8, [6]=10
+				// then we skip to [7]=14 instead of 15
+				substitutes={[ , , 2, 4, 6, , , 14]}
+
 				handleChange={(power, ix) => {
 					if (traceSliderChanges)
 						console.log(`🏃🏽 🏃🏽 ch stepsPerFrame::  ix=${ix}  power=${power}`);
@@ -94,19 +100,11 @@ function SetIntegrationTab(props) {
 			/>
 
 		</div>
-		<div className='iStats'>
-			<h3 style={{textAlign: 'left'}}>Integration Statistics</h3>
-			<table><tbody>
-				<tr><td>frame calc time:     </td><td><span  className='frameCalcTime'>-</span> ms</td></tr>
-				<tr><td>reload view variables:     </td><td><span  className='reloadVarsNBuffer'>-</span> ms</td></tr>
-				<tr><td>draw:                      </td><td><span  className='drawTime'>-</span> ms</td></tr>
-				<tr><td>total for frame:  </td><td><span  className='totalForIntegration'>-</span> ms</td></tr>
-				<tr><td>frame period:  </td><td><span  className='framePeriod'>-</span> ms</td></tr>
-				<tr><td>frames per sec:  </td><td><span  className='framesPerSec'>-</span>/sec</td></tr>
-			</tbody></table>
-		</div>
+		{statGlobals.renderIStats()}
+
 	</div>);
 }
+
 
 // 				<tr><td>reload GL variables:     </td><td><span  className='reloadGlInputs'>-</span> ms</td></tr>
 

@@ -34,7 +34,7 @@ function createVertices() {
 
 // keep these #lines pointing to the next line number in the file!
 const vertexSrc = `
-#line 43
+#line 38
 precision highp float;
 uniform vec4 cornerColorUni;
 varying vec4 nuColor;
@@ -61,7 +61,7 @@ void main() {
 `;
 
 const fragmentSrc = `
-#line 70
+#line 7065
 precision highp float;
 uniform vec4 cornerColorUni;
 varying vec4 nuColor;

@@ -34,37 +34,43 @@ echo "🎁 🔨  Emscripten Build Completed"
 
 
 
-echo "🎁 🔨  starting NPM Build"
+echo "🎁 🔨  starting Docs build"
+docGen/compileDocs.js --batch || exit 45
+echo
+echo "🎁 🔨  Docs Build Completed"
+
+
+echo "🎁 🔨  starting Final Complete NPM Build"
 if [ -z "$buildWithDev" ]
 then
+	echo build real production
+
 	# complains if any symlink points to a nonexistent file.  sigh.
+	# just move the symlink
 	mv public/qEng/quantumEngine.wasm.map /tmp
-	craco build || exit 37
+	npx craco build || exit 39
 	mv /tmp/quantumEngine.wasm.map public/qEng/
 else
-	node_modules/.bin/react-scripts build || exit 39
+	echo build production with debugging C++
+
+	export SQUISH_PROD_DEBUG=1
+	# npx react-scripts build || exit 47
+	npx craco build || exit 49
+	echo did craco build
 fi
 echo
 echo "🎁 🔨  NPM Build Completed"
 
 
-echo "🎁 🔨  starting Docs build"
-docGen/compileDocs --batch
-echo
-echo "🎁 🔨  Docs Build Completed"
-
-
 echo "🎁 🔨  starting final cleanup"
 # move these out of the way so they don't get confused with dev versions
 # but don't delete them in case I have to examine them later
-cd quantumEngine/wasm
-if [ -n "$buildWithDev" ]
-then mv -f quantumEngine.js quantumEngine.wasm quantumEngine.wasm.map /tmp
-else mv -f quantumEngine.js quantumEngine.wasm /tmp
-fi
-cd $SQUISH_ROOT
+mv -fv quantumEngine/wasm/* /tmp
+
 echo "🎁 🔨  final cleanup Completed, here's all the files:"
 ls -lR build
 
 
 echo "🎁 🔨  Build Completed"  `date +%c`
+echo "🎁 🔨  Next Step is to run deploy.sh:   maint/deploy.sh"
+

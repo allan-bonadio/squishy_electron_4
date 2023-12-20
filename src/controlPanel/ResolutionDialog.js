@@ -10,8 +10,9 @@ import qe from '../engine/qe.js';
 import CommonDialog from '../widgets/CommonDialog.js';
 import {powerToIndex} from '../utils/powers.js';
 import LogSlider from '../widgets/LogSlider.js';
-import {recreateMainSpace, eSpaceCreatedPromise} from '../engine/eEngine.js';
-import {getASetting} from '../utils/storeSettings.js';
+import {eSpaceCreatedPromise} from '../engine/eEngine.js';
+import {getASetting, storeAGroup} from '../utils/storeSettings.js';
+
 //import ControlPanel from './ControlPanel.js';
 
 
@@ -78,15 +79,10 @@ export default class ResolutionDialog extends React.Component {
 			finalParams => {
 				// this is the 0-th dimension of the space, the x axis
 				finalParams.label = 'x';
-				recreateMainSpace(finalParams);
 
-				// do i really have to wait?  I think the promise only works the first time.
-				// In fact, don't all components vaporize as a result of this?
-				// TODO run some timing checks to see what's up
-				eSpaceCreatedPromise
-				.then(space => {
-					cPanel.isRunning = timeWasAdvancing;
-				});
+				let {N, continuum, spaceLength} = finalParams;
+				storeAGroup('spaceParams',  {N, continuum, spaceLength});
+				location = location;   // reload page
 			},  // end of OK callback
 
 			// cancel callback
@@ -111,7 +107,7 @@ export default class ResolutionDialog extends React.Component {
 				current={s.N}
 				original={s.origN}
 				sliderMin={window.isDevel ? 4 : 32 /* evaluate now to make sure isDevel defined */}
-				sliderMax={1024 /* MAX_SLIDER_RES */}
+				sliderMax={256}
 
 				stepsPerDecade={16}
 				willRoundPowers={true}

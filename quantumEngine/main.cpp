@@ -24,6 +24,20 @@ EM_JS(int, qeStarted, (int max_dimensions, int max_label_len),
 	window.startUpFromCpp(max_dimensions, max_label_len);
 	return navigator.hardwareConcurrency;
 }
+
+// or this?
+// 	{
+// 		// initialization is big and complex; don't run it from C++
+// 		// it has to happen after cppRuntimeInitialized() has been loaded
+// 		let trying = setInterval(() => {
+// 			if (window.cppRuntimeInitialized) {
+// 				clearInterval(trying);
+// 				window.cppRuntimeInitialized(max_dimensions, max_label_len);
+//
+// 			}
+// 		}, 250);
+// 		return navigator.hardwareConcurrency;
+// 	}
 );
 
 

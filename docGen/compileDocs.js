@@ -19,7 +19,7 @@ let traceMetadata = false;
 /*
 ** The documentation is served from the public/doc directory, which contains mostly .html files.
 ** during writing, the docGen directory serves as a proxy.  Both have symlinks into the
-** katex directory for the katex.css file and the fonts.
+** katex directory for the katex.css file and its fonts.
 */
 
 const whatTime =
@@ -352,6 +352,7 @@ function processArgv() {
 		nMDFilesCompiled = nDirsWalked = 0;
 	if ('--batch' == argv[0]) {
 		// during production build
+		console.log(`build docs for production`);
 		return compileADir('docSrc');
 	}
 	else if (argv.length <= 0) {

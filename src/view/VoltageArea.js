@@ -29,6 +29,7 @@ let traceVoltageArea = false;
 let traceRendering = false;
 let traceDragging = false;
 let traceTweening = false;
+let tracedWheel = false;
 
 let traceSlabs = false;
 let traceScrollStretch = false;
@@ -65,7 +66,8 @@ export class VoltageArea extends React.Component {
 			// which have internal changes but the obj ref never changes.
 			changeSerial: 0,
 		};
-		if (traceVoltageArea) console.log(`👆 👆 the new VoltageArea:`, this);
+		if (traceVoltageArea)
+			console.log(`👆 👆 the new VoltageArea:`, this);
 
 		this.cnDrag = new clickNDrag(this.mouseDown, this.onEvent, this.mouseUp);
 
@@ -285,7 +287,8 @@ export class VoltageArea extends React.Component {
 		// convert pixels delta to voltage delta to fraction delta
 		let fracAmount = v.yScale.invert(deltaAmount) / v.heightVolts;
 		v.userScroll(fracAmount);
-		console.log(`wheel event: deltaY=${ev.deltaY}  deltaMode=${ev.deltaMode} scaled delta=${v.yScale.invert(deltaAmount)} fracAmount=${fracAmount}`, ev);
+		if (tracedWheel)
+			console.log(`wheel event: deltaY=${ev.deltaY}  deltaMode=${ev.deltaMode} scaled delta=${v.yScale.invert(deltaAmount)} fracAmount=${fracAmount}`, ev);
 		// i gotta get rid of this frac shit, it should scroll in volts like you would expect!
 		// meanwhile, the yScale is an absolute converter; I need a relative converter.
 		// try converting delta + bottom in pixels into volts and subtract bottom volts
@@ -359,6 +362,8 @@ export class VoltageArea extends React.Component {
 		if (p.showVoltage) {
 			const pathAttribute = v.makeVoltagePathAttribute();
 			//const pathAttribute = this.makePathAttribute(start, end);
+			if (traceRendering)
+				console.log(`👆 👆 VoltageArea.pathAttribute: `, pathAttribute);
 
 			// this one actually draws the voltage line
 			paths.push(
@@ -398,9 +403,9 @@ export class VoltageArea extends React.Component {
 	}
 
 	render() {
-		if (traceRendering)
-			console.log(`👆 👆 VoltageArea.render()`);
 		const p = this.props;
+		if (traceRendering)
+			console.log(`👆 👆 VoltageArea.render()`, p.canvasFacts);
 		if (! p.space)
 			return '';  // too early
 		this.barWidth = p.canvasFacts.width / p.space.nPoints;

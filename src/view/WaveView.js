@@ -91,11 +91,21 @@ export class WaveView extends React.Component {
 			this.setState({vDisp: this.vDisp});  // not needed if it's in the context?
 		})
 		.catch(ex => {
-			console.error(`eSpaceCreatedPromise failed`, ex);
+			console.error(`eSpaceCreatedPromise failed`);
 			debugger;
 		});
 
 		//this.initVolts();
+	}
+
+	// we finally have a canvas; rush its dimensions up here
+	setCanvasFacts =
+	(width, height) => {
+		this.canvasFacts.width = width;
+		this.canvasFacts.height = height;
+		this.setState({height: height});
+		if (traceWidth)
+			console.log(`🏄 🏄WaveView setFacts, width=${width}   height: ${height}  `);
 	}
 
 	componentDidUpdate() {
@@ -221,12 +231,15 @@ export class WaveView extends React.Component {
 		}
 
 		// can't make a real GLView until we have the space!  until then, block out area on the page
-		let glView = <div style={{width: widthToUse, height: s.height}} />;
+		let glView = <div style={{width: widthToUse, height: s.height}} >
+			{spinner}
+		</div>;
+
 		if (s.space) {
 			glView = <GLView width={widthToUse} height={s.height}
 				space={this.space} avatar={this.space.mainEAvatar}
 				viewClassName='flatViewDef' viewName='mainView'
-				canvasFacts={this.canvasFacts}
+				canvasFacts={this.canvasFacts}  setCanvasFacts={this.setCanvasFacts}
 			/>
 		}
 

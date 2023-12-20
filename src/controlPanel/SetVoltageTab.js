@@ -114,13 +114,14 @@ class SetVoltageTab extends React.Component {
 
 		// You see, if I did an autorange, the scale will seem to have no effect.  So do this crude version.
 		v.heightVolts = 10;
-		if (s.canyonScale < 0)
-			v.bottomVolts = -10;
-		else if (s.canyonScale > 0)
-			v.bottomVolts = 0;
-		else {
-			v.bottomVolts = -5;
-		}
+		v.bottomVolts = s.canyonScale / 2 - 5;
+		// if (s.canyonScale < 0)
+		// 	v.bottomVolts = -10;
+		// else if (s.canyonScale > 0)
+		// 	v.bottomVolts = 0;
+		// else {
+		// 	v.bottomVolts = -5;
+		// }
 		if (s.canyonPower < 0) {
 			v.heightVolts /= 100;
 			v.bottomVolts /= 100;

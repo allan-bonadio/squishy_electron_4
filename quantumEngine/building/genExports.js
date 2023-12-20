@@ -10,8 +10,9 @@ if (! process.env.SQUISH_ROOT) throw "env var SQUISH_ROOT not defined!  Should b
 
 console.log(`genExports: Run this whenever the list of C++ functions to call from JS changes.`);
 
+// we don't use fs promises; the promise is just for loading the fs package
 const fsProm = import('fs');
-let fs;
+let fs;  // filled in after promise is resolved
 
 /* ************************************************************************** Tables of Inputs */
 

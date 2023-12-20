@@ -11,7 +11,8 @@
 
 // import qe from './qe.js';
 
-// this does nothing now but proves that we can do workers
+this file is no longer used
+ this does nothing now but proves that we can do workers
 
 
 

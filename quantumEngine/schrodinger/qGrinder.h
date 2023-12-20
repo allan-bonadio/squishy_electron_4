@@ -47,6 +47,8 @@ struct qGrinder {
 	double *voltage;
 	double voltageFactor;  // aligned by 8
 
+	double reversePercent;
+
 	// for the fourier filter.  Call the function first time you need it.
 	// owned if non-null
 	struct qSpectrum *qspect;
@@ -94,6 +96,8 @@ struct qGrinder {
 
 	// kill high frequencies via FFTs
 	void fourierFilter(int lowPassFilter);
+
+	void tallyUpReversals(struct qWave *qwave);
 };
 
 

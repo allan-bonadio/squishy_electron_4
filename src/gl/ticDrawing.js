@@ -43,7 +43,7 @@ let pointSize = traceDrawPoints ? `gl_PointSize = 5.;` : '';
 // make the line number for the start correspond to this JS file line number - the NEXT line
 // gets out of sync so easily!
 const vertexSrc = `
-#line 48
+#line 47
 attribute vec2 endPoint;
 uniform float maxHeight;
 varying highp vec4 vColor;
@@ -61,7 +61,7 @@ void main() {
 `;
 
 const fragmentSrc = `
-#line 64
+#line 65
 precision highp float;
 varying highp vec4 vColor;
 
