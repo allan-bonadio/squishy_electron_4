@@ -25,11 +25,13 @@
 		<div id="root"></div>
 
 		<script>
-		// emscripten needs this    workerFile = 'quantumEngine.worker.js'
-		Module.locateFile = function(workerFile) {
-			return `/qEng/${workerFile}`;
-		}
-</script>
+			// emscripten needs this to find workerFile quantumEngine.worker.js
+			var Module = {
+				locateFile: function(workerFile) {
+					return `/qEng/${workerFile}`;
+				}
+			};
+		</script>
 		<script async src='%PUBLIC_URL%/qEng/quantumEngine.js'></script>
 	</body>
 </html>
