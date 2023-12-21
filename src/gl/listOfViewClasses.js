@@ -5,7 +5,8 @@
 
 import {abstractViewDef} from './abstractViewDef.js';
 import flatViewDef from './flatViewDef.js';
-//import starViewDef from './starViewDef.js';
+
+let traceViewClasses = false;
 
 // unfortunately, we hafe to have a list of all the view types.  here.
 // this will appear in the resolution dialog
@@ -14,10 +15,10 @@ export const listOfViewClasses = {
 
 	//starViewDef,  // simple for testinig ... makes its own inputs
 
-
 	flatViewDef,
 };
 
-//console.log(`list of view classes:`, listOfViewClasses);
+if (traceViewClasses)
+	console.log(`list of view classes:`, listOfViewClasses);
 
 export default listOfViewClasses;
