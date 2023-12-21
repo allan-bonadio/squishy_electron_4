@@ -217,7 +217,7 @@ export class WaveView extends React.Component {
 			frameSerial = thousands(this.grinder.frameSerial);
 		}
 
-		const spinner = qe.cppLoaded ? ''
+		const spinner = p.space ? ''
 			: <img className='spinner' alt='spinner' src='/images/eclipseOnTransparent.gif' />;
 
 		// sometimes a fraction of a pixel causes the horiz scroll bar to kick in.  avoid that without messing up everything.
@@ -230,7 +230,7 @@ export class WaveView extends React.Component {
 			`  parent.clientWidth: ${this.waveViewEl?.parentNode.clientWidth}   widthToUse=${widthToUse}`);
 		}
 
-		// can't make a real GLView until we have the space!  until then, block out area on the page
+		// can't make a real GLView until we have the space!  until then, show spinner
 		let glView = <div style={{width: widthToUse, height: s.height}} >
 			{spinner}
 		</div>;
