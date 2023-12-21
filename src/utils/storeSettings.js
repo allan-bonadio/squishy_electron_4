@@ -9,6 +9,9 @@ import qe from '../engine/qe.js';
 // what a disaster.   I made this whole subsystem,
 // but somehow the compiler fucks it up,
 // so I fell back to some lame functions.
+// TURNS OUT, all those fuckups were because there were circular import dependencies.
+// So, something gets loaded before something else, which ends up undefined!
+// Move functions into different files, or rearrange them, to fix.  Should work then.
 
 
 // group, groupName = which component of storeSettings this is
