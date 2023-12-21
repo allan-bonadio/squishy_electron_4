@@ -24,7 +24,7 @@ class App extends React.Component {
 			//clientWidth: document.body.clientWidth,  // window width as of constructor
 			//clientHeight: document.body.clientHeight,
 
-			// always true squishPanelExists: true,  // briefly cycles off and on when user changes resolution
+			// should roughly equal
 			cppRunning: false,
 
 			// non-null when dialog is showing
