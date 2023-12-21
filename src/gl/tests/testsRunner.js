@@ -1,5 +1,5 @@
 /*
-** testRunner -- js for webgl tests  with testsRunner.html
+** testRunner -- js for in-browser webgl tests  with testsRunner.html
 ** Copyright (C) 2023-2023 Tactile Interactive, all rights reserved
 */
 
@@ -30,10 +30,6 @@ function setHandlersOnAll(name, handler, initialValue) {
 }
 
 /* ************************************************************* global handlers */
-
-// it's now on ctxFactory
-//preferWebGL2
-//export let preferWebGL2 = true;
 
 // the radio buttons for GL version.  I'm using localStorge as my 'state'.  Remember they're all strings.
 function selectVersion(ev) {
@@ -123,12 +119,6 @@ function selectPenTypes(ev) {
 	}
 	localStorage.penType = starViewDef.typesList.join(' ');
 }
-
-// the radio buttons for well/endless
-//function selectContinuum(ev) {
-//	localStorage.continuum = ev.target.value;
-//	mockSpace.continuum = ev.target.value;
-//}
 
 
 /* ************************************************************* Init */

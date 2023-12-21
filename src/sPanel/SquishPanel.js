@@ -16,7 +16,6 @@ import {eSpaceCreatedPromise} from '../engine/eEngine.js';
 
 import {interpretCppException} from '../utils/errors.js';
 import WaveView from '../view/WaveView.js';
-//import CommonDialog from '../widgets/CommonDialog.js';
 import sAnimator from './sAnimator.js';
 
 import {getASetting, storeASetting} from '../utils/storeSettings.js';
@@ -148,23 +147,6 @@ export class SquishPanel extends React.Component {
 	}
 
 
-//	(period) => this.setState({framePeriod: period},
-//		() => console.log(`frame period is now set to ${this.state.framePeriod}`));
-
-	// SetVoltageTab goes and changes the voltage.  VoltageArea needs to know when it changes.
-	// So pass this down and it'll give us the va instance.
-	//gimmeVoltageArea =
-	//(vArea) => {
-	//	this.voltageArea = vArea;
-	//}
-
-	// something tells me that this isn't the way to do it in React
-	//tellMeWhenVoltsChanged =
-	//voltageParams => {
-	//	//console.log(`SquishPanel.tellMeWhenVoltsChanged:`, voltageParams);
-	//	this.voltageArea?.updateVoltageArea(voltageParams);
-	//}
-
 	/* ******************************************************* rendering */
 	// Base function that draws the WebGL, whether during iteration, or during idle times if params change.
 	// call this when you change both the GL and iter and elapsed time
@@ -190,8 +172,6 @@ export class SquishPanel extends React.Component {
 		if (traceWidth) console.log(`👑 SquishPanel render, p.width=${p.width} `
 			+ ` body.clientWidth=${document.body.clientWidth}`);
 
-		//setUpdateVoltageArea={this.setUpdateVoltageArea}
-		//populateFamiliarVoltage={this.populateFamiliarVoltage}
 		return (
 				<div id={this.props.id} className="SquishPanel">
 					<WaveView
@@ -216,8 +196,6 @@ export class SquishPanel extends React.Component {
 					/>
 				</div>
 		);
-
-		/*{{this.animator?.renderRunningOneCycle() ?? ''}}*/
 	}
 }
 

@@ -5,16 +5,12 @@
 
 import PropTypes from 'prop-types';
 import React from 'react';
-//import {scaleLinear} from 'd3-scale';
-//import {path as d3path} from 'd3-path';
 
 import {stepsPerDecadeStepFactors, indexToPower, powerToIndex} from '../utils/powers.js';
 import {thousands} from '../utils/formatNumber.js';
 
 // set a particular 'unique' in this regex to trace its renders and stuff or use the second one to turn off
-//let traceThisSlider = /stepsPerFrameSlider/;
 let traceThisSlider = {test: () => false};
-//let traceThisSlider = /stepsPerFrameSlider/;
 
 // list of settings that are more better - not that simple!
 function createGoodPowers(spd, mini, maxi, substitutes) {

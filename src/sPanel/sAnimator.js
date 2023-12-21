@@ -6,9 +6,7 @@
 import ControlPanel from '../controlPanel/ControlPanel.js';
 import {interpretCppException} from '../utils/errors.js';
 import SquishPanel from './SquishPanel.js';
-//import WaveView from '../view/WaveView.js';
 import CommonDialog from '../widgets/CommonDialog.js';
-//import {getASetting, storeASetting} from '../utils/storeSettings.js';
 import statGlobals from '../controlPanel/statGlobals.js';
 
 let traceStats = false;
@@ -67,25 +65,10 @@ class sAnimator {
 	refreshStatsOnScreen() {
 		// given a stat name, value and precision, display it using oldschool DOM
 
-// 		function show(cName, ms, nDigits = 2) {
-// 			const el = document.querySelector(`#${p.id}.SquishPanel .ControlPanel .SetIntegrationTab .${cName}`);
-// 			if (el) {
-// 				// hard to see if it's jumping around a lot
-// 				if (!el.iStatAvg)
-// 					el.iStatAvg = ms;
-// 				else
-// 					el.iStatAvg = (ms + 31 * el.iStatAvg) / 32;
-// 				el.innerHTML = el.iStatAvg.toFixed(nDigits);  // only if it's showing
-// 			}
-// 		}
-
 		const st = this.iStats;
 		statGlobals.show('reversePercent', this.grinder.reversePercent);
 		statGlobals.show('frameCalcTime', st.endCalc - st.startIntegration);
-		//statGlobals.show('reloadVarsNBuffer', st.endReloadVarsNBuffer - st.endCalc);
 		statGlobals.show('drawTime', st.endDraw - st.endCalc);
-//		statGlobals.show('reloadGlInputs', st.endReloadInputs - st.endReloadVarsNBuffer);
-//		statGlobals.show('drawTime', st.endDraw - st.endReloadInputs);
 		statGlobals.show('totalForIntegration', st.endDraw - st.startIntegration);
 		const period = st.startIntegration - st.prevStartIntegration;
 		statGlobals.show('framePeriod', period);
@@ -152,16 +135,6 @@ class sAnimator {
 		//this.iStats.endReloadVarsNBuffer =
 		this.iStats.endDraw = performance.now();
 
-		// print out per-frame benchmarks.  This is now displayed in the Integrate tab.
-		//if (areBenchmarking) {
-		//console.log(`times:\n`+
-		//	`frame calc time:     ${(this.iStats.endCalc - this.iStats.startIntegration).toFixed(2)}ms\n`+
-		//	`reloadVarsNBuffer:     ${(this.iStats.endReloadVarsNBuffer - this.iStats.endCalc).toFixed(2)}ms\n`+
-		//	//`reload GL variables:     ${(this.iStats.endReloadInputs - this.iStats.endReloadVarsNBuffer).toFixed(2)}ms\n`+
-		//	`draw:   ${(this.iStats.endDraw - this.iStats.endReloadVarsNBuffer).toFixed(2)}ms\n`+
-		//	`total for frame:  ${(this.iStats.endDraw - this.iStats.startIntegration).toFixed(2)}ms\n` +
-		//	`period since last:  ${(this.iStats.startIntegration - this.iStats.prevStartIntegration).toFixed(2)}ms\n`);
-		//}
 		this.refreshStatsOnScreen();
 		this.iStats.prevStartIntegration = this.iStats.startIntegration;
 

@@ -40,7 +40,6 @@ uniform vec4 cornerColorUni;
 varying vec4 nuColor;
 
 attribute vec2 corner;
-//attribute vec4 corner;
 
 // always returns 0...1
 float scramble(float a) {

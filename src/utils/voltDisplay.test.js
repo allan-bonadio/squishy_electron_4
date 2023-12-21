@@ -7,8 +7,6 @@ import {expect, test, jest} from '@jest/globals';
 import voltDisplay from './voltDisplay.js';
 import {dumpJsStack} from './errors.js';
 
-//import {getASetting, storeASetting, getAGroup, storeAGroup} from '../utils/storeSettings.js';
-//import {isPowerOf2} from './powers.js';
 import qe from '../engine/qe.js';
 
 let traceObj = false;

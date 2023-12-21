@@ -3,11 +3,14 @@
 ** Copyright (C) 2021-2023 Tactile Interactive, all rights reserved
 */
 
+// for testing, this is compiled by glTranslate into JS.
+// This is why some of the GLSL is JS-like.
+// Also, c++ comments are trace stmts so leave them in.
+
 // line numbers should correspond!  Be careful how many lines this is!
 const cxToColorGlsl = `
 #line 9
 float sqrtOneThird = sqrt(1. / 3.);  // 0.57735..
-//float sqrtThreeOver2 = sqrt(3.) / 2.;  // .8660...
 
 // convert a complex number into a color, whose hue is based on the
 // complex phase of the number.  Piecewise linear.  Visualize a hexagon
@@ -34,7 +37,7 @@ vec3 cxToColor(vec2 psi) {
 
 	// in here, the 'gradient' is supposed to range 0...1 or 1...0
 	// the slope is ±0 thru ±∞; cotan(angle), x/y, and is used just for qualitative decisions.
-	// No transcendental functions were used in this code; all linear approximations.
+	// No transcendental functions; all linear approximations.
 	// I think each of the diagonal sides sags in the middle but whatever
 	float slope = psi.x / psi.y;
 	//console.log('     line 23, slope=', slope.toFixed(4));

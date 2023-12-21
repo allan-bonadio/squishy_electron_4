@@ -8,27 +8,15 @@ import PropTypes from 'prop-types';
 import {scaleLinear} from 'd3-scale';
 
 
-//import MiniGraph from './MiniGraph.js';
-//import eSpace from '../engine/eSpace.js';
 import GLView from '../gl/GLView.js';
-
-// import eWave from '../engine/eWave.js';
-// import eCx from '../engine/eCx.js';
-// import cxToRgb from '../view/cxToRgb.js';
-//import cxToColor from '../gl/cxToColor/cxToColor.txlated.js';
 import TextNSlider from '../widgets/TextNSlider.js';
 import {} from '../utils/storeSettings.js';
-//import {getASetting, storeASetting, getAGroup, storeAGroup, alternateMinMaxs} from '../utils/storeSettings.js';
 import {getAGroup, alternateMinMaxs} from '../utils/storeSettings.js';
-//import {storeASetting, alternateMinMaxs} from '../utils/storeSettings.js';
 
 import {eSpaceCreatedPromise} from '../engine/eEngine.js';
 import {interpretCppException} from '../utils/errors.js';
 
-
-//let debugWaveTab = false;
-
-// fixed size GLView
+// fixed size GLView at start
 const MINI_WIDTH = 300;
 const MINI_HEIGHT = 150;
 

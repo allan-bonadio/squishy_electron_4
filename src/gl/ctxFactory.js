@@ -12,28 +12,9 @@
 let webglLintProm;
 if (typeof process == 'undefined') {
 //	// no webpack; must be testRunner.html, so no node_modules
-//	console.log(`because we think there's no 'process' variable, include webgl-lint from the net`);
-//	webglLintProm = import('https://greggman.github.io/webgl-lint/webgl-lint.js');
 }
 else {
-//	// don't know what order files are loaded in otherwise we'd use window.isDevel
-//	console.log(`NODE_ENV=${process.env.NODE_ENV}     SQUISH_PROD_DEBUG=${process.env.SQUISH_PROD_DEBUG}`);
-//	if ('development' == process.env.NODE_ENV && !process.env.SQUISH_PROD_DEBUG) {
-//		// development; this should already be set up (?)
-//		console.log(`development, so we're including webgl-lint`);
-//		// oof!  react-scripts build somehow thinks this is ... i dunno.
-//		// "The target environment doesn't support dynamic import() syntax so it's
-//		// not possible to use external type 'module' within a script"
-//		// thqt message is from node_modules/webpack/lib/ExternalModule.js
-//		webglLintProm = import('webgl-lint');
-//	}
-//	else {
-//		console.log(`production, so we're omitting webgl-lint`);
-//		webglLintProm = Promise.resolve(undefined);
-//	}
 }
-
-//import {tooOldTerminate} from '../utils/errors.js';
 
 let traceVersion = false;
 

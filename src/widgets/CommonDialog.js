@@ -10,7 +10,6 @@ import PropTypes from 'prop-types';
 import dialogPolyfill from 'dialog-polyfill';
 import 'dialog-polyfill/dist/dialog-polyfill.css';
 
-//import App from '../App.js';
 import {interpretCppException} from '../utils/errors.js';
 
 let traceKeystrokes = false;

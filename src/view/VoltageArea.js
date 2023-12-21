@@ -9,7 +9,6 @@ import PropTypes from 'prop-types';
 
 import {scaleLinear as d3_scaleLinear} from 'd3-scale';
 import {select as d3_select} from 'd3-selection';
-//import {line as d3_line} from 'd3-shape';
 import {axisLeft as d3_axisLeft} from 'd3-axis';
 
 import ReactFauxDOM from 'react-faux-dom';

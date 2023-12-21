@@ -5,8 +5,6 @@
 
 import {scaleLinear} from 'd3-scale';
 
-//import qe from '../engine/qe.js';
-//import {getASetting} from '../utils/storeSettings.js';
 import {getAGroup, storeASetting} from '../utils/storeSettings.js';
 
 let traceFamiliar = false;
@@ -24,7 +22,6 @@ const TOO_MANY_VOLTS = 1e30;
 
 // zooming in or out, changes the heightVolts by this factor either way.
 // If it's not an even power, it'll round off to the nearest integer power.
-//const zoomFactor = 2;
 const zoomFactor = Math.sqrt(2);
 const logZoomFactor = Math.log(zoomFactor);
 

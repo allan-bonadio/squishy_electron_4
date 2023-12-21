@@ -12,8 +12,6 @@ import cxToColorGlsl from './cxToColor.glsl.js';
 // Also activates certain comments that'll only show up in JS.
 // no args needed, just run this
 
-//console.log(`input:`, cxToColorGlsl);
-
 function convertFile() {
 	// intro line for function, sigh, just do it by hand
 	text = text.replace(/vec3 cxToColor\(vec2 (\w+)\)/g, 'export function cxToColor($1) ');

@@ -3,8 +3,6 @@
 ** Copyright (C) 2021-2023 Tactile Interactive, all rights reserved
 */
 
-//const URL_PREFIX = 'https://developer.mozilla.org';
-
 function raceThruAll(gl, funcName, arg, kList) {
 	const wgl2 = !(gl.VERSION == 7938);  // for now
 

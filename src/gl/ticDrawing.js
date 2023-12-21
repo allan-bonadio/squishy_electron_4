@@ -23,13 +23,7 @@ const VERTICES_PER_TIC = 2;
 const FLOATS_PER_TIC = FLOATS_PER_VERTEX * VERTICES_PER_TIC;
 
 // AVG_ψ is 1/N, the height of a circular wave
-//normal const TICS_PER_AVG_ψ  = 1;
 const TICS_PER_AVG_ψ  = 2;  // testing
-
-//// old
-//const AVG_ψ_PER_TIC  = .5;  // testing
-////const AVG_ψ_PER_TIC  = 1;  // normal
-
 
 let pointSize = traceDrawPoints ? `gl_PointSize = 5.;` : '';
 
@@ -43,7 +37,7 @@ let pointSize = traceDrawPoints ? `gl_PointSize = 5.;` : '';
 // make the line number for the start correspond to this JS file line number - the NEXT line
 // gets out of sync so easily!
 const vertexSrc = `
-#line 47
+#line 41
 attribute vec2 endPoint;
 uniform float maxHeight;
 varying highp vec4 vColor;
@@ -61,7 +55,7 @@ void main() {
 `;
 
 const fragmentSrc = `
-#line 65
+#line 59
 precision highp float;
 varying highp vec4 vColor;
 

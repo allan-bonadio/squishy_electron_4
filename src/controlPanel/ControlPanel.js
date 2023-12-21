@@ -12,7 +12,6 @@ import SetWaveTab from './SetWaveTab.js';
 import SetVoltageTab from './SetVoltageTab.js';
 import SetResolutionTab from './SetResolutionTab.js';
 import SetIntegrationTab from './SetIntegrationTab.js';
-//import SquishPanel from '../sPanel/SquishPanel.js';
 import {getASetting, storeASetting, getAGroup, storeAGroup} from '../utils/storeSettings.js';
 import {eSpaceCreatedPromise} from '../engine/eEngine.js';
 import qe from '../engine/qe.js';
