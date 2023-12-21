@@ -13,8 +13,8 @@ import eThread from './eThread.js';
 
 // all of these must be attached to window to  get called by c++
 
-let traceStartup = false;
-let tracePromises = false;
+let traceStartup = true;
+let tracePromises = true;
 
 /* ****************************************************** app startup */
 
@@ -42,8 +42,8 @@ export let eSpaceCreatedPromise = resetSpaceCreatedPromise();
 let theSpace;
 
 //let domReady = false;
-let cppReady = false;
-let startedUp = false;
+// let cppReady = false;
+// let startedUp = false;
 
 // called during startup, to create the space.  (Change Resolution reloads app - easier)
 // spaceParams is {N, continuum, spaceLength, label: 'x'}
@@ -60,7 +60,6 @@ export function create1DMainSpace(spaceParams) {
 
 		// wakes up stuff all over the JS, and gives them the space,
 		// that they've been waiting for
-		startedUp = true;
 		eSpaceCreatedSucceed(space);
 		if (traceStartup)
 			console.log(`eSpaceCreatedPromise 🐣  resolved`);
@@ -101,50 +100,51 @@ export function create1DMainSpace(spaceParams) {
 // Called by C++ when C++ has finally started up.  Once only, at page load.
 // do NOT export this; it's global cuz quantumEngine.js, the compiled C++ proxy,
 // has to have access to it early on, and it can't reach JS exports.
-function quantumEngineHasStarted(maxDims, maxLab) {
-	MAX_DIMENSIONS = maxDims;
-	MAX_LABEL_LEN = maxLab;
-
-	// get out from under emscripten/C++; otherwise,
-	// exceptions raised during initialization make a mess when it bubbles up there.
-	setTimeout(() => {
-		defineQEngineFuncs();
-		if (traceStartup) console.log(`QEngineFuncs 🐣  defined`);
-
-		// must come After defineQEngineFuncs() cuz it uses continuum constants on qe
-		createStoreSettings();
-		if (traceStartup) console.log(`StoreSettings 🐣  created`);
-
-		// and this can't happen until the storeSettings and QEngine funcs are there.
-		// It'll actually start when the promise resolves
-		create1DMainSpace({
-				N: getASetting('spaceParams', 'N'),
-				continuum: getASetting('spaceParams', 'continuum'),
-				spaceLength: getASetting('spaceParams', 'spaceLength'),
-				label: 'x',  // coordinate name
-			},
-			'main');  // space name
-		if (traceStartup) console.log(`main space 🐣  created`);
-
-		// startup threads needs avatar
-		eSpaceCreatedPromise
-		.then(space => {
-			eThread.createThreads(space.mainEAvatar);
-			if (traceStartup) console.log(`threads 🐣  created`);
-			if (tracePromises) console.log(
-				`🐥 quantumEngineHasStarted:  space created and resolving eSpaceCreatedPromise`);
-		})
-		.catch(ex => {
-			// eslint-disable-next-line no-ex-assign
-			ex = interpretCppException(ex);
-			console.error(`eSpaceCreatedPromise failed`, ex);
-			debugger;
-		});
-	}, 0);
-
-};
-
-window.quantumEngineHasStarted = quantumEngineHasStarted;  // for emscripten
+// function quantumEngineHasStarted(maxDims, maxLab) {
+// 	MAX_DIMENSIONS = maxDims;
+// 	MAX_LABEL_LEN = maxLab;
+// 	debugger;  // not used, right?
+//
+// 	// get out from under emscripten/C++; otherwise,
+// 	// exceptions raised during initialization make a mess when it bubbles up
+// 	setTimeout(() => {
+// 		defineQEngineFuncs();
+// 		if (traceStartup) console.log(`QEngineFuncs 🐣  defined`);
+//
+// 		// must come After defineQEngineFuncs() cuz it uses continuum constants on qe
+// 		createStoreSettings();
+// 		if (traceStartup) console.log(`StoreSettings 🐣  created`);
+//
+// 		// and this can't happen until the storeSettings and QEngine funcs are there.
+// 		// It'll actually start when the promise resolves
+// 		create1DMainSpace({
+// 				N: getASetting('spaceParams', 'N'),
+// 				continuum: getASetting('spaceParams', 'continuum'),
+// 				spaceLength: getASetting('spaceParams', 'spaceLength'),
+// 				label: 'x',  // coordinate name
+// 			},
+// 			'main');  // space name
+// 		if (traceStartup) console.log(`main space 🐣  created`);
+//
+// 		// startup threads needs avatar
+// 		eSpaceCreatedPromise
+// 		.then(space => {
+// 			eThread.createThreads(space.mainEAvatar);
+// 			if (traceStartup) console.log(`threads 🐣  created`);
+// 			if (tracePromises) console.log(
+// 				`🐥 quantumEngineHasStarted:  space created and resolving eSpaceCreatedPromise`);
+// 		})
+// 		.catch(ex => {
+// 			// eslint-disable-next-line no-ex-assign
+// 			ex = interpretCppException(ex);
+// 			console.error(`eSpaceCreatedPromise failed`, ex);
+// 			debugger;
+// 		});
+// 	}, 0);
+//
+// };
+//
+// window.quantumEngineHasStarted = quantumEngineHasStarted;  // for emscripten
 
 /* ************************************************************* end of for ?pthreads */
 
@@ -183,14 +183,15 @@ function startUpEverything() {
 // 	}
 // }
 
-// Called directly by main.cpp which doesn't get called if we're doing threads.  (hmmm
-// should reenable that.  keep changin my mind.) Called by C++ when C++ has
+// Called directly by main.cpp when C++ has
 // finally started up.  Once only, at page load. do NOT export this; it's global
 // cuz quantumEngine.js, the compiled C++ proxy, has to have access to it early
 // on, and it's CJS and can't reach JS module exports.
 function startUpFromCpp(maxDims, maxLab) {
 	MAX_DIMENSIONS = maxDims;
 	MAX_LABEL_LEN = maxLab;
+
+	window.cppRuntimeInitialized();
 
 	// startup threads need, like everything else, the space
 	// I guess we're starting up with threads anyway
