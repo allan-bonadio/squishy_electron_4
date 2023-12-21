@@ -34,10 +34,6 @@ export function toSiSuffix(f, nDigits) {
 	return pieces.mantissa.toPrecision(nDigits) + pieces.suffix;
 }
 
-// testing
-//for (let ff = 1e-30;  ff < 1e30; ff *= 12345) {
-//	console.log(`${ff.toPrecision(5)} = ${toSiUnits(ff, 6)}`);
-//}
 
 /* ********************************** thousands() */
 // I didn't realize when I wrote this that the Intl functions can do this too
@@ -85,16 +81,6 @@ export function thousandsBackup(n) {
 	return intPart + fracPart;
 }
 
-/* ********************************************************** put this in a spec file! */
-//😇 function testThousands() {
-//😇 	let n;
-//😇 	for (n = 1e-6; n < 1e6; n *= 10) {
-//😇 		for (let f = 1; f < 10; f *= 1.4)
-//😇 			console.info(`  testThousands, progressive fractions: ${n*f} =>`, thousands(n * f));
-//😇 		console.log();
-//😇 	}
-//😇 }
-//😇testThousands();
 
 /* ********************************************************** powers of 2 */
 
