@@ -45,11 +45,7 @@ export OPTIMIZE='-O0 '
 # if you change this, also change index.html to load the file(s) you want
 #WORKERS=" -sWASM_WORKERS    --pre-js=js/prejs.js  --post-js=js/postjs.js"
 #WORKERS=" --proxy-to-worker  --extern-pre-js=js/prejs.js  --post-js=js/postjs.js"
-WORKERS=" -pthread  -sPTHREAD_POOL_SIZE=3 "
-
-# tried to sabotage GL, but didn't seem to make much difference.
-# we call gl from JS
-DISABLE_GL="-sGL_MAX_TEMP_BUFFER_SIZE=0 -sGL_EMULATE_GLES_VERSION_STRING_FORMAT=0 -sGL_EXTENSIONS_IN_PREFIXED_FORMAT=0 -sGL_SUPPORT_AUTOMATIC_ENABLE_EXTENSIONS=0 -sGL_SUPPORT_SIMPLE_ENABLE_EXTENSIONS=0 -sGL_TRACK_ERRORS=0 -sGL_POOL_TEMP_BUFFERS=0"
+#WORKERS=" -pthread  -sPTHREAD_POOL_SIZE=3 "
 
 # others, see /opt/dvl/emscripten/emsdk/upstream/emscripten/src/settings.js
 # --proxy-to-worker   NO!
@@ -87,15 +83,6 @@ echo ℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏ
 building/buildCommon.sh || exit 93
 echo ℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏ done
 
-ls -l@ wasm
-
 exit 0
 
-
-# some of the debug options in buildDev are explained here:
-# https://emscripten.org/docs/porting/Debugging.html?highlight=assertions#compiler-settings
-# and that page in general has a lot of stuff
-
-# in order for this to work I have to mess with the wasm mem blob
-# 	-s WASM_ASYNC_COMPILATION=0 \
 
