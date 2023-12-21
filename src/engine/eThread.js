@@ -13,8 +13,6 @@ let traceThreadCreation = true;
 let traceMessages = true;
 let traceIntegration = false;
 
-console.log(`eThread: isSecureContext=${window.isSecureContext},`+
-	`crossOriginIsolated=${window.crossOriginIsolated}`);
 
 // i can't decide if there's one of these for each thread or one total.  hmmm
 // how about this: everythiing that's unique, make iit static.  Prob moved to
@@ -60,8 +58,8 @@ class eThread {
 	// shortly after page startup
 	static createThreads(grinder) {
 		this.nCores = navigator.hardwareConcurrency;
-//<<<<<<< Updated upstream
-		this.nThreads = 1;
+
+		this.nThreads = 1;  // WrONG TODO
 		this.workers = new Array(this.nThreads);
 		this.threads = new Array(this.nThreads);
 		if (traceThreadCreation)
@@ -73,11 +71,6 @@ class eThread {
 				console.log(`⛏ eThread creating thread ${serial}`);
 				this.threads[serial] = new this(serial, grinder);
 
-				// now, try it out a few times
-//				setInterval(() => {
-//					window.Atomics.notify(grinder.ints, grinder.needsIntegrationOffset, 1);
-//				}, 2000);
-
 			} catch (ex) {
 				console.error(`eThread: worker creation ${serial} failed: `,
 					ex.stack ?? ex.message ?? ex);
@@ -86,39 +79,6 @@ class eThread {
 				// wait don't get discouraged so easily!
 				//workers.doingThreads = false;
 				break;
-//=======
-// 		this.nThreads = 5;
-//
-// 		if (doingPTHreads) {
-// 			thread_startAllThreads()
-// 		}
-// 		else {
-// 			this.workers = new Array(this.nThreads);
-// 			this.threads = new Array(this.nThreads);
-// 			if (traceThreadCreation)
-// 				console.log(`⛏ eThread starting thread creation blitz`);
-//
-// 			// now set up that many threads
-// 			for (let serial = 0; serial < this.nThreads; serial++) {
-// 				try {
-// 					console.log(`⛏ eThread creating thread ${serial}`);
-// 					this.threads[serial] = new eThread(serial, grinder);
-//
-// 					// now, try it out a few times
-// 	//				setInterval(() => {
-// 	//					window.Atomics.notify(grinder.ints, grinder.needsIntegrationOffset, 1);
-// 	//				}, 2000);
-//
-// 				} catch (ex) {
-// 					console.warn(`eThread: worker creation ${serial} failed: `,
-// 						ex.stack ?? ex.message ?? ex);
-// 					debugger;
-//
-// 					// wait don't get discouraged so easily!
-// 					//workers.doingThreads = false;
-// 					break;
-// 				}
-//>>>>>>> Stashed changes
 			}
 		}
 
