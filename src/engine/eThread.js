@@ -9,8 +9,8 @@
 // full control.
 import qe from './qe.js';
 
-let traceThreadCreation = false;
-let traceMessages = false;
+let traceThreadCreation = true;
+let traceMessages = true;
 let traceIntegration = false;
 
 console.log(`eThread: isSecureContext=${window.isSecureContext},`+
@@ -87,37 +87,37 @@ class eThread {
 				//workers.doingThreads = false;
 				break;
 //=======
-		this.nThreads = 5;
-
-		if (doingPTHreads) {
-			thread_startAllThreads()
-		}
-		else {
-			this.workers = new Array(this.nThreads);
-			this.threads = new Array(this.nThreads);
-			if (traceThreadCreation)
-				console.log(`⛏ eThread starting thread creation blitz`);
-
-			// now set up that many threads
-			for (let serial = 0; serial < this.nThreads; serial++) {
-				try {
-					console.log(`⛏ eThread creating thread ${serial}`);
-					this.threads[serial] = new eThread(serial, grinder);
-
-					// now, try it out a few times
-	//				setInterval(() => {
-	//					window.Atomics.notify(grinder.ints, grinder.needsIntegrationOffset, 1);
-	//				}, 2000);
-
-				} catch (ex) {
-					console.warn(`eThread: worker creation ${serial} failed: `,
-						ex.stack ?? ex.message ?? ex);
-					debugger;
-
-					// wait don't get discouraged so easily!
-					//workers.doingThreads = false;
-					break;
-				}
+// 		this.nThreads = 5;
+//
+// 		if (doingPTHreads) {
+// 			thread_startAllThreads()
+// 		}
+// 		else {
+// 			this.workers = new Array(this.nThreads);
+// 			this.threads = new Array(this.nThreads);
+// 			if (traceThreadCreation)
+// 				console.log(`⛏ eThread starting thread creation blitz`);
+//
+// 			// now set up that many threads
+// 			for (let serial = 0; serial < this.nThreads; serial++) {
+// 				try {
+// 					console.log(`⛏ eThread creating thread ${serial}`);
+// 					this.threads[serial] = new eThread(serial, grinder);
+//
+// 					// now, try it out a few times
+// 	//				setInterval(() => {
+// 	//					window.Atomics.notify(grinder.ints, grinder.needsIntegrationOffset, 1);
+// 	//				}, 2000);
+//
+// 				} catch (ex) {
+// 					console.warn(`eThread: worker creation ${serial} failed: `,
+// 						ex.stack ?? ex.message ?? ex);
+// 					debugger;
+//
+// 					// wait don't get discouraged so easily!
+// 					//workers.doingThreads = false;
+// 					break;
+// 				}
 //>>>>>>> Stashed changes
 			}
 		}
@@ -130,17 +130,10 @@ class eThread {
 	// unused for now - qGrinder does it
 	static oneFrame(grinder) {
 		// i have to think of what to do if there's no workers available...
-		if (eThread.doingThreads) {
-			if (traceIntegration)
-				console.log(`⛏ eThread postMessage toframe`);
-			// this isn't right
-			eThread.workers[0].postMessage({verb: 'integrate', grinderPointer: grinder.pointer});
-		}
-		else {
-			if (traceIntegration)
-				console.log(`⛏ eThread integrates directly cuz no threads`);
-			qe.grinder_oneFrame(grinder.pointer);
-		}
+		if (traceIntegration)
+			console.log(`⛏ eThread postMessage toframe`);
+		// this isn't right
+		eThread.workers[0].postMessage({verb: 'integrate', grinderPointer: grinder.pointer});
 	}
 
 	/* ******************************************************************* msgs & events */
