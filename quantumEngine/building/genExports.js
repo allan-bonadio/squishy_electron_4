@@ -61,6 +61,7 @@ let exportsSrc  = [
 
 	// ************************* pthreads / qThread
 
+	{name: 'thread_setupThreads', args: [], retType: 'number'},
 	{name: 'thread_createAThread', args: ['number'], retType: 'number'},
 
 ];

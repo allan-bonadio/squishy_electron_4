@@ -4,41 +4,49 @@
 */
 
 struct qSpace;
+struct qThread;
 
 #include <pthread.h>
 
-// one for each pthread.  Each is created from the boss thread thread_createAThread()
+// N_THREADS defined in buildCommon.sh
+#define MAX_THREADS 4*N_THREADS
+
+// pointers to qThread objects in serial order
+qThread *threadsList[MAX_THREADS];
+
+
+// one for each pthread.  Each is created from JS with thread_createAThread()
 struct qThread {
 	qThread(int ser);
 	~qThread();
 
-	// i have no idea how long this is
+	// pthread's ID for this thread
 	pthread_t tid;
 
-	// nor this
+	// set preferences in this if you want
 	pthread_attr_t attr;
 
 	int serial;  // 0, 1, ...
 
+	// errno for the last operation that failed, or zero if all ok
 	int errorCode;
 
 	// atomic to halt at starting pt  (no, I think we're using the one on qGrinder)
 	 int halt;
 
+	 // set true when thread actually starts running
+	 bool confirmed;
 
-	static qThread **threads;
+	 void confirmThread();
 
-	// the function that each thread runs.  and the thread dies when it returns.
+	// the code that each thread runs.  and the thread dies when it returns.
 	// so it should never return.
-	void *threadStart(void);
+	//void threadStart(void);
 
-	// number of threads requested at compile time
-	static int nThreads;
-
-	// how many have been created
-	static int nActiveThreads;
-
-	static qThread **threadList;
+	// how many have actually been created
+	static int nCreatedThreads;
+	static int nRunningThreads;
+	static qThread **threadsList;
 
 	static std::atomic_flag changingActive;
 	static qGrinder *grinder;
@@ -53,6 +61,7 @@ struct qThread {
 // 	int onStage;
 // };
 
-extern "C" void thread_createAThread(int serial);
+extern "C" int thread_setupThreads(void);
+extern "C" qThread * thread_createAThread(int serial);
 
 
