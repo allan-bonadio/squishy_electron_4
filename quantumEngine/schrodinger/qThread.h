@@ -7,39 +7,52 @@ struct qSpace;
 
 #include <pthread.h>
 
-// one for each html5 Worker
+// one for each pthread.  Each is created from the boss thread thread_createAThread()
 struct qThread {
 	qThread(int ser);
 	~qThread();
 
+	// i have no idea how long this is
 	pthread_t tid;
-	int serial;
+
+	// nor this
+	pthread_attr_t attr;
+
+	int serial;  // 0, 1, ...
+
 	int errorCode;
 
 	// atomic to halt at starting pt  (no, I think we're using the one on qGrinder)
 	 int halt;
 
+
 	static qThread **threads;
 
-	// the function that each thread runs.  and the thread dies when it returns.  so it should never return.
-	void *threadStarts(void);
+	// the function that each thread runs.  and the thread dies when it returns.
+	// so it should never return.
+	void *threadStart(void);
 
-	// number of threads we want, number we've proven to be open/started
-	static int nRequestedThreads;
+	// number of threads requested at compile time
+	static int nThreads;
+
+	// how many have been created
 	static int nActiveThreads;
+
+	static qThread **threadList;
+
 	static std::atomic_flag changingActive;
 	static qGrinder *grinder;
-
-	static void startAllThreads(void);
 };
 
-// one for each qWave being worked on during grinding
-struct qStage : public qWave {
-	qStage(qSpace *space);
-	~qStage();
-	static qStage *stages;
+// // one for each qWave being worked on during grinding
+// struct qStage : public qWave {
+// 	qStage(qSpace *space);
+// 	~qStage();
+// 	static qStage *stages;
+//
+// 	int onStage;
+// };
 
-	int onStage;
-};
+extern "C" void thread_createAThread(int serial);
 
-extern "C" void thread_startAllThreads(int nTheads);
+

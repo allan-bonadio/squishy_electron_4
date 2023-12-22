@@ -8,6 +8,8 @@
 // the same things.  So C++ isn't the lowest level, JS is.  So call JS and have
 // full control.
 import qe from './qe.js';
+import {nTHREADS} from './eEngine.js';
+
 
 let traceThreadCreation = true;
 let traceMessages = true;
@@ -33,7 +35,7 @@ class eThread {
 		//let worker = this.worker = window.makeAWorker(`thread_${serial}`, grinder);
 		worker.serial = serial;
 
-		eThread.workers[serial] = worker;
+		eThread.workers[serial] = worker;  // don't think we need this
 		eThread.threads[serial] = this;
 
 		if (traceThreadCreation)
@@ -59,7 +61,7 @@ class eThread {
 	static createThreads(grinder) {
 		this.nCores = navigator.hardwareConcurrency;
 
-		this.nThreads = 1;  // WrONG TODO
+		this.nThreads = nTHREADS;  // requested at C++ compile time
 		this.workers = new Array(this.nThreads);
 		this.threads = new Array(this.nThreads);
 		if (traceThreadCreation)
@@ -69,7 +71,7 @@ class eThread {
 		for (let serial = 0; serial < this.nThreads; serial++) {
 			try {
 				console.log(`⛏ eThread creating thread ${serial}`);
-				this.threads[serial] = new this(serial, grinder);
+				this.threads[serial] = new eThread(serial, grinder);
 
 			} catch (ex) {
 				console.error(`eThread: worker creation ${serial} failed: `,
