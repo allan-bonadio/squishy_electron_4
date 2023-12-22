@@ -74,20 +74,20 @@ function TextNSlider(props) {
 	else {
 		// to tweak the display in the text box, do it in the render.  Then when retrieving the number, convert it back.
 		controls = <>
-			<input type='number' placeholder={p.label || ''}
+			<input type='number' placeholder={p.label || ''} name={p.label}
 					value={value} min={p.min} max={p.max}
 					step={p.step}
 					size='7'
 					onChange={handleText} />
 			<input type='range'
-					value={value} min={p.min} max={p.max}
+					value={value} min={p.min} max={p.max} name={p.label}
 					step={p.step}
 					onChange={handleSlider} />
 		</>;
 	}
 
 	const label = p.label ? <span>{p.label}</span> : '';
-	return <div className={`TextNSlider {p.className}`} style={p.style}>
+	return <div className={`TextNSlider ${p.className}`} style={p.style}>
 		{label}
 		{controls}
 	</div>;

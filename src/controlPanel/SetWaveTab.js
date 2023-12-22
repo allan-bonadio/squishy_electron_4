@@ -165,19 +165,19 @@ class SetWaveTab extends React.Component {
 		const radios = <div className='waveTabCol middle'>
 			<label>
 				circular
-				<input type='radio' checked={'circular' == breed}
+				<input type='radio' checked={'circular' == breed} name='circular'
 					onChange={ev => this.setBreed('circular')} />
 			</label>
 
 			<label>
 				standing
-				<input type='radio'  checked={'standing' == breed}
+				<input type='radio'  checked={'standing' == breed} name='standing'
 					onChange={ev => this.setBreed('standing')} />
 			</label>
 
 			<label>
 				gauss pulse
-				<input type='radio'  checked={'gaussian' == breed}
+				<input type='radio'  checked={'gaussian' == breed} name='gaussian'
 					onChange={ev => this.setBreed('gaussian')} />
 			</label>
 

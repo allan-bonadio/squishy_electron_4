@@ -60,7 +60,7 @@ function CPToolbar(props) {
 	return <div className='CPToolbar'>
 		<div className='frameRateBox'>
 			frame rate:<br />
-			<select className='rateSelector' value={apparentFrequency}
+			<select className='rateSelector' name='rateSelector' value={apparentFrequency}
 					onChange={ev => setFrameFrequency(ev.currentTarget.value)}>
 				{repRates}
 			</select>
@@ -112,7 +112,7 @@ function CPToolbar(props) {
 				&nbsp;
 
 				<label>
-					<input type='checkbox' checked={props.showVoltage}
+					<input type='checkbox' checked={props.showVoltage} name='showVoltage'
 						onChange={props.toggleShowVoltage} />
 					Show Voltage
 				</label>
