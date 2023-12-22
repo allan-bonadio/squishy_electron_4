@@ -13,17 +13,18 @@
 // Emscripten magic: this c++ function will end up executing the JS enclosed.
 // call this JS callback so JS knows we're up and ready.
 // Hand it some numbers from the builder script.
-// somehow there's a race condition where this isn't set soon enough... sometimes
-EM_JS(int, qeStarted, (int max_dimensions, int max_label_len),
+// all these param names must be lower case for some reason.
+EM_JS(int, qeStarted, (int max_dimensions, int max_label_len, int nthreads),
 {
 	if (!window.startUpFromCpp) {
 		debugger;
-		throw(" 🐣 startUpFromCpp() not available on startup!      🙄  👿 🤢 😵 🤬 😭 😠");
+		throw(" 🐣 startUpFromCpp() not available on startup!      🙄  ");
 	}
 
-	window.startUpFromCpp(max_dimensions, max_label_len);
+	window.startUpFromCpp(max_dimensions, max_label_len, nthreads);
 	return navigator.hardwareConcurrency;
 }
+);
 
 // or this?
 // 	{
@@ -32,13 +33,12 @@ EM_JS(int, qeStarted, (int max_dimensions, int max_label_len),
 // 		let trying = setInterval(() => {
 // 			if (window.cppRuntimeInitialized) {
 // 				clearInterval(trying);
-// 				window.cppRuntimeInitialized(max_dimensions, max_label_len);
+// 				window.cppRuntimeInitialized(max_dimensions, max_label_len, n_threads);
 //
 // 			}
 // 		}, 250);
 // 		return navigator.hardwareConcurrency;
 // 	}
-);
 
 
 // emscripten calls main() when the whole C++ is all set up.  Tell the JS guys.
@@ -47,7 +47,7 @@ int main() {
 
 	// returns 1.  pfft.  std::thread::hardware_concurrency();
 
-	int hardwareConcurrency = qeStarted(MAX_DIMENSIONS, MAX_LABEL_LEN);
+	int hardwareConcurrency = qeStarted(MAX_DIMENSIONS, MAX_LABEL_LEN, nTHREADS);
 	printf(" 🐣 hardwareConcurrency=%d  \n", hardwareConcurrency);
 	return 0;
 }
