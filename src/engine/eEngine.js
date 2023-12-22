@@ -19,7 +19,7 @@ let tracePromises = true;
 /* ****************************************************** app startup */
 
 // c++ main() calls us to tell us that it's up, and to pass some fundamental sizes
-export let MAX_DIMENSIONS, MAX_LABEL_LEN, nTHREADS;
+export let MAX_DIMENSIONS, MAX_LABEL_LEN, N_THREADS;
 
 // this promise resolves when the main space is created.
 // Create the promise tout de suite when app starts, so everybody can get at it.
@@ -101,7 +101,7 @@ function startUpEverything() {
 function startUpFromCpp(maxDims, maxLab, nThreads) {
 	MAX_DIMENSIONS = maxDims;
 	MAX_LABEL_LEN = maxLab;
-	nTHREADS = nThreads;
+	N_THREADS = nThreads;
 
 	window.cppRuntimeInitialized();
 

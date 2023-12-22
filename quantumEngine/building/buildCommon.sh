@@ -49,39 +49,21 @@ INCLUDES=" -I$EMSDK/upstream/emscripten/cache/sysroot/include -include emscripte
 MISC="-sFILESYSTEM=0 -sINVOKE_RUN=1 -Wno-limited-postlink-optimizations "
 
 
-# nTHREADS can be small integer 1 or above.  That's workers, the js event loop isn't counted.
+# N_THREADS can be small integer 1 or above.  That's workers, the js event loop isn't counted.
 # Ends up being a global in C++ and in JS
-nTHREADS=1
+N_THREADS=1
 
 # we want wasm_workers, but for now, all we can use is pthreads and all its enormous overhead.
 # --proxy-to-worker   NO!
-# someday:  -s USE_PTHREADS=navigator.hardwareConcurrency
-#export WORKERS=" -sWASM_WORKERS    --pre-js=js/prejs.js  --post-js=js/postjs.js"
-#export WORKERS=" --proxy-to-worker  --extern-pre-js=js/prejs.js  --post-js=js/postjs.js"
-export WORKERS=" -pthread   -sENVIRONMENT=web,worker -sPTHREAD_POOL_SIZE=$nTHREADS  -DnTHREADS=$nTHREADS "
+export WORKERS=" -pthread   -sENVIRONMENT=web,worker -sPTHREAD_POOL_SIZE=$N_THREADS  -DN_THREADS=$N_THREADS "
 
 
 
-# try to omit GL stuff, but didn't seem to make much difference.  Gotta get rid of gobs of unneeded code.
+# tried to omit GL stuff, but didn't seem to make much difference. 
+# Gotta get rid of gobs of unneeded code.
 DISABLE_GL="-sGL_MAX_TEMP_BUFFER_SIZE=0 -sGL_EMULATE_GLES_VERSION_STRING_FORMAT=0 -sGL_EXTENSIONS_IN_PREFIXED_FORMAT=0 -sGL_SUPPORT_AUTOMATIC_ENABLE_EXTENSIONS=0 -sGL_SUPPORT_SIMPLE_ENABLE_EXTENSIONS=0 -sGL_TRACK_ERRORS=0 -sGL_POOL_TEMP_BUFFERS=0 -sOFFSCREENCANVAS_SUPPORT=0 -sOFFSCREENCANVASES_TO_PTHREAD='' -sOFFSCREEN_FRAMEBUFFER=0 -sGL_ASSERTIONS=0 -sGL_DEBUG=0 -sGL_TESTING=0 -sTRACE_WEBGL_CALLS=0 -sFULL_ES2=0 -sGL_SUPPORT_EXPLICIT_SWAP_CONTROL=0 -sGL_WORKAROUND_SAFARI_GETCONTEXT_BUG=0"
 
 DISABLE_FS="-sFILESYSTEM=0 -sFETCH_SUPPORT_INDEXEDDB=0  "
-
-# compiler hints and links:
-# https://emscripten.org/docs/tools_reference/emcc.html
-# https://emscripten.org/docs/compiling/Building-Projects.html
-# other options, see /opt/dvl/emscripten/emsdk/upstream/emscripten/src/settings.js
-# should put in MALLOC="dlmalloc"=good for small allocs; emmalloc=good general,
-#		emmalloc-memvalidate=lots of checking
-# already implied EXPORT_EXCEPTION_HANDLING_HELPERS
-# take a look at var INCOMING_MODULE_JS_API=[...]
-# -sSHARED_MEMORY already implied
-# -sALLOW_BLOCKING_ON_MAIN_THREAD never never
-
-# do I need this?
-# -mnontrapping-fptoint
-# see https://emscripten.org/docs/compiling/WebAssembly.html#trapping
-# more speed, less safety, for float->int operations
 
 # most c++ files, except main.cpp, testing files, worker files.
 # omit those, so testing can also use this and compile & run itself (see testing/cppu*).
@@ -111,6 +93,8 @@ $EMSDK/upstream/emscripten/emcc -o wasm/quantumEngine.js \
 	main.cpp $allCpp || exit $?
 set +x
 
+ls -lt wasm
+
 # -ffast-math: lets the compiler make aggressive, potentially-lossy assumptions
 # about floating-point math.  probably good to have.
 # https://clang.llvm.org/docs/UsersManual.html#controlling-floating-point-behavior
@@ -125,7 +109,22 @@ set +x
 
 # we're not done yet!  Make the JS files better.
 #cat js/pre-js.js wasm/quantumEngine.js js/post-js.js > wasm/quantumEngine.main.js
-#echo "window.nTHREADS = $nTHREADS" > wasm/quantumEngine.thread.js
+#echo "window.N_THREADS = $N_THREADS" > wasm/quantumEngine.thread.js
 #cat js/pre-thread.js wasm/quantumEngine.worker.js js/post-thread.js >> wasm/quantumEngine.thread.js
 
-ls -lt wasm
+# compiler hints and links:
+# https://emscripten.org/docs/tools_reference/emcc.html
+# https://emscripten.org/docs/compiling/Building-Projects.html
+# other options, see /opt/dvl/emscripten/emsdk/upstream/emscripten/src/settings.js
+# should put in MALLOC="dlmalloc"=good for small allocs; emmalloc=good general,
+#		emmalloc-memvalidate=lots of checking
+# already implied EXPORT_EXCEPTION_HANDLING_HELPERS
+# take a look at var INCOMING_MODULE_JS_API=[...]
+# -sSHARED_MEMORY already implied
+# -sALLOW_BLOCKING_ON_MAIN_THREAD never never
+
+# do I need this?
+# -mnontrapping-fptoint
+# see https://emscripten.org/docs/compiling/WebAssembly.html#trapping
+# more speed, less safety, for float->int operations
+
