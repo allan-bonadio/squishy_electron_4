@@ -19,7 +19,7 @@ let tracePromises = true;
 /* ****************************************************** app startup */
 
 // c++ main() calls us to tell us that it's up, and to pass some fundamental sizes
-export let MAX_DIMENSIONS, MAX_LABEL_LEN;
+export let MAX_DIMENSIONS, MAX_LABEL_LEN, nTHREADS;
 
 // this promise resolves when the main space is created.
 // Create the promise tout de suite when app starts, so everybody can get at it.
@@ -98,9 +98,10 @@ function startUpEverything() {
 // finally started up.  Once only, at page load. do NOT export this; it's global
 // cuz quantumEngine.js, the compiled C++ proxy, has to have access to it early
 // on, and it's CJS and can't reach JS module exports.
-function startUpFromCpp(maxDims, maxLab) {
+function startUpFromCpp(maxDims, maxLab, nThreads) {
 	MAX_DIMENSIONS = maxDims;
 	MAX_LABEL_LEN = maxLab;
+	nTHREADS = nThreads;
 
 	window.cppRuntimeInitialized();
 
