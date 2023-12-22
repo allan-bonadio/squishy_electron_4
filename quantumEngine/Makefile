@@ -3,7 +3,7 @@
 ## Copyright (C) 2021-2023 Tactile Interactive, all rights reserved
 ##
 
-wasm/quantumEngine.js wasm/quantumEngine.wasm : *.cpp *.h */*.h */*.cpp building/exports.json building/buildDev.sh building/allCpp.list
+wasm/quantumEngine.wasm wasm/quantumEngine.js : *.cpp *.h */*.h */*.cpp building/exports.json building/buildDev.sh building/allCpp.list
 	building/buildDev.sh
 
 building/exports.json commonConstants.h ../src/engine/qe.js : building/genExports.js
