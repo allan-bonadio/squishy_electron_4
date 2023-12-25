@@ -8,7 +8,10 @@
 #include <cfenv>
 #include <stdexcept>
 
-#include <emscripten/threading.h>
+// #include <stdatomic.h>
+// stdatomic.h should have this #include <__atomic/atomic_flag.h>
+//#include <condition_variable>
+#include <pthread.h>
 // looking for emscripten_futex_wait() - it's not here #include <emscripten/atomic.h>
 
 #include "../hilbert/qSpace.h"
@@ -46,7 +49,7 @@ qGrinder::qGrinder(qSpace *sp, qAvatar *av, const char *lab)
 		dt(1e-3), lowPassFilter(1), stepsPerFrame(100),
 		isIntegrating(false), needsIntegration(false), pleaseFFT(false) {
 
-	magic = 'Grin';
+	magic = 'Grnd';
 
 	// number of waves; number of threads
 	qflick = new qFlick(space, this, 3, 0);
@@ -63,6 +66,12 @@ qGrinder::qGrinder(qSpace *sp, qAvatar *av, const char *lab)
 
 	elapsedTime = 0.;
 	frameSerial = 0;
+
+
+
+	// initialize masterSwitch and masterMutex.  Maybe they're already initted.
+
+
 
 	if (traceConstructor) {
 		dumpObj(" 🪓 constructed");
@@ -198,8 +207,11 @@ void qGrinder::dumpObj(const char *title) {
 	printf("        ==== end of qGrinder::dumpObj(%s) ====\n\n", title);
 }
 
-/* ********************************************************** doing Integration */
+/* ********************************************************** tally & measure divergence */
 
+// this tally stuff, it's not detecting divergence explosion early enough.
+// I need to start counting reversals of derivative of norm.
+// DO this in innerproduct when you're already calculating norms.
 static int tally = 0;
 
 // if these two reals differ in sign, increment the tally
@@ -230,9 +242,11 @@ void qGrinder::tallyUpReversals(qWave *qwave) {
 	this->reversePercent = percent;
 }
 
-// Does several visscher steps (eg 10 or 100 or 500). Actually does
-// stepsPerFrame+1 steps; two half steps, at start and other part at
-// finish, to adapt and de-adapt to Visscher timing
+/* ********************************************************** doing Integration */
+
+// Integrates one Frame, one iteration.  Does several visscher steps (eg 10 or
+// 100 or 500). Actually does stepsPerFrame+½ steps; two half steps, at start
+// and other part at finish, to adapt to Visscher timing, then synchronized timing.
 void qGrinder::oneFrame() {
 	if (traceIntegration)
 		qGrinder::dumpObj("starting oneFrame");
@@ -308,6 +322,26 @@ void qGrinder::oneFrame() {
 }
 
 
+// start integrating a frame in a thread, assuming everything is all set up first.
+void qGrinder::startAFrame(void) {
+	printf("🪓 qGrinder::startAFrame, about to notify");
+	// just a sec here .... atomic_notify_all(&startAll);
+	printf("🪓 qGrinder::startAFrame, notified!");
+
+
+	// after they've all started... is this right?
+	// no i think the integrating thread does this after it's over.  ?? startAll.acquire();
+
+}
+
+void grinder_startAFrame(qGrinder *grinder) {
+	grinder->startAFrame();
+
+	// does this let all the threads run?
+	pthread_cond_broadcast(&grinder->masterSwitch);
+
+}
+
 /* ********************************************************** fourierFilter */
 
 
@@ -358,7 +392,7 @@ void qGrinder::initThreadIntegration(int serial) {
 
 		// wait until the main thread needs us to do another.  (May have already
 		// happened by the time we get here.)
-		emscripten_futex_wait(&needsIntegration, 0, -1.);
+		//emscripten_futex_wait(&needsIntegration, 0, -1.);
 
 		if (traceThread)
 			printf("🪓🪓 qGrinder thread %d in got padst  futex..\n.", serial);

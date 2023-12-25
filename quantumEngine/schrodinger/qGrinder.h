@@ -3,6 +3,8 @@
 ** Copyright (C) 2022-2023 Tactile Interactive, all rights reserved
 */
 
+#include <pthread.h>
+
 struct qThread;
 struct qStage;
 
@@ -61,6 +63,9 @@ struct qGrinder {
 	// 1 if thread(s) should start a new integration asap, 0 if they should wait
 	int needsIntegration;
 
+	pthread_cond_t masterSwitch;
+	pthread_mutex_t masterMutex;
+
 	// for alignment: put the rest of these last
 
 	// mostly for debugging
@@ -81,8 +86,11 @@ struct qGrinder {
 	bool pleaseFFT;
 	// make sure the subsequent fields are aligned!  or frame is painfully slow.
 
-	// multiple steps; ≈ stepsPerFrame
+	// multiple steps; ≈ stepsPerFrame, for old same-thread
 	void oneFrame(void);
+
+	// multi-threaded
+	void startAFrame(void);
 
 	// visscher.  Calculate new from old; use hamiltonian to calculate d𝜓
 	// often oldW and hamiltonianW are the same
@@ -120,6 +128,8 @@ extern "C" {
 
 	void grinder_copyFromAvatar(qGrinder *grinder, qAvatar *avatar);
 	void grinder_copyToAvatar(qGrinder *grinder, qAvatar *avatar);
+
+	void grinder_startAFrame(qGrinder *);
 }
 
 

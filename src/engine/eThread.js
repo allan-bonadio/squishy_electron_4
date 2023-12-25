@@ -22,13 +22,13 @@ let MAX_THREADS;
 class eThread {
 	static threads = [];  // instances of eThread
 
-	constructor(serial) {
+	constructor(serial, grinder) {
 		if (traceThreadCreation)
 			console.log(`⛏ eThread constructor: about to make thread ${serial} `);
 
 		this.serial = serial;
 
-		this.pointer = eThread.threads[serial] = thread_createAThread(serial);
+		this.pointer = eThread.threads[serial] = thread_createAThread(serial, grinder);
 
 		if (traceThreadCreation)
 			console.log(`⛏ eThread constructor: ${serial} created, about to setup handlers`);

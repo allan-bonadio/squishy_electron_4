@@ -52,17 +52,24 @@ let exportsSrc  = [
 
 	// ************************* grinder
 	{name: 'grinder_initThreadIntegration', args: ['number', 'number', 'number'], retType: null},
+
+	// for the older, same-thread integration, or to be run in a/the thread
 	{name: 'grinder_oneFrame', args: ['number'], retType: null},
+
+	// releases the master semaphore to start all the threads integrating
+	{name: 'grinder_startAFrame', args: ['number'], retType: null},
+
 
 	{name: 'grinder_askForFFT', args: ['number'], retType: null},
 
 	{name: 'grinder_copyFromAvatar', args: ['number', 'number'], retType: null},
 	{name: 'grinder_copyToAvatar', args: ['number', 'number'], retType: null},
 
+
 	// ************************* pthreads / qThread
 
 	{name: 'thread_setupThreads', args: [], retType: 'number'},
-	{name: 'thread_createAThread', args: ['number'], retType: 'number'},
+	{name: 'thread_createAThread', args: ['number', 'number'], retType: 'number'},
 
 ];
 
