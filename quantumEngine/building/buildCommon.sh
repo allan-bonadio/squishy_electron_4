@@ -69,21 +69,9 @@ DISABLE_FS="-sFILESYSTEM=0 -sFETCH_SUPPORT_INDEXEDDB=0  "
 # omit those, so testing can also use this and compile & run itself (see testing/cppu*).
 allCpp=`cat building/allCpp.list`
 
-# in case you need to debug this
-#echo $DEBUG
-#echo $OPTIMIZE
-#echo $SAFETY
-#echo $FEATURES
-#echo $PROFILING
-#echo $EXPORTS
-#echo $DEFINES
-#echo $INCLUDES
-#echo $WORKERS
-#echo $MISC
-#echo $DISABLE_GL $DISABLE_FS
-
 rm -rf wasm/*
 
+# show optios while compiling and linking
 set -x
 $EMSDK/upstream/emscripten/emcc -o wasm/quantumEngine.js \
 	$DEBUG $OPTIMIZE  $SAFETY  $FEATURES  $PROFILING  \

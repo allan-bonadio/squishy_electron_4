@@ -21,7 +21,7 @@ qFlick - object that owns a list of waves, and points to its space
 #include "../hilbert/qSpace.h"
 #include "qBuffer.h"
 
-static bool traceInnerProduct = false;
+static bool traceInnerProduct = true;
 static bool traceNormalize = false;
 static bool traceAllocate = false;
 
@@ -62,8 +62,6 @@ qCx *qBuffer::allocateWave(int nPoints) {
 	return wa;
 }
 
-
-
 // create one
 qBuffer::qBuffer(void)
 	: magic('Buff'), wave(NULL),
@@ -74,7 +72,7 @@ qBuffer::qBuffer(void)
 // actually create the buffer that we need
 // dynamically allocated or Bring Your Own Buffer to use
 // usually called by subclass constructors when they figure out how long a buffer is needed
-// length is in units of qComplex (16 by)
+// length is in units of qComplex (16 bytes)
 void qBuffer::initBuffer(int length, qCx *useThisBuffer) {
 	if (useThisBuffer) {
 		wave = useThisBuffer;
@@ -104,14 +102,12 @@ qBuffer::~qBuffer() {
 }
 
 
-
-
 /* ******************************************************** diagnostic dumps **/
 
-// print one complex number, plus maybe some more calculated metrics for that point, on a line in the dump on stdout.
-// Results in buf, handed in
-// if it overflows the buffer, it won't.  just dump a row for a cx datapoint.
-// returns the magnitude non-visscher, but only withExtras
+// print one complex number, plus maybe some more calculated metrics for that
+// point, on a line in the dump on stdout. Results in buf, handed in if it
+// overflows the buffer, it won't.  just dump a row for a cx datapoint. returns
+// the magnitude non-visscher, but only withExtras
 double qBuffer::dumpRow(char buf[200], int ix, qCx w, double *pPrevPhase, bool withExtras) {
 	double re = w.re;
 	double im = w.im;
@@ -180,7 +176,7 @@ void qBuffer::dump(const char *title, bool withExtras) {
 	printf(" \n🌊🌊 qBuffer ==== a '%c%c%c%c'  %p->%p | %s ",
 		magic >> 24, magic >> 16, magic >> 8, magic, this, wave, title);
 	qBuffer::dumpSegment(wave, withExtras, start, end, continuum);
-	printf("        ==== end of Wave ====\n\n");
+	printf("        ==== end of qBuffer ====\n\n");
 }
 
 // use this if roundoff is a problem
@@ -261,7 +257,7 @@ double qBuffer::innerProduct(void) {
 		sum += norm;
 		if (traceNormalize) {
 			if (traceInnerProduct)
-				printf("innerProduct point %d (%lf,%lf) norm--> %lf\n",
+				printf("🍕 innerProduct point %d (%lf,%lf) norm--> %lf\n",
 					ix, wave[ix].re, wave[ix].im, norm);
 		}
 	}
@@ -316,8 +312,7 @@ void qBuffer::copyThatWave(qCx *dest, qCx *src, int length) {
 	memcpy(dest, src, length * sizeof(qCx));
 }
 
-// qBuffers know their length
-// buffers (waves, spectrums) must be same length!
+// qBuffers know their length - must be same length and same continuum
 void qBuffer::copyBuffer(qBuffer *dest, qBuffer *src) {
 	int sStates = src->end - src->start;
 	int dStates = dest->end - dest->start;
@@ -409,7 +404,7 @@ void qBuffer::add(double coeff1, qCx *wave1, double coeff2, qCx *wave2) {
 }
 
 // add these two waves, modulated by the coefficients, leaving result in this->wave
-// UN-normalized, UN-fixed boundaries.  Either can be this if you want, no probs
+// UN-normalized, UN-fixed boundaries.
 void qBuffer::add(double coeff1, qBuffer *qwave1, double coeff2, qBuffer *qwave2) {
 	add(coeff1, qwave1->wave + qwave1->start, coeff2, qwave2->wave + qwave2->start);
 }
