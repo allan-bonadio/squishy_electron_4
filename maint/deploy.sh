@@ -1,4 +1,5 @@
 #!/bin/bash
+# Runs on local side (panama)
 
 echo "🎁 🛫 Deploy Production Squishy Electron" `date +%c`
 cd $SQUISH_ROOT
