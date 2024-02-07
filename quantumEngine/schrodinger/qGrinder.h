@@ -7,6 +7,7 @@
 
 struct qThread;
 struct qStage;
+struct slaveThread;
 
 struct qGrinder {
 	qGrinder(qSpace *, struct qAvatar *av, const char *label);
@@ -25,7 +26,7 @@ struct qGrinder {
 	// please keep alignment stable and correct!  See also eGrinder.js
 	// Keep arranged from larger to smaller - doubles, then ints, then bools
 
-	// how much time we've integrated, from creation.  pseudo-seconds.  Since we've eliminated
+	// how much time we've integrated, from creation.  pseudo-pico-seconds.  Since we've eliminated
 	// all the actual physical constants from the math, why not choose our own definition
 	// of what a second is?  Resets to zero every so often.
 	double elapsedTime;
@@ -49,6 +50,9 @@ struct qGrinder {
 	double *voltage;
 	double voltageFactor;  // aligned by 8
 
+	// how long (thread time) it took to do the latest frame, all threads added together
+	double frameCalcTime;
+
 	double reversePercent;
 
 	// for the fourier filter.  Call the function first time you need it.
@@ -58,26 +62,43 @@ struct qGrinder {
 
 	struct qStage *stages;
 	struct qThread *threads;
-	void initThreadIntegration(int threadSerial);
 
-	// 1 if thread(s) should start a new integration asap, 0 if they should wait
-	int needsIntegration;
 
-	pthread_cond_t masterSwitch;
-	pthread_mutex_t masterMutex;
+	int nSlaveThreads;  // mostly static, total number of slave threads we'll use
+
+	// number of slaveThread s that haven't finished integration yet; decremented down to zero each frame
+	int nIntegratingThreads;
+
+	// Although isIntegrating, do only this many more frames before stopping.  Like 1 for single step.
+	int justNFrames;
+
+	pthread_mutex_t integratingMx;
+
+	void startingWork(qGrinder *grinder);
+	void endingWork(qGrinder *grinder);
+
+	// the lock that launches each frame integration
+	//pthread_rwlock_t masterLock;
+	// pthread_cond_t masterCond;
+	// pthread_mutex_t masterMutex;
 
 	// for alignment: put the rest of these last
+
+	static slaveThread **slaves;
+
+	void aggregateCalcTime(void);
 
 	// mostly for debugging
 	char label[MAX_LABEL_LEN + 1];
 
 
-	// true if frame is running; set/unset in ::oneFrame()
-	// For the interactive simulation switch, see isRunning in JS.
-	bool isIntegrating;
+	// true if thread(s) should start a new integration upon next event cycle, false if not
+	// Synchronized with the interactive simulation switch, see isRunning in JS.
+	bool shouldBeIntegrating;
 
-	// what's the diff between this and isIntegrating?  not much.
-	bool integrationFrameInProgress;
+	// same as shouldBeIntegrating, except this is synchronized with the event loop.
+	// Does not change while integration frame being calculated.
+	bool isIntegrating;
 
 	// set pleaseFFt from JS (only if in the middle of frame)
 	void askForFFT(void);
@@ -106,6 +127,11 @@ struct qGrinder {
 	void fourierFilter(int lowPassFilter);
 
 	void tallyUpReversals(struct qWave *qwave);
+
+	// called after all slaves are done, by last thread
+	void resetForNextFrame();
+
+
 };
 
 
@@ -121,7 +147,7 @@ struct qGrinder {
 
 // for JS to call.  Defined in jsSpace and elsewhere.
 extern "C" {
-	void grinder_initThreadIntegration(qGrinder *grinder, int threadSerial);
+	//void grinder_initThreadIntegration(qGrinder *grinder, int threadSerial);
 	void grinder_oneFrame(qGrinder *grinder);
 
 	void grinder_askForFFT(qGrinder *grinder);
@@ -129,7 +155,7 @@ extern "C" {
 	void grinder_copyFromAvatar(qGrinder *grinder, qAvatar *avatar);
 	void grinder_copyToAvatar(qGrinder *grinder, qAvatar *avatar);
 
-	void grinder_startAFrame(qGrinder *);
+	//void grinder_startAFrame(qGrinder *);
 }
 
 

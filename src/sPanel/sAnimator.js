@@ -53,11 +53,11 @@ class sAnimator {
 	// start them all at reasonable values
 	initStats(now) {
 		this.iStats = {
-			startIntegration: now,
-			endCalc: now,
+			startIntegrationTime: now,
+			startDrawTime: now,
 			//endReloadVarsNBuffer: now,
 			endDraw: now,
-			prevStartIntegration: now,
+			prevStartIntegrationTime: now,
 		}
 	}
 
@@ -67,10 +67,10 @@ class sAnimator {
 
 		const st = this.iStats;
 		statGlobals.show('reversePercent', this.grinder.reversePercent);
-		statGlobals.show('frameCalcTime', st.endCalc - st.startIntegration);
-		statGlobals.show('drawTime', st.endDraw - st.endCalc);
-		statGlobals.show('totalForIntegration', st.endDraw - st.startIntegration);
-		const period = st.startIntegration - st.prevStartIntegration;
+		statGlobals.show('frameCalcTime', this.grinder.frameCalcTime);
+		statGlobals.show('drawTime', st.endDraw - st.startDrawTime);
+		statGlobals.show('totalForIntegration', st.endDraw - st.startIntegrationTime);  // draw + calc
+		const period = st.startIntegrationTime - st.prevStartIntegrationTime;
 		statGlobals.show('framePeriod', period);
 		statGlobals.show('framesPerSec', Math.round(1000 / period), 0)
 	}
@@ -85,25 +85,27 @@ class sAnimator {
 
 	// trigger one integration frame to be calculated, catch any errors, stop &
 	// dialog if it catches one
-	crunchOneFrame() {
-		if (traceStats) console.log(`👑 SquishPanel. about to frame`);
-
-		try {
-			// hundreds of visscher steps
-			this.grinder?.pleaseIntegrate();
-		} catch (ex) {
-			this.cPanel.stopAnimating();
-			// eslint-disable-next-line no-ex-assign
-			ex = interpretCppException(ex);
-			CommonDialog.openErrorDialog(
-				ex.message == 'diverged' ? SquishPanel.divergedBlurb : ex, 'while integrating');
-		}
-
-		if (traceStats) console.log(`👑 SquishPanel. did frame`);
-
-		if (traceTheViewBuffer)
-			this.dumpViewBuffer('SquishPanel. did frame()');
-	}
+	// now done in threads
+	//crunchOneFrame() {
+	//	if (traceStats) console.log(`👑 SquishPanel. about to frame`);
+	//
+	//	try {
+	//		// lots of visscher steps
+	//		this.grinder.oneFrame();
+	//		//this.grinder?.pleaseIntegrate();
+	//	} catch (ex) {
+	//		this.cPanel.stopAnimating();
+	//		// eslint-disable-next-line no-ex-assign
+	//		ex = interpretCppException(ex);
+	//		CommonDialog.openErrorDialog(
+	//			ex.message == 'diverged' ? SquishPanel.divergedBlurb : ex, 'while integrating');
+	//	}
+	//
+	//	if (traceStats) console.log(`👑 SquishPanel. did frame`);
+	//
+	//	if (traceTheViewBuffer)
+	//		this.dumpViewBuffer('SquishPanel. did 1 frame()');
+	//}
 
 	// the upper left and right numbers: insert them into the HTML.  Faster than react.
 	// should move this to like WaveView
@@ -117,17 +119,17 @@ class sAnimator {
 			ne.innerHTML =  this.grinder.frameSerial;
 	}
 
-	// Integrate the ODEs by one frame, or not.  and then repaint. called frame
+	// Repaint. called frame
 	// period in animateHeartbeat() while running, as often as the menu setting
-	// says.  shouldIntegrate is false for like setting the wave and starting over.
-	integrateOneFrame(shouldIntegrate) {
-		if (traceStats) console.log(`time since last tic: ${performance.now() - this.iStats.startIntegration}ms`);
+	// says.
+	drawLatestFrame() {
+		if (traceStats) console.log(`time since last tic: ${performance.now() - this.iStats.startIntegrationTime}ms`);
 		//debugger;
-		this.iStats.startIntegration = performance.now();  // absolute beginning of integrate frame
+		//this.iStats.startIntegrationTime = performance.now();  // absolute beginning of integrate frame
 
-		if (shouldIntegrate)
-			this.crunchOneFrame();
-		this.iStats.endCalc = performance.now();
+//		if (shouldIntegrate)
+//			this.crunchOneFrame();
+		this.iStats.startDrawTime = performance.now();
 
 		this.space.mainEAvatar.doRepaint?.();
 		this.showTimeNFrame();
@@ -136,7 +138,7 @@ class sAnimator {
 		this.iStats.endDraw = performance.now();
 
 		this.refreshStatsOnScreen();
-		this.iStats.prevStartIntegration = this.iStats.startIntegration;
+		this.iStats.prevStartIntegrationTime = this.iStats.startIntegrationTime;
 
 		this.continueRunningDiagnosticCycle();
 	}
@@ -144,13 +146,13 @@ class sAnimator {
 	heartbeatSerial = 0;
 
 	// This gets called once each animation period according to
-	// requestAnimationFrame(), usually 60/sec and repeats as long as the
+	// requestAnimationFrame(), usually 60/sec or whatever your screen refresh rate is, and repeats as long as the
 	// website is running.  Even if there's no apparent motion. it will advance
 	// one heartbeat in animation time, which every so often calls
-	// integrateOneFrame(), if appropriate
+	// drawLatestFrame(), if appropriate
 	animateHeartbeat =
 	frameStart => {
-		// no matter how often animateHeartbeat is called, it'll only frame once per framePeriod
+
 		if (traceHeartbeats && ((this.heartbeatSerial & onceInAWhile) == 0))
 			console.log(`🎥  a heartbeat, serial every ${onceInAWhile+1}: `
 				+`${this.heartbeatSerial} = 0x${this.heartbeatSerial.toString(16)} `
@@ -158,16 +160,17 @@ class sAnimator {
 				+`frameStart >= this.timeForNextTic ${frameStart} >= ${this.timeForNextTic} `
 				+` = ${frameStart >= this.timeForNextTic} `);
 
+		// no matter how often animateHeartbeat is called, it'll only frame once per framePeriod
 		if (this.cPanel.isRunning && frameStart >= this.timeForNextTic) {
 			let framePeriod = this.cPanel.framePeriod;
 
 			if (traceIntegrations)
 				console.log(`🎥  an integration request serial: ${this.grinder.frameSerial} `);
 
-			this.integrateOneFrame(true);
+			this.drawLatestFrame(true);
 
 			// remember (frameStart) is the one passed in, before
-			// integrateOneFrame(), so periods are exactly timed (unless it's so slow
+			// drawLatestFrame(), so periods are exactly timed (unless it's so slow
 			// that we get behind).
 			let rightNow = 	performance.now();
 

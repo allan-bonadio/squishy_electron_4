@@ -58,11 +58,11 @@ TEST(qGrinder, CheckGrinderConstructor)
 
 
 	LONGS_EQUAL(false, qgrinder->isIntegrating);
-	LONGS_EQUAL(false, qgrinder->needsIntegration);
+	LONGS_EQUAL(false, qgrinder->shouldBeIntegrating);
 	LONGS_EQUAL(false, qgrinder->pleaseFFT);
 
 	// how does this get turned on!??!!?
-	LONGS_EQUAL(true, qgrinder->integrationFrameInProgress);
+	LONGS_EQUAL(true, qgrinder->frameInProgress);
 
 	STRCMP_EQUAL("myGrind", qgrinder->label);
 

@@ -8,15 +8,17 @@
 #include <cfenv>
 #include <stdexcept>
 
-// #include <stdatomic.h>
+//#include <stdatomic.h>
 // stdatomic.h should have this #include <__atomic/atomic_flag.h>
-//#include <condition_variable>
+#include <condition_variable>
 #include <pthread.h>
 // looking for emscripten_futex_wait() - it's not here #include <emscripten/atomic.h>
 
 #include "../hilbert/qSpace.h"
 #include "../greiman/qAvatar.h"
+#include "qThread.h"
 #include "qGrinder.h"
+#include "slaveThread.h"
 #include "../debroglie/qFlick.h"
 #include "../fourier/qSpectrum.h"
 #include "../fourier/fftMain.h"
@@ -40,14 +42,14 @@ static bool traceReversals = false;
 
 #define MIDPOINT_METHOD
 
-/* *********************************************************************************** qGrinder */
 
 // create new grinder, complete with its own stage buffers
 // make sure these values are doable by the sliders' steps
 qGrinder::qGrinder(qSpace *sp, qAvatar *av, const char *lab)
 	: space(sp), avatar(av), elapsedTime(0), frameSerial(0),
 		dt(1e-3), lowPassFilter(1), stepsPerFrame(100),
-		isIntegrating(false), needsIntegration(false), pleaseFFT(false) {
+		isIntegrating(false), shouldBeIntegrating(false), justNFrames(0),
+		pleaseFFT(false) {
 
 	magic = 'Grnd';
 
@@ -64,17 +66,20 @@ qGrinder::qGrinder(qSpace *sp, qAvatar *av, const char *lab)
 	strncpy(label, lab, MAX_LABEL_LEN);
 	label[MAX_LABEL_LEN] = 0;
 
-	elapsedTime = 0.;
-	frameSerial = 0;
+	pthread_mutex_init(&integratingMx, NULL);
 
-
-
-	// initialize masterSwitch and masterMutex.  Maybe they're already initted.
-
-
+	// should this come earlier?
+	slaveThread::createSlaves(this);
 
 	if (traceConstructor) {
-		dumpObj(" 🪓 constructed");
+		dumpObj(" qGrinder 🪓 constructed");
+
+		qDimension *dims = space->dimensions;
+		printf("          its qDimension:   N=%d start=%d end=%d ",
+			dims[0].N, dims[0].start, dims[0].end);
+		printf("        nStates=%d nPoints=%d\n", dims[0].nStates, dims[0].nPoints);
+		printf("        its continuum=%d spectrumLength=%d label=%s\n",
+			dims[0].continuum, dims[0].spectrumLength, dims[0].label);
 
 		printf("      the qSpace for 🪓 grinder %s:   magic=%c%c%c%c spacelabel=%s\n",
 			label,
@@ -83,13 +88,6 @@ qGrinder::qGrinder(qSpace *sp, qAvatar *av, const char *lab)
 		printf("         nDimesions=%d   nStates=%d nPoints=%d voltage=%p voltageFactor=%lf spectrumLength=%d  \n",
 			space->nDimensions, space->nStates, space->nPoints,
 			space->voltage, space->voltageFactor, space->spectrumLength);
-
-		qDimension *dims = space->dimensions;
-		printf("          its qDimension:   N=%d start=%d end=%d ",
-			dims->N, dims->start, dims->end);
-		printf("        nStates=%d nPoints=%d\n", dims->nStates, dims->nPoints);
-		printf("        its continuum=%d spectrumLength=%d label=%s\n",
-			dims->continuum, dims->spectrumLength, dims->label);
 	}
 
 	FORMAT_DIRECT_OFFSETS;
@@ -101,6 +99,8 @@ qGrinder::~qGrinder(void) {
 
 	delete qflick;
 	qflick = NULL;
+
+	//pthread_rwlock_destroy(&masterLock);
 
 	// these may or may not have been allocated, depending on whether they were needed
 	if (qspect)
@@ -125,7 +125,8 @@ void qGrinder::copyToAvatar(qAvatar *avatar) {
 
 // need these numbers for the js interface to this object, to figure out the offsets.
 // see eGrinder.js ;  usually this function isn't called.
-// Insert this into the constructor and run this once.  Copy text output.
+// See directAccessors.h to change FORMAT_DIRECT_OFFSETS to
+// insert this into the constructor and run this once.  Copy text output.
 // Paste the output into class eGrinder, the class itself, to replace the existing ones
 void qGrinder::formatDirectOffsets(void) {
 	// don't need magic
@@ -141,18 +142,25 @@ void qGrinder::formatDirectOffsets(void) {
 	makeDoubleGetter(frameSerial);
 	makeDoubleSetter(frameSerial);
 	printf("\n");
+	makeDoubleGetter(justNFrames);
+	makeDoubleSetter(justNFrames);
+	makeDoubleGetter(frameCalcTime);
+
+	makeBoolGetter(shouldBeIntegrating);
+	makeBoolSetter(shouldBeIntegrating);
 	makeBoolGetter(isIntegrating);
 	makeBoolSetter(isIntegrating);
+
 	makeBoolGetter(pleaseFFT);
 	makeBoolSetter(pleaseFFT);
 
-	makeIntGetter(needsIntegration);
-	makeIntSetter(needsIntegration);
+	makeIntGetter(shouldBeIntegrating);
+	makeIntSetter(shouldBeIntegrating);
 
-	makeOffset(needsIntegration)
+	makeOffset(shouldBeIntegrating)
 
-	makeBoolGetter(integrationFrameInProgress);
-	makeBoolSetter(integrationFrameInProgress);
+//	makeBoolGetter(frameInProgress);
+//	makeBoolSetter(frameInProgress);
 	printf("\n");
 	makeDoubleGetter(dt);
 	makeDoubleSetter(dt);
@@ -190,7 +198,7 @@ void qGrinder::formatDirectOffsets(void) {
 
 /* ********************************************************** dumpObj  */
 
-// dump all the fields of an grinder
+// dump all the fields of a grinder
 void qGrinder::dumpObj(const char *title) {
 	printf("\n🪓🪓 ==== qGrinder | %s ", title);
 	printf("        magic: %c%c%c%c   qSpace=%p '%s'   \n",
@@ -244,13 +252,14 @@ void qGrinder::tallyUpReversals(qWave *qwave) {
 
 /* ********************************************************** doing Integration */
 
-// Integrates one Frame, one iteration.  Does several visscher steps (eg 10 or
-// 100 or 500). Actually does stepsPerFrame+½ steps; two half steps, at start
-// and other part at finish, to adapt to Visscher timing, then synchronized timing.
+// Integrates one Frame, one iteration, on one thread.  Does several visscher steps (eg 10 or
+// 100 or 500). Actually does stepsPerFrame+½ steps; two half steps, im at start
+// and re at finish, to adapt to Visscher timing, then synchronized timing.
+// Maybe this should be in slaveThread?
 void qGrinder::oneFrame() {
 	if (traceIntegration)
 		qGrinder::dumpObj("starting oneFrame");
-	isIntegrating = integrationFrameInProgress = true;
+//	isIntegrating = frameInProgress = true;
 	qCx *wave0 = qflick->waves[0];
 	qCx *wave1 = qflick->waves[1];
 	qCx *wave2 = qflick->waves[2];
@@ -314,33 +323,37 @@ void qGrinder::oneFrame() {
 	copyToAvatar(avatar);
 
 	if (traceIntegration)
-		printf("      qGrinder frame done; elapsed time: %lf \n", getTimeDouble());
+		printf("      qGrinder frame done; time: %lf \n", getTimeDouble());
 
 	frameSerial++;
-	isIntegrating = integrationFrameInProgress = false;
+//	frameInProgress = false;
 	qCheckReset();
 }
 
 
-// start integrating a frame in a thread, assuming everything is all set up first.
-void qGrinder::startAFrame(void) {
-	printf("🪓 qGrinder::startAFrame, about to notify");
-	// just a sec here .... atomic_notify_all(&startAll);
-	printf("🪓 qGrinder::startAFrame, notified!");
+//// start integrating a frame, whenever the currently working threads are done.
+//// called by JS to launch all the threads.  Runs in the Browser thread.
+//void grinder_startAFrame(qGrinder *grinder) {
+//
+//	// just like endingWork()
+//	// this should be write locked.  All the slave threads are waiting to get a read lock.
+//	//pthread_rwlock_unlock(&grinder->masterLock);
+//}//
+//
+//// this should disable write by using a 'read only' lock.  All the slave threads
+//// have a read lock on masterLock, while integrating.
+//void qGrinder::startingWork(qGrinder *grinder) {
+//	//pthread_rwlock_rdlock(&grinder->masterLock);
+//}
+//
+//void qGrinder::endingWork(qGrinder *grinder) {
+//	// this should be  a write lock.  All the slave threads are waiting to get a read lock.
+//	//pthread_rwlock_unlock(&grinder->masterLock);
+//}
+//
 
 
-	// after they've all started... is this right?
-	// no i think the integrating thread does this after it's over.  ?? startAll.acquire();
 
-}
-
-void grinder_startAFrame(qGrinder *grinder) {
-	grinder->startAFrame();
-
-	// does this let all the threads run?
-	pthread_cond_broadcast(&grinder->masterSwitch);
-
-}
 
 /* ********************************************************** fourierFilter */
 
@@ -380,51 +393,31 @@ void qGrinder::fourierFilter(int lowPassFilter) {
 
 /* ********************************************************** threaded integration  */
 
-// This runs, endlessly in worker, to do integration as needed by main thread.
-// Use this for single-thread integration.
-void qGrinder::initThreadIntegration(int serial) {
+//void qGrinder::initThreadIntegration(int serial) {
+//
+//		// then do it! for this thread
+//		oneFrame();
+//
+//		if (traceThread)
+//			printf("🪓🪓 qGrinder thread %d finished oneFrame(), continuing onward\n", serial);
+//
+//}
 
-//	if (traceThread)
-//		printf("🪓🪓 qGrinder thread %d in grinder %p %s about to enter loop\n", serial, this, label);
-	while (true) {
-		if (traceThread)
-			printf("🪓🪓 qGrinder thread %d in grinder %p %s waiting for futex..\n.", serial, this, label);
-
-		// wait until the main thread needs us to do another.  (May have already
-		// happened by the time we get here.)
-		//emscripten_futex_wait(&needsIntegration, 0, -1.);
-
-		if (traceThread)
-			printf("🪓🪓 qGrinder thread %d in got padst  futex..\n.", serial);
-
-//	printf("\n🪓🪓 ==== qGrinder | %s ", "blah blah blah");
-//	printf("        magic: %c%c%c%c \n",magic>>3, magic>>2, magic>>1, magic);
-//	printf("       qSpace=%p   \n",space);
-//	printf("        '%s'   \n",label);
-//	printf("        elapsedTime %lf, frameSerial  %lf, dt  %lf, lowPassFilter %d, stepsPerFrame %d\n",
-//		elapsedTime, frameSerial, dt, lowPassFilter, stepsPerFrame);
-//	printf("        qflick %p, voltage  %p, voltageFactor  %lf, qspect %p\n",
-//		qflick, voltage, voltageFactor, qspect);
-//		if (traceIntegration)
-//			qGrinder::dumpObj("before starting oneFrame");
-
-
-		// then do it!
-		oneFrame();
-
-		if (traceThread)
-			printf("🪓🪓 qGrinder thread %d finished oneFrame(), continuing onward\n", serial);
+void qGrinder::aggregateCalcTime(void) {
+	// add up ALL the threads' frameCalcTime and keep a running average
+	double frameCalcTime;
+	for (int ix = 0; ix < nSlaveThreads; ix++) {
+		slaveThread *sl = slaves[ix];
+		if (sl)
+			frameCalcTime += sl->frameCalcTime;
 	}
 }
 
-void grinder_initThreadIntegration(qGrinder *grinder, int serial) {
-	printf("🪓🪓 grinder_initThreadIntegration divingf in, %p=this,  serial=%d \n",grinder,  serial);
-	grinder ->initThreadIntegration(serial);
-	printf("🪓🪓 grinder_initThreadIntegration came out other side, %p=this,  serial=%d \n",grinder,  serial);
-	//qGrinder::me ->initThreadIntegration(serial, b, c);
-}
-
-
+// the last step of the slowest thread, calls this at the end.
+//void qGrinder::resetForNextFrame(void) {
+//	aggregateCalcTime();
+//	// huh?  there must be something else...
+//}
 
 /* ********************************************************** misc  */
 

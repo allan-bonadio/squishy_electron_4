@@ -9,7 +9,7 @@ import {interpretCppException, excRespond} from '../utils/errors.js';
 import {resetObjectRegistry} from '../utils/directAccessors.js';
 import {getASetting, storeASetting, createStoreSettings} from '../utils/storeSettings.js';
 import eSpace from './eSpace.js';
-import eThread from './eThread.js';
+//import eThread from './eThread.js';
 
 // all of these must be attached to window to  get called by c++
 
@@ -109,8 +109,6 @@ function startUpFromCpp(maxDims, maxLab, nThreads) {
 	// I guess we're starting up with threads anyway
 	eSpaceCreatedPromise
 	.then(space => {
-		eThread.createThreads(space.grinder);
-
 		if (traceStartup) console.log(`threads 🐣  created`);
 		if (tracePromises) console.log(
 			`🐥 startUpFromCpp:  space created and resolving eSpaceCreatedPromise`);

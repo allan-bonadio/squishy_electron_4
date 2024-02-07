@@ -5,7 +5,7 @@
 
 import {prepForDirectAccessors} from '../utils/directAccessors.js';
 import qe from './qe.js';
-import eThread from './eThread.js';
+//import eThread from './eThread.js';
 
 let traceCreation = false;
 let traceIntegration = false;
@@ -49,15 +49,14 @@ class eGrinder {
  	get frameSerial() { return this.doubles[3]; }
  	set frameSerial(a) { this.doubles[3] = a; }
 
- 	get isIntegrating() { return this.bools[104]; }
- 	set isIntegrating(a) { this.bools[104] = a; }
- 	get pleaseFFT() { return this.bools[106]; }
- 	set pleaseFFT(a) { this.bools[106] = a; }
- 	get needsIntegration() { return this.ints[21]; }
- 	set needsIntegration(a) { this.ints[21] = a; }
- 	needsIntegrationOffset = 21;
- 	get integrationFrameInProgress() { return this.bools[105]; }
- 	set integrationFrameInProgress(a) { this.bools[105] = a; }
+ 	get frameCalcTime() { return this.doubles[8]; }
+ 	get isIntegrating() { return this.bools[144]; }
+ 	set isIntegrating(a) { this.bools[144] = a; }
+ 	get pleaseFFT() { return this.bools[146]; }
+ 	set pleaseFFT(a) { this.bools[146] = a; }
+ 	get shouldBeIntegrating() { return this.ints[23]; }
+ 	set shouldBeIntegrating(a) { this.ints[23] = a; }
+ 	startIntegrationOffset = 23;
 
  	get dt() { return this.doubles[4]; }
  	set dt(a) { this.doubles[4] = a; }
@@ -71,14 +70,16 @@ class eGrinder {
  	get _voltage() { return this.ints[13]; }
  	get voltageFactor() { return this.doubles[7]; }
  	set voltageFactor(a) { this.doubles[7] = a; }
- 	get reversePercent() { return this.doubles[8]; }
+ 	get reversePercent() { return this.doubles[9]; }
 
- 	get _qspect() { return this.ints[18]; }
- 	get _stages() { return this.ints[19]; }
- 	get _threads() { return this.ints[20]; }
- 	get _label() { return this.pointer + 88; }
+ 	get _qspect() { return this.ints[20]; }
+ 	get _stages() { return this.ints[21]; }
+ 	get _threads() { return this.ints[22]; }
+ 	get _label() { return this.pointer + 128; }
 
 	/* **************************** end of direct accessors */
+
+	// do the calc in the threads
 	// can throw std::runtime_error("divergence")
 	oneFrame() {
 		qe.grinder_oneFrame(this.pointer);
@@ -86,26 +87,28 @@ class eGrinder {
 
 	// thisis what upper levels call when another frame is needed.
 	// It either queues it out to a thread, if the threads are idle,
-	// or sets needsIntegration if busy
-	pleaseIntegrate() {
-		if (traceIntegration)
-				console.log(`🪓 eGrinder ${this.label}: pleaseIntegrate()`);
-		if (this.integrationFrameInProgress) {
-			// is actively in the middle of an integration frame
-			if (traceIntegration)
-				console.log(`🪓             eGrinder.pleaseIntegrate: needsIntegration = true cuz busy`);
-			// threads are busy but we'll get to it after we're done with this frame
-			this.needsIntegration = true;
-			return false;
-		}
-		else {
-			if (traceIntegration)
-				console.log(`🪓             eGrinder.pleaseIntegrate doing oneItration`);
-			this.needsIntegration = false;
-			this.oneFrame(this);
-			return true;
-		}
-	}
+	// or sets shouldBeIntegrating if busy
+	//pleaseIntegrate() {
+	//	if (traceIntegration)
+	//			console.log(`🪓 eGrinder ${this.label}: pleaseIntegrate()`);
+	//	if (this.frameInProgress) {
+	//		// is actively in the middle of an integration frame
+	//		if (traceIntegration)
+	//			console.log(`🪓             eGrinder.pleaseIntegrate: shouldBeIntegrating = true cuz busy`);
+	//		// threads are busy but we'll get to it after we're done with this frame
+	//		this.shouldBeIntegrating = true;
+	//		return false;
+	//	}
+	//	else {
+	//		if (traceIntegration)
+	//			console.log(`🪓             eGrinder.pleaseIntegrate doing oneItration`);
+	//		this.shouldBeIntegrating = false;
+	//
+	//		qe.grinder_startAFrame(this.pointer);  // threaded, at least 1
+	//		//this.oneFrame(this);  // original, UI thread integration
+	//		return true;
+	//	}
+	//}
 
 	askForFFT() {
 		qe.grinder_askForFFT(this.pointer);

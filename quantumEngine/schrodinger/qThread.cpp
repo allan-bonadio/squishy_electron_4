@@ -15,77 +15,98 @@
 #include "qGrinder.h"
 #include "qThread.h"
 
+bool traceThreads = true;
+
 /* ********************************************************************************** threads */
 
 // ok so this is pthreads
 
-// NO!  use N_THREADS defined const int qThread::nThreads = N_THREADS;  // requested; set at compile time
-int qThread::nCreatedThreads = 0;  // total created, dynamic
-int qThread::nRunningThreads = 0;  // total confirmed, dynamic
 
-// pointers to the qThread objects
-qThread *list[MAX_THREADS];
-qThread **qThread::threadsList = list;;
+// the function called in each thread-specific main loop, 60x/sec
+static void mainLooper(void *arg) {
+	qThread *thread = (qThread *) arg;
+	//printf("🐴  mainLooper entered with qthread=%p\n", thread);
+	thread->dumpAThread("mainLooper entered");
+	//printf("mainLooper entered with qthread=%p,  qt-handler=%p\n",
+	//	 thread->handler);
+	//qGrinder *grinder = (qGrinder *) qt->handle;
 
-//std::atomic_flag qThread::changingActive = ATOMIC_FLAG_INIT;
-//std::atomic_flag qThread::changingActive = ATOMIC_FLAG_INIT;
 
+	(*thread->handler)(thread->arg);
+}
 
-// an array of the qThread instances
-//qThread **qThread::threadsList = new qThread*[N_THREADS];
-
-// each thread does this upon startup; runs in slave thread
+// each thread does this upon startup; runs this func
 // the function that runs the whole thread, executes in the thread thread
-// argument in: it's own qtThread object
+// argument in: it's own qtThread object.  Makes main loop for thread,
+// then calls hte handler
 static void *tStart(void *qtx) {
 	// MY qThread object
 	qThread *qt = (qThread *) qtx;
 	qt->confirmThread();
-	printf("🐴 qThread::ok im in a thread #%d, pass me a needle!\n", qt->serial);
+	printf("🐴 qThread::ok confirmed in tStart #%d!\n", qt->serial);
+	qt->dumpAThread("starting tStart()");
+	emscripten_set_main_loop_arg(
+		&mainLooper,
+		qt,  // argument
+		-1,   // fps, or -1 to run off of Req Ani Frame
+		false);
+	// so does that ever return?  Tryna prevent the thread going away
 
-	// get to work!  after this semaphore is released
-	qGrinder *grinder = qt->grinder;
-	// cough just a sec...atomic_wait(grinder->startAll)
+	// I guess we don't get here until ... I dunno
+	printf("🦒  💥 🌪 emscripten_set_main_loop_arg() finished ️"
+		"I guess we don't get here until ... I dunno\n");
 
+	// wait, this ends the thread....
 	return NULL;
 };
 
 
 // object created in the main thread.  THese all stay in C++ land;
 // the browser thread never touches them.  (i think)
-// runs in browser thread
-qThread::qThread(int ser, qGrinder *gr)
-	: serial(ser), errorCode(0), halt(0), grinder(gr), confirmed(false) {
-	printf("🐴 qThread::qThread(%d) constructor... wish me luck\n", serial);
+// runs in browser thread.  gr = qGrider pointer from eGrinder.pointer
+// we can't pass the qThread without going through a few void* pointers.
+qThread::qThread(void *(*hand)(void *), void *ar)
+	: errorCode(0), handler(hand), arg(ar), confirmed(false) {
 
-	//	dunno if we'll ever set any of these
-	errorCode = pthread_attr_init(&attr);
+	printf("🐴 qThread::qThread(%d) constructor...hand=%p   ar=%p\n",
+		serial, hand, ar);
+
+	//qThread();
+
+	//	dunno if we'll ever get any
 	if (errorCode) {
 		printf("🐴 Error in attr init: %d\n", errorCode);
 		return;
 	}
 
-	// you can stick attributes in instead of that NULL, cwd or multithread safe stuff
-	// https://man7.org/linux/man-pages/man3/pthread_attr_init.3.html
-	errorCode = pthread_create(&this->tid, &this->attr, &tStart, (void *) this);
+	// runs tStart() and passes it this qThread instance
+	errorCode = pthread_create(&this->tid, NULL, &tStart, (void *) this);
 	if (errorCode) {
 		printf("🐴 Error in create thread: %d\n", errorCode);
 		return;
 	}
-// 	if (errorCode) {
-// 		char buf[100];
-// 		sprintf(buf, "🐴 pthread_create() for thread %d failed with error code %d", serial, errorCode);
-// 		throw std::runtime_error(buf);
-// 	}
+	qThread::threadsList[qThread::nCreatedThreads] = this;
+	serial = qThread::nCreatedThreads;
+	qThread::nCreatedThreads++;
 
-	printf("🐴 qThread::qThread(%d) should be off and running\n", serial);
+	dumpAThread("freshly created");
 };
 
 // must be called from inside the thread?  more likely, never.  Or, if so, join some other thread.
-qThread::~qThread() {
+qThread::~qThread(void) {
 	pthread_exit(0);
 };
 
+// print out 'everything' in the thread
+void qThread::dumpAThread(const char *title) {
+	printf("🐴 qThread::qThread(%d) %s: \n"
+		"errorCode=%d handler=%p arg=%p confirmed=%b \n"
+		"nCreatedThreads=%d   nRunningThreads=%d   threadsList=%p\n",
+		serial, title, errorCode, handler, arg, confirmed,
+		qThread::nCreatedThreads, qThread::nRunningThreads, qThread::threadsList);
+}
+
+// js runs this in the beginning
 int thread_setupThreads(void) {
 
 	return MAX_THREADS;
@@ -99,22 +120,13 @@ void qThread::confirmThread(void) {
 	qThread::nRunningThreads++;
 }
 
-// called by JS in browser thread
-qThread *thread_createAThread(int serial, qGrinder *grinder) {
+// NO!  use N_THREADS defined const int qThread::nThreads = N_THREADS;  // requested; set at compile time
+int qThread::nCreatedThreads = 0;  // total created, dynamic
+int qThread::nRunningThreads = 0;  // total confirmed, dynamic
 
-	if (serial > MAX_THREADS)
-		throw std::runtime_error("One thread too many!");
-
-	qThread *qt = qThread::threadsList[serial] = new qThread(serial, grinder);
-	// actual pthread won't start till the next event loop i think
-
-	qThread::nCreatedThreads++;
-	printf("thread_createAThread(%d) created, total %d active, should be equal\n",
-		serial, qThread::nCreatedThreads);
-
-	return qt;
-};
-
+// pointers to the qThread objects
+qThread *list[MAX_THREADS];
+qThread **qThread::threadsList = list;
 
 /* ************************************************ what sync can I use? */
 

@@ -3,6 +3,10 @@
 ** Copyright (C) 2022-2023 Tactile Interactive, all rights reserved
 */
 
+
+this is no longer used
+
+
 // THis code mostly requests the creation of threads.  pthreads in c++ does all the work.
 import qe from './qe.js';
 import {N_THREADS} from './eEngine.js';
@@ -28,7 +32,7 @@ class eThread {
 
 		this.serial = serial;
 
-		this.pointer = eThread.threads[serial] = thread_createAThread(serial, grinder);
+		this.pointer = eThread.threads[serial] = thread_createAThread(serial, grinder.pointer);
 
 		if (traceThreadCreation)
 			console.log(`⛏ eThread constructor: ${serial} created, about to setup handlers`);

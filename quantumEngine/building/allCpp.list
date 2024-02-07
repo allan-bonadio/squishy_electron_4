@@ -12,4 +12,5 @@ hilbert/qSpace.cpp
 misc.cpp
 schrodinger/qGrinder.cpp
 schrodinger/qThread.cpp
+schrodinger/slaveThread.cpp
 schrodinger/visscher.cpp

@@ -16,34 +16,43 @@ struct qThread;
 #define MAX_THREADS 20
 
 // pointers to qThread objects in serial order
-qThread *threadsList[MAX_THREADS];
 
 
 // one for each pthread.  Each is created from JS with thread_createAThread()
 struct qThread {
-	qThread(int ser, qGrinder *grinder);
+	qThread(void *(*handler)(void *), void *arg);
+
 	~qThread();
+
+	void dumpAThread(const char *title);
+
+	// how long this thread spent doing its iteration, the last time
+	double frameCalcTime;
 
 	// pthread's ID for this thread
 	pthread_t tid;
 
-	// set preferences in this if you want
-	pthread_attr_t attr;
+	void *(*moses)(void *);
+	//void *(*)(void *);
+	//void *(valley*)(void *);
+	//void *argon(*)(void *);
 
-	int serial;  // 0, 1, ...
+
+
+	int serial;  // 0, 1, ... among all qThreads
 
 	// errno for the last operation that failed, or zero if all ok
 	int errorCode;
 
-	// atomic to halt at starting pt  (no, I think we're using the one on qGrinder)
-	 int halt;
+	 // handler to call in loop; see slaveThread.h/cpp
+	 // like this void *(*)(void *)
+	 void *(*handler)(void *);
+	 //void (*handler)(void *);
+	 void *arg;
 
-	 // THE grinder that all the threads use to iterate
-	 qGrinder *grinder;
-
+	 // set true when thread actually starts running after creation
+	 bool confirmed;
 	 void confirmThread(void);
-
-	 void startAFrame(void);
 
 	// the code that each thread runs.  and the thread dies when it returns.
 	// so it should never return.
@@ -56,15 +65,12 @@ struct qThread {
 
 	//static std::atomic_flag changingActive;
 
-	 // set true when thread actually starts running
-	 bool confirmed;
-
 };
 
 
 extern "C" {
 	int thread_setupThreads(void);
-	qThread * thread_createAThread(int serial, qGrinder *grinder);
+	//qThread * thread_createAThread(int serial, qGrinder *grinder);
 }
 
 

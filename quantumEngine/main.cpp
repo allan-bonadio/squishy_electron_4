@@ -26,20 +26,6 @@ EM_JS(int, qeStarted, (int max_dimensions, int max_label_len, int n_threads),
 }
 );
 
-// or this?
-// 	{
-// 		// initialization is big and complex; don't run it from C++
-// 		// it has to happen after cppRuntimeInitialized() has been loaded
-// 		let trying = setInterval(() => {
-// 			if (window.cppRuntimeInitialized) {
-// 				clearInterval(trying);
-// 				window.cppRuntimeInitialized(max_dimensions, max_label_len, n_threads);
-//
-// 			}
-// 		}, 250);
-// 		return navigator.hardwareConcurrency;
-// 	}
-
 
 // emscripten calls main() when the whole C++ is all set up.  Tell the JS guys.
 int main() {
@@ -47,9 +33,9 @@ int main() {
 
 	// returns 1.  pfft.  std::thread::hardware_concurrency();
 
-	// I'm not sure we'll even use this.
 	int hardwareConcurrency = qeStarted(MAX_DIMENSIONS, MAX_LABEL_LEN, N_THREADS);
 	printf(" 🐣 hardwareConcurrency=%d  \n", hardwareConcurrency);
+
 	return 0;
 }
 
