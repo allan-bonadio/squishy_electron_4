@@ -7,7 +7,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import eSpace from '../engine/eSpace.js';
 
-let traceCPToolbar = false;
+let traceCPToolbar = true;
 
 
 function setPT() {

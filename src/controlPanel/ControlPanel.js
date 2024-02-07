@@ -43,7 +43,7 @@ export class ControlPanel extends React.Component {
 
 		// the integration statistics shown in the Integration tab
 		iStats: PropTypes.shape({
-			startIntegration: PropTypes.number.isRequired,
+			startIntegrationTime: PropTypes.number.isRequired,
 			endDraw: PropTypes.number.isRequired,
 		}),
 
@@ -129,6 +129,7 @@ export class ControlPanel extends React.Component {
 		//console.info(`startAnimating starts`);
 		this.isRunning = storeASetting('frameSettings', 'isRunning', true);;
 		this.setState({isRunning: true});
+		this.grinder.shouldBeIntegrating = true;
 	}
 
 	stopAnimating =
@@ -136,6 +137,7 @@ export class ControlPanel extends React.Component {
 		//console.info(`stopAnimating starts`);
 		this.isRunning = storeASetting('frameSettings', 'isRunning', false);
 		this.setState({isRunning: false});
+		this.grinder.shouldBeIntegrating = false;
 	}
 
 	startStop =
@@ -150,8 +152,13 @@ export class ControlPanel extends React.Component {
 	singleFrame =
 	(ev) => {
 		//console.info(`singleFrame starts`);
-		this.sPanel.animator.integrateOneFrame(true);
-		this.stopAnimating();
+		this.grinder.shouldBeIntegrating = true;
+		this.grinder.justNFrames = 1;
+
+
+		// wait ... need to do this one tic later.  Well, close enough.
+		setTimeout(() => this.sPanel.animator.drawLatestFrame(), 100);
+
 	}
 
 	/* ********************************************** wave */
