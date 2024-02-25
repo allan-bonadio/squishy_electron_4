@@ -69,7 +69,7 @@ class sAnimator {
 		statGlobals.show('reversePercent', this.grinder.reversePercent);
 		statGlobals.show('frameCalcTime', this.grinder.frameCalcTime);
 		statGlobals.show('drawTime', st.endDraw - st.startDrawTime);
-		statGlobals.show('totalForIntegration', st.endDraw - st.startIntegrationTime);  // draw + calc
+		statGlobals.show('totalForFrame', st.endDraw - st.startIntegrationTime);  // draw + calc
 		const period = st.startIntegrationTime - st.prevStartIntegrationTime;
 		statGlobals.show('framePeriod', period);
 		statGlobals.show('framesPerSec', Math.round(1000 / period), 0)
@@ -125,7 +125,7 @@ class sAnimator {
 	drawLatestFrame() {
 		if (traceStats) console.log(`time since last tic: ${performance.now() - this.iStats.startIntegrationTime}ms`);
 		//debugger;
-		//this.iStats.startIntegrationTime = performance.now();  // absolute beginning of integrate frame
+		this.iStats.startIntegrationTime = performance.now();  // absolute beginning of integrate frame
 
 //		if (shouldIntegrate)
 //			this.crunchOneFrame();
