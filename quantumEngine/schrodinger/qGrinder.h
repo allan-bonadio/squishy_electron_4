@@ -10,7 +10,7 @@ struct qStage;
 struct slaveThread;
 
 struct qGrinder {
-	qGrinder(qSpace *, struct qAvatar *av, const char *label);
+	qGrinder(qSpace *, struct qAvatar *av, int nThreads, const char *label);
 	~qGrinder(void);
 	void formatDirectOffsets(void);
 	void dumpObj(const char *title);
@@ -55,6 +55,11 @@ struct qGrinder {
 
 	double reversePercent;
 
+	// when screen refresh rate changes, use these to tell C++.  Normally zeroes.
+	double newIntegrationFP;
+	int newFrameFactor;
+	int frameFactor;
+
 	// for the fourier filter.  Call the function first time you need it.
 	// owned if non-null
 	struct qSpectrum *qspect;
@@ -63,7 +68,7 @@ struct qGrinder {
 	struct qStage *stages;
 	struct qThread *threads;
 
-
+	int nThreads;
 	int nSlaveThreads;  // mostly static, total number of slave threads we'll use
 
 	// number of slaveThread s that haven't finished integration yet; decremented down to zero each frame

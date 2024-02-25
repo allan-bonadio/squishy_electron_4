@@ -31,7 +31,7 @@ let exportsSrc  = [
 	// creating the space
 	{name: 'startNewSpace', args: ['string'], retType: 'number'},
 	{name: 'addSpaceDimension', args: ['number', 'number', 'number', 'number', 'string'], retType: null},
-	{name: 'completeNewSpace', args: ['number'], retType: 'number'},
+	{name: 'completeNewSpace', args: ['number', 'number'], retType: 'number'},
 	{name: 'deleteFullSpace', args: ['number'], retType: null},
 
 	// errors & exceptions

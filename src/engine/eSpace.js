@@ -9,7 +9,7 @@ import eAvatar from './eAvatar.js';
 import eGrinder from './eGrinder.js';
 import {getAGroup} from '../utils/storeSettings.js';
 import {interpretCppException} from '../utils/errors.js';
-import {MAX_DIMENSIONS} from './eEngine.js';
+import {MAX_DIMENSIONS, N_THREADS} from './eEngine.js';
 
 let traceSpace = false;
 let traceFamiliarWave = false;
@@ -57,7 +57,7 @@ export class eSpace {
 			}
 		);
 
-		qe.completeNewSpace(this.pointer);
+		qe.completeNewSpace(this.pointer, N_THREADS);
 
 		// direct access into the voltage buffer
 		this.voltageBuffer = new Float64Array(window.Module.HEAPF64.buffer,

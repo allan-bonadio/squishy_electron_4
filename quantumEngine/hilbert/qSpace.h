@@ -101,7 +101,7 @@ extern "C" {
 	// create
 	qSpace *startNewSpace(const char *name = "a space");
 	void addSpaceDimension(qSpace *space, int N, int continuum, double dx, const char *label);
-	qSpace *completeNewSpace(qSpace *space);
+	qSpace *completeNewSpace(qSpace *space, int nThreads);
 
 	// destroy
 	void deleteFullSpace(qSpace *space);

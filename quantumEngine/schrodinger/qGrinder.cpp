@@ -26,7 +26,8 @@
 
 
 
-static bool traceIntegration = false;
+static bool traceIntegration = true;
+static bool traceIntegrationDetails = false;
 
 static bool traceJustWave = false;
 
@@ -37,19 +38,20 @@ static bool traceIProd = false;
 
 static bool traceConstructor = false;
 
-static bool traceThread = false;
 static bool traceReversals = false;
 
+// RK2
 #define MIDPOINT_METHOD
 
 
 // create new grinder, complete with its own stage buffers
 // make sure these values are doable by the sliders' steps
-qGrinder::qGrinder(qSpace *sp, qAvatar *av, const char *lab)
+qGrinder::qGrinder(qSpace *sp, qAvatar *av, int nThreads, const char *lab)
 	: space(sp), avatar(av), elapsedTime(0), frameSerial(0),
 		dt(1e-3), lowPassFilter(1), stepsPerFrame(100),
 		isIntegrating(false), shouldBeIntegrating(false), justNFrames(0),
-		pleaseFFT(false) {
+		pleaseFFT(false), newFrameFactor(3), newIntegrationFP(.05),
+		nThreads(nThreads), nSlaveThreads(nThreads) {
 
 	magic = 'Grnd';
 
@@ -154,13 +156,8 @@ void qGrinder::formatDirectOffsets(void) {
 	makeBoolGetter(pleaseFFT);
 	makeBoolSetter(pleaseFFT);
 
-	makeIntGetter(shouldBeIntegrating);
-	makeIntSetter(shouldBeIntegrating);
-
 	makeOffset(shouldBeIntegrating)
 
-//	makeBoolGetter(frameInProgress);
-//	makeBoolSetter(frameInProgress);
 	printf("\n");
 	makeDoubleGetter(dt);
 	makeDoubleSetter(dt);
@@ -168,6 +165,13 @@ void qGrinder::formatDirectOffsets(void) {
 	makeIntSetter(lowPassFilter);
 	makeIntGetter(stepsPerFrame);
 	makeIntSetter(stepsPerFrame);
+
+	makeIntGetter(nSlaveThreads);
+
+	makeIntGetter(newFrameFactor);
+	makeIntSetter(newFrameFactor);
+	makeDoubleGetter(newIntegrationFP);
+	makeDoubleSetter(newIntegrationFP);
 
 	/* *********************************************** waves & buffers */
 
@@ -331,30 +335,6 @@ void qGrinder::oneFrame() {
 }
 
 
-//// start integrating a frame, whenever the currently working threads are done.
-//// called by JS to launch all the threads.  Runs in the Browser thread.
-//void grinder_startAFrame(qGrinder *grinder) {
-//
-//	// just like endingWork()
-//	// this should be write locked.  All the slave threads are waiting to get a read lock.
-//	//pthread_rwlock_unlock(&grinder->masterLock);
-//}//
-//
-//// this should disable write by using a 'read only' lock.  All the slave threads
-//// have a read lock on masterLock, while integrating.
-//void qGrinder::startingWork(qGrinder *grinder) {
-//	//pthread_rwlock_rdlock(&grinder->masterLock);
-//}
-//
-//void qGrinder::endingWork(qGrinder *grinder) {
-//	// this should be  a write lock.  All the slave threads are waiting to get a read lock.
-//	//pthread_rwlock_unlock(&grinder->masterLock);
-//}
-//
-
-
-
-
 /* ********************************************************** fourierFilter */
 
 
@@ -393,16 +373,6 @@ void qGrinder::fourierFilter(int lowPassFilter) {
 
 /* ********************************************************** threaded integration  */
 
-//void qGrinder::initThreadIntegration(int serial) {
-//
-//		// then do it! for this thread
-//		oneFrame();
-//
-//		if (traceThread)
-//			printf("🪓🪓 qGrinder thread %d finished oneFrame(), continuing onward\n", serial);
-//
-//}
-
 void qGrinder::aggregateCalcTime(void) {
 	// add up ALL the threads' frameCalcTime and keep a running average
 	double frameCalcTime;
@@ -412,12 +382,6 @@ void qGrinder::aggregateCalcTime(void) {
 			frameCalcTime += sl->frameCalcTime;
 	}
 }
-
-// the last step of the slowest thread, calls this at the end.
-//void qGrinder::resetForNextFrame(void) {
-//	aggregateCalcTime();
-//	// huh?  there must be something else...
-//}
 
 /* ********************************************************** misc  */
 

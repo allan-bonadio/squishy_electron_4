@@ -32,7 +32,7 @@ qSpace *makeFullSpace(int N) {
 	if (traceMakeSpace) printf("        finished startNewSpace(), on to add\n");
 	addSpaceDimension(space, N, contENDLESS, 10, "x");
 	if (traceMakeSpace) printf("        finished addSpaceDimension(), on to complete\n");
-	completeNewSpace(space);
+	completeNewSpace(space, 1);
 
 	if (traceMakeSpace) printf("        finished makeFullSpace(%d)\n", N);
 	return space;

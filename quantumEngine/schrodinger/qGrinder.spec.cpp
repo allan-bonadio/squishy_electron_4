@@ -30,7 +30,7 @@ TEST(qGrinder, CheckGrinderConstructor)
 {
 	qSpace *space = makeBareSpace(8, contENDLESS);
 	qAvatar *avatar = new qAvatar(space, "grindAway");
-	qGrinder *qgrinder = new qGrinder(space, avatar, "myGrinder");
+	qGrinder *qgrinder = new qGrinder(space, avatar, 1, "myGrinder");
 
 	LONGS_EQUAL('Grin', qgrinder->magic);
 	POINTERS_EQUAL(space, qgrinder->space);
@@ -134,7 +134,7 @@ static void tryFourierFilter(int N, int goodFreq, int badFreq, int lowPassFilter
 
 	qSpace *space = makeBareSpace(N, contENDLESS);
 	qAvatar *avatar = new qAvatar(space, "tryFourierAva");
-	qGrinder *qgrinder = new qGrinder(space, avatar, "tryFourierGri");
+	qGrinder *qgrinder = new qGrinder(space, avatar, 1, "tryFourierGri");
 	qFlick *qf = qgrinder->qflick;
 	qWave *addOn = new qWave(space);
 	qSpectrum *rainbow = qgrinder->getSpectrum();
@@ -199,7 +199,7 @@ TEST_SKIP(qGrinder, fourFilt64_5_22) { tryFourierFilter(64, 5, 22, 16); }
 static void fourierExperiments(int N) {
 	qSpace *space = makeBareSpace(N, contENDLESS);
 	qAvatar *avatar = new qAvatar(space, "fourExpAv");
-	qGrinder *qgrinder = new qGrinder(space, avatar, "fourExpGrind");
+	qGrinder *qgrinder = new qGrinder(space, avatar, 1, "fourExpGrind");
 
 	qSpectrum *allOnes = new qSpectrum(space);
 	allOnes->fill();
