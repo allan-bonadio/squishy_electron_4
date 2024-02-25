@@ -220,6 +220,7 @@
 			// "The keyword 'slider-vertical' ... is not standardized..."
 			.canyonScale, .canyonPower {
 				appearance: slider-vertical;
+				writing-mode: vertical-lr;  // new standard? feb 2024  use direction: rtl; to invert
 				width: 2.5em;
 			}
 
