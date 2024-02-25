@@ -11,4 +11,4 @@ These files are the top display of the wave, but above the webgl code itself (se
 
 # other
 * README.md - this file
-* cxToRgb.js - porting the cxToColor to .js (old, deprecated, will go away)
+* cxToRgb.js - porting the cx2rgb to .js (old, deprecated, will go away)

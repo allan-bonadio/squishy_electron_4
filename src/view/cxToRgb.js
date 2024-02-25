@@ -4,7 +4,7 @@
 */
 
 // this is obsolete.
-// this is rewritten from cxToColor.glsl to be the JS implementation.
+// this is rewritten from cx2rgb.glsl to be the JS implementation.
 // by hand.  See new translator and new translation in subdir.
 
 const sqrtOneThird = Math.sqrt(1. / 3.);  // 0.57735..

@@ -92,7 +92,7 @@ function testParam(groupName, varName, defaultValue, criterion) {
 
 
 // copy & paste these from storeSettings.js and substitute s/makeParam/testParam/
-describe('cxToColor tests', () => {
+describe('cx2rgb tests', () => {
 	test('just to answer the criticism that we have no tests', () => {
 		expect(5).toBe(5);
 	});

@@ -4,7 +4,7 @@
 */
 
 import {abstractDrawing} from './abstractDrawing.js';
-import cxToColorGlsl from './cxToColor/cxToColor.glsl.js';
+import cxToColorGlsl from './cx2rgb/cx2rgb.glsl.js';
 import {viewUniform, viewAttribute} from './viewVariable.js';
 
 let traceViewBufAfterDrawing = false;
@@ -54,7 +54,7 @@ void main() {
 	gl_Position = vec4(x, y, 0., 1.);
 
 	//  for the color, convert the complex values via this algorithm
-	vColor = vec4(cxToColor(vec2(row.x, row.y)), 1.);
+	vColor = vec4(cx2rgb(vec2(row.x, row.y)), 1.);
 	if (!odd)
 		vColor = vec4(vColor.r/2., vColor.g/2., vColor.b/2., vColor.a);
 	//vColor = vec4(.9, .9, .1, 1.);
