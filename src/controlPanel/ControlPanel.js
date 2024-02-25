@@ -125,7 +125,7 @@ export class ControlPanel extends React.Component {
 	isRunning = false;
 
 	startAnimating =
-	(ev) => {
+	() => {
 		//console.info(`startAnimating starts`);
 		this.isRunning = storeASetting('frameSettings', 'isRunning', true);;
 		this.setState({isRunning: true});
@@ -133,7 +133,7 @@ export class ControlPanel extends React.Component {
 	}
 
 	stopAnimating =
-	(ev) => {
+	() => {
 		//console.info(`stopAnimating starts`);
 		this.isRunning = storeASetting('frameSettings', 'isRunning', false);
 		this.setState({isRunning: false});
@@ -141,7 +141,7 @@ export class ControlPanel extends React.Component {
 	}
 
 	startStop =
-	(ev) => {
+	ev => {
 		//console.info(`startStop starts, this.isRunning=${this.isRunning}`);
 		if (this.isRunning)
 			this.stopAnimating();
