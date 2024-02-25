@@ -40,7 +40,7 @@ const statGlobals = {
 					{this.statRow('Divergence'         , 'reversePercent', '%')}
 					{this.statRow('Frame Calc Time'    , 'frameCalcTime', 'ms')}
 					{this.statRow('Draw Time'                  , 'drawTime', 'ms')}
-					{this.statRow('Total For Frame'   , 'totalForIntegration', 'ms')}
+					{this.statRow('Total For Frame'   , 'totalForFrame', 'ms')}
 					{this.statRow('Frame Period'      , 'framePeriod', 'ms')}
 					{this.statRow('Frames Per Sec'   , 'framesPerSec', '/sec')}
 				</tbody></table>
