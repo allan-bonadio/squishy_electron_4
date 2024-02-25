@@ -16,12 +16,18 @@ struct slaveThread {
 	// creates all threads, etc
 	static void createSlaves(qGrinder *grinder);
 
-	// actually gets called each frame.  Not strictly synchronized inter-thread
+	// called once per frame, at the end after last thread finishes (by last thread)
+	void threadsHaveFinished(void);
+
+	// actually gets called each frame.  Not strictly synchronized inter-thread, but runs from
+	// requestAnimationFrame()
 	void slaveRunner(void);
 
 	// timing of the most recent integration; startCalc and endCalc sampled when
 	// they're stored, beginning and end of integration frame
 	double startCalc;
 	double frameCalcTime;
+
+	static int newFrameFactor;
 };
 

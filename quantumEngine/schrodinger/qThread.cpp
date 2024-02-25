@@ -23,17 +23,18 @@ bool traceThreads = true;
 
 
 // the function called in each thread-specific main loop, 60x/sec
-static void mainLooper(void *arg) {
-	qThread *thread = (qThread *) arg;
-	//printf("🐴  mainLooper entered with qthread=%p\n", thread);
-	thread->dumpAThread("mainLooper entered");
-	//printf("mainLooper entered with qthread=%p,  qt-handler=%p\n",
-	//	 thread->handler);
-	//qGrinder *grinder = (qGrinder *) qt->handle;
-
-
-	(*thread->handler)(thread->arg);
-}
+// NO see slaveThread
+//static void mainLooper(void *arg) {
+//	qThread *thread = (qThread *) arg;
+//	//printf("🐴  mainLooper entered with qthread=%p\n", thread);
+//	thread->dumpAThread("mainLooper entered");
+//	//printf("mainLooper entered with qthread=%p,  qt-handler=%p\n",
+//	//	 thread->handler);
+//	//qGrinder *grinder = (qGrinder *) qt->handle;
+//
+//
+//	(*thread->handler)(thread->arg);
+//}
 
 // each thread does this upon startup; runs this func
 // the function that runs the whole thread, executes in the thread thread
@@ -45,16 +46,19 @@ static void *tStart(void *qtx) {
 	qt->confirmThread();
 	printf("🐴 qThread::ok confirmed in tStart #%d!\n", qt->serial);
 	qt->dumpAThread("starting tStart()");
-	emscripten_set_main_loop_arg(
-		&mainLooper,
-		qt,  // argument
-		-1,   // fps, or -1 to run off of Req Ani Frame
-		false);
-	// so does that ever return?  Tryna prevent the thread going away
 
-	// I guess we don't get here until ... I dunno
-	printf("🦒  💥 🌪 emscripten_set_main_loop_arg() finished ️"
-		"I guess we don't get here until ... I dunno\n");
+	(*qt->handler)(qt->arg);
+
+//	emscripten_set_main_loop_arg(
+//		&mainLooper,
+//		qt,  // argument
+//		-1,   // fps, or -1 to run off of Req Ani Frame
+//		false);
+//	// so does that ever return?  Tryna prevent the thread going away
+//
+//	// I guess we don't get here until ... I dunno
+//	printf("🦒  💥 🌪 emscripten_set_main_loop_arg() finished ️"
+//		"I guess we don't get here until ... I dunno\n");
 
 	// wait, this ends the thread....
 	return NULL;
@@ -120,7 +124,6 @@ void qThread::confirmThread(void) {
 	qThread::nRunningThreads++;
 }
 
-// NO!  use N_THREADS defined const int qThread::nThreads = N_THREADS;  // requested; set at compile time
 int qThread::nCreatedThreads = 0;  // total created, dynamic
 int qThread::nRunningThreads = 0;  // total confirmed, dynamic
 
