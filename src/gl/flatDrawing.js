@@ -4,7 +4,7 @@
 */
 
 import {abstractDrawing} from './abstractDrawing.js';
-import cxToColorGlsl from './cx2rgb/cx2rgb.glsl.js';
+import cx2rgb from './cx2rgb/cx2rgb.glsl.js';
 import {viewUniform, viewAttribute} from './viewVariable.js';
 
 let traceViewBufAfterDrawing = false;
@@ -27,7 +27,7 @@ let pointSize = traceDrawPoints ? `gl_PointSize = 10.;` : '';
 */
 
 // make the line number for the start correspond to this JS file line number - the NEXT line
-const vertexSrc = `${cxToColorGlsl}
+const vertexSrc = `${cx2rgb}
 #line 32
 varying highp vec4 vColor;
 attribute vec4 row;

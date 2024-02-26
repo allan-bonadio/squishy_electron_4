@@ -18,11 +18,10 @@ const KINK_FACTOR = KINK / sqrtOneThird;
 const MEZZO_FACTOR = (1. - KINK) * sqrtThree / 4;
 const MEZZO_OFFSET = (1. + KINK) / 2;
 
-
 // line numbers should correspond!  Be careful how many lines this is!
 //       '#line 17' labels the NEXT line as line 17
-const cx2rgb = `
-#line 26
+export const cx2rgb = `
+#line 25
 float sqrtOneThird = ${sqrtOneThird};
 
 // see below
@@ -102,7 +101,7 @@ vec3 cx2rgb(vec2 cx) {
 	temp = cx;
 
 	if (cx.x == 0. || cx.y == 0.) {
-		color = handleRealImag(cx.x, cx.y);
+		color = handleRealImag(cx);
 	}
 	else if (cx.x > 0.) {
 		// the real positive side
@@ -223,6 +222,8 @@ vec3 OLDcxToColor(vec2 psi) {
 
 `;
 
+
 // actual glsl string exported so all webgl code can reuse it
 // temp removed during testing
 export default cx2rgb;
+
