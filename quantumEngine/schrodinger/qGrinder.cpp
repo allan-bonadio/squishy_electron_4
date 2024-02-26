@@ -26,8 +26,8 @@
 
 
 
-static bool traceIntegration = true;
-static bool traceIntegrationDetails = false;
+static bool traceIntegration = false;
+static bool traceIntegrationDetailed = false;
 
 static bool traceJustWave = false;
 
@@ -262,6 +262,8 @@ void qGrinder::tallyUpReversals(qWave *qwave) {
 // Maybe this should be in slaveThread?
 void qGrinder::oneFrame() {
 	if (traceIntegration)
+		console.log("starting oneFrame");
+	if (traceIntegrationDetailed)
 		qGrinder::dumpObj("starting oneFrame");
 //	isIntegrating = frameInProgress = true;
 	qCx *wave0 = qflick->waves[0];
