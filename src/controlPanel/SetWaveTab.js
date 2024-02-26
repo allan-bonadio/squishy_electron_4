@@ -9,10 +9,6 @@ import {scaleLinear} from 'd3-scale';
 
 
 import GLView from '../gl/GLView.js';
-// import eWave from '../engine/eWave.js';
-// import eCx from '../engine/eCx.js';
-// import cxToRgb from '../view/cxToRgb.js';
-//import cx2rgb from '../gl/cx2rgb/cx2rgb.txlated.js';
 import TextNSlider from '../widgets/TextNSlider.js';
 import {} from '../utils/storeSettings.js';
 import {getAGroup, alternateMinMaxs} from '../utils/storeSettings.js';

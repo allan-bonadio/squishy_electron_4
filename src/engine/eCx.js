@@ -5,7 +5,6 @@
 
 // should get rid of cxToRgb; it was an old translation
 import cxToRgb from '../view/cxToRgb.js';
-import cx2rgb from '../gl/cx2rgb/cx2rgb.txlated.js';
 
 // do this old school class so  i can use the constructor without new
 // very handy - either arg can be a complex obj, or a real, and the im arg can be absent
@@ -36,12 +35,11 @@ function eCx(re, im) {
 }
 
 // aint workin
-eCx.prototype.color = function color() {
-	// should siwtch this over to cxToRgb////
-	return cxToRgb(this);
-};
+//eCx.prototype.color = function color() {
+//	return cxToRgb(this);
+//};
 
-// aint workin?
+// aint used?
 eCx.prototype.norm = function norm() {
 	return this.re ** 2 + this.im ** 2;
 }
