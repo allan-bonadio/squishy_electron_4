@@ -105,6 +105,9 @@ export class ControlPanel extends React.Component {
 
 		// This constructor can only happen after the spacePromise has resolved.
 		this.isRunning = getASetting('frameSettings', 'isRunning');
+		if (this.isRunning)
+			this.startAnimating();
+
 	}
 
 	/* ******************************************************* start/stop */
@@ -128,16 +131,17 @@ export class ControlPanel extends React.Component {
 	() => {
 		//console.info(`startAnimating starts`);
 		this.isRunning = storeASetting('frameSettings', 'isRunning', true);;
-		this.setState({isRunning: true});
-		this.grinder.shouldBeIntegrating = true;
+		eSpaceCreatedPromise
+		.then(space => space.grinder.shouldBeIntegrating = true)
+
 	}
 
 	stopAnimating =
 	() => {
 		//console.info(`stopAnimating starts`);
 		this.isRunning = storeASetting('frameSettings', 'isRunning', false);
-		this.setState({isRunning: false});
-		this.grinder.shouldBeIntegrating = false;
+		eSpaceCreatedPromise
+		.then(space => space.grinder.shouldBeIntegrating = false)
 	}
 
 	startStop =

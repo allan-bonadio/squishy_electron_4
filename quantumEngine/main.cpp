@@ -16,12 +16,15 @@
 // all these param names must be lower case for some reason.
 EM_JS(int, qeStarted, (int max_dimensions, int max_label_len, int n_threads),
 {
-	if (!window.startUpFromCpp) {
-		debugger;
-		throw(" 🐣 startUpFromCpp() not available on startup!      🙄  ");
-	}
+	// sometimes these things start in the wrong order
+	let inter = setInterval(() => {
+		if (window.startUpFromCpp) {
+			window.startUpFromCpp(max_dimensions, max_label_len, n_threads);
+			clearInterval(inter);
+		}
+	}, 100);
 
-	window.startUpFromCpp(max_dimensions, max_label_len, n_threads);
+	// worthless i think
 	return navigator.hardwareConcurrency;
 }
 );
@@ -31,11 +34,7 @@ EM_JS(int, qeStarted, (int max_dimensions, int max_label_len, int n_threads),
 int main() {
 	printf(" 🐣 bonjour le monde!\n");
 
-	// returns 1.  pfft.  std::thread::hardware_concurrency();
-
-	int hardwareConcurrency = qeStarted(MAX_DIMENSIONS, MAX_LABEL_LEN, N_THREADS);
-	printf(" 🐣 hardwareConcurrency=%d  \n", hardwareConcurrency);
-
+	qeStarted(MAX_DIMENSIONS, MAX_LABEL_LEN, N_THREADS);
 	return 0;
 }
 
