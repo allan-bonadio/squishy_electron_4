@@ -1,7 +1,7 @@
 #!/bin/bash
 ##
 ## Build Production -- build script for quantum engine Production production
-## Copyright (C) 2022-2023 Tactile Interactive, all rights reserved
+## Copyright (C) 2022-2024 Tactile Interactive, all rights reserved
 ##
 
 # script to compile emscripten/C++ sources into WebAssembly

@@ -1,6 +1,6 @@
 /*
 ** abacus -- a sequence of waves, each representing a step in integration of the PDE
-** Copyright (C) 2023-2023 Tactile Interactive, all rights reserved
+** Copyright (C) 2023-2024 Tactile Interactive, all rights reserved
 */
 
 #define UNLOCKED  255

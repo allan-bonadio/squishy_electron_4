@@ -1,6 +1,6 @@
 /*
 ** voltage utils -- since there's no wrapper class, some code to do useful things
-** Copyright (C) 2021-2023 Tactile Interactive, all rights reserved
+** Copyright (C) 2021-2024 Tactile Interactive, all rights reserved
 */
 
 import {scaleLinear} from 'd3-scale';

@@ -1,6 +1,6 @@
 /*
 ** ctxFactory -- additional code for GLView shared  with testsRunner.html
-** Copyright (C) 2023-2023 Tactile Interactive, all rights reserved
+** Copyright (C) 2023-2024 Tactile Interactive, all rights reserved
 */
 
 // TODO: you can't name this ctxFactory, that's always the thing I call 'gl'.

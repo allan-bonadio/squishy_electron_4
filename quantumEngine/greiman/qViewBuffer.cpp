@@ -1,6 +1,6 @@
 /*
 ** view Buffer -- interface data buffer to webGL
-** Copyright (C) 2021-2023 Tactile Interactive, all rights reserved
+** Copyright (C) 2021-2024 Tactile Interactive, all rights reserved
 */
 
 // TODO merge qViewBuffer into qAvatar

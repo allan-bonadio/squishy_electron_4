@@ -1,6 +1,6 @@
 /*
 ** store settings -- storing control panel settings in localStorage for the next session
-** Copyright (C) 2022-2023 Tactile Interactive, all rights reserved
+** Copyright (C) 2022-2024 Tactile Interactive, all rights reserved
 */
 
 import {isPowerOf2} from './powers.js';

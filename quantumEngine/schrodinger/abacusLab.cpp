@@ -1,6 +1,6 @@
 /*
 ** Abacus Lab -- experimental harness to test Abacus algorithm
-** Copyright (C) 2023-2023 Tactile Interactive, all rights reserved
+** Copyright (C) 2023-2024 Tactile Interactive, all rights reserved
 */
 
 #include "../hilbert/qSpace.h"

@@ -2,7 +2,7 @@
 
 ########################################################
 # abacus Runner -- run abacusLab experiments
-# Copyright (C) 2023-2023 Tactile Interactive, all rights reserved
+# Copyright (C) 2023-2024 Tactile Interactive, all rights reserved
 
 # this runs from the main quantumEngine directory
 cd `dirname $0`

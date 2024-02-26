@@ -1,6 +1,6 @@
 /*
 ** slaveThread -- one thread that's doing iteration
-** Copyright (C) 2023-2023 Tactile Interactive, all rights reserved
+** Copyright (C) 2023-2024 Tactile Interactive, all rights reserved
 */
 
 

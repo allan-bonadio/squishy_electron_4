@@ -1,6 +1,6 @@
 /*
 ** Text and Slider -- an input slider and input text box working in unison
-** Copyright (C) 2021-2023 Tactile Interactive, all rights reserved
+** Copyright (C) 2021-2024 Tactile Interactive, all rights reserved
 */
 
 import PropTypes from 'prop-types';

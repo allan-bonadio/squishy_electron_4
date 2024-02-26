@@ -1,6 +1,6 @@
 /*
 ** powers -- UI code to do logarithmic scales in powers of 10 or 2
-** Copyright (C) 2021-2023 Tactile Interactive, all rights reserved
+** Copyright (C) 2021-2024 Tactile Interactive, all rights reserved
 */
 
 

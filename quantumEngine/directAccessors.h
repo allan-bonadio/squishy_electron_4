@@ -1,6 +1,6 @@
 /*
 ** directAccessors -- helpers to generate direct accessor funcs for JS
-** Copyright (C) 2022-2023 Tactile Interactive, all rights reserved
+** Copyright (C) 2022-2024 Tactile Interactive, all rights reserved
 */
 
 // See how these are used in qGrinder.cpp and qSpace.cpp . Use one of these
