@@ -1,12 +1,12 @@
 /*
 ** eWave -- JS equivalent to a qWave (roughly)
-** Copyright (C) 2021-2023 Tactile Interactive, all rights reserved
+** Copyright (C) 2021-2024 Tactile Interactive, all rights reserved
 */
 
 // There is no eBuffer or eSpectrum; C++ deals with those exclusively
 
 import {qe} from './qe.js';
-import cxToColor from '../gl/cxToColor/cxToColor.txlated.js';
+import cx2rgb from '../gl/cx2rgb/cx2rgb.txlated.js';
 import {cppObjectRegistry, prepForDirectAccessors} from '../utils/directAccessors.js';
 import eSpace from './eSpace.js';
 
@@ -66,8 +66,7 @@ export function rainbowDump(wave, start, end, nPoints, title) {
 	for (let ix2 = start2; ix2 < end2; ix2 += 2) {
 		let mag = (wave[ix2] ** 2 + wave[ix2 + 1] ** 2) * correction;
 
-		// should change this to cxToColor()
-		let color = cxToColor([wave[ix2], wave[ix2 + 1]]);
+		let color = cx2rgb([wave[ix2], wave[ix2 + 1]]);
 		color = `rgb(${color[0]*255}, ${color[1]*255}, ${color[2]*255})`;
 		console.log(`%c `, `background-color: ${color}; padding-right: ${mag+5}px; `);
 	}

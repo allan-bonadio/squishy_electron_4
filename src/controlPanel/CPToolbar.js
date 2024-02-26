@@ -1,13 +1,13 @@
 /*
 ** control panel toolbar -- toolbar immediately below WaveView
-** Copyright (C) 2021-2023 Tactile Interactive, all rights reserved
+** Copyright (C) 2021-2024 Tactile Interactive, all rights reserved
 */
 
 import React from 'react';
 import PropTypes from 'prop-types';
 import eSpace from '../engine/eSpace.js';
 
-let traceCPToolbar = false;
+let traceCPToolbar = true;
 
 
 function setPT() {
@@ -60,7 +60,7 @@ function CPToolbar(props) {
 	return <div className='CPToolbar'>
 		<div className='frameRateBox'>
 			frame rate:<br />
-			<select className='rateSelector' value={apparentFrequency}
+			<select className='rateSelector' name='rateSelector' value={apparentFrequency}
 					onChange={ev => setFrameFrequency(ev.currentTarget.value)}>
 				{repRates}
 			</select>
@@ -112,7 +112,7 @@ function CPToolbar(props) {
 				&nbsp;
 
 				<label>
-					<input type='checkbox' checked={props.showVoltage}
+					<input type='checkbox' checked={props.showVoltage} name='showVoltage'
 						onChange={props.toggleShowVoltage} />
 					Show Voltage
 				</label>
@@ -125,14 +125,3 @@ setPT();
 
 export default CPToolbar;
 
-
-//
-// 		<div className='algorithmBox'>
-// 			algorithm:
-// 			<select className='algorithmSelector' value={algorithm}
-// 					onChange={ev => setAlgorithm(ev.currentTarget.value)}>
-// 				<option value={algRK2}>RK2</option>
-// 				<option value={algRK4}>RK4</option>
-// 				<option value={algVISSCHER}>Visscher</option>
-// 			</select>
-// 		</div>

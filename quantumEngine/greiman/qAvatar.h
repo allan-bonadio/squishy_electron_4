@@ -1,6 +1,6 @@
 /*
 ** qAvatar -- the instance and simulation of a quantum mechanical wave in a space
-** Copyright (C) 2021-2023 Tactile Interactive, all rights reserved
+** Copyright (C) 2021-2024 Tactile Interactive, all rights reserved
 */
 
 // formerly called: Manifestation, Incarnation, Timeline, ... formerly part of qSpace
@@ -32,7 +32,7 @@ struct qAvatar {
 	float *vBuffer;  // aligned by 4, not 8
 
 	// rename to initThreadIntegration
-	void initIntegrationLoop(int xxx, int nThreads, int nStages);
+	//void initIntegrationLoop(int xxx, int nThreads, int nStages);
 
 	// for alignment: put the rest of these last
 

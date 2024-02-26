@@ -1,6 +1,6 @@
 /*
 ** Hamiltonian -- calculate the energy of the wave, H | 𝜓 >
-** Copyright (C) 2021-2023 Tactile Interactive, all rights reserved
+** Copyright (C) 2021-2024 Tactile Interactive, all rights reserved
 */
 
 

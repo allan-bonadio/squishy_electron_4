@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 /*
 ** generate exports -- generate files for JS calling C++ code through emscripten
-** Copyright (C) 2021-2023 Tactile Interactive, all rights reserved
+** Copyright (C) 2021-2024 Tactile Interactive, all rights reserved
 */
 
 let traceOutput = false;
@@ -10,7 +10,7 @@ if (! process.env.SQUISH_ROOT) throw "env var SQUISH_ROOT not defined!  Should b
 
 console.log(`genExports: Run this whenever the list of C++ functions to call from JS changes.`);
 
-// we don't use fs promises; the promise is just for loading the fs package
+// we mostly don't use fs promises; the promise is just for loading the fs package
 const fsProm = import('fs');
 let fs;  // filled in after promise is resolved
 
@@ -31,7 +31,7 @@ let exportsSrc  = [
 	// creating the space
 	{name: 'startNewSpace', args: ['string'], retType: 'number'},
 	{name: 'addSpaceDimension', args: ['number', 'number', 'number', 'number', 'string'], retType: null},
-	{name: 'completeNewSpace', args: ['number'], retType: 'number'},
+	{name: 'completeNewSpace', args: ['number', 'number'], retType: 'number'},
 	{name: 'deleteFullSpace', args: ['number'], retType: null},
 
 	// errors & exceptions
@@ -51,13 +51,26 @@ let exportsSrc  = [
 
 
 	// ************************* grinder
-	{name: 'grinder_initThreadIntegration', args: ['number', 'number', 'number'], retType: null},
+	//{name: 'grinder_initThreadIntegration', args: ['number', 'number', 'number'], retType: null},
+	// nope.  JS doesn't touch threads.
+	// {name: 'grinder_createASlave', args: ['number', 'number'], retType: 'number'},
+
+	// for the older, same-thread integration, or to be run in a/the thread
 	{name: 'grinder_oneFrame', args: ['number'], retType: null},
+
+	// releases the master semaphore to start all the threads integrating
+	//{name: 'grinder_startAFrame', args: ['number'], retType: null},
+
 
 	{name: 'grinder_askForFFT', args: ['number'], retType: null},
 
 	{name: 'grinder_copyFromAvatar', args: ['number', 'number'], retType: null},
 	{name: 'grinder_copyToAvatar', args: ['number', 'number'], retType: null},
+
+
+	// ************************* pthreads / qThread
+
+	{name: 'thread_setupThreads', args: [], retType: 'number'},
 
 ];
 

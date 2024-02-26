@@ -1,6 +1,6 @@
 /*
 ** Voltage Sidebar -- on the right side of the canvas, for scrolling the voltage range
-** Copyright (C) 2023-2023 Tactile Interactive, all rights reserved
+** Copyright (C) 2023-2024 Tactile Interactive, all rights reserved
 */
 
 import React from 'react';

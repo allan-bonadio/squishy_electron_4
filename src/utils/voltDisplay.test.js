@@ -1,14 +1,12 @@
 /*
 ** voltDisplay test -- testing hte math for viewing and zooming the voltage in the WaveView
-** Copyright (C) 2022-2023 Tactile Interactive, all rights reserved
+** Copyright (C) 2022-2024 Tactile Interactive, all rights reserved
 */
 
 import {expect, test, jest} from '@jest/globals';
 import voltDisplay from './voltDisplay.js';
 import {dumpJsStack} from './errors.js';
 
-//import {getASetting, storeASetting, getAGroup, storeAGroup} from '../utils/storeSettings.js';
-//import {isPowerOf2} from './powers.js';
 import qe from '../engine/qe.js';
 
 let traceObj = false;

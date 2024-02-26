@@ -1,6 +1,6 @@
 /*
 ** Main -- top level source file for running Squishy Electron
-** Copyright (C) 2021-2023 Tactile Interactive, all rights reserved
+** Copyright (C) 2021-2024 Tactile Interactive, all rights reserved
 */
 
 #include "hilbert/qSpace.h"
@@ -13,20 +13,20 @@
 // Emscripten magic: this c++ function will end up executing the JS enclosed.
 // call this JS callback so JS knows we're up and ready.
 // Hand it some numbers from the builder script.
-// somehow there's a race condition where this isn't set soon enough... sometimes
-EM_JS(int, qeStarted, (int max_dimensions, int max_label_len),
-	{
-		// initialization is big and complex; don't run it from C++
-		// it has to happen after cppRuntimeInitialized() has been loaded
-		let trying = setInterval(() => {
-			if (window.cppRuntimeInitialized) {
-				clearInterval(trying);
-				window.cppRuntimeInitialized(max_dimensions, max_label_len);
-			
-			}
-		}, 250);
-		return navigator.hardwareConcurrency;
-	}
+// all these param names must be lower case for some reason.
+EM_JS(int, qeStarted, (int max_dimensions, int max_label_len, int n_threads),
+{
+	// sometimes these things start in the wrong order
+	let inter = setInterval(() => {
+		if (window.startUpFromCpp) {
+			window.startUpFromCpp(max_dimensions, max_label_len, n_threads);
+			clearInterval(inter);
+		}
+	}, 100);
+
+	// worthless i think
+	return navigator.hardwareConcurrency;
+}
 );
 
 
@@ -34,10 +34,7 @@ EM_JS(int, qeStarted, (int max_dimensions, int max_label_len),
 int main() {
 	printf(" 🐣 bonjour le monde!\n");
 
-	// returns 1.  pfft.  std::thread::hardware_concurrency();
-
-	int hardwareConcurrency = qeStarted(MAX_DIMENSIONS, MAX_LABEL_LEN);
-	printf(" 🐣 hardwareConcurrency=%d  \n", hardwareConcurrency);
+	qeStarted(MAX_DIMENSIONS, MAX_LABEL_LEN, N_THREADS);
 	return 0;
 }
 

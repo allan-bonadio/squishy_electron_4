@@ -1,9 +1,7 @@
 /*
 ** abstract View Def -- superclass for all the views, which live inside the WaveView
-** Copyright (C) 2021-2023 Tactile Interactive, all rights reserved
+** Copyright (C) 2021-2024 Tactile Interactive, all rights reserved
 */
-
-//import {abstractDrawing} from './abstractDrawing.js';
 
 // should have one VAO per viewdef, or per drawing?
 // per drawing seems to be the winner.
@@ -67,13 +65,6 @@ export class abstractViewDef {
 		// and set up interactivity
 		// maybe i should get rid of this
 		this.domSetupForAllDrawings(this.canvas);
-
-		// just for curiosity's sake, pretty cool
-		// need to import {curioShader, curioProgram, curioParameter} from curiousity.js;
-		//curioShader(this.gl, this.vertexShader);
-		//curioShader(this.gl, this.fragmentShader);
-		//curioProgram(this.gl, this.program);
-		//curioParameter(this.gl);
 	}
 
 	/* ****************************************** Shader s */
@@ -100,23 +91,6 @@ export class abstractViewDef {
 		});
 	}
 
-	// reload ALL the variables on this view
-	// should be done once before every repaint
-//	reloadAllVariables() {
-//		this.drawings.forEach(drawing => {
-//			drawing.setDrawing();
-////			gl.useProgram(drawing.program);
-////			gl.bindVertexArray(drawing.vao);
-//			drawing.viewVariables.forEach(v => v.reloadVariable());
-//		});
-//	}
-
-	/* ************************************************** Geometry and transformations */
-	// Synch the gl viewport to the canvvas size.  call this every time the canvas resizes.
-	// do we really need to do this!?!?
-	//setGlViewport() {
-	//	this.gl.viewport(0, 0, this.canvas.width, this.canvas.height);
-	//}
 
 	/* ************************************************** drawing */
 

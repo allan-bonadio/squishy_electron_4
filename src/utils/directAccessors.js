@@ -1,6 +1,6 @@
 /*
 ** directAccessors -- helpers to generate direct accessor funcs for JS
-** Copyright (C) 2022-2023 Tactile Interactive, all rights reserved
+** Copyright (C) 2022-2024 Tactile Interactive, all rights reserved
 */
 
 // lookup table from qObject pointer in C++, to JS eObject or TypedArray

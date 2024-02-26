@@ -1,6 +1,6 @@
 /*
 ** Abacus Lab -- experimental harness to test Abacus algorithm
-** Copyright (C) 2023-2023 Tactile Interactive, all rights reserved
+** Copyright (C) 2023-2024 Tactile Interactive, all rights reserved
 */
 
 #include "../hilbert/qSpace.h"
@@ -45,7 +45,7 @@ static void doOneFrameMaybe(void) {
 
 /* ********************************************************************************* main level */
 #define nWAVES  3
-#define nTHREADS  3
+#define N_THREADS  3
 
 int main(int argc, char **argv) {
 	space = makeFullSpace(8);
@@ -58,7 +58,7 @@ int main(int argc, char **argv) {
 	//	printf("arg %d is %s\n", i, argv[i]);
 	//}
 
-	aba = new abacus(space, qgrinder, nWAVES, nTHREADS);
+	aba = new abacus(space, qgrinder, nWAVES, N_THREADS);
 
 	//printf("---------------------------- edges fresh\n");
 	//aba->dumpEdges();

@@ -1,6 +1,6 @@
 /*
 ** q complex - complex and other types we use all over
-** Copyright (C) 2021-2023 Tactile Interactive, all rights reserved
+** Copyright (C) 2021-2024 Tactile Interactive, all rights reserved
 */
 
 #define byte unsigned char

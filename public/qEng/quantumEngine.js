@@ -1,0 +1,1 @@
+../../quantumEngine/wasm/quantumEngine.js

@@ -1,6 +1,6 @@
 /*
 ** js space -- interface to JS for qSpaces
-** Copyright (C) 2021-2023 Tactile Interactive, all rights reserved
+** Copyright (C) 2021-2024 Tactile Interactive, all rights reserved
 */
 
 #include <stdexcept>
@@ -55,7 +55,7 @@ void addSpaceDimension(qSpace *space, int N, int continuum, double spaceLength, 
 }
 
 // call this from JS to finish the process for the qSpace, create and add the avatars & voltage
-qSpace *completeNewSpace(qSpace *space) {
+qSpace *completeNewSpace(qSpace *space, int nThreads) {
 	if (traceSpaceCreation)
 		printf("🚀 🚀 🚀  JS completeNewSpace starts(%s)   space=%p\n",
 			space->label, space);
@@ -68,7 +68,7 @@ qSpace *completeNewSpace(qSpace *space) {
 	qAvatar *mainAvatar = space->mainAvatar = new qAvatar(space, "mainAvatar");
 	if (traceAvatarDetail) printf("🚀 created mainAvatar\n");
 
-	qGrinder *qgrinder = space->qgrinder = new qGrinder(space, mainAvatar, "mainGrinder");
+	qGrinder *qgrinder = space->qgrinder = new qGrinder(space, mainAvatar, nThreads, "mainGrinder");
 
 	space->miniGraphAvatar = new qAvatar(space, "miniGraph");
 

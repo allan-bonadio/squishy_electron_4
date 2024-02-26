@@ -1,6 +1,6 @@
 /*
 ** testing helpers -- C++ general utilities to help with unit tests and other tests
-** Copyright (C) 2023-2023 Tactile Interactive, all rights reserved
+** Copyright (C) 2023-2024 Tactile Interactive, all rights reserved
 */
 
 #include <stdexcept>
@@ -32,7 +32,7 @@ qSpace *makeFullSpace(int N) {
 	if (traceMakeSpace) printf("        finished startNewSpace(), on to add\n");
 	addSpaceDimension(space, N, contENDLESS, 10, "x");
 	if (traceMakeSpace) printf("        finished addSpaceDimension(), on to complete\n");
-	completeNewSpace(space);
+	completeNewSpace(space, 1);
 
 	if (traceMakeSpace) printf("        finished makeFullSpace(%d)\n", N);
 	return space;

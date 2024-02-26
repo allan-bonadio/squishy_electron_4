@@ -1,7 +1,7 @@
 /*
 ** Voltage Area -- the white voltage line, and its tactile
 **	      interactions when the user moves it.  for Squishy Electron
-** Copyright (C) 2021-2023 Tactile Interactive, all rights reserved
+** Copyright (C) 2021-2024 Tactile Interactive, all rights reserved
 */
 
 import React from 'react';
@@ -9,7 +9,6 @@ import PropTypes from 'prop-types';
 
 import {scaleLinear as d3_scaleLinear} from 'd3-scale';
 import {select as d3_select} from 'd3-selection';
-//import {line as d3_line} from 'd3-shape';
 import {axisLeft as d3_axisLeft} from 'd3-axis';
 
 import ReactFauxDOM from 'react-faux-dom';

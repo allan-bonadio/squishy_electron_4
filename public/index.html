@@ -1,6 +1,6 @@
-<!DOCTYPE html>
+<!doctype html>
 <!-- index -- top level for React app Squishy Electron
-		Copyright (C) 2021-2023 Tactile Interactive, all rights reserved -->
+		Copyright (C) 2021-2024 Tactile Interactive, all rights reserved -->
 <html lang="en">
 	<head>
 		<meta charset="utf-8" />
@@ -24,6 +24,14 @@
 		</noscript>
 		<div id="root"></div>
 
-		<script async src='%PUBLIC_URL%/qEng/quantumEngine.main.js'></script>
+		<script>
+			// emscripten needs this to find workerFile quantumEngine.worker.js
+			var Module = {
+				locateFile: function(workerFile) {
+					return `/qEng/${workerFile}`;
+				}
+			};
+		</script>
+		<script async src='%PUBLIC_URL%/qEng/quantumEngine.js'></script>
 	</body>
 </html>

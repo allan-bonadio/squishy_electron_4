@@ -1,6 +1,6 @@
 /*
 ** WaveView -- a webgl image of the quantum wave (or whatever)
-** Copyright (C) 2021-2023 Tactile Interactive, all rights reserved
+** Copyright (C) 2021-2024 Tactile Interactive, all rights reserved
 */
 
 // WaveView has a 1:1 relationship with a C++ Avatar.
@@ -11,7 +11,6 @@
 
 import React from 'react';
 import PropTypes from 'prop-types';
-//import {scaleLinear} from 'd3-scale';
 
 import eSpace from '../engine/eSpace.js';
 import {thousands} from '../utils/formatNumber.js';
@@ -43,11 +42,8 @@ export class WaveView extends React.Component {
 		width: PropTypes.number,  // handed in, pixels, depends on window width
 
 		showVoltage: PropTypes.bool.isRequired,
-		//gimmeVoltageArea: PropTypes.func.isRequired,
 
 		sPanel: PropTypes.object.isRequired,
-		//sPanel: PropTypes.instanceOf(SquishPanel).isRequired,
-
 	};
 
 	constructor(props) {
@@ -66,9 +62,6 @@ export class WaveView extends React.Component {
 		}
 		// facts: directly measured Canvas dimensions
 		this.canvasFacts = {width: 0, height: 0};  // temporary
-
-		//this.canvasFacts = {width: props.width, // temporary
-		//	height: this.state.height};
 
 		this.formerWidth = props.width;
 		this.formerHeight = this.state.height;
@@ -94,8 +87,6 @@ export class WaveView extends React.Component {
 			console.error(`eSpaceCreatedPromise failed`);
 			debugger;
 		});
-
-		//this.initVolts();
 	}
 
 	// we finally have a canvas; rush its dimensions up here
@@ -128,7 +119,6 @@ export class WaveView extends React.Component {
 			this.formerHeight = s.height;
 			this.formerShowVoltage = p.showVoltage;
 
-			//this.adjustDimensions();
 			this.vDisp.setVoltScales(this.canvasFacts.width, s.height, p.space.nPoints);
 		}
 	}
@@ -147,7 +137,6 @@ export class WaveView extends React.Component {
 		b.addEventListener('mouseup', this.mouseUp);
 		b.addEventListener('mouseleave', this.mouseUp);
 
-		//this.sizeBoxEl.style.borderColor = '#aaa';
 		ev.preventDefault();
 		ev.stopPropagation();
 	}
@@ -175,8 +164,6 @@ export class WaveView extends React.Component {
 		b.removeEventListener('mousemove', this.mouseMove);
 		b.removeEventListener('mouseup', this.mouseUp);
 		b.removeEventListener('mouseleave', this.mouseUp);
-
-		//this.sizeBoxEl.style.borderColor = '';
 
 		ev.preventDefault();
 		ev.stopPropagation();
@@ -206,8 +193,6 @@ export class WaveView extends React.Component {
 		const p = this.props;
 		const s = this.state;
 
-		//this.setVoltScales();
-
 		// if c++ isn't initialized yet, we can assume the time and frame serial
 		let elapsedTime = '0';
 		let frameSerial = '0';
@@ -217,7 +202,7 @@ export class WaveView extends React.Component {
 			frameSerial = thousands(this.grinder.frameSerial);
 		}
 
-		const spinner = qe.cppLoaded ? ''
+		const spinner = p.space ? ''
 			: <img className='spinner' alt='spinner' src='/images/eclipseOnTransparent.gif' />;
 
 		// sometimes a fraction of a pixel causes the horiz scroll bar to kick in.  avoid that without messing up everything.
@@ -230,7 +215,7 @@ export class WaveView extends React.Component {
 			`  parent.clientWidth: ${this.waveViewEl?.parentNode.clientWidth}   widthToUse=${widthToUse}`);
 		}
 
-		// can't make a real GLView until we have the space!  until then, block out area on the page
+		// can't make a real GLView until we have the space!  until then, show spinner
 		let glView = <div style={{width: widthToUse, height: s.height}} >
 			{spinner}
 		</div>;

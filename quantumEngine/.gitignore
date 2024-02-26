@@ -1,7 +1,11 @@
 
 # compiled results
-wasm
+wasm/*
 commonConstants.h
+building/exports.json
+commonConstants.h
+# also in src is engine/qe.js, see that gitignore
+
 
 # cppu test objects, now in wasm?
 #cppuTestBin

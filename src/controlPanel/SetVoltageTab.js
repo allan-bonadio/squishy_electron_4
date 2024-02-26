@@ -1,24 +1,17 @@
 /*
 ** Set Voltage tab -- user can set the voltage to something interesting
-** Copyright (C) 2021-2023 Tactile Interactive, all rights reserved
+** Copyright (C) 2021-2024 Tactile Interactive, all rights reserved
 */
 
 import React from 'react';
 import PropTypes from 'prop-types';
 
-//import {scaleLinear} from 'd3-scale';
-//import {path as d3path} from 'd3-path';
-
-// eslint-disable-next-line no-unused-vars
 import voltDisplay from '../utils/voltDisplay.js';
-//import eSpace from '../engine/eSpace.js';
-//import TextNSlider from '../widgets/TextNSlider.js';
 import {getAGroup, storeAGroup, alternateMinMaxs} from '../utils/storeSettings.js';
 import {eSpaceCreatedPromise} from '../engine/eEngine.js';
 
 let miniWidth = 300;
 let miniHeight = 150;
-
 
 // the tab that user sets voltage with
 class SetVoltageTab extends React.Component {
@@ -26,20 +19,8 @@ class SetVoltageTab extends React.Component {
 		//space: PropTypes.instanceOf(eSpace),
 
 		// actually sets the one in use by the algorithm
-		//setVoltageHandler: PropTypes.func.isRequired,
 		toggleShowVoltage: PropTypes.func.isRequired,
 		showVoltage: PropTypes.bool.isRequired,
-
-		//setVoltageAndUpdate: PropTypes.func.isRequired,
-
-		//tellMeWhenVoltsChanged: PropTypes.func.isRequired,
-
-		//voltageParams: PropTypes.shape({
-		//	voltageBreed: PropTypes.oneOf(['flat', 'canyon', 'double']),
-		//	canyonPower: PropTypes.number.isRequired,
-		//	canyonScale: PropTypes.number.isRequired,  // NOT the same as voltageFactor; this is JS only
-		//	canyonOffset: PropTypes.number.isRequired,  // centered at X
-		//}).isRequired,
 	};
 
 	constructor(props) {
@@ -115,13 +96,6 @@ class SetVoltageTab extends React.Component {
 		// You see, if I did an autorange, the scale will seem to have no effect.  So do this crude version.
 		v.heightVolts = 10;
 		v.bottomVolts = s.canyonScale / 2 - 5;
-		// if (s.canyonScale < 0)
-		// 	v.bottomVolts = -10;
-		// else if (s.canyonScale > 0)
-		// 	v.bottomVolts = 0;
-		// else {
-		// 	v.bottomVolts = -5;
-		// }
 		if (s.canyonPower < 0) {
 			v.heightVolts /= 100;
 			v.bottomVolts /= 100;
@@ -194,7 +168,8 @@ class SetVoltageTab extends React.Component {
 	render() {
 		const p = this.props;
 
-		// remember that set*VoltageHandler is an event handler that gets the params from ControlPanel state
+		// remember that set*VoltageHandler is an event handler that gets the
+		// params from ControlPanel state
 		return <div className='setVoltageTab'>
 			<div className='voltageTitlePanel'>
 				<h3>Set Voltage</h3>

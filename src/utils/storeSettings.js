@@ -1,14 +1,21 @@
 /*
 ** store settings -- storing control panel settings in localStorage for the next session
-** Copyright (C) 2022-2023 Tactile Interactive, all rights reserved
+** Copyright (C) 2022-2024 Tactile Interactive, all rights reserved
 */
 
 import {isPowerOf2} from './powers.js';
 import qe from '../engine/qe.js';
 
-// what a disaster.   I made this whole subsystem,
+// what a disaster.   I made this whole subsystem, storeSettings (aka New)
 // but somehow the compiler fucks it up,
 // so I fell back to some lame functions.
+// TURNS OUT, all those fuckups were because there were circular import dependencies.
+// So, something gets loaded before something else, which ends up undefined!
+// Move functions into different files, or rearrange them, to fix.  Should work then.
+// should work now, if I reconstruct it.
+// Reconstruction: to support both methods, must have code for both.
+// setting: must set both, using either method
+// getting: get either; calling code decides
 
 
 // group, groupName = which component of storeSettings this is
@@ -24,37 +31,21 @@ import qe from '../engine/qe.js';
 // in the component that holds the state.
 // (maybe I should integrate these better...)
 // upon load of this file, it'll retrieve all this stuff from localStore.
-// Upon setting each var, group will be stored in localStorage.
+// Upon setting each var, group will be stored back in localStorage.
 
-/* ************************************************** All Settings */
-//debugger;
+/* ************************************************** creation of groups & params */
 
-// these'll be filled in below, dynamically created.  but none of them work.
-//export const storeSettings =  {};
-//
-//if (typeof storeSettings == 'undefined') debugger;  // webpack fuckups
-
-// these will work - make them classes
+// alternate system: these will work
 export let alternateStoreDefaults = {};
 export let alternateStoreVerifiers = {};
 export let alternateMinMaxs = {};
 
 export let alternateStore = {};  // try this again?
 
-// no, try making it a function.  That way webpack can't forget it.
-export function storeSettings() {}
-// in fact, nodes all up and down the tree can be functions that return or set the value(s)
-// at that point in the setting hierarchy.  cool.  not really necessary...
+// New System: The Root.  All groups are properties of this.
+export const storeSettings = {};
 
-
-// somehow webpack fumbles this if it's extern, in SquishPanel
-// no doesn't seem to make a diff
-//window.storeSettings = storeSettings;
-
-// save in the localSettings
-//function saveGroup(groupName) {
-//	localStorage.setItem(groupName, JSON.stringify(storeSettings[groupName]));
-//}
+window.storeSettings = storeSettings;
 
 // figure out a function that can validate this param quickly
 function makeCriterionFunction(criterion) {
@@ -86,13 +77,13 @@ function makeCriterionFunction(criterion) {
 			return value => crit.includes(value);
 		}
 
-		// must be like {min=-100, max=100}; optional step
+		// must be like {min=-100, max=100}; optional step = 20
 		case 'Object': {
 			let crit = {...criterion};
 			let func;
 			if (criterion.step) {
 				func = value => (value >= crit.min && value <= crit.max
-					&& 0 === value % crit.step);
+					&& 0 === (value - crit.min) % crit.step);
 				func.step = crit.step;
 			}
 			else {
@@ -105,12 +96,12 @@ function makeCriterionFunction(criterion) {
 
 		default:
 			debugger;
-			throw new Error(`bad criterion class ${criterion.constructor.name}`);
+			throw new Error(`bad storeSettings criterion class ${criterion.constructor.name}`);
 		}
 
 	default:
 		debugger;
-		throw new Error(`bad criterion type ${typeof criterion})`);
+		throw new Error(`bad storeSettings criterion type ${typeof criterion})`);
 	}
 }
 
@@ -180,16 +171,16 @@ function makeParam(groupName, varName, defaultValue, criterion) {
 // settings are immediately effective
 // params are effective after user clicks some button to effect or commit changes
 // when referring to both, I use them interchangeably.
-// To reset them all, just delete all the local storage for this app.  I shuld mkae a button...
+// To reset them all, just delete all the local storage for this app.  I should make a button...
 
+// somewhere you have to record the defaults and criterion for each setting, so here they are
+// these also define the controls mins and maxes
 // unit tests want to recreate these from scratch
 export function createStoreSettings() {
 
 	/* ************************************ spaceParams */
-	// somewhere you have to record the defaults and criterion for each setting, so here they are
-	// these also define the controls mins and maxes
 
-	// see also resolution dialog for the slider
+	// see also resolution dialog to change these
 	makeParam('spaceParams', 'N', 64,  N => isPowerOf2(N) );
 	makeParam('spaceParams', 'continuum', qe.contENDLESS,
 		[qe.contDISCRETE, qe.contWELL, qe.contENDLESS]);
@@ -197,22 +188,26 @@ export function createStoreSettings() {
 
 	/* ************************************ waveParams */
 
-	// this keeps many settings that don't immediately affect running frame.
-	// So 'Set Wave' button actually sets the wave, but meanwhile the setting sliders
-	// need to be remembered; this does it.  Voltage and space too; not active until user does something.
-	// THis also defines slider mins and maxes!  One source of truth.
+	// These keep many settings that don't immediately affect running frame -
+	// the immediate values of the sliders and controls. So 'Set Wave' button
+	// actually sets the wave, but meanwhile the setting sliders need to be
+	// remembered; this does it.  Voltage and space too; not active until user
+	// does something. This also defines slider mins and maxes!  One source of
+	// truth.
 
 	makeParam('waveParams', 'waveBreed', 'gaussian', ['circular', 'standing', 'gaussian', 'chord']);
 	makeParam('waveParams', 'waveFrequency', 6, {min: -100, max: 100, step: 0.5});
 	makeParam('waveParams', 'pulseWidth', 10, {min: 1, max: 100});
 	makeParam('waveParams', 'pulseOffset', 20, {min: 0, max: 100});
 
-	/* ************************************ voltageParams */
+	/* ************************************ voltage */
+	// the voltage controls
 	makeParam('voltageParams', 'voltageBreed', 'flat', ['flat', 'canyon', 'double']);
 	makeParam('voltageParams', 'canyonPower', 2, {min: -4, max: 6});
 	makeParam('voltageParams', 'canyonScale', 1, {min: -10, max: 10});
 	makeParam('voltageParams', 'canyonOffset', 50, {min: 0, max: 100});
 
+	// where voltage line shows
 	makeParam('voltageSettings', 'showVoltage', true, [true, false]);
 	makeParam('voltageSettings', 'bottomVolts', -.25, {min: -256, max: 256});
 	makeParam('voltageSettings', 'heightVolts', 1, {min: 1/64, max: 256});
@@ -220,6 +215,8 @@ export function createStoreSettings() {
 	// always = min + 2 * heightVolts makeParam('voltageSettings', 'maxBottom', 16, {min: -256, max: 256});
 
 	/* ************************************ frameSettings */
+
+	// set in integration tab
 	makeParam('frameSettings', 'isRunning', true,  [false, true]);
 	makeParam('frameSettings', 'framePeriod', 50, {min: 16, max: 60_001});
 	makeParam('frameSettings', 'deltaT', 1, {min: .01, max: 1000.0, });
@@ -227,11 +224,30 @@ export function createStoreSettings() {
 	makeParam('frameSettings', 'lowPassFilter', 50, {min: 0, max: 75});
 
 	/* ************************************miscSettings */
+	// set by clicking on tab
 	makeParam('miscSettings', 'showingTab', 'wave', ['wave', 'voltage', 'space', 'integration']);
+
+	// set by size box on main view
 	makeParam('miscSettings', 'waveViewHeight', 400, {min: 50, max: 1e4});
 
 }
 
+window.dumpSettings = () => {
+	// this name comes from webpack.  Probably changes from time to time.
+	// should not be needed if I watch out for circular dependencies
+	// eslint-disable-next-line no-undef
+	const zz = _utils_storeSettings_js__WEBPACK_IMPORTED_MODULE_3__;
+	console.log(`\n🎛 Settings: alternateStoreDefaults=`,
+		alternateStoreDefaults ?? zz.alternateStoreDefaults);
+	console.log(`🎛 Settings: alternateStoreVerifiers=`,
+		alternateStoreVerifiers ?? zz.alternateStoreVerifiers);
+	console.log(`🎛 Settings: alternateMinMaxs=`,
+		alternateMinMaxs ?? zz.alternateMinMaxs);
+	console.log(`\n🎛 Settings: alternateStore=`,
+		alternateStore ?? zz.alternateStore);
+}
+
+/* ********************************************************* Alternate setters/getters */
 export function getAGroup(groupName) {
 	let group;
 	try {
@@ -242,7 +258,7 @@ export function getAGroup(groupName) {
 		group = alternateStoreDefaults[groupName];
 	}
 
-	// if completely uninitialized, create.
+	// if completely uninitialized, create.  (if user hacked on localStore)
 	if (!group)
 		group = {};
 
@@ -270,7 +286,7 @@ export function storeAGroup(groupName, newGroup) {
 	return toSet;
 }
 
-// cuz of some magical bad ju-ju, this shit just doesn't owrk and i have to do it by hand.
+// store an individual value
 export function storeASetting(groupName, varName, newValue) {
 	if (!alternateStoreVerifiers
 	|| !alternateStoreVerifiers[groupName]
@@ -306,22 +322,5 @@ export function getASetting(groupName, varName) {
 	return setting;
 }
 
+export default storeSettings;
 
-// useless
-//export default storeSettings;
-
-window.dumpSettings = () => {
-	// this name comes from webpack.  Probably changes from time to time.
-	// eslint-disable-next-line no-undef
-	const zz = _utils_storeSettings_js__WEBPACK_IMPORTED_MODULE_3__;
-	console.log(`\n🎛 Settings: alternateStoreDefaults=`,
-		alternateStoreDefaults ?? zz.alternateStoreDefaults);
-	console.log(`🎛 Settings: alternateStoreVerifiers=`,
-		alternateStoreVerifiers ?? zz.alternateStoreVerifiers);
-	console.log(`🎛 Settings: alternateMinMaxs=`,
-		alternateMinMaxs ?? zz.alternateMinMaxs);
-	console.log(`\n🎛 Settings: alternateStore=`,
-		alternateStore ?? zz.alternateStore);
-}
-
-// _utils_storeSettings_js__WEBPACK_IMPORTED_MODULE_3__

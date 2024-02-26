@@ -1,6 +1,6 @@
 /*
 ** Control Panel -- all the widgets below the displayed canvas
-** Copyright (C) 2021-2023 Tactile Interactive, all rights reserved
+** Copyright (C) 2021-2024 Tactile Interactive, all rights reserved
 */
 
 import React from 'react';
@@ -12,7 +12,6 @@ import SetWaveTab from './SetWaveTab.js';
 import SetVoltageTab from './SetVoltageTab.js';
 import SetResolutionTab from './SetResolutionTab.js';
 import SetIntegrationTab from './SetIntegrationTab.js';
-//import SquishPanel from '../sPanel/SquishPanel.js';
 import {getASetting, storeASetting, getAGroup, storeAGroup} from '../utils/storeSettings.js';
 import {eSpaceCreatedPromise} from '../engine/eEngine.js';
 import qe from '../engine/qe.js';
@@ -44,7 +43,7 @@ export class ControlPanel extends React.Component {
 
 		// the integration statistics shown in the Integration tab
 		iStats: PropTypes.shape({
-			startIntegration: PropTypes.number.isRequired,
+			startIntegrationTime: PropTypes.number.isRequired,
 			endDraw: PropTypes.number.isRequired,
 		}),
 
@@ -106,6 +105,9 @@ export class ControlPanel extends React.Component {
 
 		// This constructor can only happen after the spacePromise has resolved.
 		this.isRunning = getASetting('frameSettings', 'isRunning');
+		if (this.isRunning)
+			this.startAnimating();
+
 	}
 
 	/* ******************************************************* start/stop */
@@ -126,21 +128,24 @@ export class ControlPanel extends React.Component {
 	isRunning = false;
 
 	startAnimating =
-	(ev) => {
+	() => {
 		//console.info(`startAnimating starts`);
 		this.isRunning = storeASetting('frameSettings', 'isRunning', true);;
-		this.setState({isRunning: true});
+		eSpaceCreatedPromise
+		.then(space => space.grinder.shouldBeIntegrating = true)
+
 	}
 
 	stopAnimating =
-	(ev) => {
+	() => {
 		//console.info(`stopAnimating starts`);
 		this.isRunning = storeASetting('frameSettings', 'isRunning', false);
-		this.setState({isRunning: false});
+		eSpaceCreatedPromise
+		.then(space => space.grinder.shouldBeIntegrating = false)
 	}
 
 	startStop =
-	(ev) => {
+	ev => {
 		//console.info(`startStop starts, this.isRunning=${this.isRunning}`);
 		if (this.isRunning)
 			this.stopAnimating();
@@ -151,8 +156,13 @@ export class ControlPanel extends React.Component {
 	singleFrame =
 	(ev) => {
 		//console.info(`singleFrame starts`);
-		this.sPanel.animator.integrateOneFrame(true);
-		this.stopAnimating();
+		this.grinder.shouldBeIntegrating = true;
+		this.grinder.justNFrames = 1;
+
+
+		// wait ... need to do this one tic later.  Well, close enough.
+		setTimeout(() => this.sPanel.animator.drawLatestFrame(), 100);
+
 	}
 
 	/* ********************************************** wave */

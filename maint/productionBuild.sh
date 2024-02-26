@@ -5,7 +5,8 @@ buildWithDev=yes
 cd $SQUISH_ROOT
 
 # make sure there's no traces left on
-maint/scanForTraces.sh || exit $?
+maint/scanForTraces.py || exit $?
+#maint/scanForTraces.sh || exit $?
 
 echo "🎁 🔨 Clean and Build Production Squishy Electron"  `date +%c`
 echo you can do either make build or npm build, same

@@ -1,6 +1,6 @@
 /*
 ** quantum qGrinder tests
-** Copyright (C) 2022-2023 Tactile Interactive, all rights reserved
+** Copyright (C) 2022-2024 Tactile Interactive, all rights reserved
 */
 
 #include <cstring>
@@ -30,7 +30,7 @@ TEST(qGrinder, CheckGrinderConstructor)
 {
 	qSpace *space = makeBareSpace(8, contENDLESS);
 	qAvatar *avatar = new qAvatar(space, "grindAway");
-	qGrinder *qgrinder = new qGrinder(space, avatar, "myGrinder");
+	qGrinder *qgrinder = new qGrinder(space, avatar, 1, "myGrinder");
 
 	LONGS_EQUAL('Grin', qgrinder->magic);
 	POINTERS_EQUAL(space, qgrinder->space);
@@ -58,11 +58,11 @@ TEST(qGrinder, CheckGrinderConstructor)
 
 
 	LONGS_EQUAL(false, qgrinder->isIntegrating);
-	LONGS_EQUAL(false, qgrinder->needsIntegration);
+	LONGS_EQUAL(false, qgrinder->shouldBeIntegrating);
 	LONGS_EQUAL(false, qgrinder->pleaseFFT);
 
 	// how does this get turned on!??!!?
-	LONGS_EQUAL(true, qgrinder->integrationFrameInProgress);
+	LONGS_EQUAL(true, qgrinder->frameInProgress);
 
 	STRCMP_EQUAL("myGrind", qgrinder->label);
 
@@ -134,7 +134,7 @@ static void tryFourierFilter(int N, int goodFreq, int badFreq, int lowPassFilter
 
 	qSpace *space = makeBareSpace(N, contENDLESS);
 	qAvatar *avatar = new qAvatar(space, "tryFourierAva");
-	qGrinder *qgrinder = new qGrinder(space, avatar, "tryFourierGri");
+	qGrinder *qgrinder = new qGrinder(space, avatar, 1, "tryFourierGri");
 	qFlick *qf = qgrinder->qflick;
 	qWave *addOn = new qWave(space);
 	qSpectrum *rainbow = qgrinder->getSpectrum();
@@ -199,7 +199,7 @@ TEST_SKIP(qGrinder, fourFilt64_5_22) { tryFourierFilter(64, 5, 22, 16); }
 static void fourierExperiments(int N) {
 	qSpace *space = makeBareSpace(N, contENDLESS);
 	qAvatar *avatar = new qAvatar(space, "fourExpAv");
-	qGrinder *qgrinder = new qGrinder(space, avatar, "fourExpGrind");
+	qGrinder *qgrinder = new qGrinder(space, avatar, 1, "fourExpGrind");
 
 	qSpectrum *allOnes = new qSpectrum(space);
 	allOnes->fill();

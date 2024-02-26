@@ -1,6 +1,6 @@
 /*
 ** errors - helpers for error handling and debugging
-** Copyright (C) 2022-2023 Tactile Interactive, all rights reserved
+** Copyright (C) 2022-2024 Tactile Interactive, all rights reserved
 */
 
 import qe from '../engine/qe.js';
@@ -53,6 +53,18 @@ export function interpretCppException(ex) {
 
 	return new cppError(ex);
 }
+
+// a full-featured exception
+//	code: 25
+//	columnNumber: 0
+//	data: null
+//	filename: "http://localhost:6600/qEng/quantumEngine.main.js"
+//	lineNumber: 2795
+//	message: "Function object could not be cloned."
+//	name: "DataCloneError"
+//	result: 2152923161
+//	stack: "makeAWorker@http://localhost:6600/qEng/quantumEngine.main.js:2795:9\neThread@http://localhost:6600/static/js/bundle.js:53639:39\ncreateThreads@http://localhost:6600/static/js/bundle.js:53672:32\n./src/engine/eEngine.js/startUpWithThreads/<@http://localhost:6600/static/js/bundle.js:53046:57\npromise callback*startUpWithThreads@http://localhost:6600/static/js/bundle.js:53045:24\n@http://localhost:6600/qEng/quantumEngine.main.js:2866:10\nEventListener.handleEvent*@http://localhost:6600/qEng/quantumEngine.main.js:2861:10\n"
+
 
 // general purpose exception reporter, use like this:
 //  try/catch:      ...} catch (ex) {excRespond(ex, `reindexing of alligator`)}

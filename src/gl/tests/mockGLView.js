@@ -1,9 +1,8 @@
 /*
 ** mockGLView -- substitute for the real GLView in tests
-** Copyright (C) 2023-2023 Tactile Interactive, all rights reserved
+** Copyright (C) 2023-2024 Tactile Interactive, all rights reserved
 */
 
-//import webglLint from './node_modules_symlink/webgl-lint/webgl-lint.js';
 import 'https://greggman.github.io/webgl-lint/webgl-lint.js';
 import ctxFactory from '../ctxFactory.js';
 import abstractViewDef from '../abstractViewDef.js';
@@ -34,9 +33,6 @@ const viewClassNamez = {
 	flat: flatViewDef,
 	star: starViewDef,
 }
-
-
-// now it's on ctxFactory object   export let preferWebGL2 = true;
 
 
 export class mockGLView {
@@ -72,16 +68,11 @@ export class mockGLView {
 			canvas.glview = this;
 			canvas.viewName = this.viewName;
 
-			//p.canvasFacts.width = this.canvas.clientWidth;
-			//p.canvasFacts.height = this.canvas.clientHeight;
-
 			this.initViewClass();
 
 			// finally!
 			console.log(`🖼 🖼 mockGLView ${this.viewName}: created!`);
 		})
-//		this.gl = this.ctxFactory.gl;
-//		this.tagObject = this.ctxFactory.tagObject;
 	}
 
 	testViewClasses = {

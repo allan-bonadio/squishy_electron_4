@@ -1,6 +1,6 @@
 /*
 **   App -- top level JS for Squishy Electron
-** Copyright (C) 2021-2023 Tactile Interactive, all rights reserved
+** Copyright (C) 2021-2024 Tactile Interactive, all rights reserved
 */
 
 import React from 'react';
@@ -24,7 +24,7 @@ class App extends React.Component {
 			//clientWidth: document.body.clientWidth,  // window width as of constructor
 			//clientHeight: document.body.clientHeight,
 
-			// always true squishPanelExists: true,  // briefly cycles off and on when user changes resolution
+			// should roughly equal
 			cppRunning: false,
 
 			// non-null when dialog is showing

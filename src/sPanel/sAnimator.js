@@ -1,14 +1,12 @@
 /*
 ** squish panel animation -- real-time simulation and interactivity.
-** Copyright (C) 2023-2023 Tactile Interactive, all rights reserved
+** Copyright (C) 2023-2024 Tactile Interactive, all rights reserved
 */
 
 import ControlPanel from '../controlPanel/ControlPanel.js';
 import {interpretCppException} from '../utils/errors.js';
 import SquishPanel from './SquishPanel.js';
-//import WaveView from '../view/WaveView.js';
 import CommonDialog from '../widgets/CommonDialog.js';
-//import {getASetting, storeASetting} from '../utils/storeSettings.js';
 import statGlobals from '../controlPanel/statGlobals.js';
 
 let traceStats = false;
@@ -55,11 +53,11 @@ class sAnimator {
 	// start them all at reasonable values
 	initStats(now) {
 		this.iStats = {
-			startIntegration: now,
-			endCalc: now,
+			startIntegrationTime: now,
+			startDrawTime: now,
 			//endReloadVarsNBuffer: now,
 			endDraw: now,
-			prevStartIntegration: now,
+			prevStartIntegrationTime: now,
 		}
 	}
 
@@ -67,27 +65,12 @@ class sAnimator {
 	refreshStatsOnScreen() {
 		// given a stat name, value and precision, display it using oldschool DOM
 
-// 		function show(cName, ms, nDigits = 2) {
-// 			const el = document.querySelector(`#${p.id}.SquishPanel .ControlPanel .SetIntegrationTab .${cName}`);
-// 			if (el) {
-// 				// hard to see if it's jumping around a lot
-// 				if (!el.iStatAvg)
-// 					el.iStatAvg = ms;
-// 				else
-// 					el.iStatAvg = (ms + 31 * el.iStatAvg) / 32;
-// 				el.innerHTML = el.iStatAvg.toFixed(nDigits);  // only if it's showing
-// 			}
-// 		}
-
 		const st = this.iStats;
 		statGlobals.show('reversePercent', this.grinder.reversePercent);
-		statGlobals.show('frameCalcTime', st.endCalc - st.startIntegration);
-		//statGlobals.show('reloadVarsNBuffer', st.endReloadVarsNBuffer - st.endCalc);
-		statGlobals.show('drawTime', st.endDraw - st.endCalc);
-//		statGlobals.show('reloadGlInputs', st.endReloadInputs - st.endReloadVarsNBuffer);
-//		statGlobals.show('drawTime', st.endDraw - st.endReloadInputs);
-		statGlobals.show('totalForIntegration', st.endDraw - st.startIntegration);
-		const period = st.startIntegration - st.prevStartIntegration;
+		statGlobals.show('frameCalcTime', this.grinder.frameCalcTime);
+		statGlobals.show('drawTime', st.endDraw - st.startDrawTime);
+		statGlobals.show('totalForFrame', st.endDraw - st.startIntegrationTime);  // draw + calc
+		const period = st.startIntegrationTime - st.prevStartIntegrationTime;
 		statGlobals.show('framePeriod', period);
 		statGlobals.show('framesPerSec', Math.round(1000 / period), 0)
 	}
@@ -102,25 +85,27 @@ class sAnimator {
 
 	// trigger one integration frame to be calculated, catch any errors, stop &
 	// dialog if it catches one
-	crunchOneFrame() {
-		if (traceStats) console.log(`👑 SquishPanel. about to frame`);
-
-		try {
-			// hundreds of visscher steps
-			this.grinder?.pleaseIntegrate();
-		} catch (ex) {
-			this.cPanel.stopAnimating();
-			// eslint-disable-next-line no-ex-assign
-			ex = interpretCppException(ex);
-			CommonDialog.openErrorDialog(
-				ex.message == 'diverged' ? SquishPanel.divergedBlurb : ex, 'while integrating');
-		}
-
-		if (traceStats) console.log(`👑 SquishPanel. did frame`);
-
-		if (traceTheViewBuffer)
-			this.dumpViewBuffer('SquishPanel. did frame()');
-	}
+	// now done in threads
+	//crunchOneFrame() {
+	//	if (traceStats) console.log(`👑 SquishPanel. about to frame`);
+	//
+	//	try {
+	//		// lots of visscher steps
+	//		this.grinder.oneFrame();
+	//		//this.grinder?.pleaseIntegrate();
+	//	} catch (ex) {
+	//		this.cPanel.stopAnimating();
+	//		// eslint-disable-next-line no-ex-assign
+	//		ex = interpretCppException(ex);
+	//		CommonDialog.openErrorDialog(
+	//			ex.message == 'diverged' ? SquishPanel.divergedBlurb : ex, 'while integrating');
+	//	}
+	//
+	//	if (traceStats) console.log(`👑 SquishPanel. did frame`);
+	//
+	//	if (traceTheViewBuffer)
+	//		this.dumpViewBuffer('SquishPanel. did 1 frame()');
+	//}
 
 	// the upper left and right numbers: insert them into the HTML.  Faster than react.
 	// should move this to like WaveView
@@ -134,17 +119,17 @@ class sAnimator {
 			ne.innerHTML =  this.grinder.frameSerial;
 	}
 
-	// Integrate the ODEs by one frame, or not.  and then repaint. called frame
+	// Repaint. called frame
 	// period in animateHeartbeat() while running, as often as the menu setting
-	// says.  shouldIntegrate is false for like setting the wave and starting over.
-	integrateOneFrame(shouldIntegrate) {
-		if (traceStats) console.log(`time since last tic: ${performance.now() - this.iStats.startIntegration}ms`);
+	// says.
+	drawLatestFrame() {
+		if (traceStats) console.log(`time since last tic: ${performance.now() - this.iStats.startIntegrationTime}ms`);
 		//debugger;
-		this.iStats.startIntegration = performance.now();  // absolute beginning of integrate frame
+		this.iStats.startIntegrationTime = performance.now();  // absolute beginning of integrate frame
 
-		if (shouldIntegrate)
-			this.crunchOneFrame();
-		this.iStats.endCalc = performance.now();
+//		if (shouldIntegrate)
+//			this.crunchOneFrame();
+		this.iStats.startDrawTime = performance.now();
 
 		this.space.mainEAvatar.doRepaint?.();
 		this.showTimeNFrame();
@@ -152,18 +137,8 @@ class sAnimator {
 		//this.iStats.endReloadVarsNBuffer =
 		this.iStats.endDraw = performance.now();
 
-		// print out per-frame benchmarks.  This is now displayed in the Integrate tab.
-		//if (areBenchmarking) {
-		//console.log(`times:\n`+
-		//	`frame calc time:     ${(this.iStats.endCalc - this.iStats.startIntegration).toFixed(2)}ms\n`+
-		//	`reloadVarsNBuffer:     ${(this.iStats.endReloadVarsNBuffer - this.iStats.endCalc).toFixed(2)}ms\n`+
-		//	//`reload GL variables:     ${(this.iStats.endReloadInputs - this.iStats.endReloadVarsNBuffer).toFixed(2)}ms\n`+
-		//	`draw:   ${(this.iStats.endDraw - this.iStats.endReloadVarsNBuffer).toFixed(2)}ms\n`+
-		//	`total for frame:  ${(this.iStats.endDraw - this.iStats.startIntegration).toFixed(2)}ms\n` +
-		//	`period since last:  ${(this.iStats.startIntegration - this.iStats.prevStartIntegration).toFixed(2)}ms\n`);
-		//}
 		this.refreshStatsOnScreen();
-		this.iStats.prevStartIntegration = this.iStats.startIntegration;
+		this.iStats.prevStartIntegrationTime = this.iStats.startIntegrationTime;
 
 		this.continueRunningDiagnosticCycle();
 	}
@@ -171,13 +146,13 @@ class sAnimator {
 	heartbeatSerial = 0;
 
 	// This gets called once each animation period according to
-	// requestAnimationFrame(), usually 60/sec and repeats as long as the
+	// requestAnimationFrame(), usually 60/sec or whatever your screen refresh rate is, and repeats as long as the
 	// website is running.  Even if there's no apparent motion. it will advance
 	// one heartbeat in animation time, which every so often calls
-	// integrateOneFrame(), if appropriate
+	// drawLatestFrame(), if appropriate
 	animateHeartbeat =
 	frameStart => {
-		// no matter how often animateHeartbeat is called, it'll only frame once per framePeriod
+
 		if (traceHeartbeats && ((this.heartbeatSerial & onceInAWhile) == 0))
 			console.log(`🎥  a heartbeat, serial every ${onceInAWhile+1}: `
 				+`${this.heartbeatSerial} = 0x${this.heartbeatSerial.toString(16)} `
@@ -185,16 +160,17 @@ class sAnimator {
 				+`frameStart >= this.timeForNextTic ${frameStart} >= ${this.timeForNextTic} `
 				+` = ${frameStart >= this.timeForNextTic} `);
 
+		// no matter how often animateHeartbeat is called, it'll only frame once per framePeriod
 		if (this.cPanel.isRunning && frameStart >= this.timeForNextTic) {
 			let framePeriod = this.cPanel.framePeriod;
 
 			if (traceIntegrations)
 				console.log(`🎥  an integration request serial: ${this.grinder.frameSerial} `);
 
-			this.integrateOneFrame(true);
+			this.drawLatestFrame(true);
 
 			// remember (frameStart) is the one passed in, before
-			// integrateOneFrame(), so periods are exactly timed (unless it's so slow
+			// drawLatestFrame(), so periods are exactly timed (unless it's so slow
 			// that we get behind).
 			let rightNow = 	performance.now();
 

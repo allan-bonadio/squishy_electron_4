@@ -1,11 +1,10 @@
 /*
 ** qa complex -- complex numbers in JS.  (Actually we don't use this much - often easier to just handle an array)
-** Copyright (C) 2021-2023 Tactile Interactive, all rights reserved
+** Copyright (C) 2021-2024 Tactile Interactive, all rights reserved
 */
 
 // should get rid of cxToRgb; it was an old translation
 import cxToRgb from '../view/cxToRgb.js';
-import cxToColor from '../gl/cxToColor/cxToColor.txlated.js';
 
 // do this old school class so  i can use the constructor without new
 // very handy - either arg can be a complex obj, or a real, and the im arg can be absent
@@ -36,12 +35,11 @@ function eCx(re, im) {
 }
 
 // aint workin
-eCx.prototype.color = function color() {
-	// should siwtch this over to cxToRgb////
-	return cxToRgb(this);
-};
+//eCx.prototype.color = function color() {
+//	return cxToRgb(this);
+//};
 
-// aint workin?
+// aint used?
 eCx.prototype.norm = function norm() {
 	return this.re ** 2 + this.im ** 2;
 }

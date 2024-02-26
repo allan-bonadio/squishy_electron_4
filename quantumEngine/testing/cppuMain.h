@@ -1,6 +1,6 @@
 /*
 ** cppu main -- cppu testing helpers - all CPPUTest tests should include this file
-** Copyright (C) 2022-2023 Tactile Interactive, all rights reserved
+** Copyright (C) 2022-2024 Tactile Interactive, all rights reserved
 */
 
 // this allows CHECK_EQUAL() to do complex numbers

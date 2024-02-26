@@ -1,20 +1,22 @@
 /*
-** e thread -- main thread source for creating crunching threads
-** Copyright (C) 2022-2023 Tactile Interactive, all rights reserved
+** e thread -- main thread executive source in JS for creating threads
+** Copyright (C) 2022-2024 Tactile Interactive, all rights reserved
 */
 
-// The main thread part of the asynch stuff. It turns out that most of the
-// worker stuff in emscripten simply goes and calls the regular JS methods todo
-// the same things.  So C++ isn't the lowest level, JS is.  So call JS and have
-// full control.
-import qe from './qe.js';
 
-let traceThreadCreation = false;
-let traceMessages = false;
+this is no longer used
+
+
+// THis code mostly requests the creation of threads.  pthreads in c++ does all the work.
+import qe from './qe.js';
+import {N_THREADS} from './eEngine.js';
+
+
+let traceThreadCreation = true;
+let traceMessages = true;
 let traceIntegration = false;
 
-console.log(`eThread: isSecureContext=${window.isSecureContext},`+
-	`crossOriginIsolated=${window.crossOriginIsolated}`);
+let MAX_THREADS;
 
 // i can't decide if there's one of these for each thread or one total.  hmmm
 // how about this: everythiing that's unique, make iit static.  Prob moved to
@@ -22,21 +24,15 @@ console.log(`eThread: isSecureContext=${window.isSecureContext},`+
 // SquishPanel, should be on the grinder.  Then there's really unique things like
 // nCores... everything per-thread, make it for the eThread instance.
 class eThread {
-	static workers = [];  // instances of Worker
 	static threads = [];  // instances of eThread
-	static doingThreads = false;
 
 	constructor(serial, grinder) {
 		if (traceThreadCreation)
-			console.log(`⛏ eThread constructor: ${serial} about to make worker`);
+			console.log(`⛏ eThread constructor: about to make thread ${serial} `);
 
-		//debugger;
-		let worker = {};
-		//let worker = this.worker = window.makeAWorker(`thread_${serial}`, grinder);
-		worker.serial = serial;
+		this.serial = serial;
 
-		eThread.workers[serial] = worker;
-		eThread.threads[serial] = this;
+		this.pointer = eThread.threads[serial] = thread_createAThread(serial, grinder.pointer);
 
 		if (traceThreadCreation)
 			console.log(`⛏ eThread constructor: ${serial} created, about to setup handlers`);
@@ -50,19 +46,20 @@ class eThread {
 	}
 
 	// as the thread finishes startup, it'll send this message to us (see in .main.js)
-	static confirmThread(serial) {
-		if (traceMessages)
-			console.log(`⛏ thread ${serial} successfully launched`)
-		this.threads[serial].confirmed = true;
-	}
+// 	static confirmThread(serial) {
+// 		if (traceMessages)
+// 			console.log(`⛏ thread ${serial} successfully launched`)
+// 		eThread.threads[serial].confirmed = true;
+// 	}
 
 	// This runs in the main thread to create All (or most of ) the threads
 	// shortly after page startup
 	static createThreads(grinder) {
+
+		MAX_THREADS = eThread.MAX_THREADS = qe.thread_setupThreads();
 		this.nCores = navigator.hardwareConcurrency;
-		this.nThreads = 1;
-		this.workers = new Array(this.nThreads);
-		this.threads = new Array(this.nThreads);
+
+		eThread.N_THREADS = N_THREADS;  // requested at C++ compile time
 		if (traceThreadCreation)
 			console.log(`⛏ eThread starting thread creation blitz`);
 
@@ -70,20 +67,12 @@ class eThread {
 		for (let serial = 0; serial < this.nThreads; serial++) {
 			try {
 				console.log(`⛏ eThread creating thread ${serial}`);
-				this.threads[serial] = new this(serial, grinder);
-
-				// now, try it out a few times
-//				setInterval(() => {
-//					window.Atomics.notify(grinder.ints, grinder.needsIntegrationOffset, 1);
-//				}, 2000);
+				this.threads[serial] = new eThread(serial);
 
 			} catch (ex) {
 				console.error(`eThread: worker creation ${serial} failed: `,
 					ex.stack ?? ex.message ?? ex);
 				debugger;
-
-				// wait don't get discouraged so easily!
-				//workers.doingThreads = false;
 				break;
 			}
 		}
@@ -96,17 +85,10 @@ class eThread {
 	// unused for now - qGrinder does it
 	static oneFrame(grinder) {
 		// i have to think of what to do if there's no workers available...
-		if (eThread.doingThreads) {
-			if (traceIntegration)
-				console.log(`⛏ eThread postMessage toframe`);
-			// this isn't right
-			eThread.workers[0].postMessage({verb: 'integrate', grinderPointer: grinder.pointer});
-		}
-		else {
-			if (traceIntegration)
-				console.log(`⛏ eThread integrates directly cuz no threads`);
-			qe.grinder_oneFrame(grinder.pointer);
-		}
+		if (traceIntegration)
+			console.log(`⛏ eThread postMessage toframe`);
+		// this isn't right
+		eThread.workers[0].postMessage({verb: 'integrate', grinderPointer: grinder.pointer});
 	}
 
 	/* ******************************************************************* msgs & events */

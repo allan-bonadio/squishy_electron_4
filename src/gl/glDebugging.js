@@ -1,6 +1,6 @@
 /*
 ** vao Dump -- show me what's in a vao
-** Copyright (C) 2023-2023 Tactile Interactive, all rights reserved
+** Copyright (C) 2023-2024 Tactile Interactive, all rights reserved
 */
 
 // this sure doesn't enlighten any.  I was hoping to get info about the current VAO.

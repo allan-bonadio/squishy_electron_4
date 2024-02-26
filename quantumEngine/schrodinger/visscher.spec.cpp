@@ -1,6 +1,6 @@
 /*
 ** visscher integration testing
-** Copyright (C) 2021-2023 Tactile Interactive, all rights reserved
+** Copyright (C) 2021-2024 Tactile Interactive, all rights reserved
 */
 
 
@@ -44,7 +44,7 @@ TEST(visscher, VisscherOneStep4)
 	if (traceOneStep) oldWave4->dump("start VisscherOneStep test");
 
 	qAvatar *avatar = new qAvatar(space4, "VisscherOneStep");
-	qGrinder *grinder = new qGrinder(space4, avatar, "Visscher1Step");
+	qGrinder *grinder = new qGrinder(space4, avatar, 1, "Visscher1Step");
 
 
 	double dt = 0.01;

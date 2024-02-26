@@ -1,10 +1,10 @@
 /*
 ** flat drawing -- draw a 1d quantum wave as a 2d bargraph (band across top)
-** Copyright (C) 2021-2023 Tactile Interactive, all rights reserved
+** Copyright (C) 2021-2024 Tactile Interactive, all rights reserved
 */
 
 import {abstractDrawing} from './abstractDrawing.js';
-import cxToColorGlsl from './cxToColor/cxToColor.glsl.js';
+import cx2rgb from './cx2rgb/cx2rgb.glsl.js';
 import {viewUniform, viewAttribute} from './viewVariable.js';
 
 let traceViewBufAfterDrawing = false;
@@ -27,7 +27,7 @@ let pointSize = traceDrawPoints ? `gl_PointSize = 10.;` : '';
 */
 
 // make the line number for the start correspond to this JS file line number - the NEXT line
-const vertexSrc = `${cxToColorGlsl}
+const vertexSrc = `${cx2rgb}
 #line 32
 varying highp vec4 vColor;
 attribute vec4 row;
@@ -54,7 +54,7 @@ void main() {
 	gl_Position = vec4(x, y, 0., 1.);
 
 	//  for the color, convert the complex values via this algorithm
-	vColor = vec4(cxToColor(vec2(row.x, row.y)), 1.);
+	vColor = vec4(cx2rgb(vec2(row.x, row.y)), 1.);
 	if (!odd)
 		vColor = vec4(vColor.r/2., vColor.g/2., vColor.b/2., vColor.a);
 	//vColor = vec4(.9, .9, .1, 1.);

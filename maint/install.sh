@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# runs ON NAKODA to decompress and install latest version of squish
+# runs ON SERVER to decompress and install latest version of squish
 
 alarmError ( )
 {

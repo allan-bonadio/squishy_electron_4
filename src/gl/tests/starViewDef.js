@@ -1,6 +1,6 @@
 /*
 ** Star View Def -- an old prototype used to develop the View Variable system
-** Copyright (C) 2021-2023 Tactile Interactive, all rights reserved
+** Copyright (C) 2021-2024 Tactile Interactive, all rights reserved
 */
 
 import {abstractViewDef} from '../abstractViewDef.js';
@@ -40,7 +40,6 @@ uniform vec4 cornerColorUni;
 varying vec4 nuColor;
 
 attribute vec2 corner;
-//attribute vec4 corner;
 
 // always returns 0...1
 float scramble(float a) {

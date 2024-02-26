@@ -1,6 +1,6 @@
 /*
 ** Control Panel -- everything under the WaveView component (almost)
-** Copyright (C) 2021-2023 Tactile Interactive, all rights reserved
+** Copyright (C) 2021-2024 Tactile Interactive, all rights reserved
 */
 @use "../widgets/common.scss";
 
@@ -220,6 +220,7 @@
 			// "The keyword 'slider-vertical' ... is not standardized..."
 			.canyonScale, .canyonPower {
 				appearance: slider-vertical;
+				writing-mode: vertical-lr;  // new standard? feb 2024  use direction: rtl; to invert
 				width: 2.5em;
 			}
 

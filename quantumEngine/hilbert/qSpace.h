@@ -1,6 +1,6 @@
 /*
 ** quantum space - C++ code for optimized ODE integration for Squishy Electron
-** Copyright (C) 2021-2023 Tactile Interactive, all rights reserved
+** Copyright (C) 2021-2024 Tactile Interactive, all rights reserved
 */
 
 #ifndef __QSPACE_H__
@@ -101,7 +101,7 @@ extern "C" {
 	// create
 	qSpace *startNewSpace(const char *name = "a space");
 	void addSpaceDimension(qSpace *space, int N, int continuum, double dx, const char *label);
-	qSpace *completeNewSpace(qSpace *space);
+	qSpace *completeNewSpace(qSpace *space, int nThreads);
 
 	// destroy
 	void deleteFullSpace(qSpace *space);

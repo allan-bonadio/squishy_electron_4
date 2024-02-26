@@ -1,6 +1,6 @@
 /*
 ** quantum space tests
-** Copyright (C) 2022-2023 Tactile Interactive, all rights reserved
+** Copyright (C) 2022-2024 Tactile Interactive, all rights reserved
 */
 
 
@@ -155,10 +155,10 @@ void completeNewSpaceGauntlet(int N) {
 	deleteFullSpace(space);
 }
 
-TEST(qSpace, qSpace_CompleteNewSpaceGauntlet4096) { completeNewSpaceGauntlet(4096); }
-TEST(qSpace, qSpace_CompleteNewSpaceGauntlet256) { completeNewSpaceGauntlet(256); }
-TEST(qSpace, qSpace_CompleteNewSpaceGauntlet64) { completeNewSpaceGauntlet(64); }
-TEST(qSpace, qSpace_CompleteNewSpaceGauntlet32) { completeNewSpaceGauntlet(32); }
-TEST(qSpace, qSpace_CompleteNewSpaceGauntlet32again) { completeNewSpaceGauntlet(32); }
-TEST(qSpace, qSpace_CompleteNewSpaceGauntlet4) { completeNewSpaceGauntlet(4); }
+TEST(qSpace, qSpace_CompleteNewSpaceGauntlet4096) { completeNewSpaceGauntlet(4096, 1); }
+TEST(qSpace, qSpace_CompleteNewSpaceGauntlet256) { completeNewSpaceGauntlet(256, 1); }
+TEST(qSpace, qSpace_CompleteNewSpaceGauntlet64) { completeNewSpaceGauntlet(64, 1); }
+TEST(qSpace, qSpace_CompleteNewSpaceGauntlet32) { completeNewSpaceGauntlet(32, 1); }
+TEST(qSpace, qSpace_CompleteNewSpaceGauntlet32again) { completeNewSpaceGauntlet(32, 1); }
+TEST(qSpace, qSpace_CompleteNewSpaceGauntlet4) { completeNewSpaceGauntlet(4), 1; }
 

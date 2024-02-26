@@ -1,6 +1,6 @@
 /*
 ** quantum buffer -- a buffer of qCx values that represents a qWave or a qSpectrum
-** Copyright (C) 2022-2023 Tactile Interactive, all rights reserved
+** Copyright (C) 2022-2024 Tactile Interactive, all rights reserved
 */
 
 // a 'wave' is a straight array of qCx, of length space->nPoints.
@@ -10,7 +10,7 @@
 //    plus a qSpace pointer.  Subclass of qBuffer.
 // a 'qFlick' (see below) is a sequence of waves (defunct maybe)
 // a 'qViewBuffer' is specifically to send coordinates to WebGL for display; very different
-// a 'qSpectrum' is like a qWave designed for FFT results.  Subclass of qBuffer.
+// a 'qSpectrum' is like a qWave designed for FFT results - momentums not locations.  Subclass of qBuffer.
 
 #ifndef __QBUFFER_H__
 #define __QBUFFER_H__
@@ -38,7 +38,7 @@ struct qBuffer {
 	// length is length in qCxs
 	void initBuffer(int length, qCx *useThisBuffer = NULL);
 
-	// the actual data, hopefully in the right size allocated block
+	// the actual data, must be in the right size allocated block
 	qCx *wave;
 
 	// spectrums don't have wraparounds boundaries so spectrums calculate different numbers from waves.
@@ -82,14 +82,13 @@ struct qBuffer {
 	// Add any two qBuffers, leave result in this.  Must have same space N, although not continuum.
 	void add(double coeff1, qBuffer *qwave1, double coeff2, qBuffer *qwave2);
 
-	// Same, but you can pass pass raw waves; the waves assume same N as this wave.
+	// Same, but you can pass raw waves; the waves assume same N as this wave.
 	// YOU MUST OFFSET THE WAVE POINTERS YOURSELF!
 	void add(double coeff1, qCx *wave1, double coeff2, qCx *wave2);
 
 	// like the JS version but in C++ and used only for testing
 	void setCircularWave(double freq = 1., int first = 0);
 	void setSquareWave(int wavelength = 1, int first = 0, qCx height = 1.);
-
 };
 
 #endif
