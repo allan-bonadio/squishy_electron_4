@@ -3,17 +3,24 @@
 ** Copyright (C) 2022-2024 Tactile Interactive, all rights reserved
 */
 
+//import inteStats from '../controlPanel/inteStats.js';
+//import statGlobals from './statGlobals.js';
 import PropTypes from 'prop-types';
 import LogSlider from '../widgets/LogSlider.js';
 import TextNSlider from '../widgets/TextNSlider.js';
 import {getASetting, alternateMinMaxs} from '../utils/storeSettings.js';
-import statGlobals from './statGlobals.js';
 
 let traceSliderChanges = false;
 
 // set prop types
 function setPT() {
 	SetIntegrationTab.propTypes = {
+		// only present after eSpace promise
+		space: PropTypes.shape({
+			pointer: PropTypes.number,
+			dimensions: PropTypes.arrayOf(PropTypes.object).isRequired,
+		}),
+
 		deltaT: PropTypes.number.isRequired,
 		setDeltaT: PropTypes.func.isRequired,
 		stepsPerFrame: PropTypes.number.isRequired,
@@ -100,7 +107,11 @@ function SetIntegrationTab(props) {
 			/>
 
 		</div>
-		{statGlobals.renderIStats()}
+		{
+			props.space?.sIntStats.renderAllStats()
+			// why doesn't this show up!??!?!
+			//typeof statGlobals != 'undefined' && statGlobals.renderIStats()
+		}
 
 	</div>);
 }

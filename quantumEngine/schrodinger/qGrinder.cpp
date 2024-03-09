@@ -262,7 +262,7 @@ void qGrinder::tallyUpReversals(qWave *qwave) {
 // Maybe this should be in slaveThread?
 void qGrinder::oneFrame() {
 	if (traceIntegration)
-		console.log("starting oneFrame");
+		printf("starting oneFrame\n");
 	if (traceIntegrationDetailed)
 		qGrinder::dumpObj("starting oneFrame");
 //	isIntegrating = frameInProgress = true;
@@ -377,7 +377,8 @@ void qGrinder::fourierFilter(int lowPassFilter) {
 
 void qGrinder::aggregateCalcTime(void) {
 	// add up ALL the threads' frameCalcTime and keep a running average
-	double frameCalcTime;
+	//double frameCalcTime;
+	frameCalcTime = 0;
 	for (int ix = 0; ix < nSlaveThreads; ix++) {
 		slaveThread *sl = slaves[ix];
 		if (sl)
