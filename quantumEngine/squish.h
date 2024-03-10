@@ -15,6 +15,8 @@
 
 #include "commonConstants.h"
 
+extern const double NaN;
+
 // return elapsed time since last page reload, in seconds
 extern double getTimeDouble(void);
 

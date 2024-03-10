@@ -114,7 +114,8 @@ double qBuffer::dumpRow(char buf[200], int ix, qCx w, double *pPrevPhase, bool w
 	double norm = w.norm();
 	if (withExtras) {
 		// if re and im are zero (or close) then the angle is undefined.  Use NaN.
-		double phase = NAN;
+		double phase = NaN;
+		//double phase = NAN;
 		if (abs(im) + abs(re) > 1e-9)
 			phase = atan2(im, re) * 180. / PI;  // pos or neg OR NAN
 

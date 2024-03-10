@@ -10,6 +10,8 @@
 
 static bool traceExceptions = false;
 
+extern const double NaN = nan("squish");
+
 // return elapsed real time since last page reload, in seconds, only for tracing
 // seems like it's down to miliseconds or even a bit smaller
 double getTimeDouble(void)
@@ -19,7 +21,7 @@ double getTimeDouble(void)
     return ts.tv_sec + ts.tv_nsec / 1e9;
 }
 
-/* ***************************************************************************************************** exceptions */
+/* *********************************************************************** exceptions */
 
 // Given the mysterious number thrown when C++ barfs, get a real error message.  this is loosely from
 // https://emscripten.org/docs/porting/Debugging.html#handling-c-exceptions-from-javascript
