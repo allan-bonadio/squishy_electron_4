@@ -7,7 +7,7 @@
 #include "qThread.h"
 #include "qGrinder.h"
 #include "slaveThread.h"
-#include <emscripten/html5.h>
+//#include <emscripten/html5.h>
 #include <emscripten/emscripten.h>
 #include <stdarg.h>
 
