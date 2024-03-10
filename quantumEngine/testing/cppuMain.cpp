@@ -12,7 +12,7 @@
 #include "../greiman/qAvatar.h"
 #include "../greiman/qViewBuffer.h"
 #include "../schrodinger/qGrinder.h"
-#include "../schrodinger/abacus.h"
+// #include "../schrodinger/abacus.h"
 #include "../hilbert/qSpace.h"
 
 #include "CppUTest/TestHarness.h"

@@ -4,6 +4,12 @@
 # cppu Unit Test Runner -- for Squishy Electron
 # Copyright (C) 2022-2024 Tactile Interactive, all rights reserved
 
+# you'll need cpputest installed and ready to go:
+#  [CPPUTEST](https://cpputest.github.io)
+# then in your .profile (or wherever) define  CPPUTEST_HOME to point to its root dir
+# (with AUTHORS README.md  lib/ and include/ in it)
+)
+
 # To run all the tests, run it like this:
 #    quantumEngine> make test
 # or
@@ -36,7 +42,8 @@ echo "CppUTest Test runner args: db=debugger; all others are assumed to be test 
 echo "Use -g groupname to test a whole group"
 
 # https://cpputest.github.io
-export CPPUTEST_HOME=/opt/dvl/cpputest/cpputest-3.8
+# panama export CPPUTEST_HOME=/opt/dvl/cpputest/cpputest-3.8
+# dnipro export CPPUTEST_HOME=/opt/homebrew/opt/cpputest
 
 # no enscriptm here!  just native C++.
 #. $EMSDK/emsdk_env.sh
@@ -44,7 +51,7 @@ export CPPUTEST_HOME=/opt/dvl/cpputest/cpputest-3.8
 # create a space-sep list of ALL the runtime cpp files (almost all)
 allCpp=`cat building/allCpp.list`
 
-# keep (MAX_LABEL_LEN+1) a multiple of 4, 8, 16, 32 or 8 for alignment, eg 7, 15 or 31
+# keep (MAX_LABEL_LEN+1) a multiple of 4, 8, 16, 32 for alignment, ie 7, 15 or 31
 MAX_LABEL_LEN=7
 MAX_DIMENSIONS=2
 
@@ -65,13 +72,14 @@ g++ -o wasm/cppuTestBin -Wno-tautological-undefined-compare  \
 	-I$CPPUTEST_HOME/include \
 	-include $CPPUTEST_HOME/include/CppUTest/MemoryLeakDetectorNewMacros.h \
 	-L$CPPUTEST_HOME/lib -lCppUTest -lCppUTestExt \
-	-include squish.h schrodinger/abacus.cpp \
+	-include squish.h  \
 	testing/cppuMain.cpp testing/testingHelpers.cpp */*.spec.cpp \
 	$allCpp \
 	|| exit $?
 set +x
+# removed schrodinger/abacus.cpp 9-mar-2024
 
-echo ====================== done compiling... start testing ==================================
+echo =================== done compiling... start testing ===============================
 echo
 
 debug=false

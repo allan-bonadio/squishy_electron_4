@@ -5,6 +5,7 @@ cd ..
 
 
 this is not used anymore
+old, pre-cpputest runner script
 exit 1
 
 
