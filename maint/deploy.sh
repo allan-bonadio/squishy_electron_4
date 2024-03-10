@@ -3,6 +3,11 @@
 
 echo "🎁 🛫 Deploy Production Squishy Electron" `date +%c`
 cd $SQUISH_ROOT
+if [ ! -d 'quantumEngine' ]
+then
+	echo "Error: SQUISH_ROOT isn't defined right, '$SQUISH_ROOT'"
+	exit 41
+fi
 
 echo you can do either make deploy or npm deploy, same
 

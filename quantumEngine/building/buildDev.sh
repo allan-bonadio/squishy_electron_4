@@ -20,7 +20,7 @@ export MAX_LABEL_LEN=15
 
 
 # EMIT_PRODUCERS_SECTION = leave more comments in generated JS
-export DEBUG='-g3 -gsource-map --source-map-base /qEng/ -sEMIT_PRODUCERS_SECTION -sDEMANGLE_SUPPORT=1 '
+export DEBUG='-g3 -gsource-map --source-map-base /qEng/ -sEMIT_PRODUCERS_SECTION '
 export OPTIMIZE='-O0 '
 
 
