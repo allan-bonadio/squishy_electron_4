@@ -5,7 +5,7 @@
 
 #define UNLOCKED  255
 #define MAX_THREADS 254
-#define UNDECIDED -1
+//#define UNDECIDED -1
 
 struct progress;
 struct abacus;
