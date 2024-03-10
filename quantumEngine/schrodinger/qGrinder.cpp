@@ -262,7 +262,7 @@ void qGrinder::tallyUpReversals(qWave *qwave) {
 // Maybe this should be in slaveThread?
 void qGrinder::oneFrame() {
 	if (traceIntegration)
-		console.log("starting oneFrame");
+		printf("starting oneFrame\n");
 	if (traceIntegrationDetailed)
 		qGrinder::dumpObj("starting oneFrame");
 //	isIntegrating = frameInProgress = true;
