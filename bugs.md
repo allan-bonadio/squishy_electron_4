@@ -44,7 +44,7 @@ I get it.  Standing wave freq 0 => nans.
 - should detect off-the-rails situations and stop frame. any NaNs,
 	Infinity, or consecutive ix values that differ greatly.  Maybe calculate
 	sum of abs of differences between consecutive psi values - and figure
-	how whatthreshold to use.
+	how what threshold to use.
 
 - I think it doesn't converve energy - gotta check this out.  I'm pretty certain it doesn't.
 	But now I have FFTs to measure it at least.
