@@ -87,7 +87,8 @@ The packet (hump) itself also moves to the right, more quickly.
 This is called the [group velocity](https://en.wikipedia.org/wiki/Group_velocity).
 The group velocity is more like the actual velocity of the particle.
 
-
+You can also see
+[this video](https://www.youtube.com/watch?v=pLMiYnP-pAA) starting at 10:41.
 
 ### specific location
 If you try to nail down the location more, by using a more narrow packet, the velocity is more uncertain, so it spreads faster.
@@ -111,7 +112,7 @@ but they're all attracted to the protons in the nucleus.
 They have a fuzzy wave packet; but the packet is circling the nucleus endlessly.
 This is called an **electron shell**.
 In order to be stable, there has to be a whole number of cycles around
-the circumference of the orbit; zero cycles for ground-state hydrogen, 
+the circumference of the orbit; zero cycles for ground-state hydrogen,
 1 cycle for the first orbit up,
 2 cycles for the second orbit, and on up.
 This is where the word **quantum** comes from;
