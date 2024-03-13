@@ -24,7 +24,7 @@ I had toys made of metal, plastic, fabric, wood.
 That's because I grew up with solid objects, with definite surfaces, like anybody else.
 Wood and metal and plastic all have surfaces; they have different textures,
 but their surface layers all seem infinitesimally thin, and mostly inflexible.
-![](cordInMouth2.jpg)
+![](biteStuffedAnimal.jpg)
 I'd finger them, follow the surfaces and edges with my fingers or toes,
 and put them in my mouth and feel them with my lips and tongue.
 (I'm talking about, like, before kindergarten,
@@ -70,7 +70,7 @@ If one is big, the other has to be small, and vice versa.
 	</ul>
 
 ℏ is [Plank's reduced constant](https://en.wikipedia.org/wiki/Planck_constant).
-It's a really tiny number, $1.05×10^{-34} {kg m^2} \over s$, so in normal life,
+It's a really tiny number, $1.05×10^{-34} {{kg m^2} \over s}$, so in normal life,
 it seems like zero, and you can have an object at an exact location, going an exact speed.
 (Give or take a nanometer or so.)
 So, in order for an electron to have a more specific location, with a

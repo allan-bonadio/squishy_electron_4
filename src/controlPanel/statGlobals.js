@@ -3,8 +3,6 @@
 ** Copyright (C) 2022-2024 Tactile Interactive, all rights reserved
 */
 
-import React from 'react';
-
 // one for each metric we follow.  We'll avg them over time.
 const statGlobals = {
 	// one dom pointer for each stat, keyed by name
@@ -31,7 +29,7 @@ const statGlobals = {
 		</tr>;
 	},
 
-	// render all the rows - with dummy values
+	// render all the rows - with dummy values.  Just creates the nodes and elements, not numbers.
 	renderIStats() {
 		return (
 			<div className='iStats'>
@@ -43,6 +41,7 @@ const statGlobals = {
 					{this.statRow('Total For Frame'   , 'totalForFrame', 'ms')}
 					{this.statRow('Frame Period'      , 'framePeriod', 'ms')}
 					{this.statRow('Frames Per Sec'   , 'framesPerSec', '/sec')}
+					{this.statRow('rAF Period'   , 'rAFPeriod', 'ms')}
 				</tbody></table>
 			</div>
 		);
@@ -111,7 +110,8 @@ const statGlobals = {
 		if (el) {
 			// hard to see if it's jumping around a lot, so average over many frames
 			this.smoothNumber(value, el);
-			el.innerHTML = el.iStatAvg.toFixed(nDigits);
+			if (el.iStatAvg != undefined)
+				el.innerHTML = el.iStatAvg.toFixed(nDigits);
 		}
 	},
 

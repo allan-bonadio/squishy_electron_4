@@ -12,7 +12,7 @@ We measure time in picoseconds,
 pronounced 'pie-ko-second' or 'pee-ko-second'.
 This is a trillionth of a second.
 Light travels about 0.3 mm, or 1/85th of an inch, in a picosecond.
-(It goes about 1 foot per nanosecond, but we're doing picoseconds.)
+(It goes about 1 foot per nanosecond, but we're doing metric.)
 
 We measure distance in nanometers, pronounced 'na-no-meter'.
 The smallest metal traces on the latest microchips,
@@ -41,6 +41,20 @@ A whisper for one second is about 100,000 ev or 0.1 MeV.
 1eV = (1.602176634e-19 * 1e18 / 1e24) kg nm^2 / ps^2
 
 = 1.602176634e-25 kg nm^2 / ps^2
+
+### mass
+
+zepto = 1e−21 so like micro-femto-grams or nano-pico-grams
+
+
+1 kg = 1000g = 1e+30 kilo-quectograms = 1e+33 quectograms
+  = 1e21 kilo-zepto grams = 1e24 zeptograms
+1 g = 1e+30 quecto-grams
+1 g = 1e+30 femto-femto-grams
+
+Lets not use quectos or zeptos.    femtos are 1e-15, size of a nucleus.  that's OK.
+1 eV = 1.602176634×10−19 J
+meaning the charge of an electron is 1.602176634×10−19 coulomb, exactly.
 
 1 kg = 6.241509074460763e+24 eV ps^2 / nm^2
 
@@ -80,8 +94,9 @@ because e is a sortof standard unit of charge, eV ~= V
 = 6.58211956547607524373e-4 eV ps
 
 ℏ =  6.58211956547607524373e-4 eV ps
+confirmed with wikipedia: 6.582119569...e−16 eV⋅s
 
-### m_e
+######################################### m_e  mass of electron
 
 m_e = 9.1093837015e-31 kg = 9.1e-28 g
 
@@ -90,24 +105,13 @@ m_e = 9.1093837015e-31 kg = 9.1e-28 g
 = 5.685630103565723e-6 eV ps^2 / nm^2
 5.685630103565723
 
+5.6856301035657230e-6
 
 
 
 
-######################################
 
 mass of electron = m_e
 m_e = 9.1093837015e-31 kg = 9.1e-28 g
 = 9.1093837015e-31 * 1e24 zeptograms
 = 9.1093837015e-7 zeptograms
-zepto = 1e−21 so like micro-femto-grams or nano-pico-grams
-
-
-1 kg = 1000g = 1e+30 kilo-quectograms = 1e+33 quectograms
-  = 1e21 kilo-zepto grams = 1e24 zeptograms
-1 g = 1e+30 quecto-grams
-1 g = 1e+30 femto-femto-grams
-
-1 eV = 1.602176634×10−19 J
-meaning the charge of an electron is 1.602176634×10−19 coulomb, exactly.
-

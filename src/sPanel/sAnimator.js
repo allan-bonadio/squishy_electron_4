@@ -3,11 +3,12 @@
 ** Copyright (C) 2023-2024 Tactile Interactive, all rights reserved
 */
 
+//import inteStats from '../controlPanel/inteStats.js';
+//import statGlobals from '../controlPanel/statGlobals.js';
 import ControlPanel from '../controlPanel/ControlPanel.js';
 import {interpretCppException} from '../utils/errors.js';
 import SquishPanel from './SquishPanel.js';
 import CommonDialog from '../widgets/CommonDialog.js';
-import statGlobals from '../controlPanel/statGlobals.js';
 
 let traceStats = false;
 let traceTheViewBuffer = false;
@@ -52,7 +53,7 @@ class sAnimator {
 	// the variables that actually mark the various times
 	// start them all at reasonable values
 	initStats(now) {
-		this.iStats = {
+		this.inteTimes = {
 			startIntegrationTime: now,
 			startDrawTime: now,
 			//endReloadVarsNBuffer: now,
@@ -63,16 +64,21 @@ class sAnimator {
 
 	// update the stats, as displayed in the Integration tab
 	refreshStatsOnScreen() {
-		// given a stat name, value and precision, display it using oldschool DOM
+		//	if (typeof statGlobals == 'undefined' || !statGlobals)
+		//		return;  // why does this happen?!?!?!
 
-		const st = this.iStats;
-		statGlobals.show('reversePercent', this.grinder.reversePercent);
-		statGlobals.show('frameCalcTime', this.grinder.frameCalcTime);
-		statGlobals.show('drawTime', st.endDraw - st.startDrawTime);
-		statGlobals.show('totalForFrame', st.endDraw - st.startIntegrationTime);  // draw + calc
-		const period = st.startIntegrationTime - st.prevStartIntegrationTime;
-		statGlobals.show('framePeriod', period);
-		statGlobals.show('framesPerSec', Math.round(1000 / period), 0)
+		this.space.sIntStats.displayAllStats(this.inteTimes, this.grinder);
+
+		// given a stat name, value and precision, display it using oldschool DOM
+		//const st = this.inteTimes;
+		//statGlobals.show('reversePercent', this.grinder.reversePercent);
+		//statGlobals.show('frameCalcTime', this.grinder.frameCalcTime);
+		//statGlobals.show('drawTime', st.endDraw - st.startDrawTime);
+		//statGlobals.show('totalForFrame', st.endDraw - st.startIntegrationTime);  // draw + calc
+		//const period = st.startIntegrationTime - st.prevStartIntegrationTime;
+		//statGlobals.show('framePeriod', period);
+		//statGlobals.show('framesPerSec', Math.round(1000 / period), 0)
+		//statGlobals.show('rAFPeriod', st.rAFPeriod)
 	}
 
 
@@ -82,30 +88,6 @@ class sAnimator {
 	+` it's a limitation of the mathematical engine - it's just not as accurate as the real `
 	+` thing, and sometimes it just runs off the rails.  You can click on the Reset Wave `
 	+` button; lower frequencies and more space points will help.`;
-
-	// trigger one integration frame to be calculated, catch any errors, stop &
-	// dialog if it catches one
-	// now done in threads
-	//crunchOneFrame() {
-	//	if (traceStats) console.log(`👑 SquishPanel. about to frame`);
-	//
-	//	try {
-	//		// lots of visscher steps
-	//		this.grinder.oneFrame();
-	//		//this.grinder?.pleaseIntegrate();
-	//	} catch (ex) {
-	//		this.cPanel.stopAnimating();
-	//		// eslint-disable-next-line no-ex-assign
-	//		ex = interpretCppException(ex);
-	//		CommonDialog.openErrorDialog(
-	//			ex.message == 'diverged' ? SquishPanel.divergedBlurb : ex, 'while integrating');
-	//	}
-	//
-	//	if (traceStats) console.log(`👑 SquishPanel. did frame`);
-	//
-	//	if (traceTheViewBuffer)
-	//		this.dumpViewBuffer('SquishPanel. did 1 frame()');
-	//}
 
 	// the upper left and right numbers: insert them into the HTML.  Faster than react.
 	// should move this to like WaveView
@@ -121,24 +103,24 @@ class sAnimator {
 
 	// Repaint. called frame
 	// period in animateHeartbeat() while running, as often as the menu setting
-	// says.
+	// says.  Not a render time thing.
 	drawLatestFrame() {
-		if (traceStats) console.log(`time since last tic: ${performance.now() - this.iStats.startIntegrationTime}ms`);
+		if (traceStats) console.log(`time since last tic: ${performance.now() - this.inteTimes.startIntegrationTime}ms`);
 		//debugger;
-		this.iStats.startIntegrationTime = performance.now();  // absolute beginning of integrate frame
+		this.inteTimes.startIntegrationTime = performance.now();  // absolute beginning of integrate frame
 
 //		if (shouldIntegrate)
 //			this.crunchOneFrame();
-		this.iStats.startDrawTime = performance.now();
+		this.inteTimes.startDrawTime = performance.now();
 
 		this.space.mainEAvatar.doRepaint?.();
 		this.showTimeNFrame();
 
-		//this.iStats.endReloadVarsNBuffer =
-		this.iStats.endDraw = performance.now();
+		//this.inteTimes.endReloadVarsNBuffer =
+		this.inteTimes.endDraw = performance.now();
 
 		this.refreshStatsOnScreen();
-		this.iStats.prevStartIntegrationTime = this.iStats.startIntegrationTime;
+		this.inteTimes.prevStartIntegrationTime = this.inteTimes.startIntegrationTime;
 
 		this.continueRunningDiagnosticCycle();
 	}

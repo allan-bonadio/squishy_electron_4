@@ -3,6 +3,8 @@
 ** Copyright (C) 2023-2024 Tactile Interactive, all rights reserved
 */
 
+//import inteStats from '../controlPanel/inteStats.js';
+//import statGlobals from '../controlPanel/statGlobals.js';
 import {prepForDirectAccessors} from '../utils/directAccessors.js';
 import qe from './qe.js';
 import {getASetting} from '../utils/storeSettings.js';
@@ -112,12 +114,14 @@ class eGrinder {
 			+ ` newFrameFactor=${this.newFrameFactor}   newIntegrationFP=${this.newIntegrationFP}`);
 	}
 
+	// requestAnimationFrame() handler.  this repeats Always during page operation.
 	// we have to measure animationFP in case it changes: user moves window to screen with diff
 	// refresh rate, or user changes refresh rate in control panel
 	eachAnimation =
 	now => {
 		let animationFP = now - this.prevFrame;
 		this.prevFrame = now;
+		this.rAFPeriod = animationFP;
 
 		// this jiggles around quite a  bit so smooth it.  I think individual
 		// calls lag, so long periods come next to short periods, so this

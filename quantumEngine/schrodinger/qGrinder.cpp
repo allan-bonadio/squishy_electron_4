@@ -377,7 +377,8 @@ void qGrinder::fourierFilter(int lowPassFilter) {
 
 void qGrinder::aggregateCalcTime(void) {
 	// add up ALL the threads' frameCalcTime and keep a running average
-	double frameCalcTime;
+	//double frameCalcTime;
+	frameCalcTime = 0;
 	for (int ix = 0; ix < nSlaveThreads; ix++) {
 		slaveThread *sl = slaves[ix];
 		if (sl)

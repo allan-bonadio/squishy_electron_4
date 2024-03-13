@@ -3,6 +3,7 @@
 ** Copyright (C) 2021-2024 Tactile Interactive, all rights reserved
 */
 import qe from './qe.js';
+import inteStats from '../controlPanel/inteStats.js';
 import {prepForDirectAccessors} from '../utils/directAccessors.js';
 import voltDisplay from '../utils/voltDisplay.js';
 import eAvatar from './eAvatar.js';
@@ -83,9 +84,10 @@ export class eSpace {
 		qe.grinder_copyFromAvatar(this.grinder.pointer, this.mainEAvatar.pointer);
 
 		this.miniGraphAvatar.ewave.setFamiliarWave(waveParams);  //  SquishPanel re-does this for SetWave
-		if (traceFamiliarWave) console.log(`🚀  done with setFamiliarWave():`, JSON.stringify(this.mainEWave.wave));
+		if (traceFamiliarWave) console.log(`🚀  done with setFamiliarWave():`,
+			JSON.stringify(this.mainEWave.wave));
 
-
+		this.sIntStats = new inteStats(this);
 		if (traceSpace) console.log(`🚀  done creating eSpace:`, this);
 	}
 

@@ -316,6 +316,7 @@ export class ControlPanel extends React.Component {
 
 		case 'integration':
 			return <SetIntegrationTab
+				space={this.space}
 				deltaT={s.deltaT}
 				setDeltaT={this.setDeltaT}
 				stepsPerFrame={s.stepsPerFrame}

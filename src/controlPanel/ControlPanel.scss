@@ -272,11 +272,16 @@
 				text-align: right;
 
 				&:first-child {
-					font-size: .7em;
+					font-size: .8em;
+				}
+				&:nth-child(2) {
+					width: 4em;					
+					font-weight: bold;
 				}
 				&:last-child {
-					width: 7em;
+					width: 4em;
 					font-weight: normal;
+					text-align: left;
 				}
 			}
 		}

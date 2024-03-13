@@ -6,7 +6,7 @@ What is Science?  stupid, nobody cares.
 
 What is Physics?  Physics is the science of things that aren't alive, or if they are, we don't care.  This applies to things that are very large or very small or anything in between.  Astrophysics or Astronomy is the physics of very large things (planets, galaxies) up to the size of the universe.  Quantum Mechanics is the study of very tiny things = the tiniest.  The smallest particles they've found on the frontiers of physics, all follow the rules of Quantum Mechanics.
 
-One big area of study is atoms.  You take some electrons, some protons, and some neutrons (in roughly equal numbers) and you can make an atom.  The number of protons tells you waht element it is.  Elements have different chemical properties.
+One big area of study is atoms.  You take some electrons, some protons, and some neutrons (in roughly equal numbers) and you can make an atom.  The number of protons tells you what element it is.  Elements have different chemical properties.
 
 What is Chemistry?  Chemistry is the science of chemicals.  Everything around you, clothes, chairs, cellphones, grape juice and the air you breathe are all chemicals.  Even we, ourselves, are made of chemicals.  All chemicals are made of molecules, and all molecules are made of atoms.
 
