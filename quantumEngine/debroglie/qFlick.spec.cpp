@@ -18,7 +18,7 @@ TEST_GROUP(qFlick)
 /* ***************************************************************************** Alloc */
 static void testAnAlloc(int N, int nW) {
 	qSpace *space = makeBareSpace(N);
-	qFlick *qflick = new qFlick(space, nW);
+	qFlick *qflick = new qFlick(space, nW, 1);
 
 	LONGS_EQUAL_TEXT('Flic', qflick->magic, "qFlick magic");
 	CHECK_TEXT(qflick->wave, "qFlick wave");
@@ -67,7 +67,7 @@ static void proveIt(qFlick *qflick, int nWaves, int allocWaves) {
 
 static void testSetNWaves(int size0, int size1, int size2) {
 	qSpace *space = makeBareSpace(16);
-	qFlick *qflick = new qFlick(space, size0);
+	qFlick *qflick = new qFlick(space, size0, 1);
 	proveIt(qflick, size0, size0);
 	int maxW = size0;
 

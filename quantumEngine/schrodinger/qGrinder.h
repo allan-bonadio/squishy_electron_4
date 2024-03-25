@@ -40,6 +40,9 @@ struct qGrinder {
 	int lowPassFilter;
 	int stepsPerFrame;
 
+	// any exception thrown in a
+	std::runtime_error& integrationEx;
+
 	/* *********************************************** integrating */
 
 	// a subclass of  qWave, it has multiple waves to do grinding with
@@ -71,16 +74,28 @@ struct qGrinder {
 	int nThreads;
 	int nSlaveThreads;  // mostly static, total number of slave threads we'll use
 
-	// number of slaveThread s that haven't finished integration yet; decremented down to zero each frame
-	int nIntegratingThreads;
+	// number of slaveThread s that have started/finished integration yet; incremented up to nSlaveThreads
+	int nStartedThreads;
+	int nFinishedThreads;
 
 	// Although isIntegrating, do only this many more frames before stopping.  Like 1 for single step.
 	int justNFrames;
 
-	pthread_mutex_t integratingMx;
+	// guards grinder->nFinishedThreads, frameCalcTime, etc
+	pthread_mutex_t finishMx;
 
-	void startingWork(qGrinder *grinder);
-	void endingWork(qGrinder *grinder);
+	// All threads start (roughly) all at once when this is unlocked.  Then, each slave thread, who have all requested an lock of the startMx, each get to lock it, add one to nStartedThreads, and immediately unlock it, and proceed to integration.
+	pthread_mutex_t startMx;
+
+	// called once per frame, at the start after last thread locks and unlocks startMx (by last thread to start)
+	void threadsHaveStarted(void);
+
+	// called once per frame, at the end after last thread finishes (by last thread)
+	void threadsHaveFinished(void);
+
+
+//	void startingWork(qGrinder *grinder);
+//	void endingWork(qGrinder *grinder);
 
 	// the lock that launches each frame integration
 	//pthread_rwlock_t masterLock;
@@ -98,11 +113,11 @@ struct qGrinder {
 
 
 	// true if thread(s) should start a new integration upon next event cycle, false if not
-	// Synchronized with the interactive simulation switch, see isRunning in JS.
+	// Synchronized with the interactive simulation switch, visible and changeable in JS.
 	bool shouldBeIntegrating;
 
-	// same as shouldBeIntegrating, except this is synchronized with the event loop.
-	// Does not change while integration frame being calculated.
+	// same as shouldBeIntegrating, except this is synchronized with rAF.
+	// Does not change while integration frame being calculated.  So all threads are on the same page.
 	bool isIntegrating;
 
 	// set pleaseFFt from JS (only if in the middle of frame)
@@ -154,6 +169,7 @@ struct qGrinder {
 extern "C" {
 	//void grinder_initThreadIntegration(qGrinder *grinder, int threadSerial);
 	void grinder_oneFrame(qGrinder *grinder);
+	void grinder_triggerIteration(qGrinder *grinder);
 
 	void grinder_askForFFT(qGrinder *grinder);
 

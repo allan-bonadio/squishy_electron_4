@@ -56,6 +56,7 @@ let exportsSrc  = [
 	// {name: 'grinder_createASlave', args: ['number', 'number'], retType: 'number'},
 
 	// for the older, same-thread integration, or to be run in a/the thread
+	{name: 'grinder_triggerIteration', args: ['number'], retType: null},
 	{name: 'grinder_oneFrame', args: ['number'], retType: null},
 
 	// releases the master semaphore to start all the threads integrating

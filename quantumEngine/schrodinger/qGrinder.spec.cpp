@@ -61,9 +61,6 @@ TEST(qGrinder, CheckGrinderConstructor)
 	LONGS_EQUAL(false, qgrinder->shouldBeIntegrating);
 	LONGS_EQUAL(false, qgrinder->pleaseFFT);
 
-	// how does this get turned on!??!!?
-	LONGS_EQUAL(true, qgrinder->frameInProgress);
-
 	STRCMP_EQUAL("myGrind", qgrinder->label);
 
 	delete qgrinder;
@@ -92,7 +89,7 @@ static void isAllZeroesExceptFor(qBuffer *qwave, int except1, bool shouldFail, c
 		if (ix != except1) {
 			double norm = cx.norm();
 			if ( norm> ERROR_RADIUS) {
-				sprintf(buf, "\n wave at [%d]  😢 value = %8.8lf %8.8lf  norm=%8.8lg   shouldFail=%d ",
+				snprintf(buf, 100, "\n wave at [%d]  😢 value = %8.8lf %8.8lf  norm=%8.8lg   shouldFail=%d ",
 					ix, cx.re, cx.im, norm, shouldFail);
 			}
 		}
@@ -189,9 +186,10 @@ TEST(qGrinder, fourFilt16_1_LPFscan6) { tryFourierFilter(16, 1, 5, 6, false); }
 // also wipes out freq 1 so should fail the test
 TEST(qGrinder, fourFilt16_1_LPFscan7) { tryFourierFilter(16, 1, 5, 7, true); }
 
-TEST_SKIP(qGrinder, fourFilt16_1_3_LPFscan7) { tryFourierFilter(16, 1, 3, 7); }
-
-TEST_SKIP(qGrinder, fourFilt64_5_22) { tryFourierFilter(64, 5, 22, 16); }
+// they TOOK OUT TEST_SKIP() ... I guess you can comment it out
+//TEST_SKIP(qGrinder, fourFilt16_1_3_LPFscan7) { tryFourierFilter(16, 1, 3, 7, false); }
+//
+//TEST_SKIP(qGrinder, fourFilt64_5_22) { tryFourierFilter(64, 5, 22, 16, false); }
 
 
 /* ********************************************************************** random experimentatiojn */

@@ -5,6 +5,7 @@
 
 #include <ctime>
 #include <stdexcept>
+#include <stdarg.h>
 
 //#include <stdatomic.h>
 #include <pthread.h>
@@ -15,7 +16,51 @@
 #include "qGrinder.h"
 #include "qThread.h"
 
-bool traceThreads = true;
+bool traceThreads = false;
+bool traceSpeedyLog = false;
+
+/* *********************************************** speedyLogging */
+// for extra-fast logging of timing for these threads.  On the honor system, don't overfill!
+
+#define MAX_BUF_LEN  16000
+#define MAX_ONE_LOG_LEN  400
+static char speedyBuf[MAX_BUF_LEN];
+static int speedyCursor = 0;
+static double startTime = getTimeDouble();
+
+
+void speedyLog(const char* format, ...) {
+    va_list args;
+    va_start(args, format);
+
+	if (speedyCursor >= MAX_BUF_LEN - MAX_ONE_LOG_LEN)
+		speedyFlush();
+
+ 	// first the time, then the message
+	speedyCursor += snprintf(speedyBuf+speedyCursor, 20, "🚄 %8.3f ", getTimeDouble() - startTime);
+	speedyCursor +=  vsnprintf(speedyBuf+speedyCursor, MAX_ONE_LOG_LEN, format, args);
+	speedyBuf[speedyCursor] = 0;
+
+    va_end(args);
+	if (traceSpeedyLog)
+		printf("speedyLog fmt='%s' speedyCursor=%d  log so far:\n‹%s›\n", format, speedyCursor, speedyBuf);
+//	printf("%16llx %16llx \n%16llx %16llx \n%16llx %16llx \n%16llx %16llx \n",
+//		*((long long int *) speedyBuf), *((long long int *) (speedyBuf+8)),
+//		*((long long int *) (speedyBuf+16)), *((long long int *) (speedyBuf+24)),
+//		*((long long int *) (speedyBuf+32)), *((long long int *) (speedyBuf+40)),
+//		*((long long int *) (speedyBuf+48)), *((long long int *) (speedyBuf+56))
+//		);
+}
+
+// finally, print it out
+void speedyFlush(void) {
+	if (traceSpeedyLog)
+		printf("speedyLog speedyFlush speedyCursor=%d \n", speedyCursor);
+	if (speedyBuf[0])
+		printf("%s", speedyBuf);
+	speedyCursor = 0;
+	speedyBuf[0] = 0;
+}
 
 /* ********************************************************************************** threads */
 
@@ -44,8 +89,10 @@ static void *tStart(void *qtx) {
 	// MY qThread object
 	qThread *qt = (qThread *) qtx;
 	qt->confirmThread();
-	printf("🐴 qThread::ok confirmed in tStart #%d!\n", qt->serial);
-	qt->dumpAThread("starting tStart()");
+	//printf("🐴 qThread::ok confirmed in tStart #%d!\n", qt->serial);
+
+	// since this is the thread execcuting, it should show up in its log in the debugger?
+	qt->dumpAThread("thread starting up()");
 
 	(*qt->handler)(qt->arg);
 
@@ -72,8 +119,9 @@ static void *tStart(void *qtx) {
 qThread::qThread(void *(*hand)(void *), void *ar)
 	: errorCode(0), handler(hand), arg(ar), confirmed(false) {
 
-	printf("🐴 qThread::qThread(%d) constructor...hand=%p   ar=%p\n",
-		serial, hand, ar);
+	if (traceThreads)
+		printf("🐴 qThread::qThread(%d) constructor...hand=%p   ar=%p\n",
+			serial, hand, ar);
 
 	//qThread();
 
@@ -93,7 +141,9 @@ qThread::qThread(void *(*hand)(void *), void *ar)
 	serial = qThread::nCreatedThreads;
 	qThread::nCreatedThreads++;
 
-	dumpAThread("freshly created");
+	// this should show up in the UI thread console
+	if (traceThreads)
+		dumpAThread("thread freshly launched");
 };
 
 // must be called from inside the thread?  more likely, never.  Or, if so, join some other thread.

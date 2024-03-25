@@ -7,45 +7,16 @@
 #include "qThread.h"
 #include "qGrinder.h"
 #include "slaveThread.h"
-#include <emscripten/html5.h>
-#include <emscripten/emscripten.h>
-#include <stdarg.h>
+//#include <emscripten/html5.h>
 
 // lame threads don't do integration; extra threads on the end just for testing
 static bool traceLameThreads = false;
 
-static bool traceRunner = false;
-
-static bool traceNewPeriod = false;
-
-
-/* *********************************************** speedyLogging */
-// for extra-fast logging of timing for these threads.  On the honor system, don't overfill!
-#define MAX_BUF_LEN  16000
-static char speedyBuf[MAX_BUF_LEN];
-static int speedyCursor = 0;
+static bool traceStart = true;
+static bool traceRunner = true;
+static bool traceFinish = true;
 
 
-
-//#define SCT speedyCursor += snprintf(speedyBuf+speedyCursor, 100, "%12.3f ", emscripten_performance_now())
-//#define SLF(format, ...)  speedyCursor += snprintf(speedyBuf+speedyCursor, 100, format, __VA_OPT__(,) __VA_ARGS__)
-//#define speedyLog(format, ...)   SCT; SLF(format, __VA_OPT__(,) __VA_ARGS__); speedyBuf[speedyCursor++] = '\n'
-static void speedyLog(const char* format, ...) {
-    va_list args;
-    va_start(args, format);
-
- 	// first the time, then the message, and supply a newline to make it easier
-	speedyCursor += sprintf(speedyBuf+speedyCursor, "%13.3f ", emscripten_performance_now());
-	speedyCursor +=  vsnprintf(speedyBuf+speedyCursor, 400, format, args);
-	//speedyBuf[speedyCursor++] = '\n';
-
-    va_end(args);
-}
-
-void speedyDump(void) {
-	printf("%s", speedyBuf);
-	speedyCursor = 0;
-}
 
 /* *********************************************** slave threads */
 
@@ -57,20 +28,19 @@ slaveThread **qGrinder::slaves = sla;
 // only nonzero when we're changing the frame factor
 int slaveThread::newFrameFactor = 0;
 
-// wrapper for emscripten_request_animation_frame_loop() to call slaveRunner()
-static void sRunner(void *arg) {
-	slaveThread *This = (slaveThread *) arg;
-	This->slaveRunner();
-}
+// wrapper for emscripten_request_animation_frame_loop() to call slaveWork()
+//static void sRunner(void *arg) {
+//	slaveThread *This = (slaveThread *) arg;
+//	This->slaveWork();
+//}
 
 // wrapper for pthread to start the thread.  arg is the slaveThread ptr.  requestAnimationFrame.
 static void *sStarter(void *arg) {
 	printf("🔪 sStarter: starting\n");
 
-	// true on the end does that throwing thing, so this function never returns, only the runner keeps repeating.
-	emscripten_set_main_loop_arg(&sRunner, arg, -1, true);
+	// runs forever never returns
+	((slaveThread *) arg)->slaveLoop();
 
-	printf("🔪 sStarter: main_loop_arg() returned\n");
 	return NULL;
 }
 
@@ -85,128 +55,110 @@ slaveThread::slaveThread(qGrinder *gr)
 }
 // no destructor - never freed
 
-// runs repeatedly, either does integration or not depending on grinder flag
-void slaveThread::slaveRunner(void) {
+// do the work: integration
+void slaveThread::slaveWork(void) {
 	int nWas;
 
-	if (traceRunner) speedyLog("🔪 slaveRunner #%d starts cycle\n", serial);
-	if (slaveThread::newFrameFactor) {
-		// change to new integration frame period.  Here so all threads get it at the same time.
-		// threadsHaveFinished() will reset it to zero.
-		emscripten_set_main_loop_timing(EM_TIMING_RAF, slaveThread::newFrameFactor);
-	}
+	if (traceRunner) speedyLog("🔪 slaveWork #%d starts cycle\n", serial);
+//	if (slaveThread::newFrameFactor) {
+//		// change to new integration frame period.  Here so all threads get it at the same time.
+//		// threadsHaveFinished() will reset it to zero.
+//
+//		// lemme figure this out... emscripten_set_main_loop_timing(EM_TIMING_RAF, slaveThread::newFrameFactor);
+//	}
 
 	if (traceRunner)  {
 		speedyLog("🔪              thread #%d: shouldBeIntegrating=%d  isIntegrating=%d.  "
-			"nIntegratingThreads=%d\n",
+			"nFinishedThreads=%d\n",
 			serial, grinder->shouldBeIntegrating, grinder->isIntegrating,
-			grinder->nIntegratingThreads);
+			grinder->nFinishedThreads);
 	}
 
-	// maybe we shouldn't do it?
-	if ( !grinder->isIntegrating) {
-		// STILL have to sync in case user turned integration on.
-		// note we don't touch the frameCalcTime
-		pthread_mutex_lock(&grinder->integratingMx);
-			nWas = --grinder->nIntegratingThreads;
-		pthread_mutex_unlock(&grinder->integratingMx);
+//
+//	// maybe we shouldn't do it?
+//	if ( !grinder->isIntegrating) {
+//		// STILL have to sync in case user turned integration on.
+//		// note we don't touch the frameCalcTime
+//		pthread_mutex_lock(&grinder->finishMx);
+//			nWas = --grinder->nFinishedThreads;
+//		pthread_mutex_unlock(&grinder->finishMx);
+//
+//		if (nWas <= 0) {
+//			if (traceRunner)  {
+//				speedyLog("🔪 slaveWork: last thread is #%d.\n", serial);
+//				speedyLog("🔪              shouldBeIntegrating=%d  isIntegrating=%d \n",
+//					grinder->shouldBeIntegrating, grinder->isIntegrating);
+//			}
+//			grinder->threadsHaveFinished();
+//			//grinder->isIntegrating = grinder->shouldBeIntegrating;
+//		}
+//		return;
+//	}
 
-		if (nWas <= 0) {
-			if (traceRunner)  {
-				speedyLog("🔪 slaveRunner: last thread is #%d.\n", serial);
-				speedyLog("🔪              shouldBeIntegrating=%d  isIntegrating=%d \n",
-					grinder->shouldBeIntegrating, grinder->isIntegrating);
-			}
-			threadsHaveFinished();
-			//grinder->isIntegrating = grinder->shouldBeIntegrating;
-		}
-		return;
-	}
-
-	// Gonna do an integration frame.  set starting time, under lock
-	double now = emscripten_performance_now();
-	pthread_mutex_lock(&grinder->integratingMx);
-		startCalc = now;
-	pthread_mutex_unlock(&grinder->integratingMx);
+	// Gonna do an integration frame.  set starting time, under lockf
+	// wait this doesn't have to be under lock!  it's per-thread.
+	startCalc = getTimeDouble();
+//	pthread_mutex_lock(&grinder->finishMx);
+//	pthread_mutex_unlock(&grinder->finishMx);
 
 	//actually, doing the calculation
 	grinder->oneFrame();
 
-	double endCalc = emscripten_performance_now();
-	pthread_mutex_lock(&grinder->integratingMx);
-		// get endCalc and compare
-		frameCalcTime = endCalc - startCalc;
+	// get endCalc and compare
+	double endCalc = getTimeDouble();
+	frameCalcTime = endCalc - startCalc;
 
-		// tell the boss we're done
-		nWas = --grinder->nIntegratingThreads;
-	pthread_mutex_unlock(&grinder->integratingMx);
-
-	if (nWas <= 0) {
-		grinder->aggregateCalcTime();
-
-		// this must be the last thread to finish in this integration frame!
-		threadsHaveFinished();
-
-		// single step (or a few steps): are we done yet?
-		if (grinder->justNFrames) {
-			--grinder->justNFrames;
-			if (0 >= grinder->justNFrames)
-				grinder->shouldBeIntegrating = false;
-		}
-
-	}
 	if (traceRunner) speedyLog("🔪 end of runner; shouldBeIntegrating=%d  isIntegrating=%d\n",
 				grinder->shouldBeIntegrating, grinder->isIntegrating);
-	return;
+}
+
+// repeatedly run the runner in a loop
+void slaveThread::slaveLoop(void) {
+	while (true) {
+		try {
+			int nWas;
+
+			// this thread will freeze here until startMx is unlocked, at start of iteration.
+			// All other slave threads will also be waiting for startMx.  When this one gets its chance,
+			// it'll lock and unlock, then start its integration work.
+			// so they all start at roughly the same time.
+			pthread_mutex_lock(&grinder->startMx);
+				nWas = ++grinder->nStartedThreads;
+
+			// EXCEPT for the last one starting; it'll leave it locked for the next cycle.
+			// NO IT's illegal to unlock a thread from a different thread than who set it.
+			// Must use a semaphore to synch the threads!!!  This'll work if there's only 1 thread, for now.
+			if (grinder->nStartedThreads < grinder->nSlaveThreads)
+				pthread_mutex_unlock(&grinder->startMx);
+			if (traceStart)
+				speedyLog("🔪 start of work, nStarted=%d\n", grinder->nStartedThreads);
+
+
+			slaveWork();
+
+
+			// tell the boss we're done
+			pthread_mutex_lock(&grinder->finishMx);
+				nWas = ++grinder->nFinishedThreads;
+			pthread_mutex_unlock(&grinder->finishMx);
+			if (traceFinish)
+				speedyLog("🔪 finishing work, nFinished=%d\n", grinder->nFinishedThreads);
+
+			if (nWas >= grinder->nSlaveThreads) {
+				// this must be the last thread to finish in this integration frame!
+				grinder->threadsHaveFinished();
+			}
+
+			speedyFlush();
+		} catch (std::runtime_error& ex) {
+			//  typically divergence.  JS handles it
+			grinder->integrationEx = ex;
+		}
+	}
 }
 
 
-// runs in the thread loop, only in the last thread per integration frame.
-// maybe this should be a grinder method!?!
-void slaveThread::threadsHaveFinished() {
-
-	// at the beginning of this cycle, all the threads set their frame factor from
-	// slaveThread::newFrameFactor .  So now we can reset it.
-	if (slaveThread::newFrameFactor) {
-		 grinder->frameFactor = slaveThread::newFrameFactor;
-
-		if (traceNewPeriod)  {
-			speedyLog("🔪 threadsHaveFinished: absorbing slaveThread::newFrameFactor to zero, was %d\n",
-				slaveThread::newFrameFactor);
-		}
-		slaveThread::newFrameFactor = 0;  // its been used by now
-	}
-
-	if (grinder->newFrameFactor) {
-		// slaveThread::newFrameFactor tells each thread they have to change themselves.
-		// It must be set at the same time for all threads - hence here.
-		// Whereas, grinder->newFrameFactor can be set any old time.
-
-		// do we even use newIntegrationFP?  only for reporting on integration tab
-		if (traceNewPeriod) speedyLog("🔪  threadsHaveFinished- setting newFrameFactor to %d, from "
-			"grinder->newFrameFactor=%d\n",
-			slaveThread::newFrameFactor, grinder->newFrameFactor);
-
-		// slaveThread::newFrameFactor is where each thread will get its frame factor from, all threads at same time
-		slaveThread::newFrameFactor = grinder->newFrameFactor;
-		grinder->newFrameFactor = grinder->newIntegrationFP = 0;  // cuz it's passed on
-	}
-
-		if (traceRunner)  {
-			speedyLog("🔪                ...in threadsHaveFinished().  justNFrames=%d and shouldBeIntegrating=%d\n",
-					grinder->justNFrames, grinder->shouldBeIntegrating);
-		}
-
-	// set isIntegrating here so all threads get it at the same time
-	grinder->isIntegrating = grinder->shouldBeIntegrating;
-
-	// ready for new frame
-	grinder->nIntegratingThreads = grinder->nSlaveThreads;
-
-	speedyDump();
-}
-
-// creates all slave threads; runs early
+// static; creates all slave threads; runs early
 void slaveThread::createSlaves(qGrinder *grinder) {
 
 	for (int t = 0; t < grinder->nSlaveThreads; t++) {

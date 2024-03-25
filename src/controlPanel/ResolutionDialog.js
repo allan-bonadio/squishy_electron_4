@@ -64,10 +64,10 @@ export default class ResolutionDialog extends React.Component {
 
 
 	// puts up the resolution dialog, starting with the values from the state
-	static openResolutionDialog(cPanel) {
+	static openResolutionDialog(grinder) {
 		// freeze the frame while this is going on ...
-		const timeWasAdvancing = cPanel.isRunning;
-		cPanel.isRunning = false;
+		const timeWasAdvancing = grinder.shouldBeIntegrating;
+		grinder.shouldBeIntegrating = false;
 
 		// pass our state upward to load into the dialog
 		ResolutionDialog.openResDialog(
@@ -83,7 +83,7 @@ export default class ResolutionDialog extends React.Component {
 
 			// cancel callback
 			() => {
-				cPanel.isRunning = timeWasAdvancing;
+				grinder.shouldBeIntegrating = timeWasAdvancing;
 			}
 		);
 	}
