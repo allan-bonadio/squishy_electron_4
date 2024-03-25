@@ -35,8 +35,32 @@ cd ..
 echo "CppUTest Test runner args: db=debugger; all others are assumed to be test name segments"
 echo "Use -g groupname to test a whole group"
 
+######################################### CPPUtest pkg
 # https://cpputest.github.io
-export CPPUTEST_HOME=/opt/dvl/cpputest/cpputest-3.8
+# in your ~/.profile or wherever, set this to where cpputest home directory is.
+# Home dir should have > 70 files in it, including README.md, Makefile, INSTALL and
+# more than a dozen subdirs.
+# panama: export CPPUTEST_HOME=/opt/dvl/cpputest/cpputest-3.8
+# dnipro: export CPPUTEST_HOME=/opt/homebrew/opt/cpputest
+
+export CPPFLAGS="-I$CPPUTEST_HOME/include"
+
+# Then for the memory leak detection, you’ll need to add:
+
+export CXXFLAGS="-include $CPPUTEST_HOME/include/CppUTest/MemoryLeakDetectorNewMacros.h"
+export CFLAGS="-include $CPPUTEST_HOME/include/CppUTest/MemoryLeakDetectorMallocMacros.h"
+
+export LD_LIBRARIES="-L$CPPUTEST_HOME/lib -lCppUTest -lCppUTestExt"
+
+#INCLUDES=" -I$EMSDK/upstream/emscripten/cache/sysroot/include"
+# nope	-include $CPPUTEST_HOME/include/CppUTest/MemoryLeakDetectorNewMacros.h \
+
+if [ -z "$CPPUTEST_HOME" ]
+then echo "Must define CPPUTEST_HOME !!"
+	exit 77
+fi
+
+######################################### squish pkg
 
 # no enscriptm here!  just native C++.
 #. $EMSDK/emsdk_env.sh
@@ -44,8 +68,12 @@ export CPPUTEST_HOME=/opt/dvl/cpputest/cpputest-3.8
 # create a space-sep list of ALL the runtime cpp files (almost all)
 allCpp=`cat building/allCpp.list`
 
-# keep (MAX_LABEL_LEN+1) a multiple of 4, 8, 16, 32 or 8 for alignment, eg 7, 15 or 31
+# keep (MAX_LABEL_LEN+1) a multiple of 4, 8, 16, 32 for alignment, ie 7, 15 or 31
+#  It's just for debug labels, no big deal.
 MAX_LABEL_LEN=7
+
+# number of dimensions of the state array.  Currently only 1 is supported.
+# If we do spin on the electron, or a y coordinate or something, it'll go up.
 MAX_DIMENSIONS=2
 
 
@@ -61,17 +89,18 @@ set -x
 g++ -o wasm/cppuTestBin -Wno-tautological-undefined-compare  \
 	-g -O0 \
 	-std=c++11 -fexceptions  \
-	-DqDEV_VERSION -DMAX_LABEL_LEN=$MAX_LABEL_LEN -DMAX_DIMENSIONS=$MAX_DIMENSIONS \
+	-DqDEV_VERSION \
+	-DMAX_LABEL_LEN=$MAX_LABEL_LEN -DMAX_DIMENSIONS=$MAX_DIMENSIONS \
 	-I$CPPUTEST_HOME/include \
-	-include $CPPUTEST_HOME/include/CppUTest/MemoryLeakDetectorNewMacros.h \
 	-L$CPPUTEST_HOME/lib -lCppUTest -lCppUTestExt \
-	-include squish.h schrodinger/abacus.cpp \
+	-include squish.h  \
 	testing/cppuMain.cpp testing/testingHelpers.cpp */*.spec.cpp \
 	$allCpp \
 	|| exit $?
 set +x
 
-echo ====================== done compiling... start testing ==================================
+
+echo =================== done compiling... start testing ===============================
 echo
 
 debug=false
