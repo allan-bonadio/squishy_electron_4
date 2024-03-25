@@ -24,10 +24,6 @@ fi
 MAX_DIMENSIONS=2
 # add any other config variables that need to be handed into the C++ and JS
 
-# sEXPORTED_FUNCTIONS are my C++ functions. sEXPORTED_RUNTIME_METHODS are
-# magical Emscripten functions I can get to appear in my qE files so I can call
-# them. Do the compile command in pieces - so many params
-
 export EMSDK_QUIET=1
 . $EMSDK/emsdk_env.sh
 
@@ -41,6 +37,10 @@ D_E_C="-sNO_DISABLE_EXCEPTION_CATCHING"
 
 FEATURES="-ffast-math  -lembind  $D_E_C"
 
+# sEXPORTED_FUNCTIONS are my C++ functions callable from JS. sEXPORTED_RUNTIME_METHODS are
+# magical Emscripten functions I can get to appear in my qE files so I can call
+# them. Construct the compile command in pieces - so many params
+
 EXPORTS="-sEXPORTED_FUNCTIONS=@building/exports.json -sEXPORTED_RUNTIME_METHODS=@building/runMethods.json"
 DEFINES=" -DqDEV_VERSION -DMAX_LABEL_LEN=$MAX_LABEL_LEN -DMAX_DIMENSIONS=$MAX_DIMENSIONS "
 INCLUDES=" -I$EMSDK/upstream/emscripten/cache/sysroot/include -include emscripten.h -include squish.h "
@@ -50,7 +50,7 @@ MISC="-sFILESYSTEM=0 -sINVOKE_RUN=1 -Wno-limited-postlink-optimizations "
 
 
 # N_THREADS can be small integer 1 or above.  That's workers, the js event loop isn't counted.
-# Ends up being a global in C++ and in JS
+# Ends up being a global in C++ and in JS.  As of this writing, only 1 is supported!!
 N_THREADS=1
 
 # we want wasm_workers, but for now, all we can use is pthreads and all its enormous overhead.
@@ -61,7 +61,7 @@ export WORKERS=" -pthread   -sENVIRONMENT=web,worker -sPTHREAD_POOL_SIZE=$N_THRE
 
 # tried to omit GL stuff, but didn't seem to make much difference.
 # Gotta get rid of gobs of unneeded code.
-DISABLE_GL="-sGL_MAX_TEMP_BUFFER_SIZE=0 -sGL_EMULATE_GLES_VERSION_STRING_FORMAT=0 -sGL_EXTENSIONS_IN_PREFIXED_FORMAT=0 -sGL_SUPPORT_AUTOMATIC_ENABLE_EXTENSIONS=0 -sGL_SUPPORT_SIMPLE_ENABLE_EXTENSIONS=0 -sGL_TRACK_ERRORS=0 -sGL_POOL_TEMP_BUFFERS=0 -sOFFSCREENCANVAS_SUPPORT=0 -sOFFSCREENCANVASES_TO_PTHREAD='' -sOFFSCREEN_FRAMEBUFFER=0 -sGL_ASSERTIONS=0 -sGL_DEBUG=0 -sGL_TESTING=0 -sTRACE_WEBGL_CALLS=0 -sFULL_ES2=0 -sGL_SUPPORT_EXPLICIT_SWAP_CONTROL=0 -sGL_WORKAROUND_SAFARI_GETCONTEXT_BUG=0"
+DISABLE_GL="-sGL_MAX_TEMP_BUFFER_SIZE=0 -sGL_EMULATE_GLES_VERSION_STRING_FORMAT=0 -sGL_EXTENSIONS_IN_PREFIXED_FORMAT=0 -sGL_SUPPORT_AUTOMATIC_ENABLE_EXTENSIONS=0 -sGL_SUPPORT_SIMPLE_ENABLE_EXTENSIONS=0 -sGL_TRACK_ERRORS=0 -sGL_POOL_TEMP_BUFFERS=0 -sOFFSCREENCANVAS_SUPPORT=0 -sOFFSCREEN_FRAMEBUFFER=0 -sGL_ASSERTIONS=0 -sGL_DEBUG=0 -sGL_TESTING=0 -sTRACE_WEBGL_CALLS=0 -sFULL_ES2=0 -sGL_SUPPORT_EXPLICIT_SWAP_CONTROL=0 -sGL_WORKAROUND_SAFARI_GETCONTEXT_BUG=0"
 
 DISABLE_FS="-sFILESYSTEM=0 -sFETCH_SUPPORT_INDEXEDDB=0  "
 
