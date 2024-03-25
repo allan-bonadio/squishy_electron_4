@@ -9,13 +9,14 @@ import ResolutionDialog from './ResolutionDialog.js';
 function setPT() {
 	SetResolutionTab.propTypes = {
 		cPanel: PropTypes.object.isRequired,
+		grinder: PropTypes.object.isRequired,
 	};
 }
 
 function SetResolutionTab(props) {
 	return (<div className='SetResolutionTab'>
 		<button className='setResolutionButton'
-			onClick={ev => ResolutionDialog.openResolutionDialog(props.cPanel)}>
+			onClick={ev => ResolutionDialog.openResolutionDialog(props.grinder)}>
 				Change Space
 				<div style={{fontSize: '.7em'}}>
 					(will reset current wave)</div>

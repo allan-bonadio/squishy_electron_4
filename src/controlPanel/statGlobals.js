@@ -3,6 +3,8 @@
 ** Copyright (C) 2022-2024 Tactile Interactive, all rights reserved
 */
 
+this is no longer used
+
 // one for each metric we follow.  We'll avg them over time.
 const statGlobals = {
 	// one dom pointer for each stat, keyed by name

@@ -14,8 +14,7 @@
 // call this JS callback so JS knows we're up and ready.
 // Hand it some numbers from the builder script.
 // all these param names must be lower case for some reason.
-EM_JS(int, qeStarted, (int max_dimensions, int max_label_len, int n_threads),
-{
+EM_JS(int, qeStarted, (int max_dimensions, int max_label_len, int n_threads), {
 	// sometimes these things start in the wrong order
 	let inter = setInterval(() => {
 		if (window.startUpFromCpp) {
@@ -23,11 +22,7 @@ EM_JS(int, qeStarted, (int max_dimensions, int max_label_len, int n_threads),
 			clearInterval(inter);
 		}
 	}, 100);
-
-	// worthless i think
-	return navigator.hardwareConcurrency;
-}
-);
+});
 
 
 // emscripten calls main() when the whole C++ is all set up.  Tell the JS guys.
@@ -37,4 +32,5 @@ int main() {
 	qeStarted(MAX_DIMENSIONS, MAX_LABEL_LEN, N_THREADS);
 	return 0;
 }
+
 

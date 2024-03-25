@@ -126,7 +126,7 @@ describe('cx2rgb tests', () => {
 	testParam('voltageSettings', 'showVoltage', true, [true, false]);  // not really the same as the rest...
 
 	/* ************************************ frameSettings */
-	testParam('frameSettings', 'isRunning', false,  [false, true]);
+	testParam('frameSettings', 'shouldBeIntegrating', false,  [false, true]);
 	testParam('frameSettings', 'framePeriod', 50, {min: 16, max: 60_001});
 	testParam('frameSettings', 'deltaT', 1, {min: .01, max: 100.0, });
 	testParam('frameSettings', 'stepsPerFrame', 100, {min: 10, max: 1e5});

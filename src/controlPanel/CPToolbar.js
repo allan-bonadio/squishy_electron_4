@@ -7,13 +7,15 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import eSpace from '../engine/eSpace.js';
 
-let traceCPToolbar = true;
+let traceCPToolbar = false;
 
 
 function setPT() {
 	CPToolbar.propTypes = {
 		frameFrequency: PropTypes.number.isRequired,
 		setFrameFrequency: PropTypes.func.isRequired,
+
+		shouldBeIntegrating: PropTypes.bool.isRequired,
 
 		// these two might be undefined during startup, so get ready to punt
 		N: PropTypes.number,
@@ -23,8 +25,6 @@ function setPT() {
 		resetVoltage: PropTypes.func.isRequired,
 		toggleShowVoltage: PropTypes.func.isRequired,
 		showVoltage: PropTypes.bool.isRequired,
-
-		isRunning: PropTypes.bool.isRequired,  // make sure start/stop button updates
 	};
 }
 
@@ -74,7 +74,7 @@ function CPToolbar(props) {
 					console.info(`CPToolbar props.cPanel.startStop -> (props)  props=`, props);
 				props.cPanel.startStop(ev)
 			}}>
-			{ props.isRunning
+			{ props.space?.grinder.shouldBeIntegrating
 				? <span><big>&nbsp;</big>▐▐ <big>&nbsp;</big></span>
 				: <big>►</big> }
 		</button>

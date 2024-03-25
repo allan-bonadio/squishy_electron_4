@@ -8,14 +8,21 @@ struct qThread;
 
 #include <pthread.h>
 
+// use speedyLog() just like printf(), then call speedyFlush() to print out
+// everything logged
+extern void speedyLog(const char* format, ...);
+extern void speedyFlush(void);
+
+
 // N_THREADS defined in buildCommon.sh
 // from emscripten docs for pthreads:  For web security purposes, there exists a
 // fixed limit (by default 20) of threads that can be spawned when running in
 // Firefox Nightly. #1052398. To adjust the limit, navigate to about:config and
 // change the value of the pref “dom.workers.maxPerDomain”.
+// So, I don't know how to get that number out here, so we'll just guess.
+// This is NOT the number of threads, it's just the max nThreads.
 #define MAX_THREADS 20
 
-// pointers to qThread objects in serial order
 
 
 // one for each pthread.  Each is created from JS with thread_createAThread()

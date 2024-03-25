@@ -70,15 +70,10 @@ export class ControlPanel extends React.Component {
 			stepsPerFrame: getASetting('frameSettings', 'stepsPerFrame'),
 			lowPassFilter: getASetting('frameSettings', 'lowPassFilter'),
 
-			// state for voltage resets - control panel only, populateFamiliarVoltage()  see below;...
-			//voltageBreed: getASetting('voltageParams', 'voltageBreed'),
-			//canyonPower: getASetting('voltageParams', 'canyonPower'),
-			//canyonScale: getASetting('voltageParams', 'canyonScale'),
-			//canyonOffset: getASetting('voltageParams', 'canyonOffset'),
-
 			showingTab: getASetting('miscSettings', 'showingTab'),
 
-			// waveParams & voltage params - see below
+			// a copy of shouldBeIntegrating, to update this panel when it's changed
+			sbIntegrating: getASetting('frameSettings', 'shouldBeIntegrating'),
 		}
 		this.framePeriod = this.state.framePeriod;  // everybody uses this one
 
@@ -93,21 +88,19 @@ export class ControlPanel extends React.Component {
 			// not much happens without this info
 			this.space = space;
 			this.N = space.dimensions[0].N;
-			this.grinder = space.grinder;
 			this.mainEAvatar = space.mainEAvatar;
 			this.mainEWave = space.mainEWave;
+
+			this.grinder = space.grinder;
+			this.grinder.shouldBeIntegrating = this.state.sbIntegrating;
+			if (this.grinder.shouldBeIntegrating)
+				this.startAnimating();
 		})
 		.catch(rex => {
 			let ex = interpretCppException(rex);
 			console.error(ex.stack ?? ex.message ?? ex);
 			debugger;
 		});
-
-		// This constructor can only happen after the spacePromise has resolved.
-		this.isRunning = getASetting('frameSettings', 'isRunning');
-		if (this.isRunning)
-			this.startAnimating();
-
 	}
 
 	/* ******************************************************* start/stop */
@@ -123,31 +116,33 @@ export class ControlPanel extends React.Component {
 		// NO!  the grinder doesn't use this; squishpanel does.  this.grinder.framePeriod = this.framePeriod;
 	}
 
-	// the central authority as to whether we're animating or not.
-	// the first time, we get it from the settings.  in the constructor.
-	isRunning = false;
+	// the central authority as to whether we're animating/integrating or not is grinder.shouldBeIntegrating
+	// Change the status by turning this on or off.  Also, set in the settings.
 
 	startAnimating =
 	() => {
 		//console.info(`startAnimating starts`);
-		this.isRunning = storeASetting('frameSettings', 'isRunning', true);;
 		eSpaceCreatedPromise
-		.then(space => space.grinder.shouldBeIntegrating = true)
+		.then(space => {
+			space.grinder.shouldBeIntegrating  = storeASetting('frameSettings', 'shouldBeIntegrating', true);
+			this.setState({sbIntegrating: true});
+		});
 
 	}
 
 	stopAnimating =
 	() => {
-		//console.info(`stopAnimating starts`);
-		this.isRunning = storeASetting('frameSettings', 'isRunning', false);
+		//console.info(`stopAnimating stops`);
 		eSpaceCreatedPromise
-		.then(space => space.grinder.shouldBeIntegrating = false)
+		.then(space => {
+			space.grinder.shouldBeIntegrating  = storeASetting('frameSettings', 'shouldBeIntegrating', false);
+			this.setState({sbIntegrating: false});
+		});
 	}
 
 	startStop =
 	ev => {
-		//console.info(`startStop starts, this.isRunning=${this.isRunning}`);
-		if (this.isRunning)
+		if (this.grinder.shouldBeIntegrating)
 			this.stopAnimating();
 		else
 			this.startAnimating();
@@ -157,8 +152,9 @@ export class ControlPanel extends React.Component {
 	(ev) => {
 		//console.info(`singleFrame starts`);
 		this.grinder.shouldBeIntegrating = true;
-		this.grinder.justNFrames = 1;
+		this.setState({sbIntegrating: true});
 
+		this.grinder.justNFrames = 1;
 
 		// wait ... need to do this one tic later.  Well, close enough.
 		setTimeout(() => this.sPanel.animator.drawLatestFrame(), 100);
@@ -166,16 +162,6 @@ export class ControlPanel extends React.Component {
 	}
 
 	/* ********************************************** wave */
-
-	// used to set any familiarParam value, pass eg {pulseWidth: 40}
-	// Sets state in control panel only, eg setWave panel settings
-	// obsolete; get rid of this someday////
-	//setCPState =
-	//(obj) => {
-	//	debugger;  // this is deprecated
-	//	this.setState(obj);
-	//	console.error(`hey, boy, you shouldn't be using setCPState()!!  ControlPanel 153'`)
-	//}
 
 	// given these params, put it into effect and display it on the wave view
 	// This is most of 'Reset Wave'  NOT for regular iteration
@@ -215,8 +201,7 @@ export class ControlPanel extends React.Component {
 			// space not there until space promise, but that should happen
 			// before anybody clicks on this
 			if (space) {
-				//console.info(`props.isRunning=`, this.isRunning);
-				if (this.isRunning)
+				if (this.grinder.isIntegrating)
 					space.grinder.pleaseFFT = true;  // remind me after next iter
 				else
 					qe.grinder_askForFFT(space.grinder.pointer);  // do it now
@@ -312,7 +297,7 @@ export class ControlPanel extends React.Component {
 			/>;
 
 		case 'space':
-			return <SetResolutionTab cPanel={this}/>;
+			return <SetResolutionTab grinder={this.grinder}/>;
 
 		case 'integration':
 			return <SetIntegrationTab
@@ -349,7 +334,7 @@ export class ControlPanel extends React.Component {
 				frameFrequency={1000. / s.framePeriod}
 				setFrameFrequency={this.setFrameFrequency}
 
-				isRunning={this.isRunning}
+				shouldBeIntegrating={this.grinder?.shouldBeIntegrating ?? false}
 
 				resetWave={this.resetWave}
 				resetVoltage={this.resetVoltage}
@@ -376,6 +361,12 @@ export class ControlPanel extends React.Component {
 				</div>
 			</div>
 		</div>;
+	}
+
+	componentDidUpdate() {
+		// these should be EQUAL!  but single step leaves it off without updating our state.  Make sure it's ok here.
+		if (this.state.sbIntegrating != this.grinder.shouldBeIntegrating)
+			this.setState({sbIntegrating: this.grinder.shouldBeIntegrating});
 	}
 }
 

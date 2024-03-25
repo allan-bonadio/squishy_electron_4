@@ -9,19 +9,24 @@ import ControlPanel from '../controlPanel/ControlPanel.js';
 import {interpretCppException} from '../utils/errors.js';
 import SquishPanel from './SquishPanel.js';
 import CommonDialog from '../widgets/CommonDialog.js';
+import {getASetting} from '../utils/storeSettings.js';
 
 let traceStats = false;
 let traceTheViewBuffer = false;
 let traceHeartbeats = false;
 let traceIntegrations = false;
+let traceFramePeriods = false;
 
 const onceInAWhile = 1023;
 const everySoOften = 1023;
 
+// rAF should certainly call more often than this many ms
+const MAX_rAF_PERIOD =  50;
 
 
 class sAnimator {
 
+	// spanel is SquishPanel
 	constructor(spanel, space) {
 		this.sPanel = spanel;
 		this.cPanel = spanel.cPanel;
@@ -30,9 +35,10 @@ class sAnimator {
 
 		// ticks and benchmarks
 		const now = performance.now();
-		this.timeForNextTic = now + 10;  // default so we can get rolling
-		this.prevFrameStart = now;
+		//this.timeForNextTic = now + 10;  // default so we can get rolling
+
 		this.initStats(now);
+		this.initAnimationFP();
 
 		// stick ?allowRunningDiagnosticCycle at the end of URL to show runningDiagnosticCycle panel
 		// advance forward with each iter.  NOT SAME as shown on WaveView!
@@ -41,11 +47,6 @@ class sAnimator {
 		// eslint-disable-next-line
 		this.allowRunningDiagnosticCycle = /allowRunningDiagnosticCycle/.test(location.search);
 
-		// this should be the only place animateHeartbeat() should be called
-		// except for inside the function itself
-		if (traceHeartbeats)
-			console.log(`🎥 sAnimator: about to kick off animateHeartbeat`);
-		this.animateHeartbeat(performance.now());
 	}
 
 	/* ******************************************************* stats */
@@ -84,12 +85,7 @@ class sAnimator {
 
 	/* ******************************************************* frames */
 
-	static divergedBlurb = `Sorry, but your quantum wave diverged!  This isn't your fault; `
-	+` it's a limitation of the mathematical engine - it's just not as accurate as the real `
-	+` thing, and sometimes it just runs off the rails.  You can click on the Reset Wave `
-	+` button; lower frequencies and more space points will help.`;
-
-	// the upper left and right numbers: insert them into the HTML.  Faster than react.
+	// elapsed (virtual) picoseconds and frame count: insert them into the HTML.  Faster than react.
 	// should move this to like WaveView
 	showTimeNFrame() {
 		// need them instantaneously - react is too slow.  but react replaces the whole screen upon error
@@ -101,13 +97,12 @@ class sAnimator {
 			ne.innerHTML =  this.grinder.frameSerial;
 	}
 
-	// Repaint. called frame
-	// period in animateHeartbeat() while running, as often as the menu setting
-	// says.  Not a render time thing.
+	// Repaint, with webgl, the waveview.
 	drawLatestFrame() {
-		if (traceStats) console.log(`time since last tic: ${performance.now() - this.inteTimes.startIntegrationTime}ms`);
+		if (traceStats) console.log(`time since last tic: ${performance.now()
+				- this.inteTimes.startIntegrationTime}ms`);
 		//debugger;
-		this.inteTimes.startIntegrationTime = performance.now();  // absolute beginning of integrate frame
+		//this.inteTimes.startIntegrationTime = performance.now();  // absolute beginning of integrate frame
 
 //		if (shouldIntegrate)
 //			this.crunchOneFrame();
@@ -116,72 +111,150 @@ class sAnimator {
 		this.space.mainEAvatar.doRepaint?.();
 		this.showTimeNFrame();
 
+		// update dom elements in integration tab to latest stats
+		this.refreshStatsOnScreen();
+
 		//this.inteTimes.endReloadVarsNBuffer =
 		this.inteTimes.endDraw = performance.now();
 
-		this.refreshStatsOnScreen();
 		this.inteTimes.prevStartIntegrationTime = this.inteTimes.startIntegrationTime;
 
 		this.continueRunningDiagnosticCycle();
 	}
 
-	heartbeatSerial = 0;
 
-	// This gets called once each animation period according to
-	// requestAnimationFrame(), usually 60/sec or whatever your screen refresh rate is, and repeats as long as the
-	// website is running.  Even if there's no apparent motion. it will advance
-	// one heartbeat in animation time, which every so often calls
-	// drawLatestFrame(), if appropriate
-	animateHeartbeat =
-	frameStart => {
 
-		if (traceHeartbeats && ((this.heartbeatSerial & onceInAWhile) == 0))
-			console.log(`🎥  a heartbeat, serial every ${onceInAWhile+1}: `
-				+`${this.heartbeatSerial} = 0x${this.heartbeatSerial.toString(16)} `
-				+ `.isRunning=${this.cPanel.isRunning} \n`
-				+`frameStart >= this.timeForNextTic ${frameStart} >= ${this.timeForNextTic} `
-				+` = ${frameStart >= this.timeForNextTic} `);
+	/* ************************************************ Frame timing */
 
-		// no matter how often animateHeartbeat is called, it'll only frame once per framePeriod
-		if (this.cPanel.isRunning && frameStart >= this.timeForNextTic) {
-			let framePeriod = this.cPanel.framePeriod;
+	// animationFP = animation frame period, from requestAnimatioFrame().  Depends
+	// on video; often 60/sec.  Can change as window moves to different monitor
+	// or monitor frame rate changes (settings).
+	// targetFP = target (ui) frame period, what user chose from menu
+	// integrationFP = frame period of actual calculations; rounded from targetFP
+	//     to be an integer factor of animationFP
 
-			if (traceIntegrations)
-				console.log(`🎥  an integration request serial: ${this.grinder.frameSerial} `);
+	// start up all the frame period numbers.  once.
+	initAnimationFP() {
+		// defaults - will work until set by the real code
+		this.animationFP = this.avgAnimationFP = 16.666666;
+		this.frameFactor = 3;
+		this.prevFrame = performance.now();
+		this.unstableFP = true;
 
-			this.drawLatestFrame(true);
+		// Start the heartbeat.   This should be the only place rafHandler()
+		// should be called except for inside the function itself
+		if (traceHeartbeats)
+			console.log(`🎥 sAnimator: about to kick off rafHandler`);
+		this.rafHandler(performance.now());
+	}
 
-			// remember (frameStart) is the one passed in, before
-			// drawLatestFrame(), so periods are exactly timed (unless it's so slow
-			// that we get behind).
-			let rightNow = 	performance.now();
+	// given new animationFP or anything else changed, or init, refigure
+	// everything
+	recalcIntegrationFP(newAnimationFP) {
+		let targetFP = getASetting('frameSettings', 'framePeriod');
 
-			// next time.  Trim by a few ms so random fluctuations don't make me skip periods
-			this.timeForNextTic = rightNow + framePeriod - 5;
-			if (!isFinite(this.timeForNextTic)) debugger;
+		// how many animationFP in an integrationFP?  This is the FrameFactor
+		this.newFrameFactor = Math.round(targetFP / newAnimationFP);
 
-			if (traceHeartbeats && ((this.grinder.frameSerial & everySoOften) == 0))
-				console.log(`🎥  a frame: ${framePeriod} every ${everySoOften+1}; `
-					+`serial: ${this.grinder.frameSerial}  .isRunning=${this.cPanel.isRunning}`);
+		// for a grand total of...
+		this.newIntegrationFP = this.newFrameFactor * newAnimationFP;
+
+		if (traceFramePeriods) console.log(`targetFP=${targetFP}  newAnimationFP=${newAnimationFP} `
+			+ ` newFrameFactor=${this.newFrameFactor}   newIntegrationFP=${this.newIntegrationFP}`);
+	}
+
+	// we have to measure animationFP in case it changes: user moves window to screen with diff
+	// refresh rate, or user changes refresh rate in control panel
+	measureAndUpdateFramePeriods(now) {
+		let animationFP = now - this.prevFrame;
+		this.prevFrame = now;
+		//this.rAFPeriod = animationFP;
+
+		// this jiggles around quite a  bit so smooth it.  I think individual
+		// calls lag, so long periods come next to short periods, so this
+		// averages out pretty well.  And, it's never more than 1/20 sec, unless
+		// I'm tinkering in the debugger.
+		this.avgAnimationFP  =
+			Math.min(MAX_rAF_PERIOD, (animationFP + 3 * this.avgAnimationFP) / 4);
+
+		// IF the frame period changed from recent cycles,
+		if (Math.abs(animationFP - this.avgAnimationFP) > 4) {
+			// something's changing, let it settle down
+			this.unstableFP = true;
+			if (traceFramePeriods) console.log(`🪓 aniFP change!  animationFP=${animationFP}  `
+				+ ` this.animationFP = ${this.animationFP}  `
+				+ `abs diff = ${Math.abs(animationFP - this.animationFP)} `);
+		}
+		else {
+			// if the animationFP changed in the last cycle but is settling down
+			if (this.unstableFP) {
+				// it's calmed down!  the threads can now recalibrate.
+				this.unstableFP = false;
+				this.recalcIntegrationFP(animationFP);
+			}
+		}
+		this.animationFP = animationFP;
+
+	}
+
+
+
+
+	// counts off frameFactor raf periods then starts next iteration
+	// requestAnmationFrame() (rAF) calls rafHandler(), which increments scanCount up to
+	// frameFactor to call triggerIteration().
+	scanCount = 0;
+
+	//	This gets called once each animation scan period according to
+	//	requestAnimationFrame(), usually 60/sec or whatever your screen refresh
+	//	rate is, and repeats as long as the website is running.  Even if there's
+	//	no apparent motion.  It will advance frameFactor scan periods, which
+	//	often calls drawLatestFrame(), if appropriate.  frameFactor can change
+	//	if user changes display scan rate, or the frame rate menu on
+	//	CPToolbar, or moves to a screen with a different scan rate.
+	rafHandler =
+	now => {
+
+		//		if (traceHeartbeats && ((this.heartbeatSerial & onceInAWhile) == 0))
+		//			console.log(`🎥  a heartbeat, serial every ${onceInAWhile+1}: `
+		//				+`${this.heartbeatSerial} = 0x${this.heartbeatSerial.toString(16)} `
+		//				+ `.shouldBeIntegrating=${this.grinder.shouldBeIntegrating} \n`
+		//				+`now >= this.timeForNextTic ${now} >= ${this.timeForNextTic} `
+		//				+` = ${now >= this.timeForNextTic} `);
+
+		// no matter how often rafHandler is called, it'll only frame once per frameFactor
+		if (this.scanCount >= this.frameFactor) {
+
+			if (this.grinder.shouldBeIntegrating) {
+				this.grinder.triggerIteration();
+				this.needsRepaint = true;
+			}
+
+			//if (traceIntegrations)
+			//	console.log(`🎥  an integration request serial: ${this.grinder.frameSerial} `);
+
+			if (this.needsRepaint) {
+				this.drawLatestFrame();
+				this.needsRepaint = false;
+			}
+			this.scanCount = 0;
 		}
 
-		if (traceHeartbeats && ((this.heartbeatSerial & onceInAWhile) == 0))
-			console.log(`🎥  a heartbeat, serial every ${onceInAWhile+1}: `
-				+` ${this.heartbeatSerial} = 0x${this.heartbeatSerial.toString(16)} `
-				+`.isRunning=${this.cPanel.isRunning} time=${(performance.now() & 4095)}`);
-		this.heartbeatSerial++;
+		//if (traceHeartbeats && ((this.heartbeatSerial & onceInAWhile) == 0))
+		//	console.log(`🎥  a heartbeat, serial every ${onceInAWhile+1}: `
+		//		+` ${this.heartbeatSerial} = 0x${this.heartbeatSerial.toString(16)} `
+		//		+`.shouldBeIntegrating=${this.grinder.shouldBeIntegrating} time=${(performance.now() & 4095)}`);
+		//this.heartbeatSerial++;
+		this.scanCount++;
 
+		this.measureAndUpdateFramePeriods(now);
 
-		// frame period: this is in milliseconds
-		//const timeSince = frameStart - this.prevFrameStart;
-		this.prevFrameStart = frameStart;
-
-		requestAnimationFrame(this.animateHeartbeat);
+		requestAnimationFrame(this.rafHandler);
 	}
 
 	/* *******************************************************  runningDiagnosticCycle of circular wave*/
 
-	// special test code
+	// special test code.  orobably broken
 	// use for benchmarking with a circular wave.  Will start frame, and stop after
 	// the leftmost state is at its peak.  Then display stats.
 	// not used for a year or more, so probably broken somehow.

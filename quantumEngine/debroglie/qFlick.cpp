@@ -230,7 +230,8 @@ void qFlick::reset(void) {
 /* ************************************************************ birth & death & basics */
 
 // each buffer is initialized to zero bytes therefore 0.0 everywhere
-qFlick::qFlick(qSpace *space, qGrinder *qgr, int nW, int nTProgresses)
+// HEY!  the grinder arg is not used!
+qFlick::qFlick(qSpace *space, int nW, int nTProgresses)
 	: qWave(space), nWaves(nW),  allocWaves(nW), currentWave(0)
 {
 	if (! space)
@@ -281,10 +282,7 @@ qFlick::~qFlick() {
 		freeWave(waves[i]);
 		waves[i] = NULL;
 	}
-
 	delete waves;
-	if (traceConstruction)
-		printf("    freed most of the buffers...\n");
 
 	waves = NULL;
 	if (traceConstruction)
@@ -323,6 +321,7 @@ void qFlick::setNWaves(int newNW) {
 
 // print one complex number, from a flick at time doubleSerial, on a line in the dump on stdout.
 // if it overflows the buffer, it won't.  just dump a row for a cx datapoint.
+// buf must be 200 long
 double qFlick::dumpRow(char *buf, int doubleSerial, int ix, double *pPrevPhase, bool withExtras) {
 	qCx w = value(ix, doubleSerial);  // interpolates
 	int it = doubleSerial / 2;
@@ -336,12 +335,12 @@ double qFlick::dumpRow(char *buf, int doubleSerial, int ix, double *pPrevPhase, 
 		double dPhase = phase - *pPrevPhase + 360.;  // so now its positive, right?
 		while (dPhase >= 360.) dPhase -= 360.;
 
-		sprintf(buf, "[%3d] %c%8.4lf,%8.4lf%c | %8.2lf %8.2lf %8.4lf",
+		snprintf(buf, 200, "[%3d] %c%8.4lf,%8.4lf%c | %8.2lf %8.2lf %8.4lf",
 			ix, leftParen, w.re, w.im, rightParen, phase, dPhase, mag);
 		*pPrevPhase = phase;
 	}
 	else {
-		sprintf(buf, "[%3d] %c%8.4lf,%8.4lf%c", ix, leftParen, w.re, w.im, rightParen);
+		snprintf(buf, 200, "[%3d] %c%8.4lf,%8.4lf%c", ix, leftParen, w.re, w.im, rightParen);
 	}
 	return mag;
 }

@@ -106,7 +106,7 @@ struct abacus {
 	int statesMask;
 
 	int waitAllThreds;
-	void startAllThreads(void);
+	void triggerIteration(void);
 
 	// set up our edges and progresses to get ready for a new frame
 	void reset(void);

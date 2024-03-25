@@ -24,17 +24,14 @@
 // for memory leaks that cppu conveniently gives us, some clues:
 static void dumpSizes(void) {
 	printf("byte sizes... sz(qSpace)=%lu  sz(qWave)=%lu  sz(qBuffer)=%lu  sz(qSpectrum)=%lu  \n"
-		"sz(qFlick)=%lu  sz(qViewBuffer)=%lu  sz(qAvatar)=%lu  sz(qGrinder)=%lu\n"
-		"sz(abacus)=%lu  sz(edge)=%lu  sz(progress)=%lu\n\n",
+		"sz(qFlick)=%lu  sz(qViewBuffer)=%lu  sz(qAvatar)=%lu  sz(qGrinder)=%lu\n\n",
 		sizeof(qSpace), sizeof(qWave), sizeof(qBuffer), sizeof(qSpectrum),
-		sizeof(qFlick), sizeof(qViewBuffer), sizeof(qAvatar), sizeof(qGrinder),
-		sizeof(abacus), sizeof(edge), sizeof(progress));
+		sizeof(qFlick), sizeof(qViewBuffer), sizeof(qAvatar), sizeof(qGrinder));
 }
 
 
 int main(int ac, char** av)
 {
-	initExperiments();
 	dumpSizes();
 
     return CommandLineTestRunner::RunAllTests(ac, av);

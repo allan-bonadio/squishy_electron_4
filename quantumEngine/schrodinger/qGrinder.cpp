@@ -26,6 +26,8 @@
 
 
 
+static bool traceRunner = false;
+
 static bool traceIntegration = false;
 static bool traceIntegrationDetailed = false;
 
@@ -40,15 +42,20 @@ static bool traceConstructor = false;
 
 static bool traceReversals = false;
 
+static bool traceAggregate = true;
+static bool traceSingleStep = true;
+
 // RK2
 #define MIDPOINT_METHOD
+
+static std::runtime_error nullException("");
 
 
 // create new grinder, complete with its own stage buffers
 // make sure these values are doable by the sliders' steps
 qGrinder::qGrinder(qSpace *sp, qAvatar *av, int nThreads, const char *lab)
 	: space(sp), avatar(av), elapsedTime(0), frameSerial(0),
-		dt(1e-3), lowPassFilter(1), stepsPerFrame(100),
+		dt(1e-3), lowPassFilter(1), stepsPerFrame(100), integrationEx(nullException),
 		isIntegrating(false), shouldBeIntegrating(false), justNFrames(0),
 		pleaseFFT(false), newFrameFactor(3), newIntegrationFP(.05),
 		nThreads(nThreads), nSlaveThreads(nThreads) {
@@ -56,7 +63,7 @@ qGrinder::qGrinder(qSpace *sp, qAvatar *av, int nThreads, const char *lab)
 	magic = 'Grnd';
 
 	// number of waves; number of threads
-	qflick = new qFlick(space, this, 3, 0);
+	qflick = new qFlick(space, 3, 0);
 
 	// so wave in the qflick points to the zero-th wave
 
@@ -68,7 +75,8 @@ qGrinder::qGrinder(qSpace *sp, qAvatar *av, int nThreads, const char *lab)
 	strncpy(label, lab, MAX_LABEL_LEN);
 	label[MAX_LABEL_LEN] = 0;
 
-	pthread_mutex_init(&integratingMx, NULL);
+	pthread_mutex_init(&finishMx, NULL);
+	pthread_mutex_init(&startMx, NULL);
 
 	// should this come earlier?
 	slaveThread::createSlaves(this);
@@ -144,8 +152,8 @@ void qGrinder::formatDirectOffsets(void) {
 	makeDoubleGetter(frameSerial);
 	makeDoubleSetter(frameSerial);
 	printf("\n");
-	makeDoubleGetter(justNFrames);
-	makeDoubleSetter(justNFrames);
+	makeIntGetter(justNFrames);
+	makeIntSetter(justNFrames);
 	makeDoubleGetter(frameCalcTime);
 
 	makeBoolGetter(shouldBeIntegrating);
@@ -165,6 +173,9 @@ void qGrinder::formatDirectOffsets(void) {
 	makeIntSetter(lowPassFilter);
 	makeIntGetter(stepsPerFrame);
 	makeIntSetter(stepsPerFrame);
+
+//	makeIntGetter(integrationEx);
+//	makeIntSetter(integrationEx);
 
 	makeIntGetter(nSlaveThreads);
 
@@ -315,7 +326,7 @@ void qGrinder::oneFrame() {
 
 	if (iProd > 1.01) {
 		char buf[64];
-		sprintf(buf, "🪓 🪓 wave is diverging, iProd=%10.4g 🔥 🧨", iProd);
+		snprintf(buf, 64, "🪓 🪓 wave is diverging, iProd=%10.4g 🔥 🧨", iProd);
 		if (iProd > 3) {
 			qflick->dump(buf);
 			throw std::runtime_error("diverged");  // js code intercepts this exact spelling
@@ -384,6 +395,51 @@ void qGrinder::aggregateCalcTime(void) {
 		if (sl)
 			frameCalcTime += sl->frameCalcTime;
 	}
+	if (traceAggregate)
+		speedyLog(" qGrinder 🪓 aggregate time summed: %15.6lf\n", frameCalcTime);
+}
+
+
+
+// runs in the thread loop, only in the last thread to start, in an integration frame.
+//void qGrinder::threadsHaveStarted() {
+//}
+
+
+// runs in the thread loop, only in the last thread to finish integration in an integration frame.
+void qGrinder::threadsHaveFinished() {
+	aggregateCalcTime();
+
+	// single step (or a few steps): are we done yet?
+	if (justNFrames) {
+		if (traceSingleStep) speedyLog("ss: justNFrames = %d\n", justNFrames);
+		--justNFrames;
+		if (0 >= justNFrames) {
+			shouldBeIntegrating = false;
+			if (traceSingleStep) speedyLog("ss turned off sbi: justNFrames = %d\n", justNFrames);
+		}
+	}
+
+	if (traceRunner)  {
+		speedyLog("🔪                ...in threadsHaveFinished().  justNFrames=%d and shouldBeIntegrating=%d\n",
+				justNFrames, shouldBeIntegrating);
+	}
+
+	// set isIntegrating here so all threads get it at the same time
+	isIntegrating = shouldBeIntegrating;
+
+	// ready for new frame
+	nStartedThreads = 0;
+	nFinishedThreads = 0;
+
+}
+
+
+// start a new frame calculating by starting each/all slave threads
+void grinder_triggerIteration(qGrinder *grinder) {
+
+	grinder->isIntegrating = grinder->shouldBeIntegrating;
+	pthread_mutex_unlock(&grinder->startMx);
 }
 
 /* ********************************************************** misc  */
@@ -404,3 +460,7 @@ void grinder_copyFromAvatar(qGrinder *qgrinder, qAvatar *avatar) {qgrinder->copy
 //	printf("grinder_copyFromAvatar; qgrinder='%s', avatar='%s'\n", (char *) qgrinder, (char *) avatar);
 
 void grinder_copyToAvatar(qGrinder *qgrinder, qAvatar *avatar) {qgrinder->copyToAvatar(avatar);}
+
+
+
+
