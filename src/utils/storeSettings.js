@@ -217,7 +217,7 @@ export function createStoreSettings() {
 	/* ************************************ frameSettings */
 
 	// set in integration tab
-	makeParam('frameSettings', 'isRunning', true,  [false, true]);
+	makeParam('frameSettings', 'shouldBeIntegrating', true,  [false, true]);
 	makeParam('frameSettings', 'framePeriod', 50, {min: 16, max: 60_001});
 	makeParam('frameSettings', 'deltaT', 1, {min: .01, max: 1000.0, });
 	makeParam('frameSettings', 'stepsPerFrame', 10, {min: 2, max: 50});
