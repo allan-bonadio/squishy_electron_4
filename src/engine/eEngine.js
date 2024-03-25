@@ -13,8 +13,8 @@ import eSpace from './eSpace.js';
 
 // all of these must be attached to window to  get called by c++
 
-let traceStartup = true;
-let tracePromises = true;
+let traceStartup = false;
+let tracePromises = false;
 
 /* ****************************************************** app startup */
 
@@ -30,9 +30,11 @@ function resetSpaceCreatedPromise() {
 	let prom = new Promise((succeed, fail) => {
 		eSpaceCreatedSucceed = succeed;
 		eSpaceCreatedFail = fail;
-		if (tracePromises) console.info(`🐥 eSpaceCreatedPromise (re)created:`, succeed, fail);
+		if (tracePromises)
+			console.info(`🐥 eSpaceCreatedPromise (re)created:`, succeed, fail);
 	});
-	if (traceStartup) console.log(`spaceCreatedPromise 🐣 ... created but NOT YET RESOLVED`);
+	if (traceStartup)
+		console.log(`spaceCreatedPromise 🐣 ... created but NOT YET RESOLVED`);
 	return prom;
 }
 // for the first time when app starts up
