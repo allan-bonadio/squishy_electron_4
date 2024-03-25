@@ -12,7 +12,7 @@
 
 // use for bool field, or anything 1 byte
 #define byteOffset(field)  (int) ((byte *) &this->field - (byte *) this)
-#define makeBoolGetter(field)  printf("\tget " #field  "() { return this.bools[%d]; }\n", byteOffset(field));
+#define makeBoolGetter(field)  printf("\tget " #field  "() { return Boolean(this.bools[%d]); }\n", byteOffset(field));
 #define makeBoolSetter(field)  printf("\tset " #field  "(a) { this.bools[%d] = a; }\n", byteOffset(field));
 
 // use for a standard C string
