@@ -16,11 +16,14 @@
 
 // in case I ever need it const long double PI = 3.141592653589793238460;
 
+static bool traceFFT = true;
+static bool traceIFFT = true;
 
 // Cooley–Tukey FFT from src to dest
 // src and dest can be different or the same.  N better be a power of 2.
 void cooleyTukeyFFT(qCx *dest, qCx *src, int N)
 {
+	if (traceFFT) printf("cooleyTukeyFFT(dest=%p, src=%p, N=%d)\n", dest, src, N);
 	if (N <= 1) return;
 
 	// make we can do this with first-stride-length objects
@@ -49,13 +52,11 @@ void cooleyTukeyFFT(qCx *dest, qCx *src, int N)
 	}
 }
 
-
-static bool traceIFFT = false;
-
 // inverse fft, same rules as fft(),
 // DON'T  trash the src coming in
 void cooleyTukeyIFFT(qCx *dest, qCx *src, int N)
 {
+	if (traceIFFT) printf("cooleyTukey IFFT(dest=%p, src=%p, N=%d)\n", dest, src, N);
 	qCx altSrc[N];
 
 	// conjugate the qCx numbers
