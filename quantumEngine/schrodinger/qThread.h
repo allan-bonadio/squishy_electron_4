@@ -33,18 +33,8 @@ struct qThread {
 
 	void dumpAThread(const char *title);
 
-	// how long this thread spent doing its iteration, the last time
-	double frameCalcTime;
-
 	// pthread's ID for this thread
 	pthread_t tid;
-
-	void *(*moses)(void *);
-	//void *(*)(void *);
-	//void *(valley*)(void *);
-	//void *argon(*)(void *);
-
-
 
 	int serial;  // 0, 1, ... among all qThreads
 
