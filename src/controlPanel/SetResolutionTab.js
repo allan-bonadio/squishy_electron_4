@@ -8,21 +8,21 @@ import ResolutionDialog from './ResolutionDialog.js';
 
 function setPT() {
 	SetResolutionTab.propTypes = {
-		cPanel: PropTypes.object.isRequired,
-		grinder: PropTypes.object.isRequired,
+		// we won't need this till user clicks button
+		grinder: PropTypes.object,
 	};
 }
 
 function SetResolutionTab(props) {
 	return (<div className='SetResolutionTab'>
 		<button className='setResolutionButton'
-			onClick={ev => ResolutionDialog.openResolutionDialog(props.grinder)}>
+			onClick={ev => (props.grinder)
+					&& ResolutionDialog.openResolutionDialog(props.grinder)}>
 				Change Space
-				<div style={{fontSize: '.7em'}}>
-					(will reset current wave)</div>
-		</button>
+			<div style={{fontSize: '.8em'}}>
+				(will reset current wave)</div>
+		</button>;
 		<h3>Reconfigure the Space</h3>
-
 		<p>
 			Squishy Electron's space is a one-dimensional region for an electron to travel in.
 			You can reconfigure this space here, if you want, with different settings.
