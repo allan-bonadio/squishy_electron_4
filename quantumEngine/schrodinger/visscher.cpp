@@ -73,17 +73,20 @@ Here, we use dx=1 for ease of calculation, and fold the conversion factors into 
 
 // ******************************************************** Grinder methods
 
-// first step: advance the 𝜓.re a dt, from t to t + dt
+// first step: advance the 𝜓.re one dt, from t to t + dt
 // oldW points to buffer with real = 𝜓.re(t)    imag = 𝜓.im(t + dt/2)
 // newW points to buffer with real = 𝜓.re(t + dt)   imag unchanged = 𝜓.im(t + dt/2)
 // hamiltW is what we calculate the derivitives from
 // here we will calculate the 𝜓.re(t + dt) values in a new buffer only, and fill them in.
 // the 𝜓.im values in buffer oldW are still uncalculated
-void qGrinder::stepReal(qCx *newW, qCx *oldW, qCx *hamiltW, double dt_) {
+void qGrinder::stepReal(qCx *newW, qCx *oldW, qCx *hamiltW, double dt) {
 	qDimension *dims = space->dimensions;
 	if (traceRealStep) printf("⚛️ start of stepReal nStates=%d, nPoints=%d, start=%d, end=%d\n",
 			space->nStates, space->nPoints, dims->start, dims->end);
 
+	// someday I should check for dt==0 and do a copy() instead of this calc
+	// must make versions of qBuffer::copyThatWave() that only copy real or imag parts
+	// or better, make substitutes for stepReal and stepImag
 	for (int ix = dims->start; ix < dims->end; ix++) {
 		// second deriv wrt x of psi
 		double d2𝜓i = hamiltW[ix-1].im + hamiltW[ix+1].im - hamiltW[ix].im * 2;
@@ -94,26 +97,27 @@ void qGrinder::stepReal(qCx *newW, qCx *oldW, qCx *hamiltW, double dt_) {
 
 		// new = old + 𝛥 dt   note subtraction
 		if (traceRealStep) printf("⚛️ stepReal ix=%d\n", ix);
-		newW[ix].re = oldW[ix].re - dt_ * H𝜓;
+		newW[ix].re = oldW[ix].re - dt * H𝜓;
 		if (traceRealStep) printf("⚛️ stepReal ix=%d\n", ix);
 
 		qCheck(newW[ix], "vischer stepReal", ix);
 	}
 	qflick->fixThoseBoundaries(newW);
-	elapsedTime += dt_/2;  // could be 0 or already dt_/2
+	elapsedTime += dt/2;  // could be 0 or already dt/2
 
 	if (traceVischerBench) printf("      stepReal, done: time=%lf\n",
 		getTimeDouble());
 	if (traceRealStep) printf("⚛️ end of stepReal:");
 }
 
-// second step: advance the Imaginaries of 𝜓 a dt, from dt/2 to 3 dt/2
+// second step: advance the Imaginaries of 𝜓 one dt, from dt/2 to 3 dt/2
 // given the reals we just generated in stepReal(), but don't change them
-void qGrinder::stepImaginary(qCx *newW, qCx *oldW, qCx *hamiltW, double dt_) {
+void qGrinder::stepImaginary(qCx *newW, qCx *oldW, qCx *hamiltW, double dt) {
 	qDimension *dims = space->dimensions;
-	if (traceImaginaryStep) printf("⚛️ start of stepImaginary nStates=%d, nPoints=%d, start=%d, end=%d\n",
+	if (traceImaginaryStep) printf("⚛️ start of stepImag nStates=%d, nPoints=%d, start=%d, end=%d\n",
 			space->nStates, space->nPoints, dims->start, dims->end);
 
+	// someday I should check for dt==0 and do a copyThatWave() instead of this calc
 	for (int ix = dims->start; ix < dims->end; ix++) {
 		// second deriv d2𝜓.re / dx**2
 		double d2𝜓r = hamiltW[ix-1].re + hamiltW[ix+1].re - hamiltW[ix].re * 2;
@@ -124,14 +128,14 @@ void qGrinder::stepImaginary(qCx *newW, qCx *oldW, qCx *hamiltW, double dt_) {
 
 		// note addition
 		if (traceImaginaryStep) printf("⚛️ stepImaginary ix=%d\n", ix);
-		newW[ix].im = oldW[ix].im + dt_ * H𝜓;
+		newW[ix].im = oldW[ix].im + dt * H𝜓;
 		if (traceImaginaryStep) printf("⚛️ stepImaginary ix=%d\n", ix);
 
 		qCheck(newW[ix], "vischer stepImaginary", ix);
 	}
 
 	qflick->fixThoseBoundaries(newW);
-	elapsedTime += dt_/2;  // could be 0 or already dt_/2
+	elapsedTime += dt/2;  // could be 0 or already dt/2
 
 	if (traceVischerBench) printf("      stepImaginary done: time=%lf\n",
 		getTimeDouble());
