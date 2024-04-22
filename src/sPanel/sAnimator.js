@@ -136,7 +136,7 @@ class sAnimator {
 	// start up all the frame period numbers.  once.
 	initAnimationFP() {
 		// defaults - will work until set by the real code
-		this.animationFP = this.avgAnimationFP = 16.666666;
+		this.avgAnimationFP = 16.666666;
 		this.frameFactor = 3;
 		this.prevFrame = performance.now();
 		this.unstableFP = true;
@@ -163,42 +163,39 @@ class sAnimator {
 			+ ` newFrameFactor=${this.newFrameFactor}   newIntegrationFP=${this.newIntegrationFP}`);
 	}
 
-	// we have to measure animationFP in case it changes: user moves window to screen with diff
-	// refresh rate, or user changes refresh rate in control panel
+	// we have to measure requestAnimationFrame()'s animationFP in case
+	// it changes: user moves window to screen with diff refresh rate,
+	// or user changes refresh rate in control panel
 	measureAndUpdateFramePeriods(now) {
 		let animationFP = now - this.prevFrame;
 		this.prevFrame = now;
 		//this.rAFPeriod = animationFP;
 
-		// this jiggles around quite a  bit so smooth it.  I think individual
-		// calls lag, so long periods come next to short periods, so this
-		// averages out pretty well.  And, it's never more than 1/20 sec, unless
-		// I'm tinkering in the debugger.
+		// this jiggles around quite a  bit so smooth it.  I think
+		// individual periods lag into next period, so long periods come
+		// next to short periods, so this averages out pretty well.
+		// And, it's never more than 1/20 sec, unless I'm tinkering in
+		// the debugger.
 		this.avgAnimationFP  =
 			Math.min(MAX_rAF_PERIOD, (animationFP + 3 * this.avgAnimationFP) / 4);
 
 		// IF the frame period changed from recent cycles,
 		if (Math.abs(animationFP - this.avgAnimationFP) > 4) {
-			// something's changing, let it settle down
+			// something's changing, let it settle down.  Some timing fumbles are tolerable while this is on.
 			this.unstableFP = true;
 			if (traceFramePeriods) console.log(`🪓 aniFP change!  animationFP=${animationFP}  `
-				+ ` this.animationFP = ${this.animationFP}  `
-				+ `abs diff = ${Math.abs(animationFP - this.animationFP)} `);
+				+ ` this.avgAnimationFP = ${this.avgAnimationFP}  `
+				+ `abs diff = ${Math.abs(animationFP - this.avgAnimationFP)} `);
 		}
 		else {
-			// if the animationFP changed in the last cycle but is settling down
+			// if the animationFP changed recently, but is settling down
 			if (this.unstableFP) {
 				// it's calmed down!  the threads can now recalibrate.
 				this.unstableFP = false;
 				this.recalcIntegrationFP(animationFP);
 			}
 		}
-		this.animationFP = animationFP;
-
 	}
-
-
-
 
 	// counts off frameFactor raf periods then starts next iteration
 	// requestAnmationFrame() (rAF) calls rafHandler(), which increments scanCount up to
