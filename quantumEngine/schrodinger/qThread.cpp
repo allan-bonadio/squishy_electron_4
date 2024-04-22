@@ -181,6 +181,9 @@ int qThread::nRunningThreads = 0;  // total confirmed, dynamic
 qThread *list[MAX_THREADS];
 qThread **qThread::threadsList = list;
 
+// I'll need to lookup thread IDs someday...
+//int lookupThread()
+
 /* ************************************************ what sync can I use? */
 
 /* I couldn't figure out what pthreads synchronization primitives were

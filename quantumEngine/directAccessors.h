@@ -3,9 +3,10 @@
 ** Copyright (C) 2022-2024 Tactile Interactive, all rights reserved
 */
 
+// Use proxy JS objects to access fields in C++ objects.
 // See how these are used in qGrinder.cpp and qSpace.cpp . Use one of these
 // printf macros, in *::formatDirectOffsets(),  for each field from your .h file
-// you want to export to JS. You should arrange the fields in the .h file from
+// you want to share with JS. You should arrange the fields in the .h file from
 // wides (doubles) to narrows (bools) for safer alignment, or just count bytes.
 // Include or omit fields and setters depending on if you use these macros in
 // the JS proxy class, in JS.
@@ -43,12 +44,15 @@
 // are proxied in JS, uncomment only the second line, below, to re-calc
 // the offsets, in all proxied objects, so all constructors print out JS
 // code. Then run in the browser (not C++ cppu tests, they use 64bit
-// ptrs), and take the generated JS and paste it into the corresponding
+// ptrs).  Turn off timestamps in console if you have them on.
+// Take the generated JS and paste it into the corresponding
 // JS files, in src/engine, where indicated. Then, do a global
 // search/replace the string 'quantumEngine.main.js:2412' or whatever
-// your line number is; just change it to '', don't get rid of any
+// your line number is. (if you don't understand, you'll see when you get
+// there.) Just change it to '', don't get rid of any
 // spaces. You should then have valid JS.  When it all works, you can
-// turn off FORMAT_DIRECT_OFFSETS and recompile.
+// turn off FORMAT_DIRECT_OFFSETS and recompile to get rid of the
+// annoying output (which should be harmless anyway).
 
 #define FORMAT_DIRECT_OFFSETS
 //#define FORMAT_DIRECT_OFFSETS  formatDirectOffsets()

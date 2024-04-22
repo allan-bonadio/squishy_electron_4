@@ -248,6 +248,8 @@ window.dumpSettings = () => {
 }
 
 /* ********************************************************* Alternate setters/getters */
+
+// retrieve a whole group, with defaults filled in as needed
 export function getAGroup(groupName) {
 	let group;
 	try {
@@ -271,7 +273,7 @@ export function getAGroup(groupName) {
 }
 
 // store a whole group.  Eliminates values that aren't official, defaults missing ones.
-// Cleaned up value object returned.
+// Returns clone of newGroup with defaults filled in, if any.
 export function storeAGroup(groupName, newGroup) {
 	// only set those that are official
 	let toSet = {};
@@ -305,7 +307,6 @@ export function storeASetting(groupName, varName, newValue) {
 	savedGroup[varName] = newValue;
 	storeAGroup(groupName, savedGroup);
 
-	// also return the new, validated value; input could be weird!
 	return newValue;
 }
 

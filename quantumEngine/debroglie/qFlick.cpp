@@ -403,7 +403,7 @@ void qFlick::dumpOverview(const char *title) {
 }
 
 /* ************************************************************ Vischer calcs on waves in-progress  */
-// not sure if we actually need these
+// not sure if we actually need these.  Sorry, lots of commented-out code.
 
 // calculate the complex value, re + i im, at this point and doubleSerial
 // always interpolate the missing component as an average of the two nearest
