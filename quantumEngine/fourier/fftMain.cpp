@@ -14,7 +14,7 @@
 #include "fftMain.h"
 
 
-static bool traceGenerate = true;
+static bool traceGenerate = false;
 
 
 /* ****************************************************** small utilities */

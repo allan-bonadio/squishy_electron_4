@@ -16,8 +16,8 @@
 
 // in case I ever need it const long double PI = 3.141592653589793238460;
 
-static bool traceFFT = true;
-static bool traceIFFT = true;
+static bool traceFFT = false;
+static bool traceIFFT = false;
 
 // Cooley–Tukey FFT from src to dest
 // src and dest can be different or the same.  N better be a power of 2.

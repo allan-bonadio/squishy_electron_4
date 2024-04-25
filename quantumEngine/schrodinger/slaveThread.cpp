@@ -12,9 +12,9 @@
 // lame threads don't do integration; extra threads on the end just for testing
 static bool traceLameThreads = false;
 
-static bool traceStart = true;
-static bool traceRunner = true;
-static bool traceFinish = true;
+static bool traceStart = false;
+static bool traceRunner = false;
+static bool traceFinish = false;
 
 /* *********************************************** slave threads */
 

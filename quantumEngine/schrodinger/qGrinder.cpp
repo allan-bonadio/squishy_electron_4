@@ -42,8 +42,8 @@ static bool traceConstructor = false;
 
 static bool traceReversals = false;
 
-static bool traceAggregate = true;
-static bool traceSingleStep = true;
+static bool traceAggregate = false;
+static bool traceSingleStep = false;
 
 // RK2
 #define MIDPOINT_METHOD
