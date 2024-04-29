@@ -41,7 +41,7 @@ function resetSpaceCreatedPromise() {
 export let eSpaceCreatedPromise = resetSpaceCreatedPromise();
 
 // the Space for the SquishPanel
-let theSpace;
+//let theSpace;
 
 // called during startup, to create the space.  (Change Resolution reloads app - easier)
 // spaceParams is {N, continuum, spaceLength, label: 'x'}
@@ -49,12 +49,12 @@ let theSpace;
 export function create1DMainSpace(spaceParams) {
 	try {
 		if (traceStartup)
-			console.log(`theSpace 🐣  before creation, spaceParams=`, spaceParams);
+			console.log(`space 🐣  before creation, spaceParams=`, spaceParams);
 
 		// eSpace expects an array of param sets, one for each dimension
-		let space = theSpace = new eSpace([spaceParams], 'main');
+		let space = new eSpace([spaceParams], 'main');
 		if (traceStartup)
-			console.log(`theSpace 🐣  created, spaceParams=`, spaceParams);
+			console.log(`space 🐣  created, spaceParams=`, spaceParams);
 
 		// wakes up stuff all over the JS, and gives them the space,
 		// that they've been waiting for

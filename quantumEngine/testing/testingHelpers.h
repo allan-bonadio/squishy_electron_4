@@ -14,7 +14,7 @@ extern struct qSpace *makeBareSpace(int N, int continuum = contENDLESS);
 #define MAKEBARESPACE_LABEL "makeBar"
 #define MAKEBARE1DDIM_LABEL "makeDim"
 
-// use the jsSpace functions to make a js-callable qSpace in theSpace,
+// use the jsSpace functions to make a js-callable qSpace,
 // with all of the buffers allocated.
 extern struct qSpace *makeFullSpace(int N);  // handy
 #define MAKEFULLSPACE_LABEL "makeFul"
