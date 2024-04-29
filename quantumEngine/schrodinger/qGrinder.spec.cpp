@@ -41,8 +41,8 @@ TEST(qGrinder, CheckGrinderConstructor)
 	DOUBLES_EQUAL(1e-3, qgrinder->dt, ERROR_RADIUS);
 
 
-	LONGS_EQUAL(1, qgrinder->lowPassFilter);
-	LONGS_EQUAL(100, qgrinder->stepsPerFrame);
+	// LONGS_EQUAL(1, qgrinder->lowPassFilter);
+	// LONGS_EQUAL(100, qgrinder->stepsPerFrame);
 
 	LONGS_EQUAL(space->nPoints, qgrinder->qflick->nPoints);
 	proveItsMine(qgrinder->qflick->waves[0], space->nPoints * sizeof(qCx));
@@ -124,41 +124,41 @@ static void isAllZeroesExceptFor(qBuffer *qwave, int except1, bool shouldFail, c
 
 // try out FF on a mix of frequencies goodFreq & badFreq, then filter.
 // goodFreq should stay there, while badFreq should be filtered out.
-static void tryFourierFilter(int N, int goodFreq, int badFreq, int lowPassFilter, bool shouldFail)
-{
-	if (traceFourierFilter) printf("🌈  tryFourierFilter(N=%d, freq=%d & %d,  lowPassFilter=%d)\n",
-		 N,  goodFreq, badFreq,  lowPassFilter);
-
-	qSpace *space = makeBareSpace(N, contENDLESS);
-	qAvatar *avatar = new qAvatar(space, "tryFourierAva");
-	qGrinder *qgrinder = new qGrinder(space, avatar, 1, "tryFourierGri");
-	qFlick *qf = qgrinder->qflick;
-	qWave *addOn = new qWave(space);
-	qSpectrum *rainbow = qgrinder->getSpectrum();
-
-	qf->setCircularWave(goodFreq);
-	addOn->setCircularWave(badFreq);
-
-	qf->add(1., qf->wave + qf->start, 1., addOn->wave + addOn->start);
-	rainbow->generateSpectrum(qf);
-	if (traceFourierFilter)
-		rainbow->dumpSpectrum("spectrum before FourierFilter(), input wave:");
-
-	// now the actual filter, do it!
-	qgrinder->fourierFilter(lowPassFilter);
-
-	// now take a look at what we got
-	rainbow->generateSpectrum(qf);
-	if (traceFourierFilter)
-		rainbow->dumpSpectrum("after fourierFilter()");
-
-	isAllZeroesExceptFor(rainbow, goodFreq, shouldFail, "unfiltered frequency");
-
-	delete addOn;
-	delete qgrinder;
-	delete avatar;
-	delete space;
-}
+// static void tryFourierFilter(int N, int goodFreq, int badFreq, int lowPassFilter, bool shouldFail)
+// {
+// 	if (traceFourierFilter) printf("🌈  tryFourierFilter(N=%d, freq=%d & %d,  lowPassFilter=%d)\n",
+// 		 N,  goodFreq, badFreq,  lowPassFilter);
+//
+// 	qSpace *space = makeBareSpace(N, contENDLESS);
+// 	qAvatar *avatar = new qAvatar(space, "tryFourierAva");
+// 	qGrinder *qgrinder = new qGrinder(space, avatar, 1, "tryFourierGri");
+// 	qFlick *qf = qgrinder->qflick;
+// 	qWave *addOn = new qWave(space);
+// 	qSpectrum *rainbow = qgrinder->getSpectrum();
+//
+// 	qf->setCircularWave(goodFreq);
+// 	addOn->setCircularWave(badFreq);
+//
+// 	qf->add(1., qf->wave + qf->start, 1., addOn->wave + addOn->start);
+// 	rainbow->generateSpectrum(qf);
+// 	if (traceFourierFilter)
+// 		rainbow->dumpSpectrum("spectrum before FourierFilter(), input wave:");
+//
+// 	// now the actual filter, do it!
+// 	qgrinder->fourierFilter(lowPassFilter);
+//
+// 	// now take a look at what we got
+// 	rainbow->generateSpectrum(qf);
+// 	if (traceFourierFilter)
+// 		rainbow->dumpSpectrum("after fourierFilter()");
+//
+// 	isAllZeroesExceptFor(rainbow, goodFreq, shouldFail, "unfiltered frequency");
+//
+// 	delete addOn;
+// 	delete qgrinder;
+// 	delete avatar;
+// 	delete space;
+// }
 
 // arguments are: N, good freq to retain, bad freq to filter out.
 // lowPassFilter, expeted goodFreq height as a result.

@@ -54,9 +54,10 @@ static std::runtime_error nullException("");
 // create new grinder, complete with its own stage buffers
 // make sure these values are doable by the sliders' steps
 qGrinder::qGrinder(qSpace *sp, qAvatar *av, int nThreads, const char *lab)
-	: space(sp), avatar(av), elapsedTime(0), frameSerial(0),
-		dt(1e-3), lowPassFilter(1), stepsPerFrame(100), integrationEx(nullException),
+	: space(sp), avatar(av), elapsedTime(0), frameSerial(0), stretchedDt(.01),
+		integrationEx(nullException),
 		isIntegrating(false), shouldBeIntegrating(false), justNFrames(0),
+		stepsPerFrame(10),
 		pleaseFFT(false), newFrameFactor(3), newIntegrationFP(.05),
 		nThreads(nThreads), nSlaveThreads(nThreads) {
 
@@ -154,7 +155,9 @@ void qGrinder::formatDirectOffsets(void) {
 	printf("\n");
 	makeIntGetter(justNFrames);
 	makeIntSetter(justNFrames);
+
 	makeDoubleGetter(frameCalcTime);
+	makeDoubleGetter(maxCalcTime);
 
 	makeBoolGetter(shouldBeIntegrating);
 	makeBoolSetter(shouldBeIntegrating);
@@ -167,12 +170,12 @@ void qGrinder::formatDirectOffsets(void) {
 	makeOffset(shouldBeIntegrating)
 
 	printf("\n");
-	makeDoubleGetter(dt);
-	makeDoubleSetter(dt);
-	makeIntGetter(lowPassFilter);
-	makeIntSetter(lowPassFilter);
-	makeIntGetter(stepsPerFrame);
-	makeIntSetter(stepsPerFrame);
+	makeDoubleGetter(stretchedDt);
+	makeDoubleSetter(stretchedDt);
+	// makeIntGetter(lowPassFilter);
+	// makeIntSetter(lowPassFilter);
+// 	makeIntGetter(stepsPerFrame);
+// 	makeIntSetter(stepsPerFrame);
 
 //	makeIntGetter(integrationEx);
 //	makeIntSetter(integrationEx);
@@ -219,13 +222,14 @@ void qGrinder::dumpObj(const char *title) {
 	printf("        magic: %c%c%c%c   qSpace=%p '%s'   \n",
 		magic>>24, magic>>16, magic>>8, magic, space, label);
 
-	printf("        elapsedTime %lf, frameSerial  %lf, dt  %lf, lowPassFilter %d, stepsPerFrame %d\n",
-		elapsedTime, frameSerial, dt, lowPassFilter, stepsPerFrame);
+	printf("        elapsedTime=%lf, frameSerial=%lf, dt=%lf, \n",
+		elapsedTime, frameSerial, space->dt);
 
-	printf("        qflick %p, voltage  %p, voltageFactor  %lf, qspect %p\n",
+	printf("        qflick=%p, voltage=%p, voltageFactor=%lf, qspect=%p\n",
 		qflick, voltage, voltageFactor, qspect);
 
-	printf("        isIntegrating: %hhu   pleaseFFT=%hhu \n", isIntegrating, pleaseFFT);
+	printf("        shouldBeIntegrating: %hhu   isIntegrating: %hhu   pleaseFFT=%hhu \n",
+		shouldBeIntegrating, isIntegrating, pleaseFFT);
 
 	printf("        ==== end of qGrinder::dumpObj(%s) ====\n\n", title);
 }
@@ -267,10 +271,11 @@ void qGrinder::tallyUpReversals(qWave *qwave) {
 
 /* ********************************************************** doing Integration */
 
-// Integrates one Frame, one iteration, on one thread.  Does several visscher steps (eg 10 or
-// 100 or 500). Actually does stepsPerFrame+½ steps; two half steps, im at start
-// and re at finish, to adapt to Visscher timing, then synchronized timing.
-// Maybe this should be in slaveThread?
+// Integrates one Frame, one iteration, on one thread.  Does several
+// visscher steps (eg 10 or 100 or 500). Actually does stepsPerFrame+½
+// steps; two half steps, im at start and re at finish, to adapt to
+// Visscher timing, then synchronized timing. Maybe this should be in
+// slaveThread?  Multi-threads will have to be done with totally different code.
 void qGrinder::oneFrame() {
 	if (traceIntegration)
 		printf("starting oneFrame\n");
@@ -280,7 +285,9 @@ void qGrinder::oneFrame() {
 	qCx *wave0 = qflick->waves[0];
 	qCx *wave1 = qflick->waves[1];
 	qCx *wave2 = qflick->waves[2];
-	double dt_ = dt;  // don't change even if user slides it
+
+	double dt = space->dt;
+	double dtHalf = dt / 2;
 
 	// half step in beginning to move Im forward dt/2
 	// cuz outside of here, re and im are interlaced.
@@ -295,11 +302,11 @@ void qGrinder::oneFrame() {
 	for (int step = 0; step < doubleSteps; step++) {
 
 		#ifdef MIDPOINT_METHOD
-		stepMidpoint(wave0, wave1, wave2, dt_);
-		stepMidpoint(wave1, wave0, wave2, dt_);
+		stepMidpoint(wave0, wave1, wave2, dt);
+		stepMidpoint(wave1, wave0, wave2, dt);
 		#else
-		stepRealImaginary(wave0, wave1, wave1, dt_);
-		stepRealImaginary(wave1, wave0, wave0, dt_);
+		stepRealImaginary(wave0, wave1, wave1, dt);
+		stepRealImaginary(wave1, wave0, wave0, dt);
 		#endif
 	}
 
@@ -311,8 +318,8 @@ void qGrinder::oneFrame() {
 
 	// ok the algorithm tends to diverge after thousands of frames.  Hose it down.
 	if (this->pleaseFFT) analyzeWaveFFT(qflick, "before fourierFilter()");
-	fourierFilter(lowPassFilter);
-	if (this->pleaseFFT) analyzeWaveFFT(qflick, "after fourierFilter()");
+	//fourierFilter(lowPassFilter);
+	//if (this->pleaseFFT) analyzeWaveFFT(qflick, "after fourierFilter()");
 	this->pleaseFFT = false;
 
 	// normalize it and return the old inner product, see how close to 1.000 it is
@@ -349,40 +356,40 @@ void qGrinder::oneFrame() {
 
 
 /* ********************************************************** fourierFilter */
-
-
-// FFT the wave, cut down the high frequencies, then iFFT it back.
-// lowPassFilter (aka lpf) is  #frequencies we zero out
-// Can't we eventually find a simple convolution to do this instead of FFT/iFFT?
-// maybe after i get more of this working and fine tune it.
-// Or maybe FFT is the fastest way anyway?
-// lowPassFilter = number of freqs to squelch on BOTH sides, excluding nyquist
-// which is always filtered out.  range 0...N/2-1
-void qGrinder::fourierFilter(int lowPassFilter) {
-	qspect = getSpectrum();
-	qspect->generateSpectrum(qflick);
-	if (dumpFFHiResSpectums) qspect->dumpSpectrum("qspect right at start of fourierFilter()");
-
-	// the high frequencies are in the middle
-	int nyquist = qspect->nPoints/2;
-	qCx *s = qspect->wave;
-
-	// the nyquist freq is at N/2, ALWAYS block that!!
-	s[nyquist] = 0;
-
-	if (traceFourierFilter)
-		printf("🪓 🌈  fourierFilter: nPoints=%d  nyquist=%d    lowPassFilter=%d\n",
-			qspect->nPoints, nyquist, lowPassFilter);
-
-	for (int k = 1; k <= lowPassFilter; k++) {
-		s[nyquist + k] = 0;
-		s[nyquist - k] = 0;
-	}
-
-	if (dumpFFHiResSpectums) qspect->dumpSpectrum("qspect right at END of fourierFilter()");
-	qspect->generateWave(qflick);
-	if (dumpFFHiResSpectums) qflick->dumpHiRes("wave END fourierFilter() b4 normalize");
-}
+//
+//
+// // FFT the wave, cut down the high frequencies, then iFFT it back.
+// ///// lowPassFilter (aka lpf) is  #frequencies we zero out
+// // Can't we eventually find a simple convolution to do this instead of FFT/iFFT?
+// // maybe after i get more of this working and fine tune it.
+// // Or maybe FFT is the fastest way anyway?
+// // lowPassFilter = number of freqs to squelch on BOTH sides, excluding nyquist
+// // which is always filtered out.  range 0...N/2-1
+// void qGrinder::fourierFilter(int lowPassFilter) {
+// 	qspect = getSpectrum();
+// 	qspect->generateSpectrum(qflick);
+// 	if (dumpFFHiResSpectums) qspect->dumpSpectrum("qspect right at start of fourierFilter()");
+//
+// 	// the high frequencies are in the middle
+// 	int nyquist = qspect->nPoints/2;
+// 	qCx *s = qspect->wave;
+//
+// 	// the nyquist freq is at N/2, ALWAYS block that!!
+// 	s[nyquist] = 0;
+//
+// 	if (traceFourierFilter)
+// 		printf("🪓 🌈  fourierFilter: nPoints=%d  nyquist=%d    lowPassFilter=%d\n",
+// 			qspect->nPoints, nyquist, lowPassFilter);
+//
+// 	for (int k = 1; k <= lowPassFilter; k++) {
+// 		s[nyquist + k] = 0;
+// 		s[nyquist - k] = 0;
+// 	}
+//
+// 	if (dumpFFHiResSpectums) qspect->dumpSpectrum("qspect right at END of fourierFilter()");
+// 	qspect->generateWave(qflick);
+// 	if (dumpFFHiResSpectums) qflick->dumpHiRes("wave END fourierFilter() b4 normalize");
+// }
 
 /* ********************************************************** threaded integration  */
 
@@ -390,13 +397,18 @@ void qGrinder::aggregateCalcTime(void) {
 	// add up ALL the threads' frameCalcTime and keep a running average
 	//double frameCalcTime;
 	frameCalcTime = 0;
+	maxCalcTime = 0;
 	for (int ix = 0; ix < nSlaveThreads; ix++) {
 		slaveThread *sl = slaves[ix];
-		if (sl)
+		if (sl) {
 			frameCalcTime += sl->frameCalcTime;
+			maxCalcTime = fmax(maxCalcTime, sl->frameCalcTime);
+		}
 	}
-	if (traceAggregate)
-		speedyLog(" qGrinder 🪓 aggregate time summed: %15.6lf\n", frameCalcTime);
+	if (traceAggregate) {
+		speedyLog(" qGrinder 🪓 aggregate time summed: %15.6lf  maxed: %15.6lf\n",
+			frameCalcTime, maxCalcTime);
+	}
 }
 
 

@@ -40,8 +40,6 @@ class eGrinder {
 	// see qGrinder.cpp to regenerate this. Note these are all scalars; buffers
 	// are passed by pointer and you need to allocate them in JS (eg see
 	// eGrinder.constructor)
-
-
 	get _space() { return this.ints[1]; }
 
  	get elapsedTime() { return this.doubles[2]; }
@@ -51,7 +49,8 @@ class eGrinder {
 
  	get justNFrames() { return this.ints[33]; }
  	set justNFrames(a) { this.ints[33] = a; }
- 	get frameCalcTime() { return this.doubles[9]; }
+ 	get frameCalcTime() { return this.doubles[8]; }
+ 	get maxCalcTime() { return this.doubles[9]; }
  	get shouldBeIntegrating() { return Boolean(this.bools[200]); }
  	set shouldBeIntegrating(a) { this.bools[200] = a; }
  	get isIntegrating() { return Boolean(this.bools[201]); }
@@ -60,32 +59,25 @@ class eGrinder {
  	set pleaseFFT(a) { this.bools[202] = a; }
  	shouldBeIntegratingOffset = 50;
 
-	get dt() { return this.doubles[4]; }
- 	set dt(a) { this.doubles[4] = a; }
- 	get lowPassFilter() { return this.ints[10]; }
- 	set lowPassFilter(a) { this.ints[10] = a; }
- 	get stepsPerFrame() { return this.ints[11]; }
- 	set stepsPerFrame(a) { this.ints[11] = a; }
-// 	get integrationEx() { return this.ints[-6446]; }
-// 	set integrationEx(a) { this.ints[-6446] = a; }
+ 	get stretchedDt() { return this.doubles[4]; }
+ 	set stretchedDt(a) { this.doubles[4] = a; }
  	get nSlaveThreads() { return this.ints[30]; }
  	get newFrameFactor() { return this.ints[24]; }
  	set newFrameFactor(a) { this.ints[24] = a; }
  	get newIntegrationFP() { return this.doubles[11]; }
  	set newIntegrationFP(a) { this.doubles[11] = a; }
 
- 	get _qflick() { return this.ints[13]; }
+ 	get _qflick() { return this.ints[11]; }
 
-	get _voltage() { return this.ints[14]; }
- 	get voltageFactor() { return this.doubles[8]; }
- 	set voltageFactor(a) { this.doubles[8] = a; }
+ 	get _voltage() { return this.ints[12]; }
+ 	get voltageFactor() { return this.doubles[7]; }
+ 	set voltageFactor(a) { this.doubles[7] = a; }
  	get reversePercent() { return this.doubles[10]; }
 
  	get _qspect() { return this.ints[26]; }
  	get _stages() { return this.ints[27]; }
  	get _threads() { return this.ints[28]; }
  	get _label() { return this.pointer + 184; }
-
 	/* ******************* end of direct accessors */
 
 	/* ************************************************  */

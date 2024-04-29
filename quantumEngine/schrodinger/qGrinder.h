@@ -5,6 +5,20 @@
 
 #include <pthread.h>
 
+/* Some terms:
+a Frame: is an amount of calculation correspoinding to one refresh of the display.
+	Doesn't have to be synchronized with the screen refreshes; just the amount of
+	calculation done for it.
+
+a Step: is an mount of calculation to advance the model dt time.
+	(Really ∆t but it's tedious entering the delta character.)
+
+a Hit: advancement by dt of one of many parts of the calculation.  As of this writing,
+	there are four hits to a step: two split by the Vischer algorithm,
+	and two split doing the Midpoint method.
+
+*/
+
 struct qThread;
 struct qStage;
 struct slaveThread;
@@ -35,10 +49,13 @@ struct qGrinder {
 	// it's a double cuz I don't know how big it'll get)
 	double frameSerial;
 
-	// params that the user can set/get
-	double dt;
-	int lowPassFilter;
-	int stepsPerFrame;
+	// dynamically adjusted so integration calculation of a frame takes
+	// about as much time as a screen refresh frame, as set by the user.
+	// No direct connection with UI.
+	double stepsPerFrame;
+
+	// = dtStretch * space->dt
+	double stretchedDt;
 
 	// any exception thrown in a
 	std::runtime_error& integrationEx;
@@ -55,6 +72,7 @@ struct qGrinder {
 
 	// how long (thread time) it took to do the latest frame, all threads added together
 	double frameCalcTime;
+	double maxCalcTime;  // and max of all threads
 
 	double reversePercent;
 
@@ -127,14 +145,14 @@ struct qGrinder {
 	bool pleaseFFT;
 	// make sure the subsequent fields are aligned!  or frame is painfully slow.
 
-	// multiple steps; ≈ stepsPerFrame, for old same-thread
+	// multiple steps; ≈ stepsPerFrame???, for old same-thread
 	void oneFrame(void);
 
 	// multi-threaded
 	void startAFrame(void);
 
 	// visscher.  Calculate new from old; use hamiltonian to calculate d𝜓
-	// often oldW and hamiltonianW are the same
+	// sometimes oldW and hamiltonianW are the same
 	void stepReal(qCx *newW, qCx *oldW, qCx *hamiltW, double dt);
 	void stepImaginary(qCx *newW, qCx *oldW, qCx *hamiltW, double dt);
 
@@ -144,7 +162,7 @@ struct qGrinder {
 	void stepMidpoint(qCx *newW, qCx *oldW, qCx *scratch, double dt);
 
 	// kill high frequencies via FFTs
-	void fourierFilter(int lowPassFilter);
+	//void fourierFilter(int lowPassFilter);
 
 	void tallyUpReversals(struct qWave *qwave);
 

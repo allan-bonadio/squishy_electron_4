@@ -14,10 +14,10 @@ class inteStats {
 
 		this.addStat('Divergence'         , 'reversePercent', '%');
 		this.addStat('Frame Calc Time'    , 'frameCalcTime', 'ms');
-		this.addStat('Draw Time'                  , 'drawTime', 'ms');
-		this.addStat('Total For Frame'   , 'totalForFrame', 'ms');
-		this.addStat('Frame Period'      , 'framePeriod', 'ms');
-		this.addStat('Frames Per Sec'   , 'framesPerSec', '/sec');
+		this.addStat('Draw Time'                  , 'totalDrawTime', 'ms');
+		//this.addStat('Total For Frame'   , 'totalForFrame', 'ms');
+//		this.addStat('Frame Period'      , 'framePeriod', 'ms');
+//		this.addStat('Frames Per Sec'   , 'framesPerSec', '/sec');
 		this.addStat('rAF Period'   , 'rAFPeriod', 'ms');
 
 	}
@@ -129,7 +129,7 @@ class inteStats {
 		}
 	}
 
-	// hand in where the actual numbers are, we'll them on the int tab
+	// hand in inteTimes, where the actual numbers are, we'll them on the int tab
 	// inteTimes is raw numbers collected by sAnimator
 	// grinder is eGrinder instance doing integration and its numbers
 	displayAllStats(inteTimes, grinder) {
@@ -140,19 +140,22 @@ class inteStats {
 		let frameCalcTime = 0;
 		if (grinder) {
 			this.display(sm.reversePercent, grinder.reversePercent);
-			this.display(sm.frameCalcTime, grinder.frameCalcTime);
+			this.display(sm.frameCalcTime, grinder.maxCalcTime);
 			frameCalcTime = grinder.frameCalcTime;
-			this.display(sm.rAFPeriod, grinder.rAFPeriod);
 		}
+
 
 		// these are mostly from sAnimator
 		if (inteTimes) {
-			let drawTime = inteTimes.endDraw - inteTimes.startDrawTime;
-			this.display(sm.drawTime,drawTime );
-			this.display(sm.totalForFrame, drawTime + frameCalcTime);  // draw + calc
-			const period = inteTimes.startIntegrationTime - inteTimes.prevStartIntegrationTime;
-			this.display(sm.framePeriod, period);
-			this.display(sm.framesPerSec, Math.round(1000 / period), 0);
+			this.display(sm.totalDrawTime, inteTimes.totalDrawTime);
+			this.display(sm.rAFPeriod, inteTimes.rAFPeriod);
+
+			// drawing and calculating happen in different threads, so it makes no sense
+			// to add the times together
+			//this.display(sm.totalForFrame, totalDrawTime + frameCalcTime);  // draw + calc
+
+//			this.display(sm.framePeriod, this.inteTimes.frameDrawPeriod);
+//			this.display(sm.framesPerSec, Math.round(1000 / this.inteTimes.frameDrawPeriod), 0);
 		}
 	}
 
