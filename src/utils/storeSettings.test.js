@@ -128,9 +128,9 @@ describe('cx2rgb tests', () => {
 	/* ************************************ frameSettings */
 	testParam('frameSettings', 'shouldBeIntegrating', false,  [false, true]);
 	testParam('frameSettings', 'framePeriod', 50, {min: 16, max: 60_001});
-	testParam('frameSettings', 'deltaT', 1, {min: .01, max: 100.0, });
-	testParam('frameSettings', 'stepsPerFrame', 100, {min: 10, max: 1e5});
-	testParam('frameSettings', 'lowPassFilter', 50, {min: 0, max: 75});
+	testParam('frameSettings', 'dtStretch', 1, {min: .1, max: 10.0, });
+	//testParam('frameSettings', 'stepsPerFrame', 100, {min: 10, max: 1e5});
+	//testParam('frameSettings', 'lowPassFilter', 50, {min: 0, max: 75});
 
 	/* ************************************miscSettings */
 	testParam('miscSettings', 'showingTab', 'wave', ['wave', 'voltage', 'space', 'integrate']);

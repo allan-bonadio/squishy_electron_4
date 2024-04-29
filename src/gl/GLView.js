@@ -124,15 +124,14 @@ class GLView extends React.Component {
 			p.avatar.dumpViewBuffer(`🖼 🖼 GLView ${p.viewName}: loaded ViewBuffer`);
 
 		// NO!  now done before drawing each drawing individually this.effectiveView.reloadAllVariables();
-		let endReloadVarsNBuffer = performance.now();
+		//let endReloadVarsNBuffer = performance.now();
 
 		// draw
 		this.effectiveView.drawAllDrawings();
-		let endDraw = performance.now();
 		if (tracePainting)
 			console.log(`🖼 🖼 GLView ${p.viewName} ${p.avatar.label}: doRepaint done drawing`);
 
-		return {endReloadVarsNBuffer, endDraw};
+		return //{endReloadVarsNBuffer, endDrawTime};
 	}
 
 	// this just creates the canvas

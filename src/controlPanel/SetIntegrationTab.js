@@ -1,5 +1,5 @@
 /*
-** SetIntegrationTab -- tab for adjusting deltaT, stepsPerFrame, etc
+** SetIntegrationTab -- tab for adjusting dtStretch, etc
 ** Copyright (C) 2022-2024 Tactile Interactive, all rights reserved
 */
 
@@ -21,12 +21,12 @@ function setPT() {
 			dimensions: PropTypes.arrayOf(PropTypes.object).isRequired,
 		}),
 
-		deltaT: PropTypes.number.isRequired,
-		setDeltaT: PropTypes.func.isRequired,
-		stepsPerFrame: PropTypes.number.isRequired,
-		setStepsPerFrame: PropTypes.func.isRequired,
-		lowPassFilter: PropTypes.number.isRequired,
-		setLowPassFilter: PropTypes.func.isRequired,
+		dtStretch: PropTypes.number.isRequired,
+		setDtStretch: PropTypes.func.isRequired,
+		//stepsPerFrame: PropTypes.number.isRequired,
+		//setStepsPerFrame: PropTypes.func.isRequired,
+		//lowPassFilter: PropTypes.number.isRequired,
+		//setLowPassFilter: PropTypes.func.isRequired,
 	};
 }
 
@@ -40,7 +40,7 @@ function SetIntegrationTab(props) {
 	// step between valid settings, and also the minimum setting, where you just
 	// filter off Nyquist.  Think of this like 100 * ( 1 / (N/2))
 	const N = getASetting('spaceParams', 'N');
-	const lowPassStep = 200 / N;
+//	const lowPassStep = 200 / N;
 
 	const nDigits = (N < 150) ? 0 : ((N < 600) ? 1 : 2);
 	// ...Math.max(0, 1 -Math.ceil(Math.log10(lowPassStep)));
@@ -51,24 +51,48 @@ function SetIntegrationTab(props) {
 		<div className='sliderBlock'>
 			<h3>Integration Controls</h3>
 
-			<LogSlider
-				unique='deltaTSlider'
-				className='deltaTSlider cpSlider'
-				label='𝚫t each frame, ps'
-				minLabel='0.01'
-				maxLabel='100.0'
+			<p className='discussion'>
+			Schrodinger's equation can diverge (explode) into high frequencies,
+			ruining a simulation.
+			In order to guarantee convergence (not exploding),
+			we must use a time increment, <i>∆t</i>, small enough, according to the
+			von Neumann stability criteria.
+			This might lead to a very slow integration experience.
+			You can speed this up a bit by bending the rules and stretching
+			<i>∆t</i>, at the risk of diverging.
+			</p>
 
-				current={props.deltaT}
-				sliderMin={alternateMinMaxs.frameSettings.deltaT.min}
-				sliderMax={alternateMinMaxs.frameSettings.deltaT.max}
-				stepsPerDecade={6}
+			<LogSlider
+				unique='dtStretchSlider'
+				className='dtStretchSlider cpSlider'
+				label='stretch factor for ∆t, relative to recommended ∆t'
+				minLabel='0.1'
+				maxLabel='10.0'
+
+				current={props.dtStretch}
+				sliderMin={alternateMinMaxs.frameSettings.dtStretch.min}
+				sliderMax={alternateMinMaxs.frameSettings.dtStretch.max}
+				stepsPerDecade={10}
 
 				handleChange={(power, ix) => {
 					if (traceSliderChanges)
-						console.log(`🏃🏽 🏃🏽 ch 𝚫t   ix=${ix}  power=${power}`);
-					props.setDeltaT(power);
+						console.log(`🏃🏽 🏃🏽 ch dtStretch ix=${ix}  power=${power}`);
+					props.setDtStretch(power);
 				}}
 			/>
+
+		</div>
+		{
+			props.space?.sIntStats.renderAllStats()
+			// why doesn't this show up!??!?!
+			//typeof statGlobals != 'undefined' && statGlobals.renderIStats()
+		}
+
+	</div>);
+}
+
+
+/*
 			<LogSlider
 				unique='stepsPerFrameSlider'
 				className='stepsPerFrameSlider cpSlider'
@@ -106,15 +130,7 @@ function SetIntegrationTab(props) {
 					}}
 			/>
 
-		</div>
-		{
-			props.space?.sIntStats.renderAllStats()
-			// why doesn't this show up!??!?!
-			//typeof statGlobals != 'undefined' && statGlobals.renderIStats()
-		}
-
-	</div>);
-}
+*/
 
 
 // 				<tr><td>reload GL variables:     </td><td><span  className='reloadGlInputs'>-</span> ms</td></tr>

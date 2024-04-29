@@ -55,31 +55,17 @@ class sAnimator {
 	// start them all at reasonable values
 	initStats(now) {
 		this.inteTimes = {
-			startIntegrationTime: now,
-			startDrawTime: now,
-			//endReloadVarsNBuffer: now,
-			endDraw: now,
-			prevStartIntegrationTime: now,
+//			startIntegrationTime: now,
+//			prevStartIntegrationTime: now,
+
+			totalDrawTime: 0,
 		}
 	}
 
 	// update the stats, as displayed in the Integration tab
 	refreshStatsOnScreen() {
-		//	if (typeof statGlobals == 'undefined' || !statGlobals)
-		//		return;  // why does this happen?!?!?!
-
 		this.space.sIntStats.displayAllStats(this.inteTimes, this.grinder);
 
-		// given a stat name, value and precision, display it using oldschool DOM
-		//const st = this.inteTimes;
-		//statGlobals.show('reversePercent', this.grinder.reversePercent);
-		//statGlobals.show('frameCalcTime', this.grinder.frameCalcTime);
-		//statGlobals.show('drawTime', st.endDraw - st.startDrawTime);
-		//statGlobals.show('totalForFrame', st.endDraw - st.startIntegrationTime);  // draw + calc
-		//const period = st.startIntegrationTime - st.prevStartIntegrationTime;
-		//statGlobals.show('framePeriod', period);
-		//statGlobals.show('framesPerSec', Math.round(1000 / period), 0)
-		//statGlobals.show('rAFPeriod', st.rAFPeriod)
 	}
 
 
@@ -99,25 +85,24 @@ class sAnimator {
 
 	// Repaint, with webgl, the waveview.
 	drawLatestFrame() {
-		if (traceStats) console.log(`time since last tic: ${performance.now()
-				- this.inteTimes.startIntegrationTime}ms`);
-		//debugger;
-		//this.inteTimes.startIntegrationTime = performance.now();  // absolute beginning of integrate frame
+		//if (traceStats) console.log(`time since last tic: ${performance.now()
+		//		- this.inteTimes.startIntegrationTime}ms`);
+		let startDrawTime = performance.now();
+		this.inteTimes.frameDrawPeriod = startDrawTime - this.inteTimes.prevDrawTime;
+		this.inteTimes.prevDrawTime = startDrawTime;
 
-//		if (shouldIntegrate)
-//			this.crunchOneFrame();
-		this.inteTimes.startDrawTime = performance.now();
+			this.space.mainEAvatar.doRepaint?.();
+			this.showTimeNFrame();  // part of the draw time
 
-		this.space.mainEAvatar.doRepaint?.();
-		this.showTimeNFrame();
 
-		// update dom elements in integration tab to latest stats
-		this.refreshStatsOnScreen();
+			// update dom elements in integration tab to latest stats
+			this.refreshStatsOnScreen();
 
 		//this.inteTimes.endReloadVarsNBuffer =
-		this.inteTimes.endDraw = performance.now();
+		let endDrawTime = performance.now();
+		this.inteTimes.totalDrawTime = endDrawTime - startDrawTime;
 
-		this.inteTimes.prevStartIntegrationTime = this.inteTimes.startIntegrationTime;
+		//this.inteTimes.prevStartIntegrationTime = this.inteTimes.startIntegrationTime;
 
 		this.continueRunningDiagnosticCycle();
 	}
@@ -178,6 +163,7 @@ class sAnimator {
 		// the debugger.
 		this.avgAnimationFP  =
 			Math.min(MAX_rAF_PERIOD, (animationFP + 3 * this.avgAnimationFP) / 4);
+		this.inteTimes.rAFPeriod = this.avgAnimationFP;
 
 		// IF the frame period changed from recent cycles,
 		if (Math.abs(animationFP - this.avgAnimationFP) > 4) {
@@ -276,7 +262,7 @@ class sAnimator {
 			if (real0 < this.prevReal0) {
 				// we're going down - first half of the cycle
 				if (this.goingUp) {
-					// if we were going up, we've gone just 1 deltaT past the peak.  Good time to stop.
+					// if we were going up, we've gone just 1 step past the peak.  Good time to stop.
 					this.runningDiagnosticCycle = false;
 
 					ControlPanel.stopAnimating();

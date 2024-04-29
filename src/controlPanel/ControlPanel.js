@@ -44,7 +44,7 @@ export class ControlPanel extends React.Component {
 		// the integration statistics shown in the Integration tab
 		iStats: PropTypes.shape({
 			startIntegrationTime: PropTypes.number.isRequired,
-			endDraw: PropTypes.number.isRequired,
+			totalDrawTime: PropTypes.number.isRequired,
 		}),
 
 		animator: PropTypes.object,
@@ -65,10 +65,10 @@ export class ControlPanel extends React.Component {
 		this.state = {
 			framePeriod: getASetting('frameSettings', 'framePeriod'),
 
-			// defaults for sliders for deltaT & spi
-			deltaT: getASetting('frameSettings', 'deltaT'),
-			stepsPerFrame: getASetting('frameSettings', 'stepsPerFrame'),
-			lowPassFilter: getASetting('frameSettings', 'lowPassFilter'),
+			// defaults for sliders
+			dtStretch: getASetting('frameSettings', 'dtStretch'),
+			//stepsPerFrame: getASetting('frameSettings', 'stepsPerFrame'),
+			//lowPassFilter: getASetting('frameSettings', 'lowPassFilter'),
 
 			showingTab: getASetting('miscSettings', 'showingTab'),
 
@@ -92,6 +92,8 @@ export class ControlPanel extends React.Component {
 			this.mainEWave = space.mainEWave;
 
 			this.grinder = space.grinder;
+			this.grinder.stretchedDt = this.state.dtStretch * this.space.dt;
+
 			this.grinder.shouldBeIntegrating = this.state.sbIntegrating;
 			if (this.grinder.shouldBeIntegrating)
 				this.startAnimating();
@@ -227,43 +229,43 @@ export class ControlPanel extends React.Component {
 
 	/* ********************************************** frame */
 
-	// dt is time per step, for the algorithm; deltaT is time per frame, the user/UI control)
-	setDeltaT = deltaT => {
-		deltaT = storeASetting('frameSettings', 'deltaT', deltaT);
-		this.setState({deltaT});
-		this.grinder.dt = deltaT / (this.state.stepsPerFrame + N_EXTRA_STEPS);  // always one more!
+	// dt is time per step, stretchedDt is stretched, ready to use
+	setDtStretch = dtStretch => {
+		dtStretch = storeASetting('frameSettings', 'dtStretch', dtStretch);
+		this.setState({dtStretch});
+		this.grinder.stretchedDt = dtStretch * this.space.dt;
 		//console.log(`setDeltaT: dt = ${this.grinder.dt} = deltaT ${deltaT} / spf+1=${ (this.state.stepsPerFrame + N_EXTRA_STEPS)}`)
 	}
 
-	setStepsPerFrame =
-	stepsPerFrame => {
-		try {
-			if (traceSetPanels) console.log(`js setStepsPerFrame(${stepsPerFrame})`);
-			storeASetting('frameSettings', 'stepsPerFrame', stepsPerFrame);
-			this.setState({stepsPerFrame});
-			this.grinder.stepsPerFrame = stepsPerFrame;
-
-			// dt needs to be recalculated if either of these change
-			this.grinder.dt = this.state.deltaT / (stepsPerFrame + N_EXTRA_STEPS);
-			//console.log(`setStepsPerFrame: dt = ${this.grinder.dt} = deltaT ${this.state.deltaT} / spf+1=${ (stepsPerFrame + N_EXTRA_STEPS)}`)
-		} catch (ex) {
-			ex = interpretCppException(ex);
-			console.error(`setStepsPerFrame error:`, ex.stack ?? ex.message ?? ex);
-			////debugger;
-		}
-	}
-
-	// sets the LPF in both SPanel state AND in the C++ area
-	setLowPassFilter =
-	lowPassFilter => {
-		if (traceSetPanels) console.log(`js setLowPassFilter(${lowPassFilter})`)
-
-		let lpf = storeASetting('frameSettings', 'lowPassFilter', lowPassFilter);
-		this.setState({lowPassFilter: lpf});
-
-		// here's where it converts from percent to the C++ style integer number of freqs
-		this.grinder.lowPassFilter = Math.round(lpf / 200 * this.state.N);
-	}
+	//setStepsPerFrame =
+	//stepsPerFrame => {
+	//	try {
+	//		if (traceSetPanels) console.log(`js setStepsPerFrame(${stepsPerFrame})`);
+	//		storeASetting('frameSettings', 'stepsPerFrame', stepsPerFrame);
+	//		this.setState({stepsPerFrame});
+	//		this.grinder.stepsPerFrame = stepsPerFrame;
+	//
+	//		// dt needs to be recalculated if either of these change
+	//		this.grinder.dt = this.state.deltaT / (stepsPerFrame + N_EXTRA_STEPS);
+	//		//console.log(`setStepsPerFrame: dt = ${this.grinder.dt} = deltaT ${this.state.deltaT} / spf+1=${ (stepsPerFrame + N_EXTRA_STEPS)}`)
+	//	} catch (ex) {
+	//		ex = interpretCppException(ex);
+	//		console.error(`setStepsPerFrame error:`, ex.stack ?? ex.message ?? ex);
+	//		////debugger;
+	//	}
+	//}
+	//
+	//// sets the LPF in both SPanel state AND in the C++ area
+	//setLowPassFilter =
+	//lowPassFilter => {
+	//	if (traceSetPanels) console.log(`js setLowPassFilter(${lowPassFilter})`)
+	//
+	//	let lpf = storeASetting('frameSettings', 'lowPassFilter', lowPassFilter);
+	//	this.setState({lowPassFilter: lpf});
+	//
+	//	// here's where it converts from percent to the C++ style integer number of freqs
+	//	this.grinder.lowPassFilter = Math.round(lpf / 200 * this.state.N);
+	//}
 
 
 
@@ -302,17 +304,19 @@ export class ControlPanel extends React.Component {
 		case 'integration':
 			return <SetIntegrationTab
 				space={this.space}
-				deltaT={s.deltaT}
-				setDeltaT={this.setDeltaT}
-				stepsPerFrame={s.stepsPerFrame}
-				setStepsPerFrame={this.setStepsPerFrame}
-				lowPassFilter={s.lowPassFilter}
-				setLowPassFilter={this.setLowPassFilter}
+				dtStretch={s.dtStretch}
+				setDtStretch={this.setDtStretch}
 
 				N={this.N}
 				iStats={p.iStats}
 			/>;
 
+			/*
+				lowPassFilter={s.lowPassFilter}
+				setLowPassFilter={this.setLowPassFilter}
+							stepsPerFrame={s.stepsPerFrame}
+				setStepsPerFrame={this.setStepsPerFrame}
+			*/
 		default:
 			return `Do not understand showingTab='${s.showingTab}'`;
 		}

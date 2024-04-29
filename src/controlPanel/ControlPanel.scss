@@ -15,6 +15,9 @@
 		flex: 0 0 10em;
 	}
 
+	.discussion {
+		font-size: .8em;
+	}
 
 	/* **************************************** all log sliders */
 
@@ -275,7 +278,7 @@
 					font-size: .8em;
 				}
 				&:nth-child(2) {
-					width: 4em;					
+					width: 4em;
 					font-weight: bold;
 				}
 				&:last-child {
