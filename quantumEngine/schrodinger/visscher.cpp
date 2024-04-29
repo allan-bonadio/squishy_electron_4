@@ -46,26 +46,31 @@ We do the hamiltonian custom here and sometimes omit the potential
 
 /*
 this is our second derivative wrt x:
-	qCxd2 = wave[x-1] + wave[x+1] - wave[x] * 2;
-because dx  is always chosen to be 1.
+	qCxd2 = wave[ix-1] + wave[ix+1] - wave[ix] * 2;
 
-real units:
-ℏ = 1.054571817e-34 kg m^2 / s = 1 cuz of the lhs of schrodinger's we use
-m_e = 9.1093837015e-31 kg
-ℏ / 2m_e = 5.78838180e-5  m^2/s = 1 cuz of the rhs of schrodinger's we use
-therefore, 1s = 5.7...e-5 m^2   ???
-and 1ps = 1e-12s = 5.78838180e-17 m^2 - yeah i think so.
-or 1ns corresponds to 5.78838180e-14 m^2
-or  2.4059056091210226e-7 m or about 241 µm ??
+ix is the integer index into each length dimension.  The actual distance is dx * ix; determined by
+the length (supplied by user) and N, for each dimension of the space.
 
-no do it this way
-ℏ^2 / 2m_e = 6.10426431e-39  kg m^4 / s^2  = 1 cuz of the rhs of schrodinger's we use
+// The following uses nanometers, picoseconds, etc as described in definiionOfUnits.md
+//
+// real units:
+// ℏ = 105.4571817 pfg nm^2 / ps
+// m_e = .91093837015 pfg
+// // ℏ / 2m_e = 5.78838180e-5  m^2/s = 1 cuz of the rhs of schrodinger's we use
+// // therefore, 1s = 5.7...e-5 m^2   ???
+// // and 1ps = 1e-12s = 5.78838180e-17 m^2 - yeah i think so.
+// // or 1ns corresponds to 5.78838180e-14 m^2
+// // or  2.4059056091210226e-7 m or about 241 µm ??
+//
+// no do it this way.  The coefficient on the rhs for the second derivative is
+// ℏ^2 / 2m_e = 6.10426431e-39  kg m^4 / s^2  = 1 cuz of the rhs of schrodinger's we use
+//
+// wait try this, ℏ = 1, right, so 1 / 2m_e = 1  and m_e = 1/2 = 9.1093837015e-31 kg
+// and 1 kg = 5.4888455287888166e+29
 
-wait try this, ℏ = 1, right, so 1 / 2m_e = 1  and m_e = 1/2 = 9.1093837015e-31 kg
-and 1 kg = 5.4888455287888166e+29
-
-See definitionOfUnits in docGen/docSrc for latest believable work.
-Here, we use dx=1 for ease of calculation, and fold the conversion factors into other nubmers.
+See definitionOfUnits in articles directory for latest believable work.
+Here, we use ix as a surrogate for x, x = ix * dx.
+dx is a field on the dimension in the space.
 
 */
 
