@@ -11,7 +11,7 @@
 #include "../debroglie/qWave.h"
 #include "../greiman/qViewBuffer.h"
 
-static bool traceSpaceCreation = false;
+static bool traceSpaceCreation = true;
 static bool traceAvatarDetail = false;
 
 /* ********************************************************** glue functions for js */
@@ -48,8 +48,10 @@ qSpace *startNewSpace(const char *label) {
 
 // call this from JS to add one or more dimensions
 void addSpaceDimension(qSpace *space, int N, int continuum, double spaceLength, const char *label) {
-	double dx = spaceLength / (N - 1);  // shouldn't this be N instead of N-1?
-	if (traceSpaceCreation) printf("🚀 addSpaceDimension(%d, %d, %lf=>%lf, %s)\n",
+	// each datapoint represents a piece of the length dx wide, with dx/2 before the center datapoint and dx/2 after.
+	double dx = spaceLength / N;
+
+	if (traceSpaceCreation) printf("🚀 addSpaceDimension(N=%d, cont=%d, spaceLength-%lf=>%lf=dx, %s)\n",
 		N, continuum, spaceLength, dx, label);
 	space->addDimension(N, continuum, dx, label);
 }
@@ -72,21 +74,14 @@ qSpace *completeNewSpace(qSpace *space, int nThreads) {
 
 	space->miniGraphAvatar = new qAvatar(space, "miniGraph");
 
-//	if (theVoltage) throw std::runtime_error("🚀 🚀 🚀 theVoltage exists while trying to create new one");
-//	theVoltage = space->voltage;
-
-	if (traceSpaceCreation) printf("   🚀 🚀 🚀 qSpace::jsSpace: done\n");
+	if (traceSpaceCreation) printf("   🚀 🚀 🚀 qSpace created: space=%p  mainAvatar=%p  grinder=%p\n",
+		space, mainAvatar, qgrinder);
 	return space;
 }
 
 // dispose of ALL of everything attached to the space
 // use this to get rid of a space created with startNewSpace/addSpaceDimension/completeNewSpace
 void deleteFullSpace(qSpace *space) {
-//	if (traceSpaceCreation) printf("   🚀 🚀 🚀 deleteFullSpace(): starts, theSpace:%p, space to delete=%p\n",
-//		theSpace, space);
-//	if (theSpace != space)
-//		throw std::runtime_error("Trying to delete a space other than theSpace!");
-
 	// deleting the avatars will delete their qWaves and qViewBuffers
 	// not there if completeNewSpace() never called, even if initSpace() called
 	if (space->mainAvatar) {
@@ -101,17 +96,8 @@ void deleteFullSpace(qSpace *space) {
 		space->qgrinder = NULL;
 	}
 
-	// voltage going to be deleted cuz it's part of the space
-
 	// deletes its voltage
 	delete space;
-
-	// get rid of these variables someday
-//	theSpace = NULL;
-//	theVoltage = NULL;
-
-//	if (traceSpaceCreation) printf("    🚀  deleteFullSpace(): done.  theSpace=%p, theVoltage=%p \n",
-//		theSpace, theVoltage);
 }
 
 
