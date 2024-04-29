@@ -9,6 +9,13 @@
 // not even used these days
 extern qCx hamiltonian(struct qSpace *space, qCx *wave, int x);
 
+extern const double hBar;  //  = 105.4571817 pfg nm^2 / ps, Plank's reduced
+extern const double m_e;  //  = .91093837015 pico femto grams, mass of electron
+
+// these two are used directly in Schrodinger's
+extern const double hOver2m_e;  // = hBar / (2 * m_e);  // units nm^2 / ps
+extern const double inverseH;  //  = 1 / hBar;  // units ps / pfg nm^2
+
 /* *************************************** one for each DIMENSION of the wave array */
 struct qDimension {
 public:
@@ -31,11 +38,16 @@ public:
 	// includes boundaries.
 	int nPoints;
 
-	// nanometers separating data points
+	// nanometers separating data points.  Named dx even if this coordinate is y or z.
+	// Not used if this is a discrete coordinate.
 	double dx;
 
-	// size for Fourier transforms, or zero if not yet calculated.  ON THIS DIMENSION ONLY!
-	// Often a power of two.  no boundaries.
+	// multiply this onto the second derivative while integrating
+	double d2Coeff;
+
+	// size for Fourier transforms, or zero if not yet calculated.  ON
+	// THIS DIMENSION ONLY! Often a power of two.  no boundaries.  Not
+	// sure if I need this anymore as it's always N for powers of 2.
 	void chooseSpectrumLength(void);
 	int spectrumLength;
 
@@ -46,6 +58,8 @@ public:
 	// Also could have Energy dimensions...
 	char label[MAX_LABEL_LEN+1];
 
+	// called by qSpace::tallyDimensions() to count/sum/multiply up stuff
+	void tally(qSpace *space);
 };
 
 /* ************************************************************ the space */
@@ -75,6 +89,12 @@ public:
 	// 𝜓[outermost-dim][dim][dim][innermost-dim]
 	// always a fixed size, for simplicity.
 	qDimension dimensions[MAX_DIMENSIONS];
+
+	// alpha for convergence https://en.wikipedia.org/wiki/FTCS_scheme#Stability
+	double alpha;
+
+	// picoseconds per step (re, im, re, im cycle of steps recommended for convergence)
+	double dt;
 
 	// number of  dimensions actually used, always <= MAX_DIMENSIONS
 	// do not confuse with nStates or nPoints

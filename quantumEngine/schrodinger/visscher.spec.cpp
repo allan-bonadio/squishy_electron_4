@@ -114,9 +114,9 @@ TEST(visscher, VisscherOneFrame32)
 		fl->dump("VisscherOneFrame, before", true);
 
 	// simulate the app taking one iter = 100 steps
-	qgrinder->stepsPerFrame = 100;
-	qgrinder->dt = .01;
-	qgrinder->lowPassFilter = 10;  // num freqs to eliminate on each side
+	// qgrinder->stepsPerFrame = 100;
+	// qgrinder->dt = .01;
+	// qgrinder->lowPassFilter = 10;  // num freqs to eliminate on each side
 
 	// one frame
 	qgrinder->oneFrame();
