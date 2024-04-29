@@ -58,40 +58,12 @@ void slaveThread::slaveWork(void) {
 	int nWas;
 
 	if (traceRunner) speedyLog("🔪 slaveWork #%d starts cycle\n", serial);
-//	if (slaveThread::newFrameFactor) {
-//		// change to new integration frame period.  Here so all threads get it at the same time.
-//		// threadsHaveFinished() will reset it to zero.
-//
-//		// lemme figure this out... emscripten_set_main_loop_timing(EM_TIMING_RAF, slaveThread::newFrameFactor);
-//	}
-
 	if (traceRunner)  {
 		speedyLog("🔪              thread #%d: shouldBeIntegrating=%d  isIntegrating=%d.  "
 			"nFinishedThreads=%d\n",
 			serial, grinder->shouldBeIntegrating, grinder->isIntegrating,
 			grinder->nFinishedThreads);
 	}
-
-//
-//	// maybe we shouldn't do it?
-//	if ( !grinder->isIntegrating) {
-//		// STILL have to sync in case user turned integration on.
-//		// note we don't touch the frameCalcTime
-//		pthread_mutex_lock(&grinder->finishMx);
-//			nWas = --grinder->nFinishedThreads;
-//		pthread_mutex_unlock(&grinder->finishMx);
-//
-//		if (nWas <= 0) {
-//			if (traceRunner)  {
-//				speedyLog("🔪 slaveWork: last thread is #%d.\n", serial);
-//				speedyLog("🔪              shouldBeIntegrating=%d  isIntegrating=%d \n",
-//					grinder->shouldBeIntegrating, grinder->isIntegrating);
-//			}
-//			grinder->threadsHaveFinished();
-//			//grinder->isIntegrating = grinder->shouldBeIntegrating;
-//		}
-//		return;
-//	}
 
 	// Gonna do an integration frame.  set starting time, under lockf
 	// wait this doesn't have to be under lock!  it's per-thread.

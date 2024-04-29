@@ -50,7 +50,7 @@ struct {
 
 
 // hamilt pointers are pointers to the 𝜓 arrays being used for calculation of the hamiltonian
-void stepOneReal(double *newReal, double *oldReal, double *hamiltReal, double *hamiltImag, int ix, double dt_) {
+void stepOneReal(double *newReal, double *oldReal, double *hamiltReal, double *hamiltImag, int ix, double dt) {
 	// sec deriv d^2 𝜓 / dx^2
 	double d2𝜓 = hamiltImag[ix-1] + hamiltImag[ix+1] - hamiltImag[ix] * 2;
 
@@ -58,12 +58,12 @@ void stepOneReal(double *newReal, double *oldReal, double *hamiltReal, double *h
 	double H𝜓 = d2𝜓 + voltage[ix] * voltageFactor * hamiltReal[ix];
 
 	// new = old + 𝛥𝜓 dt   note subtraction
-	newReal[ix] = oldReal[ix] - dt_ * H𝜓;
+	newReal[ix] = oldReal[ix] - dt * H𝜓;
 
 	qCheck(newW[ix], "vischer stepOneReal", ix);
 }
 
-void stepOneImag(double *newImag, double *oldImag, double *hamiltReal, double *hamiltImag, int ix, double dt_) {
+void stepOneImag(double *newImag, double *oldImag, double *hamiltReal, double *hamiltImag, int ix, double dt) {
 	// second deriv d2𝜓 / dx**2
 	double d2𝜓 = hamiltReal[ix-1] + hamiltReal[ix+1] - hamiltReal[ix] * 2;
 
@@ -71,7 +71,7 @@ void stepOneImag(double *newImag, double *oldImag, double *hamiltReal, double *h
 	double H𝜓 = d2𝜓 + voltage[ix] * voltageFactor * hamiltImag[ix];
 
 	// note addition
-	newImag[ix] = oldImag[ix] + dt_ * H𝜓;
+	newImag[ix] = oldImag[ix] + dt * H𝜓;
 
 	qCheck(newW[ix], "vischer stepImaginary", ix);
 }
@@ -79,21 +79,21 @@ void stepOneImag(double *newImag, double *oldImag, double *hamiltReal, double *h
 lastBuffer and penultimateBuffer
 
 void phase0(int ix) {
-	stepOneReal(buf0, penultimateBuffer, penultimateBuffer, lastBuffer, ix, dt_)
+	stepOneReal(buf0, penultimateBuffer, penultimateBuffer, lastBuffer, ix, dt)
 }
 
 void phase1(int ix) {
-	stepOneImag(buf1, lastBuffer, penultimateBuffer, lastBuffer, ix, dt_)
+	stepOneImag(buf1, lastBuffer, penultimateBuffer, lastBuffer, ix, dt)
 
 }
 
 void phase2(int ix) {
-	stepOneReal(buf2, penultimateBuffer, buf0, buf1, ix, dt_)
+	stepOneReal(buf2, penultimateBuffer, buf0, buf1, ix, dt)
 	also, buf4 = (buf0 + buf2) / 2
 }
 
 void phase3(int ix) {
-	stepOneImag(buf3, lastBuffer, buf0, buf1, ix, dt_)
+	stepOneImag(buf3, lastBuffer, buf0, buf1, ix, dt)
 	also, buf5 = (buf1 + buf32) / 2
 }
 
@@ -129,7 +129,7 @@ buf5 = bufferSix + 5*Nb;
 //						qCx d2 = wave[ix-1] + wave[ix+1] - wave[ix] * 2;
 //						qCheck(d2, "hamiltonian d2", ix);
 //
-//						// theVoltage no longer e3xists qCx pot = wave[ix] * theVoltage[ix];
+//						// qCx pot = wave[ix] * voltage[ix];
 //						double pot = space->voltageBuffer[ix];
 //						qCheck(pot, "hamiltonian pot", ix);
 //						qCx rate = pot - d2;
