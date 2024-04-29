@@ -8,8 +8,16 @@
 // printf macros, in *::formatDirectOffsets(),  for each field from your .h file
 // you want to share with JS. You should arrange the fields in the .h file from
 // wides (doubles) to narrows (bools) for safer alignment, or just count bytes.
-// Include or omit fields and setters depending on if you use these macros in
+// Include or omit fields and setters in C++ depending on if you use these macros in
 // the JS proxy class, in JS.
+
+// the "Named" variations are for arrays, right now just the Dimensions struct array
+// in qSpace. It's a temporary hack until I figure out a better way.
+// Whereas you'd say makeDoubleGetter(dx) for the dx double in the main
+// object, you'd say makeNamedDoubleGetter(dx0, dimensions[0].dx) for
+// the dx double in the struct array 0th element.  See the code.
+// Probably I'll have one getter to get the dimension struct and one for
+// the variable in it, sometime in the future.
 
 // use for bool field, or anything 1 byte
 #define byteOffset(field)  (int) ((byte *) &this->field - (byte *) this)
@@ -37,6 +45,7 @@
 // use for double float field, or anything 64 bits
 #define doubleOffset(field)  (int) ((double *) &this->field - (double *) this)
 #define makeDoubleGetter(field)  printf("\tget " #field  "() { return this.doubles[%d]; }\n", doubleOffset(field));
+#define makeNamedDoubleGetter(name, field)  printf("\tget " #name  "() { return this.doubles[%d]; }\n", doubleOffset(field));
 #define makeDoubleSetter(field)  printf("\tset " #field  "(a) { this.doubles[%d] = a; }\n", doubleOffset(field));
 
 // Uncomment only the first line below, for normal operation. When you
@@ -54,7 +63,7 @@
 // turn off FORMAT_DIRECT_OFFSETS and recompile to get rid of the
 // annoying output (which should be harmless anyway).
 
-#define FORMAT_DIRECT_OFFSETS
-//#define FORMAT_DIRECT_OFFSETS  formatDirectOffsets()
+//#define FORMAT_DIRECT_OFFSETS
+#define FORMAT_DIRECT_OFFSETS  formatDirectOffsets()
 
 
