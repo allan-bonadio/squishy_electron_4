@@ -58,13 +58,16 @@ struct qBuffer {
 
 	// print any segment of any buffer
 	// you can use this on waves or spectrums; for the latter, leave off the start and the rest
-	static void dumpSegment(qCx *wave, bool withExtras = false,
+	static void dumpSegment(qCx *wave, bool withExtras = true,
 		int start = 0, int end = -1, int continuum = 0);
+
+	// print headings for the columns these dump functions print
+	static void dumpHeadings(bool withNewline = false, bool withExtras = true);
 
 	// for a naked wave, and for a qWave.
 	// so the length of each buffer is nPoints from the wave's space.
-	void dumpThat(qCx *wave, bool withExtras = false);
-	void dump(const char *title = "any buffer", bool withExtras = false);
+	void dumpThat(qCx *wave, bool withExtras = true);
+	void dump(const char *title = "any buffer", bool withExtras = true);
 	void dumpHiRes(const char *title = "a hi res buffer");
 	void rainbowDump(const char *title = "a rainbow buffer");  // calls JS to do it
 

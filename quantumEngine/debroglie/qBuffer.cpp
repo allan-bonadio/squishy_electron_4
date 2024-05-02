@@ -104,6 +104,15 @@ qBuffer::~qBuffer() {
 
 /* ******************************************************** diagnostic dumps **/
 
+void qBuffer::dumpHeadings(bool withNewline, bool withExtras) {
+	if (withExtras)
+		printf("\n  ix       re        im        phase   ∆ phase      norm m𝜓/nm");
+	else
+		printf("\n  ix       re        im      norm m𝜓/nm");
+	if (withNewline)
+		printf("\n");
+}
+
 // print one complex number, plus maybe some more calculated metrics for that
 // point, on a line in the dump on stdout. Results in buf, handed in if it
 // overflows the buffer, it won't.  just dump a row for a cx datapoint. returns
@@ -123,12 +132,13 @@ double qBuffer::dumpRow(char buf[200], int ix, qCx w, double *pPrevPhase, bool w
 		double dPhase = fmod(phase - *pPrevPhase + 180, 360) - 180.;
 
 		// if this or the previous point was (0,0) then the phase and dPhase will be NAN, and they print that way
-		snprintf(buf, 200, "[%3d] (%8.4lf,%8.4lf) | %8.3lf %9.3lf %8.4lf  m𝜓/nm",
+		snprintf(buf, 200, "[%3d] (%8.4lf,%8.4lf) | %8.3lf %9.3lf   %8.4lf  m𝜓/nm",
 			ix, re, im, phase, dPhase, norm * 1000);
 		*pPrevPhase = phase;
 	}
 	else {
-		snprintf(buf, 200, "[%3d] (%8.4lf,%8.4lf)    ... norm=%lg", ix, re, im, norm);
+		snprintf(buf, 200, "[%3d] (%8.4lf,%8.4lf)    %8.4lf  m𝜓/nm",
+			ix, re, im, norm * 1000);
 	}
 	return norm;
 }
@@ -146,9 +156,6 @@ void qBuffer::dumpSegment(qCx *wave, bool withExtras, int start, int end, int co
 	double prevPhase = 0.;
 	double innerProd = 0.;
 
-	// somehow, commenting out these lines fixes the nan problem.
-	// but the nan problem doesn't happen on flores?
-	// i haven't seen the nan problem since like a month ago.  ab 2021-08-25
 	if (continuum) {
 		qBuffer::dumpRow(buf, ix, wave[0], &prevPhase, withExtras);
 		printf("%s", buf);
@@ -174,8 +181,9 @@ void qBuffer::dumpThat(qCx *wave, bool withExtras) {
 
 // works on any buffer but originally written for qWaves
 void qBuffer::dump(const char *title, bool withExtras) {
-	printf(" \n🌊🌊 qBuffer ==== a '%c%c%c%c'  %p->%p | %s ",
+	printf(" \n🌊🌊 qBuffer ==== a '%c%c%c%c'  %p->%p | %s \n",
 		magic >> 24, magic >> 16, magic >> 8, magic, this, wave, title);
+	qBuffer::dumpHeadings();
 	qBuffer::dumpSegment(wave, withExtras, start, end, continuum);
 	printf("        ==== end of qBuffer ====\n\n");
 }
@@ -228,8 +236,7 @@ static void fixSomeBoundaries(qCx *wave, int continuum, int start, int end) {
 	case contWELL:
 		// the points on the end are ∞ voltage, but the arithmetic goes bonkers
 		// if I actually set the voltage to ∞
-		wave[0] = qCx();
-		wave[end] = qCx();
+		wave[0] = wave[end] = qCx();
 		break;
 
 	case contENDLESS:
@@ -267,6 +274,7 @@ double qBuffer::innerProduct(void) {
 }
 
 // enforce ⟨𝜓 | 𝜓⟩ = 1 by dividing out the current magnitude sum.
+// returns the PREVIOUS magnitude sum (inner product)
 // Buffer must be installed as well as nPoints, start and end
 double qBuffer::normalize(void) {
 	if (traceNormalize) {
@@ -409,3 +417,4 @@ void qBuffer::add(double coeff1, qCx *wave1, double coeff2, qCx *wave2) {
 void qBuffer::add(double coeff1, qBuffer *qwave1, double coeff2, qBuffer *qwave2) {
 	add(coeff1, qwave1->wave + qwave1->start, coeff2, qwave2->wave + qwave2->start);
 }
+
