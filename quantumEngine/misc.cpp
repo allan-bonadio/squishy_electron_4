@@ -39,7 +39,7 @@ extern "C" const char * getCppExceptionMessage(intptr_t exceptionPtrInt) {
 
 #define LAST_WHERE_LENTH 99
 static char lastWhere[LAST_WHERE_LENTH+1];
-static int howManyWheres = 0;
+static int errorCount = 0;
 
 #ifdef qDEV_VERSION
 // check to make sure real and imag are finite and nice; warn if not
@@ -49,11 +49,11 @@ void qCheck(qCx aCx, const char *where, int index) {
 		return;
 
 	if (strncmp(lastWhere, where, LAST_WHERE_LENTH) == 0) {
-		if (0 == howManyWheres++)
+		if (0 == errorCount++)
 			printf("💥 same msg...\n");
 	}
 	else {
-		howManyWheres = 0;
+		errorCount = 0;
 		if ( -999999999 == index) {
 			// no array with index
 			printf("💥 complex number became non-finite in %s: (%5.4g,%5.4g)\n",
@@ -69,10 +69,10 @@ void qCheck(qCx aCx, const char *where, int index) {
 }
 
 void qCheckReset(void) {
-	if (howManyWheres)
-		printf("💥 %d unprinted complex wave errors\n", howManyWheres);
+	if (errorCount)
+		printf("💥 %d unprinted complex wave errors\n", errorCount);
 	*lastWhere = 0;
-	howManyWheres = 0;
+	errorCount = 0;
 }
 
 #endif
