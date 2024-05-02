@@ -76,7 +76,49 @@ dx is a field on the dimension in the space.
 
 
 
-// ******************************************************** Grinder methods
+// ******************************************************** single point methods
+int usedIx;  // trace only
+
+// Thes functions do a single point of a hit.  They are handed pointers
+// to THE point they are to do.  The hamiltonian (to be split off in the
+// future) accesses the points on each side of the point, too.
+
+void qGrinder::pointReal(qCx *newW, qCx *oldW, qCx *hamiltW, double volts, double dt) {
+	// second deriv wrt x of psi
+	double d2𝜓i = (hamiltW[-1].im + hamiltW[+1].im - hamiltW->im * 2) * d2Coeff;
+	if (traceRealStep) printf("⚛️ pointReal\n");
+
+	// total hamiltonian including voltage
+	double H𝜓 = d2𝜓i + volts * voltageFactor * hamiltW->re * inverseHbar;
+
+	// new = old + 𝛥 dt   note subtraction
+	if (traceRealStep) printf("⚛️ pointReal \n");
+	newW->re = oldW->re - dt * H𝜓;
+	if (traceRealStep) printf("⚛️ pointReal \n");
+
+	qCheck(*newW, "vischer pointReal", usedIx);
+}
+
+// second step: advance the Imaginaries of 𝜓 one dt, from ½ dt to ³⧸₂ dt
+// given the reals we just generated in hitReal(), but don't change them
+void qGrinder::pointImaginary(qCx *newW, qCx *oldW, qCx *hamiltW, double volts, double dt) {
+	// second deriv d2𝜓.re / dx**2
+	double d2𝜓r = (hamiltW[-1].re + hamiltW[+1].re - hamiltW->re * 2) * d2Coeff;
+	if (traceImaginaryStep) printf("⚛️ pointImaginary\n");
+
+	// total hamiltonian
+	double H𝜓 = d2𝜓r + volts * voltageFactor * hamiltW->im * inverseHbar;
+
+	// note addition
+	if (traceImaginaryStep) printf("⚛️ pointImaginary\n");
+	newW->im = oldW->im + dt * H𝜓;
+	if (traceImaginaryStep) printf("⚛️ pointImaginary\n");
+
+	qCheck(*newW, "vischer pointImaginary");
+}
+
+
+// ******************************************************** whole wave methods
 
 // first step: advance the 𝜓.re one dt, from t to t + dt
 // oldW points to buffer with real = 𝜓.re(t)    imag = 𝜓.im(t + dt/2)
@@ -84,78 +126,85 @@ dx is a field on the dimension in the space.
 // hamiltW is what we calculate the derivitives from
 // here we will calculate the 𝜓.re(t + dt) values in a new buffer only, and fill them in.
 // the 𝜓.im values in buffer oldW are still uncalculated
-void qGrinder::stepReal(qCx *newW, qCx *oldW, qCx *hamiltW, double dt) {
+void qGrinder::hitReal(qCx *newW, qCx *oldW, qCx *hamiltW, double dt) {
 	qDimension *dims = space->dimensions;
-	if (traceRealStep) printf("⚛️ start of stepReal nStates=%d, nPoints=%d, start=%d, end=%d\n",
+	if (traceRealStep) printf("⚛️ start of hitReal nStates=%d, nPoints=%d, start=%d, end=%d\n",
 			space->nStates, space->nPoints, dims->start, dims->end);
 
 	// someday I should check for dt==0 and do a copy() instead of this calc
 	// must make versions of qBuffer::copyThatWave() that only copy real or imag parts
-	// or better, make substitutes for stepReal and stepImag
+	// or better, make substitutes for hitReal and stepImag
 	for (int ix = dims->start; ix < dims->end; ix++) {
-		// second deriv wrt x of psi
-		double d2𝜓i = hamiltW[ix-1].im + hamiltW[ix+1].im - hamiltW[ix].im * 2;
-		if (traceRealStep) printf("⚛️ stepReal ix=%d\n", ix);
+		usedIx = ix;
+		pointReal(newW + ix, oldW + ix, hamiltW + ix, voltage[ix],dt);
 
-		// total hamiltonian including voltage
-		double H𝜓 = d2𝜓i + voltage[ix] * voltageFactor * hamiltW[ix].re;
-
-		// new = old + 𝛥 dt   note subtraction
-		if (traceRealStep) printf("⚛️ stepReal ix=%d\n", ix);
-		newW[ix].re = oldW[ix].re - dt * H𝜓;
-		if (traceRealStep) printf("⚛️ stepReal ix=%d\n", ix);
-
-		qCheck(newW[ix], "vischer stepReal", ix);
+		// // second deriv wrt x of psi
+		// double d2𝜓i = hamiltW[ix-1].im + hamiltW[ix+1].im - hamiltW[ix].im * 2;
+		// if (traceRealStep) printf("⚛️ hitReal ix=%d\n", ix);
+		//
+		// // total hamiltonian including voltage
+		// double H𝜓 = d2𝜓i + voltage[ix] * voltageFactor * hamiltW[ix].re;
+		//
+		// // new = old + 𝛥 dt   note subtraction
+		// if (traceRealStep) printf("⚛️ hitReal ix=%d\n", ix);
+		// newW[ix].re = oldW[ix].re - dt * H𝜓;
+		// if (traceRealStep) printf("⚛️ hitReal ix=%d\n", ix);
+		//
+		// qCheck(newW[ix], "vischer hitReal", ix);
 	}
 	qflick->fixThoseBoundaries(newW);
 	elapsedTime += dt/2;  // could be 0 or already dt/2
 
-	if (traceVischerBench) printf("      stepReal, done: time=%lf\n",
+	if (traceVischerBench) printf("      hitReal, done: time=%lf\n",
 		getTimeDouble());
-	if (traceRealStep) printf("⚛️ end of stepReal:");
+	if (traceRealStep) printf("⚛️ end of hitReal:");
 }
 
-// second step: advance the Imaginaries of 𝜓 one dt, from dt/2 to 3 dt/2
-// given the reals we just generated in stepReal(), but don't change them
-void qGrinder::stepImaginary(qCx *newW, qCx *oldW, qCx *hamiltW, double dt) {
+// second step: advance the Imaginaries of 𝜓 one dt, from ½ dt to ³⧸₂ dt
+// given the reals we just generated in hitReal(), but don't change them
+void qGrinder::hitImaginary(qCx *newW, qCx *oldW, qCx *hamiltW, double dt) {
 	qDimension *dims = space->dimensions;
 	if (traceImaginaryStep) printf("⚛️ start of stepImag nStates=%d, nPoints=%d, start=%d, end=%d\n",
 			space->nStates, space->nPoints, dims->start, dims->end);
 
 	// someday I should check for dt==0 and do a copyThatWave() instead of this calc
 	for (int ix = dims->start; ix < dims->end; ix++) {
-		// second deriv d2𝜓.re / dx**2
-		double d2𝜓r = hamiltW[ix-1].re + hamiltW[ix+1].re - hamiltW[ix].re * 2;
-		if (traceImaginaryStep) printf("⚛️ stepImaginary ix=%d\n", ix);
+		usedIx = ix;
+		pointImaginary(newW + ix, oldW + ix, hamiltW + ix, voltage[ix], dt);
 
-		// total hamiltonian
-		double H𝜓 = d2𝜓r + voltage[ix] * voltageFactor * hamiltW[ix].im;
-
-		// note addition
-		if (traceImaginaryStep) printf("⚛️ stepImaginary ix=%d\n", ix);
-		newW[ix].im = oldW[ix].im + dt * H𝜓;
-		if (traceImaginaryStep) printf("⚛️ stepImaginary ix=%d\n", ix);
-
-		qCheck(newW[ix], "vischer stepImaginary", ix);
+		// // second deriv d2𝜓.re / dx**2
+		// double d2𝜓r = hamiltW[ix-1].re + hamiltW[ix+1].re - hamiltW[ix].re * 2;
+		// if (traceImaginaryStep) printf("⚛️ hitImaginary ix=%d\n", ix);
+		//
+		// // total hamiltonian
+		// double H𝜓 = d2𝜓r + voltage[ix] * voltageFactor * hamiltW[ix].im;
+		//
+		// // note addition
+		// if (traceImaginaryStep) printf("⚛️ hitImaginary ix=%d\n", ix);
+		// newW[ix].im = oldW[ix].im + dt * H𝜓;
+		// if (traceImaginaryStep) printf("⚛️ hitImaginary ix=%d\n", ix);
+		//
+		// qCheck(newW[ix], "vischer hitImaginary", ix);
 	}
 
 	qflick->fixThoseBoundaries(newW);
 	elapsedTime += dt/2;  // could be 0 or already dt/2
 
-	if (traceVischerBench) printf("      stepImaginary done: time=%lf\n",
+	if (traceVischerBench) printf("      hitImaginary done: time=%lf\n",
 		getTimeDouble());
-	if (traceImaginaryStep) printf("⚛️ end of stepImaginary:");
+	if (traceImaginaryStep) printf("⚛️ end of hitImaginary:");
+
 }
 
 // this is what will be replaced to make Midpoint.  except midpoint also uses this.
 // Cuz, you can't really do two Real steps in a row; must do an Imag step in between.  And vice versa.
-void qGrinder::stepRealImaginary(qCx *newW, qCx *oldW, qCx *hamiltW, double dt) {
+void qGrinder::hitRealImaginary(qCx *newW, qCx *oldW, qCx *hamiltW, double dt) {
 	qflick->fixThoseBoundaries(oldW);
 	if (oldW != hamiltW)
 		qflick->fixThoseBoundaries(hamiltW);
 
-	stepReal(newW, oldW, hamiltW, dt);
-	stepImaginary(newW, oldW, hamiltW, dt);
+	hitReal(newW, oldW, hamiltW, dt);
+	hitImaginary(newW, oldW, hamiltW, dt);
 }
 
 /* ********************************************************** midpoint method */
@@ -163,14 +212,14 @@ void qGrinder::stepRealImaginary(qCx *newW, qCx *oldW, qCx *hamiltW, double dt) 
 // this will go forward calculating dPsi based on derivatives at the front AND back of dx
 void qGrinder::stepMidpoint(qCx *newW, qCx *oldW, qCx *scratch, double dt) {
 	// first calculate the normal step taking derivatives at the beginning of dt
-	qflick->fixThoseBoundaries(oldW);
-	stepReal(scratch, oldW, oldW, dt);
-	stepImaginary(scratch, oldW, oldW, dt);
+	// already done in hit func qflick->fixThoseBoundaries(oldW);
+	hitReal(scratch, oldW, oldW, dt);
+	hitImaginary(scratch, oldW, oldW, dt);
 
 	// now do it again with the derivatives at the end
-	qflick->fixThoseBoundaries(scratch);
-	stepReal(newW, oldW, scratch, dt);
-	stepImaginary(newW, oldW, scratch, dt);
+	// already done in hit func qflick->fixThoseBoundaries(scratch);
+	hitReal(newW, oldW, scratch, dt);
+	hitImaginary(newW, oldW, scratch, dt);
 
 	// now average them into new
 	qDimension *dims = space->dimensions;
