@@ -77,7 +77,7 @@ class sAnimator {
 		// need them instantaneously - react is too slow.  but react replaces the whole screen upon error
 		let nw = document.querySelector('.voNorthWest')
 		if (nw)
-			nw.innerHTML = this.grinder.elapsedTime.toFixed(2);
+			nw.innerHTML = this.grinder.elapsedTime.toFixed(8);
 		let ne = document.querySelector('.voNorthEast')
 		if (ne)
 			ne.innerHTML =  this.grinder.frameSerial;
@@ -126,26 +126,28 @@ class sAnimator {
 		this.prevFrame = performance.now();
 		this.unstableFP = true;
 
-		// Start the heartbeat.   This should be the only place rafHandler()
+		// Start the heartbeat.   This should be the only place rAFHandler()
 		// should be called except for inside the function itself
 		if (traceHeartbeats)
-			console.log(`🎥 sAnimator: about to kick off rafHandler`);
-		this.rafHandler(performance.now());
+			console.log(`🎥 sAnimator: about to kick off rAFHandler`);
+		this.rAFHandler(performance.now());
 	}
 
 	// given new animationFP or anything else changed, or init, refigure
-	// everything
+	// all the frame periods
 	recalcIntegrationFP(newAnimationFP) {
+		// if user uses the menu, will change this
 		let targetFP = getASetting('frameSettings', 'framePeriod');
 
 		// how many animationFP in an integrationFP?  This is the FrameFactor
-		this.newFrameFactor = Math.round(targetFP / newAnimationFP);
+		this.frameFactor = Math.round(targetFP / newAnimationFP);
 
-		// for a grand total of...
-		this.newIntegrationFP = this.newFrameFactor * newAnimationFP;
+		// now rounded off to an integer multiple of the requested frame rate.
+		this.displayFP = this.grinder.displayFP
+			= this.frameFactor * newAnimationFP;
 
 		if (traceFramePeriods) console.log(`targetFP=${targetFP}  newAnimationFP=${newAnimationFP} `
-			+ ` newFrameFactor=${this.newFrameFactor}   newIntegrationFP=${this.newIntegrationFP}`);
+			+ ` frameFactor=${this.frameFactor}   displayFP=${this.displayFP}`);
 	}
 
 	// we have to measure requestAnimationFrame()'s animationFP in case
@@ -167,14 +169,15 @@ class sAnimator {
 
 		// IF the frame period changed from recent cycles,
 		if (Math.abs(animationFP - this.avgAnimationFP) > 4) {
-			// something's changing, let it settle down.  Some timing fumbles are tolerable while this is on.
+			// something's changing, let it settle down.  Some timing
+			// fumbles are tolerable while this is on.
 			this.unstableFP = true;
 			if (traceFramePeriods) console.log(`🪓 aniFP change!  animationFP=${animationFP}  `
 				+ ` this.avgAnimationFP = ${this.avgAnimationFP}  `
 				+ `abs diff = ${Math.abs(animationFP - this.avgAnimationFP)} `);
 		}
 		else {
-			// if the animationFP changed recently, but is settling down
+			// if the animationFP changed recently/last time, but is settling down
 			if (this.unstableFP) {
 				// it's calmed down!  the threads can now recalibrate.
 				this.unstableFP = false;
@@ -184,7 +187,7 @@ class sAnimator {
 	}
 
 	// counts off frameFactor raf periods then starts next iteration
-	// requestAnmationFrame() (rAF) calls rafHandler(), which increments scanCount up to
+	// requestAnmationFrame() (rAF) calls rAFHandler(), which increments scanCount up to
 	// frameFactor to call triggerIteration().
 	scanCount = 0;
 
@@ -195,7 +198,7 @@ class sAnimator {
 	//	often calls drawLatestFrame(), if appropriate.  frameFactor can change
 	//	if user changes display scan rate, or the frame rate menu on
 	//	CPToolbar, or moves to a screen with a different scan rate.
-	rafHandler =
+	rAFHandler =
 	now => {
 
 		//		if (traceHeartbeats && ((this.heartbeatSerial & onceInAWhile) == 0))
@@ -205,8 +208,15 @@ class sAnimator {
 		//				+`now >= this.timeForNextTic ${now} >= ${this.timeForNextTic} `
 		//				+` = ${now >= this.timeForNextTic} `);
 
-		// no matter how often rafHandler is called, it'll only frame once per frameFactor
+		// no matter how often rAFHandler is called, it'll only frame once per frameFactor
 		if (this.scanCount >= this.frameFactor) {
+			this.scanCount = 0;
+
+			// an error (eg divergence) will halt integration.  Start Over will put it back.
+			if (this.grinder.fatalGrindingError) {
+				this.grinder.shouldBeIntegrating = false;
+				this.needsRepaint = true;
+			}
 
 			if (this.grinder.shouldBeIntegrating) {
 				this.grinder.triggerIteration();
@@ -220,7 +230,6 @@ class sAnimator {
 				this.drawLatestFrame();
 				this.needsRepaint = false;
 			}
-			this.scanCount = 0;
 		}
 
 		//if (traceHeartbeats && ((this.heartbeatSerial & onceInAWhile) == 0))
@@ -232,15 +241,15 @@ class sAnimator {
 
 		this.measureAndUpdateFramePeriods(now);
 
-		requestAnimationFrame(this.rafHandler);
+		requestAnimationFrame(this.rAFHandler);
 	}
 
-	/* *******************************************************  runningDiagnosticCycle of circular wave*/
+	/* *************************************  runningDiagnosticCycle of circular wave*/
 
 	// special test code.  orobably broken
 	// use for benchmarking with a circular wave.  Will start frame, and stop after
 	// the leftmost state is at its peak.  Then display stats.
-	// not used for a year or more, so probably broken somehow.
+	// not used for a year or more, so probably broken.
 
 	// button handler
 	startRunningDiagnosticCycle =
