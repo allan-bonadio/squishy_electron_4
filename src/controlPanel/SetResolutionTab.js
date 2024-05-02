@@ -21,7 +21,7 @@ function SetResolutionTab(props) {
 				Change Space
 			<div style={{fontSize: '.8em'}}>
 				(will reset current wave)</div>
-		</button>;
+		</button>
 		<h3>Reconfigure the Space</h3>
 		<p className='discussion'>
 			Squishy Electron's space is a one-dimensional region for an electron to travel in.
