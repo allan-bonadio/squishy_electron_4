@@ -167,13 +167,14 @@ export default class ResolutionDialog extends React.Component {
 			<label className='spaceLengthLabel'>
 				Space Length: &nbsp;
 				<input value={this.state.spaceLength} placeholder='Fill in length'
-					onChange={ev => this.setState({spaceLength: ev.target.value}) } />
-				nm
+					onChange={ev => this.setState({spaceLength: ev.target.value}) }
+					size='6' />
+				&nbsp; nm
 				<small>
 					<br/>Total length, in nanometers, of space,
-					<br/>resulting in
-					{(this.state.spaceLength /(this.state.N - 1)).toPrecision(3)}nm
-					separation between points
+					<br/>resulting in &nbsp;
+					{(this.state.spaceLength / this.state.N).toPrecision(4)}&nbsp;nm
+					distance between points
 				</small>
 			</label>
 		</section>;
