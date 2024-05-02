@@ -216,10 +216,7 @@ export class WaveView extends React.Component {
 		}
 
 		// can't make a real GLView until we have the space!  until then, show spinner
-		let glView = <div style={{width: widthToUse, height: s.height}} >
-			{spinner}
-		</div>;
-
+		let glView;
 		if (s.space) {
 			glView = <GLView width={widthToUse} height={s.height}
 				space={this.space} avatar={this.space.mainEAvatar}
@@ -227,7 +224,11 @@ export class WaveView extends React.Component {
 				canvasFacts={this.canvasFacts}  setCanvasFacts={this.setCanvasFacts}
 			/>
 		}
-
+		else {
+			let glView = <div style={{width: widthToUse, height: s.height}} >
+				{spinner}
+			</div>;
+		}
 		return (
 		<div className='WaveView'  ref={el => this.waveViewEl = el}
 				style={{height: `${s.height}px`}}>
@@ -256,6 +257,12 @@ export class WaveView extends React.Component {
 					vDisp={this.vDisp}
 					canvasFacts={this.canvasFacts}
 				/>
+
+				{this.grinder?.fatalGrindingError
+					? <span className='viewError' > Wave has diverged; click Start Over</span>
+					: ''
+				}
+}
 			</div>
 			<VoltageSidebar width={voltageSidebarWidth} height={s.height}
 				vDisp={this.vDisp}
