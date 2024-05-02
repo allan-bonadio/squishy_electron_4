@@ -47,6 +47,9 @@ function SetIntegrationTab(props) {
 
 	// Unlike other tabs, all these are instant-update.
 
+	let mini = alternateMinMaxs.frameSettings.dtStretch.min;
+	let maxi = alternateMinMaxs.frameSettings.dtStretch.max;
+
 	return (<div className='SetIntegrationTab'>
 		<div className='sliderBlock'>
 			<h3>Integration Controls</h3>
@@ -58,21 +61,21 @@ function SetIntegrationTab(props) {
 			we must use a time increment, <i>∆t</i>, small enough, according to the
 			von Neumann stability criteria.
 			This might lead to a very slow integration experience.
-			You can speed this up a bit by bending the rules and stretching
-			<i>∆t</i>, at the risk of diverging.
+			You can speed this up a bit by bending the rules and
+			stretching <i>∆t</i>, at the risk of diverging.
 			</p>
 
 			<LogSlider
 				unique='dtStretchSlider'
 				className='dtStretchSlider cpSlider'
-				label='stretch factor for ∆t, relative to recommended ∆t'
-				minLabel='0.1'
-				maxLabel='10.0'
+				label='stretch factor for ∆t'
+				minLabel={mini}
+				maxLabel={maxi}
 
 				current={props.dtStretch}
-				sliderMin={alternateMinMaxs.frameSettings.dtStretch.min}
-				sliderMax={alternateMinMaxs.frameSettings.dtStretch.max}
-				stepsPerDecade={10}
+				sliderMin={mini}
+				sliderMax={maxi}
+				stepsPerDecade={6}
 
 				handleChange={(power, ix) => {
 					if (traceSliderChanges)
