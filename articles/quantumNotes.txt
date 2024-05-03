@@ -1,6 +1,22 @@
 
+2024 May 2 ============================================= squishy_electron_4
+Finalizing the version using pthreads successfully with one thread.
+
+candidates for new dir name:
+Dorothy Jean Johnson Vaughan - first African-American woman to receive a promotion and supervise a group of staff at Langley.
+
+Creola Katherine Johnson - earned a reputation for mastering complex manual calculations and helped pioneer the use of computers to perform the tasks
+
+Mary Jackson, NASA's first black female engineer.
+
+
+
+
+
 2023 Feb 22 ============================================= proxy2worker branch
 
+still trying to make workers work in emscripten.
+AirSim job Mar-Oct that year.
 
 
 2023 Feb 17 ============================================= aWorker branch
