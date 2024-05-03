@@ -73,7 +73,7 @@ export class ControlPanel extends React.Component {
 			showingTab: getASetting('miscSettings', 'showingTab'),
 
 			// a copy of shouldBeIntegrating, to update this panel when it's changed
-			sbIntegrating: getASetting('frameSettings', 'shouldBeIntegrating'),
+			shouldBeIntegrating: getASetting('frameSettings', 'shouldBeIntegrating'),
 		}
 		this.framePeriod = this.state.framePeriod;  // everybody uses this one
 
@@ -94,9 +94,12 @@ export class ControlPanel extends React.Component {
 			this.grinder = space.grinder;
 			this.grinder.stretchedDt = this.state.dtStretch * this.space.dt;
 
-			this.grinder.shouldBeIntegrating = this.state.sbIntegrating;
+			this.grinder.shouldBeIntegrating = this.state.shouldBeIntegrating;
 			if (this.grinder.shouldBeIntegrating)
 				this.startAnimating();
+
+			console.log(`ControlPanel constructor Then clause, ${this.grinder.pointer.toString(16)}  isIntegrating=${this.grinder.isIntegrating}   shouldBeIntegrating=${this.grinder.shouldBeIntegrating}`);
+
 		})
 		.catch(rex => {
 			let ex = interpretCppException(rex);
@@ -126,8 +129,15 @@ export class ControlPanel extends React.Component {
 		//console.info(`startAnimating starts`);
 		eSpaceCreatedPromise
 		.then(space => {
+			// set it true as you store it in store; then set state
 			space.grinder.shouldBeIntegrating  = storeASetting('frameSettings', 'shouldBeIntegrating', true);
-			this.setState({sbIntegrating: true});
+			this.setState({shouldBeIntegrating: true});
+
+			// must do this to start iteration loop going in the thread(s)
+			// NO!  shouldBeIntegrating will trigger each cycle.
+			//space.grinder.triggerIteration();
+			//console.log(`startAnimating done: shouldBeIntegrating =${space.grinder.shouldBeIntegrating}   `);
+			if (this.grinder) console.log(`ControlPanel startAnimating, isIntegrating=${this.grinder.isIntegrating}   shouldBeIntegrating=${this.grinder.shouldBeIntegrating}`);
 		});
 
 	}
@@ -137,8 +147,10 @@ export class ControlPanel extends React.Component {
 		//console.info(`stopAnimating stops`);
 		eSpaceCreatedPromise
 		.then(space => {
+			// set it false as you store it in store; then set state
 			space.grinder.shouldBeIntegrating  = storeASetting('frameSettings', 'shouldBeIntegrating', false);
-			this.setState({sbIntegrating: false});
+			this.setState({shouldBeIntegrating: false});
+			if (this.grinder) console.log(`ControlPanel STOP Animating, isIntegrating=${this.grinder.isIntegrating}   shouldBeIntegrating=${this.grinder.shouldBeIntegrating}`);
 		});
 	}
 
@@ -154,7 +166,7 @@ export class ControlPanel extends React.Component {
 	(ev) => {
 		//console.info(`singleFrame starts`);
 		this.grinder.shouldBeIntegrating = true;
-		this.setState({sbIntegrating: true});
+		this.setState({shouldBeIntegrating: true});
 
 		this.grinder.justNFrames = 1;
 
@@ -234,7 +246,7 @@ export class ControlPanel extends React.Component {
 		dtStretch = storeASetting('frameSettings', 'dtStretch', dtStretch);
 		this.setState({dtStretch});
 		this.grinder.stretchedDt = dtStretch * this.space.dt;
-		//console.log(`setDeltaT: dt = ${this.grinder.dt} = deltaT ${deltaT} / spf+1=${ (this.state.stepsPerFrame + N_EXTRA_STEPS)}`)
+		console.log(`setDtStretch: dt = ${this.space.dt}   dtStretch= ${dtStretch} stretchedDt=${this.grinder.stretchedDt}`)
 	}
 
 	//setStepsPerFrame =
@@ -369,8 +381,8 @@ export class ControlPanel extends React.Component {
 
 	componentDidUpdate() {
 		// these should be EQUAL!  but single step leaves it off without updating our state.  Make sure it's ok here.
-		if (this.state.sbIntegrating != this.grinder.shouldBeIntegrating)
-			this.setState({sbIntegrating: this.grinder.shouldBeIntegrating});
+		if (this.state.shouldBeIntegrating != this.grinder.shouldBeIntegrating)
+			this.setState({shouldBeIntegrating: this.grinder.shouldBeIntegrating});
 	}
 }
 

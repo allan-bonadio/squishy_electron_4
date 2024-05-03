@@ -42,43 +42,43 @@ class eGrinder {
 	// eGrinder.constructor)
 	get _space() { return this.ints[1]; }
 
- 	get elapsedTime() { return this.doubles[2]; }
- 	set elapsedTime(a) { this.doubles[2] = a; }
- 	get frameSerial() { return this.doubles[3]; }
- 	set frameSerial(a) { this.doubles[3] = a; }
+	get elapsedTime() { return this.doubles[2]; }
+	set elapsedTime(a) { this.doubles[2] = a; }
+	get frameSerial() { return this.doubles[3]; }
+	set frameSerial(a) { this.doubles[3] = a; }
 
- 	get justNFrames() { return this.ints[33]; }
- 	set justNFrames(a) { this.ints[33] = a; }
- 	get frameCalcTime() { return this.doubles[8]; }
- 	get maxCalcTime() { return this.doubles[9]; }
- 	get shouldBeIntegrating() { return Boolean(this.bools[200]); }
- 	set shouldBeIntegrating(a) { this.bools[200] = a; }
- 	get isIntegrating() { return Boolean(this.bools[201]); }
- 	set isIntegrating(a) { this.bools[201] = a; }
- 	get pleaseFFT() { return Boolean(this.bools[202]); }
- 	set pleaseFFT(a) { this.bools[202] = a; }
- 	shouldBeIntegratingOffset = 50;
+	get justNFrames() { return this.ints[37]; }
+	set justNFrames(a) { this.ints[37] = a; }
+	get frameCalcTime() { return this.doubles[10]; }
+	get maxCalcTime() { return this.doubles[11]; }
+	get shouldBeIntegrating() { return Boolean(this.bools[216]); }
+	set shouldBeIntegrating(a) { this.bools[216] = a; }
+	get isIntegrating() { return Boolean(this.bools[217]); }
+	set isIntegrating(a) { this.bools[217] = a; }
+	get pleaseFFT() { return Boolean(this.bools[218]); }
+	set pleaseFFT(a) { this.bools[218] = a; }
+	shouldBeIntegratingOffset = 54;
 
- 	get stretchedDt() { return this.doubles[4]; }
- 	set stretchedDt(a) { this.doubles[4] = a; }
- 	get nSlaveThreads() { return this.ints[30]; }
- 	get newFrameFactor() { return this.ints[24]; }
- 	set newFrameFactor(a) { this.ints[24] = a; }
- 	get newIntegrationFP() { return this.doubles[11]; }
- 	set newIntegrationFP(a) { this.doubles[11] = a; }
+	get stretchedDt() { return this.doubles[5]; }
+	set stretchedDt(a) { this.doubles[5] = a; }
+	get nSlaveThreads() { return this.ints[34]; }
+	get newFrameFactor() { return this.ints[28]; }
+	set newFrameFactor(a) { this.ints[28] = a; }
+	get newIntegrationFP() { return this.doubles[13]; }
+	set newIntegrationFP(a) { this.doubles[13] = a; }
 
- 	get _qflick() { return this.ints[11]; }
+	get _qflick() { return this.ints[15]; }
 
- 	get _voltage() { return this.ints[12]; }
- 	get voltageFactor() { return this.doubles[7]; }
- 	set voltageFactor(a) { this.doubles[7] = a; }
- 	get reversePercent() { return this.doubles[10]; }
+	get _voltage() { return this.ints[16]; }
+	get voltageFactor() { return this.doubles[9]; }
+	set voltageFactor(a) { this.doubles[9] = a; }
+	get reversePercent() { return this.doubles[12]; }
 
- 	get _qspect() { return this.ints[26]; }
- 	get _stages() { return this.ints[27]; }
- 	get _threads() { return this.ints[28]; }
- 	get _label() { return this.pointer + 184; }
-	/* ******************* end of direct accessors */
+	get _qspect() { return this.ints[30]; }
+	get _stages() { return this.ints[31]; }
+	get _threads() { return this.ints[32]; }
+	get _label() { return this.pointer + 200; }
+ 	/* ******************* end of direct accessors */
 
 	/* ************************************************  */
 //	static divergedBlurb = `Sorry, but your quantum wave diverged!  This isn't your fault; `
@@ -88,6 +88,7 @@ class eGrinder {
 
 	// call this to trigger all the threads to do the next iteration
 	triggerIteration() {
+		console.log(`eGrinder.triggerIteration, ${this.pointer.toString(16)} starting  isIntegrating=${this.isIntegrating}   shouldBeIntegrating=${this.shouldBeIntegrating}`);
 		qe.grinder_triggerIteration(this.pointer);
 
 	}
