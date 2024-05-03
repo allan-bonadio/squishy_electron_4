@@ -9,12 +9,12 @@
 // not even used these days
 extern qCx hamiltonian(struct qSpace *space, qCx *wave, int x);
 
-extern const double hBar;  //  = 105.4571817 pfg nm^2 / ps, Plank's reduced
+extern const double ℏ;  //  = 105.4571817 pfg nm^2 / ps, Plank's reduced
 extern const double m_e;  //  = .91093837015 pico femto grams, mass of electron
 
 // these two are used directly in Schrodinger's
-extern const double hOver2m_e;  // = hBar / (2 * m_e);  // units nm^2 / ps
-extern const double inverseH;  //  = 1 / hBar;  // units ps / pfg nm^2
+extern const double ℏOver2m_e;  // = ℏ / (2 * m_e);  // units nm^2 / ps
+extern const double inverseℏ;  //  = 1 / ℏ;  // units ps / pfg nm^2
 
 /* *************************************** one for each DIMENSION of the wave array */
 struct qDimension {

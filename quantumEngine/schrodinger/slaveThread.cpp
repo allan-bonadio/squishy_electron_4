@@ -13,7 +13,7 @@
 static bool traceLameThreads = false;
 
 static bool traceStart = false;
-static bool traceRunner = false;
+static bool traceWork = false;
 static bool traceFinish = false;
 
 /* *********************************************** slave threads */
@@ -57,8 +57,8 @@ slaveThread::slaveThread(qGrinder *gr)
 void slaveThread::slaveWork(void) {
 	int nWas;
 
-	if (traceRunner) speedyLog("🔪 slaveWork #%d starts cycle\n", serial);
-	if (traceRunner)  {
+	if (traceWork) speedyLog("🔪 slaveWork #%d starts cycle\n", serial);
+	if (traceWork)  {
 		speedyLog("🔪              thread #%d: shouldBeIntegrating=%d  isIntegrating=%d.  "
 			"nFinishedThreads=%d\n",
 			serial, grinder->shouldBeIntegrating, grinder->isIntegrating,
@@ -78,8 +78,8 @@ void slaveThread::slaveWork(void) {
 	double endCalc = getTimeDouble();
 	frameCalcTime = endCalc - startCalc;
 
-	if (traceRunner) speedyLog("🔪 end of runner; shouldBeIntegrating=%d  isIntegrating=%d\n",
-				grinder->shouldBeIntegrating, grinder->isIntegrating);
+	if (traceWork) speedyLog("🔪 end of runner; shouldBeIntegrating=%d  isIntegrating=%d\n",
+ 				grinder->shouldBeIntegrating, grinder->isIntegrating);
 }
 
 // repeatedly run the runner in a loop

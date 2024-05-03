@@ -22,11 +22,11 @@ static bool traceQSpace = true;
 
 /* ****************** constants */
 
-const double hBar = 105.4571817;  // units of pfg nm^2 / ps
+const double ℏ = 105.4571817;  // units of pfg nm^2 / ps
 const double m_e = .91093837015;  // pico femto grams
 
-const double hOver2m_e = hBar / (2 * m_e);  // units nm^2 / ps
-const double inverseH = 1 / hBar;  // units ps / pfg nm^2
+const double ℏOver2m_e = ℏ / (2 * m_e);  // units nm^2 / ps
+const double inverseℏ = 1 / ℏ;  // units ps / pfg nm^2
 
 
 /* ********************************************************** qSpace construction */
@@ -90,7 +90,7 @@ void qDimension::tally(qSpace *space) {
 	chooseSpectrumLength();
 
 	double dx2 = dx * dx;
-	d2Coeff = hOver2m_e / dx2;
+	d2Coeff = ℏOver2m_e / dx2;
 	space->alpha += d2Coeff;
 }
 
@@ -120,7 +120,7 @@ void qSpace::tallyDimensions(void) {
 		// dim->chooseSpectrumLength();
 		//
 		// double dx2 = dim->dx * dim->dx;
-		// dim->d2Coeff = hOver2m_e / dx2;
+		// dim->d2Coeff = ℏOver2m_e / dx2;
 		// alpha += dim->d2Coeff;
 	}
 	dt = 1 / (2 * alpha);

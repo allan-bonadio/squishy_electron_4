@@ -57,6 +57,8 @@ struct qGrinder {
 	// = dtStretch * space->dt
 	double stretchedDt;
 
+	double d2Coeff;
+
 	// any exception thrown in a
 	std::runtime_error& integrationEx;
 
@@ -153,11 +155,13 @@ struct qGrinder {
 
 	// visscher.  Calculate new from old; use hamiltonian to calculate d𝜓
 	// sometimes oldW and hamiltonianW are the same
-	void stepReal(qCx *newW, qCx *oldW, qCx *hamiltW, double dt);
-	void stepImaginary(qCx *newW, qCx *oldW, qCx *hamiltW, double dt);
+	void pointReal(qCx *newW, qCx *oldW, qCx *hamiltW, double volts, double dt);
+	void pointImaginary(qCx *newW, qCx *oldW, qCx *hamiltW, double volts, double dt);
+	void hitReal(qCx *newW, qCx *oldW, qCx *hamiltW, double dt);
+	void hitImaginary(qCx *newW, qCx *oldW, qCx *hamiltW, double dt);
 
 	// just one after the other
-	void stepRealImaginary(qCx *newW, qCx *oldW, qCx *hamiltW, double dt);
+	void hitRealImaginary(qCx *newW, qCx *oldW, qCx *hamiltW, double dt);
 
 	void stepMidpoint(qCx *newW, qCx *oldW, qCx *scratch, double dt);
 

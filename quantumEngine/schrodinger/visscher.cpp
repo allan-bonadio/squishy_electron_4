@@ -86,17 +86,17 @@ int usedIx;  // trace only
 void qGrinder::pointReal(qCx *newW, qCx *oldW, qCx *hamiltW, double volts, double dt) {
 	// second deriv wrt x of psi
 	double d2𝜓i = (hamiltW[-1].im + hamiltW[+1].im - hamiltW->im * 2) * d2Coeff;
-	if (traceRealStep) printf("⚛️ pointReal\n");
+	if (traceRealStep) printf("⚛️ pointReal d2𝜓i=%3.8lf\n", d2𝜓i);
 
 	// total hamiltonian including voltage
-	double H𝜓 = d2𝜓i + volts * voltageFactor * hamiltW->re * inverseHbar;
+	double H𝜓 = d2𝜓i + volts * voltageFactor * hamiltW->re * inverseℏ;
 
 	// new = old + 𝛥 dt   note subtraction
-	if (traceRealStep) printf("⚛️ pointReal \n");
+	if (traceRealStep) printf("⚛️ pointReal oldW->re=%3.8lf  H𝜓=%3.8lf\n", oldW->re, H𝜓);
 	newW->re = oldW->re - dt * H𝜓;
-	if (traceRealStep) printf("⚛️ pointReal \n");
+	if (traceRealStep) printf("⚛️ pointReal newW->re=%3.8lf\n", newW->re);
 
-	qCheck(*newW, "vischer pointReal", usedIx);
+	qCheck(*newW, "vischer pointReal done for ix=", usedIx);
 }
 
 // second step: advance the Imaginaries of 𝜓 one dt, from ½ dt to ³⧸₂ dt
@@ -107,7 +107,7 @@ void qGrinder::pointImaginary(qCx *newW, qCx *oldW, qCx *hamiltW, double volts, 
 	if (traceImaginaryStep) printf("⚛️ pointImaginary\n");
 
 	// total hamiltonian
-	double H𝜓 = d2𝜓r + volts * voltageFactor * hamiltW->im * inverseHbar;
+	double H𝜓 = d2𝜓r + volts * voltageFactor * hamiltW->im * inverseℏ;
 
 	// note addition
 	if (traceImaginaryStep) printf("⚛️ pointImaginary\n");

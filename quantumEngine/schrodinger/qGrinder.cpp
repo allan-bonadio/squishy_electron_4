@@ -26,8 +26,6 @@
 
 
 
-static bool traceRunner = false;
-
 static bool traceIntegration = false;
 static bool traceIntegrationDetailed = false;
 
@@ -57,7 +55,7 @@ qGrinder::qGrinder(qSpace *sp, qAvatar *av, int nThreads, const char *lab)
 	: space(sp), avatar(av), elapsedTime(0), frameSerial(0), stretchedDt(.01),
 		integrationEx(nullException),
 		isIntegrating(false), shouldBeIntegrating(false), justNFrames(0),
-		stepsPerFrame(10),
+		stepsPerFrame(100),
 		pleaseFFT(false), newFrameFactor(3), newIntegrationFP(.05),
 		nThreads(nThreads), nSlaveThreads(nThreads) {
 
@@ -271,16 +269,16 @@ void qGrinder::tallyUpReversals(qWave *qwave) {
 
 /* ********************************************************** doing Integration */
 
-// Integrates one Frame, one iteration, on one thread.  Does several
-// visscher steps (eg 10 or 100 or 500). Actually does stepsPerFrame+½
-// steps; two half steps, im at start and re at finish, to adapt to
+// Integrates one Frame, one iteration, on single thread.  Does several
+// visscher steps (eg 10 or 100 or 500). Actually does stepsPerFrame + ½
+// steps; four half hits, im at start and re at finish, to adapt to
 // Visscher timing, then synchronized timing. Maybe this should be in
 // slaveThread?  Multi-threads will have to be done with totally different code.
 void qGrinder::oneFrame() {
 	if (traceIntegration)
-		printf("starting oneFrame\n");
+		printf("qGrinder starting oneFrame\n");
 	if (traceIntegrationDetailed)
-		qGrinder::dumpObj("starting oneFrame");
+		qGrinder::dumpObj("qGrinder starting oneFrame");
 //	isIntegrating = frameInProgress = true;
 	qCx *wave0 = qflick->waves[0];
 	qCx *wave1 = qflick->waves[1];
@@ -292,8 +290,8 @@ void qGrinder::oneFrame() {
 	// half step in beginning to move Im forward dt/2
 	// cuz outside of here, re and im are interlaced.
 	qflick->fixThoseBoundaries(wave0);
-	stepReal(wave1, wave0, wave0, 0);
-	stepImaginary(wave1, wave0, wave0, dt/2);
+	hitReal(wave1, wave0, wave0, 0);
+	hitImaginary(wave1, wave0, wave0, dt/2);
 
 	// Note here the latest is in [1]; frame continues this,
 	// and the halfwave at the end moves it back to [0]].
@@ -305,16 +303,16 @@ void qGrinder::oneFrame() {
 		stepMidpoint(wave0, wave1, wave2, dt);
 		stepMidpoint(wave1, wave0, wave2, dt);
 		#else
-		stepRealImaginary(wave0, wave1, wave1, dt);
-		stepRealImaginary(wave1, wave0, wave0, dt);
+		hitRealImaginary(wave0, wave1, wave1, dt);
+		hitRealImaginary(wave1, wave0, wave0, dt);
 		#endif
 	}
 
-	// half step at completion to move Re forward dt / 2
+	// half hit at completion to move Re forward dt / 2
 	// and copy back to Main
 	qflick->fixThoseBoundaries(wave1);
-	stepReal(wave0, wave1, wave1, dt/2);
-	stepImaginary(wave0, wave1, wave1, 0);
+	hitReal(wave0, wave1, wave1, dt/2);
+	hitImaginary(wave0, wave1, wave1, 0);
 
 	// ok the algorithm tends to diverge after thousands of frames.  Hose it down.
 	if (this->pleaseFFT) analyzeWaveFFT(qflick, "before fourierFilter()");
@@ -347,7 +345,8 @@ void qGrinder::oneFrame() {
 	copyToAvatar(avatar);
 
 	if (traceIntegration)
-		printf("      qGrinder frame done; time: %lf \n", getTimeDouble());
+		printf("qGrinder oneFrame done; shouldBeIntegrating: %hhu   isIntegrating: %hhu dt=%lf\n",
++			shouldBeIntegrating, isIntegrating, dt);
 
 	frameSerial++;
 //	frameInProgress = false;
@@ -432,7 +431,7 @@ void qGrinder::threadsHaveFinished() {
 		}
 	}
 
-	if (traceRunner)  {
+	if (traceSingleStep)  {
 		speedyLog("🔪                ...in threadsHaveFinished().  justNFrames=%d and shouldBeIntegrating=%d\n",
 				justNFrames, shouldBeIntegrating);
 	}
