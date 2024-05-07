@@ -16,7 +16,7 @@ body {
 	color: #eee;
 	margin: 0;
 	padding: 0;
-	
+
 	// some stupid plugin sets our fontto some crap
 	#root {
 		font-size: 16px;
@@ -104,23 +104,24 @@ input[type=range] {
 	aside {
 		display: flex;
 		padding: .2px;
+		line-height: 1.2em;
 
 		.left {
-			flex: 1 0 1em;
-			text-align: left;  // does it do anything?
-			flex: 1 0 4em;
+			flex: 1 0 3em;
 			text-align: left;
 		}
 
 		.middle {
 			flex: 2 0 10em;
 			text-align: center;
+			big {
+				display: inline-block;
+				width: 3em;
+			}
 		}
 
 		.right {
-			flex: 1 0 1em;
-			text-align: right;  // does it do anything?
-			flex: 1 0 4em;
+			flex: 1 0 3em;
 			text-align: right;
 		}
     }

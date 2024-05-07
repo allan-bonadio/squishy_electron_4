@@ -92,17 +92,17 @@ export default class ResolutionDialog extends React.Component {
 
 	renderNSlider() {
 		const s = this.state;
-		return <>
+		return <section className='resolutionSlider'>
 			<LogSlider
-				unique='resolutionSlider'
-				className='resolutionSlider'
+				unique='resolutionSliderCore'
+				className='resolutionSliderCore'
 				label='Datapoints'
 				minLabel='faster'
 				maxLabel='more accurate'
 
 				current={s.N}
 				original={s.origN}
-				sliderMin={window.isDevel ? 4 : 32 /* evaluate now to make sure isDevel defined */}
+				sliderMin={window.isDevel ? 4 : 16 /* evaluate now to make sure isDevel defined */}
 				sliderMax={256}
 
 				stepsPerDecade={16}
@@ -110,7 +110,12 @@ export default class ResolutionDialog extends React.Component {
 
 				handleChange={this.handleResChange}
 			/>
-		</>;
+			<div className='note'>
+				<small>Calculation speed goes as the cube of
+				the number of points, so if you use twice
+				as many points, it'll take 8× as long to run.</small>
+			</div>
+		</section>;
 	}
 
 	handleResChange =
@@ -136,7 +141,7 @@ export default class ResolutionDialog extends React.Component {
 						(s.continuum == qe.contENDLESS)
 						? 'bold'
 						: 'normal'}}/>
-				Endless
+				Endless &nbsp;
 				<small>wrapping around from right to left</small>
 			</label>
 			<label  className='contWELL'  key='contWELL'>
@@ -144,44 +149,33 @@ export default class ResolutionDialog extends React.Component {
 					checked={s.continuum == qe.contWELL}
 					onChange={onChange}
 					style={{fontWeight: (s.continuum == qe.contWELL) ? 'bold' : 'normal'}}/>
-				Well
+				Well &nbsp;
 				<small>with walls on the ends that a
 				<br/>wave packet will bounce against</small>
 			</label>
-			{/* <label  key='contDISCRETE'><input type='radio' name='continuum'  value={qe.contDISCRETE}
-					checked={s.continuum == qe.contDISCRETE}
-					onChange={onChange}
-					style={{fontWeight:
-						(s.continuum == qe.contDISCRETE)
-						? 'bold'
-						: 'normal'}}
-						disabled />
-				Discreet Quanta (not developed yet)</label> */}
 		</section>;
 	}
 
 
 	renderSpaceLength() {
-		//const s = this.state;
 		return <section className='spaceLength'>
 			<label className='spaceLengthLabel'>
 				Space Length: &nbsp;
 				<input value={this.state.spaceLength} placeholder='Fill in length'
 					onChange={ev => this.setState({spaceLength: ev.target.value}) }
-					size='6' />
+					size='4' />
 				&nbsp; nm
-				<small>
-					<br/>Total length, in nanometers, of space,
-					<br/>resulting in &nbsp;
+				<div className='note'>
+					<small>Total length, in nanometers, of space, resulting in &nbsp;
 					{(this.state.spaceLength / this.state.N).toPrecision(4)}&nbsp;nm
-					distance between points
-				</small>
+					distance between points.</small>
+				</div>
 			</label>
 		</section>;
 	}
 
 
-	// this is just the stuff INSIDE the dialog
+	// this is just the stuff INSIDE the dialog.  It's all a big grid.
 	render() {
 		return (
 			<article className='dialog ResolutionDialog'>
@@ -190,12 +184,14 @@ export default class ResolutionDialog extends React.Component {
 				{this.renderNSlider()}
 				{this.renderContinuum()}
 				{this.renderSpaceLength()}
-				<button className='cancelButton' onClick={this.cancel}>
-						Cancel
-				</button>
-				<button className='okButton' onClick={this.OK}>
-						Recreate Space
-				</button>
+				<section className='okCancel'>
+					<button className='cancelButton' onClick={this.cancel}>
+							Cancel
+					</button>
+					<button className='okButton' onClick={this.OK}>
+							Recreate Space
+					</button>
+				</section>
 
 			</article>
 		);

@@ -33,6 +33,10 @@
 			background-color: #48f;
 			color: #fc4
 		}
+
+		.middle big {
+			width: 3em;
+		}
 	}
 
 
@@ -299,70 +303,99 @@
 }
 
 .ResolutionDialog {
-	h3 { margin-top: 0; }
-	.spaceLength {
-		input {
-			width: 6em;
-			text-align: right;
-		}
-	}
+	background-color: black;
+	color: white;
 	padding: 1em;
 	margin: 0 auto;
 	label {
 		margin: .5em;
 	}
 
-	background-color: black;
-	color: white;
-
 	display: grid;
-	gap: .5em;
+	gap: 2em;
 	h3 {
 		grid-area: header;
 		text-align: center;
+		margin-top: 0;
 	}
-	.resolutionSlider { grid-area: resolutionSlider }
+	.resolutionSlider {
+		grid-area: resolutionSlider;
+		width: 40em;
+		div.note {
+			max-width: 25em;
+			text-align: center;
+			margin-inline: auto;
+
+		}
+	}
 	.continuum {
 		grid-area: continuum;
-		label.contENDLESS {  }
-		label.contWELL {  }
 	}
-	.spaceLength { grid-area: spaceLength; }
-	.cancelButton { grid-area: cancelButton }
-	.okButton { grid-area: okButton }
+	// the space quantum width text box, in nm
+	.spaceLength {
+		grid-area: spaceLength;
+		text-align: right;
+		input {
+			width: 6em;
+			text-align: right;
+		}
+		div.note {
+			max-width: 15em;
+			margin-left: auto;
+		}
+	}
+	.okCancel {
+		grid-area: okCancel;
+		text-align: right;
+	}
+
+	// for small screens
 	@media screen and (max-width: 599px) {
 		grid-template-columns: auto auto;
 		grid-template-areas:
-			"header header"
-			"resolutionSlider resolutionSlider"
-			"continuum continuum"
-			"cancelButton okButton";
+			"header"
+			"resolutionSlider"
+			"continuum"
+			"okCancel";
 
-		.spaceLength { display: none; }
-		.continuum {
-			.continuumTitle { display: none};
-			display: flex;
-			label {flex: 1 1 0;}
-		}
-		label {
-			padding: 0;
-			small { display: none }
+		.resolutionSlider {
+			width: 20em;
+			text-align: center;
+			div.note {
+				max-width: 12em;
+			}
+			.spaceLength { display: none; }
+			.continuum {
+				.continuumTitle { display: none};
+				display: flex;
+				label {flex: 1 1 0;}
+			}
+			label {
+				padding: 0;
+				small { display: none }
+			}
 		}
 	}
+
+	// for large screens
 	@media screen and (min-width: 600px) {
-		grid-template-columns: auto auto auto ;
+		grid-template-columns: auto auto ;
 		grid-template-areas:
-			"header header header header"
-			"resolutionSlider resolutionSlider resolutionSlider resolutionSlider"
-			"continuum .   spaceLength spaceLength"
-			"continuum .  spaceLength spaceLength"
-			". . cancelButton okButton ";
+			" header header"
+			"resolutionSlider resolutionSlider "
+			"  continuum  spaceLength "
+			"  . okCancel ";
 
 		.continuum label {
 			display: block;
 			padding: 0;
 			small { display: block }
+			.continuumTitle {
+				text-weight: bold;
+			};
 		}
+
+		.resolutionSlider {}
 	}
 
 }
