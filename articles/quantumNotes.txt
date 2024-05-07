@@ -1,6 +1,10 @@
 
 2024 May 2 ============================================= squishy_electron_4
+
+
+
 Finalizing the version using pthreads successfully with one thread.
+but now it's busted.  no integration.
 
 candidates for new dir name:
 Dorothy Jean Johnson Vaughan - first African-American woman to receive a promotion and supervise a group of staff at Langley.

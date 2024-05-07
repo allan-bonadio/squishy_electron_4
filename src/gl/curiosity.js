@@ -47,7 +47,7 @@ export function curioShader(gl, shader) {
 		desc: "Returns a GLenum indicating whether the shader is a vertex shader (gl.VERTEX_SHADER) or fragment shader (gl.FRAGMENT_SHADER) object."},
 	];
 
-	console.log(`======================= getShaderParameter for ${shaderLabel}`);
+	console.log(`≡≡≡≡≡≡≡≡≡≡≡≡ getShaderParameter for ${shaderLabel}`);
 	raceThruAll(gl, 'getShaderParameter', shader, keywords);
 }
 
@@ -76,7 +76,7 @@ export function curioProgram(gl, program) {
 	desc: "Returns a GLint indicating the number of uniform blocks containing active uniforms."},
 	];
 
-	console.log(`======================= getProgramParameter`);
+	console.log(`≡≡≡≡≡≡≡≡≡≡≡≡ getProgramParameter`);
 	raceThruAll(gl, 'getProgramParameter', program, keywords);
 
 }
@@ -432,7 +432,7 @@ const keywords = [
 		desc: 'See /en-US/docs/Web/API/WebGL2RenderingContext/bindVertexArray'},
 	];
 
-	console.log(`======================= getParameter`);
+	console.log(`≡≡≡≡≡≡≡≡≡≡≡≡ getParameter`);
 	raceThruAll(gl, 'getParameter', null, keywords);
 
 }
@@ -455,7 +455,7 @@ export function curioAUB(gl, vShader, fShader, program, ) {
 //		desc: "Returns a GLboolean indicating whether the uniform block is referenced by the fragment shader."},
 //	];
 //
-//	console.log(`======================= getParameter`);
+//	console.log(`≡≡≡≡≡≡≡≡≡≡≡≡ getParameter`);
 //	raceThruAll(gl, 'getAUBParameter', null, keywords);
 }
 

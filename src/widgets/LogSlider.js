@@ -120,7 +120,7 @@ class LogSlider extends React.Component {
 				<aside>
 					<div className='left'>{p.minLabel}</div>
 					<div className='middle'>
-						{p.label}: <big>{thousands(cur)}</big>
+						<b>{p.label}</b>: <big>{thousands(cur)}</big>
 						{this.wasOriginal}
 					</div>
 					<div className='right'>{p.maxLabel}</div>

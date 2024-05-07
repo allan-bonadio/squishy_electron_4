@@ -126,26 +126,26 @@ export class eSpace {
 	// see qSpace.cpp and squish.h to regenerate this.
 
 	get _voltage() { return this.ints[1]; }
- 	get voltageFactor() { return this.doubles[1]; }
+	get voltageFactor() { return this.doubles[1]; }
 
- 	get N() { return this.ints[4]; }
- 	get continuum() { return this.ints[5]; }
- 	get start() { return this.ints[6]; }
- 	get end() { return this.ints[7]; }
- 	get nStates0() { return this.ints[8]; }
- 	get nPoints0() { return this.ints[9]; }
- 	get spectrumLength0() { return this.ints[14]; }
- 	get dx0() { return this.doubles[5]; }
- 	get _label0() { return this.pointer + 60; }
- 	get dt() { return this.doubles[19]; }
- 	get nDimensions() { return this.ints[40]; }
- 	get nStates() { return this.ints[41]; }
- 	get nPoints() { return this.ints[42]; }
- 	get spectrumLength() { return this.ints[43]; }
- 	get _mainAvatar() { return this.ints[44]; }
- 	get _miniGraphAvatar() { return this.ints[45]; }
- 	get _qgrinder() { return this.ints[46]; }
- 	get _label() { return this.pointer + 188; }
+	get N() { return this.ints[4]; }
+	get continuum() { return this.ints[5]; }
+	get start() { return this.ints[6]; }
+	get end() { return this.ints[7]; }
+	get nStates0() { return this.ints[8]; }
+	get nPoints0() { return this.ints[9]; }
+	get spectrumLength0() { return this.ints[14]; }
+	get dx0() { return this.doubles[5]; }
+	get _label0() { return this.pointer + 60; }
+	get dt() { return this.doubles[19]; }
+	get nDimensions() { return this.ints[40]; }
+	get nStates() { return this.ints[41]; }
+	get nPoints() { return this.ints[42]; }
+	get spectrumLength() { return this.ints[43]; }
+	get _mainAvatar() { return this.ints[44]; }
+	get _miniGraphAvatar() { return this.ints[45]; }
+	get _qgrinder() { return this.ints[46]; }
+	get _label() { return this.pointer + 188; }
 
 	/* **************************** end of direct accessors */
 

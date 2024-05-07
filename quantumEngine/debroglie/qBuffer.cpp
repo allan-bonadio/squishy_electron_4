@@ -106,9 +106,9 @@ qBuffer::~qBuffer() {
 
 void qBuffer::dumpHeadings(bool withNewline, bool withExtras) {
 	if (withExtras)
-		printf("\n  ix       re        im        phase   ∆ phase      norm m𝜓/nm");
+		printf("  ix       re        im        phase   ∆ phase      norm m𝜓/nm");
 	else
-		printf("\n  ix       re        im      norm m𝜓/nm");
+		printf("  ix       re        im      norm m𝜓/nm");
 	if (withNewline)
 		printf("\n");
 }
@@ -143,7 +143,8 @@ double qBuffer::dumpRow(char buf[200], int ix, qCx w, double *pPrevPhase, bool w
 	return norm;
 }
 
-// you can use this on waves or spectrums; for the latter, leave off the start and the rest
+// you can use this on waves or spectrums; for some, leaves off the start and end
+// also prints the inner prod on the last line
 void qBuffer::dumpSegment(qCx *wave, bool withExtras, int start, int end, int continuum) {
 	if (start >= end) {
 		printf("qBuffer::dumpSegment(%p, %d, %d, %d)\n",
@@ -171,7 +172,7 @@ void qBuffer::dumpSegment(qCx *wave, bool withExtras, int start, int end, int co
 		printf("\nend %s", buf);
 	}
 
-	printf("    inner product=%11.8lg\n", innerProd);
+	printf("  inner product=%4.8lg\n", innerProd);
 }
 
 // any wave, probably shouldn't call this
@@ -179,9 +180,9 @@ void qBuffer::dumpThat(qCx *wave, bool withExtras) {
 	qBuffer::dumpSegment(wave, withExtras, start, end, continuum);
 }
 
-// works on any buffer but originally written for qWaves
+// works on any buffer, shows which kind
 void qBuffer::dump(const char *title, bool withExtras) {
-	printf(" \n🌊🌊 qBuffer ==== a '%c%c%c%c'  %p->%p | %s \n",
+	printf(" \n🌊🌊 a %c%c%c%c buffer, o%p w%p | %s \n",
 		magic >> 24, magic >> 16, magic >> 8, magic, this, wave, title);
 	qBuffer::dumpHeadings();
 	qBuffer::dumpSegment(wave, withExtras, start, end, continuum);
@@ -217,7 +218,7 @@ void qBuffer::rainbowDump(const char *title) {
 		//	$1, $2, $3, $4);
 	}, wave, start, end, nPoints, title);
 	#endif
-printf("done with rainbowDump EM_ASM\n\n");
+	printf("done with rainbowDump EM_ASM\n\n");
 }
 
 
@@ -309,7 +310,7 @@ double qBuffer::normalize(void) {
 	return iProd;
 }
 
-/* ****************************************************************************  setting */
+/* **********************************************************************  setting wave */
 
 // a little bit dangerous if your waves don't have the same continuum
 void qBuffer::copyThatWave(qCx *dest, qCx *src, int length) {

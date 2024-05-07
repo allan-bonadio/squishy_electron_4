@@ -173,9 +173,9 @@ class eWave {
 	// dump out wave content.
 	dump(title) {
 		const avatarLabel = this.avatarLabel || '';
-		console.log(`\n🌊 ==== eWave ${avatarLabel} | ${title} `+
+		console.log(`\n🌊 ≡≡≡≡≡ eWave ${avatarLabel} | ${title} `+
 			this.dumpThat(this.wave) +
-			`\n🌊 ==== end of Wave ====\n\n`);
+			`\n🌊 ≡≡≡≡≡ end of eWave ≡≡≡≡≡\n\n`);
 	}
 
 	rainbowDump(title) {

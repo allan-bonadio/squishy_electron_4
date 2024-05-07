@@ -85,6 +85,9 @@ It's kg m^2 / s^2; energy is always mass x length^2 / time^2 .
 = 1.602176634e+5 pfg nm^2 / ps^2
 or 160217.6634 pfg nm^2 / ps^2
 
+Alternatively, we could measure it in mks-analogous units,
+pfg nm^2 / ps^2
+
 <!--
 ### mass
 

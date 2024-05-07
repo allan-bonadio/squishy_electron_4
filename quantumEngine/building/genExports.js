@@ -57,11 +57,9 @@ let exportsSrc  = [
 
 	// for the older, same-thread integration, or to be run in a/the thread
 	{name: 'grinder_triggerIteration', args: ['number'], retType: null},
+
+	// only needed if UI thread does a frame's worth of integration
 	{name: 'grinder_oneFrame', args: ['number'], retType: null},
-
-	// releases the master semaphore to start all the threads integrating
-	//{name: 'grinder_startAFrame', args: ['number'], retType: null},
-
 
 	{name: 'grinder_askForFFT', args: ['number'], retType: null},
 

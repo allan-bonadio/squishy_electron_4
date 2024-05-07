@@ -35,7 +35,7 @@
 #define makeIntSetter(field)  printf("\tset " #field  "(a) { this.ints[%d] = a; }\n", intOffset(field));
 
 // Just need this offset
-#define makeOffset(field)  printf("\t"  #field  "Offset = %d;\n", intOffset(field));
+#define makeIntOffset(field)  printf("\t"  #field  "Offset = %d;\n", intOffset(field));
 
 // like makeIntGetter() but creates a different name so as to not conflict with actual JS field in same class.
 // This will return to JS the C++ pointer value, which can be wrapped into a JS class.

@@ -41,6 +41,8 @@ qSpace::qSpace(const char *lab)
 	if (traceQSpace) {
 		printf("🚀 🚀 qSpace::qSpace() constructor starts label:'%s'  this= %p\n",
 			lab, (this));
+		printf("      ℏ=%8.3g, m_e=%8.3g, ℏOver2m_e=%8.3g, inverseℏ=%8.3g\n",
+			ℏ, m_e, ℏOver2m_e, inverseℏ);
 	}
 
 	strncpy(label, lab, MAX_LABEL_LEN);

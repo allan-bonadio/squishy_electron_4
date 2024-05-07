@@ -57,7 +57,7 @@ void addSpaceDimension(qSpace *space, int N, int continuum, double spaceLength, 
 }
 
 // call this from JS to finish the process for the qSpace, create and add the avatars & voltage
-qSpace *completeNewSpace(qSpace *space, int nThreads) {
+qSpace *completeNewSpace(qSpace *space, int nSlaveThreads) {
 	if (traceSpaceCreation)
 		printf("🚀 🚀 🚀  JS completeNewSpace starts(%s)   space=%p\n",
 			space->label, space);
@@ -70,7 +70,7 @@ qSpace *completeNewSpace(qSpace *space, int nThreads) {
 	qAvatar *mainAvatar = space->mainAvatar = new qAvatar(space, "mainAvatar");
 	if (traceAvatarDetail) printf("🚀 created mainAvatar\n");
 
-	qGrinder *qgrinder = space->qgrinder = new qGrinder(space, mainAvatar, nThreads, "mainGrinder");
+	qGrinder *qgrinder = space->qgrinder = new qGrinder(space, mainAvatar, nSlaveThreads, "mainGrinder");
 
 	space->miniGraphAvatar = new qAvatar(space, "miniGraph");
 
