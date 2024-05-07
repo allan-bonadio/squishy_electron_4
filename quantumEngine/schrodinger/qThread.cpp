@@ -3,9 +3,9 @@
 ** Copyright (C) 2023-2024 Tactile Interactive, all rights reserved
 */
 
-#include <ctime>
+//#include <ctime>
 #include <stdexcept>
-#include <stdarg.h>
+//#include <stdarg.h>
 
 //#include <stdatomic.h>
 #include <pthread.h>
@@ -17,50 +17,6 @@
 #include "qThread.h"
 
 bool traceThreads = false;
-bool traceSpeedyLog = false;
-
-/* *********************************************** speedyLogging */
-// for extra-fast logging of timing for these threads.  On the honor system, don't overfill!
-
-#define MAX_BUF_LEN  16000
-#define MAX_ONE_LOG_LEN  400
-static char speedyBuf[MAX_BUF_LEN];
-static int speedyCursor = 0;
-static double startTime = getTimeDouble();
-
-
-void speedyLog(const char* format, ...) {
-    va_list args;
-    va_start(args, format);
-
-	if (speedyCursor >= MAX_BUF_LEN - MAX_ONE_LOG_LEN)
-		speedyFlush();
-
- 	// first the time, then the message
-	speedyCursor += snprintf(speedyBuf+speedyCursor, 20, "🚄 %8.3f ", getTimeDouble() - startTime);
-	speedyCursor +=  vsnprintf(speedyBuf+speedyCursor, MAX_ONE_LOG_LEN, format, args);
-	speedyBuf[speedyCursor] = 0;
-
-    va_end(args);
-	if (traceSpeedyLog)
-		printf("speedyLog fmt='%s' speedyCursor=%d  log so far:\n‹%s›\n", format, speedyCursor, speedyBuf);
-//	printf("%16llx %16llx \n%16llx %16llx \n%16llx %16llx \n%16llx %16llx \n",
-//		*((long long int *) speedyBuf), *((long long int *) (speedyBuf+8)),
-//		*((long long int *) (speedyBuf+16)), *((long long int *) (speedyBuf+24)),
-//		*((long long int *) (speedyBuf+32)), *((long long int *) (speedyBuf+40)),
-//		*((long long int *) (speedyBuf+48)), *((long long int *) (speedyBuf+56))
-//		);
-}
-
-// finally, print it out
-void speedyFlush(void) {
-	if (traceSpeedyLog)
-		printf("speedyLog speedyFlush speedyCursor=%d \n", speedyCursor);
-	if (speedyBuf[0])
-		printf("%s", speedyBuf);
-	speedyCursor = 0;
-	speedyBuf[0] = 0;
-}
 
 /* ********************************************************************************** threads */
 

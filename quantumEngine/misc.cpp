@@ -7,6 +7,7 @@
 #include <string>
 #include <string.h>
 #include <stdexcept>
+#include <stdarg.h>
 
 static bool traceExceptions = false;
 
@@ -19,6 +20,51 @@ double getTimeDouble(void)
     struct timespec ts;
     clock_gettime(CLOCK_MONOTONIC, &ts);
     return ts.tv_sec + ts.tv_nsec / 1e9;
+}
+
+/* *********************************************** speedyLogging */
+// for extra-fast logging of timing for these threads.
+
+// of course, tracing it will not be speeding
+bool traceSpeedyLog = false;
+
+#define MAX_BUF_LEN  16000
+#define MAX_ONE_LOG_LEN  400
+static char speedyBuf[MAX_BUF_LEN];
+static int speedyCursor = 0;
+static double startTime = getTimeDouble();
+
+
+void speedyLog(const char* format, ...) {
+    va_list args;
+    va_start(args, format);
+
+	if (speedyCursor >= MAX_BUF_LEN - MAX_ONE_LOG_LEN)
+		speedyFlush();
+
+	struct tm nowPieces;
+	time_t nowTime = time(NULL);
+	localtime_r(&nowTime, &nowPieces);
+
+ 	// first the time, then the message
+	speedyCursor += snprintf(speedyBuf+speedyCursor, 20, "🚄 %02d:%02d:%02d ",
+		nowPieces.tm_hour, nowPieces.tm_min, nowPieces.tm_sec);
+	speedyCursor +=  vsnprintf(speedyBuf+speedyCursor, MAX_ONE_LOG_LEN, format, args);
+	speedyBuf[speedyCursor] = 0;
+
+    va_end(args);
+	if (traceSpeedyLog)
+		printf("🚄 🚄 🚄 speedyLog fmt='%s' speedyCursor=%d  log so far:\n‹%s›\n", format, speedyCursor, speedyBuf);
+}
+
+// finally, print it out
+void speedyFlush(void) {
+	if (traceSpeedyLog)
+		printf("🚄 🚄 🚄 speedyFlush speedyCursor=%d \n", speedyCursor);
+	if (speedyBuf[0])
+		printf("%s", speedyBuf);
+	speedyCursor = 0;
+	speedyBuf[0] = 0;
 }
 
 /* *********************************************************************** exceptions */

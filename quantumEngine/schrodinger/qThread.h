@@ -8,11 +8,6 @@ struct qThread;
 
 #include <pthread.h>
 
-// use speedyLog() just like printf(), then call speedyFlush() to print out
-// everything logged
-extern void speedyLog(const char* format, ...);
-extern void speedyFlush(void);
-
 
 // N_THREADS defined in buildCommon.sh
 // from emscripten docs for pthreads:  For web security purposes, there exists a
