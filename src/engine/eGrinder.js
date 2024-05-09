@@ -23,8 +23,10 @@ class eGrinder {
 		this.avatar = avatar;
 		avatar.grinder = this;
 
+		if (this.sentinel !== true)
+			throw "🔥 🔥 Grinder offsets not correct 🔥 🔥";
 		if (traceCreation)
-			console.log(`eGrinder constructed:`, this);
+			console.log(`🪚 eGrinder constructed:`, this);
 	}
 
 	// delete, except 'delete' is a reserved word.  Turn everything off.
@@ -41,6 +43,7 @@ class eGrinder {
 	// are passed by pointer and you need to allocate them in JS (eg see
 	// eGrinder.constructor)
 
+
 	get _space() { return this.ints[1]; }
 
 	get elapsedTime() { return this.doubles[2]; }
@@ -52,12 +55,12 @@ class eGrinder {
 	set justNFrames(a) { this.ints[30] = a; }
 	get frameCalcTime() { return this.doubles[10]; }
 	get maxCalcTime() { return this.doubles[11]; }
-	get shouldBeIntegrating() { return Boolean(this.bools[196]); }
-	set shouldBeIntegrating(a) { this.bools[196] = a; }
-	get isIntegrating() { return Boolean(this.bools[197]); }
-	set isIntegrating(a) { this.bools[197] = a; }
-	get pleaseFFT() { return Boolean(this.bools[198]); }
-	set pleaseFFT(a) { this.bools[198] = a; }
+	get shouldBeIntegrating() { return Boolean(this.bools[152]); }
+	set shouldBeIntegrating(a) { this.bools[152] = a; }
+	get isIntegrating() { return Boolean(this.bools[153]); }
+	set isIntegrating(a) { this.bools[153] = a; }
+	get pleaseFFT() { return Boolean(this.bools[154]); }
+	set pleaseFFT(a) { this.bools[154] = a; }
 
 	get stretchedDt() { return this.doubles[3]; }
 	set stretchedDt(a) { this.doubles[3] = a; }
@@ -77,7 +80,8 @@ class eGrinder {
 	get _qspect() { return this.ints[26]; }
 	get _stages() { return this.ints[27]; }
 	get _threads() { return this.ints[28]; }
-	get _label() { return this.pointer + 180; }
+	get _label() { return this.pointer + 136; }
+	get sentinel() { return Boolean(this.bools[155]); }
 
  	/* ******************* end of direct accessors */
 
@@ -89,7 +93,8 @@ class eGrinder {
 
 	// call this to trigger all the threads to do the next iteration
 	triggerIteration() {
-		console.log(`eGrinder.triggerIteration, ${this.pointer.toString(16)} starting  isIntegrating=${this.isIntegrating}   shouldBeIntegrating=${this.shouldBeIntegrating}`);
+		console.log(`🪚 eGrinder.triggerIteration, ${this.pointer.toString(16)} starting  `
+		+`shouldBeIntegrating=${this.shouldBeIntegrating}  isIntegrating=${this.isIntegrating}`);
 		qe.grinder_triggerIteration(this.pointer);
 
 	}

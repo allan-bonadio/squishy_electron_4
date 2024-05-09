@@ -8,10 +8,6 @@
 #include "qGrinder.h"
 #include "slaveThread.h"
 
-
-// lame threads don't do integration; extra threads on the end just for testing
-static bool traceLameThreads = false;
-
 static bool traceStart = false;
 static bool traceWork = false;
 static bool traceFinish = false;
@@ -24,7 +20,7 @@ static slaveThread *sla[MAX_THREADS];
 slaveThread **qGrinder::slaves = sla;
 
 // only nonzero when we're changing the frame factor
-int slaveThread::newFrameFactor = 0;
+// obsolete int slaveThread::frameFactor = 0;
 
 // wrapper for emscripten_request_animation_frame_loop() to call slaveWork()
 //static void sRunner(void *arg) {
@@ -34,7 +30,7 @@ int slaveThread::newFrameFactor = 0;
 
 // wrapper for pthread to start the thread.  arg is the slaveThread ptr.  requestAnimationFrame.
 static void *sStarter(void *arg) {
-	printf("🔪 sStarter: starting\n");
+	speedyLog("🔪 slaveThread: starting\n");
 
 	// runs forever never returns
 	((slaveThread *) arg)->slaveLoop();
@@ -57,12 +53,16 @@ slaveThread::slaveThread(qGrinder *gr)
 void slaveThread::slaveWork(void) {
 	int nWas;
 
-	if (traceWork) speedyLog("🔪 slaveWork #%d starts cycle\n", serial);
 	if (traceWork)  {
 		speedyLog("🔪              thread #%d: shouldBeIntegrating=%d  isIntegrating=%d.  "
 			"nFinishedThreads=%d\n",
 			serial, grinder->shouldBeIntegrating, grinder->isIntegrating,
-			grinder->nFinishedThreads);
+			#ifdef USING_ATOMICS
+			grinder->finishAtomic
+			#else
+			grinder->nFinishedThreads
+			#endif
+			);
 	}
 
 	// Gonna do an integration frame.  set starting time, under lockf
@@ -78,11 +78,11 @@ void slaveThread::slaveWork(void) {
 	double endCalc = getTimeDouble();
 	frameCalcTime = endCalc - startCalc;
 
-	if (traceWork) speedyLog("🔪 end of runner; shouldBeIntegrating=%d  isIntegrating=%d\n",
+	if (traceWork) speedyLog("🔪 end of slaveWork; shouldBeIntegrating=%d  isIntegrating=%d\n",
  				grinder->shouldBeIntegrating, grinder->isIntegrating);
 }
 
-// repeatedly run the runner in a loop
+// do the atomics and synchronization, and call slaveWork().  runs repeatedly
 void slaveThread::slaveLoop(void) {
 	while (true) {
 		try {
@@ -92,37 +92,79 @@ void slaveThread::slaveLoop(void) {
 			// All other slave threads will also be waiting for startMx.  When this one gets its chance,
 			// it'll lock and unlock, then start its integration work.
 			// so they all start at roughly the same time.
+			#ifdef USING_ATOMICS
+			speedyLog("🏁 🔪 Starting Gate in slaveThread::slaveLoop- startAtomic=%d (shdbe -1) 🏁\n",
+				grinder->startAtomic);
+			speedyFlush();
+
+			// wait forever to get notified, when startAtomic changes from -1 to zero
+			int howEnded = emscripten_atomic_wait_u32(&grinder->startAtomic, -1, ATOMICS_WAIT_DURATION_INFINITE);
+			speedyLog("🔪 after atomic wait on startAtomic=%d (shdbe 0) and wait returned %d ok=0, ≠1, timeout=2\n",
+				emscripten_atomic_load_u32(&grinder->startAtomic), howEnded);
+			speedyFlush();
+
+			// now we count each thread as it starts up
+			nWas = emscripten_atomic_add_u32(&grinder->startAtomic, -1);
+			nWas++;
+
+// 			while (atomic_load(&grinder->startAtomic) < 0) ;
+			speedyLog("🔪 after atomic_add on startAtomic=%d (shdbe 0 or more)\n", nWas);
+			//emscripten_debugger();
+
+// 			nWas = atomic_fetch_add(&grinder->startAtomic, 1);  // returns number BEFORE incr
+// 			nWas++;
+
+			//speedyLog("after increment on startAtomic=%d (shdbe 1 or more)\n", nWas);
+
+			#else
+
 			pthread_mutex_lock(&grinder->startMx);
 				nWas = ++grinder->nStartedThreads;
+			pthread_mutex_unlock(&grinder->startMx);
 
-			// EXCEPT for the last one starting; it'll leave it locked for the next cycle.
-			// NO IT's illegal to unlock a thread from a different thread than who set it.
-			// Must use a semaphore to synch the threads!!!  This'll work if there's only 1 thread, for now.
-			if (grinder->nStartedThreads < grinder->nSlaveThreads)
-				pthread_mutex_unlock(&grinder->startMx);
+			// upon last one started, lock the mutex again for next cycle
+			if (nWas >= grinder->nSlaveThreads)
+				pthread_mutex_lock(&grinder->startMx);
+
+			#endif
+			// I don't think we really need this counting for start....?
 			if (traceStart)
-				speedyLog("🔪 start of work, nStarted=%d\n", grinder->nStartedThreads);
+				speedyLog("🔪 start of work, nStarted=%d\n", nWas);
+			speedyFlush();
 
 
 			slaveWork();
+			speedyFlush();
 
 
 			// tell the boss we're done
+			#ifdef USING_ATOMICS
+			speedyLog("🔪 before increment on finishAtomic=%d (shdbe 0)\n", grinder->finishAtomic);
+			nWas = emscripten_atomic_add_u32(&grinder->finishAtomic, 1);  // returns number BEFORE incr
+			nWas++;
+			speedyLog("🔪 after increment on finishAtomic=%d (shdbe 1 or more)\n", grinder->finishAtomic);
+
+			#else
+
 			pthread_mutex_lock(&grinder->finishMx);
 				nWas = ++grinder->nFinishedThreads;
 			pthread_mutex_unlock(&grinder->finishMx);
-			if (traceFinish)
-				speedyLog("🔪 finishing work, nFinished=%d\n", grinder->nFinishedThreads);
+			#endif
+
+			if (traceFinish) {
+				speedyLog("🔪 finishing work on thread %d, nFinished=%d\n",
+					serial, nWas);
+			}
 
 			if (nWas >= grinder->nSlaveThreads) {
 				// this must be the last thread to finish in this integration frame!
 				grinder->threadsHaveFinished();
 			}
-
 			speedyFlush();
 		} catch (std::runtime_error& ex) {
-			//  typically divergence.  JS handles it
+			//  typically divergence.  JS handles it.  save whole exception
 			grinder->integrationEx = ex;
+			printf("🔪 Error (saved to grinder) during slaveLoop: %s\n", ex.what());
 		}
 	}
 }
@@ -135,10 +177,10 @@ void slaveThread::createSlaves(qGrinder *grinder) {
 		// actual pthread won't start till the next event loop i think
 		slaveThread *slave = new slaveThread(grinder);
 		grinder->slaves[slave->thread->serial] = slave;
-		printf("🔪  slaveThread::createSlaves() created A Slave(%d) \n", slave->serial);
+		speedyLog("🔪  slaveThread::createSlaves() created A Slave(%d) \n", slave->serial);
 	}
 
-	printf("🔪  slaveThread created %d slaves \n", grinder->nSlaveThreads);
+	speedyLog("🔪  slaveThread created %d slaves \n", grinder->nSlaveThreads);
 };
 
 

@@ -10,8 +10,9 @@
 
 //#include <stdatomic.h>
 // stdatomic.h should have this #include <__atomic/atomic_flag.h>
-#include <condition_variable>
+//#include <condition_variable>
 #include <pthread.h>
+#include <stdatomic.h>
 // looking for emscripten_futex_wait() - it's not here #include <emscripten/atomic.h>
 
 #include "../hilbert/qSpace.h"
@@ -26,22 +27,22 @@
 
 
 
-static bool traceIntegration = false;
+static bool traceIntegration = true;
 static bool traceIntegrationDetailed = false;
 
 static bool traceJustWave = false;
 
-static bool traceFourierFilter = false;
+//static bool traceFourierFilter = false;
 
 static bool dumpFFHiResSpectums = false;
-static bool traceIProd = false;
+static bool traceIProd = true;
 
 static bool traceConstructor = false;
 
 static bool traceReversals = false;
 
 static bool traceAggregate = false;
-static bool traceSingleStep = false;
+static bool traceSingleStep = true;
 
 // RK2
 #define MIDPOINT_METHOD
@@ -49,15 +50,16 @@ static bool traceSingleStep = false;
 static std::runtime_error nullException("");
 
 
-// create new grinder, complete with its own stage buffers
-// make sure these values are doable by the sliders' steps
-qGrinder::qGrinder(qSpace *sp, qAvatar *av, int nThreads, const char *lab)
-	: space(sp), avatar(av), elapsedTime(0), frameSerial(0), stretchedDt(.01),
+// create new grinder, complete with its own stage buffers. make sure
+// these values are doable by the sliders' steps. Space is definitely
+// created by creation time here, although a few details left  to do.
+qGrinder::qGrinder(qSpace *sp, qAvatar *av, int nSlaves, const char *lab)
+	: space(sp), avatar(av), elapsedTime(0), frameSerial(0), stretchedDt(60),
 		integrationEx(nullException),
-		isIntegrating(false), shouldBeIntegrating(false), justNFrames(0),
-		stepsPerFrame(100),
-		pleaseFFT(false), newFrameFactor(3), newIntegrationFP(.05),
-		nThreads(nThreads), nSlaveThreads(nThreads) {
+		shouldBeIntegrating(false), isIntegrating(false), justNFrames(0),
+		stepsPerFrame(10),
+		pleaseFFT(false), frameFactor(3), integrationFP(.05),
+		nSlaveThreads(nSlaves) {
 
 	magic = 'Grnd';
 
@@ -68,17 +70,27 @@ qGrinder::qGrinder(qSpace *sp, qAvatar *av, int nThreads, const char *lab)
 
 	qspect = NULL;  // until used
 
+	// use these for grinding
 	voltage = sp->voltage;
 	voltageFactor = sp->voltageFactor;
+	d2Coeff = sp->dimensions[0].d2Coeff;
 
 	strncpy(label, lab, MAX_LABEL_LEN);
 	label[MAX_LABEL_LEN] = 0;
-
-	pthread_mutex_init(&finishMx, NULL);
+	#ifdef USING_ATOMICS
+	atomic_init(&startAtomic, -1);
+	atomic_init(&finishAtomic, 0);
+	#else
 	pthread_mutex_init(&startMx, NULL);
+	pthread_mutex_lock(&startMx);  // don't let a spurious frame start
+	pthread_mutex_init(&finishMx, NULL);
+	#endif
+
 
 	// should this come earlier?
 	slaveThread::createSlaves(this);
+
+	samplePoint = space->dimensions[0].N / 3 + space->dimensions[0].start;
 
 	if (traceConstructor) {
 		dumpObj(" qGrinder 🪓 constructed");
@@ -98,6 +110,7 @@ qGrinder::qGrinder(qSpace *sp, qAvatar *av, int nThreads, const char *lab)
 			space->nDimensions, space->nStates, space->nPoints,
 			space->voltage, space->voltageFactor, space->spectrumLength);
 	}
+	sentinel = true;
 
 	FORMAT_DIRECT_OFFSETS;
 };
@@ -125,11 +138,11 @@ qSpectrum *qGrinder::getSpectrum(void) {
 };
 
 void qGrinder::copyFromAvatar(qAvatar *avatar) {
-	qflick->copyBuffer(qflick, avatar->qwave);
+	qflick->copyBuffer(qflick, avatar->qwave);  // to buffer zero
 }
 
 void qGrinder::copyToAvatar(qAvatar *avatar) {
-	qflick->copyBuffer(avatar->qwave, qflick);
+	qflick->copyBuffer(avatar->qwave, qflick);  // from buffer zero
 }
 
 // need these numbers for the js interface to this object, to figure out the offsets.
@@ -148,8 +161,8 @@ void qGrinder::formatDirectOffsets(void) {
 
 	makeDoubleGetter(elapsedTime);
 	makeDoubleSetter(elapsedTime);
-	makeDoubleGetter(frameSerial);
-	makeDoubleSetter(frameSerial);
+	makeIntGetter(frameSerial);
+	makeIntSetter(frameSerial);
 	printf("\n");
 	makeIntGetter(justNFrames);
 	makeIntSetter(justNFrames);
@@ -165,8 +178,6 @@ void qGrinder::formatDirectOffsets(void) {
 	makeBoolGetter(pleaseFFT);
 	makeBoolSetter(pleaseFFT);
 
-	makeOffset(shouldBeIntegrating)
-
 	printf("\n");
 	makeDoubleGetter(stretchedDt);
 	makeDoubleSetter(stretchedDt);
@@ -180,10 +191,10 @@ void qGrinder::formatDirectOffsets(void) {
 
 	makeIntGetter(nSlaveThreads);
 
-	makeIntGetter(newFrameFactor);
-	makeIntSetter(newFrameFactor);
-	makeDoubleGetter(newIntegrationFP);
-	makeDoubleSetter(newIntegrationFP);
+	makeIntGetter(frameFactor);
+	makeIntSetter(frameFactor);
+	makeDoubleGetter(integrationFP);
+	makeDoubleSetter(integrationFP);
 
 	/* *********************************************** waves & buffers */
 
@@ -209,6 +220,9 @@ void qGrinder::formatDirectOffsets(void) {
 
 	makeStringPointer(label);
 
+	makeBoolGetter(sentinel);  // should always be value true
+
+
 	printf("\n🖼 🖼 --------------- done with qGrinder direct access --------------\n");
 }
 
@@ -216,20 +230,20 @@ void qGrinder::formatDirectOffsets(void) {
 
 // dump all the fields of a grinder
 void qGrinder::dumpObj(const char *title) {
-	printf("\n🪓🪓 ==== qGrinder | %s ", title);
-	printf("        magic: %c%c%c%c   qSpace=%p '%s'   \n",
+	speedyLog("\n🪓🪓 ==== qGrinder | %s ", title);
+	speedyLog("        magic: %c%c%c%c   qSpace=%p '%s'   \n",
 		magic>>24, magic>>16, magic>>8, magic, space, label);
 
-	printf("        elapsedTime=%lf, frameSerial=%lf, dt=%lf, \n",
+	speedyLog("        elapsedTime=%lf, frameSerial=%d, dt=%lf, \n",
 		elapsedTime, frameSerial, space->dt);
 
-	printf("        qflick=%p, voltage=%p, voltageFactor=%lf, qspect=%p\n",
+	speedyLog("        qflick=%p, voltage=%p, voltageFactor=%lf, qspect=%p\n",
 		qflick, voltage, voltageFactor, qspect);
 
-	printf("        shouldBeIntegrating: %hhu   isIntegrating: %hhu   pleaseFFT=%hhu \n",
+	speedyLog("        shouldBeIntegrating: %hhu   isIntegrating: %hhu   pleaseFFT=%hhu \n",
 		shouldBeIntegrating, isIntegrating, pleaseFFT);
 
-	printf("        ==== end of qGrinder::dumpObj(%s) ====\n\n", title);
+	speedyLog("        ==== end of qGrinder::dumpObj(%s) ====\n\n", title);
 }
 
 /* ********************************************************** tally & measure divergence */
@@ -262,7 +276,7 @@ void qGrinder::tallyUpReversals(qWave *qwave) {
 	int N = qwave->end - qwave->start;
 	double percent = 100.0 * tally / N / 2.;
 	if (traceReversals)
-		printf("🖼 tallyUpReversals result: %d out of %d or %5.1f %%\n",
+		speedyLog("🖼 tallyUpReversals result: %d out of %d or %5.1f %%\n",
 			tally, N, percent);
 	this->reversePercent = percent;
 }
@@ -276,7 +290,7 @@ void qGrinder::tallyUpReversals(qWave *qwave) {
 // slaveThread?  Multi-threads will have to be done with totally different code.
 void qGrinder::oneFrame() {
 	if (traceIntegration)
-		printf("qGrinder starting oneFrame\n");
+		speedyLog("qGrinder 🪓 starting oneFrame()\n");
 	if (traceIntegrationDetailed)
 		qGrinder::dumpObj("qGrinder starting oneFrame");
 //	isIntegrating = frameInProgress = true;
@@ -284,7 +298,7 @@ void qGrinder::oneFrame() {
 	qCx *wave1 = qflick->waves[1];
 	qCx *wave2 = qflick->waves[2];
 
-	double dt = space->dt;
+	double dt = stretchedDt;
 	double dtHalf = dt / 2;
 
 	// half step in beginning to move Im forward dt/2
@@ -307,6 +321,8 @@ void qGrinder::oneFrame() {
 		hitRealImaginary(wave1, wave0, wave0, dt);
 		#endif
 	}
+	elapsedTime += dt * (doubleSteps * 2 + .5);
+	frameSerial++;
 
 	// half hit at completion to move Re forward dt / 2
 	// and copy back to Main
@@ -323,72 +339,40 @@ void qGrinder::oneFrame() {
 	// normalize it and return the old inner product, see how close to 1.000 it is
 	double iProd = qflick->normalize();
 	if (dumpFFHiResSpectums) qflick->dumpHiRes("wave END fourierFilter() after normalize");
-	if (traceIProd && ((int) frameSerial & 0xf) == 0)
-		printf("      qGrinder: iProd= %lf \n", iProd);
+	if (traceIProd && ((int) frameSerial & 0x7) == 0)
+		speedyLog("      🪓 qGrinder frame %d elapsed %4.6lf  iProd= %lf \n",
+			frameSerial, elapsedTime, iProd);
 
 	// just an expt: see how many alternating values we have
 	tallyUpReversals(qflick);
 
 	if (iProd > 1.01) {
-		char buf[64];
-		snprintf(buf, 64, "🪓 🪓 wave is diverging, iProd=%10.4g 🔥 🧨", iProd);
 		if (iProd > 3) {
+			char buf[64];
+			snprintf(buf, 64, "🪓 🪓 wave is DIVERGING, iProd=%4.4g 🔥 🧨", iProd);
+			shouldBeIntegrating = isIntegrating = false;
 			qflick->dump(buf);
 			throw std::runtime_error("diverged");  // js code intercepts this exact spelling
+		}
+		else {
+			speedyLog("🪓 wave starting to Diverge, iProd=%4.4g 🔥 🧨", iProd);
 		}
 	}
 
 	if (traceJustWave)
-		qflick->dump("      qGrinder traceJustWave at end of frame", true);
-
-	// now, copy it to the Avatar's wave buffer, so iit can copy it to its ViewBuffer, so webgl can pick it up
-	copyToAvatar(avatar);
+		qflick->dump("     🪓 qGrinder traceJustWave at end of frame", true);
 
 	if (traceIntegration)
-		printf("qGrinder oneFrame done; shouldBeIntegrating: %hhu   isIntegrating: %hhu dt=%lf\n",
-+			shouldBeIntegrating, isIntegrating, dt);
+		speedyLog("🪓 qGrinder::oneFrame() done; shouldBeIntegrating: %hhu   isIntegrating: %hhu \n"
+			"  dt in use=%lf  stretchedDt=%8.6lf stepsPerFrame=%d  wave0[5]=%lf\n",
+			shouldBeIntegrating, isIntegrating, dt, stretchedDt, stepsPerFrame,
+			wave0[5]);
 
 	frameSerial++;
 //	frameInProgress = false;
 	qCheckReset();
 }
 
-
-/* ********************************************************** fourierFilter */
-//
-//
-// // FFT the wave, cut down the high frequencies, then iFFT it back.
-// ///// lowPassFilter (aka lpf) is  #frequencies we zero out
-// // Can't we eventually find a simple convolution to do this instead of FFT/iFFT?
-// // maybe after i get more of this working and fine tune it.
-// // Or maybe FFT is the fastest way anyway?
-// // lowPassFilter = number of freqs to squelch on BOTH sides, excluding nyquist
-// // which is always filtered out.  range 0...N/2-1
-// void qGrinder::fourierFilter(int lowPassFilter) {
-// 	qspect = getSpectrum();
-// 	qspect->generateSpectrum(qflick);
-// 	if (dumpFFHiResSpectums) qspect->dumpSpectrum("qspect right at start of fourierFilter()");
-//
-// 	// the high frequencies are in the middle
-// 	int nyquist = qspect->nPoints/2;
-// 	qCx *s = qspect->wave;
-//
-// 	// the nyquist freq is at N/2, ALWAYS block that!!
-// 	s[nyquist] = 0;
-//
-// 	if (traceFourierFilter)
-// 		printf("🪓 🌈  fourierFilter: nPoints=%d  nyquist=%d    lowPassFilter=%d\n",
-// 			qspect->nPoints, nyquist, lowPassFilter);
-//
-// 	for (int k = 1; k <= lowPassFilter; k++) {
-// 		s[nyquist + k] = 0;
-// 		s[nyquist - k] = 0;
-// 	}
-//
-// 	if (dumpFFHiResSpectums) qspect->dumpSpectrum("qspect right at END of fourierFilter()");
-// 	qspect->generateWave(qflick);
-// 	if (dumpFFHiResSpectums) qflick->dumpHiRes("wave END fourierFilter() b4 normalize");
-// }
 
 /* ********************************************************** threaded integration  */
 
@@ -419,38 +403,107 @@ void qGrinder::aggregateCalcTime(void) {
 
 // runs in the thread loop, only in the last thread to finish integration in an integration frame.
 void qGrinder::threadsHaveFinished() {
+	speedyLog("🪓 qGrinder::threadsHaveFinished starts\n");
 	aggregateCalcTime();
 
 	// single step (or a few steps): are we done yet?
 	if (justNFrames) {
-		if (traceSingleStep) speedyLog("ss: justNFrames = %d\n", justNFrames);
+		if (traceSingleStep) speedyLog("🪓 ss: justNFrames = %d\n", justNFrames);
 		--justNFrames;
 		if (0 >= justNFrames) {
 			shouldBeIntegrating = false;
-			if (traceSingleStep) speedyLog("ss turned off sbi: justNFrames = %d\n", justNFrames);
+			if (traceSingleStep) speedyLog("🪓 ss turned off sbi: justNFrames = %d\n", justNFrames);
 		}
 	}
 
-	if (traceSingleStep)  {
-		speedyLog("🔪                ...in threadsHaveFinished().  justNFrames=%d and shouldBeIntegrating=%d\n",
-				justNFrames, shouldBeIntegrating);
+	if (traceIntegration)  {
+		speedyLog("🪓                ...in threadsHaveFinished().  justNFrames=%d and "
+			"shouldBeIntegrating=%d   isIntegrating=%d\n",
+			justNFrames, shouldBeIntegrating, isIntegrating);
 	}
 
-	// set isIntegrating here so all threads get it at the same time
-	isIntegrating = shouldBeIntegrating;
+	// isIntegrating is on otherwise we wouldn't be here.
+	// if shouldBeIntegrating has turned off (by user), time to stop.  So all threads
+	// are synchronized.  turned on again when triggered.
+	if (!shouldBeIntegrating)
+		isIntegrating = false;
+
+	if (traceIntegration)  {
+		speedyLog("🪓 finished threadsHaveFinished() sortof. shouldBeIntegrating=%d   isIntegrating=%d\n",
+				shouldBeIntegrating, isIntegrating);
+	}
+	speedyFlush();
+
+	// now, copy it to the Avatar's wave buffer, so it can copy it to
+	// its ViewBuffer, so webgl can pick it up.  quick!  No mutexes or anything;
+	// this here runs in thread time.  webgl runs in UI time.  Worst
+	// thing that'll happen is the image will be part one frame and part
+	// the next frame.
+	copyToAvatar(avatar);
+	speedyLog("🪓 threadsHaveFinished() copied to avatar\n",
+			shouldBeIntegrating, isIntegrating);
 
 	// ready for new frame
+	// check whether we've stopped and leave it locked or unlocked for the next cycle.
+	#ifdef USING_ATOMICS
+	speedyLog("🪓  threadsHaveFinished() sortof. shouldBeIntegrating=%d   isIntegrating=%d\n",
+			shouldBeIntegrating, isIntegrating);
+
+	// this retriggers every frametime.  see how that goes.
+	if (isIntegrating)
+		emscripten_atomic_store_u32(&startAtomic, 0);  // start next iteration
+	else
+		emscripten_atomic_store_u32(&startAtomic, -1);  // stop integration
+	emscripten_atomic_store_u32(&finishAtomic, 0);
+	speedyLog("🪓  so now startAtomic=%d   and finishAtomic=%d\n",
+		emscripten_atomic_load_u32(&startAtomic), emscripten_atomic_load_u32(&finishAtomic));
+
+
+	#else
 	nStartedThreads = 0;
 	nFinishedThreads = 0;
+
+	// unlock for starting next cycle
+	if (isIntegrating) {
+		speedyLog("unlocking startMx to lauch the next cycle\n");
+		pthread_mutex_unlock(&startMx);
+	}
+	#endif
 
 }
 
 
-// start a new frame calculating by starting each/all slave threads
-void grinder_triggerIteration(qGrinder *grinder) {
+// start a new frame calculating by starting each/all slave threads.
+// This is called from JS, therefore the UI thread.
+// Each frame will trigger the next to continue integration?
+void qGrinder::triggerIteration() {
+	if (traceIntegration)  {
+		speedyLog("🪓 qGrinder::triggerIteration(): shouldBeIntegrating=%d   isIntegrating=%d\n",
+				shouldBeIntegrating, isIntegrating);
+	}
 
-	grinder->isIntegrating = grinder->shouldBeIntegrating;
-	pthread_mutex_unlock(&grinder->startMx);
+	// don't let it trigger if already running; might scrw up timing
+	if (isIntegrating) return;
+
+	//emscripten_debugger();
+	isIntegrating = true;
+
+	// start next iteration
+	#ifdef USING_ATOMICS
+	emscripten_atomic_store_u32(&startAtomic, 0);
+
+	// this is like notify_all
+	emscripten_atomic_notify(&startAtomic, EMSCRIPTEN_NOTIFY_ALL_WAITERS);
+	#else
+	pthread_mutex_unlock(&startMx);
+	#endif
+
+}
+
+// start a new frame calculating by starting each/all slave threads.
+// This is called from JS, therefore the UI thread.
+void grinder_triggerIteration(qGrinder *grinder) {
+	grinder->triggerIteration();
 }
 
 /* ********************************************************** misc  */
@@ -468,7 +521,7 @@ void grinder_askForFFT(qGrinder *pointer) { pointer->askForFFT(); }
 void grinder_oneFrame(qGrinder *pointer) { pointer->oneFrame(); }
 
 void grinder_copyFromAvatar(qGrinder *qgrinder, qAvatar *avatar) {qgrinder->copyFromAvatar(avatar);}
-//	printf("grinder_copyFromAvatar; qgrinder='%s', avatar='%s'\n", (char *) qgrinder, (char *) avatar);
+//	speedyLog("grinder_copyFromAvatar; qgrinder='%s', avatar='%s'\n", (char *) qgrinder, (char *) avatar);
 
 void grinder_copyToAvatar(qGrinder *qgrinder, qAvatar *avatar) {qgrinder->copyToAvatar(avatar);}
 

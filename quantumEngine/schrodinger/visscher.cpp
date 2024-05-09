@@ -10,9 +10,11 @@
 #include "../debroglie/qFlick.h"
 
 
-static bool traceRealStep = false;  // in detail
+static bool traceRealStep = true;  // in detail
 static bool traceImaginaryStep = false;  // in detail
 static bool traceVischerBench = false;
+static bool traceMidpoint = true;
+
 
 /*
 reinterpreted from the article
@@ -86,15 +88,19 @@ int usedIx;  // trace only
 void qGrinder::pointReal(qCx *newW, qCx *oldW, qCx *hamiltW, double volts, double dt) {
 	// second deriv wrt x of psi
 	double d2𝜓i = (hamiltW[-1].im + hamiltW[+1].im - hamiltW->im * 2) * d2Coeff;
-	if (traceRealStep) printf("⚛️ pointReal d2𝜓i=%3.8lf\n", d2𝜓i);
+
+	if (traceRealStep && samplePoint == usedIx) speedyLog(
+		"    🧶 pointReal[%d] d2𝜓i=%3.8lf  hamiltons=%5.5lf %5.5lf %5.5lf and d2Coeff %3.8lf\n",
+		samplePoint, d2𝜓i, hamiltW[-1].im, hamiltW[+1].im, hamiltW->im, d2Coeff);
 
 	// total hamiltonian including voltage
 	double H𝜓 = d2𝜓i + volts * voltageFactor * hamiltW->re * inverseℏ;
 
 	// new = old + 𝛥 dt   note subtraction
-	if (traceRealStep) printf("⚛️ pointReal oldW->re=%3.8lf  H𝜓=%3.8lf\n", oldW->re, H𝜓);
 	newW->re = oldW->re - dt * H𝜓;
-	if (traceRealStep) printf("⚛️ pointReal newW->re=%3.8lf\n", newW->re);
+	if (traceRealStep && samplePoint == usedIx)
+		speedyLog("    🧶 pointReal[%d] oldW->re=%3.8lf  newW->re=%3.8lf  H𝜓=%3.8lf\n",
+		samplePoint, oldW->re, newW->re, H𝜓);
 
 	qCheck(*newW, "vischer pointReal done for ix=", usedIx);
 }
@@ -104,15 +110,15 @@ void qGrinder::pointReal(qCx *newW, qCx *oldW, qCx *hamiltW, double volts, doubl
 void qGrinder::pointImaginary(qCx *newW, qCx *oldW, qCx *hamiltW, double volts, double dt) {
 	// second deriv d2𝜓.re / dx**2
 	double d2𝜓r = (hamiltW[-1].re + hamiltW[+1].re - hamiltW->re * 2) * d2Coeff;
-	if (traceImaginaryStep) printf("⚛️ pointImaginary\n");
+	if (traceImaginaryStep) speedyLog("    🧶 pointImaginary\n");
 
 	// total hamiltonian
 	double H𝜓 = d2𝜓r + volts * voltageFactor * hamiltW->im * inverseℏ;
 
 	// note addition
-	if (traceImaginaryStep) printf("⚛️ pointImaginary\n");
+	if (traceImaginaryStep) speedyLog("    🧶 pointImaginary\n");
 	newW->im = oldW->im + dt * H𝜓;
-	if (traceImaginaryStep) printf("⚛️ pointImaginary\n");
+	if (traceImaginaryStep) speedyLog("    🧶 pointImaginary\n");
 
 	qCheck(*newW, "vischer pointImaginary");
 }
@@ -128,7 +134,7 @@ void qGrinder::pointImaginary(qCx *newW, qCx *oldW, qCx *hamiltW, double volts, 
 // the 𝜓.im values in buffer oldW are still uncalculated
 void qGrinder::hitReal(qCx *newW, qCx *oldW, qCx *hamiltW, double dt) {
 	qDimension *dims = space->dimensions;
-	if (traceRealStep) printf("⚛️ start of hitReal nStates=%d, nPoints=%d, start=%d, end=%d\n",
+	if (traceRealStep) speedyLog("🧶 start of hitReal nStates=%d, nPoints=%d, start=%d, end=%d\n",
 			space->nStates, space->nPoints, dims->start, dims->end);
 
 	// someday I should check for dt==0 and do a copy() instead of this calc
@@ -137,62 +143,34 @@ void qGrinder::hitReal(qCx *newW, qCx *oldW, qCx *hamiltW, double dt) {
 	for (int ix = dims->start; ix < dims->end; ix++) {
 		usedIx = ix;
 		pointReal(newW + ix, oldW + ix, hamiltW + ix, voltage[ix],dt);
-
-		// // second deriv wrt x of psi
-		// double d2𝜓i = hamiltW[ix-1].im + hamiltW[ix+1].im - hamiltW[ix].im * 2;
-		// if (traceRealStep) printf("⚛️ hitReal ix=%d\n", ix);
-		//
-		// // total hamiltonian including voltage
-		// double H𝜓 = d2𝜓i + voltage[ix] * voltageFactor * hamiltW[ix].re;
-		//
-		// // new = old + 𝛥 dt   note subtraction
-		// if (traceRealStep) printf("⚛️ hitReal ix=%d\n", ix);
-		// newW[ix].re = oldW[ix].re - dt * H𝜓;
-		// if (traceRealStep) printf("⚛️ hitReal ix=%d\n", ix);
-		//
-		// qCheck(newW[ix], "vischer hitReal", ix);
 	}
 	qflick->fixThoseBoundaries(newW);
-	elapsedTime += dt/2;  // could be 0 or already dt/2
+	//elapsedTime += dt/2;  // could be 0 or already dt/2
 
-	if (traceVischerBench) printf("      hitReal, done: time=%lf\n",
+	if (traceVischerBench) speedyLog("      hitReal, done: time=%lf\n",
 		getTimeDouble());
-	if (traceRealStep) printf("⚛️ end of hitReal:");
+	if (traceRealStep) speedyLog("🧶 end of hitReal\n");
 }
 
 // second step: advance the Imaginaries of 𝜓 one dt, from ½ dt to ³⧸₂ dt
 // given the reals we just generated in hitReal(), but don't change them
 void qGrinder::hitImaginary(qCx *newW, qCx *oldW, qCx *hamiltW, double dt) {
 	qDimension *dims = space->dimensions;
-	if (traceImaginaryStep) printf("⚛️ start of stepImag nStates=%d, nPoints=%d, start=%d, end=%d\n",
+	if (traceImaginaryStep) speedyLog("🧶 start of stepImag nStates=%d, nPoints=%d, start=%d, end=%d\n",
 			space->nStates, space->nPoints, dims->start, dims->end);
 
 	// someday I should check for dt==0 and do a copyThatWave() instead of this calc
 	for (int ix = dims->start; ix < dims->end; ix++) {
 		usedIx = ix;
 		pointImaginary(newW + ix, oldW + ix, hamiltW + ix, voltage[ix], dt);
-
-		// // second deriv d2𝜓.re / dx**2
-		// double d2𝜓r = hamiltW[ix-1].re + hamiltW[ix+1].re - hamiltW[ix].re * 2;
-		// if (traceImaginaryStep) printf("⚛️ hitImaginary ix=%d\n", ix);
-		//
-		// // total hamiltonian
-		// double H𝜓 = d2𝜓r + voltage[ix] * voltageFactor * hamiltW[ix].im;
-		//
-		// // note addition
-		// if (traceImaginaryStep) printf("⚛️ hitImaginary ix=%d\n", ix);
-		// newW[ix].im = oldW[ix].im + dt * H𝜓;
-		// if (traceImaginaryStep) printf("⚛️ hitImaginary ix=%d\n", ix);
-		//
-		// qCheck(newW[ix], "vischer hitImaginary", ix);
 	}
 
 	qflick->fixThoseBoundaries(newW);
-	elapsedTime += dt/2;  // could be 0 or already dt/2
+	//elapsedTime += dt/2;  // could be 0 or already dt/2
 
-	if (traceVischerBench) printf("      hitImaginary done: time=%lf\n",
+	if (traceVischerBench) speedyLog("      hitImaginary done: time=%lf\n",
 		getTimeDouble());
-	if (traceImaginaryStep) printf("⚛️ end of hitImaginary:");
+	if (traceImaginaryStep) speedyLog("🧶 end of hitImaginary");
 
 }
 
@@ -228,5 +206,7 @@ void qGrinder::stepMidpoint(qCx *newW, qCx *oldW, qCx *scratch, double dt) {
 	}
 
 	// and that's the midpoint method
+	if (traceMidpoint) speedyLog("🧶 end of stepMidpoint");
+
 }
 

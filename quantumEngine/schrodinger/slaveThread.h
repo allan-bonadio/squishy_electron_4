@@ -55,6 +55,6 @@ struct slaveThread {
 	double startCalc;
 	double frameCalcTime;
 
-	static int newFrameFactor;
+// obsolete 	static int frameFactor;
 };
 
