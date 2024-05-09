@@ -61,7 +61,7 @@ function CPToolbar(props) {
 		<div className='frameRateBox'>
 			frame rate:<br />
 			<select className='rateSelector' name='rateSelector' value={apparentFrequency}
-					onChange={ev => setFrameFrequency(ev.currentTarget.value)}>
+					onChange={ev => setFrameFrequency(ev.currentTarget.value)} >
 				{repRates}
 			</select>
 		</div>
@@ -74,7 +74,7 @@ function CPToolbar(props) {
 					console.info(`CPToolbar props.cPanel.startStop -> (props)  props=`, props);
 				props.cPanel.startStop(ev)
 			}}>
-			{ props.space?.grinder.shouldBeIntegrating
+			{ props.shouldBeIntegrating
 				? <span><big>&nbsp;</big>▐▐ <big>&nbsp;</big></span>
 				: <big>►</big> }
 		</button>

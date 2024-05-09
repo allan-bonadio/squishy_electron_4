@@ -84,28 +84,38 @@ export class ControlPanel extends React.Component {
 		let voltageParams = getAGroup('voltageParams');
 		Object.assign(this.state, waveParams, voltageParams);
 
+		// we can't init some stuff till we get the space.  But we also can't until this constructor runs.
 		eSpaceCreatedPromise.then(space => {
-			// not much happens without this info
-			this.space = space;
-			this.N = space.dimensions[0].N;
-			this.mainEAvatar = space.mainEAvatar;
-			this.mainEWave = space.mainEWave;
-
-			this.grinder = space.grinder;
-			this.grinder.stretchedDt = this.state.dtStretch * this.space.dt;
-
-			this.grinder.shouldBeIntegrating = this.state.shouldBeIntegrating;
-			if (this.grinder.shouldBeIntegrating)
-				this.startAnimating();
-
-			console.log(`ControlPanel constructor Then clause, ${this.grinder.pointer.toString(16)}  isIntegrating=${this.grinder.isIntegrating}   shouldBeIntegrating=${this.grinder.shouldBeIntegrating}`);
-
+			this.initWithSpace(space);
 		})
 		.catch(rex => {
 			let ex = interpretCppException(rex);
 			console.error(ex.stack ?? ex.message ?? ex);
 			debugger;
 		});
+	}
+
+	// we need a surprising amount of stuff from the space.  So this gets called when it comes up.
+	initWithSpace(space) {
+		// not much happens without this info
+		this.space = space;
+		this.N = space.dimensions[0].N;
+		this.mainEAvatar = space.mainEAvatar;
+		this.mainEWave = space.mainEWave;
+
+		this.grinder = space.grinder;
+		this.grinder.stretchedDt = this.state.dtStretch * this.space.dt;
+
+		// if somebody tried to set this before the space and grinder
+		// were here, it's saved in the state.
+		this.grinder.shouldBeIntegrating = this.state.shouldBeIntegrating;
+		if (this.grinder.shouldBeIntegrating)
+			this.startAnimating();
+
+		console.log(`🎛️ ControlPanel constructor initialized with space, ${this.grinder.pointer.toString(16)} `
+			+` shouldBeIntegrating=${this.grinder.shouldBeIntegrating}  `
+			+` isIntegrating=${this.grinder.isIntegrating}`);
+
 	}
 
 	/* ******************************************************* start/stop */
@@ -121,57 +131,77 @@ export class ControlPanel extends React.Component {
 		// NO!  the grinder doesn't use this; squishpanel does.  this.grinder.framePeriod = this.framePeriod;
 	}
 
-	// the central authority as to whether we're animating/integrating or not is grinder.shouldBeIntegrating
-	// Change the status by turning this on or off.  Also, set in the settings.
+	// need to keep grinder's variable nd our state in sync for sbi.
+	// maybe these help.  Oh yeah, the setting, too.
+	get shouldBeIntegrating() {
+		// before the space is created, this.grinder is undefined
+		const sbi = this.grinder?.shouldBeIntegrating ?? false;
 
+		// NO this could be in a render method
+		//if (this.state.shouldBeIntegrating != sbi)
+		//	this.setState({shouldBeIntegrating: sbi});  // oops!
+
+		return sbi;
+	}
+	set shouldBeIntegrating(sbi) {
+		if (this.grinder)
+			this.grinder.shouldBeIntegrating = sbi;
+		this.setState({shouldBeIntegrating: sbi});
+		storeASetting('frameSettings', 'shouldBeIntegrating', sbi);
+	}
+
+	// the central authority as to whether we're animating/integrating or not is grinder.shouldBeIntegrating
+	// Change the status by calling start/stop animating functions here
+	// the C++ will copy it to isIntegrating at the right  time
 	startAnimating =
 	() => {
-		//console.info(`startAnimating starts`);
-		eSpaceCreatedPromise
-		.then(space => {
-			// set it true as you store it in store; then set state
-			space.grinder.shouldBeIntegrating  = storeASetting('frameSettings', 'shouldBeIntegrating', true);
-			this.setState({shouldBeIntegrating: true});
+		if (!this.space) return;  // too early.  mbbe should gray out the button?
+		if (this.shouldBeIntegrating) return;  // already on.  how'd this happen?
 
-			// must do this to start iteration loop going in the thread(s)
-			// NO!  shouldBeIntegrating will trigger each cycle.
-			//space.grinder.triggerIteration();
-			//console.log(`startAnimating done: shouldBeIntegrating =${space.grinder.shouldBeIntegrating}   `);
-			if (this.grinder) console.log(`ControlPanel startAnimating, isIntegrating=${this.grinder.isIntegrating}   shouldBeIntegrating=${this.grinder.shouldBeIntegrating}`);
-		});
+		console.info(`startAnimating starts, triggering iteration`);
+		// set it true as you store it in store; then set state
+		this.shouldBeIntegrating = true;
+		//	= storeASetting('frameSettings', 'shouldBeIntegrating', true);
+		//this.setState({shouldBeIntegrating: true});
 
+		// must do this to start iteration loop going in the thread(s)
+		this.grinder.triggerIteration();
+
+		//console.log(`startAnimating done: shouldBeIntegrating =${space.grinder.shouldBeIntegrating}   `);
+		console.log(`🎛️ ControlPanel startAnimating, shouldBeIntegrating=${this.shouldBeIntegrating}, isIntegrating=${this.grinder.isIntegrating}   `);
 	}
 
 	stopAnimating =
 	() => {
-		//console.info(`stopAnimating stops`);
-		eSpaceCreatedPromise
-		.then(space => {
-			// set it false as you store it in store; then set state
-			space.grinder.shouldBeIntegrating  = storeASetting('frameSettings', 'shouldBeIntegrating', false);
-			this.setState({shouldBeIntegrating: false});
-			if (this.grinder) console.log(`ControlPanel STOP Animating, isIntegrating=${this.grinder.isIntegrating}   shouldBeIntegrating=${this.grinder.shouldBeIntegrating}`);
-		});
+		if (!this.space) return;  // too early.  mbbe should gray out the button?
+		if (!this.shouldBeIntegrating) return;  // already off.  how'd this happen?
+
+		// set it false as you store it in store; then set state
+		this.shouldBeIntegrating = false;
+		console.log(`🎛️ ControlPanel STOP Animating, shouldBeIntegrating=${this.shouldBeIntegrating}, isIntegrating=${this.grinder.isIntegrating}   `);
 	}
 
 	startStop =
 	ev => {
-		if (this.grinder.shouldBeIntegrating)
+		if (this.shouldBeIntegrating)
 			this.stopAnimating();
 		else
 			this.startAnimating();
 	}
 
+	// needs work
 	singleFrame =
 	(ev) => {
 		//console.info(`singleFrame starts`);
-		this.grinder.shouldBeIntegrating = true;
-		this.setState({shouldBeIntegrating: true});
+		this.shouldBeIntegrating = true;
 
 		this.grinder.justNFrames = 1;
 
+		this.grinder.triggerIteration();
+
 		// wait ... need to do this one tic later.  Well, close enough.
-		setTimeout(() => this.sPanel.animator.drawLatestFrame(), 100);
+		setTimeout(() => this.shouldBeIntegrating = false, 100);
+		//setTimeout(() => this.sPanel.animator.drawLatestFrame(), 100);
 
 	}
 
@@ -246,7 +276,7 @@ export class ControlPanel extends React.Component {
 		dtStretch = storeASetting('frameSettings', 'dtStretch', dtStretch);
 		this.setState({dtStretch});
 		this.grinder.stretchedDt = dtStretch * this.space.dt;
-		console.log(`setDtStretch: dt = ${this.space.dt}   dtStretch= ${dtStretch} stretchedDt=${this.grinder.stretchedDt}`)
+		console.log(`🎛️ setDtStretch: dt = ${this.space.dt}   dtStretch= ${dtStretch} stretchedDt=${this.grinder.stretchedDt}`)
 	}
 
 	//setStepsPerFrame =
@@ -350,7 +380,7 @@ export class ControlPanel extends React.Component {
 				frameFrequency={1000. / s.framePeriod}
 				setFrameFrequency={this.setFrameFrequency}
 
-				shouldBeIntegrating={this.grinder?.shouldBeIntegrating ?? false}
+				shouldBeIntegrating={this.shouldBeIntegrating ?? false}
 
 				resetWave={this.resetWave}
 				resetVoltage={this.resetVoltage}
@@ -380,7 +410,8 @@ export class ControlPanel extends React.Component {
 	}
 
 	componentDidUpdate() {
-		// these should be EQUAL!  but single step leaves it off without updating our state.  Make sure it's ok here.
+		// these should be EQUAL!  but single step turns it off without
+		// updating our state.  Make sure it's ok here.
 		if (this.state.shouldBeIntegrating != this.grinder.shouldBeIntegrating)
 			this.setState({shouldBeIntegrating: this.grinder.shouldBeIntegrating});
 	}
