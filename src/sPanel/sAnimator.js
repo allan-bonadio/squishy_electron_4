@@ -85,7 +85,7 @@ class sAnimator {
 
 	// Repaint, with webgl, the waveview.
 	drawLatestFrame() {
-		//if (traceStats) console.log(`time since last tic: ${performance.now()
+		//if (traceStats) console.log(`🎥 time since last tic: ${performance.now()
 		//		- this.inteTimes.startIntegrationTime}ms`);
 		let startDrawTime = performance.now();
 		this.inteTimes.frameDrawPeriod = startDrawTime - this.inteTimes.prevDrawTime;
@@ -146,7 +146,7 @@ class sAnimator {
 		this.displayFP = this.grinder.displayFP
 			= this.frameFactor * newAnimationFP;
 
-		if (traceFramePeriods) console.log(`targetFP=${targetFP}  newAnimationFP=${newAnimationFP} `
+		if (traceFramePeriods) console.log(`🎥 targetFP=${targetFP}  newAnimationFP=${newAnimationFP} `
 			+ ` frameFactor=${this.frameFactor}   displayFP=${this.displayFP}`);
 	}
 
@@ -172,7 +172,7 @@ class sAnimator {
 			// something's changing, let it settle down.  Some timing
 			// fumbles are tolerable while this is on.
 			this.unstableFP = true;
-			if (traceFramePeriods) console.log(`🪓 aniFP change!  animationFP=${animationFP}  `
+			if (traceFramePeriods) console.log(`🎥  aniFP change!  animationFP=${animationFP}  `
 				+ ` this.avgAnimationFP = ${this.avgAnimationFP}  `
 				+ `abs diff = ${Math.abs(animationFP - this.avgAnimationFP)} `);
 		}
@@ -200,6 +200,11 @@ class sAnimator {
 	//	CPToolbar, or moves to a screen with a different scan rate.
 	rAFHandler =
 	now => {
+		// sometimes these can pile up on the stack or list of threads or something
+		// so here, if one already started, return quickly from any new ones that get started
+		if (this.alreadyRAF)
+			return;
+		this.alreadyRAF = true;
 
 		//		if (traceHeartbeats && ((this.heartbeatSerial & onceInAWhile) == 0))
 		//			console.log(`🎥  a heartbeat, serial every ${onceInAWhile+1}: `
@@ -218,8 +223,10 @@ class sAnimator {
 				this.needsRepaint = true;
 			}
 
+			// has USER turned this on?  we shouldn't do this every frame; it
 			if (this.grinder.shouldBeIntegrating) {
-				this.grinder.triggerIteration();
+				// yeah the repaint will happen only for the previous integration
+				//this.grinder.triggerIteration();
 				this.needsRepaint = true;
 			}
 
@@ -242,6 +249,7 @@ class sAnimator {
 		this.measureAndUpdateFramePeriods(now);
 
 		requestAnimationFrame(this.rAFHandler);
+		this.alreadyRAF = false;
 	}
 
 	/* *************************************  runningDiagnosticCycle of circular wave*/
