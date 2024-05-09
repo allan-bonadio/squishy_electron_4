@@ -103,7 +103,7 @@ void qAvatar::formatDirectOffsets(void) {
 	printf("\n🚦 🚦 --------------- done with qAvatar direct access --------------\n");
 }
 
-/* ********************************************************** dumpObj  */
+/* ********************************************************** dump  */
 
 // dump all the fields of an avatar
 void qAvatar::dumpObj(const char *title) {
@@ -115,5 +115,4 @@ void qAvatar::dumpObj(const char *title) {
 
 	printf("        ==== end of qAvatar ====\n\n");
 }
-
 

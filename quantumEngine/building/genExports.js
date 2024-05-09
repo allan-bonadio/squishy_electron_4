@@ -63,7 +63,10 @@ let exportsSrc  = [
 
 	{name: 'grinder_askForFFT', args: ['number'], retType: null},
 
+	// this one is called from JS
 	{name: 'grinder_copyFromAvatar', args: ['number', 'number'], retType: null},
+
+	// i think this one is actually only called from C++
 	{name: 'grinder_copyToAvatar', args: ['number', 'number'], retType: null},
 
 

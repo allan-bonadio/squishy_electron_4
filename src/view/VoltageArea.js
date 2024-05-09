@@ -66,13 +66,13 @@ export class VoltageArea extends React.Component {
 			changeSerial: 0,
 		};
 		if (traceVoltageArea)
-			console.log(`👆 👆 the new VoltageArea:`, this);
+			console.log(`⚡️ the new VoltageArea:`, this);
 
 		this.cnDrag = new clickNDrag(this.mouseDown, this.onEvent, this.mouseUp);
 
 
 		if (traceVoltageArea)
-			console.log(`👆 👆 VoltageArea  constructor done`);
+			console.log(`⚡️ VoltageArea  constructor done`);
 	}
 
 	componentWillUnmount() {
@@ -162,7 +162,7 @@ export class VoltageArea extends React.Component {
 			return;  // same old same old; these events come too fast
 
 		if (traceDragging) {
-			console.log(`👆 👆 mouse %s on point (%f,%f) voltage @ ix=%d changing from %f to %f`,
+			console.log(`⚡️ mouse %s on point (%f,%f) voltage @ ix=%d changing from %f to %f`,
 				phase,
 				cnDrag.xArena, cnDrag.yArena,
 				ix, v.voltageBuffer[ix], newVoltage);
@@ -182,10 +182,10 @@ export class VoltageArea extends React.Component {
 			let lo = Math.min(this.latestIx, ix);
 			for (let ixx = lo; ixx <= hi; ixx++) {
 				if (traceTweening)
-					console.log(`👆 👆 tweening: set point [${ixx}] to ${tweenScale(ixx).toFixed(4)}`)
+					console.log(`⚡️ tweening: set point [${ixx}] to ${tweenScale(ixx).toFixed(4)}`)
 				v.voltageBuffer[ixx] = tweenScale(ixx);
 			}
-			if (traceTweening) console.log(`👆 👆 tweening done`)
+			if (traceTweening) console.log(`⚡️ tweening done`)
 		}
 
 		this.latestIx = ix;
@@ -217,7 +217,7 @@ export class VoltageArea extends React.Component {
 	//	let chosenVoltage = v.yScale.invert(ev.clientY);
 	//	this.mouseYOffset = chosenVoltage - this.latestVoltage;
 	//	if (traceDragging) {
-	//		console.log(`👆 👆 🎯  Y numbers: mouseYOffset(${this.mouseYOffset}) =
+	//		console.log(`⚡️ 🎯  Y numbers: mouseYOffset(${this.mouseYOffset}) =
 	//			chosenVoltage(${chosenVoltage}) - latestVoltage(${this.latestVoltage})
 	//			from client X=${ev.clientX}    Y=${ev.clientY}`);
 	//	}
@@ -251,7 +251,7 @@ export class VoltageArea extends React.Component {
 		// no gotta catch wheel events  cnDrag.arenaEl.style.pointerEvents = 'none';
 
 		if (traceDragging) {
-			console.log(`👆 👆 mouse UP on point (%f,%f) voltage @ ix=%d stopped at %f`,
+			console.log(`⚡️ mouse UP on point (%f,%f) voltage @ ix=%d stopped at %f`,
 				cnDrag.xArena, cnDrag.yArena,
 				this.latestIx, v.voltageBuffer[this.latestIx]);
 		}
@@ -317,7 +317,7 @@ export class VoltageArea extends React.Component {
 		if (p.space)
 			p.space.updateVoltageArea = this.updateVoltageArea;
 		else
-			console.log(`👆 👆  VoltageArea, no space! ${p.space}.  Is there also no vDisp?  ${p.vDisp}`);
+			console.log(`⚡️  VoltageArea, no space! ${p.space}.  Is there also no vDisp?  ${p.vDisp}`);
 	}
 
 
@@ -362,7 +362,7 @@ export class VoltageArea extends React.Component {
 			const pathAttribute = v.makeVoltagePathAttribute();
 			//const pathAttribute = this.makePathAttribute(start, end);
 			if (traceRendering)
-				console.log(`👆 👆 VoltageArea.pathAttribute: `, pathAttribute);
+				console.log(`⚡️ VoltageArea.pathAttribute: `, pathAttribute);
 
 			// this one actually draws the voltage line
 			paths.push(
@@ -404,7 +404,7 @@ export class VoltageArea extends React.Component {
 	render() {
 		const p = this.props;
 		if (traceRendering)
-			console.log(`👆 👆 VoltageArea.render()`, p.canvasFacts);
+			console.log(`⚡️ VoltageArea.render()`, p.canvasFacts);
 		if (! p.space)
 			return '';  // too early
 		this.barWidth = p.canvasFacts.width / p.space.nPoints;
@@ -425,7 +425,7 @@ export class VoltageArea extends React.Component {
 		);
 
 		if (traceRendering)
-			console.log(`👆 👆 VoltageArea render done`);
+			console.log(`⚡️ VoltageArea render done`);
 
 		return vArea;
 	}

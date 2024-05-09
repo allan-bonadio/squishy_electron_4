@@ -139,8 +139,8 @@ export function VoltageSidebar(props) {
 	thumbY = thumbFreedom * (1 - (v.bottomVolts - v.minBottom) / v.heightVolts)
 
 	if (traceVoltageSidebar) {
-		console.log(`🍟 🍟 V Sidebar rend: width=${sidebarWidth}  heightVolts=${v.heightVolts}hv
-		🍟 🍟    ${v.minBottom}sm ... ${v.bottomVolts}bv ... ${v.maxBottom}sm ||| ${v.maxTop}am`);
+		console.log(`🍟 V Sidebar rend: width=${sidebarWidth}  heightVolts=${v.heightVolts}hv
+		🍟    ${v.minBottom}sm ... ${v.bottomVolts}bv ... ${v.maxBottom}sm ||| ${v.maxTop}am`);
 	}
 
 	// render.  The buttons are almost square.

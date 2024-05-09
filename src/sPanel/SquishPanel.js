@@ -52,7 +52,7 @@ export class SquishPanel extends React.Component {
 		if (SquishPanel.squishPanelConstructed) {
 			// should not be called twice!  now that i've got craco and space recreate relods the page,
 			// I shouldn't need this anymore, right ?!?!?!?!?  TODO
-			console.log(`annoying hot reload; continue to really reload page...🙄  👿 🤢 😵 🤬 😭 😠`);
+			console.log(`👑 annoying hot reload; continue to really reload page...🙄  👿 🤢 😵 🤬 😭 😠`);
 			debugger;
 			location = location;  // eslint-disable-line no-restricted-globals
 		}
@@ -133,7 +133,7 @@ export class SquishPanel extends React.Component {
 		let nRows = s.space.nPoints * 2;
 		let vb = s.space.mainVBuffer;
 		const _ = (f) => f.toFixed(3).padStart(6);
-		console.log(`dump of view buffer '${title}' for ${s.space.nPoints} points in ${nRows} rows`);
+		console.log(`👑 dump of view buffer '${title}' for ${s.space.nPoints} points in ${nRows} rows`);
 		for (let i = 0; i < nRows; i++)
 			console.log(_(vb[i*4]), _(vb[i*4+1]), _(vb[i*4+2]), _(vb[i*4+3]));
 	}

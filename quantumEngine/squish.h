@@ -21,15 +21,21 @@ extern const double NaN;
 extern double getTimeDouble(void);
 
 #ifdef qDEV_VERSION
-	extern void qCheck(qCx aCx, const char *where = "", int index = -999999999);
-	extern void qCheckReset(void);
+extern void qCheck(qCx aCx, const char *where = "", int index = -999999999);
+extern void qCheckReset(void);
 #else
-	#define qCheck(where, ...)
-	#define qCheckReset(where, ...)
+#define qCheck(where, ...)
+#define qCheckReset(where, ...)
 #endif
 
 // use this for tracing without needing the debugger.
 #define FOOTPRINT  printf("🦶 FOOTPRINT 🦶 %s() in %s:%d 🦶\n", __FUNCTION__, __FILE__, __LINE__);
+
+// use speedyLog() just like printf(), then call speedyFlush() to print out
+// everything logged
+extern void speedyLog(const char* format, ...);
+extern void speedyFlush(void);
+
 
 #endif
 

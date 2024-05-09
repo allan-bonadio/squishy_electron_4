@@ -30,7 +30,7 @@ class DocReader extends React.Component {
 
 			...this.getOurDimensions(),
 		};
-		if (traceReader) console.log(`📘 📘 doc reader constructed for '${DocReader.startingUri}'`);
+		if (traceReader) console.log(`📘 oc reader constructed for '${DocReader.startingUri}'`);
 
 	}
 

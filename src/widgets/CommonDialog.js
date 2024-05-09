@@ -110,7 +110,7 @@ CommonDialog.openDialog =
 			CommonDialog.dialogElement.showModal();
 		} catch (ex) {
 			// not a big deal
-			console.log(ex);
+			console.warn(ex);
 		}
 	}
 
@@ -152,7 +152,7 @@ CommonDialog.returnEscapeKeyDown =
 	ev.preventDefault();
 	ev.stopPropagation();
 	if (traceKeystrokes)
-		console.log(`Keystroke: ev.key=${ev.key}  ev.code=${ev.code}`, ev);
+		console.log(`⌨️ Keystroke: ev.key=${ev.key}  ev.code=${ev.code}`, ev);
 
 	if (ev.isComposing || ev.keyCode === 229)
 		return;

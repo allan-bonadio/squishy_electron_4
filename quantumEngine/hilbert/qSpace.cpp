@@ -17,7 +17,7 @@
 #include "../directAccessors.h"
 
 
-static bool traceQSpace = true;
+static bool traceQSpace = false;
 
 
 /* ****************** constants */
@@ -39,7 +39,7 @@ qSpace::qSpace(const char *lab)
 		voltageFactor(-.1) {
 
 	if (traceQSpace) {
-		printf("🚀 🚀 qSpace::qSpace() constructor starts label:'%s'  this= %p\n",
+		printf("🚀 🚀 qSpace::qSpace() constructor starts. label:'%s'  this= %p\n",
 			lab, (this));
 		printf("      ℏ=%8.3g, m_e=%8.3g, ℏOver2m_e=%8.3g, inverseℏ=%8.3g\n",
 			ℏ, m_e, ℏOver2m_e, inverseℏ);
@@ -63,8 +63,8 @@ qSpace::qSpace(const char *lab)
 // after the contructor, call this to add each dimension up to MAX_DIMENSIONS
 void qSpace::addDimension(int N, int continuum, double dx, const char *label) {
 	if (nDimensions >= MAX_DIMENSIONS) {
-		printf("🚀 🚀 Error dimensions: %d\n", nDimensions);
-		throw std::runtime_error("🚀 🚀 too many dimensions");
+		printf("🚀 Error dimensions: %d\n", nDimensions);
+		throw std::runtime_error("🚀 too many dimensions");
 	}
 
 	// start of the next dim
@@ -130,7 +130,7 @@ void qSpace::tallyDimensions(void) {
 	spectrumLength = dimensions[0].spectrumLength;
 
 	if (traceQSpace) {
-		printf("🚀 🚀  got past tallyDimensions; nStates=%d  nPoints=%d\n", nStates, nPoints);
+		printf("🚀  got past tallyDimensions; nStates=%d  nPoints=%d\n", nStates, nPoints);
 		printf("   d2Coeff=%lf  alpha=%lf /ps  dt=%lf ps\n",
 			dimensions[0].d2Coeff, alpha, dt);
 	}
@@ -148,13 +148,13 @@ void qSpace::initSpace() {
 
 // the avatars and grinder are deleted in deleteFullSpace
 qSpace::~qSpace(void) {
-	if (traceQSpace) printf("🚀 🚀 qSpace destructor starting %s, this= %p  \n", label, (this));
+	if (traceQSpace) printf("🚀 qSpace destructor starting %s, this= %p  \n", label, (this));
 
 	// not there if initSpace() never called
 	if (voltage)
 		delete[] voltage;
 
-	if (traceQSpace) printf("🚀 🚀 qSpace destructor done this= %p\n", (this));
+	if (traceQSpace) printf("🚀 qSpace destructor done this= %p\n", (this));
 }
 
 // need these numbers for the js interface to this object, to figure out the offsets.
@@ -207,7 +207,7 @@ void qSpace::dumpVoltage(const char *title) {
 	int ix;
 	qDimension *dims = dimensions;
 
-	printf("🚀 🚀 == Voltage %s, %d...%d\n", title, dims->start, dims->end);
+	printf("🚀 == Voltage %s, %d...%d\n", title, dims->start, dims->end);
 
 	int half = dims->N / 2;
 	int quarter = dims->N / 4;
@@ -218,6 +218,6 @@ void qSpace::dumpVoltage(const char *title) {
 			ix, voltage[ix], ix+quarter, voltage[ix+quarter],
 			ix+half, voltage[ix+half], ix+half+quarter, voltage[ix+half+quarter]);
 	}
-	printf("🚀 🚀 == Voltage %s, %d...%d\n", title, dims->start, dims->end);
+	printf("🚀 == Voltage %s, %d...%d\n", title, dims->start, dims->end);
 }
 

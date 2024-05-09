@@ -86,7 +86,7 @@ class ErrorBoundary extends React.Component {
 	// Here, we'll turn on state.errorObj if one comes in.
 	static getDerivedStateFromError(errorObj) {
 		if (traceExceptions)
-			console.log(`🚒 🚒  getDerivedStateFromError():`, errorObj)
+			console.log(`🧨 🧨  getDerivedStateFromError():`, errorObj)
 
 		// react will setState:
 		return { errorObj };
@@ -98,7 +98,7 @@ class ErrorBoundary extends React.Component {
 	// Usually also gets called after getDerivedStateFromError() with the same errorObj
 	componentDidCatch(errorObj, infoObj) {
 		if (traceExceptions)
-			console.log(`🚒 🚒 ErrorBoundary: componentDidCatch() `, errorObj, infoObj);
+			console.log(`🧨 🧨 ErrorBoundary: componentDidCatch() `, errorObj, infoObj);
 		if (!this.state.errorObj) {
 			//  first time, state.errorObj is null.  Just remember the new one.
 			// next see: compDidUpdate()
@@ -116,9 +116,9 @@ class ErrorBoundary extends React.Component {
 
 		// those were different errors... this one is new.  this happened while handling the previous error?
 		// Two strikes you're out: nested errors locks you up
-		console.warn(`##### ErrorBoundary ######### this.state.errorObj !== errorObj ##########`);
-		console.warn(`#### ${this.state.errorObj.message} !== ${errorObj.message} ####`);
-		console.warn(`### error encountered handling error; contact Allan ###`);
+		console.warn(`🧨🧨🧨🧨🧨 ErrorBoundary 🧨🧨🧨🧨🧨🧨🧨🧨🧨 this.state.errorObj !== errorObj 🧨🧨🧨🧨🧨🧨🧨🧨🧨🧨`);
+		console.warn(`🧨🧨🧨🧨 ${this.state.errorObj.message} !== ${errorObj.message} 🧨🧨🧨🧨`);
+		console.warn(`🧨🧨🧨 error encountered handling error; contact Allan 🧨🧨🧨`);
 		this.setState({ terminalErrorObj: errorObj });
 	}
 

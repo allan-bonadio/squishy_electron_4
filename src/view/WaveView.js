@@ -96,7 +96,7 @@ export class WaveView extends React.Component {
 		this.canvasFacts.height = height;
 		this.setState({height: height});
 		if (traceWidth)
-			console.log(`🏄 🏄WaveView setFacts, width=${width}   height: ${height}  `);
+			console.log(`🏄 WaveView setFacts, width=${width}   height: ${height}  `);
 	}
 
 	componentDidUpdate() {
@@ -110,7 +110,7 @@ export class WaveView extends React.Component {
 					|| this.formerWidth != this.waveViewEl.clientWidth
 					|| this.formerHeight != s.height) ) {
 			if (traceScaling) {
-				console.log(`🏄 🏄 mainEAvatar=${this.mainEAvatar.label}
+				console.log(`🏄 mainEAvatar=${this.mainEAvatar.label}
 				formerShowVoltage=${this.formerShowVoltage}   showVoltage=${p.showVoltage}
 				formerWidth=${this.formerWidth}   wv.clientWidth=${this.waveViewEl.clientWidth}
 				formerHeight=${this.formerHeight}   height=${s.height}`);
@@ -131,7 +131,7 @@ export class WaveView extends React.Component {
 		this.resizing = true;
 		this.yOffset = this.state.height - ev.pageY;
 		if (traceDragCanvasHeight)
-			console.info(`🏄 🏄 mouse down ${ev.pageX} ${ev.pageY} offset=${this.yOffset}`);
+			console.info(`🏄 mouse down ${ev.pageX} ${ev.pageY} offset=${this.yOffset}`);
 		const b = document.body;
 		b.addEventListener('mousemove', this.mouseMove);
 		b.addEventListener('mouseup', this.mouseUp);
@@ -148,7 +148,7 @@ export class WaveView extends React.Component {
 			this.setState({height: vHeight});
 		storeASetting('miscSettings', 'waveViewHeight', vHeight);
 		if (traceDragCanvasHeight)
-			console.info(`🏄 🏄 mouse drag ${ev.pageX} ${ev.pageY}  newheight=${ev.pageY + this.yOffset}`);
+			console.info(`🏄 mouse drag ${ev.pageX} ${ev.pageY}  newheight=${ev.pageY + this.yOffset}`);
 
 		ev.preventDefault();
 		ev.stopPropagation();
@@ -157,7 +157,7 @@ export class WaveView extends React.Component {
 	mouseUp =
 	ev => {
 		if (traceDragCanvasHeight)
-			console.info(`🏄 🏄 mouse up ${ev.pageX} ${ev.pageY}`);
+			console.info(`🏄 mouse up ${ev.pageX} ${ev.pageY}`);
 		this.resizing = false;
 
 		const b = document.body;
@@ -211,7 +211,7 @@ export class WaveView extends React.Component {
 			widthToUse -= voltageSidebarWidth + .5;
 
 		if (traceWidth) {
-			console.log(`🏄 🏄WaveView render, width=${this.waveViewEl?.clientWidth}`+
+			console.log(`🏄 WaveView render, width=${this.waveViewEl?.clientWidth}`+
 			`  parent.clientWidth: ${this.waveViewEl?.parentNode.clientWidth}   widthToUse=${widthToUse}`);
 		}
 
