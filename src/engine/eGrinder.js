@@ -43,7 +43,6 @@ class eGrinder {
 	// are passed by pointer and you need to allocate them in JS (eg see
 	// eGrinder.constructor)
 
-
 	get _space() { return this.ints[1]; }
 
 	get elapsedTime() { return this.doubles[2]; }
@@ -53,7 +52,7 @@ class eGrinder {
 
 	get justNFrames() { return this.ints[30]; }
 	set justNFrames(a) { this.ints[30] = a; }
-	get frameCalcTime() { return this.doubles[10]; }
+	get totalCalcTime() { return this.doubles[10]; }
 	get maxCalcTime() { return this.doubles[11]; }
 	get shouldBeIntegrating() { return Boolean(this.bools[152]); }
 	set shouldBeIntegrating(a) { this.bools[152] = a; }
@@ -61,6 +60,8 @@ class eGrinder {
 	set isIntegrating(a) { this.bools[153] = a; }
 	get pleaseFFT() { return Boolean(this.bools[154]); }
 	set pleaseFFT(a) { this.bools[154] = a; }
+	get needsRepaint() { return Boolean(this.bools[155]); }
+	set needsRepaint(a) { this.bools[155] = a; }
 
 	get stretchedDt() { return this.doubles[3]; }
 	set stretchedDt(a) { this.doubles[3] = a; }
@@ -81,7 +82,7 @@ class eGrinder {
 	get _stages() { return this.ints[27]; }
 	get _threads() { return this.ints[28]; }
 	get _label() { return this.pointer + 136; }
-	get sentinel() { return Boolean(this.bools[155]); }
+	get sentinel() { return Boolean(this.bools[156]); }
 
  	/* ******************* end of direct accessors */
 

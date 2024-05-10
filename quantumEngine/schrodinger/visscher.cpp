@@ -10,10 +10,10 @@
 #include "../debroglie/qFlick.h"
 
 
-static bool traceRealStep = true;  // in detail
+static bool traceRealStep = false;  // in detail
 static bool traceImaginaryStep = false;  // in detail
 static bool traceVischerBench = false;
-static bool traceMidpoint = true;
+static bool traceMidpoint = false;
 
 
 /*

@@ -73,6 +73,9 @@ struct qGrinder {
 
 	// frameFactor: number of rAF cycles in an integration frame.
 	int frameFactor;
+
+	// scan period of the screen = target rate for a frame of grinding
+	// In seconds, with fractions.  comes from sAnimator.
 	double integrationFP;
 
 	// a subclass of  qWave, it has multiple waves to do grinding with
@@ -84,7 +87,7 @@ struct qGrinder {
 	double voltageFactor;  // aligned by 8
 
 	// how long (thread time) it took to do the latest frame, all threads added together
-	double frameCalcTime;
+	double totalCalcTime;
 	double maxCalcTime;  // and max of all threads
 
 	double reversePercent;  // divergence measure
@@ -103,16 +106,14 @@ struct qGrinder {
 	int justNFrames;
 
 	#ifdef USING_ATOMICS
-	// Starts at -1 = waiting at starting line, or set it to 0 to launch a frame.  All the threads atomic_wait, waiting for this to turn
-	// nonnegative.  ?? Then each thread starts by atomically incrementing this,
-	// and then, proceeds to start iteration.  When the last one starts,
-	// it's equal to nSlaveThreads ??
+	// Starts at -1 = waiting at starting line, or set it to 0 to launch
+	// a frame.  All the threads atomic_wait, waiting for this to turn
+	// nonnegative.
 	_Atomic int startAtomic;
 
 	// starts at 0.  As each thread finishes their iteration work, they
 	// atomically increment it.  The thread that increments it to
-	// nSlaveThreads, knows it's the last and calls threadsHaveFinished(),
-	// which does several things.
+	// nSlaveThreads, knows it's the last and calls threadsHaveFinished()
 	_Atomic int finishAtomic;
 
 	#else
@@ -164,6 +165,10 @@ struct qGrinder {
 
 	// true = please do an FFT after the current frame ends
 	bool pleaseFFT;
+
+	// grinding turns this on upon a new grind, so JS goes and repaints it
+	bool needsRepaint;
+
 	// make sure the subsequent fields are aligned!  or frame is painfully slow.
 
 	// Actually do integration, single thread only.

@@ -11,6 +11,7 @@
 static bool traceStart = false;
 static bool traceWork = false;
 static bool traceFinish = false;
+static bool traceSync = false;
 
 /* *********************************************** slave threads */
 
@@ -93,13 +94,15 @@ void slaveThread::slaveLoop(void) {
 			// it'll lock and unlock, then start its integration work.
 			// so they all start at roughly the same time.
 			#ifdef USING_ATOMICS
-			speedyLog("🏁 🔪 Starting Gate in slaveThread::slaveLoop- startAtomic=%d (shdbe -1) 🏁\n",
+			if (traceSync) speedyLog("🏁 🔪 at Starting Gate in slaveThread::slaveLoop- "
+				"startAtomic=%d (stopped= -1, go=0) 🏁\n",
 				grinder->startAtomic);
 			speedyFlush();
 
 			// wait forever to get notified, when startAtomic changes from -1 to zero
 			int howEnded = emscripten_atomic_wait_u32(&grinder->startAtomic, -1, ATOMICS_WAIT_DURATION_INFINITE);
-			speedyLog("🔪 after atomic wait on startAtomic=%d (shdbe 0) and wait returned %d ok=0, ≠1, timeout=2\n",
+			if (traceSync) speedyLog("🔪 after atomic wait on startAtomic=%d (shdbe 0) and wait "
+				"returned %d ok=0, ≠1, timeout=2\n",
 				emscripten_atomic_load_u32(&grinder->startAtomic), howEnded);
 			speedyFlush();
 
@@ -108,7 +111,7 @@ void slaveThread::slaveLoop(void) {
 			nWas++;
 
 // 			while (atomic_load(&grinder->startAtomic) < 0) ;
-			speedyLog("🔪 after atomic_add on startAtomic=%d (shdbe 0 or more)\n", nWas);
+			if (traceSync) speedyLog("🔪 after atomic_add on startAtomic=%d (shdbe 0 or more)\n", nWas);
 			//emscripten_debugger();
 
 // 			nWas = atomic_fetch_add(&grinder->startAtomic, 1);  // returns number BEFORE incr
@@ -139,10 +142,10 @@ void slaveThread::slaveLoop(void) {
 
 			// tell the boss we're done
 			#ifdef USING_ATOMICS
-			speedyLog("🔪 before increment on finishAtomic=%d (shdbe 0)\n", grinder->finishAtomic);
+			if (traceSync) speedyLog("🔪 before increment on finishAtomic=%d (shdbe 0)\n", grinder->finishAtomic);
 			nWas = emscripten_atomic_add_u32(&grinder->finishAtomic, 1);  // returns number BEFORE incr
 			nWas++;
-			speedyLog("🔪 after increment on finishAtomic=%d (shdbe 1 or more)\n", grinder->finishAtomic);
+			if (traceSync) speedyLog("🔪 after increment on finishAtomic=%d (shdbe 1 or more)\n", grinder->finishAtomic);
 
 			#else
 

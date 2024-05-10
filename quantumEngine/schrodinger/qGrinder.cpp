@@ -27,7 +27,7 @@
 
 
 
-static bool traceIntegration = true;
+static bool traceIntegration = false;
 static bool traceIntegrationDetailed = false;
 
 static bool traceJustWave = false;
@@ -41,8 +41,9 @@ static bool traceConstructor = false;
 
 static bool traceReversals = false;
 
-static bool traceAggregate = false;
+static bool traceAggregate = true;
 static bool traceSingleStep = true;
+static bool traceThreadsHaveFinished = false;
 
 // RK2
 #define MIDPOINT_METHOD
@@ -130,21 +131,6 @@ qGrinder::~qGrinder(void) {
 	qspect = NULL;
 };
 
-// some uses never need this so wait till they do
-qSpectrum *qGrinder::getSpectrum(void) {
-	if (!qspect)
-		qspect = new qSpectrum(space);
-	return qspect;
-};
-
-void qGrinder::copyFromAvatar(qAvatar *avatar) {
-	qflick->copyBuffer(qflick, avatar->qwave);  // to buffer zero
-}
-
-void qGrinder::copyToAvatar(qAvatar *avatar) {
-	qflick->copyBuffer(avatar->qwave, qflick);  // from buffer zero
-}
-
 // need these numbers for the js interface to this object, to figure out the offsets.
 // see eGrinder.js ;  usually this function isn't called.
 // See directAccessors.h to change FORMAT_DIRECT_OFFSETS to
@@ -167,7 +153,7 @@ void qGrinder::formatDirectOffsets(void) {
 	makeIntGetter(justNFrames);
 	makeIntSetter(justNFrames);
 
-	makeDoubleGetter(frameCalcTime);
+	makeDoubleGetter(totalCalcTime);
 	makeDoubleGetter(maxCalcTime);
 
 	makeBoolGetter(shouldBeIntegrating);
@@ -177,6 +163,9 @@ void qGrinder::formatDirectOffsets(void) {
 
 	makeBoolGetter(pleaseFFT);
 	makeBoolSetter(pleaseFFT);
+
+	makeBoolGetter(needsRepaint);
+	makeBoolSetter(needsRepaint);
 
 	printf("\n");
 	makeDoubleGetter(stretchedDt);
@@ -246,6 +235,23 @@ void qGrinder::dumpObj(const char *title) {
 	speedyLog("        ==== end of qGrinder::dumpObj(%s) ====\n\n", title);
 }
 
+/* ********************************************************** avatar and view buffer */
+
+// some uses never need this so wait till they do
+qSpectrum *qGrinder::getSpectrum(void) {
+	if (!qspect)
+		qspect = new qSpectrum(space);
+	return qspect;
+};
+
+void qGrinder::copyFromAvatar(qAvatar *avatar) {
+	qflick->copyBuffer(qflick, avatar->qwave);  // to buffer zero
+}
+
+void qGrinder::copyToAvatar(qAvatar *avatar) {
+	qflick->copyBuffer(avatar->qwave, qflick);  // from buffer zero
+}
+
 /* ********************************************************** tally & measure divergence */
 
 // this tally stuff, it's not detecting divergence explosion early enough.
@@ -293,7 +299,6 @@ void qGrinder::oneFrame() {
 		speedyLog("qGrinder 🪓 starting oneFrame()\n");
 	if (traceIntegrationDetailed)
 		qGrinder::dumpObj("qGrinder starting oneFrame");
-//	isIntegrating = frameInProgress = true;
 	qCx *wave0 = qflick->waves[0];
 	qCx *wave1 = qflick->waves[1];
 	qCx *wave2 = qflick->waves[2];
@@ -369,7 +374,6 @@ void qGrinder::oneFrame() {
 			wave0[5]);
 
 	frameSerial++;
-//	frameInProgress = false;
 	qCheckReset();
 }
 
@@ -378,19 +382,30 @@ void qGrinder::oneFrame() {
 
 void qGrinder::aggregateCalcTime(void) {
 	// add up ALL the threads' frameCalcTime and keep a running average
-	//double frameCalcTime;
-	frameCalcTime = 0;
+	totalCalcTime = 0;
 	maxCalcTime = 0;
 	for (int ix = 0; ix < nSlaveThreads; ix++) {
 		slaveThread *sl = slaves[ix];
 		if (sl) {
-			frameCalcTime += sl->frameCalcTime;
+			totalCalcTime += sl->frameCalcTime;
 			maxCalcTime = fmax(maxCalcTime, sl->frameCalcTime);
 		}
 	}
+
+	// now compare it to the screen and adjust so it's just under the frame  time
+	// double gap = fabs(maxCalcTime - integrationFP);
+	// if (maxCalcTime >= integrationFP) {
+	stepsPerFrame += (stepsPerFrame / maxCalcTime) * (integrationFP - maxCalcTime);
+	// }
+	//else if (maxCalcTime < integrationFP * 15 / 16) {
+		//stepsPerFrame += (stepsPerFrame / maxCalcTime) * integrationFP;
+	//}
+
 	if (traceAggregate) {
-		speedyLog(" qGrinder 🪓 aggregate time summed: %15.6lf  maxed: %15.6lf\n",
-			frameCalcTime, maxCalcTime);
+		speedyLog(" qGrinder 🪓 aggregate time summed: %5.6lf  maxed: %5.6lf\n",
+			totalCalcTime, maxCalcTime);
+		speedyLog("       integrationFP: %5.6lf  new stepsPerFrame: %d time per step: %5.8lf µs\n",
+			integrationFP, stepsPerFrame, maxCalcTime/stepsPerFrame * 1e6);
 	}
 }
 
@@ -403,7 +418,7 @@ void qGrinder::aggregateCalcTime(void) {
 
 // runs in the thread loop, only in the last thread to finish integration in an integration frame.
 void qGrinder::threadsHaveFinished() {
-	speedyLog("🪓 qGrinder::threadsHaveFinished starts\n");
+	if (traceThreadsHaveFinished) speedyLog("🪓 qGrinder::threadsHaveFinished starts\n");
 	aggregateCalcTime();
 
 	// single step (or a few steps): are we done yet?
@@ -440,22 +455,20 @@ void qGrinder::threadsHaveFinished() {
 	// thing that'll happen is the image will be part one frame and part
 	// the next frame.
 	copyToAvatar(avatar);
-	speedyLog("🪓 threadsHaveFinished() copied to avatar\n",
-			shouldBeIntegrating, isIntegrating);
+	needsRepaint = true;
+	if (traceThreadsHaveFinished) speedyLog("🪓 threadsHaveFinished() copied to avatar needsRepaint=%d  shouldBeIntegrating=%d   isIntegrating=%d\n",
+			needsRepaint, shouldBeIntegrating, isIntegrating);
 
 	// ready for new frame
 	// check whether we've stopped and leave it locked or unlocked for the next cycle.
 	#ifdef USING_ATOMICS
-	speedyLog("🪓  threadsHaveFinished() sortof. shouldBeIntegrating=%d   isIntegrating=%d\n",
-			shouldBeIntegrating, isIntegrating);
-
 	// this retriggers every frametime.  see how that goes.
 	if (isIntegrating)
 		emscripten_atomic_store_u32(&startAtomic, 0);  // start next iteration
 	else
-		emscripten_atomic_store_u32(&startAtomic, -1);  // stop integration
+		emscripten_atomic_store_u32(&startAtomic, -1);  // stop integration at starting line
 	emscripten_atomic_store_u32(&finishAtomic, 0);
-	speedyLog("🪓  so now startAtomic=%d   and finishAtomic=%d\n",
+	if (traceThreadsHaveFinished) speedyLog("🪓  so now startAtomic=%d   and finishAtomic=%d\n",
 		emscripten_atomic_load_u32(&startAtomic), emscripten_atomic_load_u32(&finishAtomic));
 
 
@@ -465,7 +478,7 @@ void qGrinder::threadsHaveFinished() {
 
 	// unlock for starting next cycle
 	if (isIntegrating) {
-		speedyLog("unlocking startMx to lauch the next cycle\n");
+		if (traceThreadsHaveFinished) speedyLog("unlocking startMx to lauch the next cycle\n");
 		pthread_mutex_unlock(&startMx);
 	}
 	#endif
