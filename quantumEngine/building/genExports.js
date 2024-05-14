@@ -69,6 +69,9 @@ let exportsSrc  = [
 	// i think this one is actually only called from C++
 	{name: 'grinder_copyToAvatar', args: ['number', 'number'], retType: null},
 
+	// return the  message stored in grinder->integrationEx
+	{name: 'grinder_getExceptionMessage', args: [], retType: 'string'},
+
 
 	// ************************* pthreads / qThread
 

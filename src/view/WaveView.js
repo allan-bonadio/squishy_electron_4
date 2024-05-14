@@ -258,7 +258,7 @@ export class WaveView extends React.Component {
 					canvasFacts={this.canvasFacts}
 				/>
 
-				{this.grinder?.fatalGrindingError
+				{this.grinder?.hadException
 					? <span className='viewError' > Wave has diverged; click Start Over</span>
 					: ''
 				}

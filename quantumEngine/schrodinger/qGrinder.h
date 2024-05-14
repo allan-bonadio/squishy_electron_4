@@ -62,8 +62,21 @@ struct qGrinder {
 
 	double d2Coeff;
 
-	// any exception thrown in a thread
+	// any exception thrown or discovered in a thread.  Message is human-readable.
 	std::runtime_error integrationEx;
+
+	// non-human error code for parts of the code that have to intercept
+	// specific exceptions by exact spelling
+	char exceptionCode[14];
+	char _zero;
+
+	// use this with integrationEx, which JS cannot read, but getExceptionMessage() can.
+	bool hadException;  // aligned to 8 bytes again
+	const char *getExceptionMessage(void);
+
+	// set integrationEx to exception with message; optionally set code, too
+	void reportException(const char *message, const char *code = "reported");
+	void reportException(std::runtime_error *ex, const char *code = "reported");
 
 	// dynamically adjusted so integration calculation of a frame takes
 	// about as much time as a screen refresh frame, as set by the user.
@@ -71,12 +84,9 @@ struct qGrinder {
 
 	/* *********************************************** integrating */
 
-	// frameFactor: number of rAF cycles in an integration frame.
-	int frameFactor;
-
 	// scan period of the screen = target rate for a frame of grinding
 	// In seconds, with fractions.  comes from sAnimator.
-	double integrationFP;
+	double animationFP;
 
 	// a subclass of  qWave, it has multiple waves to do grinding with
 	// this grinder OWNS the qFlick & is responsible for deleting it
@@ -90,7 +100,7 @@ struct qGrinder {
 	double totalCalcTime;
 	double maxCalcTime;  // and max of all threads
 
-	double reversePercent;  // divergence measure
+	double kinkPercent;  // divergence measure
 
 	// for the fourier filter.  Call the function first time you need it.
 	// owned if non-null
@@ -172,7 +182,7 @@ struct qGrinder {
 	// make sure the subsequent fields are aligned!  or frame is painfully slow.
 
 	// Actually do integration, single thread only.
-	// must maintain stepsPerFrame to match integrationFP, but not necessarily sync with it
+	// must maintain stepsPerFrame to match animationFP, but not necessarily sync with it
 	void oneFrame(void);
 
 	// visscher.  Calculate new from old; use hamiltonian to calculate d𝜓
@@ -190,7 +200,7 @@ struct qGrinder {
 	// kill high frequencies via FFTs
 	//void fourierFilter(int lowPassFilter);
 
-	void tallyUpReversals(struct qWave *qwave);
+	void tallyUpKinks(struct qWave *qwave);
 
 	// this because I keep on forgetting to do the direct accessors
 	bool sentinel;
@@ -211,6 +221,8 @@ extern "C" {
 
 	void grinder_copyFromAvatar(qGrinder *grinder, qAvatar *avatar);
 	void grinder_copyToAvatar(qGrinder *grinder, qAvatar *avatar);
+
+	const char *grinder_getExceptionMessage(qGrinder *grinder);
 }
 
 

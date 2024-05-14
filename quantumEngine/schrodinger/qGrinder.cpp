@@ -32,8 +32,6 @@ static bool traceIntegrationDetailed = false;
 
 static bool traceJustWave = false;
 
-//static bool traceFourierFilter = false;
-
 static bool dumpFFHiResSpectums = false;
 static bool traceIProd = true;
 
@@ -41,8 +39,8 @@ static bool traceConstructor = false;
 
 static bool traceReversals = false;
 
-static bool traceAggregate = true;
-static bool traceSingleStep = true;
+static bool traceAggregate = false;
+static bool traceSingleStep = false;
 static bool traceThreadsHaveFinished = false;
 
 // RK2
@@ -56,10 +54,10 @@ static std::runtime_error nullException("");
 // created by creation time here, although a few details left  to do.
 qGrinder::qGrinder(qSpace *sp, qAvatar *av, int nSlaves, const char *lab)
 	: space(sp), avatar(av), elapsedTime(0), frameSerial(0), stretchedDt(60),
-		integrationEx(nullException),
+		integrationEx(nullException), exceptionCode(""), _zero(0), hadException(false),
 		shouldBeIntegrating(false), isIntegrating(false), justNFrames(0),
 		stepsPerFrame(10),
-		pleaseFFT(false), frameFactor(3), integrationFP(.05),
+		pleaseFFT(false), animationFP(.05),
 		nSlaveThreads(nSlaves) {
 
 	magic = 'Grnd';
@@ -167,23 +165,19 @@ void qGrinder::formatDirectOffsets(void) {
 	makeBoolGetter(needsRepaint);
 	makeBoolSetter(needsRepaint);
 
+	makeBoolGetter(hadException);
+	makeBoolSetter(hadException);
+	makeStringPointer(exceptionCode);
+
+
 	printf("\n");
 	makeDoubleGetter(stretchedDt);
 	makeDoubleSetter(stretchedDt);
-	// makeIntGetter(lowPassFilter);
-	// makeIntSetter(lowPassFilter);
-// 	makeIntGetter(stepsPerFrame);
-// 	makeIntSetter(stepsPerFrame);
-
-//	makeIntGetter(integrationEx);
-//	makeIntSetter(integrationEx);
 
 	makeIntGetter(nSlaveThreads);
 
-	makeIntGetter(frameFactor);
-	makeIntSetter(frameFactor);
-	makeDoubleGetter(integrationFP);
-	makeDoubleSetter(integrationFP);
+	makeDoubleGetter(animationFP);
+	makeDoubleSetter(animationFP);
 
 	/* *********************************************** waves & buffers */
 
@@ -195,12 +189,11 @@ void qGrinder::formatDirectOffsets(void) {
 	makeDoubleGetter(voltageFactor);
 	makeDoubleSetter(voltageFactor);
 
-	makeDoubleGetter(reversePercent);
+	makeDoubleGetter(kinkPercent);
 
 //	printf("\n");
 //	makePointerGetter(scratchQWave);
 
-	// for the fourier filter.  Call the function first time you need it.
 	printf("\n");
 	makePointerGetter(qspect);
 
@@ -212,7 +205,7 @@ void qGrinder::formatDirectOffsets(void) {
 	makeBoolGetter(sentinel);  // should always be value true
 
 
-	printf("\n🖼 🖼 --------------- done with qGrinder direct access --------------\n");
+	printf("\n🪓 🪓 --------------- done with qGrinder direct access --------------\n");
 }
 
 /* ********************************************************** dumpObj  */
@@ -254,37 +247,38 @@ void qGrinder::copyToAvatar(qAvatar *avatar) {
 
 /* ********************************************************** tally & measure divergence */
 
-// this tally stuff, it's not detecting divergence explosion early enough.
-// I need to start counting reversals of derivative of norm.
-// DO this in innerproduct when you're already calculating norms.
 static int tally = 0;
 
-// if these two reals differ in sign, increment the tally
-static void difft(double a, double b) {
-	if (a > 0 && b < 0) tally++;
-	if (b > 0 && a < 0) tally++;
+// if these two derivatives differ in sign, increment the tally.
+// In other words, if there's a kink.
+static void difft(double p, double q, double r) {
+	if (p > q && q < r) tally++;
+	if (p < q && q > r) tally++;
 }
 
-// count up how many sign reversals in consecutive cells we have
-// should be about 4 * freq if healthy
-void qGrinder::tallyUpReversals(qWave *qwave) {
+// count up how many sign reversals, for the derivative, in consecutive cells we have
+void qGrinder::tallyUpKinks(qWave *qwave) {
 	tally = 0;
 	qCx *wave = qwave->wave;
-	qCx prevOne = wave[qwave->start];
-	for (int ix = qwave->start + 1; ix < qwave->end; ix++) {
-		qCx thisOne = wave[ix];
-		difft(thisOne.re, prevOne.re);
-		difft(thisOne.im, prevOne.im);
-		prevOne = thisOne;
+	qCx a = wave[qwave->start - 1];
+	qCx b = wave[qwave->start];
+	qCx c;
+	for (int ix = qwave->start + 1; ix <= qwave->end; ix++) {
+		c = wave[ix];
+
+		difft(a.re, b.re, c.re);
+		difft(a.im, b.im, c.im);
+		a = b;
+		b = c;
 	}
 
 	// figure rate.  ÷2 for real, imag
 	int N = qwave->end - qwave->start;
 	double percent = 100.0 * tally / N / 2.;
 	if (traceReversals)
-		speedyLog("🖼 tallyUpReversals result: %d out of %d or %5.1f %%\n",
+		speedyLog("🪓 tallyUpKinks result: %d out of %d or %5.1f %%\n",
 			tally, N, percent);
-	this->reversePercent = percent;
+	kinkPercent = percent;
 }
 
 /* ********************************************************** doing Integration */
@@ -295,10 +289,13 @@ void qGrinder::tallyUpReversals(qWave *qwave) {
 // Visscher timing, then synchronized timing. Maybe this should be in
 // slaveThread?  Multi-threads will have to be done with totally different code.
 void qGrinder::oneFrame() {
-	if (traceIntegration)
-		speedyLog("qGrinder 🪓 starting oneFrame()\n");
+	if (traceIntegration) {
+		speedyLog("qGrinder 🪓 starting oneFrame() "
+			"shouldBeIntegrating: %hhu   isIntegrating: %hhu\n",
+			shouldBeIntegrating, isIntegrating);
+	}
 	if (traceIntegrationDetailed)
-		qGrinder::dumpObj("qGrinder starting oneFrame");
+		qGrinder::dumpObj("qGrinder 🪓 starting oneFrame()");
 	qCx *wave0 = qflick->waves[0];
 	qCx *wave1 = qflick->waves[1];
 	qCx *wave2 = qflick->waves[2];
@@ -335,34 +332,12 @@ void qGrinder::oneFrame() {
 	hitReal(wave0, wave1, wave1, dt/2);
 	hitImaginary(wave0, wave1, wave1, 0);
 
-	// ok the algorithm tends to diverge after thousands of frames.  Hose it down.
-	if (this->pleaseFFT) analyzeWaveFFT(qflick, "before fourierFilter()");
-	//fourierFilter(lowPassFilter);
-	//if (this->pleaseFFT) analyzeWaveFFT(qflick, "after fourierFilter()");
-	this->pleaseFFT = false;
-
 	// normalize it and return the old inner product, see how close to 1.000 it is
 	double iProd = qflick->normalize();
 	if (dumpFFHiResSpectums) qflick->dumpHiRes("wave END fourierFilter() after normalize");
 	if (traceIProd && ((int) frameSerial & 0x7) == 0)
 		speedyLog("      🪓 qGrinder frame %d elapsed %4.6lf  iProd= %lf \n",
 			frameSerial, elapsedTime, iProd);
-
-	// just an expt: see how many alternating values we have
-	tallyUpReversals(qflick);
-
-	if (iProd > 1.01) {
-		if (iProd > 3) {
-			char buf[64];
-			snprintf(buf, 64, "🪓 🪓 wave is DIVERGING, iProd=%4.4g 🔥 🧨", iProd);
-			shouldBeIntegrating = isIntegrating = false;
-			qflick->dump(buf);
-			throw std::runtime_error("diverged");  // js code intercepts this exact spelling
-		}
-		else {
-			speedyLog("🪓 wave starting to Diverge, iProd=%4.4g 🔥 🧨", iProd);
-		}
-	}
 
 	if (traceJustWave)
 		qflick->dump("     🪓 qGrinder traceJustWave at end of frame", true);
@@ -392,28 +367,16 @@ void qGrinder::aggregateCalcTime(void) {
 		}
 	}
 
-	// now compare it to the screen and adjust so it's just under the frame  time
-	// double gap = fabs(maxCalcTime - integrationFP);
-	// if (maxCalcTime >= integrationFP) {
-	stepsPerFrame += (stepsPerFrame / maxCalcTime) * (integrationFP - maxCalcTime);
-	// }
-	//else if (maxCalcTime < integrationFP * 15 / 16) {
-		//stepsPerFrame += (stepsPerFrame / maxCalcTime) * integrationFP;
-	//}
+	// now compare it to the screen and adjust so it's just about the frame  time
+	stepsPerFrame += (stepsPerFrame / maxCalcTime) * (animationFP - maxCalcTime);
 
 	if (traceAggregate) {
 		speedyLog(" qGrinder 🪓 aggregate time summed: %5.6lf  maxed: %5.6lf\n",
 			totalCalcTime, maxCalcTime);
-		speedyLog("       integrationFP: %5.6lf  new stepsPerFrame: %d time per step: %5.8lf µs\n",
-			integrationFP, stepsPerFrame, maxCalcTime/stepsPerFrame * 1e6);
+		speedyLog("       animationFP: %5.6lf  new stepsPerFrame: %d time per step: %5.8lf µs\n",
+			animationFP, stepsPerFrame, maxCalcTime/stepsPerFrame * 1e6);
 	}
 }
-
-
-
-// runs in the thread loop, only in the last thread to start, in an integration frame.
-//void qGrinder::threadsHaveStarted() {
-//}
 
 
 // runs in the thread loop, only in the last thread to finish integration in an integration frame.
@@ -458,6 +421,30 @@ void qGrinder::threadsHaveFinished() {
 	needsRepaint = true;
 	if (traceThreadsHaveFinished) speedyLog("🪓 threadsHaveFinished() copied to avatar needsRepaint=%d  shouldBeIntegrating=%d   isIntegrating=%d\n",
 			needsRepaint, shouldBeIntegrating, isIntegrating);
+
+	if (this->pleaseFFT) analyzeWaveFFT(qflick, "before fourierFilter()");
+	this->pleaseFFT = false;
+
+	// see how many alternating derivatives we have
+	tallyUpKinks(qflick);
+	if (kinkPercent > 10) {
+		if (kinkPercent > 70) {
+			char buf[64];
+			snprintf(buf, 64, "🪓 🪓 wave is DIVERGING, kinkPercent=%4.4g %% 🔥 🧨", kinkPercent);
+			shouldBeIntegrating = isIntegrating = false;
+			//qflick->dump(buf);
+
+			// js code intercepts this exact spelling
+			reportException("Sorry, your wave integration diverged! Try a shorter "
+				"stretch factor for ∆t.  Click Start Over to try again.", "diverged");
+			// integrationEx = std::runtime_error();
+			// strncpy(exceptionCode, , sizeof(exceptionCode));
+			hadException = true;
+		}
+		else {
+			speedyLog("🪓 wave starting to Diverge, kinkPercent=%4.4g %% 🔥 🧨", kinkPercent);
+		}
+	}
 
 	// ready for new frame
 	// check whether we've stopped and leave it locked or unlocked for the next cycle.
@@ -519,6 +506,30 @@ void grinder_triggerIteration(qGrinder *grinder) {
 	grinder->triggerIteration();
 }
 
+/* ********************************************************** exceptions  */
+
+// set integrationEx to exception or string with message
+void qGrinder::reportException(std::runtime_error *ex, const char *code) {
+	integrationEx = *ex;  // copy it.  hope I'm doing this right.
+	strncpy(exceptionCode, code, sizeof(exceptionCode));
+	hadException = true;  // tells js to call grinder_getExceptionMessage
+}
+
+void qGrinder::reportException(const char *message, const char *code) {
+	std::runtime_error ex(message);
+	reportException(&ex, code);
+}
+
+// JUST the message from the C++ exception; not the code.  that's just a string.
+const char *qGrinder::getExceptionMessage(void) {
+	return integrationEx.what();
+}
+
+// called from JS to get a message
+const char *grinder_getExceptionMessage(qGrinder *grinder) {
+	return grinder->integrationEx.what();
+}
+
 /* ********************************************************** misc  */
 
 
@@ -534,7 +545,6 @@ void grinder_askForFFT(qGrinder *pointer) { pointer->askForFFT(); }
 void grinder_oneFrame(qGrinder *pointer) { pointer->oneFrame(); }
 
 void grinder_copyFromAvatar(qGrinder *qgrinder, qAvatar *avatar) {qgrinder->copyFromAvatar(avatar);}
-//	speedyLog("grinder_copyFromAvatar; qgrinder='%s', avatar='%s'\n", (char *) qgrinder, (char *) avatar);
 
 void grinder_copyToAvatar(qGrinder *qgrinder, qAvatar *avatar) {qgrinder->copyToAvatar(avatar);}
 

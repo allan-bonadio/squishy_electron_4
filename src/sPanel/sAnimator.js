@@ -16,6 +16,7 @@ let traceTheViewBuffer = false;
 let traceHeartbeats = false;
 let traceIntegrations = false;
 let traceFramePeriods = false;
+let traceRAFPeriods = false;
 
 const onceInAWhile = 1023;
 const everySoOften = 1023;
@@ -24,6 +25,7 @@ const everySoOften = 1023;
 const MAX_rAF_PERIOD =  50;
 
 
+// Note: the sAnimator is NOT a React Component!  Just an object created in the SquishPanel
 class sAnimator {
 
 	// spanel is SquishPanel
@@ -71,19 +73,19 @@ class sAnimator {
 
 	/* ******************************************************* frames */
 
-	// elapsed (virtual) picoseconds and frame count: insert them into the HTML.  Faster than react.
-	// should move this to like WaveView
+	// elapsed (virtual) picoseconds and frame count: insert them into
+	// the SVG in the HTML.  Faster than react. should move this to like
+	// WaveView
 	showTimeNFrame() {
-		// need them instantaneously - react is too slow.  but react replaces the whole screen upon error
 		let nw = document.querySelector('.voNorthWest')
 		if (nw)
-			nw.innerHTML = this.grinder.elapsedTime.toFixed(8);
+			nw.innerHTML = this.grinder.elapsedTime.toFixed(3);
 		let ne = document.querySelector('.voNorthEast')
 		if (ne)
 			ne.innerHTML =  this.grinder.frameSerial;
 	}
 
-	// Repaint, with webgl, the waveview.
+	// Repaint, with webgl, the waveview.  (not render!)
 	drawLatestFrame() {
 		//if (traceStats) console.log(`🎥 time since last tic: ${performance.now()
 		//		- this.inteTimes.startIntegrationTime}ms`);
@@ -114,40 +116,32 @@ class sAnimator {
 	// animationFP = animation frame period, from requestAnimatioFrame().  Depends
 	// on video; often 60/sec.  Can change as window moves to different monitor
 	// or monitor frame rate changes (settings).
-	// targetFP = target (ui) frame period, what user chose from menu
-	// integrationFP = frame period of actual calculations; rounded from targetFP
-	//     to be an integer factor of animationFP
 
 	// start up all the frame period numbers.  once.
 	initAnimationFP() {
-		// defaults - will work until set by the real code
-		this.avgAnimationFP = 16.666666;
-		this.frameFactor = 3;
+		// defaults - will work until set by real life
+		this.avgAnimationFP = 18;
 		this.prevFrame = performance.now();
 		this.unstableFP = true;
 
 		// Start the heartbeat.   This should be the only place rAFHandler()
 		// should be called except for inside the function itself
 		if (traceHeartbeats)
-			console.log(`🎥 sAnimator: about to kick off rAFHandler`);
+			console.log(`🎥 sAnimator: about to kick off rAFHandler  ${this.grinder.hadException}`);
 		this.rAFHandler(performance.now());
 	}
 
 	// given new animationFP or anything else changed, or init, refigure
 	// all the frame periods
-	recalcIntegrationFP(newAnimationFP) {
+	recalcAnimationFP(animationFP) {
 		// if user uses the menu, will change this
-		let targetFP = getASetting('frameSettings', 'framePeriod');
+		//let targetFP = getASetting('frameSettings', 'framePeriod');
 
-		// how many animationFP in an integrationFP?  This is the FrameFactor
-		this.frameFactor = Math.round(targetFP / newAnimationFP);
-
-		// now rounded off to an integer multiple of the requested frame rate.
-		this.displayFP = this.grinder.displayFP
-			= this.frameFactor * newAnimationFP;
-
-		if (traceFramePeriods) console.log(`🎥 targetFP=${targetFP}  newAnimationFP=${newAnimationFP} `
-			+ ` frameFactor=${this.frameFactor}   displayFP=${this.displayFP}`);
+		// these JS calculations have been in ms.  (all  durations)
+		// getTimeDouble() in c++ returns time as a double float, in
+		// seconds. Also note these performance.now() and rAF times are
+		// from app startup, not wallclock.
+		this.grinder.animationFP = this.avgAnimationFP * 0.001;
 	}
 
 	// we have to measure requestAnimationFrame()'s animationFP in case
@@ -181,23 +175,11 @@ class sAnimator {
 			if (this.unstableFP) {
 				// it's calmed down!  the threads can now recalibrate.
 				this.unstableFP = false;
-				this.recalcIntegrationFP(animationFP);
+				this.recalcAnimationFP(animationFP);
 			}
 		}
 	}
 
-	// counts off frameFactor raf periods then starts next iteration
-	// requestAnmationFrame() (rAF) calls rAFHandler(), which increments scanCount up to
-	// frameFactor to call triggerIteration().
-	scanCount = 0;
-
-	//	This gets called once each animation scan period according to
-	//	requestAnimationFrame(), usually 60/sec or whatever your screen refresh
-	//	rate is, and repeats as long as the website is running.  Even if there's
-	//	no apparent motion.  It will advance frameFactor scan periods, which
-	//	often calls drawLatestFrame(), if appropriate.  frameFactor can change
-	//	if user changes display scan rate, or the frame rate menu on
-	//	CPToolbar, or moves to a screen with a different scan rate.
 	rAFHandler =
 	now => {
 		// sometimes these can pile up on the stack or list of threads or something
@@ -206,45 +188,34 @@ class sAnimator {
 			return;
 		this.alreadyRAF = true;
 
-		//		if (traceHeartbeats && ((this.heartbeatSerial & onceInAWhile) == 0))
-		//			console.log(`🎥  a heartbeat, serial every ${onceInAWhile+1}: `
-		//				+`${this.heartbeatSerial} = 0x${this.heartbeatSerial.toString(16)} `
-		//				+ `.shouldBeIntegrating=${this.grinder.shouldBeIntegrating} \n`
-		//				+`now >= this.timeForNextTic ${now} >= ${this.timeForNextTic} `
-		//				+` = ${now >= this.timeForNextTic} `);
+		// an error (eg divergence) will halt integration.  Start Over will put it back.
+		if (this.grinder.hadException) {
+			this.cPanel.shouldBeIntegrating = false;
+			this.errorMessage = qe.grinder_getExceptionMessage(this.grinder.pointer);
+			if (!this.errorMessage) this.errorMessage = 'Bogus Error';
+			console.error(`had Exception!  '${this.errorMessage}' `);
+debugger;
+			const ex = new Error(this.errorMessage);
+			ex.code  = UTF8ToString(this.grinder.exceptionCode);
 
-		// no matter how often rAFHandler is called, it'll only frame once per frameFactor
-		if (this.scanCount >= this.frameFactor) {
-			this.scanCount = 0;
-
-			// an error (eg divergence) will halt integration.  Start Over will put it back.
-			if (this.grinder.fatalGrindingError) {
-				this.grinder.shouldBeIntegrating = false;
-				this.needsRepaint = true;
-			}
-
-			// has USER turned this on?  we shouldn't do this every frame; it
-			if (this.grinder.shouldBeIntegrating) {
-				// yeah the repaint will happen only for the previous integration
-				//this.grinder.triggerIteration();
-				this.needsRepaint = true;
-			}
-
-			//if (traceIntegrations)
-			//	console.log(`🎥  an integration request serial: ${this.grinder.frameSerial} `);
-
-			if (this.needsRepaint) {
-				this.drawLatestFrame();
-				this.needsRepaint = false;
-			}
+			CommonDialog.openErrorDialog({message: this.errorMessage},
+				`while integrating Schrodinger's`);
+			//throw new Error(this.errorMessage);
+			this.grinder.hadException = false;
 		}
 
-		//if (traceHeartbeats && ((this.heartbeatSerial & onceInAWhile) == 0))
-		//	console.log(`🎥  a heartbeat, serial every ${onceInAWhile+1}: `
-		//		+` ${this.heartbeatSerial} = 0x${this.heartbeatSerial.toString(16)} `
-		//		+`.shouldBeIntegrating=${this.grinder.shouldBeIntegrating} time=${(performance.now() & 4095)}`);
-		//this.heartbeatSerial++;
-		this.scanCount++;
+		if (traceTheViewBuffer) {
+			let ddd=new Date();
+			let time = ddd.getSeconds() + ddd.getMilliseconds() / 1e9;
+			console.log(`🎥 needsRepaint=${this.grinder.needsRepaint} latest frame `
+				+ `${this.grinder.frameSerial} at :${time.toFixed(3)} `);
+		}
+
+		// this is turned on after each frame is ground
+		if (this.grinder.needsRepaint) {
+			this.drawLatestFrame();
+			this.grinder.needsRepaint = false;
+		}
 
 		this.measureAndUpdateFramePeriods(now);
 

@@ -11,6 +11,7 @@ import {getASetting} from '../utils/storeSettings.js';
 
 let traceCreation = false;
 let traceIntegration = true;
+let traceTriggerIteration = true;
 
 // a qGrinder manages frame of a wave
 class eGrinder {
@@ -43,6 +44,7 @@ class eGrinder {
 	// are passed by pointer and you need to allocate them in JS (eg see
 	// eGrinder.constructor)
 
+
 	get _space() { return this.ints[1]; }
 
 	get elapsedTime() { return this.doubles[2]; }
@@ -50,39 +52,39 @@ class eGrinder {
 	get frameSerial() { return this.ints[3]; }
 	set frameSerial(a) { this.ints[3] = a; }
 
-	get justNFrames() { return this.ints[30]; }
-	set justNFrames(a) { this.ints[30] = a; }
-	get totalCalcTime() { return this.doubles[10]; }
-	get maxCalcTime() { return this.doubles[11]; }
-	get shouldBeIntegrating() { return Boolean(this.bools[152]); }
-	set shouldBeIntegrating(a) { this.bools[152] = a; }
-	get isIntegrating() { return Boolean(this.bools[153]); }
-	set isIntegrating(a) { this.bools[153] = a; }
-	get pleaseFFT() { return Boolean(this.bools[154]); }
-	set pleaseFFT(a) { this.bools[154] = a; }
-	get needsRepaint() { return Boolean(this.bools[155]); }
-	set needsRepaint(a) { this.bools[155] = a; }
+	get justNFrames() { return this.ints[34]; }
+	set justNFrames(a) { this.ints[34] = a; }
+	get totalCalcTime() { return this.doubles[12]; }
+	get maxCalcTime() { return this.doubles[13]; }
+	get shouldBeIntegrating() { return Boolean(this.bools[168]); }
+	set shouldBeIntegrating(a) { this.bools[168] = a; }
+	get isIntegrating() { return Boolean(this.bools[169]); }
+	set isIntegrating(a) { this.bools[169] = a; }
+	get pleaseFFT() { return Boolean(this.bools[170]); }
+	set pleaseFFT(a) { this.bools[170] = a; }
+	get needsRepaint() { return Boolean(this.bools[171]); }
+	set needsRepaint(a) { this.bools[171] = a; }
+	get hadException() { return Boolean(this.bools[63]); }
+	set hadException(a) { this.bools[63] = a; }
+	get _exceptionCode() { return this.pointer + 48; }
 
 	get stretchedDt() { return this.doubles[3]; }
 	set stretchedDt(a) { this.doubles[3] = a; }
-	get nSlaveThreads() { return this.ints[29]; }
-	get frameFactor() { return this.ints[13]; }
-	set frameFactor(a) { this.ints[13] = a; }
-	get integrationFP() { return this.doubles[7]; }
-	set integrationFP(a) { this.doubles[7] = a; }
+	get nSlaveThreads() { return this.ints[33]; }
+	get animationFP() { return this.doubles[9]; }
+	set animationFP(a) { this.doubles[9] = a; }
 
-	get _qflick() { return this.ints[16]; }
+	get _qflick() { return this.ints[20]; }
 
-	get _voltage() { return this.ints[17]; }
-	get voltageFactor() { return this.doubles[9]; }
-	set voltageFactor(a) { this.doubles[9] = a; }
-	get reversePercent() { return this.doubles[12]; }
+	get _voltage() { return this.ints[21]; }
+	get voltageFactor() { return this.doubles[11]; }
+	set voltageFactor(a) { this.doubles[11] = a; }
+	get _qspect() { return this.ints[30]; }
+	get _stages() { return this.ints[31]; }
+	get _threads() { return this.ints[32]; }
+	get _label() { return this.pointer + 152; }
+	get sentinel() { return Boolean(this.bools[172]); }
 
-	get _qspect() { return this.ints[26]; }
-	get _stages() { return this.ints[27]; }
-	get _threads() { return this.ints[28]; }
-	get _label() { return this.pointer + 136; }
-	get sentinel() { return Boolean(this.bools[156]); }
 
  	/* ******************* end of direct accessors */
 
@@ -94,14 +96,15 @@ class eGrinder {
 
 	// call this to trigger all the threads to do the next iteration
 	triggerIteration() {
-		console.log(`🪚 eGrinder.triggerIteration, ${this.pointer.toString(16)} starting  `
-		+`shouldBeIntegrating=${this.shouldBeIntegrating}  isIntegrating=${this.isIntegrating}`);
+		if (traceTriggerIteration) {
+			console.log(`🪚 eGrinder.triggerIteration, ${this.pointer.toString(16)} starting  `
+				+`shouldBeIntegrating=${this.shouldBeIntegrating}  isIntegrating=${this.isIntegrating}`);
+		}
 		qe.grinder_triggerIteration(this.pointer);
-
 	}
 
-	// Single Threaded - deprecated sortof
-	// should do the calc in the threads but for testing maybe keep the single threaded way
+	// Grind one frame - Single Threaded - deprecated sortof
+	// for testing maybe keep the single threaded way
 	// can throw std::runtime_error("divergence")
 	oneFrame() {
 		qe.grinder_oneFrame(this.pointer);
