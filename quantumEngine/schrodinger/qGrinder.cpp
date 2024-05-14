@@ -19,7 +19,7 @@
 #include "../greiman/qAvatar.h"
 #include "qThread.h"
 #include "qGrinder.h"
-#include "slaveThread.h"
+#include "grinderThread.h"
 #include "../debroglie/qFlick.h"
 #include "../fourier/qSpectrum.h"
 #include "../fourier/fftMain.h"
@@ -52,13 +52,13 @@ static std::runtime_error nullException("");
 // create new grinder, complete with its own stage buffers. make sure
 // these values are doable by the sliders' steps. Space is definitely
 // created by creation time here, although a few details left  to do.
-qGrinder::qGrinder(qSpace *sp, qAvatar *av, int nSlaves, const char *lab)
+qGrinder::qGrinder(qSpace *sp, qAvatar *av, int nGrinderThreads, const char *lab)
 	: space(sp), avatar(av), elapsedTime(0), frameSerial(0), stretchedDt(60),
 		integrationEx(nullException), exceptionCode(""), _zero(0), hadException(false),
 		shouldBeIntegrating(false), isIntegrating(false), justNFrames(0),
 		stepsPerFrame(10),
 		pleaseFFT(false), animationFP(.05),
-		nSlaveThreads(nSlaves) {
+		nGrinderThreads(nGrinderThreads) {
 
 	magic = 'Grnd';
 
@@ -87,7 +87,7 @@ qGrinder::qGrinder(qSpace *sp, qAvatar *av, int nSlaves, const char *lab)
 
 
 	// should this come earlier?
-	slaveThread::createSlaves(this);
+	grinderThread::createGrinderThreads(this);
 
 	samplePoint = space->dimensions[0].N / 3 + space->dimensions[0].start;
 
@@ -174,7 +174,7 @@ void qGrinder::formatDirectOffsets(void) {
 	makeDoubleGetter(stretchedDt);
 	makeDoubleSetter(stretchedDt);
 
-	makeIntGetter(nSlaveThreads);
+	makeIntGetter(nGrinderThreads);
 
 	makeDoubleGetter(animationFP);
 	makeDoubleSetter(animationFP);
@@ -287,7 +287,7 @@ void qGrinder::tallyUpKinks(qWave *qwave) {
 // visscher steps (eg 10 or 100 or 500). Actually does stepsPerFrame + ½
 // steps; four half hits, im at start and re at finish, to adapt to
 // Visscher timing, then synchronized timing. Maybe this should be in
-// slaveThread?  Multi-threads will have to be done with totally different code.
+// grinderThread?  Multi-threads will have to be done with totally different code.
 void qGrinder::oneFrame() {
 	if (traceIntegration) {
 		speedyLog("qGrinder 🪓 starting oneFrame() "
@@ -359,8 +359,8 @@ void qGrinder::aggregateCalcTime(void) {
 	// add up ALL the threads' frameCalcTime and keep a running average
 	totalCalcTime = 0;
 	maxCalcTime = 0;
-	for (int ix = 0; ix < nSlaveThreads; ix++) {
-		slaveThread *sl = slaves[ix];
+	for (int ix = 0; ix < nGrinderThreads; ix++) {
+		grinderThread *sl = gThreads[ix];
 		if (sl) {
 			totalCalcTime += sl->frameCalcTime;
 			maxCalcTime = fmax(maxCalcTime, sl->frameCalcTime);
@@ -473,7 +473,7 @@ void qGrinder::threadsHaveFinished() {
 }
 
 
-// start a new frame calculating by starting each/all slave threads.
+// start a new frame calculating by starting each/all gThread threads.
 // This is called from JS, therefore the UI thread.
 // Each frame will trigger the next to continue integration?
 void qGrinder::triggerIteration() {
@@ -500,7 +500,7 @@ void qGrinder::triggerIteration() {
 
 }
 
-// start a new frame calculating by starting each/all slave threads.
+// start a new frame calculating by starting each/all gThread threads.
 // This is called from JS, therefore the UI thread.
 void grinder_triggerIteration(qGrinder *grinder) {
 	grinder->triggerIteration();

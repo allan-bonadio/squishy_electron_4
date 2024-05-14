@@ -51,9 +51,6 @@ let exportsSrc  = [
 
 
 	// ************************* grinder
-	//{name: 'grinder_initThreadIntegration', args: ['number', 'number', 'number'], retType: null},
-	// nope.  JS doesn't touch threads.
-	// {name: 'grinder_createASlave', args: ['number', 'number'], retType: 'number'},
 
 	// for the older, same-thread integration, or to be run in a/the thread
 	{name: 'grinder_triggerIteration', args: ['number'], retType: null},

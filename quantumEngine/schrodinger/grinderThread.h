@@ -1,17 +1,17 @@
 /*
-** slave thread -- info for a thread that does real integration crunching
+** gThread thread -- info for a thread that does real integration crunching
 ** Copyright (C) 2023-2024 Tactile Interactive, all rights reserved
 */
 
 /*
-	grinder.isIntegrating and grinder.startMx and .finishMx mutexes synchronize all the slaveThreads.
+	grinder.isIntegrating and grinder.startMx and .finishMx mutexes synchronize all the gThreadThreads.
 
 	Start of cycle:
 	If grinder.isIntegrating is false, no iteration, nothing happens.
 	trigger func returns w/o triggering.  Threads stay waiting for startMx.
 	If grinder.isIntegrating is true, JS  trigger func unlocks startMx.
 	All threads start (roughly) all at once when grinder.startMx is unlocked.
-	Each slave thread, who have all requested a lock of the startMx, each
+	Each gThread thread, who have all requested a lock of the startMx, each
 	get to lock it, add one to grinder.nStartedThreads, and immediately unlock
 	it, and proceed to integration.  Locking is by startMx.
 
@@ -32,29 +32,27 @@
 */
 
 
-struct slaveThread {
+struct grinderThread {
 	qThread *thread;  // points to corresponding thread
 	qGrinder *grinder;  // all point to the same grinder
 	int serial;  // same as thread serial
 	//bool isDone;  // false while still working
 
 	// makes its own qThread
-	slaveThread(qGrinder *gr);
+	grinderThread(qGrinder *gr);
 
 	// creates all threads, etc
-	static void createSlaves(qGrinder *grinder);
+	static void createGrinderThreads(qGrinder *grinder);
 
 	// actually gets called each frame.  Not strictly synchronized inter-thread, but runs from
 	// requestAnimationFrame()
-	void slaveWork(void);
+	void gThreadWork(void);
 
-	void slaveLoop(void);
+	void gThreadLoop(void);
 
 	// timing of the most recent integration; startCalc and endCalc sampled when
 	// they're stored, beginning and end of integration frame
 	double startCalc;
 	double frameCalcTime;
-
-// obsolete 	static int frameFactor;
 };
 

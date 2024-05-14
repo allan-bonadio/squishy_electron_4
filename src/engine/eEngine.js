@@ -13,8 +13,8 @@ import eSpace from './eSpace.js';
 
 // all of these must be attached to window to  get called by c++
 
-let traceStartup = false;
-let tracePromises = false;
+let traceStartup = true;
+let tracePromises = true;
 
 /* ****************************************************** app startup */
 

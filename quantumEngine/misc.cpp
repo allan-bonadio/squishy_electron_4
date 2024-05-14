@@ -47,20 +47,20 @@ void speedyLog(const char* format, ...) {
 	localtime_r(&nowTime, &nowPieces);
 
  	// first the time, then the message
-	speedyCursor += snprintf(speedyBuf+speedyCursor, 20, "☄️ %02d:%02d:%02d ",
+	speedyCursor += snprintf(speedyBuf+speedyCursor, 20, "🌪️ %02d:%02d:%02d ",
 		nowPieces.tm_hour, nowPieces.tm_min, nowPieces.tm_sec);
 	speedyCursor +=  vsnprintf(speedyBuf+speedyCursor, MAX_ONE_LOG_LEN, format, args);
 	speedyBuf[speedyCursor] = 0;
 
     va_end(args);
 	if (traceSpeedyLog)
-		printf("☄️ ☄️ ☄️ speedyLog fmt='%s' speedyCursor=%d  log so far:\n‹%s›\n", format, speedyCursor, speedyBuf);
+		printf("🌪 🌪 🌪 speedyLog fmt='%s' speedyCursor=%d  log so far:\n‹%s›\n", format, speedyCursor, speedyBuf);
 }
 
 // finally, print it out
 void speedyFlush(void) {
 	if (traceSpeedyLog)
-		printf("☄️ ☄️ ☄️ speedyFlush speedyCursor=%d \n", speedyCursor);
+		printf("🌪 🌪 🌪 speedyFlush speedyCursor=%d \n", speedyCursor);
 	if (speedyBuf[0])
 		printf("%s", speedyBuf);
 	speedyCursor = 0;

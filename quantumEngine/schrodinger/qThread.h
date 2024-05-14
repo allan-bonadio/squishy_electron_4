@@ -36,7 +36,7 @@ struct qThread {
 	// errno for the last operation that failed, or zero if all ok
 	int errorCode;
 
-	 // handler to call in loop; see slaveThread.h/cpp
+	 // handler to call in loop; see grinderThread.h/cpp
 	 // like this void *(*)(void *)
 	 void *(*handler)(void *);
 	 //void (*handler)(void *);

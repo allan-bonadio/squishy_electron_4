@@ -1,48 +1,40 @@
 /*
-** slaveThread -- one thread that's doing iteration
+** grinderThread -- one thread that's doing iteration
 ** Copyright (C) 2023-2024 Tactile Interactive, all rights reserved
 */
 
 
 #include "qThread.h"
 #include "qGrinder.h"
-#include "slaveThread.h"
+#include "grinderThread.h"
 
 static bool traceStart = false;
 static bool traceWork = false;
 static bool traceFinish = false;
 static bool traceSync = false;
 
-/* *********************************************** slave threads */
+/* *********************************************** gThread threads */
 
 // indexed by thread serial, there may be gaps.
-// for threads that AREN'T slaves
-static slaveThread *sla[MAX_THREADS];
-slaveThread **qGrinder::slaves = sla;
+// for threads that AREN'T gThreads
+static grinderThread *sla[MAX_THREADS];
+grinderThread **qGrinder::gThreads = sla;
 
-// only nonzero when we're changing the frame factor
-// obsolete int slaveThread::frameFactor = 0;
-
-// wrapper for emscripten_request_animation_frame_loop() to call slaveWork()
-//static void sRunner(void *arg) {
-//	slaveThread *This = (slaveThread *) arg;
-//	This->slaveWork();
-//}
-
-// wrapper for pthread to start the thread.  arg is the slaveThread ptr.  requestAnimationFrame.
-static void *sStarter(void *arg) {
-	speedyLog("🔪 slaveThread: starting\n");
+// wrapper for pthread to start the thread.  arg is the grinderThread ptr.  requestAnimationFrame.
+static void *sStarter(void *st) {
+	if (traceStart)
+		speedyLog("🔪 grinderThread: starting\n");
 
 	// runs forever never returns
-	((slaveThread *) arg)->slaveLoop();
+	((grinderThread *) st)->gThreadLoop();
 
 	return NULL;
 }
 
-/* ******************************************************************* slaveThread */
+/* ******************************************************************* grinderThread */
 // initialize this as being idle, before starting an integration task.
 // All the grinders are the same object; all the threads are differrent.
-slaveThread::slaveThread(qGrinder *gr)
+grinderThread::grinderThread(qGrinder *gr)
 	: grinder(gr) {
 
 	thread = new qThread(&sStarter, (void *) this);
@@ -51,7 +43,7 @@ slaveThread::slaveThread(qGrinder *gr)
 // no destructor - never freed
 
 // do the work: integration
-void slaveThread::slaveWork(void) {
+void grinderThread::gThreadWork(void) {
 	int nWas;
 
 	if (traceWork)  {
@@ -79,22 +71,22 @@ void slaveThread::slaveWork(void) {
 	double endCalc = getTimeDouble();
 	frameCalcTime = endCalc - startCalc;
 
-	if (traceWork) speedyLog("🔪 end of slaveWork; shouldBeIntegrating=%d  isIntegrating=%d\n",
+	if (traceWork) speedyLog("🔪 end of gThreadWork; shouldBeIntegrating=%d  isIntegrating=%d\n",
  				grinder->shouldBeIntegrating, grinder->isIntegrating);
 }
 
-// do the atomics and synchronization, and call slaveWork().  runs repeatedly
-void slaveThread::slaveLoop(void) {
+// do the atomics and synchronization, and call gThreadWork().  runs repeatedly
+void grinderThread::gThreadLoop(void) {
 	while (true) {
 		try {
 			int nWas;
 
 			// this thread will freeze here until startMx is unlocked, at start of iteration.
-			// All other slave threads will also be waiting for startMx.  When this one gets its chance,
+			// All other gThread threads will also be waiting for startMx.  When this one gets its chance,
 			// it'll lock and unlock, then start its integration work.
 			// so they all start at roughly the same time.
 			#ifdef USING_ATOMICS
-			if (traceSync) speedyLog("🏁 🔪 at Starting Gate in slaveThread::slaveLoop- "
+			if (traceSync) speedyLog("🏁 🔪 at Starting Gate in grinderThread::gThreadLoop- "
 				"startAtomic=%d (stopped= -1, go=0) 🏁\n",
 				grinder->startAtomic);
 			speedyFlush();
@@ -126,7 +118,7 @@ void slaveThread::slaveLoop(void) {
 			pthread_mutex_unlock(&grinder->startMx);
 
 			// upon last one started, lock the mutex again for next cycle
-			if (nWas >= grinder->nSlaveThreads)
+			if (nWas >= grinder->nGrinderThreads)
 				pthread_mutex_lock(&grinder->startMx);
 
 			#endif
@@ -136,7 +128,7 @@ void slaveThread::slaveLoop(void) {
 			speedyFlush();
 
 
-			slaveWork();
+			gThreadWork();
 			speedyFlush();
 
 
@@ -159,31 +151,33 @@ void slaveThread::slaveLoop(void) {
 					serial, nWas);
 			}
 
-			if (nWas >= grinder->nSlaveThreads) {
+			if (nWas >= grinder->nGrinderThreads) {
 				// this must be the last thread to finish in this integration frame!
 				grinder->threadsHaveFinished();
 			}
 			speedyFlush();
 		} catch (std::runtime_error& ex) {
 			//  typically divergence.  JS handles it.  save whole exception
-			grinder->integrationEx = ex;
-			printf("🔪 Error (saved to grinder) during slaveLoop: %s\n", ex.what());
+			grinder->reportException(&ex, "thrown");
+			//integrationEx = ex;
+			//strncpy(exceptionCode, "thrown", sizeof(exceptionCode));
+			printf("🔪 Error (saved to grinder) during gThreadLoop: %s\n", ex.what());
 		}
 	}
 }
 
 
-// static; creates all slave threads; runs early
-void slaveThread::createSlaves(qGrinder *grinder) {
+// static; creates all gThread threads; runs early
+void grinderThread::createGrinderThreads(qGrinder *grinder) {
 
-	for (int t = 0; t < grinder->nSlaveThreads; t++) {
+	for (int t = 0; t < grinder->nGrinderThreads; t++) {
 		// actual pthread won't start till the next event loop i think
-		slaveThread *slave = new slaveThread(grinder);
-		grinder->slaves[slave->thread->serial] = slave;
-		speedyLog("🔪  slaveThread::createSlaves() created A Slave(%d) \n", slave->serial);
+		grinderThread *gThread = new grinderThread(grinder);
+		grinder->gThreads[gThread->thread->serial] = gThread;
+		speedyLog("🔪  grinderThread::createGrinderThreads() created A GrinderThread(%d) \n", gThread->serial);
 	}
 
-	speedyLog("🔪  slaveThread created %d slaves \n", grinder->nSlaveThreads);
+	speedyLog("🔪  grinderThread created %d gThreads \n", grinder->nGrinderThreads);
 };
 
 

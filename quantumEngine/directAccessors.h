@@ -63,8 +63,7 @@
 // turn off FORMAT_DIRECT_OFFSETS and recompile to get rid of the
 // annoying output (which should be harmless anyway).
 
-
-//#define FORMAT_DIRECT_OFFSETS
-#define FORMAT_DIRECT_OFFSETS  formatDirectOffsets()
+#define FORMAT_DIRECT_OFFSETS
+//#define FORMAT_DIRECT_OFFSETS  formatDirectOffsets()
 
 

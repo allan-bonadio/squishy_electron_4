@@ -30,10 +30,10 @@ a Hit: advancement by dt of one of many parts of the calculation.  As of this wr
 
 struct qThread;
 struct qStage;
-struct slaveThread;
+struct grinderThread;
 
 struct qGrinder {
-	qGrinder(qSpace *, struct qAvatar *av, int nSlaveThreads, const char *label);
+	qGrinder(qSpace *, struct qAvatar *av, int nGrinderThreads, const char *label);
 	~qGrinder(void);
 	void formatDirectOffsets(void);
 	void dumpObj(const char *title);
@@ -110,7 +110,7 @@ struct qGrinder {
 	struct qStage *stages;
 	struct qThread *threads;
 
-	int nSlaveThreads;  // total number of slave threads we'll use for integrating
+	int nGrinderThreads;  // total number of gThread threads we'll use for integrating
 
 	// Although isIntegrating, do only this many more frames before stopping.  Like 1 for single step.
 	int justNFrames;
@@ -123,13 +123,13 @@ struct qGrinder {
 
 	// starts at 0.  As each thread finishes their iteration work, they
 	// atomically increment it.  The thread that increments it to
-	// nSlaveThreads, knows it's the last and calls threadsHaveFinished()
+	// nGrinderThreads, knows it's the last and calls threadsHaveFinished()
 	_Atomic int finishAtomic;
 
 	#else
 
 	// All threads start (roughly) all at once when this is unlocked.
-	// Then, each slave thread, who have all requested an lock of the
+	// Then, each gThread thread, who have all requested an lock of the
 	// startMx, each get to lock it, add one to nStartedThreads, and
 	// immediately unlock it, and proceed to integration.
 	pthread_mutex_t startMx;
@@ -137,7 +137,7 @@ struct qGrinder {
 	// guards grinder->nFinishedThreads, frameCalcTime, etc
 	pthread_mutex_t finishMx;
 
-	// number of slaveThread s that have started/finished integration yet; incremented up to nSlaveThreads
+	// number of grinderThread s that have started/finished integration yet; incremented up to nGrinderThreads
 	int nStartedThreads;
 	int nFinishedThreads;
 	#endif
@@ -151,7 +151,7 @@ struct qGrinder {
 	// figure out the total elapsed time for each thread, average of all, max of all...
 	void aggregateCalcTime(void);
 
-	static slaveThread **slaves;
+	static grinderThread **gThreads;
 
 	// when trace msgs display just one point (to avoid overwhelming output),
 	// this is the one.

@@ -24,7 +24,7 @@ bool traceThreads = false;
 
 
 // the function called in each thread-specific main loop, 60x/sec
-// NO see slaveThread
+// NO see grinderThread
 //static void mainLooper(void *arg) {
 //	qThread *thread = (qThread *) arg;
 //	//printf("🐴  mainLooper entered with qthread=%p\n", thread);
@@ -69,7 +69,7 @@ static void *tStart(void *qtx) {
 
 
 // object created in the main thread.  THese all stay in C++ land;
-// the browser thread never touches them.  (i think)
+// the browser thread never touches them.
 // runs in browser thread.  gr = qGrider pointer from eGrinder.pointer
 // we can't pass the qThread without going through a few void* pointers.
 qThread::qThread(void *(*hand)(void *), void *ar)
