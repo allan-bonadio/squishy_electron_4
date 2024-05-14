@@ -209,8 +209,7 @@ function ErrorDialog(props) {
 
 CommonDialog.openErrorDialog =
 (ex, where) => {
-	CommonDialog.openDialog(<ErrorDialog error={ex} where={where} />,
-			{backgroundColor: '#a00'});
+	CommonDialog.openDialog(<ErrorDialog error={ex} where={where} />, {});
 }
 
 /* *********************************************************** interactive testing */

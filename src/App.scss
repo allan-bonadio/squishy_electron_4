@@ -197,6 +197,7 @@ dialog#CommonDialog {
 	background-color: white;
 	color: black;
 	box-shadow: 5px 5px 5px #0008;
+	border-radius: 1em;
 
 	&::backdrop {
 		background-color: #ddd8;
@@ -243,9 +244,10 @@ dialog#CommonDialog {
 	// the insides of various dialogs
 	#SimpleDialog, #ErrorDialog {
 		padding: 1em;
-		border: 1px #ddd outset;
+		border: 4px solid;
 		height: 100%;
 		background-color: #fff;
+		border-radius: 1em;
 
 		p {
 			min-width: 30em;
@@ -265,8 +267,9 @@ dialog#CommonDialog {
 		color: #ddd;
 	}
 	#ErrorDialog {
-		background: #800;
-		color: #ffe;
+		background: #900;
+		color: #fff;
+		border-color: #f00;
 	}
 
 }
