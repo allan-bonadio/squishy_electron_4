@@ -39,11 +39,15 @@ export class eDimension {
 // Coords are the same if two dims are parallel, eg two particles with x coords.
 // Not the same if one particle with x and y coords; eg you could have an endless canal.
 export class eSpace {
+	// some bugs cause a big restart, creating a new space, and a big mess.
+	static theSpace = null;
+
 	constructor(dims, spaceLabel) {
 		if (traceSpace) console.log(`eSpace constructor just starting`, dims, spaceLabel);
 		if (dims.length > MAX_DIMENSIONS)
 			throw new Error(`Too many dimensions for space: ${dims.length} given but max is ${MAX_DIMENSIONS}`);
-
+		if (eSpace.theSpace)
+			throw new Error('creating second space')
 		// this actually does it over on the C++ side
 		this.pointer = qe.startNewSpace(spaceLabel);
 		prepForDirectAccessors(this, this.pointer);
@@ -149,6 +153,7 @@ export class eSpace {
 
 	/* **************************** end of direct accessors */
 
+	// return me the start, end, etc of this 1d space
 	// call it like this: const {start, end, N, continuum} = space.startEnd;
 	get startEnd() {
 		const dim = this.dimensions[0];
@@ -157,7 +162,7 @@ export class eSpace {
 	}
 
 	// this will return the DOUBLE of start and end so you can just loop thru += 2
-	// but NOT N, that's honest
+	// skipping over reals/imags.  but NOT N, that's honest
 	// call like this:       const {start2, end2, N} = this.space.startEnd2;
 	// note start2, end2 NEED TO BE SPELLED exactly that way!
 	get startEnd2() {

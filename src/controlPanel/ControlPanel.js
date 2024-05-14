@@ -18,6 +18,7 @@ import qe from '../engine/qe.js';
 import {interpretCppException, wrapForExc} from '../utils/errors.js';
 
 let traceSetPanels = false;
+let traceStartStop = false;
 
 // integrations always need specific numbers of steps.  But there's always one
 // more. maybe this should be defined in the grinder.  Hey, isn't this really
@@ -120,6 +121,13 @@ export class ControlPanel extends React.Component {
 
 	/* ******************************************************* start/stop */
 
+	setFramePeriod =
+	(period) => {
+		//this.framePeriod = period;
+		if (this.animator)
+			this.animator.framePeriod = period;
+	}
+
 	// set freq of frame, which is 1, 2, 4, 8, ... some float number of times per second you want frames.
 	// freq is how the CPToolbar handles it, but we keep the period in the ControlPanel state,
 	setFrameFrequency =
@@ -127,11 +135,10 @@ export class ControlPanel extends React.Component {
 		// set it in the settings, controlpanel state, and SquishPanel's state, too.
 		this.framePeriod = 1000. / +freq;
 		this.setState({framePeriod: storeASetting('frameSettings', 'framePeriod', this.framePeriod)});
-		this.props.setFramePeriod(this.framePeriod);  // so squish panel can adjust the heartbeat
-		// NO!  the grinder doesn't use this; squishpanel does.  this.grinder.framePeriod = this.framePeriod;
+		this.setFramePeriod(this.framePeriod);  // so squish panel can adjust the heartbeat
 	}
 
-	// need to keep grinder's variable nd our state in sync for sbi.
+	// need to keep grinder's variable and our state in sync for sbi.
 	// maybe these help.  Oh yeah, the setting, too.
 	get shouldBeIntegrating() {
 		// before the space is created, this.grinder is undefined
@@ -150,15 +157,16 @@ export class ControlPanel extends React.Component {
 		storeASetting('frameSettings', 'shouldBeIntegrating', sbi);
 	}
 
-	// the central authority as to whether we're animating/integrating or not is grinder.shouldBeIntegrating
-	// Change the status by calling start/stop animating functions here
-	// the C++ will copy it to isIntegrating at the right  time
+	// the central authority as to whether we're animating/integrating
+	// or not is grinder.shouldBeIntegrating Change the status by
+	// calling start/stop animating functions here the C++ will copy it
+	// to isIntegrating at the right  time
 	startAnimating =
 	() => {
 		if (!this.space) return;  // too early.  mbbe should gray out the button?
 		if (this.shouldBeIntegrating) return;  // already on.  how'd this happen?
 
-		console.info(`startAnimating starts, triggering iteration`);
+		if (traceStartStop) console.info(`startAnimating starts, triggering iteration`);
 		// set it true as you store it in store; then set state
 		this.shouldBeIntegrating = true;
 		//	= storeASetting('frameSettings', 'shouldBeIntegrating', true);
@@ -168,7 +176,7 @@ export class ControlPanel extends React.Component {
 		this.grinder.triggerIteration();
 
 		//console.log(`startAnimating done: shouldBeIntegrating =${space.grinder.shouldBeIntegrating}   `);
-		console.log(`🎛️ ControlPanel startAnimating, shouldBeIntegrating=${this.shouldBeIntegrating}, isIntegrating=${this.grinder.isIntegrating}   `);
+		if (traceStartStop) console.log(`🎛️ ControlPanel startAnimating, shouldBeIntegrating=${this.shouldBeIntegrating}, isIntegrating=${this.grinder.isIntegrating}   `);
 	}
 
 	stopAnimating =
@@ -178,7 +186,7 @@ export class ControlPanel extends React.Component {
 
 		// set it false as you store it in store; then set state
 		this.shouldBeIntegrating = false;
-		console.log(`🎛️ ControlPanel STOP Animating, shouldBeIntegrating=${this.shouldBeIntegrating}, isIntegrating=${this.grinder.isIntegrating}   `);
+		if (traceStartStop) console.log(`🎛️ ControlPanel STOP Animating, shouldBeIntegrating=${this.shouldBeIntegrating}, isIntegrating=${this.grinder.isIntegrating}   `);
 	}
 
 	startStop =
@@ -224,11 +232,13 @@ export class ControlPanel extends React.Component {
 		p.redrawWholeMainWave();
 	}
 
-	// toolbar: reset Wave button.  Display it from wave params
+	// toolbar: Start Over button.  Display it from wave params
 	resetWave =
 	() => {
 		let waveParams = getAGroup('waveParams');
 		this.setAndPaintMainWave(waveParams);
+		this.grinder.hadException = false;
+		this.stopAnimating()
 	}
 
 	// SetWave button in SetWaveTab: set it from passed in params, and save it

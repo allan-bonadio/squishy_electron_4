@@ -64,12 +64,6 @@ export class SquishPanel extends React.Component {
 			showVoltage:  getASetting('voltageSettings', 'showVoltage'),
 		};
 
-		// this is the actual 'frequency' as a period in milliseconds, as set by that menu.
-		// convert between like 1000/n
-		// eg the menu on the CPToolbar says 10/sec, so this becomes 100
-		// we actually get it from the control panel which is the official rate keeper
-		this.framePeriod = getASetting('frameSettings', 'framePeriod');
-
 		if (traceSquishPanel) console.log(`👑 SquishPanel constructor done`);
 	}
 
@@ -97,14 +91,17 @@ export class SquishPanel extends React.Component {
 		.catch(ex => {
 			// eslint-disable-next-line no-ex-assign
 			ex = interpretCppException(ex);
-			if ('from C++: Trying to start a new space when one already exists!' == ex.message) {
-				// obnoxious hot reloading; frequently end up here, so let me reload the right way
+			if (typeof ex == 'string')
+				ex = new Error(ex);
+			if ('creating second space' == ex.message) {
+				// obnoxious hot reloading; let me reload the right way
 				debugger;
 				location = location;  // eslint-disable-line no-restricted-globals
 				// never gets here
 			}
-			console.error(`error  SquishPanel.didMount.then():`, ex.stack ?? ex.message ?? ex);
+			console.error(`eSpaceCreatedPromise threw: `, ex.stack ?? ex.message ?? ex);
 			debugger;
+			throw ex;
 		});
 
 		// check for obsolescence.  Do this after HTML stuff appears.
@@ -139,12 +136,12 @@ export class SquishPanel extends React.Component {
 	}
 
 	// get this from the control panel every time user changes it
-	setFramePeriod =
-	(period) => {
-		this.framePeriod = period;
-		if (this.animator)
-			this.animator.framePeriod = period;
-	}
+	//setFramePeriod =
+	//(period) => {
+	//	//this.framePeriod = period;
+	//	if (this.animator)
+	//		this.animator.framePeriod = period;
+	//}
 
 
 	/* ******************************************************* rendering */
@@ -181,9 +178,6 @@ export class SquishPanel extends React.Component {
 						sPanel={this}
 					/>
 					<ControlPanel
-
-						setFramePeriod={this.setFramePeriod}
-
 						toggleShowVoltage={this.toggleShowVoltage}
 						showVoltage={s.showVoltage}
 
