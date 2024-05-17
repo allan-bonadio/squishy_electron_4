@@ -4,31 +4,37 @@
 */
 
 /*
-	grinder.isIntegrating and grinder.startMx and .finishMx mutexes synchronize all the gThreadThreads.
+	grinder.isIntegrating and grinder.startAtom and .finishAtom synchronize all the gThreadThreads.
 
 	Start of cycle:
-	If grinder.isIntegrating is false, no iteration, nothing happens.
-	trigger func returns w/o triggering.  Threads stay waiting for startMx.
-	If grinder.isIntegrating is true, JS  trigger func unlocks startMx.
-	All threads start (roughly) all at once when grinder.startMx is unlocked.
-	Each gThread thread, who have all requested a lock of the startMx, each
-	get to lock it, add one to grinder.nStartedThreads, and immediately unlock
-	it, and proceed to integration.  Locking is by startMx.
+	All grinderThreads are halted, waiting on startAtomic, where -1 means locked, and >=0 means unlocked.
+	isIntegrating should be false, as that indicates not active.
 
-	Maybe I have to use semaphores:
-	sem_t sem;
-	sem_init(&sem, 0, initiaqlCount)
-	sem_wait(&sem) - try to decrement, sleeps if zero
-	sem_post(&sem) - adds one; wakes one up
-	hun, maybe not if I get Grinder on the main thread to lock the mutex...
+	To start integration, qGrinder::triggerIteration() is called
+	(however). startAtomic is atomically set to zero, isIntegrating is
+	set to true, and a notify is done on startAtomic.  All of the
+	grinderThreads launch all together (simultaneously?).  They all run
+	this algorithm that requires them to start simultaneously, and to
+	pause upon ending so the latest version of the wave can be copied
+	out.
 
-	When nStartedThreads gets to nThreads, the last thread leaves startMx locked, anticipating next frame synch.
+	[Not implemented yet; not sure if we need it — Upon notification and
+	activation, each grinderThread, atomically add one to
+	grinder.startAtomic, and immediately proceed to integration. When
+	startAtomic gets to nGrinderThreads, that last thread locks startAtom
+	again, anticipating next frame synch.  Yeah, I think we need this; works fine now cuz there's just one thread.  We also need that extra thread to run threadsHaveFinished().]
 
-	Threads, when they finish, count down with grinder.nFinishedThreads locked with finishMx.
-	When it gets to zero, that means that all threads have finished,
+
+	Threads, when they finish, count up, atomically incrementing with grinder.finishAtomic.
+	When it gets to nGrinderThreads, that means that all threads have finished,
 	so that last thread calls grinder.threadsHaveFinished(), which cleans up.
+	[OR starts in the finishing thread]
 
-	At finishing, grinder.shouldBeIntegrating is copied to grinder.isIntegrating so every thread is on the same page.
+	As part of finishing, grinder.shouldBeIntegrating is copied to
+	grinder.isIntegrating.  If true, the startAtomic is unlocked again
+	to trigger the next cycle.
+
+	[Single step should be done this way — start integrating with trigger, but never set shouldBeIntegrating on, so  that at the end of the cycle, integration will turn off.]
 */
 
 
