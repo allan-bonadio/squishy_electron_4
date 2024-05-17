@@ -22,7 +22,9 @@
 	activation, each grinderThread, atomically add one to
 	grinder.startAtomic, and immediately proceed to integration. When
 	startAtomic gets to nGrinderThreads, that last thread locks startAtom
-	again, anticipating next frame synch.  Yeah, I think we need this; works fine now cuz there's just one thread.  We also need that extra thread to run threadsHaveFinished().]
+	again, anticipating next frame synch.  Yeah, I think we need this;
+	works fine now cuz there's just one thread.  We also need that extra
+	tail thread to run threadsHaveFinished().]
 
 
 	Threads, when they finish, count up, atomically incrementing with grinder.finishAtomic.

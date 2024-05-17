@@ -92,12 +92,12 @@ export class VoltageArea extends React.Component {
 		let now = performance.now();
 		let howLong = (now - this.lastDragOutside) / DOUBLING_TIME;
 		if (traceScrollStretch)
-			console.log(`strayOutside down how close?  newVoltage=${newVoltage} v.bottomVolts=${v.bottomVolts} `);
+			console.log(`⚡️ strayOutside down how close?  newVoltage=${newVoltage} v.bottomVolts=${v.bottomVolts} `);
 		if (newVoltage < v.bottomVolts) {
 			// dragging down
 			let howMuch = (v.bottomVolts - newVoltage) / v.heightVolts * howLong;
 			if (traceScrollStretch)
-				console.log(`strayOutside down howMuch=${howMuch} `);
+				console.log(`⚡️ strayOutside down howMuch=${howMuch} `);
 			if (newVoltage < v.minBottom) {
 				// stretch heightVolts
 				v.heightVolts += v.heightVolts * howMuch;
@@ -116,7 +116,7 @@ export class VoltageArea extends React.Component {
 			// dragging up
 			let howMuch = (newVoltage - v.maxTop) / v.heightVolts * howLong;
 			if (traceScrollStretch)
-				console.log(`strayOutside up  howMuch=${howMuch} `)
+				console.log(`⚡️  strayOutside up  howMuch=${howMuch} `)
 			if (newVoltage > v.maxTop) {
 				// stretch heightVolts
 				v.heightVolts += v.heightVolts * howMuch;
@@ -127,7 +127,7 @@ export class VoltageArea extends React.Component {
 				v.bottomVolts = v.maxBottom;
 			v.setMaxMax();
 			if (traceScrollStretch)
-				v.dumpVoltDisplay('   after stretching up');
+				v.dumpVoltDisplay('⚡️ after stretching up');
 
 			this.lastDragOutside = now;
 		}
@@ -197,50 +197,6 @@ export class VoltageArea extends React.Component {
 		return true;
 	}
 
-	//mouseDown =
-	//(ev) => {
-	//	ev.preventDefault();
-	//	ev.stopPropagation();
-	//
-	//	const v = this.props.vDisp;
-	//
-	//	// a hit! otherwise we wouldn't be here.
-	//	this.changeVoltage(ev, 'Down');
-	//	this.dragging = true;
-	//
-	//	// must also switch the svg to catch mouse events otherwise you can't drag far
-	//	this.svgElement.style.pointerEvents = 'visible';  // auto all none
-	//
-	//	// must figure out pointer offset; diff between mousedown pot and the neareest piece of line
-	//	// remember that clientY is in pix units
-	//	//const p = this.props;
-	//	let chosenVoltage = v.yScale.invert(ev.clientY);
-	//	this.mouseYOffset = chosenVoltage - this.latestVoltage;
-	//	if (traceDragging) {
-	//		console.log(`⚡️ 🎯  Y numbers: mouseYOffset(${this.mouseYOffset}) =
-	//			chosenVoltage(${chosenVoltage}) - latestVoltage(${this.latestVoltage})
-	//			from client X=${ev.clientX}    Y=${ev.clientY}`);
-	//	}
-	//}
-	//
-	//// this one and mouseUp are attached to the whole SVG cuz user can drag all over
-	//mouseMove =
-	//(ev) => {
-	//	ev.preventDefault();
-	//	ev.stopPropagation();
-	//
-	//	if (! this.dragging) return;
-	//
-	//	if (ev.buttons) {
-	//		this.changeVoltage(ev, 'DRAG');
-	//		ev.preventDefault();
-	//		ev.stopPropagation();
-	//	}
-	//	else {
-	//		this.mouseUp(ev);
-	//	}
-	//}
-
 	// called upon mouseup or a move without mouse down
 	mouseUp =
 	(cnDrag, ev) => {
@@ -305,7 +261,7 @@ export class VoltageArea extends React.Component {
 	updateVoltageArea =
 	() => {
 		if (traceRendering)
-			console.log(`VoltageArea.updateVoltageArea`);
+			console.log(`⚡️ VoltageArea.updateVoltageArea`);
 		//const space = this.props.space;
 		this.props.vDisp.findVoltExtremes();
 		this.forceUpdate();
@@ -348,7 +304,8 @@ export class VoltageArea extends React.Component {
 					/>
 				);
 				if (traceSlabs)
-					console.info(`installed slabs: width=${p.canvasFacts.width} height=${p.canvasFacts.height}  this.barWidth=${this.barWidth}`);
+					console.info(`installed slabs: width=${p.canvasFacts.width} `
+						+`height=${p.canvasFacts.height}  this.barWidth=${this.barWidth}`);
 				break;
 
 			case qe.contENDLESS:
@@ -382,7 +339,7 @@ export class VoltageArea extends React.Component {
 
 
 			// axis for voltage.  Makes no sense if no axis there.
-			//debugger;
+			// but the way d3 draws on GL is different - should use svg  instead
 			let axis = d3_axisLeft(v.yUpsideDown);
 			axis.ticks(3);
 
@@ -403,11 +360,15 @@ export class VoltageArea extends React.Component {
 
 	render() {
 		const p = this.props;
-		if (traceRendering)
-			console.log(`⚡️ VoltageArea.render()`, p.canvasFacts);
 		if (! p.space)
 			return '';  // too early
 		this.barWidth = p.canvasFacts.width / p.space.nPoints;
+		if (traceRendering)
+			console.log(`⚡️ VArea.render, barWidth:${this.barWidth}  cFacts:`,
+				p.canvasFacts);
+
+		console.info(`canvasFacts: width=${p.canvasFacts.width} `
+			+`height=${p.canvasFacts.height}  barWidth=${this.barWidth}`);
 
 		let v = p.vDisp;
 		v.setVoltScales(p.canvasFacts.width, p.canvasFacts.height, p.space.N);

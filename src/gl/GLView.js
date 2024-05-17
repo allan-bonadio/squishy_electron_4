@@ -48,7 +48,7 @@ class GLView extends React.Component {
 			canvas: null
 		};
 
-		if (traceSetup) console.log(`🖼 🖼 GLView:${props.viewName}: constructor done`);
+		if (traceSetup) console.log(`🖼 GLView:${props.viewName}: constructor done`);
 	}
 
 	// When you know <canvas element, pass it here.
@@ -62,7 +62,7 @@ class GLView extends React.Component {
 			return;  // already done
 
 		this.setState({canvas}, () => traceSetup &&
-			console.log(`🖼 🖼 GLView ${p.viewName}: setGLCanvas set state completed`));
+			console.log(`🖼 GLView ${p.viewName}: setGLCanvas set state completed`));
 		this.canvas = canvas;  // immediately available
 
 		// get the gl, figuring out which versions of GL we have, preferrinig 1 or 2
@@ -75,14 +75,12 @@ class GLView extends React.Component {
 			canvas.glview = this;
 			canvas.viewName = this.viewName = p.viewName;
 
-// 			p.canvasFacts.width = this.canvas.clientWidth;
-// 			p.canvasFacts.height = this.canvas.clientHeight;
 			p.setCanvasFacts(this.canvas.clientWidth, this.canvas.clientHeight);
 
 			this.initViewClass();
 
 			// finally!
-			if (traceSetup) console.log(`🖼 🖼 GLView ${p.viewName}: canvas, gl, view and the drawing done`);
+			if (traceSetup) console.log(`🖼 GLView ${p.viewName}: canvas, gl, view and the drawing done`);
 		})
 	}
 
@@ -101,7 +99,7 @@ class GLView extends React.Component {
 		p.avatar.doRepaint = this.doRepaint;
 		// intrinsic to avatar p.avatar.reStartDrawing = this.reStartDrawing;
 		//p.avatar.setGlViewport = this.setGlViewport;
-		if (traceSetup) console.log(`🖼 🖼 GLView ${p.viewName} ${p.avatar.label}: done with initViewClass`);
+		if (traceSetup) console.log(`🖼 GLView ${p.viewName} ${p.avatar.label}: done with initViewClass`);
 	}
 
 	// repaint whole GL image.  This is not 'render' as in React;
@@ -111,17 +109,17 @@ class GLView extends React.Component {
 	() => {
 		let p = this.props;
 		if (tracePainting)
-			console.log(`🖼 🖼 GLView ${p.viewName} ${p.avatar.label}: starting doRepaint`);
+			console.log(`🖼 GLView ${p.viewName} ${p.avatar.label}: starting doRepaint`);
 		if (! this.effectiveView)
 			return null;  // too early
 
 		if (tracePainting)
-			p.avatar.ewave.dump(`🖼 🖼 GLView ${p.viewName}: got the ewave right here`);
+			p.avatar.ewave.dump(`🖼 GLView ${p.viewName}: got the ewave right here`);
 
 		// copy from latest wave to view buffer (c++) & pick up highest
 		p.avatar.loadViewBuffer();
 		if (tracePainting)
-			p.avatar.dumpViewBuffer(`🖼 🖼 GLView ${p.viewName}: loaded ViewBuffer`);
+			p.avatar.dumpViewBuffer(`🖼 GLView ${p.viewName}: loaded ViewBuffer`);
 
 		// NO!  now done before drawing each drawing individually this.effectiveView.reloadAllVariables();
 		//let endReloadVarsNBuffer = performance.now();
@@ -129,7 +127,7 @@ class GLView extends React.Component {
 		// draw
 		this.effectiveView.drawAllDrawings();
 		if (tracePainting)
-			console.log(`🖼 🖼 GLView ${p.viewName} ${p.avatar.label}: doRepaint done drawing`);
+			console.log(`🖼 GLView ${p.viewName} ${p.avatar.label}: doRepaint done drawing`);
 
 		return //{endReloadVarsNBuffer, endDrawTime};
 	}
@@ -139,11 +137,11 @@ class GLView extends React.Component {
 		const p = this.props;
 
 		if (traceGeometry) {
-			// facts are filled in in componentDidUpdate() so the first render, tehre's none
+			// facts are filled in in componentDidUpdate() so the first render, thre's none
 			let facts = p.canvasFacts;
-			console.log(`🖼 🖼 GLV rend '${p.viewName}': canvas=${this.canvas?.nodeName}
+			console.log(`🖼 GLView rend '${p.viewName}': canvas=${this.canvas?.nodeName}
 				Facts.width: ${facts.width}      Facts.height: ${facts.height}`);
-			console.log(`🖼 🖼 BUT:  canvas.parent.clientWidth: ${this.canvas?.parentNode?.clientWidth ?? 'no canv'}`);
+			console.log(`     widths:  canvas parent clientWidth: ${this.canvas?.parentNode?.clientWidth ?? 'no canv'}`);
 		}
 
 		// the canvas w&h attributes define its inner coord system
@@ -157,7 +155,8 @@ class GLView extends React.Component {
 		if (traceGeometry) {
 			// facts are filled in in componentDidUpdate() so the first render, tehre's none
 			let facts = p.canvasFacts;
-			console.log(`🖼 🖼 GLV final canvas.width: ${cWidth}      final .height: ${cHeight}`);
+			console.log(`🖼 GLView final canvas width: ${cWidth}      final height: ${cHeight}
+				Facts.width: ${facts.width}      Facts.height: ${facts.height}`);
 		}
 
 		// but we override the size with CSS here.  Ultimately, bounding width will change to p.width

@@ -118,6 +118,7 @@ export class WaveView extends React.Component {
 			this.formerWidth = p.width;
 			this.formerHeight = s.height;
 			this.formerShowVoltage = p.showVoltage;
+			console.log(`canvasFacts was ${this.canvasFacts.width} is now ${p.width}`);
 
 			this.vDisp.setVoltScales(this.canvasFacts.width, s.height, p.space.nPoints);
 		}
@@ -258,11 +259,6 @@ export class WaveView extends React.Component {
 					canvasFacts={this.canvasFacts}
 				/>
 
-				{this.grinder?.hadException
-					? <span className='viewError' > Wave has diverged; click Start Over</span>
-					: ''
-				}
-}
 			</div>
 			<VoltageSidebar width={voltageSidebarWidth} height={s.height}
 				vDisp={this.vDisp}

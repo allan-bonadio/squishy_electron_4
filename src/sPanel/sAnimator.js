@@ -194,13 +194,13 @@ class sAnimator {
 			this.errorMessage = qe.grinder_getExceptionMessage(this.grinder.pointer);
 			if (!this.errorMessage) this.errorMessage = 'Bogus Error';
 			console.error(`had Exception!  '${this.errorMessage}' `);
-debugger;
+			debugger;  // won't stop if we're not in the debugger
 			const ex = new Error(this.errorMessage);
-			ex.code  = UTF8ToString(this.grinder.exceptionCode);
+			ex.code  = UTF8ToString(this.grinder._exceptionCode);
 
+			// throwing in the rAF handler is problematic, but a dialog isn't.
 			CommonDialog.openErrorDialog({message: this.errorMessage},
 				`while integrating Schrodinger's`);
-			//throw new Error(this.errorMessage);
 			this.grinder.hadException = false;
 		}
 
