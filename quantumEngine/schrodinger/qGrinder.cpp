@@ -419,7 +419,7 @@ void qGrinder::threadsHaveFinished() {
 	// the next frame.
 	copyToAvatar(avatar);
 	needsRepaint = true;
-	if (traceThreadsHaveFinished) speedyLog("🪓 threadsHaveFinished() copied to avatar needsRepaint=%d  shouldBeIntegrating=%d   isIntegrating=%d\n",
+	if (traceThreadsHaveFinished) speedyLog("🪓 threadsHaveFinished()— copied latest wave to avatar needsRepaint=%d  shouldBeIntegrating=%d   isIntegrating=%d\n",
 			needsRepaint, shouldBeIntegrating, isIntegrating);
 
 	if (this->pleaseFFT) analyzeWaveFFT(qflick, "before fourierFilter()");
