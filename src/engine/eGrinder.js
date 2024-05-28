@@ -10,8 +10,8 @@ import qe from './qe.js';
 import {getASetting} from '../utils/storeSettings.js';
 
 let traceCreation = false;
-let traceIntegration = true;
-let traceTriggerIteration = true;
+let traceIntegration = false;
+let traceTriggerIteration = false;
 
 // a qGrinder manages frame of a wave
 class eGrinder {
@@ -56,6 +56,7 @@ class eGrinder {
 	set justNFrames(a) { this.ints[34] = a; }
 	get totalCalcTime() { return this.doubles[12]; }
 	get maxCalcTime() { return this.doubles[13]; }
+	get divergence() { return this.doubles[14]; }
 	get shouldBeIntegrating() { return Boolean(this.bools[168]); }
 	set shouldBeIntegrating(a) { this.bools[168] = a; }
 	get isIntegrating() { return Boolean(this.bools[169]); }

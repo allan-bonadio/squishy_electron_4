@@ -153,6 +153,7 @@ void qGrinder::formatDirectOffsets(void) {
 
 	makeDoubleGetter(totalCalcTime);
 	makeDoubleGetter(maxCalcTime);
+	makeDoubleGetter(divergence);
 
 	makeBoolGetter(shouldBeIntegrating);
 	makeBoolSetter(shouldBeIntegrating);
