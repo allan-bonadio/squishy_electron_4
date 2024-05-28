@@ -113,10 +113,11 @@ export class ControlPanel extends React.Component {
 		if (this.grinder.shouldBeIntegrating)
 			this.startAnimating();
 
-		console.log(`🎛️ ControlPanel constructor initialized with space, ${this.grinder.pointer.toString(16)} `
-			+` shouldBeIntegrating=${this.grinder.shouldBeIntegrating}  `
-			+` isIntegrating=${this.grinder.isIntegrating}`);
-
+		if (traceStartStop) {
+			console.log(`🎛️ ControlPanel constructor initialized with space, ${this.grinder.pointer.toString(16)} `
+				+` shouldBeIntegrating=${this.grinder.shouldBeIntegrating}  `
+				+` isIntegrating=${this.grinder.isIntegrating}`);
+		}
 	}
 
 	/* ******************************************************* start/stop */

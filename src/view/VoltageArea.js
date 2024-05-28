@@ -367,8 +367,10 @@ export class VoltageArea extends React.Component {
 			console.log(`⚡️ VArea.render, barWidth:${this.barWidth}  cFacts:`,
 				p.canvasFacts);
 
-		console.info(`canvasFacts: width=${p.canvasFacts.width} `
-			+`height=${p.canvasFacts.height}  barWidth=${this.barWidth}`);
+		if (traceRendering) {
+			console.info(`canvasFacts: width=${p.canvasFacts.width} `
+				+`height=${p.canvasFacts.height}  barWidth=${this.barWidth}`);
+		}
 
 		let v = p.vDisp;
 		v.setVoltScales(p.canvasFacts.width, p.canvasFacts.height, p.space.N);
