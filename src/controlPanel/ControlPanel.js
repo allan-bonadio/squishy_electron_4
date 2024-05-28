@@ -88,6 +88,10 @@ export class ControlPanel extends React.Component {
 		// we can't init some stuff till we get the space.  But we also can't until this constructor runs.
 		eSpaceCreatedPromise.then(space => {
 			this.initWithSpace(space);
+			
+			if (this.state.shouldBeIntegrating) {
+				space.grinder.triggerIteration();
+			}
 		})
 		.catch(rex => {
 			let ex = interpretCppException(rex);
@@ -142,8 +146,8 @@ export class ControlPanel extends React.Component {
 	// need to keep grinder's variable and our state in sync for sbi.
 	// maybe these help.  Oh yeah, the setting, too.
 	get shouldBeIntegrating() {
-		// before the space is created, this.grinder is undefined
-		const sbi = this.grinder?.shouldBeIntegrating ?? false;
+		// before the space is created, this.grinder is undefined but the state should be set from storeSettings
+		const sbi = this.grinder?.shouldBeIntegrating ?? this.state.shouldBeIntegrating;
 
 		// NO this could be in a render method
 		//if (this.state.shouldBeIntegrating != sbi)
