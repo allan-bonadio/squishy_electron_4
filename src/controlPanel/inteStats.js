@@ -12,7 +12,7 @@ class inteStats {
 		this.statsMap = {};  // by name
 		this.statsList = [];  // by serial
 
-		this.addStat('Divergence'         , 'kinkPercent', '%');
+		this.addStat('Divergence'         , 'divergence', '%');
 		this.addStat('Frame Calc Time'    , 'frameCalcTime', 'ms');
 		this.addStat('Draw Time'                  , 'totalDrawTime', 'ms');
 		//this.addStat('Total For Frame'   , 'totalForFrame', 'ms');
@@ -139,7 +139,7 @@ class inteStats {
 		// some of these aren't here when we need them.  Grinder numbers come from c++
 		let frameCalcTime = 0;
 		if (grinder) {
-			this.display(sm.kinkPercent, grinder.kinkPercent);
+			this.display(sm.divergence, grinder.divergence);
 			this.display(sm.frameCalcTime, grinder.maxCalcTime);
 			frameCalcTime = grinder.frameCalcTime;
 		}

@@ -100,7 +100,7 @@ struct qGrinder {
 	double totalCalcTime;
 	double maxCalcTime;  // and max of all threads
 
-	double kinkPercent;  // divergence measure
+	double divergence;  // divergence measure
 
 	// for the fourier filter.  Call the function first time you need it.
 	// owned if non-null

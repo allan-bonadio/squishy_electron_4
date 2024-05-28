@@ -189,7 +189,7 @@ void qGrinder::formatDirectOffsets(void) {
 	makeDoubleGetter(voltageFactor);
 	makeDoubleSetter(voltageFactor);
 
-	makeDoubleGetter(kinkPercent);
+	makeDoubleGetter(divergence);
 
 //	printf("\n");
 //	makePointerGetter(scratchQWave);
@@ -278,7 +278,7 @@ void qGrinder::tallyUpKinks(qWave *qwave) {
 	if (traceReversals)
 		speedyLog("🪓 tallyUpKinks result: %d out of %d or %5.1f %%\n",
 			tally, N, percent);
-	kinkPercent = percent;
+	divergence = percent;
 }
 
 /* ********************************************************** doing Integration */
@@ -428,10 +428,10 @@ void qGrinder::threadsHaveFinished() {
 
 	// see how many alternating derivatives we have
 	tallyUpKinks(qflick);
-	if (kinkPercent > 10) {
-		if (kinkPercent > 70) {
+	if (divergence > 10) {
+		if (divergence > 70) {
 			char buf[64];
-			snprintf(buf, 64, "🪓 🪓 wave is DIVERGING, kinkPercent=%4.4g %% 🔥 🧨", kinkPercent);
+			snprintf(buf, 64, "🪓 🪓 wave is DIVERGING, divergence=%4.4g %% 🔥 🧨", divergence);
 			shouldBeIntegrating = isIntegrating = false;
 			//qflick->dump(buf);
 
@@ -440,10 +440,10 @@ void qGrinder::threadsHaveFinished() {
 				"stretch factor for ∆t.  Click Start Over to try again.", "diverged");
 			// integrationEx = std::runtime_error();
 			// strncpy(exceptionCode, , sizeof(exceptionCode));
-			hadException = true;
+			// hadException = true;
 		}
 		else {
-			speedyLog("🪓 wave starting to Diverge, kinkPercent=%4.4g %% 🔥 🧨", kinkPercent);
+			speedyLog("🪓 wave starting to Diverge, divergence=%4.4g %% 🔥 🧨", divergence);
 		}
 	}
 
@@ -509,6 +509,7 @@ void grinder_triggerIteration(qGrinder *grinder) {
 
 /* ********************************************************** exceptions  */
 
+// any error in the threads, send it here and the UI thread will grab it.
 // set integrationEx to exception or string with message
 void qGrinder::reportException(std::runtime_error *ex, const char *code) {
 	integrationEx = *ex;  // copy it.  hope I'm doing this right.
@@ -516,6 +517,7 @@ void qGrinder::reportException(std::runtime_error *ex, const char *code) {
 	hadException = true;  // tells js to call grinder_getExceptionMessage
 }
 
+// no fancy exception objects; just an error message string
 void qGrinder::reportException(const char *message, const char *code) {
 	std::runtime_error ex(message);
 	reportException(&ex, code);
