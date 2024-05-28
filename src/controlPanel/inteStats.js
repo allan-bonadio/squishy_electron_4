@@ -122,12 +122,15 @@ class inteStats {
 	}
 
 	// stick text into span to display number, smoothed
-	display(stat, value, nDigits = 1) {
+	display(stat, value, nDigits = 1, mangleFunction) {
 		if (stat.el) {
 			// hard to see if it's jumping around a lot, so average over many frames
 			this.smoothNumber(stat, value);
-			if (stat.statAvg != undefined)
+			if (stat.statAvg != undefined) {
 				stat.el.innerHTML = stat.statAvg.toFixed(nDigits);
+				if (mangleFunction)
+					mangleFunction(value, stat.el);
+			}
 		}
 	}
 
@@ -139,11 +142,39 @@ class inteStats {
 		const sm = this.statsMap;
 
 		// some of these aren't here when we need them.  Grinder numbers come from c++
-		let frameCalcTime = 0;
+		//let frameCalcTime = 0;
 		if (grinder) {
-			this.display(sm.divergence, grinder.divergence);
-			this.display(sm.frameCalcTime, grinder.maxCalcTime);
-			frameCalcTime = grinder.frameCalcTime;
+			this.display(sm.divergence, grinder.divergence, 0, (value, element) => {
+				let dv = grinder.divergence;
+				if (dv <= 50 ) {
+					// color will go black -> dark red -> full red
+					let red = dv / 50 * 255
+					element.style.color = `rgb(${red}, 0, 0)`;
+					element.style.fontSize = '1em';
+					element.style.textShadow = 'initial';
+				}
+				else {
+					// color will go red -> orange -> yellow, also size 1em -> 2em
+					let green = (dv - 50) / 50 * 255;
+					element.style.color = `rgb(255, ${green}, 0)`;
+					element.style.fontSize = (dv / 50) + 'em';
+					element.style.textShadow = '0 0 3px #0008';
+
+				}
+			});
+
+
+// 							{grinder.divergence * 10
+// 					let extra = Math.min(127, Math.max(0, red - 255));  // for extra brightness
+// 					red = Math.min(255, Math.max(0, red));
+// 					stat.el.style.color = `rgb(${red}, ${extra * 2}, 0)`;
+// 					stat.el.style.fontSize = (1 + extra/100) + 'em';
+// 				}
+//
+
+
+			this.display(sm.frameCalcTime, grinder.maxCalcTime * 1000);  // seconds to ms
+			//frameCalcTime = grinder.frameCalcTime;
 		}
 
 
@@ -152,12 +183,6 @@ class inteStats {
 			this.display(sm.totalDrawTime, inteTimes.totalDrawTime);
 			this.display(sm.rAFPeriod, inteTimes.rAFPeriod);
 
-			// drawing and calculating happen in different threads, so it makes no sense
-			// to add the times together
-			//this.display(sm.totalForFrame, totalDrawTime + frameCalcTime);  // draw + calc
-
-//			this.display(sm.framePeriod, this.inteTimes.frameDrawPeriod);
-//			this.display(sm.framesPerSec, Math.round(1000 / this.inteTimes.frameDrawPeriod), 0);
 		}
 	}
 
