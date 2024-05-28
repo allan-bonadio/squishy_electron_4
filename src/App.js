@@ -11,7 +11,7 @@ import CommonDialog from './widgets/CommonDialog.js';
 import DocReader from './widgets/DocReader.js';
 import {eSpaceCreatedPromise} from './engine/eEngine.js';
 
-let traceResize = false;
+let traceResize = true;
 
 class App extends React.Component {
 	constructor(props) {
@@ -41,12 +41,13 @@ class App extends React.Component {
 		// add listener only executed once
 		window.addEventListener('resize', ev => {
 			if (traceResize)
-				console.log(`🍦 window resize to ${this.appEl?.clientWidth}`, ev);
+				console.log(`🍦  App Mount: window resize, from bodyClientWidth=${bodyClientWidth} to ${this.appEl?.clientWidth}`, ev);
 			console.assert(ev.currentTarget === window, `ev.currentTarget =?== window`);
+			bodyClientWidth = this.appEl?.clientWidth
 
 			// if we don't set the state here, nobody redraws.  Otherwise, get body.clientWidth directly.
 			this.setState({clientWidth: bodyClientWidth});
-			if (traceResize) console.log(`🍦 AppMount: bodyClientWidth= ${bodyClientWidth}`);
+			if (traceResize) console.log(`🍦 App Mount window resize: set s.clientWidth to bodyClientWidth= ${bodyClientWidth}`);
 
 			// the doc reader tries to track the window size
 			DocReader.setDimensions(bodyClientWidth);
@@ -56,9 +57,9 @@ class App extends React.Component {
 		// cuz there's nothing in the page yet.  This confuses everybody, but give it a kick.
 		// NO somehow if I don't init clientWidth in constructor, this catches and fixes it
 		if (this.state.clientWidth != bodyClientWidth) {
-			this.setState({clientWidth: bodyClientWidth});
 			if (traceResize)
 				console.log(`🍦 mounting resize cuz scrollbar: ${this.state.clientWidth} --> ${bodyClientWidth} `);
+			this.setState({clientWidth: bodyClientWidth});
 			//debugger;
 		}
 
@@ -114,6 +115,9 @@ class App extends React.Component {
 			// real squishpanel
 			sqPanel = <SquishPanel id='theSquishPanel'
 				width={this.appEl?.clientWidth ?? document.body.clientWidth}/>;
+			if (this.appEl?.clientWidth != document.body.clientWidth)
+					console.log(`🍦 render if cppRunning, appEl?.clientWidth=${this.appEl?.clientWidth} ≠ body.clientWidth=${document.body.clientWidth} this.appEl=`, this.appEl);
+
 		}
 		else {
 			// spinner tells ppl we're working on it
