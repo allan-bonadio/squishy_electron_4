@@ -3,8 +3,8 @@
 ** Copyright (C) 2023-2024 Tactile Interactive, all rights reserved
 */
 
-// TODO: you can't name this ctxFactory, that's always the thing I call 'gl'.
-// So rename this to ctxFactory cuz that's what it does.
+// Creates a webgl context from the canvas upon startup.  Starts either webgl1 or 2
+// depending on what's available.
 
 // webgl-lint: sigh.
 // the gl Tests aren't tuned in to node_modules; use the https form for those.

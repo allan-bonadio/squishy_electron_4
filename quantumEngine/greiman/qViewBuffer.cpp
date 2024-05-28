@@ -137,7 +137,7 @@ float qViewBuffer::loadViewBuffer(void) {
 			pointNum, twoRowPtr[0], twoRowPtr[1], twoRowPtr[2], twoRowPtr[3],
 				twoRowPtr[4], twoRowPtr[5], twoRowPtr[6], twoRowPtr[7]);
 
-		// while we're here, collect the highest point (obsolete i think)
+		// while we're here, collect the highest point
 		double height = re * re + im * im;
 		if (height > highest)
 			highest = height;

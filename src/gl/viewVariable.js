@@ -4,7 +4,7 @@
 */
 
 let traceGLCalls = false;
-let traceUniforms = false;
+let traceUniforms = true;
 let traceAttributes = false;
 
 // attr arrays and uniforms that can change on every frame.
@@ -108,11 +108,13 @@ export class viewUniform extends viewVariable {
 		gl[method].apply(gl, args);
 
 		if (traceUniforms) {
-			console.log(`𒐿 viewUniform reloaded U variable '${this.varName}' in `+
-				`${this.drawing.avatarLabel} like:   gl.${method}(${args.map(a => a + ', ')})`);
+			console.log(`𒐿 viewUniform reloaded U variable '${this.varName}' in `);
+			console.log(`            ${this.drawing.avatarLabel} uniform gl.${method}`
+				+`  (${args[0].constructor.name}, ${args[1]}, ${args[2]} ) `);
 		}
 	}
 }
+
 
 /* *********************************************** attributes for arrays */
 // attributes DO change from one vertex to another; each row of the attr array
