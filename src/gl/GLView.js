@@ -14,7 +14,7 @@ import ctxFactory from './ctxFactory.js';
 
 let traceSetup = false;
 let tracePainting = false;
-let traceGeometry = false;
+let traceGeometry = true;
 
 // For each GLView, there's one:
 // - canvas, and one gl context
@@ -33,8 +33,11 @@ class GLView extends React.Component {
 		// We can't jut use the promise ourselves; we have to know which avatar
 		avatar: PropTypes.object.isRequired,
 		space: PropTypes.object.isRequired,
+		
+		// our caller needs the gl ctx itself
+		setGl: PropTypes.func.isRequired,
 
-		// the width and height we measure
+		// the width and height we measure; should be width & height of canvas
 		canvasFacts: PropTypes.object.isRequired,
 		setCanvasFacts: PropTypes.func.isRequired,
 	}
@@ -70,6 +73,8 @@ class GLView extends React.Component {
 		this.ctxFactory.glProm
 		.then(gl => {
 			this.gl = gl;
+			p.setGl(gl);
+			
 			this.tagObject = this.ctxFactory.tagObject;
 
 			canvas.glview = this;
@@ -80,7 +85,8 @@ class GLView extends React.Component {
 			this.initViewClass();
 
 			// finally!
-			if (traceSetup) console.log(`🖼 GLView ${p.viewName}: canvas, gl, view and the drawing done`);
+			if (traceSetup) 
+				console.log(`🖼 GLView ${p.viewName}: canvas, gl, view and the drawing done`);
 		})
 	}
 
@@ -102,9 +108,11 @@ class GLView extends React.Component {
 		if (traceSetup) console.log(`🖼 GLView ${p.viewName} ${p.avatar.label}: done with initViewClass`);
 	}
 
-	// repaint whole GL image.  This is not 'render' as in React;
-	// this is repainting a canvas with GL.   returns an object with perf stats.
-	// Returns null if it couldn't do it (eSpace promise hasn't resolved)
+	// repaint whole GL image.  this is repainting a canvas with GL.
+	// This is not 'render' as in React; react places the canvas element
+	// and this function redraws on teh canvas. returns an object with
+	// perf stats. Returns null if it couldn't do it (eSpace promise
+	// hasn't resolved)
 	doRepaint =
 	() => {
 		let p = this.props;
@@ -120,9 +128,6 @@ class GLView extends React.Component {
 		p.avatar.loadViewBuffer();
 		if (tracePainting)
 			p.avatar.dumpViewBuffer(`🖼 GLView ${p.viewName}: loaded ViewBuffer`);
-
-		// NO!  now done before drawing each drawing individually this.effectiveView.reloadAllVariables();
-		//let endReloadVarsNBuffer = performance.now();
 
 		// draw
 		this.effectiveView.drawAllDrawings();
@@ -153,7 +158,8 @@ class GLView extends React.Component {
 			cHeight = this.canvas.clientHeight;
 		}
 		if (traceGeometry) {
-			// facts are filled in in componentDidUpdate() so the first render, tehre's none
+			// facts are filled in in componentDidUpdate() so the first render, there's none.
+			// Soon in componentDidUpdate() the canvas facts will be updated.
 			let facts = p.canvasFacts;
 			console.log(`🖼 GLView final canvas width: ${cWidth}      final height: ${cHeight}
 				Facts.width: ${facts.width}      Facts.height: ${facts.height}`);
@@ -169,32 +175,20 @@ class GLView extends React.Component {
 		// took out style={{width: `${p.width}px`, height: `${p.height}px`}}
 	}
 
+	// how did you tell if the canvas resized?  It aways gets a render.
 	componentDidUpdate() {
-		//const p = this.props;
-		//const s = this.state;
+		// this wil alert everybody if the user changed the canvas dims
+		// the first time, the gl ctx might not be there yet
+		// be careful with this, if the height changes, this will make it rerender for ever
+		if (this.gl)
+			this.props.setCanvasFacts(this.canvas.clientWidth, this.canvas.clientHeight);
 
-		//renderedSucceed
+		this.doRepaint();
 
-//		if (this.canvas) {
-//			// do this only when the dust has settled, other parts of the code depend on canvasFacts
-//			//let cRect = this.canvas.getBoundingClientRect();
-//			p.canvasFacts.width = this.canvas.clientWidth;
-//			p.canvasFacts.height = this.canvas.clientHeight;
-//		}
-//		else
-//			console.warn(`oops no canvas in GLView.componentDidUpdate()`)
-
-		// a one-time initialization.  but upon page load, neither the avatar,
-		// space or canvas are there yet.  Don't worry, when the space comes in,
-		// we'll all initViewClass.
-//		if (traceSetup && !this.effectiveView) {
-//			console.log(`🖼 🖼 GLView:${p.viewName}: time to init?  avatar=${p.avatar?.label}  `+
-//				`space=${p.space?.nPoints}  canvas=${this.canvas?.nodeName}  `+
-//				`effectiveView=${this.effectiveView?.viewName}`);
-//		}
-//		if (p.avatar && p.space && this.canvas && !this.effectiveView) {
-//			this.initViewClass();
-//		}
+		// trying to not have sideeffects during render.
+// 		const p = this.props;
+// 		p.canvasFacts.width = this.canvas.clientWidth;
+// 		p.canvasFacts.height = this.canvas.clientHeight;
 	}
 }
 

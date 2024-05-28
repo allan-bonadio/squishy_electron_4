@@ -39,7 +39,9 @@ export class WaveView extends React.Component {
 
 		space: PropTypes.instanceOf(eSpace),
 
-		width: PropTypes.number,  // handed in, pixels, depends on window width
+		// handed in, pixels.  Width of whole waveview,
+		// including sidebar.  Canvas is 1 pixel smaller all around.
+		width: PropTypes.number,
 
 		showVoltage: PropTypes.bool.isRequired,
 
@@ -60,8 +62,10 @@ export class WaveView extends React.Component {
 			// These are in
 			vDisp: null,
 		}
-		// facts: directly measured Canvas dimensions
-		this.canvasFacts = {width: 0, height: 0};  // temporary
+		// directly measured Canvas width & height and maybe more set by
+		// the lower levels with setCanvasFacts() and passed to the
+		// lower levels. gotta be initialized in setCanvasFacts()
+		this.canvasFacts = {width: 0, height: 0};
 
 		this.formerWidth = props.width;
 		this.formerHeight = this.state.height;
@@ -77,7 +81,7 @@ export class WaveView extends React.Component {
 
 			// easy access
 			this.space = space;
-			this.grinder = space.qgrinder;
+			this.grinder = space.grinder;
 			this.mainEAvatar = space.mainEAvatar;
 
 			this.vDisp = space.vDisp;
@@ -89,14 +93,32 @@ export class WaveView extends React.Component {
 		});
 	}
 
-	// we finally have a canvas; rush its dimensions up here
+	// we finally have a canvas; give me a copy so I can save it
+	setGl =
+	gl => {
+		if (!gl)
+			throw `no gl value`;
+		if (!this.gl)
+			this.gl = gl;
+		else if (this.gl !== gl)
+			throw `this.gl ≠ gl !`;
+	}
+
+	// we finally have a canvas; rush its dimensions up here.  Early in
+	// startup, either or both might be undefined, ignores those
 	setCanvasFacts =
 	(width, height) => {
-		this.canvasFacts.width = width;
-		this.canvasFacts.height = height;
-		this.setState({height: height});
+		if (width)
+			this.canvasFacts.width = width;
+		if (height) {
+			height += 2;
+			this.canvasFacts.height = height;
+			if (height != this.state.height)
+				this.setState({height: height});
+		}
 		if (traceWidth)
-			console.log(`🏄 WaveView setFacts, width=${width}   height: ${height}  `);
+			console.log(`🏄 WaveView canvasFacts, width=${width}   height: ${height}  `);
+		this.gl.viewport(0, 0, width, height);
 	}
 
 	componentDidUpdate() {
@@ -118,7 +140,7 @@ export class WaveView extends React.Component {
 			this.formerWidth = p.width;
 			this.formerHeight = s.height;
 			this.formerShowVoltage = p.showVoltage;
-			console.log(`canvasFacts was ${this.canvasFacts.width} is now ${p.width}`);
+			console.log(`canvasFacts was ${this.canvasFacts.width}W ; WV is now ${p.width}W`);
 
 			this.vDisp.setVoltScales(this.canvasFacts.width, s.height, p.space.nPoints);
 		}
@@ -188,6 +210,30 @@ export class WaveView extends React.Component {
 		this.vDisp.setVoltScales(this.canvasFacts.width, this.state.height, this.props.space.nPoints);
 	}
 
+	// when user moves mouse over the canvas (or WaveView whichh is kindofthe same area)
+	// the voltage stuff appears and disappears.
+	// onMouseEnter={this.mouseEnter} onMouseLeave={this.mouseLeave}
+	mouseEnter =
+	ev => {
+		// non-react
+		const voltageArea = document.querySelector('.VoltageArea');
+		if (voltageArea)
+			voltageArea.style.display = 'inline';
+	}
+
+	mouseLeave =
+	ev => {
+		const voltageArea = document.querySelector('.VoltageArea');
+		if (voltageArea)
+			voltageArea.style.display = 'none';
+	}
+
+	componentDidMount() {
+		const wv = document.querySelector('.WaveView');
+		wv.addEventListener('mouseleave', this.mouseLeave);
+		wv.addEventListener('mouseenter', this.mouseEnter);
+	}
+
 	/* ************************************************************************ render */
 
 	render() {
@@ -207,26 +253,27 @@ export class WaveView extends React.Component {
 			: <img className='spinner' alt='spinner' src='/images/eclipseOnTransparent.gif' />;
 
 		// sometimes a fraction of a pixel causes the horiz scroll bar to kick in.  avoid that without messing up everything.
-		let widthToUse = p.width - .5;
+		let widthForCanvas = p.width - .5;
 		if (p.showVoltage)
-			widthToUse -= voltageSidebarWidth + .5;
+			widthForCanvas -= voltageSidebarWidth + .5;
 
 		if (traceWidth) {
 			console.log(`🏄 WaveView render, width=${this.waveViewEl?.clientWidth}`+
-			`  parent.clientWidth: ${this.waveViewEl?.parentNode.clientWidth}   widthToUse=${widthToUse}`);
+			`  parent.clientWidth: ${this.waveViewEl?.parentNode.clientWidth}   widthForCanvas=${widthForCanvas}`);
 		}
 
 		// can't make a real GLView until we have the space!  until then, show spinner
 		let glView;
 		if (s.space) {
-			glView = <GLView width={widthToUse} height={s.height}
+			glView = <GLView width={widthForCanvas} height={s.height}
 				space={this.space} avatar={this.space.mainEAvatar}
 				viewClassName='flatViewDef' viewName='mainView'
+				setGl={this.setGl}
 				canvasFacts={this.canvasFacts}  setCanvasFacts={this.setCanvasFacts}
 			/>
 		}
 		else {
-			let glView = <div style={{width: widthToUse, height: s.height}} >
+			let glView = <div style={{width: widthForCanvas, height: s.height}} >
 				{spinner}
 			</div>;
 		}
