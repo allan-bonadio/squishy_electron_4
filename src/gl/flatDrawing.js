@@ -9,7 +9,7 @@ import {viewUniform, viewAttribute} from './viewVariable.js';
 
 let traceViewBufAfterDrawing = false;
 let traceHighest = false;
-let traceFlatDrawing = false;
+let traceFlatDrawing = true;
 
 // diagnostic purposes
 let traceDrawPoints = false;
@@ -88,7 +88,7 @@ export class flatDrawing extends abstractDrawing {
 		this.setDrawing();
 
 		if (traceFlatDrawing)
-			console.log(`flatDrawing ${this.viewName}: creatingVariables`);
+			console.log(`🫓 flatDrawing ${this.viewName}: creatingVariables`);
 
 		// loads view buffer from corresponding wave, calculates highest norm.
 		// Need this for starting values for highest & smoothHighest
@@ -99,7 +99,7 @@ export class flatDrawing extends abstractDrawing {
 		this.maxHeightUniform = new viewUniform('maxHeight', this,
 			() => {
 				if (traceHighest)
-					console.log(`flatDrawing reloading ${this.viewName}: highest=${this.avatar.highest.toFixed(5)}  smoothHighest=${this.avatar.smoothHighest.toFixed(5)}`);
+					console.log(`🫓 flatDrawing reloading ${this.viewName}: highest=${this.avatar.highest.toFixed(5)}  smoothHighest=${this.avatar.smoothHighest.toFixed(5)}`);
 
 				// add in a few percent
 				return {value: this.avatar.smoothHighest * this.viewDef.PADDING_ON_BOTTOM, type: '1f'};
@@ -108,8 +108,14 @@ export class flatDrawing extends abstractDrawing {
 
 		let nPoints = this.nPoints = this.space.nPoints;
 		let barWidth = 1 / (nPoints - 1);
+		if (traceFlatDrawing) console.log(`🫓 barWidth= ${barWidth}`);
 		this.barWidthUniform = new viewUniform('barWidth', this,
-			() => ({value: barWidth, type: '1f'}) );
+			() => {
+				//barWidth = this.gl.canvas.width / (nPoints - 1)
+				barWidth = 1 / (nPoints - 1)
+				return { value: barWidth, type: '1f' };
+			}
+		);
 
 		this.vertexCount = nPoints * 2;  // nPoints * vertsPerBar
 		this.rowFloats = 4;
@@ -122,7 +128,7 @@ export class flatDrawing extends abstractDrawing {
 	}
 
 	draw() {
-		if (traceFlatDrawing) console.log(`flatDrawing ${this.viewName}, ${this.avatarLabel}: `+
+		if (traceFlatDrawing) console.log(`🫓 flatDrawing ${this.viewName}, ${this.avatarLabel}: `+
 			` drawing ${this.vertexCount/2} points`);
 		const gl = this.gl;
 		this.setDrawing();
