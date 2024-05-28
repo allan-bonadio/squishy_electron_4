@@ -22,6 +22,7 @@ class inteStats {
 
 	}
 
+	// creates a stat object for a statistic.
 	addStat(label, name, unit) {
 		let stat = {label, name, unit};
 		this.statsMap[name] = stat;
@@ -31,7 +32,7 @@ class inteStats {
 	/* ********************************************************* render table */
 
 	// render the row for this integration statistic (1 num), collecting nodes for the spans.
-	// values inserted right now are dummies to be replaced
+	// values inserted right now are dummies to be replaced - real numbers inserted in display()
 	renderStat(stat) {
 		// this'll run when the dom nodes are in place.  eventually.
 		const init = el => {
@@ -51,6 +52,7 @@ class inteStats {
 	}
 
 	// render all the rows - with dummy values.  Just creates the nodes and elements, not numbers.
+	// display() will actually stick the text into the elements.
 	renderAllStats() {
 		return (
 			<div className='iStats'>

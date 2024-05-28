@@ -14,7 +14,7 @@ import ctxFactory from './ctxFactory.js';
 
 let traceSetup = false;
 let tracePainting = false;
-let traceGeometry = true;
+let traceGeometry = false;
 
 // For each GLView, there's one:
 // - canvas, and one gl context

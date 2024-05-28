@@ -4,7 +4,7 @@
 */
 
 let traceGLCalls = false;
-let traceUniforms = true;
+let traceUniforms = false;
 let traceAttributes = false;
 
 // attr arrays and uniforms that can change on every frame.

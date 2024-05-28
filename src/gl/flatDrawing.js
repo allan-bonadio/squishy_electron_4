@@ -9,7 +9,7 @@ import {viewUniform, viewAttribute} from './viewVariable.js';
 
 let traceViewBufAfterDrawing = false;
 let traceHighest = false;
-let traceFlatDrawing = true;
+let traceFlatDrawing = false;
 
 // diagnostic purposes
 let traceDrawPoints = false;
