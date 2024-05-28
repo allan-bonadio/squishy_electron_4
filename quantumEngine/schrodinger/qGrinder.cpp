@@ -430,18 +430,14 @@ void qGrinder::threadsHaveFinished() {
 	// see how many alternating derivatives we have
 	tallyUpKinks(qflick);
 	if (divergence > 10) {
-		if (divergence > 70) {
+		if (divergence > 95) {
 			char buf[64];
 			snprintf(buf, 64, "🪓 🪓 wave is DIVERGING, divergence=%4.4g %% 🔥 🧨", divergence);
 			shouldBeIntegrating = isIntegrating = false;
-			//qflick->dump(buf);
 
 			// js code intercepts this exact spelling
 			reportException("Sorry, your wave integration diverged! Try a shorter "
 				"stretch factor for ∆t.  Click Start Over to try again.", "diverged");
-			// integrationEx = std::runtime_error();
-			// strncpy(exceptionCode, , sizeof(exceptionCode));
-			// hadException = true;
 		}
 		else {
 			speedyLog("🪓 wave starting to Diverge, divergence=%4.4g %% 🔥 🧨", divergence);
