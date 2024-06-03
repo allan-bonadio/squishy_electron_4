@@ -228,7 +228,9 @@
 			.canyonScale, .canyonPower {
 				appearance: slider-vertical;
 				writing-mode: vertical-lr;  // new standard? feb 2024  use direction: rtl; to invert
+				direction: rtl;
 				width: 2.5em;
+
 			}
 
 			.canyonOffset {
@@ -241,7 +243,7 @@
 			}
 
 			.scaleDisplay {
-				width: 4em;
+				width: 7em;
 				text-align: center;
 				font-size: .7em;
 			}
@@ -252,7 +254,7 @@
 				stroke: common.$voltageColor;
 				stroke-width: 1;
 				pointer-events: none;
-				background-color: #000;
+				background-color: #444;
 			}
 		}
 	}

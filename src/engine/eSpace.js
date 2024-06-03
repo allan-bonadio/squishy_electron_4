@@ -127,7 +127,7 @@ export class eSpace {
 	}
 
 	/* *************************************************************** Direct Accessors */
-	// see qSpace.cpp and squish.h to regenerate this.
+	// see qSpace.cpp and directAccessors.h to regenerate this.
 
 	get _voltage() { return this.ints[1]; }
 	get voltageFactor() { return this.doubles[1]; }

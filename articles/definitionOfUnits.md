@@ -85,8 +85,6 @@ It's kg m^2 / s^2; energy is always mass x length^2 / time^2 .
 = 1.602176634e+5 pfg nm^2 / ps^2
 or 160217.6634 pfg nm^2 / ps^2
 
-Alternatively, we could measure it in mks-analogous units,
-pfg nm^2 / ps^2
 
 <!--
 ### mass
@@ -131,7 +129,7 @@ Long story.
 Anyway, he needed a conversion factor in there, and he called it *h*.
 
 This was just as quantum mechanics was starting to be understood.
-And, it turned out, that instead of using frequencies measured in cycles per second,
+Back then, people were using frequencies measured in cycles per second.
 it fit better to measure them in radians per second.
 Imagine if you take the radius of a circle, and you used that length to crawl around a circle.
 That unit is called a 'radian', and that's how you measure angles in calculus.

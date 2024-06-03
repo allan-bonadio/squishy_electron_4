@@ -17,7 +17,7 @@ static bool traceMidpoint = false;
 
 
 /*
-reinterpreted from the article
+--- reinterpreted from the article
 A fast explicit algorithm for the time-dependent Schrodinger equation
 P. B. Visscher (emeritus)
 Department of Physics and Astronomy, University of Alabama, Tuscaloosa, Alabama 35487-0324
@@ -37,13 +37,15 @@ initial wave:   𝜓.re(t)              𝜓.im(t + dt/2)
 The natural discretization of Eqs. 6 (visscher paper) is therefore
 	𝜓.re(t + dt) = 𝜓.re(t) + dt H 𝜓.im(t + dt/2)
 
-Half a tick later, at a half odd integer multiple of dt,
+Half a tick before, at a half odd integer multiple of dt,
 	𝜓.im(t + dt/2) = 𝜓.im(t - dt/2) - dt H 𝜓.re(t)
-or
+
+Or later,
 	𝜓.im(t + 3dt/2) = 𝜓.im(t + dt/2) - dt H 𝜓.re(t + dt)
 
-where H is hamiltonian, typically ( potential + ∂2/∂x2 )
-We do the hamiltonian custom here and sometimes omit the potential
+where H is hamiltonian, typically ( potential + ∂²/∂x² )
+
+--- We do the hamiltonian custom here and sometimes omit the potential
  */
 
 /*
@@ -55,24 +57,19 @@ the length (supplied by user) and N, for each dimension of the space.
 
 // The following uses nanometers, picoseconds, etc as described in definiionOfUnits.md
 //
-// real units:
+// squish units:
 // ℏ = 105.4571817 pfg nm^2 / ps
 // m_e = .91093837015 pfg
-// // ℏ / 2m_e = 5.78838180e-5  m^2/s = 1 cuz of the rhs of schrodinger's we use
-// // therefore, 1s = 5.7...e-5 m^2   ???
-// // and 1ps = 1e-12s = 5.78838180e-17 m^2 - yeah i think so.
-// // or 1ns corresponds to 5.78838180e-14 m^2
-// // or  2.4059056091210226e-7 m or about 241 µm ??
 //
-// no do it this way.  The coefficient on the rhs for the second derivative is
-// ℏ^2 / 2m_e = 6.10426431e-39  kg m^4 / s^2  = 1 cuz of the rhs of schrodinger's we use
+// The coefficient on the rhs for the second derivative is
+// ℏ² / 2m_e = 6.10426431e-39  kg m^4 / s^2  = 1 cuz of the rhs of schrodinger's we use
 //
 // wait try this, ℏ = 1, right, so 1 / 2m_e = 1  and m_e = 1/2 = 9.1093837015e-31 kg
 // and 1 kg = 5.4888455287888166e+29
 
 See definitionOfUnits in articles directory for latest believable work.
-Here, we use ix as a surrogate for x, x = ix * dx.
-dx is a field on the dimension in the space.
+Here, we use ix as a surrogate for x, x = ix * dx = 𝜉 ix.
+dx is a field on the qDimension in the qSpace.
 
 */
 

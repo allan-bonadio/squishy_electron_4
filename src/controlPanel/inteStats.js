@@ -163,16 +163,6 @@ class inteStats {
 				}
 			});
 
-
-// 							{grinder.divergence * 10
-// 					let extra = Math.min(127, Math.max(0, red - 255));  // for extra brightness
-// 					red = Math.min(255, Math.max(0, red));
-// 					stat.el.style.color = `rgb(${red}, ${extra * 2}, 0)`;
-// 					stat.el.style.fontSize = (1 + extra/100) + 'em';
-// 				}
-//
-
-
 			this.display(sm.frameCalcTime, grinder.maxCalcTime * 1000);  // seconds to ms
 			//frameCalcTime = grinder.frameCalcTime;
 		}
