@@ -274,10 +274,11 @@ export class voltDisplay {
 		}
 		else {
 			for (let ix = this.start; ix < this.end; ix++) {
-				let pot = Math.pow(Math.abs(ix - offset), canyonPower) * (canyonScale * VALLEY_FACTOR);  // * VALLEY_FACTOR);
+				let pot = Math.pow(Math.abs(ix - offset), canyonPower)
+					* (canyonScale * VALLEY_FACTOR);  // * VALLEY_FACTOR);
 
 				if (isNaN(pot)) {
-					// wait i know this situation - pow generates NaN when it should generate ±∞
+					// we disallow neg powers so don't need first case?
 					if (canyonPower < 0)
 						pot = Infinity * canyonScale;
 					else {
@@ -296,16 +297,17 @@ export class voltDisplay {
 			this.dumpVoltage(`done with setFamiliarVoltage()`);
 	}
 
-	// make the value for the 'd' attribute on a <path element
+	// make the value for the 'd' attribute on an svg <path element
 	// from start to end, on your space, using std volts array from WaveView
-	makeVoltagePathAttribute() {
+	// usedYScale is either yScale or yUpsideDown; your choice
+	makeVoltagePathAttribute(usedYScale) {
 		let start = this.start;
 		let end = this.end;
 		if (tracePathAttribute)
 			console.log(`⚡️ ⚡️ voltDisplay.makePathAttribute(${start}, ${end})`);
 
 		// yawn too early?
-		if (! this.yScale) {
+		if (! usedYScale) {
 			if (tracePathAttribute)
 				console.log(`⚡️ ⚡️ makePathAttribute(): no yScale so punting`);
 			return `M0,0`;
@@ -318,20 +320,19 @@ export class voltDisplay {
 		let points = this.points;
 		let x, y, pt;
 
-		//let y = this.yScale(voltageBuffer[start]);  //qe.get1DVoltage(dim.start);
+		//let y = usedYScale(voltageBuffer[start]);  //qe.get1DVoltage(dim.start);
 		//let x = this.xScale(start);
 		if (start) points[0] = points[end] = '';
 
 		// get ready to stop and start the path if needed
 		let didMove = false, didLine = false;
 		for (let ix = start; ix < end; ix++) {
-			//console.time('🧑‍🚀makeVoltagePathAttribute');
 			x = this.xScale(ix);
 			if ((x==null) || !isFinite(x))
 				debugger;
 
 			// ±∞ come out as NaN.
-			y = this.yScale(voltageBuffer[ix]);
+			y = usedYScale(voltageBuffer[ix]);
 			if (isNaN(y) || y < -TOO_MANY_VOLTS || y > TOO_MANY_VOLTS) {
 				didMove = didLine = false;
 				pt = '';
@@ -353,7 +354,6 @@ export class voltDisplay {
 				}
 			}
 			points[ix] = pt;
-			//console.timeEnd('🧑‍🚀makeVoltagePathAttribute');
 		}
 
 		let final = points.join('');

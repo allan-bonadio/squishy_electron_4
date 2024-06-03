@@ -82,6 +82,7 @@ class SetVoltageTab extends React.Component {
 		</div>;
 	}
 
+	// the minigraph is all in svg; no gl
 	renderMiniGraph() {
 		// even if you can't draw it, at least reserve the space
 		if (!this.miniVolts)
@@ -90,19 +91,19 @@ class SetVoltageTab extends React.Component {
 		const v = this.miniVolts;
 		//debugger;
 
-		// grab the latest params to fill the buffer
+		// grab the latest params to fill the voltage buffer
 		v.setFamiliarVoltage(this.state);
 
 		// You see, if I did an autorange, the scale will seem to have no effect.  So do this crude version.
 		v.heightVolts = 10;
 		v.bottomVolts = s.canyonScale / 2 - 5;
-		if (s.canyonPower < 0) {
-			v.heightVolts /= 100;
-			v.bottomVolts /= 100;
-		}
+		// if (s.canyonPower < 0) {
+		// 	v.heightVolts /= 100;
+		// 	v.bottomVolts /= 100;
+		// }
 
 		v.setVoltScales(miniWidth, miniHeight, this.space.nPoints);
-		let path = v.makeVoltagePathAttribute();
+		let path = v.makeVoltagePathAttribute(v.yUpsideDown);
 
 		return <svg className='miniGraph' width={miniWidth} height={miniHeight}  >
 			<rect x={0} y={0} width={miniWidth} height={miniHeight} fill='#000' />
@@ -111,7 +112,7 @@ class SetVoltageTab extends React.Component {
 
 	}
 
-	// wrap the minigraph with sliders on 3 sides
+	// draw minigraph, and wrap it with sliders on 3 sides
 	renderMiniGraphPanel() {
 		//const p = this.props;
 		const s = this.state;
@@ -119,9 +120,9 @@ class SetVoltageTab extends React.Component {
 		let disabled= 'flat' == s.voltageBreed;
 
 		// vertical sliders have zero on the top
-		let scaleDisplayN = -(s.canyonScale ?? 0);
+		let scaleDisplayN = s.canyonScale ?? 0;
 		let scaleDisplay = scaleDisplayN.toFixed(3);
-		if (scaleDisplayN < 0) scaleDisplay = `(${scaleDisplay})`;
+		// shouldn't be neg if (scaleDisplayN < 0) scaleDisplay = `(${scaleDisplay})`;
 
         // for vertical sliders, firefox requires orient=vertical; chrome/safari appearance:slider-vertical.
         // each ignore the other
@@ -137,11 +138,11 @@ class SetVoltageTab extends React.Component {
 			{this.renderMiniGraph()}
 
 			<input type='range' className='canyonScale' orient='vertical' disabled={disabled}
-				value={-(s.canyonScale ?? 0)}
+				value={(s.canyonScale ?? 0)}
 				min={vMinsMaxes.canyonScale.min}
 				max={vMinsMaxes.canyonScale.max}
 				step='.01'
-				onChange={ev => this.setState({canyonScale: -ev.target.valueAsNumber})}
+				onChange={ev => this.setState({canyonScale: ev.target.valueAsNumber})}
 			/>
 
 			{/* second row. */}
@@ -158,12 +159,12 @@ class SetVoltageTab extends React.Component {
 			/>
 
 			<div className='scaleDisplay'>
-				×{scaleDisplay}  {/* that's a multiply symbol, not letter x */}
+				{scaleDisplay} <var>x</var><sup>•</sup>
 			</div>
 
 		</div>;
 	}
-
+	//  <sup>{(s.canyonPower ?? 0).toFixed(1)}</sup>
 
 	render() {
 		const p = this.props;

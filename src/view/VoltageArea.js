@@ -14,8 +14,6 @@ import {axisLeft as d3_axisLeft} from 'd3-axis';
 import ReactFauxDOM from 'react-faux-dom';
 
 import qe from '../engine/qe.js';
-//import eSpace from '../engine/eSpace.js';
-//import {dumpVoltage, makeVoltagePathAttribute} from '../utils/voltDisplay.js';
 
 import clickNDrag from '../widgets/clickNDrag.js';
 
@@ -149,7 +147,7 @@ export class VoltageArea extends React.Component {
 		const v = p.vDisp;
 		let phase = ev.type;
 
-		// shift key gives you steady voltage as you drag across, but if you do it on the first
+		// shift key gives you steady voltage as you drag across, but if you do it on the down
 		// click, we don't know where to start
 		let newVoltage = this.latestVoltage;
 		if (! ev.shiftKey || phase == 'mousedown') {
@@ -168,7 +166,7 @@ export class VoltageArea extends React.Component {
 				ix, v.voltageBuffer[ix], newVoltage);
 		}
 
-		if (phase == 'down') {
+		if (phase == 'mousedown') {
 			// the first time, all you can do is the one point
 			v.voltageBuffer[ix] = newVoltage;
 		}
@@ -277,7 +275,7 @@ export class VoltageArea extends React.Component {
 	}
 
 
-	// the main path is the voltage, but for WELL we also draw end blocks, and also...
+	// the main path is the voltage, but for continuum WELL we also draw end blocks, and also...
 	renderPaths() {
 		const p = this.props;
 		const v = p.vDisp;
@@ -316,7 +314,7 @@ export class VoltageArea extends React.Component {
 
 		// the lines themselves: exactly overlapping.  tactile wider than visible.
 		if (p.showVoltage) {
-			const pathAttribute = v.makeVoltagePathAttribute();
+			const pathAttribute = v.makeVoltagePathAttribute(v.yScale);
 			//const pathAttribute = this.makePathAttribute(start, end);
 			if (traceRendering)
 				console.log(`⚡️ VoltageArea.pathAttribute: `, pathAttribute);
