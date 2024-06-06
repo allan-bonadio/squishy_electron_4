@@ -11,7 +11,7 @@ import {getASetting} from '../utils/storeSettings.js';
 
 let traceCreation = false;
 let traceIntegration = false;
-let traceTriggerIteration = false;
+let traceTriggerIteration = true;
 
 // a qGrinder manages frame of a wave
 class eGrinder {
@@ -99,7 +99,8 @@ class eGrinder {
 	triggerIteration() {
 		if (traceTriggerIteration) {
 			console.log(`🪚 eGrinder.triggerIteration, ${this.pointer.toString(16)} starting  `
-				+`shouldBeIntegrating=${this.shouldBeIntegrating}  isIntegrating=${this.isIntegrating}`);
+				+`shouldBeIntegrating=${this.shouldBeIntegrating}  isIntegrating=${this.isIntegrating} `
+				+`voltageFactor=${this.voltageFactor}`);
 		}
 		qe.grinder_triggerIteration(this.pointer);
 	}

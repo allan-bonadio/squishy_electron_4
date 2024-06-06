@@ -10,14 +10,14 @@ but I want to stick to SI prefixes.
 
 ## •••••••••••••••••••• MKS Units
 
-MKS stands for Meters, Kilograms, Seconds.  So length is measured in Meters (m), mass in Kilograms (kg) and time in Seconds (s).  Speed is in m/s, acceleration in m/s^2 which is m/s gained, per second.
+MKS stands for Meters, Kilograms, Seconds.  So length is measured in Meters (m), mass in Kilograms (kg) and time in Seconds (s).  Speed is in m/s, acceleration in m/s² which is m/s gained, per second.
 
 Momentum is mass x velocity, kg m / s.  Momentum is conserved if you add up all the pieces involved.
-Kinetic energy is mass x velocity^2, so energy is in   kg m^2/s^2.
+Kinetic energy is mass x velocity², so energy is in   kg m²/s².
 Energy is also conserved, but it can be Kinetic (energy of motion) or Potential (energy of situation, like being uphill vs downhill).  And, like momentum, you have to add up all the pieces and their energy.
 
-Plank's constant is in kg m^2 / s .
-Same as the units for angular momentum; momentum is kg m/s, but held out at a distance (length) that becomes kg m^2 / s.
+Plank's constant is in kg m² / s .
+Same as the units for angular momentum; momentum is kg m/s, but held out at a distance (length) that becomes kg m² / s.
 
 ## ••••••••••••••••••••••• Squishy Units
 
@@ -69,21 +69,65 @@ A whisper for one second is about 100,000 ev or 0.1 MeV (Mega eV).
 
 In MKS, energy is measured in Joules (named after James Prescott Joule,
 who discovered the law of conservation of energy).
-It's kg m^2 / s^2; energy is always mass x length^2 / time^2 .
+It's kg m² / s²; energy is always mass x length² / time² .
 
 1 eV = 1.602176634e-19 J
 
-= 1.602176634e-19 kg m^2 / s^2
+= 1.602176634e-19 kg m² / s²
 
-= 1.602176634e-19 (1e30 pico femto grams) (1e9 nm)^2 / (1e12 ps)^2
-//= 1.602176634e-19 kg (1e9 nm)^2 / (1e12 ps)^2
+= 1.602176634e-19 (1e30 pico femto grams) (1e9 nm)² / (1e12 ps)²
+//= 1.602176634e-19 kg (1e9 nm)² / (1e12 ps)²
 
-= (1.602176634e-19 * (1e30 * 1e18 / 1e24) pfg nm^2 / ps^2
+= (1.602176634e-19 * (1e30 * 1e18 / 1e24) pfg nm² / ps²
 
-= 1.602176634e-19 * 1e24 pfg nm^2 / ps^2
+= 1.602176634e-19 * 1e24 pfg nm² / ps²
 
-= 1.602176634e+5 pfg nm^2 / ps^2
-or 160217.6634 pfg nm^2 / ps^2
+= 1.602176634e+5 pfg nm² / ps²
+or 160217.6634 pfg nm² / ps²
+
+But in SI/Squish units, energy is in pfg nm² / ps²
+can we give this a name like 'moxie'?
+moxie = 1e-30 kgrams 1e-18 meters / 1e-24 sec
+= 1e-48 / 1e-24 = 1e-24 joules
+
+### Volts and Coulombs
+
+charge of electron is 𝑒 = 1.602176634e−19 coulombs
+
+So, that term in the schrodinger's equation is U𝜓, the potential energy times 𝜓.
+U = eV, where e is electron charge, and V is the voltage — the electrical potential.
+That sounds like the whole electron, but really the electron is broken up into 16 or
+128 cells or whatever N is.  That's why we say eV𝜓, where 𝜓 is in millipsis per cell.
+
+Actually, the only reason for e is to multiply it by a voltage, so it's more like eV is the quantity we're concerned with.  Which seems to be about .005, with the settings I have now, at voltage=5V, voltageFactor=-0.1 (?!?!?) and inverseℏ at .0095 (which won't change).  That is, .005 is effective as a voltage at altering the wave progression over time.  (wrong i think)
+
+For a point, if the U𝜓 / | 𝜓 | is (?) about -0.005
+that is for U ≈ volts * voltageFactor * hamiltW->im * inverseℏ
+where 'volts' is just the phony number I'm using to fill the voltage buffer
+potential volts=  4.9  voltageFactor= -0.1000  inverseℏ=  0.0095
+   so U must  be ≈  -0.5    (wrong i think)
+
+Adjust voltageFactor to be 1, and we get:
+ 🧶  viss: real ΔE: kinetic/ℏ=  0.1619  potential/ℏ=  0.0475  total/ℏ=  0.2094
+  potential U: volts=  5.0081  voltageFactor=  1.0000  inverseℏ=  0.0095
+  so U must  be  =   5.0081
+🧶  viss: imag ΔE: kinetic=-126.3952  potential=0.0475  total=-126.3477
+
+So if volts are actual volts, then U = 𝑒V, where 𝑒 = 1.602176634e−19 coulombs...
+I''ve  been assuming that U ≈ V, like the charge is 1 coulomb or something.  No.
+
+Volts * Amps = Watt.
+Volts * Amps * second = Volts * Coulomb = Joule but we don't use joules, we use moxies
+U is volts * coulombs  ≈  5v * 1.602176634e-19 coulombs  ≈ 8e-19 joules
+1 moxie = 1e-24 joules
+1e24 moxie = 1 joules
+so U is 1e24 * 8e-19  moxie = 8e5 moxie, that's the energy from 5 volts * e
+
+turns out 1500 volts or 1000 volts is effective at moving the wave.
+1000v * 1.6e-19 coulombs = 1.6e-16 moxies
+yeah, 500v barely has an effect, seems mostly friction
+yeah, 1000v seems to snag it pretty well.  Wonder how much energy is lost, or where it goes.
+
 
 
 <!--
@@ -101,7 +145,7 @@ Lets not use quectos or zeptos.    femtos are 1e-15, size of a nucleus.  that's 
 1 eV = 1.602176634×10−19 J
 meaning the charge of an electron is 1.602176634×10−19 coulomb, exactly.
 
-1 kg = 6.241509074460763e+24 eV ps^2 / nm^2
+1 kg = 6.241509074460763e+24 eV ps² / nm²
  -->
 
 <!--
@@ -138,25 +182,25 @@ There's 2π radians in a circle.
 So in order to avoid dragging 2π around in all their equations, they just absorbed into Plank's constant as h / 2π.
 that's what ℏ h-bar is.
 
-ℏ = 1.054571817e-34 kg m^2 / s
+ℏ = 1.054571817e-34 kg m² / s
 
-ℏ = 1.054571817e-34 * (1e30 pfg) (1e9 nm)^2 / (1e12 ps)
+ℏ = 1.054571817e-34 * (1e30 pfg) (1e9 nm)² / (1e12 ps)
 
-= 105.4571817 pfg nm^2 / ps
+= 105.4571817 pfg nm² / ps
 
 In other words, about a hundred.
 
 
 <!--
-= 1.054571817e-34 * (6.241509074460763e+24 eV ps^2 / nm^2)  * (1e9 nm)^2 / 1e12 ps
+= 1.054571817e-34 * (6.241509074460763e+24 eV ps² / nm²)  * (1e9 nm)² / 1e12 ps
 
-= 6.582119565476075e-10 (eV ps^2 / nm^2) * (1e18 / 1e12) * (nm^2 / ps)
+= 6.582119565476075e-10 (eV ps² / nm²) * (1e18 / 1e12) * (nm² / ps)
 
-= 6.582119565476075e-10 eV ps^2 / nm^2 * 1e6 (nm^2/ps)
+= 6.582119565476075e-10 eV ps² / nm² * 1e6 (nm²/ps)
 
-= 6.582119565476075e-10 eV ps^2  * 1e6 (1/ps)
+= 6.582119565476075e-10 eV ps²  * 1e6 (1/ps)
 
-= 6.582119565476075e-10 eV ps^2  * 1e6 (1/ps)
+= 6.582119565476075e-10 eV ps²  * 1e6 (1/ps)
 
 
 = 6.58211956547607524373e-4 eV ps
@@ -186,7 +230,7 @@ Move the coefficients on the left to the right:
 That is how integration proceeds, calculating d𝜓 for each time step.
 The coefficient  on the double derivative is the 'diffusivity' 𝛼
 
-hOver2m_e = 105.4571817 / (2 * 0.91093837015)   nm^2 / ps
+hOver2m_e = 105.4571817 / (2 * 0.91093837015)   nm² / ps
 
 Divide this by dx² and it's ready to use for integrating.
 

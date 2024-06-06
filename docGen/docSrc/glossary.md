@@ -70,6 +70,10 @@ micro µ = one millionth.  So a microgram is 1/1000000 of a gram.  (6 decimal pl
 milli - A prefix that means one thousandth.
 So a milligram is 1/1000 of a gram, and a millimeter is 1/1000 of a meter.
 
+millipsi or milli𝜓 - a unit that represents 1/1000 of the particle or its probability.
+See also 𝜓.  It's really a pure number, but sometimes sit's handy to have a unit for it,
+usually applied to datapoints in the wave.
+
 **N**
 
 nano - prefix means one-billionth.   (9 decimal places)
@@ -101,6 +105,10 @@ pound (lb) - a unit of weight.
 Used mostly in the US; the rest of the world has graduated to kilograms.
 
 proton - a particle that's positively charged.  Hydrogen atoms have a proton in the center.
+
+𝜓 - psi (greek letter) pronounced 'psi' - The wave.
+Complex valued, one for each state (or location) of a particle.
+Also, as a unit, the integration of 𝜓* 𝜓 everywhere, which should be 1.
 
 **Q**
 

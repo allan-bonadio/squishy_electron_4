@@ -37,7 +37,7 @@ static bool traceIProd = true;
 
 static bool traceConstructor = false;
 
-static bool traceReversals = false;
+static bool traceKinks = false;
 
 static bool traceAggregate = false;
 static bool traceSingleStep = false;
@@ -105,9 +105,10 @@ qGrinder::qGrinder(qSpace *sp, qAvatar *av, int nGrinderThreads, const char *lab
 			label,
 			space->magic >> 24,  space->magic >> 16, space->magic >> 8, space->magic,
 			space->label);
-		printf("         nDimesions=%d   nStates=%d nPoints=%d voltage=%p voltageFactor=%lf spectrumLength=%d  \n",
+		printf("         nDimesions=%d   nStates=%d nPoints=%d voltage=%p voltageFactor=%lf spectrumLength=%d  samplePoint=%d\n",
 			space->nDimensions, space->nStates, space->nPoints,
-			space->voltage, space->voltageFactor, space->spectrumLength);
+			space->voltage, space->voltageFactor, space->spectrumLength,
+			samplePoint);
 	}
 	sentinel = true;
 
@@ -188,7 +189,7 @@ void qGrinder::formatDirectOffsets(void) {
 	printf("\n");
 	makePointerGetter(voltage);
 	makeDoubleGetter(voltageFactor);
-	makeDoubleSetter(voltageFactor);
+	//makeDoubleSetter(voltageFactor);
 
 	makeDoubleGetter(divergence);
 
@@ -276,7 +277,7 @@ void qGrinder::tallyUpKinks(qWave *qwave) {
 	// figure rate.  ÷2 for real, imag
 	int N = qwave->end - qwave->start;
 	double percent = 100.0 * tally / N / 2.;
-	if (traceReversals)
+	if (traceKinks)
 		speedyLog("🪓 tallyUpKinks result: %d out of %d or %5.1f %%\n",
 			tally, N, percent);
 	divergence = percent;
