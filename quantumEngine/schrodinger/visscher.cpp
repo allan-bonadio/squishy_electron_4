@@ -10,6 +10,7 @@
 #include "../debroglie/qFlick.h"
 
 
+static bool traceΔE = false;  // energy each iteration (voluminous)
 static bool traceRealStep = false;  // in detail
 static bool traceImaginaryStep = false;  // in detail
 static bool traceVischerBench = false;
@@ -83,15 +84,25 @@ int usedIx;  // trace only
 // future) accesses the points on each side of the point, too.
 
 void qGrinder::pointReal(qCx *newW, qCx *oldW, qCx *hamiltW, double volts, double dt) {
-	// second deriv wrt x of psi
+	// second deriv wrt x of psi, multiplied by that coeff
 	double d2𝜓i = (hamiltW[-1].im + hamiltW[+1].im - hamiltW->im * 2) * d2Coeff;
 
 	if (traceRealStep && samplePoint == usedIx) speedyLog(
-		"    🧶 pointReal[%d] d2𝜓i=%3.8lf  hamiltons=%5.5lf %5.5lf %5.5lf and d2Coeff %3.8lf\n",
+		"    🧶 pointReal[%d] d2𝜓i=%3.8lf  hamiltW=%5.5lf %5.5lf %5.5lf and d2Coeff %3.8lf\n",
 		samplePoint, d2𝜓i, hamiltW[-1].im, hamiltW[+1].im, hamiltW->im, d2Coeff);
 
-	// total hamiltonian including voltage
-	double H𝜓 = d2𝜓i + volts * voltageFactor * hamiltW->re * inverseℏ;
+	// total hamiltonian including voltage (remember hamiltW isn't the hamiltonian,
+	// just the 𝜓 used to calculate the hamiltonian!)
+	double U𝜓 = volts * voltageFactor * hamiltW->re * inverseℏ;
+	double H𝜓 = d2𝜓i + U𝜓;
+	if (traceΔE && samplePoint == usedIx) {
+		printf(" 🧶  viss: real ΔE: kinetic/ℏ=%8.4lf  potential/ℏ=%8.4lf  total/ℏ=%8.4lf  ",
+			d2𝜓i / hamiltW->re, U𝜓/hamiltW->re, H𝜓 / hamiltW->re);
+		printf("   potential U: volts=%8.4lf  voltageFactor=%8.4lf  inverseℏ=%8.4lf  ",
+			volts, voltageFactor, inverseℏ);
+		printf("   so U must  be  = %8.4lf, in moxies\n",
+			U𝜓 / hamiltW->re * ℏ);
+	}
 
 	// new = old + 𝛥 dt   note subtraction
 	newW->re = oldW->re - dt * H𝜓;
@@ -111,8 +122,12 @@ void qGrinder::pointImaginary(qCx *newW, qCx *oldW, qCx *hamiltW, double volts, 
 
 	// total hamiltonian
 	double H𝜓 = d2𝜓r + volts * voltageFactor * hamiltW->im * inverseℏ;
+	if (traceΔE && samplePoint == usedIx) {
+		printf(" 🧶  viss: imag ΔE: kinetic=%1.4lf  potential=%1.4lf  total=%1.4lf\n",
+			d2𝜓r / hamiltW->im, (H𝜓 - d2𝜓r)/hamiltW->im, H𝜓 / hamiltW->im);
+	}
 
-	// note addition
+	//  new = old + 𝛥 dt   note addition
 	if (traceImaginaryStep) speedyLog("    🧶 pointImaginary\n");
 	newW->im = oldW->im + dt * H𝜓;
 	if (traceImaginaryStep) speedyLog("    🧶 pointImaginary\n");

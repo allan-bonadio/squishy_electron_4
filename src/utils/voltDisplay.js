@@ -4,7 +4,7 @@
 */
 
 import {scaleLinear} from 'd3-scale';
-
+import LOTS_OF_VOLTS from './lotsOfVolts.js';
 import {getAGroup, storeASetting} from '../utils/storeSettings.js';
 
 let traceFamiliar = false;
@@ -145,8 +145,8 @@ export class voltDisplay {
 			// i will change my mind on this...
 			// first, decide a heightVolts.  Potential might be zero everywhere, therefore zero difference.  Potential might have some range to it, if so, enclose that.
 			//let diff = Math.abs(this.measuredMaxVolts - this.measuredMinVolts);
-			let approx = Math.abs(this.measuredMaxVolts) + Math.abs(this.measuredMinVolts);
-			this.heightVolts = (approx || 8) / 8;
+			let approx = Math.abs(this.measuredMaxVolts - this.measuredMinVolts);
+			this.heightVolts = (approx || 2 * LOTS_OF_VOLTS);
 			// (also, make sure that a zero potential results in the voltageSettings defaults)
 
 			// this is bs... guessing at numbers that could be anywhere
