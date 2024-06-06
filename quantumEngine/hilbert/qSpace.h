@@ -9,13 +9,6 @@
 // not even used these days
 extern qCx hamiltonian(struct qSpace *space, qCx *wave, int x);
 
-extern const double ℏ;  //  = 105.4571817 pfg nm^2 / ps, Plank's reduced
-extern const double m_e;  //  = .91093837015 pico femto grams, mass of electron
-
-// these two are used directly in Schrodinger's
-extern const double ℏOver2m_e;  // = ℏ / (2 * m_e);  // units nm^2 / ps
-extern const double inverseℏ;  //  = 1 / ℏ;  // units ps / pfg nm^2
-
 /* *************************************** one for each DIMENSION of the wave array */
 struct qDimension {
 public:
@@ -82,7 +75,7 @@ public:
 
 	// part of the space; it helps to define the lay of the land
 	double *voltage;
-	double voltageFactor;  // tweak this
+	double voltageFactor;  // now a constant 1.0 (?)
 	void dumpVoltage(const char *title);
 
 	// Dimensions are listed from outer to inner as with the resulting 𝜓 array:

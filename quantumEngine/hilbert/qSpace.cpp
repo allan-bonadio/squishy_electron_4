@@ -20,13 +20,6 @@
 static bool traceQSpace = false;
 
 
-/* ****************** constants */
-
-const double ℏ = 105.4571817;  // units of pfg nm^2 / ps
-const double m_e = .91093837015;  // pico femto grams
-
-const double ℏOver2m_e = ℏ / (2 * m_e);  // units nm^2 / ps
-const double inverseℏ = 1 / ℏ;  // units ps / pfg nm^2
 
 
 /* ********************************************************** qSpace construction */
@@ -36,7 +29,7 @@ const double inverseℏ = 1 / ℏ;  // units ps / pfg nm^2
 // Use the functions in jsSpace.cpp to do  practical constructions.
 qSpace::qSpace(const char *lab)
 	: magic('Spac'), nDimensions(0), voltage(NULL), nPoints(0), nStates(0),
-		voltageFactor(-.1) {
+		voltageFactor(1.0) {
 
 	if (traceQSpace) {
 		printf("🚀 🚀 qSpace::qSpace() constructor starts. label:'%s'  this= %p\n",

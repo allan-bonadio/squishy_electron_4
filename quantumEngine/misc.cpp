@@ -11,8 +11,6 @@
 
 static bool traceExceptions = false;
 
-extern const double NaN = nan("squish");
-
 // return elapsed real time since last page reload, in seconds, only for tracing
 // seems like it's down to miliseconds or even a bit smaller
 double getTimeDouble(void)
@@ -21,6 +19,17 @@ double getTimeDouble(void)
     clock_gettime(CLOCK_MONOTONIC, &ts);
     return ts.tv_sec + ts.tv_nsec / 1e9;
 }
+
+/* ****************** constants */
+
+const double ℏ = 105.4571817;  // units of pfg nm^2 / ps
+const double m_e = .91093837015;  // pico femto grams
+
+const double ℏOver2m_e = ℏ / (2 * m_e);  // units nm^2 / ps
+const double inverseℏ = 1 / ℏ;  // units ps / pfg nm^2
+
+const double NaN = nan("squish");
+
 
 /* *********************************************** speedyLogging */
 // for extra-fast logging of timing for these threads.
