@@ -13,7 +13,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 
 import eSpace from '../engine/eSpace.js';
-import {thousands} from '../utils/formatNumber.js';
+import {thousands, thousandsSpaces} from '../utils/formatNumber.js';
 import qe from '../engine/qe.js';
 import './view.scss';
 import {getASetting, storeASetting} from '../utils/storeSettings.js';
@@ -252,7 +252,8 @@ export class WaveView extends React.Component {
 		const spinner = p.space ? ''
 			: <img className='spinner' alt='spinner' src='/images/eclipseOnTransparent.gif' />;
 
-		// sometimes a fraction of a pixel causes the horiz scroll bar to kick in.  avoid that without messing up everything.
+		// sometimes a fraction of a pixel causes the horiz scroll bar
+		// to kick in.  avoid that without messing up everything.
 		let widthForCanvas = p.width - .5;
 		if (p.showVoltage)
 			widthForCanvas -= voltageSidebarWidth + .5;
@@ -288,7 +289,7 @@ export class WaveView extends React.Component {
 						<span className='voNorthWest'>{elapsedTime}</span> ps
 					</div>
 					<div className='northEastWrapper'>
-						frame <span className='voNorthEast'>{frameSerial}</span>
+						frame <span className='voNorthEast'>{thousandsSpaces(frameSerial)}</span>
 					</div>
 
 					<img className='sizeBox' src='/images/sizeBox4.png' alt='size box'

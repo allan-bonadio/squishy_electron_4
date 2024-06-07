@@ -45,18 +45,19 @@ export function thousands(n) {
 		return Number(n).toLocaleString();
 		// num.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2}));
 	}
-	return thousandsBackup(n);
+	return thousandsSpaces(n);
 }
 
-// put spaces between triples of digits.  ALWAYS positive reals.
+// put spaces between triples of digits.  ALWAYS positive reals.  Also decimal places.
 // not sure why I did this cuz it's built in to intl but in case you have an
 // ancient browser ... but if you do, you can't run webassembly or GL...
-export function thousandsBackup(n) {
+export function thousandsSpaces(n) {
+	// round off to nearest millionth - 6 digits past dec pt
 	n = Math.round(n * 1e6) / 1e6;
 	let nInt = Math.floor(n);
 	let nFrac = (n) % 1;
 	if (n < 1e-12) {
-		console.warn(` hey!  ${n} is too small for thousands!!`);
+		return toSiSuffix(n, 10);
 	}
 
 	let nuPart = 'z';
@@ -77,7 +78,7 @@ export function thousandsBackup(n) {
 		intPart = nuPart.replace(/(\d\d\d) /, ' $1 ').trim();  // each additional space
 	}
 
-	console.log( '    done: '+ intPart + fracPart);
+	//console.log( '    done: '+ intPart + fracPart);
 	return intPart + fracPart;
 }
 

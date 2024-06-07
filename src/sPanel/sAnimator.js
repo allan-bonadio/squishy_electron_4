@@ -3,13 +3,12 @@
 ** Copyright (C) 2023-2024 Tactile Interactive, all rights reserved
 */
 
-//import inteStats from '../controlPanel/inteStats.js';
-//import statGlobals from '../controlPanel/statGlobals.js';
 import ControlPanel from '../controlPanel/ControlPanel.js';
 import {interpretCppException} from '../utils/errors.js';
 import SquishPanel from './SquishPanel.js';
 import CommonDialog from '../widgets/CommonDialog.js';
 import {getASetting} from '../utils/storeSettings.js';
+import {thousands, thousandsSpaces} from '../utils/formatNumber.js';
 
 let traceStats = false;
 let traceTheViewBuffer = false;
@@ -82,7 +81,7 @@ class sAnimator {
 			nw.innerHTML = this.grinder.elapsedTime.toFixed(3);
 		let ne = document.querySelector('.voNorthEast')
 		if (ne)
-			ne.innerHTML =  this.grinder.frameSerial;
+			ne.innerHTML =  thousandsSpaces(this.grinder.frameSerial);
 	}
 
 	// Repaint, with webgl, the waveview.  (not render!)
