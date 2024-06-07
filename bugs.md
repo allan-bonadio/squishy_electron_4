@@ -13,7 +13,7 @@ I get it.  Standing wave freq 0 => nans.
 - need a button to reset ALL params and settings
 
 
-## GL WaveView
+## GL & WaveView
 - left tic marks rarely draw.
 
 - display Garland Spiral in 3d could be easy.
@@ -59,6 +59,8 @@ certain it doesn't. But now I have FFTs to measure it at least.
 - Is the frame count correct?  If not, fix it.
 
 - RK4?
+
+- Gotta have some way to control the speed.  Goes up or down x8
 
 ## Docs
 

@@ -13,34 +13,12 @@ static bool traceWork = false;
 static bool traceFinish = false;
 static bool traceSync = false;
 
-/* *********************************************** gThread threads */
+/* *********************************************** grinderThread */
 
 // indexed by thread serial, there may be gaps.
 // for threads that AREN'T gThreads
 static grinderThread *sla[MAX_THREADS];
 grinderThread **qGrinder::gThreads = sla;
-
-// wrapper for pthread to start the thread.  arg is the grinderThread ptr.  requestAnimationFrame.
-static void *sStarter(void *st) {
-	if (traceStart)
-		speedyLog("🔪 grinderThread: starting\n");
-
-	// runs forever never returns
-	((grinderThread *) st)->gThreadLoop();
-
-	return NULL;
-}
-
-/* ******************************************************************* grinderThread */
-// initialize this as being idle, before starting an integration task.
-// All the grinders are the same object; all the threads are differrent.
-grinderThread::grinderThread(qGrinder *gr)
-	: grinder(gr) {
-
-	thread = new qThread(&sStarter, (void *) this);
-	serial = thread->serial;
-}
-// no destructor - never freed
 
 // do the work: integration
 void grinderThread::gThreadWork(void) {
@@ -61,10 +39,8 @@ void grinderThread::gThreadWork(void) {
 	// Gonna do an integration frame.  set starting time, under lockf
 	// wait this doesn't have to be under lock!  it's per-thread.
 	startCalc = getTimeDouble();
-//	pthread_mutex_lock(&grinder->finishMx);
-//	pthread_mutex_unlock(&grinder->finishMx);
 
-	//actually, doing the calculation
+	//actually, doing the calculation, single  thread
 	grinder->oneFrame();
 
 	// get endCalc and compare
@@ -75,7 +51,8 @@ void grinderThread::gThreadWork(void) {
  				grinder->shouldBeIntegrating, grinder->isIntegrating);
 }
 
-// do the atomics and synchronization, and call gThreadWork().  runs repeatedly
+// do the atomics and synchronization, and call gThreadWork().  runs repeatedly.
+// Catches exceptions; copies them to grinder for the JS to pick up, continues.
 void grinderThread::gThreadLoop(void) {
 	while (true) {
 		try {
@@ -165,6 +142,33 @@ void grinderThread::gThreadLoop(void) {
 		}
 	}
 }
+
+
+/* *********************************************** creation and startup */
+
+// wrapper for pthread to start the thread.  arg is the grinderThread ptr.  requestAnimationFrame.
+static void *sStarter(void *st) {
+	if (traceStart)
+		speedyLog("🔪 grinderThread: starting\n");
+
+	// runs forever. never returns.  catches its exceptions.
+	((grinderThread *) st)->gThreadLoop();
+
+	return NULL;
+}
+
+
+// initialize this as being idle, before starting an integration task.
+// All the grinders are the same object; all the threads are differrent.
+grinderThread::grinderThread(qGrinder *gr)
+	: grinder(gr) {
+
+	thread = new qThread(&sStarter, (void *) this);
+	serial = thread->serial;
+}
+// no destructor - never freed
+
+
 
 
 // static; creates all gThread threads; runs early
