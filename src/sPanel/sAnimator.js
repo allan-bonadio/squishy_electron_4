@@ -38,7 +38,7 @@ class sAnimator {
 		const now = performance.now();
 		//this.timeForNextTic = now + 10;  // default so we can get rolling
 
-		this.initStats(now);
+		this.inteTimes = {totalDrawTime: 0};
 		this.initAnimationFP();
 
 		// stick ?allowRunningDiagnosticCycle at the end of URL to show runningDiagnosticCycle panel
@@ -49,26 +49,6 @@ class sAnimator {
 		this.allowRunningDiagnosticCycle = /allowRunningDiagnosticCycle/.test(location.search);
 
 	}
-
-	/* ******************************************************* stats */
-
-	// the variables that actually mark the various times
-	// start them all at reasonable values
-	initStats(now) {
-		this.inteTimes = {
-//			startIntegrationTime: now,
-//			prevStartIntegrationTime: now,
-
-			totalDrawTime: 0,
-		}
-	}
-
-	// update the stats, as displayed in the Integration tab
-	refreshStatsOnScreen() {
-		this.space.sIntStats.displayAllStats(this.inteTimes, this.grinder);
-
-	}
-
 
 	/* ******************************************************* frames */
 
@@ -97,7 +77,7 @@ class sAnimator {
 
 
 			// update dom elements in integration tab to latest stats
-			this.refreshStatsOnScreen();
+			this.space.sIntStats.displayAllStats(this.inteTimes, this.grinder);
 
 		//this.inteTimes.endReloadVarsNBuffer =
 		let endDrawTime = performance.now();
