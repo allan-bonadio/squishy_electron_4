@@ -5,7 +5,7 @@
 
 - chord pulse should be harmonics of the full width.  Needs an overhaul, and re-enabling.
 
-- SetWave: Sliding the frequency slider really fast screws something up.  The
+* *- SetWave: Sliding the frequency slider really fast screws something up.  The
 events come  too fast.  maybe need 'passive' mode?  Or capture mode?
 Now the offset slider.  JUST the offset slider.  Doing it slowly is OK.
 I get it.  Standing wave freq 0 => nans.
@@ -14,14 +14,15 @@ I get it.  Standing wave freq 0 => nans.
 
 
 ## GL & WaveView
+
 - left tic marks rarely draw.
 
 - display Garland Spiral in 3d could be easy.
 	Really should use Three.js
 
-- use gl.getError()
+- use gl.getError() (I already do in some places)
 
-- install that WebGL debugger
+* *- install that WebGL debugger
 
 - should have x axis on the bottom marked in nm
 
@@ -53,7 +54,7 @@ per thread. And way of each thread claiming the border and moving it in
 or out depending.  Matrix of atoms.
 
 
-- I think it doesn't converve energy - gotta check this out.  I'm pretty
+- I think it doesn't conserve energy - gotta check this out.  I'm pretty
 certain it doesn't. But now I have FFTs to measure it at least.
 
 - Is the frame count correct?  If not, fix it.
@@ -68,7 +69,7 @@ certain it doesn't. But now I have FFTs to measure it at least.
 
 - behavior of different waveforms
 
-- complex analysis?
+- complex numbers, fourier transform
 
 - the voltage
 
