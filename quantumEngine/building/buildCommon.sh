@@ -28,8 +28,8 @@ export EMSDK_QUIET=1
 . $EMSDK/emsdk_env.sh
 
 
-# same for production/dev
-SAFETY="-sASSERTIONS=2 -sSAFE_HEAP=1 -sSTACK_OVERFLOW_CHECK=2  -sLLD_REPORT_UNDEFINED"
+# same for production/dev.  Change to dev-only when things get mature.
+SAFETY="-sASSERTIONS=2 -sSAFE_HEAP=1  -sSTACK_OVERFLOW_CHECK=1 -sLLD_REPORT_UNDEFINED "
 
 # This sabotages exception throwing in C++
 D_E_C="-sNO_DISABLE_EXCEPTION_CATCHING"
@@ -46,17 +46,25 @@ DEFINES=" -DqDEV_VERSION -DMAX_LABEL_LEN=$MAX_LABEL_LEN -DMAX_DIMENSIONS=$MAX_DI
 INCLUDES=" -I$EMSDK/upstream/emscripten/cache/sysroot/include -include emscripten.h -include squish.h "
 
 # INVOKE_RUN=0 and IGNORE_MISSING_MAIN avoids main.cpp main()
-MISC="-sFILESYSTEM=0 -sINVOKE_RUN=1 -Wno-limited-postlink-optimizations "
+MISC="-sFILESYSTEM=0 -sINVOKE_RUN=1 -Wno-limited-postlink-optimizations -sSUPPORT_LONGJMP=0"
 
 
 # N_THREADS can be small integer 1 or above.  That's workers, the js event loop isn't counted.
 # Ends up being a global in C++ and in JS.  As of this writing, only 1 is supported!!
 N_THREADS=1
 
-# we want wasm_workers, but for now, all we can use is pthreads and all its enormous overhead.
+# we want wasm_workers, but for now, all we can use is pthreads and all its overhead.
+# from emscripten docs for -sENVIRONMENT :
+#   We detect whether we are a pthread at runtime, but that’s set for
+#   workers and not for the main file so it wouldn’t make sense to specify
+#   here.
+# so am I supposed to compile the worker code separately?  docs unclear but this works.
 # --proxy-to-worker   NO!
 export WORKERS=" -pthread   -sENVIRONMENT=web,worker -sPTHREAD_POOL_SIZE=$N_THREADS  -DN_THREADS=$N_THREADS "
 
+# -sPTHREAD_POOL_DELAY_LOAD : consider in the future to gradually
+# preallocate threads, speeding page startup.
+# Probably needs some thread code to gradually introduce new threads?
 
 
 # tried to omit GL stuff, but didn't seem to make much difference.
@@ -106,8 +114,6 @@ ls -lt wasm
 # other options, see /opt/dvl/emscripten/emsdk/upstream/emscripten/src/settings.js
 # should put in MALLOC="dlmalloc"=good for small allocs; emmalloc=good general,
 #		emmalloc-memvalidate=lots of checking
-# already implied EXPORT_EXCEPTION_HANDLING_HELPERS
-# take a look at var INCOMING_MODULE_JS_API=[...]
 # -sSHARED_MEMORY already implied
 # -sALLOW_BLOCKING_ON_MAIN_THREAD never never
 
