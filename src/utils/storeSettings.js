@@ -5,7 +5,7 @@
 
 import {isPowerOf2} from './powers.js';
 import qe from '../engine/qe.js';
-import LOTS_OF_VOLTS from './lotsOfVolts.js';
+import {EFFECTIVE_VOLTS} from './voltConstants.js';
 
 // what a disaster.   I made this whole subsystem, storeSettings (aka New)
 // but somehow the compiler fucks it up,
@@ -202,21 +202,26 @@ export function createStoreSettings() {
 	makeParam('waveParams', 'pulseOffset', 20, {min: 0, max: 100});
 
 	/* ************************************ voltage */
-	// the voltage controls
-	makeParam('voltageParams', 'voltageBreed', 'flat', ['flat', 'canyon', 'double']);
+	// the voltage controls   volts ≈ canyonScale * x ** canyonPower sortof
+	// where x is centered at voltageSlide across
+	makeParam('voltageParams', 'voltageBreed', 'flat', ['flat', 'slot', 'block', 'canyon']);
+	makeParam('voltageParams', 'voltageSlide', 50, {min: 0, max: 100});
+
+	makeParam('voltageParams', 'slotWidth', 2, {min: 0, max: 50});
+	makeParam('voltageParams', 'slotScale', EFFECTIVE_VOLTS, {min: 0, max: EFFECTIVE_VOLTS * 4});
+
 	makeParam('voltageParams', 'canyonPower', 2, {min: 0, max: 6});
-	makeParam('voltageParams', 'canyonScale', LOTS_OF_VOLTS * .1, {min: 0, max: LOTS_OF_VOLTS});
-	makeParam('voltageParams', 'canyonOffset', 50, {min: 0, max: 100});
+	makeParam('voltageParams', 'canyonScale', EFFECTIVE_VOLTS, {min: 0, max: EFFECTIVE_VOLTS * 4});
 
 	// where voltage line shows
 	makeParam('voltageSettings', 'showVoltage', true, [true, false]);
 
 	// voltage at bottom of wave view, 𝚫voltage of wave view height
-	const extremes = {min: -1000 * LOTS_OF_VOLTS, max: 1000 * LOTS_OF_VOLTS}
-	makeParam('voltageSettings', 'bottomVolts', -LOTS_OF_VOLTS, extremes);
-	makeParam('voltageSettings', 'heightVolts', 2 * LOTS_OF_VOLTS,
-		{min: LOTS_OF_VOLTS * .001, max: LOTS_OF_VOLTS * 1000});
-	makeParam('voltageSettings', 'minBottom', -.5, extremes);  // soon to be deprecated
+	const extremes = {min: -1000 * EFFECTIVE_VOLTS, max: 1000 * EFFECTIVE_VOLTS}
+	makeParam('voltageSettings', 'bottomVolts', -EFFECTIVE_VOLTS, extremes);
+	makeParam('voltageSettings', 'heightVolts', 2 * EFFECTIVE_VOLTS,
+		{min: EFFECTIVE_VOLTS * .001, max: EFFECTIVE_VOLTS * 1000});
+	//makeParam('voltageSettings', 'minBottom', -.5, extremes);  // soon to be deprecated
 	// always = min + 2 * heightVolts makeParam('voltageSettings', 'maxBottom', 16, {min: -256, max: 256});
 
 	/* ************************************ frameSettings */

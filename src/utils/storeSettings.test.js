@@ -120,7 +120,7 @@ describe('cx2rgb tests', () => {
 	testParam('voltageParams', 'voltageBreed', 'flat', ['flat', 'canyon']);
 	testParam('voltageParams', 'canyonPower', 0, {min: -4, max: 4});
 	testParam('voltageParams', 'canyonScale', 0, {min: -10, max: 10});
-	testParam('voltageParams', 'canyonOffset', 50, {min: 0, max: 100});
+	testParam('voltageParams', 'voltageSlide', 50, {min: 0, max: 100});
 
 
 	testParam('voltageSettings', 'showVoltage', true, [true, false]);  // not really the same as the rest...

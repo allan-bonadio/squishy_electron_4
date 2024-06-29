@@ -186,10 +186,24 @@
 
 
 	/* **************************************** Set Voltage tab */
+	--miniGraphWidth: 200px;
+	--miniGraphHeight: 150px;
 
 	.setVoltageTab {
-		width: calc( 50em + 200px );
-		height: 8em;
+		width: calc( 50em + --miniGraphWidth );
+		height: auto;
+
+		.voltageTitlePanel {
+			float: left;
+			label {
+				display: block;
+				line-height: 3em;
+			}
+		}
+
+		.breedSelector {
+			padding: 1em 0;
+		}
 
 		input[type=range]{
 			accent-color: common.$voltageDarkerColor;
@@ -202,20 +216,6 @@
 			margin: 1em .5em;
 		}
 
-		.voltageTitlePanel {
-			float: left;
-			width: 14em;
-		}
-
-		.breedSelector {
-			padding: 1em 0;
-		}
-
-		.voltageCanyonPanel {
-			float: left;
-			width: 24em;
-		}
-
 		.miniGraphPanel {
 			display: grid;
 			grid-template-columns: auto auto auto;
@@ -223,25 +223,32 @@
 			gap: .5em;
 			width: 450px;
 
-			// will trigger 2 warnings, it's ok, ignore it as long as it still works
 			// "The keyword 'slider-vertical' ... is not standardized..."
-			.canyonScale, .canyonPower {
-				appearance: slider-vertical;
+			.slotScale, .canyonScale, .canyonPower {
+				//appearance: slider-vertical;
 				writing-mode: vertical-lr;  // new standard? feb 2024  use direction: rtl; to invert
-				direction: rtl;
+				//direction: rtl;
 				width: 2.5em;
 
 			}
 
-			.canyonOffset {
+			// left-right
+			.voltageSlide {
 				height: 20px;
 			}
 
+			// left-right
+			.slotSlide {
+				height: 20px;
+			}
+
+			// only for canyon
 			.powerDisplay {
 				width: 2.5em;
 				text-align: center;
 			}
 
+			// for block, slot or canyon
 			.scaleDisplay {
 				width: 7em;
 				text-align: center;

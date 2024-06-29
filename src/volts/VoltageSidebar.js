@@ -136,7 +136,7 @@ export function VoltageSidebar(props) {
 	}
 
 	// so how far down is the thumb from top of rail in pix?
-	thumbY = thumbFreedom * (1 - (v.bottomVolts - v.minBottom) / v.heightVolts)
+	//thumbY = thumbFreedom * (1 - (v.bottomVolts - v.minBottom) / v.heightVolts)
 
 	if (traceVoltageSidebar) {
 		console.log(`🍟 V Sidebar rend: width=${sidebarWidth}  heightVolts=${v.heightVolts}hv
@@ -158,7 +158,7 @@ export function VoltageSidebar(props) {
 
 		<div className='voltRail' ref={el => railEl = el}>
 			<div className='voltThumb' onMouseDown={mouseDown}
-				style={{top: thumbY}}  ref={el => thumbEl = el}>
+				style={{top: 0}}  ref={el => thumbEl = el}>
 			⚡️
 			</div>
 		</div>

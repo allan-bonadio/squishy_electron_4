@@ -88,7 +88,7 @@ export class ControlPanel extends React.Component {
 		// we can't init some stuff till we get the space.  But we also can't until this constructor runs.
 		eSpaceCreatedPromise.then(space => {
 			this.initWithSpace(space);
-			
+
 			if (this.state.shouldBeIntegrating) {
 				space.grinder.triggerIteration();
 			}
@@ -333,7 +333,7 @@ export class ControlPanel extends React.Component {
 		const p = this.props;
 		const s = this.state;
 		const {waveBreed, waveFrequency, pulseWidth, pulseOffset} = s;
-		const {canyonPower, canyonScale, canyonOffset} = s;
+		const {canyonPower, canyonScale, slotWidth, slotScale, voltageSlide} = s;
 
 		switch (s.showingTab) {
 		case 'wave':
@@ -350,7 +350,7 @@ export class ControlPanel extends React.Component {
 			// setVoltageHandler={this.setVoltageHandler}
 			//setVoltageAndUpdate={this.setVoltageAndUpdate}
 			return <SetVoltageTab
-				voltageParams={{ canyonPower, canyonScale, canyonOffset,}}
+				voltageParams={{ canyonPower, canyonScale, slotWidth, slotScale, voltageSlide,}}
 				toggleShowVoltage={p.toggleShowVoltage}
 				showVoltage={p.showVoltage}
 			/>;
