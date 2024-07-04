@@ -5,7 +5,7 @@
 import qe from './qe.js';
 import inteStats from '../controlPanel/inteStats.js';
 import {prepForDirectAccessors} from '../utils/directAccessors.js';
-import voltDisplay from '../utils/voltDisplay.js';
+import voltDisplay from '../volts/voltDisplay.js';
 import eAvatar from './eAvatar.js';
 import eGrinder from './eGrinder.js';
 import {getAGroup} from '../utils/storeSettings.js';
@@ -172,6 +172,7 @@ export class eSpace {
 	}
 
 	updateVoltageArea = null;  // will be filled in in VoltageArea.js
+			// after a few renders
 }
 
 export default eSpace;
