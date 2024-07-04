@@ -40,16 +40,16 @@ class clickNDrag {
 		this.options = options ?? {};
 
 		// if you want to disable clicks/drags, turn this on for the duration.
-		// Will not pick up moves/mouseups if no clickdown happend with this on.
+		// Will not pick up moves/pointerups if no clickdown happend with this on.
 		this.acceptClicks = true;
 	}
 
 	// please call this before your component vaporizes, so we can remove the
-	// mouseDown handler. not imperative but I think it leaks.
+	// pointerDown handler. not imperative but I think it leaks.
 	liquidate() {
-		// mouseDownHandler is unique for each instance
+		// pointerDownHandler is unique for each instance
 		if (this.targetEl)
-			this.targetEl.removeEventListener('mousedown', this.mouseDownHandler);
+			this.targetEl.removeEventListener('pointerdown', this.pointerDownHandler);
 	}
 
 	/* **************************************************** rectangles */
@@ -113,17 +113,17 @@ class clickNDrag {
 	}
 
 	/* **************************************************** Events */
-	// this is set as the mouseDown handler - do not set your own
-	mouseDown =
+	// this is set as the pointerDown handler - do not set your own
+	pointerDown =
 	ev => {
 		try {
 			if (traceClick)
-				console.log(`👈 👆  mouseDown`, this, ev);
+				console.log(`👈 👆  pointerDown`, this, ev);
 			if (!this.acceptClicks) return;
 
 			if (this.targetEl && ev.currentTarget !== this.targetEl) {
 				debugger;
-				throw `mouseDown target isn't right:'`+
+				throw `pointerDown target isn't right:'`+
 					`currentTarget:(${ev.currentTarget.offsetWidth}x${ev.currentTarget.offsetHeight})`+
 					` != targetEl (${this.targetEl.offsetWidth}x${this.targetEl.offsetHeight})`;
 			}
@@ -134,12 +134,16 @@ class clickNDrag {
 				this.xDown = this.xArena = ev.pageX - this.arenaRect.left;
 				this.yDown = this.yArena = ev.pageY - this.arenaRect.top;
 
+				// this adjusts for wayward pointer drags
+				this.targetEl.setPointerCapture(ev.pointerId);
+
+
 				this.dragging = true;
 				let b = document.body;
-				b.addEventListener('mousemove', this.mouseMove);
-				b.addEventListener('mouseup', this.mouseUp);
+				b.addEventListener('pointermove', this.pointerMove);
+				b.addEventListener('pointerup', this.pointerUp);
 				if (!this.options.outsideWindow)
-					b.addEventListener('mouseleave', this.mouseUp);
+					b.addEventListener('mouseleave', this.pointerUp);
 
 				this.onDown(this, ev);
 				this.eachEvent(ev);
@@ -149,17 +153,17 @@ class clickNDrag {
 				ev.stopPropagation();
 			}
 			else {
-				// in case it didn't figure out to give us a mouseUp in time
+				// in case it didn't figure out to give us a pointerUp in time
 				// OR some button other than left got clicked
 				console.warn(`👈 👆 some other button`, ev);
-				//this.mouseUp(ev);
+				//this.pointerUp(ev);
 			}
 		} catch (ex) {
 			this.catchEventException(ex, 'Down');
 		}
 	}
 
-	// called upon moves and mouseup/leave.  for every point dragged over.
+	// called upon moves and pointerup/leave.  for every point dragged over.
 	// userHandler is either this.onDown, this.onUp, or null
 	eachEvent =
 	ev => {
@@ -171,7 +175,8 @@ class clickNDrag {
 		this.xArena = ev.pageX - this.arenaRect.left;
 		this.yArena = ev.pageY - this.arenaRect.top;
 		if (traceDrag)
-			console.log(`👈 👆  eachEvent rel to arena: (${this.xArena}, ${this.yArena})`, this, ev);
+			console.log(`👈 👆  eachEvent rel to arena: (${this.xArena}, ${this.yArena})`,
+				this, ev);
 
 		this.targetRect = this.getOuterRectangle(this.targetEl);
 		//this.figureTargetCoords();
@@ -180,7 +185,8 @@ class clickNDrag {
 		this.xTarget = ev.pageX - this.targetRect.left;
 		this.yTarget = ev.pageY - this.targetRect.top;
 		if (traceDrag)
-			console.log(`👈 👆  eachEvent rel to target: (${this.xTarget}, ${this.yTarget})`, this, ev);
+			console.log(`👈 👆  eachEvent rel to target: (${this.xTarget}, ${this.yTarget})`,
+				this, ev);
 
 		// opportunity to move the target, depending on what kind of c&d
 		// always called for down, move or up
@@ -190,7 +196,7 @@ class clickNDrag {
 		ev.stopPropagation();
 	}
 
-	mouseMove =
+	pointerMove =
 	ev => {
 		try {
 			this.eachEvent(ev);
@@ -199,20 +205,20 @@ class clickNDrag {
 		}
 	}
 
-	mouseUp =
+	pointerUp =
 	ev => {
 		try {
 			if (traceClick)
-				console.log(`👈 👆  mouseUp`, this, ev);
+				console.log(`👈 👆  pointerUp`, this, ev);
 			this.eachEvent(ev, this.onUp);
 			if (this.dragging && this.acceptClicks)
 				this.onUp(this, ev);
 
 			let b = document.body;
-			b.removeEventListener('mousemove', this.mouseMove);
-			b.removeEventListener('mouseup', this.mouseUp);
+			b.removeEventListener('pointermove', this.pointerMove);
+			b.removeEventListener('pointerup', this.pointerUp);
 			if (!this.options.outsideWindow)
-					b.removeEventListener('mouseleave', this.mouseUp);
+					b.removeEventListener('mouseleave', this.pointerUp);
 
 			this.dragging = false;
 		} catch (ex) {
@@ -224,7 +230,7 @@ class clickNDrag {
 	/* **************************************************** elements */
 
 	// in render, put this in your Target element: ref=(cndrag.refTarget).
-	// Target can be same el as arena.  This is where mouseDown will be caught.
+	// Target can be same el as arena.  This is where pointerDown will be caught.
 	refTarget =
 	el => {
 		if (!el || this.targetEl === el)
@@ -233,8 +239,8 @@ class clickNDrag {
 
 		// by creating a new handler function each time, we can remove the
 		// right handler when comes time.
-		this.mouseDownHandler = (ev => this.mouseDown(ev));
-		el.addEventListener('mousedown', this.mouseDownHandler);
+		this.pointerDownHandler = (ev => this.pointerDown(ev));
+		el.addEventListener('pointerdown', this.pointerDownHandler);
 		this.targetRect = this.getOuterRectangle(this.targetEl);
 		//this.figureTargetCoords();
 	}
