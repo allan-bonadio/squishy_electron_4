@@ -10,6 +10,9 @@
 // Adjust this subjectively to fit.
 export let EFFECTIVE_VOLTS = 1000;
 
+// used for default graphical limits
+export let AMPLE_VOLTS = 4 * EFFECTIVE_VOLTS;
+
 
 // any voltage above this is just too much for the code to handle so it may be
 // truncated or similar

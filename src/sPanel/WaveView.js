@@ -15,11 +15,11 @@ import PropTypes from 'prop-types';
 import eSpace from '../engine/eSpace.js';
 import {thousands, thousandsSpaces} from '../utils/formatNumber.js';
 import qe from '../engine/qe.js';
-import './view.scss';
+import './WaveView.scss';
 import {getASetting, storeASetting} from '../utils/storeSettings.js';
 
-import VoltageArea from './VoltageArea.js';
-import VoltageSidebar from './VoltageSidebar.js';
+import VoltageArea from '../volts/VoltageArea.js';
+import VoltageSidebar from '../volts/VoltageSidebar.js';
 import GLView from '../gl/GLView.js';
 import {eSpaceCreatedPromise} from '../engine/eEngine.js';
 
@@ -43,7 +43,7 @@ export class WaveView extends React.Component {
 		// including sidebar.  Canvas is 1 pixel smaller all around.
 		width: PropTypes.number,
 
-		showVoltage: PropTypes.bool.isRequired,
+		showVoltage: PropTypes.string.isRequired,
 
 		sPanel: PropTypes.object.isRequired,
 	};
@@ -64,8 +64,8 @@ export class WaveView extends React.Component {
 		}
 		// directly measured Canvas width & height and maybe more set by
 		// the lower levels with setCanvasFacts() and passed to the
-		// lower levels. gotta be initialized in setCanvasFacts()
-		this.canvasFacts = {width: 0, height: 0};
+		// lower levels. correctly initialized in setCanvasFacts()
+		this.canvasFacts = {width: props.width, height: this.state.height};
 
 		this.formerWidth = props.width;
 		this.formerHeight = this.state.height;
@@ -210,30 +210,6 @@ export class WaveView extends React.Component {
 		this.vDisp.setVoltScales(this.canvasFacts.width, this.state.height, this.props.space.nPoints);
 	}
 
-	// when user moves mouse over the canvas (or WaveView whichh is kindofthe same area)
-	// the voltage stuff appears and disappears.
-	// onMouseEnter={this.mouseEnter} onMouseLeave={this.mouseLeave}
-	mouseEnter =
-	ev => {
-		// non-react
-		const voltageArea = document.querySelector('.VoltageArea');
-		if (voltageArea)
-			voltageArea.style.display = 'inline';
-	}
-
-	mouseLeave =
-	ev => {
-		const voltageArea = document.querySelector('.VoltageArea');
-		if (voltageArea)
-			voltageArea.style.display = 'none';
-	}
-
-	componentDidMount() {
-		const wv = document.querySelector('.WaveView');
-		wv.addEventListener('mouseleave', this.mouseLeave);
-		wv.addEventListener('mouseenter', this.mouseEnter);
-	}
-
 	/* ************************************************************************ render */
 
 	render() {
@@ -284,7 +260,7 @@ export class WaveView extends React.Component {
 			<div className='viewArea' >
 				{glView}
 
-				<section className='viewOverlay' >
+				<section className='timeOverlay' >
 					<div className='northWestWrapper'>
 						<span className='voNorthWest'>{elapsedTime}</span> ps
 					</div>
@@ -299,21 +275,23 @@ export class WaveView extends React.Component {
 					{spinner}
 				</section>
 
-				<VoltageArea
-					space={s.space}
-					height={s.height}
-					showVoltage={p.showVoltage}
-					vDisp={this.vDisp}
-					canvasFacts={this.canvasFacts}
-				/>
+				<section className={p.showVoltage + 'ShowVoltage voltageOverlay'} >
+					<VoltageSidebar width={voltageSidebarWidth} height={s.height}
+						vDisp={this.vDisp}
+						showVoltage={p.showVoltage}
+						scrollVoltHandler={this.scrollVoltHandler}
+						zoomVoltHandler={this.zoomVoltHandler}
+					/>
+					<VoltageArea
+						space={s.space}
+						height={s.height}
+						showVoltage={p.showVoltage}
+						vDisp={this.vDisp}
+						canvasFacts={this.canvasFacts}
+					/>
+				</section>
 
 			</div>
-			<VoltageSidebar width={voltageSidebarWidth} height={s.height}
-				vDisp={this.vDisp}
-				showVoltage={p.showVoltage}
-				scrollVoltHandler={this.scrollVoltHandler}
-				zoomVoltHandler={this.zoomVoltHandler}
-			/>
 
 		</div>
 		);

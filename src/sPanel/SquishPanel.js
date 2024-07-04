@@ -15,7 +15,7 @@ import ControlPanel from '../controlPanel/ControlPanel.js';
 import {eSpaceCreatedPromise} from '../engine/eEngine.js';
 
 import {interpretCppException} from '../utils/errors.js';
-import WaveView from '../view/WaveView.js';
+import WaveView from './WaveView.js';
 import sAnimator from './sAnimator.js';
 
 import {getASetting, storeASetting} from '../utils/storeSettings.js';
@@ -50,9 +50,8 @@ export class SquishPanel extends React.Component {
 		super(props);
 
 		if (SquishPanel.squishPanelConstructed) {
-			// should not be called twice!  now that i've got craco and space recreate relods the page,
-			// I shouldn't need this anymore, right ?!?!?!?!?  TODO
-			console.log(`👑 annoying hot reload; continue to really reload page...🙄  👿 🤢 😵 🤬 😭 😠`);
+			// should not be called twice!
+			console.error(`👑 annoying hot reload...🙄  👿 🤢 😵 🤬 😭 😠`);
 			debugger;
 			location = location;  // eslint-disable-line no-restricted-globals
 		}
@@ -118,10 +117,29 @@ export class SquishPanel extends React.Component {
 	// others managed from ControlPanel
 	// can i move these to the control panel?
 
-	toggleShowVoltage =
+	// as long as this alo apppears in the CPToolbar, has to be here
+	changeShowVoltage =
 	ev => {
-		this.setState({showVoltage: ev.target.checked});
-		storeASetting('voltageSettings', 'showVoltage', ev.target.checked);
+		let newSetting = ev.target.value;
+		this.setState({showVoltage: newSetting});
+		storeASetting('voltageSettings', 'showVoltage', newSetting);
+
+		// now make it effective.  This class and css do it.
+		// this stays until the next render, which will also generate the same className.
+		// this will have to get more specific if/when there's multiple squish panels
+		const setSV = voEl => {
+			if (!voEl) return;
+			voEl.classList.remove('alwaysShowVoltage', 'hoverShowVoltage',
+					'neverShowVoltage');
+			voEl.classList.add(newSetting + 'ShowVoltage');
+		}
+		setSV(document.querySelector('.SquishPanel .voltageOverlay'));
+		setSV(document.querySelector('.SquishPanel .VoltageArea'));
+// 		if (voltageOverlay) {
+// 			voltageOverlay.classList.remove('alwaysShowVoltage', 'hoverShowVoltage',
+// 					'neverShowVoltage');
+// 			voltageOverlay.classList.add(newSetting + 'ShowVoltage');
+// 		}
 	}
 
 	// dump the view buffer, from the JS side.  Why not use the C++ version?
@@ -178,7 +196,7 @@ export class SquishPanel extends React.Component {
 						sPanel={this}
 					/>
 					<ControlPanel
-						toggleShowVoltage={this.toggleShowVoltage}
+						changeShowVoltage={this.changeShowVoltage}
 						showVoltage={s.showVoltage}
 
 						redrawWholeMainWave={this.redrawWholeMainWave}

@@ -6,7 +6,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-import voltDisplay from '../utils/voltDisplay.js';
+import voltDisplay from './voltDisplay.js';
 
 let traceVoltageSidebar = false;
 let traceDragging = false;
@@ -18,83 +18,83 @@ export const spongeFactor = 100;
 
 
 
-/* ***************************************************** scrollbar interaction */
-const body = document.body;
-
-// we need these to stick around.  Attach these to something before we get multiple SquishPanels someday.
-
-let railEl;
-let thumbEl;
-
-// page Y coords of thumb when moved to the top of its rail
-let topOfRail;
-
-// mousedown Y coord of mouse rel to top of thumb
-let offsetInsideThumb;
-
-
-// thumb's offsetTop upon click down.  If null, no drag is in progress.
-// the pixel version of .bottomVolts, upside down
-let offsetTop = null;
-
-// every time function is called, we set the props here.  There's only one so we can use this global.
-let savedProps;
-
-// the offset between top of the scrollbar and the top of the thumb, = offsetTop while dragging
-let thumbY;
-
-let railHeight;
-
-// maxBottom - minBottom in pixels
-let thumbFreedom;
-
-// putting them here so they don't have to be recompiled every render
-
-const mouseDown =
-(ev) => {
-	ev.preventDefault();
-	ev.stopPropagation();
-
-	offsetTop = ev.target.offsetTop;  // the thumb's offset from top of rail
-	offsetInsideThumb = ev.nativeEvent.offsetY;  // like <32
-	topOfRail = ev.pageY - offsetInsideThumb - offsetTop;
-
-	// only registered while dragging
-	body.addEventListener('mousemove', thumbSlide);
-	//body.addEventListener('mouseleave', mouseUp);
-	body.addEventListener('mouseup', mouseUp);
-}
-
-// called upon mouseMove, Up and Leave
-const thumbSlide =
-(ev) => {
-	ev.preventDefault();
-	ev.stopPropagation();
-
-	if ((ev.buttons & 1) && offsetTop != null) {
-		// must use page coords cuz the event handler is attached to doc body
-		thumbY = Math.min(thumbFreedom, Math.max(0, ev.pageY - offsetInsideThumb - topOfRail));
-		let frac = 1 - thumbY / thumbFreedom;  // 1=scrolled to top, 0=scrolled to bottom
-
-		// scrollVoltHandler() changes VoltageArea scales, userScroll() calcs and changes bottomVolts
-		savedProps.scrollVoltHandler(savedProps.vDisp.userScroll(frac));
-		if (traceDragging) {
-			savedProps.vDisp.dumpVoltDisplay(
-				`🍟 mouse Move thumbY=${thumbY} thumbFreedom=${thumbFreedom} shd be constant`);
-		}
-	}
-}
-
-// called upon mouseup or a mouse leave
-const mouseUp =
-(ev) => {
-	thumbSlide(ev);
-	offsetTop = null;  // says mouse is up
-
-	body.removeEventListener('mousemove', thumbSlide);
-	//body.removeEventListener('mouseleave', mouseUp);
-	body.removeEventListener('mouseup', mouseUp);
-}
+// ***************************************************** scrollbar interaction */
+// const body = document.body;
+//
+// // we need these to stick around.  Attach these to something before we get multiple SquishPanels someday.
+//
+// let railEl;
+// let thumbEl;
+//
+// // page Y coords of thumb when moved to the top of its rail
+// let topOfRail;
+//
+// // mousedown Y coord of mouse rel to top of thumb
+// let offsetInsideThumb;
+//
+//
+// // thumb's offsetTop upon click down.  If null, no drag is in progress.
+// // the pixel version of .bottomVolts, upside down
+// let offsetTop = null;
+//
+// // every time function is called, we set the props here.  There's only one so we can use this global.
+// let savedProps;
+//
+// // the offset between top of the scrollbar and the top of the thumb, = offsetTop while dragging
+// let thumbY;
+//
+// let railHeight;
+//
+// // maxBottom - minBottom in pixels
+// let thumbFreedom;
+//
+// // putting them here so they don't have to be recompiled every render
+//
+// const mouseDown =
+// (ev) => {
+// 	ev.preventDefault();
+// 	ev.stopPropagation();
+//
+// 	offsetTop = ev.target.offsetTop;  // the thumb's offset from top of rail
+// 	offsetInsideThumb = ev.nativeEvent.offsetY;  // like <32
+// 	topOfRail = ev.pageY - offsetInsideThumb - offsetTop;
+//
+// 	// only registered while dragging
+// 	body.addEventListener('mousemove', thumbSlide);
+// 	//body.addEventListener('mouseleave', mouseUp);
+// 	body.addEventListener('mouseup', mouseUp);
+// }
+//
+// // called upon mouseMove, Up and Leave
+// const thumbSlide =
+// (ev) => {
+// 	ev.preventDefault();
+// 	ev.stopPropagation();
+//
+// 	if ((ev.buttons & 1) && offsetTop != null) {
+// 		// must use page coords cuz the event handler is attached to doc body
+// 		thumbY = Math.min(thumbFreedom, Math.max(0, ev.pageY - offsetInsideThumb - topOfRail));
+// 		let frac = 1 - thumbY / thumbFreedom;  // 1=scrolled to top, 0=scrolled to bottom
+//
+// 		// scrollVoltHandler() changes VoltageArea scales, userScroll() calcs and changes bottomVolts
+// 		savedProps.scrollVoltHandler(savedProps.vDisp.userScroll(frac));
+// 		if (traceDragging) {
+// 			savedProps.vDisp.dumpVoltDisplay(
+// 				`🍟 mouse Move thumbY=${thumbY} thumbFreedom=${thumbFreedom} shd be constant`);
+// 		}
+// 	}
+// }
+//
+// // called upon mouseup or a mouse leave
+// const mouseUp =
+// (ev) => {
+// 	thumbSlide(ev);
+// 	offsetTop = null;  // says mouse is up
+//
+// 	body.removeEventListener('mousemove', thumbSlide);
+// 	//body.removeEventListener('mouseleave', mouseUp);
+// 	body.removeEventListener('mouseup', mouseUp);
+// }
 
 
 /* ***************************************************** scrollbar  */
@@ -108,62 +108,66 @@ function setPT() {
 
 		// Same as voltage area, this shows and hides along with it
 		// but won't draw anything if the checkbox is off
-		showVoltage: PropTypes.bool.isRequired,
+		showVoltage: PropTypes.string.isRequired,
 	}
 }
 
 
-// ultimately, this is a <svg node with a <path inside it
-export function VoltageSidebar(props) {
+function VoltageSidebar(props) {
 	if (!props) return '';  // too early
-	savedProps = props;
 	let sidebarWidth = props.width;
 
 	let v = props.vDisp;
 	if (!v) return '';  // too early or first render
-	if (! props.showVoltage) return '';  // not showingd
 
 	if (!v.heightVolts  || v.heightVolts <= 0) throw `bad heightVolts ${v.heightVolts}`
-
-	if (railEl && thumbEl) {
-		railHeight = railEl.clientHeight;  // changed if user resized canvas
-		thumbFreedom = railHeight - thumbEl.offsetHeight;
-	}
-	else {
-		// guesses until we get real dom elements
-		railHeight = props.height * .7;
-		thumbFreedom = railHeight * .7;
-	}
 
 	// so how far down is the thumb from top of rail in pix?
 	//thumbY = thumbFreedom * (1 - (v.bottomVolts - v.minBottom) / v.heightVolts)
 
 	if (traceVoltageSidebar) {
-		console.log(`🍟 V Sidebar rend: width=${sidebarWidth}  heightVolts=${v.heightVolts}hv
-		🍟    ${v.minBottom}sm ... ${v.bottomVolts}bv ... ${v.maxBottom}sm ||| ${v.maxTop}am`);
+		console.log(`🍟 V Sidebar rend: width=${sidebarWidth}  heightVolts=${v.heightVolts}  ${v.minBottom} `);
 	}
 
 	// render.  The buttons are almost square.
-	return (<aside className='VoltageSidebar' style={{flexBasis: sidebarWidth}} >
+	return (<aside className='VoltageSidebar' >
+		<p/>
+
+		<button className='scrollUp'
+				onClick={ev => v.scrollVoltHandler(+1)}>
+			⬆︎
+		</button>
+		<p/>
 
 		<button className='zoomIn'
-				onClick={ev => props.zoomVoltHandler(+1)} style={{flexBasis: sidebarWidth}} >
-			<img src='/images/zoomInIcon.png' alt='zoom in' />
+				onClick={ev => v.zoomVoltHandler(-1)}>
+			+
 		</button>
+		<p/>
 
 		<button className='zoomOut'
-				onClick={ev => props.zoomVoltHandler(-1)} style={{flexBasis: sidebarWidth}} >
-			<img src='/images/zoomOutIcon.png' alt='zoom out' />
+				onClick={ev => v.zoomVoltHandler(+1)}>
+			–
 		</button>
+		<p/>
 
-		<div className='voltRail' ref={el => railEl = el}>
-			<div className='voltThumb' onMouseDown={mouseDown}
-				style={{top: 0}}  ref={el => thumbEl = el}>
-			⚡️
-			</div>
-		</div>
+		<button className='scrollDown'
+				onClick={ev => v.scrollVoltHandler(-1)}>
+			⬇︎
+		</button>
+		<p/>
+
 	</aside>);
 }
 setPT();
 
 export default VoltageSidebar;
+
+
+
+// 		<div className='voltRail' ref={el => railEl = el}>
+// 			<div className='voltThumb' onMouseDown={mouseDown}
+// 				style={{top: 0}}  ref={el => thumbEl = el}>
+// 			⚡️
+// 			</div>
+// 		</div>

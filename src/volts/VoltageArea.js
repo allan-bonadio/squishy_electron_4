@@ -4,7 +4,8 @@
 ** Copyright (C) 2021-2024 Tactile Interactive, all rights reserved
 */
 
-import React from 'react';
+import React, {createRef} from 'react';
+
 import PropTypes from 'prop-types';
 
 import {scaleLinear as d3_scaleLinear} from 'd3-scale';
@@ -16,6 +17,7 @@ import ReactFauxDOM from 'react-faux-dom';
 import qe from '../engine/qe.js';
 
 import clickNDrag from '../widgets/clickNDrag.js';
+import './volts.scss';
 
 // I dunno but the voltages I'm generating are too strong.
 // So I reduced it by this factor, but still have to magnify it to make it visible.
@@ -23,7 +25,7 @@ import clickNDrag from '../widgets/clickNDrag.js';
 
 let traceVoltageArea = false;
 
-let traceRendering = false;
+let traceRendering = true;
 let traceDragging = false;
 let traceTweening = false;
 let tracedWheel = false;
@@ -49,7 +51,7 @@ export class VoltageArea extends React.Component {
 
 		// this component is always rendered so it retains its state,
 		// but won't draw anything if the checkbox is off
-		showVoltage: PropTypes.bool.isRequired,
+		showVoltage: PropTypes.string.isRequired,
 
 		canvasFacts: PropTypes.object,
 	};
@@ -57,17 +59,21 @@ export class VoltageArea extends React.Component {
 	constructor(props) {
 		super(props);
 		//debugger;
-		this.state = {
-			// should just use forceUpdate on our comp obj instead!
-			// I guess I am.  The state for this is the voltDisp obj and the voltageBuffer,
-			// which have internal changes but the obj ref never changes.
-			changeSerial: 0,
-		};
+		// should be a functional component
+		// this.state = {
+		// 	// should just use forceUpdate on our comp obj instead!
+		// 	// I guess I am.  The state for this is the voltDisp obj and the voltageBuffer,
+		// 	// which have internal changes but the obj ref never changes.
+		// 	changeSerial: 0,
+		// };
+
 		if (traceVoltageArea)
 			console.log(`⚡️ the new VoltageArea:`, this);
 
 		this.cnDrag = new clickNDrag(this.mouseDown, this.onEvent, this.mouseUp);
 
+		// GET RID OF THIS breaking change: ref attrs no longer get passed node refs, gotta use this
+		//this.voltageAreaRef = createRef();
 
 		if (traceVoltageArea)
 			console.log(`⚡️ VoltageArea  constructor done`);
@@ -250,7 +256,6 @@ export class VoltageArea extends React.Component {
 		ev.stopPropagation();
 	}
 
-
 	/* *************************************************** rendering */
 
 	// tell the VoltageArea (that;s us) that something in the
@@ -260,18 +265,18 @@ export class VoltageArea extends React.Component {
 	() => {
 		if (traceRendering)
 			console.log(`⚡️ VoltageArea.updateVoltageArea`);
-		//const space = this.props.space;
-		this.props.vDisp.findVoltExtremes();
+		//this.props.vDisp.findVoltExtremes();
 		this.forceUpdate();
 	}
 
 	componentDidUpdate() {
 		// the constructor probably won't have space, but here it will.  should.
 		const p = this.props;
-		if (p.space)
-			p.space.updateVoltageArea = this.updateVoltageArea;
+		if (p.space && p.vDisp) {
+			p.vDisp.updateVoltageArea = this.updateVoltageArea;
+			p.space.updateVoltageArea = this.updateVoltageArea;}
 		else
-			console.log(`⚡️  VoltageArea, no space! ${p.space}.  Is there also no vDisp?  ${p.vDisp}`);
+			console.warn(`⚡️  VoltageArea, no space! ${p.space}.  Is there also no vDisp?  ${p.vDisp}`);
 	}
 
 
@@ -313,17 +318,24 @@ export class VoltageArea extends React.Component {
 		}
 
 		// the lines themselves: exactly overlapping.  tactile wider than visible.
-		if (p.showVoltage) {
+// 		if (traceRendering)
+// 			console.log(`⚡️      pathAttribute: showVoltage=${p.showVoltage}   isHovering=${this.isHovering}`);
+// 		if ('always' == p.showVoltage || ('hover' == p.showVoltage && this.isHovering)) {
 			const pathAttribute = v.makeVoltagePathAttribute(v.yScale);
-			//const pathAttribute = this.makePathAttribute(start, end);
 			if (traceRendering)
 				console.log(`⚡️ VoltageArea.pathAttribute: `, pathAttribute);
+
+			// for showVoltage on hover, need this to  hover over
+			paths.push(
+				<rect className='hoverBox' key='hoverBox'
+					x={0} y={0} width={p.canvasFacts.width} height={p.canvasFacts.height}
+					/>
+			);
 
 			// this one actually draws the voltage line
 			paths.push(
 				<path className='visibleLine' key='visibleLine'
-					d={pathAttribute}
-				/>
+					d={pathAttribute} />
 			);
 
 			// you click on this one
@@ -331,8 +343,7 @@ export class VoltageArea extends React.Component {
 			paths.push(
 				<path className='tactileLine' key='tactileLine'
 					d={pathAttribute}
-					ref={this.cnDrag.refTarget}
-				/>
+					ref={this.cnDrag.refTarget} />
 			);
 
 
@@ -352,7 +363,7 @@ export class VoltageArea extends React.Component {
 			vAx.call(axis);
 			//debugger;
 			paths.push(voltageAxis.toReact());
-		}
+// 		}
 		return paths
 	}
 
@@ -373,8 +384,9 @@ export class VoltageArea extends React.Component {
 		let v = p.vDisp;
 		v.setVoltScales(p.canvasFacts.width, p.canvasFacts.height, p.space.N);
 
+		let vClass = p.showVoltage +'ShowVoltage';
 		let vArea = (
-			<svg className='VoltageArea'
+			<svg className={'VoltageArea ' + vClass}
 				viewBox={`0 0 ${p.canvasFacts.width} ${p.canvasFacts.height}`}
 				width={p.canvasFacts.width} height={p.canvasFacts.height}
 				ref={this.cnDrag.refArena}
@@ -390,7 +402,6 @@ export class VoltageArea extends React.Component {
 
 		return vArea;
 	}
-
 
 }
 

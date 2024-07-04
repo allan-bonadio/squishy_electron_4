@@ -1,5 +1,5 @@
 /*
-** view -- CSS for WaveView and contents
+** volts -- CSS for voltage stuff as shown in the WaveView
 ** Copyright (C) 2021-2024 Tactile Interactive, all rights reserved
 */
 
@@ -9,63 +9,20 @@
 // user last dragged the resize box in the corner, in WaveView state.  Width
 // comes from the window width.  hmmm...
 .WaveView {
-	position: relative;
-	display: flex;
-	width: 100%;
+	// the setting for showVoltage chooses one of these
+	// display:none gets no events.  so change visibilty instead.
+	.alwaysShowVoltage {visibility: visible}
+	.hoverShowVoltage {visibility: hidden}
+	.hoverShowVoltage:hover {visibility: visible}
+	.neverShowVoltage {visibility: hidden}
 
-	// view area is the canvas, GLView and everything that should be the same size
-	// like the voltage area.  EXCLUDING the voltage sidebar.
-	// height and width set in the Render method.
-	.viewArea {
-		flex: 1 1 auto;
-		position: relative;
-		height: 100%;
+	// encloses the actual glview, the timeOverlay, and the voltageOverlay
+	.viewArea .voltageOverlay {
+		display: block;
 
-		/* canvas itself: bottom layer */
-		canvas.GLView {
-			position: absolute;
-			display: block;
-			width: 100%;
-			height: 100%;
-			border: 1px #666 inset;
-			z-index: 10;
-		}
+		pointer-events: all;  // experimental on html; not sure if it enables :hover?
 
-		// overlay with frame count, virtual time and other stuff, on top of canvas
-		.viewOverlay {
-			position: absolute;
-			pointer-events: none;  // need to click through for voltage
-			z-index: 40;
-			width: 100%;
-			height: 100%;
-
-			// numbers in upper corners
-			.northWestWrapper, .northEastWrapper {
-				position: absolute;
-				top: .5em;
-				z-index: 10;
-				text-shadow: 1px 1px 3px #800f;
-			}
-
-			.northWestWrapper { left: 2em; }
-			.northEastWrapper { right: 2em; }
-
-			.sizeBox {
-				position: absolute;
-				pointer-events: auto;
-				bottom: 1px;
-				right: 0;
-				width: common.$sizeBoxSize; height: common.$sizeBoxSize;
-				z-index: 20;
-				cursor: ns-resize;
-				opacity: 0.1;
-
-				&:hover { opacity: 1; }
-				&:active { opacity: 1; }
-			}
-		}
-
-		svg.VoltageArea {
+		.VoltageArea {
 			position: relative;
 			width: 100%;
 			height: 100%;
@@ -73,6 +30,11 @@
 			transform: scale(1, -1);
 			pointer-events: all;
 			// hmmm lemme think about this... pointer-events: none;  // need to click through for size box
+
+			// for pointer enter/leave events
+			.hoverBox {
+				fill: transparent;
+			}
 
 			path.visibleLine {
 				stroke: common.$voltageColor;
@@ -106,84 +68,90 @@
 					scale: 1 -1;
 				}
 			}
+
 		}  // end of VoltageArea
-	}  // end of viewArea
 
-	.VoltageSidebar {
-		// this is a column flex box
-		height: 100%;
-		display: flex;
-		flex-direction: column;
+		// buttons etc to scroll and zoom the voltage
+		.VoltageSidebar {
+			// this is a column flex box
+			position: absolute;
+			right: .5em;
+			height: 100%;
+			display: flex;
+			flex-direction: column;
+			float: right;
+			z-index: 35;
 
-		border: 1px #666 outset;
+			//border: 1px #666 outset;
 
-		// but particpates in its parent's row flex box.  Width and display set by code in WaveView.render()
-		text-align: center;
-		flex: 0 0;
+			// but particpates in its parent's row flex box.  Width and display set by code in WaveView.render()
+			text-align: center;
 
-		background-color: common.$voltageDarkerColor;
+			background-color: transparent;
+			pointer-events: none;
 
-		// zoom in/out buttons
-		button {
-			background-color: common.$voltageDarkerColor;
-			border: none;
-			flex: 0 0;
-			display: block;
-			border-radius: .5em;
-			padding: 0;
 
-			img {
-				width: 1em;
-			}
-		}
-		button:hover {
-			background-color: common.$voltageColor;
-		}
-		button:active {
-			background-color: #44f;
-		}
-
-		.voltRail {
-			position: relative;
-			flex: 1 1;
-			margin: 2px;
-			border: 1px inset #aaa;
-			background-color: common.$voltageColor;
-
-			.voltThumb {
-				position: absolute;
-				left: 0;
-				right: 0;
+			// zoom in/out buttons
+			button {
+				display: inline;
+				background-color: transparent;
+				width: 2em;
 				height: 2em;
-				line-height: 2em;
-				cursor: ns-resize;
+				gap: 3em;
+				border-radius: 1em;
+				color: common.$voltageColor;
+				padding: 0;
+				//visibility: visible;
+				border: .5px solid common.$voltageMuchDarkerColor;
 
-				border: 1px outset #aaa;
-				background-color: common.$voltageDarkerColor;
-
-				text-align: center;
+				pointer-events: auto;
 			}
+			button:hover {
+				border-color: common.$voltageColor;
+			}
+			button:active {
+				background-color: #640;
+			}
+
+			// we use p as spacers between the buttons
+			p {
+				flex: 1 1 0em;
+			}
+
+			// .voltRail {
+			// 	position: relative;
+			// 	flex: 1 1;
+			// 	margin: 2px;
+			// 	border: 1px inset #aaa;
+			// 	background-color: common.$voltageColor;
+			//
+			// 	.voltThumb {
+			// 		position: absolute;
+			// 		left: 0;
+			// 		right: 0;
+			// 		height: 2em;
+			// 		line-height: 2em;
+			// 		cursor: ns-resize;
+			//
+			// 		border: 1px outset #aaa;
+			// 		background-color: common.$voltageDarkerColor;
+			//
+			// 		text-align: center;
+			// 	}
+			// }
+
+			//input[type=range] {
+			//	display: block;
+			//	width: 100%;
+			//	flex: 1 1;
+			//	appearance: slider-vertical;  // works on safari & chrome, not firefox
+			//	color: #000;
+			//	background-color: #voltageColor;
+			//	border: none;
+			//	accent-color: #fd0;
+			//}
 		}
+	}  // end of viewArea voltageOverlay
 
-		//input[type=range] {
-		//	display: block;
-		//	width: 100%;
-		//	flex: 1 1;
-		//	appearance: slider-vertical;  // works on safari & chrome, not firefox
-		//	color: #000;
-		//	background-color: #voltageColor;
-		//	border: none;
-		//	accent-color: #fd0;
-		//}
-	}
 }
 
-.spinner {
-	position: absolute;
-	left: calc(50% - 100px);
-	top: 20%;
-}
-
-.errorView {
-	color: #f80;
-}

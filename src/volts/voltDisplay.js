@@ -7,18 +7,17 @@ import {scaleLinear} from 'd3-scale';
 import {EFFECTIVE_VOLTS, VALLEY_FACTOR, TOO_MANY_VOLTS} from './voltConstants.js';
 import {getAGroup, storeASetting} from '../utils/storeSettings.js';
 
-let traceFamiliar = false;
-let tracePathAttribute = false;
+let traceFamiliar = true;
+let tracePathAttribute = true;
+let tracePathIndividualPoints = false
 
 let traceVoltArithmetic = false;
-let traceVoltScales = false;
+let traceVoltScales = true;
 let traceScrolling = false;
 let traceZooming = false;
 
 
-const min = Math.min;
-const max = Math.max;
-const abs = Math.abs;
+const {min, max, abs, round} = Math;
 
 // zooming in or out, changes the heightVolts by this factor either way.
 const zoomFactor = Math.sqrt(2);
@@ -86,22 +85,25 @@ export class voltDisplay {
 			skipAllButEvery = Math.ceil(N / 40);
 		if (! nPerRow)
 			nPerRow =  Math.ceil(N / 10);
-
-		let txt = `⚡️ dumpVoltage buffer: ${title} `;
-		for (let ix = this.start; ix < this.end; ix++) {
-			txt += voltageArray[ix].toFixed(6).padStart(10);
-			if (ix % skipAllButEvery == 0)
-				txt += '\n';
+		let stride = nPerRow * skipAllButEvery;
+		let txt = `⚡️ dumpVoltage buffer: ${title}\n`;
+		for (let rowStart = this.start; rowStart < this.end; rowStart += stride) {
+			txt += `[${String(rowStart).padStart(4)}]  `;
+			for (let ix = rowStart; ix < rowStart + stride; ix += skipAllButEvery)
+				txt += voltageArray[ix].toFixed(0).padStart(10);
+			txt += '\n';
 		}
 		console.log(`${txt}\n`);
 	}
 
-	// all of our tedious properties, but not the datapoints
-	dumpVoltDisplay(title) {
-		console.log(`⚡️ voltD: ${title}
-			voltage range: ${this.measuredMinVolts} ... ${this.measuredMaxVolts},
-			//scroll: ${this.minBottom}mnBot ... ${this.maxBottom}mxBot  ... ${this.maxTop}mxTop
-			heightVolts: ${this.heightVolts}    bottomVolts: ${this.bottomVolts}`);
+	// all of our properties, but not the datapoints.  Optional: pass voltage params
+	dumpVoltDisplay(title, voltageParams) {
+		this.findVoltExtremes();
+		console.log(`⚡️ voltD: ${title},
+			bottomVolts: ${this.bottomVolts}   heightVolts: ${this.heightVolts}   (top volts: ${this.bottomVolts + this.heightVolts})
+			measured voltage range: ${this.measuredMinVolts} ... ${this.measuredMaxVolts}`);
+		if (voltageParams)
+			console.log(`    `, voltageParams);
 	}
 
 	/* ******************************************************************* height and bottom calculations */
@@ -131,7 +133,7 @@ export class voltDisplay {
 // 		// this.bottomVolts = this.minBottom + this.heightVolts / 4;
 // 	}
 
-	// Adjust bottomVolts and heightVolts to the existing wave numbers, so it looks nice.
+	// Adjust bottomVolts and heightVolts to the existing potential numbers, so it looks nice.
 	// call this after loading these settings from somewhere, if you're not confident about them.
 	decideBottomHeightVolts() {
 		// make sure some part of the current voltage is visible somewhere - adjust bottomVolts if needed
@@ -156,25 +158,9 @@ export class voltDisplay {
 			this.bottomVolts = this.measuredMinVolts - EFFECTIVE_VOLTS;
 		}
 
-		// this.dumpVoltDisplay('decideBottomHeightVolts: set to defaults');
-		// 	return;
-		// }
-
-
 		if (traceVoltArithmetic) {
-			console.log(``);
-			//dumpJsStack('decideBottomHeightVolts');
 			this.dumpVoltDisplay('⚡️ ⚡️ decideBottomHeightVolts: ');
 		}
-
-		// check and adjust if out of bounds.
-		// if (this.minBottom > almostMax ||  this.maxTop < almostMin) {
-		// 	this.minBottom = this.measuredMinVolts;
-		// 	this.heightVolts = max(this.heightVolts, (this.measuredMaxVolts - this.measuredMinVolts) / 2);
-		// 	//this.setMaxMaxBottom();
-		// 	this.dumpVoltDisplay('decideBottomHeightVolts: sorry had to adjust');
-		// 	return;
-		// }
 	}
 
 	// set our xScale and yScale according to the numbers passed in, and our own settings
@@ -188,53 +174,45 @@ export class voltDisplay {
 		this.xScale = scaleLinear([0, nPoints-1], [0, canvasWidth]);
 
 		if (traceVoltScales) {
-			console.log(
-				`⚡️ ⚡️   voltagearea.setVoltScales():done, domains: x&y:\n       `,
-				this.xScale.domain(), this.yScale.domain());
-			console.log(`       ranges: x&y:`, this.xScale.range(), this.yScale.range());
+			console.log(`⚡️ ⚡️   voltagearea.setVoltScales()  done\n X domain & range: `);
+			console.log(`    X domain & range: `, this.xScale.domain(), this.xScale.range());
+			console.log(`    Y domain & range: `, this.yScale.domain(),  this.yScale.range());
+			console.log(`    Y UpsideDown: `, this.yUpsideDown.domain(),  this.yUpsideDown.range());
+			console.log(`    Zero at: `, this.xScale(0),  this.yScale(0),  this.yUpsideDown(0));
 		}
 		return true;
 	}
 
 
-	// given measuredMinVolts & Max, and heightVolts,
-	// user can see a voltage range of 2*heightVolts.  By scrolling, they can see 2x heightVolts.
-	// Half above and half below middleVolts.  Scroller will end up with middleVolts in the middle.
-	// bottomVolts is at the BOTTOM of the view, remember.
-	// 	centerVariables(heightVolts) {
-	// 		this.findVoltExtremes();
-	//
-	// 		// middleVolts should be the middle of the highest and lowest voltage in the buffer.
-	// 		this.heightVolts = heightVolts;
-	// 		let middleVolts = (this.measuredMinVolts + this.measuredMaxVolts) / 2;
-	// 		//this.bottomVolts = middleVolts - .5 * heightVolts;  // near bottom of the visible area
-	// 		//this.minBottom = middleVolts - heightVolts;
-	// 		//this.setMaxMaxBottom();
-	// 	}
-
-
 	/* ******************************************************************* interaction */
 
-	// called after user scrolls up or down.
+	// called after user changed bottom and/or  height.
 	saveScroll() {
 		storeASetting('voltageSettings', 'bottomVolts', +this.bottomVolts);
 		storeASetting('voltageSettings', 'heightVolts', +this.heightVolts);
 		//storeASetting('voltageSettings', 'minBottom', +this.minBottom);
+
+		// this function is set in the VoltageArea constructor
+		this.updateVoltageArea();
 	}
 
 	// called when user scrolls up or down.
-	// frac = 1=scrolled to top, 0=scrolled to bottom
-	userScroll(frac) {
-		this.bottomVolts = min(1, max(0, frac)) * this.heightVolts + this.minBottom;// ??
+	// frac = 1=scrolled to top, one click.  -1=scrolled toward bottom, one click.
+	// Other schromll mechanisms pass other proprtional numbers
+	scrollVoltHandler(frac) {
+		let distance = this.heightVolts * frac / 4;
+
+		this.bottomVolts += distance;
+
 		//storeASetting('voltageSettings', 'bottomVolts', this.bottomVolts);
 		if (traceScrolling)
 			console.info(`userScroll(frac=${frac}) => bottomVolts=${this.bottomVolts}`);
-		return this.bottomVolts;
+		this.saveScroll();
 	}
 
 	// called when human zooms in or out.  pass +1 or -1.  heightVolts will
 	// usually be an integer power of zoomFactor, x latest set from decideBottomHeightVolts() or zero.
-	userZoom(upDown) {
+	zoomVoltHandler(inOut) {
 		// keep looking at same place
 		let midView = this.bottomVolts + this.heightVolts/2;
 
@@ -242,72 +220,167 @@ export class voltDisplay {
 		//let scrollFraction = (this.bottomVolts - this.minBottom) / this.heightVolts;  // ??
 
 		if (traceZooming)
-			this.dumpVoltDisplay(`zoom START ${upDown}: old midView=${midView}  sFrac=${scrollFraction}`);
+			this.dumpVoltDisplay(`zoom START ${inOut}: old midView=${midView}  sFrac=${scrollFraction}`);
 
 		// zoom in/out to int powers of ZoomFactor.
 		// let newLogZoom = Math.log(this.heightVolts) / logZoomFactor;
-		// newLogZoom = Math.round(newLogZoom - upDown);  // round off to integer power of ZoomFactor
-		this.heightVolts *= zoomFactor ** upDown;
+		// newLogZoom = Math.round(newLogZoom - inOut);  // round off to integer power of ZoomFactor
+		this.heightVolts *= zoomFactor ** inOut;
 
 		// the rests of this is exactly the same no matter which direction
 		this.bottomVolts = midView - this.heightVolts / 2;
-		//this.minBottom = this.bottomVolts - scrollFraction * this.heightVolts;// ??
-
-		//this.setMaxMax();
-
-// 		if (traceZooming)
-// 			this.dumpVoltDisplay(`zoom: DONE  ${upDown} new midView=${ this.bottomVolts + this.heightVolts/2}, scrollFraction=${(this.bottomVolts - this.minBottom) / this.heightVolts};`);
 
 		this.saveScroll();
 	}
 
-	// for Block or Slot voltage: rectangular indentation or wall
-	setSlotVoltage() {
+
+	/* ******************************************************************* familiar potential filling */
+
+	// fill the buffer with a constant from A to B
+	fillVoltage(fillWith, start = this.start, end = this.end) {
+		for (let ix = start; ix < end; ix++)
+			this.voltageBuffer[ix] = fillWith;
+	}
+
+	// pre-calc variables needed for evaluating the voltage familiarly
+	slotVoltageSetup(voltageParams) {
+		const {voltageSlide, slotWidth} = voltageParams;
+		const toIx = (this.end - this.start) / 100;  // converts 0...100 across to  0...N
+		this.offset = voltageSlide * toIx;
+
+		const halfSlotWidth = slotWidth * toIx / 2;
+		this.edgeStart = round(this.offset - halfSlotWidth);
+		this.edgeEnd = round(this.offset + halfSlotWidth);
+	}
+
+	// pre-calc variables needed for evaluating the voltage familiarly
+	canyonVoltageSetup(voltageParams) {
+		const {voltageSlide, slotWidth} = voltageParams;
+
+		const toIx = (this.end - this.start) / 100;  // converts 0...100 across to  0...N
+		this.halfN = (this.end - this.start) / 2;
+		this.offset = voltageSlide * toIx;
+	}
+
+	canyonVoltage(ix, canyonPower) {
+		let xm1_1 = (ix - this.offset) / this.halfN;  // -1...+1
+		let y0_1 = Math.pow(abs(xm1_1), canyonPower);  // 0 ... +1
+
+		if (!isFinite(y0_1)) {
+			// needs correction
+			console.warn(`voltage ${y0_1 * EFFECTIVE_VOLTS} not finite at x=${ix} ${JSON.stringify(voltageParams)}
+				ix - offset=${ix - offset}
+				x ** ${canyonPower}=${Math.pow(ix - offset, canyonPower)}
+				x ** ${canyonPower} * ${canyonScale}=
+				${Math.pow(ix - offset, canyonPower) * canyonScale}`);
+		}
+		return y0_1 * EFFECTIVE_VOLTS;
 	}
 
 	// generate a canyon, flat etc voltage potential in the given array, according to params.
 	setFamiliarVoltage(voltageParams) {
-		this.bottomVolts = ('flat' == voltageParams.voltageBreed
-				|| 0 == voltageParams.canyonScale)
-			? -EFFECTIVE_VOLTS
-			: 0;
-		let {canyonPower, canyonScale, voltageSlide, voltageBreed} = voltageParams;
-		if (canyonPower == undefined || canyonScale == undefined || voltageSlide == undefined)
-			throw `bad Voltage params: canyonPower=${canyonPower}, canyonScale=${canyonScale},
+		let {voltageSlide, voltageBreed, canyonPower, canyonScale, slotScale, slotWidth} = voltageParams;
+		if (canyonPower == undefined || canyonScale == undefined || slotScale == undefined || voltageSlide == undefined)
+			throw `bad Voltage params: slotScale=${slotScale}, canyonPower=${canyonPower}, canyonScale=${canyonScale},
 				voltageSlide=${voltageSlide}`;
 
 		if (traceFamiliar)
-			console.log(`starting setFamiliarVoltage(`, voltageParams);
-		const offset = voltageSlide / 100 * (this.end - this.start);
-		if ('flat' == voltageBreed) {
-			for (let ix = this.start; ix < this.end; ix++)
-				this.voltageBuffer[ix] = 0;
-		}
-		else {
-			// the actual formula is like y = x ** p, where 0 <= y <= 1 and -1 <= x <= 1
-			let halfN = (this.end - this.start) / 2;
-			let topVolts = (canyonScale * VALLEY_FACTOR);
-			for (let ix = this.start; ix < this.end; ix++) {
-				let x01 = (ix - offset - halfN) / halfN;
-				let y01 = Math.pow(abs(x01), canyonPower)
-				let pot = y01 * topVolts;
+			console.log(`⚡️ starting setFamiliarVoltage(`, voltageParams);
 
-				if (isNaN(pot)) {
-					console.warn(`voltage ${pot} not finite at x=${ix} ${JSON.stringify(voltageParams)}
-						ix - offset=${ix - offset}
-						x ** ${canyonPower}=${Math.pow(ix - offset, canyonPower)}
-						x ** ${canyonPower} * ${canyonScale}=
-						${Math.pow(ix - offset, canyonPower) * canyonScale}`);
-				}
-				this.voltageBuffer[ix] = pot;
+		// figure out these ixs from percents
+		switch (voltageBreed) {
+		case 'flat':
+			this.fillVoltage(0);
+			break;
+
+		case 'slot':
+			this.slotVoltageSetup(voltageParams);
+			this.fillVoltage(0);
+			this.fillVoltage(-slotScale, this.edgeStart, this.edgeEnd)
+			break;
+
+		case 'block':
+			this.slotVoltageSetup(voltageParams);
+			this.fillVoltage(0);
+			this.fillVoltage(slotScale, this.edgeStart, this.edgeEnd)
+			break;
+
+		case 'canyon':
+			// the actual formula is like y = x ** p, where 0 <= y <= 1 and -1 <= x <= 1
+			// 	let halfN = (this.end - this.start) / 2;
+			// 	let topVolts = (canyonScale * VALLEY_FACTOR);  // ??
+			this.canyonVoltageSetup(voltageParams);
+
+			for (let ix = this.start; ix < this.end; ix++) {
+				// canyonVoltage(ix, canyonPower);
+				// let x01 = (ix - offset - halfN) / halfN;
+				// let y01 = Math.pow(abs(x01), canyonPower)
+				// let pot = y01 * topVolts;
+				//
+				// if (isNaN(pot)) {
+				// 	console.warn(`voltage ${pot} not finite at x=${ix} ${JSON.stringify(voltageParams)}
+				// 		ix - offset=${ix - offset}
+				// 		x ** ${canyonPower}=${Math.pow(ix - offset, canyonPower)}
+				// 		x ** ${canyonPower} * ${canyonScale}=
+				// 		${Math.pow(ix - offset, canyonPower) * canyonScale}`);
+				// }
+				this.voltageBuffer[ix] = this.canyonVoltage(ix, canyonPower);
 			}
+			break;
+
+		default:
+			console.warn(`setFamiliarVoltage: no breed`, voltageParams);
 		}
 
 		if (traceFamiliar)
 			this.dumpVoltage(`done with setFamiliarVoltage()`);
 	}
 
-	// Rendering
+	// set bottomVolts and heightVolts to see the results of setFamiliarVolts()
+	setAppropriateRange(voltageParams) {
+
+		if (traceFamiliar)
+			console.log(`⚡️ starting setAppropriateRange(`, voltageParams);
+
+		const MARGIN = EFFECTIVE_VOLTS;
+		let bottom, height;
+
+		switch (voltageParams.voltageBreed) {
+		case 'flat':
+			bottom = -EFFECTIVE_VOLTS;
+			height = 2 * EFFECTIVE_VOLTS;
+			break;
+
+		case 'slot':
+			height = 4 * EFFECTIVE_VOLTS
+			bottom = -height +  MARGIN;
+			break;
+
+		case 'block':
+			height = 4 * EFFECTIVE_VOLTS
+			bottom = -MARGIN;
+			break;
+
+		case 'canyon':
+			// always, the max is one or the other end
+			this.canyonVoltageSetup(voltageParams);
+			let startVal = this.canyonVoltage(this.start, voltageParams.canyonPower);
+			let endVal = this.canyonVoltage(this.end-1, voltageParams.canyonPower);
+			height = max(startVal, endVal) + MARGIN;
+			bottom = -MARGIN;
+			break;
+
+		default:
+			console.warn(`setAppropriateRange: no breed`, voltageParams);
+ 		}
+
+		this.bottomVolts = bottom;
+		this.heightVolts = height;
+		if (traceFamiliar)
+			this.dumpVoltDisplay(`setAppropriateRange(): from ${bottom} to $bottom + height`, voltageParams);
+	}
+
+	/* **************************************************************************** Rendering */
 	// make the value for the 'd' attribute on an svg <path element
 	// from start to end, on your space, using std volts array from WaveView
 	// usedYScale is either yScale or yUpsideDown; your choice
@@ -315,12 +388,12 @@ export class voltDisplay {
 		let start = this.start;
 		let end = this.end;
 		if (tracePathAttribute)
-			console.log(`⚡️ ⚡️ voltDisplay.makePathAttribute(${start}, ${end})`);
+			console.log(`⚡️voltDisplay.makePathAttribute(${start}, ${end})`);
 
 		// yawn too early?
 		if (! usedYScale) {
 			if (tracePathAttribute)
-				console.log(`⚡️ ⚡️ makePathAttribute(): no yScale so punting`);
+				console.warn(`⚡️ 🧨  makePathAttribute(): no yScale so punting`);
 			return `M0,0`;
 		}
 
@@ -344,6 +417,8 @@ export class voltDisplay {
 
 			// ±∞ come out as NaN.
 			y = usedYScale(voltageBuffer[ix]);
+			if (tracePathIndividualPoints)
+				console.log(`⚡️    x=${x}  y=${y}`);
 			if (isNaN(y) || y < -TOO_MANY_VOLTS || y > TOO_MANY_VOLTS) {
 				// Absent.  the line ends here, for this pt and maybe a few more; just omit it
 				didMove = didLine = false;
@@ -359,18 +434,14 @@ export class voltDisplay {
 					pt = 'L' + pt;
 					didLine = true;
 				}
-				else {
-					// spaces between xy pairs make them easier to read, and they repeat L
-					pt = ' ' + pt;
-				}
 			}
 			points[ix] = pt;
 		}
 
-		let final = points.join('');
-		if (tracePathAttribute) {
-			console.log(`⚡️ ⚡️  voltDisplay.makePathAttribute: done`, final);
-		}
+		// spaces between xy pairs make them easier to read, and they repeat L
+		let final = points.join(' ');
+		if (tracePathAttribute)
+			console.log(`final path attribute`, final);
 		return final;
 	}
 }

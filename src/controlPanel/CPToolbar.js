@@ -6,6 +6,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import eSpace from '../engine/eSpace.js';
+import {ShowVoltageControl} from './SetVoltageTab.js';
 
 let traceCPToolbar = false;
 
@@ -23,8 +24,8 @@ function setPT() {
 
 		resetWave: PropTypes.func.isRequired,
 		resetVoltage: PropTypes.func.isRequired,
-		toggleShowVoltage: PropTypes.func.isRequired,
-		showVoltage: PropTypes.bool.isRequired,
+		changeShowVoltage: PropTypes.func.isRequired,
+		showVoltage: PropTypes.string.isRequired,
 	};
 }
 
@@ -111,11 +112,8 @@ function CPToolbar(props) {
 				</button>
 				&nbsp;
 
-				<label>
-					<input type='checkbox' checked={props.showVoltage} name='showVoltage'
-						onChange={props.toggleShowVoltage} />
-					Show Voltage
-				</label>
+				<ShowVoltageControl showVoltage={props.showVoltage}
+					changeShowVoltage={props.changeShowVoltage} />
 			</div>
 		</div>
 	</div>;

@@ -5,7 +5,7 @@
 
 import {isPowerOf2} from './powers.js';
 import qe from '../engine/qe.js';
-import {EFFECTIVE_VOLTS} from './voltConstants.js';
+import {EFFECTIVE_VOLTS, AMPLE_VOLTS} from '../volts/voltConstants.js';
 
 // what a disaster.   I made this whole subsystem, storeSettings (aka New)
 // but somehow the compiler fucks it up,
@@ -207,14 +207,14 @@ export function createStoreSettings() {
 	makeParam('voltageParams', 'voltageBreed', 'flat', ['flat', 'slot', 'block', 'canyon']);
 	makeParam('voltageParams', 'voltageSlide', 50, {min: 0, max: 100});
 
-	makeParam('voltageParams', 'slotWidth', 2, {min: 0, max: 50});
-	makeParam('voltageParams', 'slotScale', EFFECTIVE_VOLTS, {min: 0, max: EFFECTIVE_VOLTS * 4});
+	makeParam('voltageParams', 'slotWidth', 10, {min: 0, max: 100});  // 0 to 100 despite appearance
+	makeParam('voltageParams', 'slotScale', EFFECTIVE_VOLTS, {min: 0, max: AMPLE_VOLTS});
 
 	makeParam('voltageParams', 'canyonPower', 2, {min: 0, max: 6});
-	makeParam('voltageParams', 'canyonScale', EFFECTIVE_VOLTS, {min: 0, max: EFFECTIVE_VOLTS * 4});
+	makeParam('voltageParams', 'canyonScale', EFFECTIVE_VOLTS, {min: 0, max: AMPLE_VOLTS});
 
 	// where voltage line shows
-	makeParam('voltageSettings', 'showVoltage', true, [true, false]);
+	makeParam('voltageSettings', 'showVoltage', 'hover', ['always', 'hover', 'never']);
 
 	// voltage at bottom of wave view, 𝚫voltage of wave view height
 	const extremes = {min: -1000 * EFFECTIVE_VOLTS, max: 1000 * EFFECTIVE_VOLTS}

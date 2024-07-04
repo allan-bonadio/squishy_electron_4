@@ -36,9 +36,8 @@ export class ControlPanel extends React.Component {
 		//populateFamiliarVoltage: PropTypes.func.isRequired,
 
 		// the showVoltage bool is kept by the Squish Panel; probably should by the WaveView
-		// oh wait the checkbox in the SetVoltage panel
-		toggleShowVoltage: PropTypes.func.isRequired,
-		showVoltage: PropTypes.bool.isRequired,
+		changeShowVoltage: PropTypes.func.isRequired,
+		showVoltage: PropTypes.string.isRequired,
 
 		redrawWholeMainWave: PropTypes.func.isRequired,
 
@@ -351,7 +350,7 @@ export class ControlPanel extends React.Component {
 			//setVoltageAndUpdate={this.setVoltageAndUpdate}
 			return <SetVoltageTab
 				voltageParams={{ canyonPower, canyonScale, slotWidth, slotScale, voltageSlide,}}
-				toggleShowVoltage={p.toggleShowVoltage}
+				changeShowVoltage={p.changeShowVoltage}
 				showVoltage={p.showVoltage}
 			/>;
 
@@ -399,7 +398,7 @@ export class ControlPanel extends React.Component {
 
 				resetWave={this.resetWave}
 				resetVoltage={this.resetVoltage}
-				toggleShowVoltage={p.toggleShowVoltage}
+				changeShowVoltage={p.changeShowVoltage}
 				showVoltage={p.showVoltage}
 
 				N={this.N}

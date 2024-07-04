@@ -193,11 +193,12 @@
 		width: calc( 50em + --miniGraphWidth );
 		height: auto;
 
-		.voltageTitlePanel {
+		// this is the whole left panel, the title and the breed selector, etc
+		.voltageBreedPanel {
 			float: left;
 			label {
 				display: block;
-				line-height: 3em;
+				//line-height: 3em;
 			}
 		}
 
@@ -219,26 +220,22 @@
 		.miniGraphPanel {
 			display: grid;
 			grid-template-columns: auto auto auto;
-			grid-template-rows: auto auto;
+			grid-template-rows: auto auto auto;
 			gap: .5em;
 			width: 450px;
+			float: left;
 
 			// "The keyword 'slider-vertical' ... is not standardized..."
 			.slotScale, .canyonScale, .canyonPower {
 				//appearance: slider-vertical;
 				writing-mode: vertical-lr;  // new standard? feb 2024  use direction: rtl; to invert
-				//direction: rtl;
+				direction: rtl;
 				width: 2.5em;
 
 			}
 
-			// left-right
+			// left-right offset of voltage pattern
 			.voltageSlide {
-				height: 20px;
-			}
-
-			// left-right
-			.slotSlide {
 				height: 20px;
 			}
 
@@ -248,7 +245,7 @@
 				text-align: center;
 			}
 
-			// for block, slot or canyon
+			// for block, slot or canyon.  the power of x to use
 			.scaleDisplay {
 				width: 7em;
 				text-align: center;
@@ -262,6 +259,14 @@
 				stroke-width: 1;
 				pointer-events: none;
 				background-color: #444;
+			}
+
+			.ShowVoltageControl {
+				float: left;
+				padding: 1em;
+				.showVoltage {
+
+				}
 			}
 		}
 	}
