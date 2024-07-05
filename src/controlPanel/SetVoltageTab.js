@@ -10,6 +10,7 @@ import voltDisplay from '../volts/voltDisplay.js';
 import {EFFECTIVE_VOLTS, VALLEY_FACTOR, TOO_MANY_VOLTS} from '../volts/voltConstants.js';
 import {getAGroup, storeAGroup, storeASetting, alternateMinMaxs} from '../utils/storeSettings.js';
 import {eSpaceCreatedPromise} from '../engine/eEngine.js';
+import LogSlider from '../widgets/LogSlider.js';
 
 // miniGraph: always fixed size
 let MINI_WIDTH = 300;
@@ -84,32 +85,6 @@ function SetVoltageTab(props) {
 	}
 	if (!This.space)
 		return null;  // can't render till space promise resolves, sorry
-
-// 	constructor(props) {
-// 		super(props);
-//
-// 		// This is exactly the voltageParams object.  THEREFORE,
-// 		// don't stick some other stuff into the state!
-// 		this.state = {
-// 		};
-//
-// 		// be prepared.  If this isn't an object, punt
-// 		this.miniVolts = null;
-// 		eSpaceCreatedPromise.then(space => {
-// 			this.space = space;
-//
-// 			// used for depicting what the user's selected.  Copy from live one.
-// 			this.miniGraphBuffer = new Float64Array(space.nPoints);
-// 			voltDisplay.copyVolts(this.miniGraphBuffer, space.voltageBuffer);
-// 			this.miniVolts = new voltDisplay(space.start, space.end,
-// 				this.miniGraphBuffer, getAGroup('voltageSettings'));
-//
-// 			// only now set the state, when we're prepared to render
-// 			let vParams = getAGroup('voltageParams');
-// 			this.setState(vParams);
-// 			this.miniVolts.setFamiliarVoltage(vParams);
-// 		})
-// 	}
 
 	// Set Voltage button copies This panel's volts to the space's volts, and stores params
 	const setVoltage=
@@ -189,17 +164,26 @@ function SetVoltageTab(props) {
 	// start pointer capture on this drag
 	const capture = (ev) => ev.target.setPointerCapture(ev.pointerId);
 
+// 			<input type='range' className='canyonPower'
+// 				value={vParams.canyonPower ?? alternateStoreDefaults.voltageParams.canyonPower}
+// 				min={vMinsMaxes.canyonPower.min} max={vMinsMaxes.canyonPower.max}
+// 				step={.5}
+// 				onChange={ev => setVParams({canyonPower: ev.target.valueAsNumber})}
+// 				onPointerDown={capture}
+// 				style={{visibility: 'canyon' == breed ? 'visible' : 'hidden'}}
+// 			/>
+
 	// draw minigraph, and wrap it with sliders on 3 sides, depending on breed
 	function renderFirstRow(breed, vMinsMaxes) {
 		return <>
 			{/* only shows for canyon, otherwise blank space */}
-			<input type='range' className='canyonPower'
-				value={vParams.canyonPower ?? alternateStoreDefaults.voltageParams.canyonPower}
-				min={vMinsMaxes.canyonPower.min} max={vMinsMaxes.canyonPower.max}
-				step={.5}
-				onChange={ev => setVParams({canyonPower: ev.target.valueAsNumber})}
-				onPointerDown={capture}
-				style={{visibility: 'canyon' == breed ? 'visible' : 'hidden'}}
+			<LogSlider className='canyonPower'
+				current={vParams.canyonPower ?? alternateStoreDefaults.voltageParams.canyonPower}
+				annotation={false}
+				sliderMin={vMinsMaxes.canyonPower.min} sliderMax={vMinsMaxes.canyonPower.max}
+				stepsPerDecade={10}
+				handleChange={power => setVParams({canyonPower: power})}
+				wholeStyle={{visibility: 'canyon' == breed ? 'visible' : 'hidden'}}
 			/>
 
 			{renderMiniGraph()}

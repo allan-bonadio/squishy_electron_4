@@ -30,9 +30,13 @@ function createGoodPowers(spd, mini, maxi, substitutes) {
 class LogSlider extends React.Component {
 	static propTypes = {
 		className: PropTypes.string,
-		label: PropTypes.string.isRequired,
+
+		annotation: PropTypes.bool,  // false to get rid of these labels
+		label: PropTypes.string,
 		minLabel: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
 		maxLabel: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+
+
 		substitutes: PropTypes.array,
 
 		// these are powers, not indices
@@ -54,11 +58,17 @@ class LogSlider extends React.Component {
 
 		// handleChange(power, ix)
 		handleChange: PropTypes.func,
+
+		wholeStyle: PropTypes.object,   // whole  component, like to make it invisible
+		inputStyle: PropTypes.object,  // just the input.range slider
+
 	}
 
 	static defaultProps = {
 		unique: 'you should really choose a unique code for this logslider',
 		className: '',
+
+		annotation: true,
 		label: 'how much',
 		minLabel: 'low',
 		maxLabel: 'high',
@@ -86,6 +96,7 @@ class LogSlider extends React.Component {
 		const p = this.props;
 		if (traceThisSlider.test(p.unique)) console.info(`mouseDown avgValue=`, this.avgValue);
 		this.avgValue = +ev.currentTarget.value;
+		ev.target.pointerCapture(ev.pointerId);
 	}
 
 	handleSlide =
@@ -115,9 +126,8 @@ class LogSlider extends React.Component {
 		if (traceThisSlider.test(p.unique)) console.info(
 			`LogSlider render..  spd=${spd}, p.current=${p.current}   value=${val} props=`, p);
 
-		try {
-			return <div className={`${p.className} LogSlider`}>
-				<aside>
+		const annotation = p.annotation
+			?   <aside>
 					<div className='left'>{p.minLabel}</div>
 					<div className='middle'>
 						<b>{p.label}</b>: <big>{thousands(cur)}</big>
@@ -127,6 +137,13 @@ class LogSlider extends React.Component {
 
 				</aside>
 
+			: undefined;
+
+		try {
+			return <div className={`${p.className} LogSlider`} style={p.wholeStyle ?? {}}>
+
+				{annotation}
+
 				<input type="range"
 					min={this.minIndex}
 					max={this.maxIndex}
@@ -134,6 +151,7 @@ class LogSlider extends React.Component {
 					list={uniqueId}
 					onInput={this.handleSlide}
 					onMouseDown={this.mouseDown}
+					style={p.inputStyle ?? {}}
 				/>
 				<datalist id={uniqueId} >{createGoodPowers(spd, p.sliderMin, p.sliderMax, p.substitutes)}</datalist>
 			</div>;
