@@ -217,6 +217,7 @@
 			margin: 1em .5em;
 		}
 
+		// the panel with the minigraph, and all the sliders
 		.miniGraphPanel {
 			display: grid;
 			grid-template-columns: auto auto auto;
@@ -239,13 +240,13 @@
 				height: 20px;
 			}
 
-			// only for canyon
+			// thing that looks like x^2.5 only for canyon
 			.powerDisplay {
 				width: 2.5em;
 				text-align: center;
 			}
 
-			// for block, slot or canyon.  the power of x to use
+			// for block, slot or canyon.  looks like 2.50 • x...
 			.scaleDisplay {
 				width: 7em;
 				text-align: center;
@@ -261,6 +262,7 @@
 				background-color: #444;
 			}
 
+			// menu showing in some places: always, hover, never
 			.ShowVoltageControl {
 				float: left;
 				padding: 1em;
