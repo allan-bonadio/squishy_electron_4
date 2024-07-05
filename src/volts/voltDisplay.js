@@ -17,7 +17,7 @@ let traceScrolling = false;
 let traceZooming = false;
 
 
-const {min, max, abs, round} = Math;
+const {min, max, abs, round, sqrt, cbrt} = Math;
 
 // zooming in or out, changes the heightVolts by this factor either way.
 const zoomFactor = Math.sqrt(2);
@@ -262,9 +262,9 @@ export class voltDisplay {
 		this.offset = voltageSlide * toIx;
 	}
 
-	canyonVoltage(ix, canyonPower) {
+	canyonVoltage(ix, voltageParams) {
 		let xm1_1 = (ix - this.offset) / this.halfN;  // -1...+1
-		let y0_1 = Math.pow(abs(xm1_1), canyonPower);  // 0 ... +1
+		let y0_1 = Math.pow(abs(xm1_1), voltageParams.canyonPower);  // 0 ... +1
 
 		if (!isFinite(y0_1)) {
 			// needs correction
@@ -274,7 +274,7 @@ export class voltDisplay {
 				x ** ${canyonPower} * ${canyonScale}=
 				${Math.pow(ix - offset, canyonPower) * canyonScale}`);
 		}
-		return y0_1 * EFFECTIVE_VOLTS;
+		return y0_1 * voltageParams.canyonScale;
 	}
 
 	// generate a canyon, flat etc voltage potential in the given array, according to params.
@@ -312,19 +312,7 @@ export class voltDisplay {
 			this.canyonVoltageSetup(voltageParams);
 
 			for (let ix = this.start; ix < this.end; ix++) {
-				// canyonVoltage(ix, canyonPower);
-				// let x01 = (ix - offset - halfN) / halfN;
-				// let y01 = Math.pow(abs(x01), canyonPower)
-				// let pot = y01 * topVolts;
-				//
-				// if (isNaN(pot)) {
-				// 	console.warn(`voltage ${pot} not finite at x=${ix} ${JSON.stringify(voltageParams)}
-				// 		ix - offset=${ix - offset}
-				// 		x ** ${canyonPower}=${Math.pow(ix - offset, canyonPower)}
-				// 		x ** ${canyonPower} * ${canyonScale}=
-				// 		${Math.pow(ix - offset, canyonPower) * canyonScale}`);
-				// }
-				this.voltageBuffer[ix] = this.canyonVoltage(ix, canyonPower);
+				this.voltageBuffer[ix] = this.canyonVoltage(ix, voltageParams);
 			}
 			break;
 
@@ -342,32 +330,37 @@ export class voltDisplay {
 		if (traceFamiliar)
 			console.log(`⚡️ starting setAppropriateRange(`, voltageParams);
 
-		const MARGIN = EFFECTIVE_VOLTS;
+		const MARGIN = EFFECTIVE_VOLTS / 2;
 		let bottom, height;
 
 		switch (voltageParams.voltageBreed) {
 		case 'flat':
-			bottom = -EFFECTIVE_VOLTS;
-			height = 2 * EFFECTIVE_VOLTS;
+			bottom = -MARGIN;
+			height = 2 * MARGIN;
 			break;
 
 		case 'slot':
-			height = 4 * EFFECTIVE_VOLTS
-			bottom = -height +  MARGIN;
+			height = voltageParams.slotScale + 2*MARGIN;
+			//height = 5 * sqrt(EFFECTIVE_VOLTS * voltageParams.slotScale ** 2 ) + 2*MARGIN
+			bottom = -height + MARGIN;
 			break;
 
 		case 'block':
-			height = 4 * EFFECTIVE_VOLTS
-			bottom = -MARGIN;
+			height = voltageParams.slotScale + 2*MARGIN
+			//height = 5 * sqrt(EFFECTIVE_VOLTS * voltageParams.slotScale ** 2 ) + 2*MARGIN
+			bottom = - MARGIN;
 			break;
 
 		case 'canyon':
-			// always, the max is one or the other end
+			// always, the max is one or the other end.
 			this.canyonVoltageSetup(voltageParams);
-			let startVal = this.canyonVoltage(this.start, voltageParams.canyonPower);
-			let endVal = this.canyonVoltage(this.end-1, voltageParams.canyonPower);
-			height = max(startVal, endVal) + MARGIN;
-			bottom = -MARGIN;
+			let startVal = this.canyonVoltage(this.start, voltageParams);
+			let endVal = this.canyonVoltage(this.end-1, voltageParams);
+			let highest = max(startVal, endVal);
+
+			// But autoscaling hides changes in scale so do this
+			height =  sqrt(highest * EFFECTIVE_VOLTS) + MARGIN;
+			bottom = -MARGIN / 2;
 			break;
 
 		default:
@@ -377,7 +370,7 @@ export class voltDisplay {
 		this.bottomVolts = bottom;
 		this.heightVolts = height;
 		if (traceFamiliar)
-			this.dumpVoltDisplay(`setAppropriateRange(): from ${bottom} to $bottom + height`, voltageParams);
+			this.dumpVoltDisplay(`setAppropriateRange(): `);
 	}
 
 	/* **************************************************************************** Rendering */
