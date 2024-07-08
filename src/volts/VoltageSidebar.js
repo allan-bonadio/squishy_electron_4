@@ -129,8 +129,23 @@ function VoltageSidebar(props) {
 		console.log(`🍟 V Sidebar rend: width=${sidebarWidth}  heightVolts=${v.heightVolts}  ${v.minBottom} `);
 	}
 
+	// Hovering  to show/hide voltage - hovering over the sidebar
+	// buttons can make the voltage stuff disappear.  these make sure
+	// the voltage still shows if the mouse is over the sidebar.
+	const pointerEnter = ev => {
+		const vo = document.querySelector('.WaveView .voltageOverlay');
+		if (vo) vo.style.visibility = 'visible';
+	};
+	const pointerLeave = ev => {
+		const vo = document.querySelector('.WaveView .voltageOverlay');
+		if (vo) vo.style.visibility = '';
+	};
+
+
+
 	// render.  The buttons are almost square.
-	return (<aside className='VoltageSidebar' >
+	return (<aside className='VoltageSidebar'
+			onPointerEnter={pointerEnter} onPointerLeave={pointerLeave} >
 		<p/>
 
 		<button className='scrollUp'
