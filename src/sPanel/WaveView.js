@@ -192,7 +192,7 @@ export class WaveView extends React.Component {
 		ev.stopPropagation();
 	}
 
-	/* ************************************************************************ volts */
+	/* ************************************************************************ interaction */
 
 	// the actual bottomVolts is ignored; what's important is to tell us that it changed
 	scrollVoltHandler =

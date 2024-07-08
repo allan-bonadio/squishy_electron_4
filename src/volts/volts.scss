@@ -17,10 +17,9 @@
 	.neverShowVoltage {visibility: hidden}
 
 	// encloses the actual glview, the timeOverlay, and the voltageOverlay
+	// the voltageOverlay is what hides/shows with mouseover (see above)
 	.viewArea .voltageOverlay {
 		display: block;
-
-		pointer-events: all;  // experimental on html; not sure if it enables :hover?
 
 		.VoltageArea {
 			position: relative;
@@ -91,13 +90,12 @@
 			pointer-events: none;
 
 
-			// zoom in/out buttons
+			// scroll & zoom in/out buttons
 			button {
 				display: inline;
 				background-color: transparent;
 				width: 2em;
 				height: 2em;
-				gap: 3em;
 				border-radius: 1em;
 				color: common.$voltageColor;
 				padding: 0;
