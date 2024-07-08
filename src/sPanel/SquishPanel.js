@@ -133,8 +133,8 @@ export class SquishPanel extends React.Component {
 					'neverShowVoltage');
 			voEl.classList.add(newSetting + 'ShowVoltage');
 		}
-		setSV(document.querySelector('.SquishPanel .voltageOverlay'));
-		setSV(document.querySelector('.SquishPanel .VoltageArea'));
+		//setSV(document.querySelector('.SquishPanel .voltageOverlay'));
+		setSV(document.querySelector('.SquishPanel .optionalVoltage'));
 // 		if (voltageOverlay) {
 // 			voltageOverlay.classList.remove('alwaysShowVoltage', 'hoverShowVoltage',
 // 					'neverShowVoltage');
