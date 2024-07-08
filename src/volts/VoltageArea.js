@@ -4,7 +4,7 @@
 ** Copyright (C) 2021-2024 Tactile Interactive, all rights reserved
 */
 
-import React, {createRef} from 'react';
+import React, {useRef, useState} from 'react';
 
 import PropTypes from 'prop-types';
 
@@ -37,9 +37,9 @@ let traceScrollStretch = false;
 // to double the scroll or heightVolts
 let DOUBLING_TIME = 2000;
 
-// ultimately, this is a <svg node with a <path inside it
-export class VoltageArea extends React.Component {
-	static propTypes = {
+
+function setPT() {
+	VoltageArea.propTypes = {
 		// for first couple of renders, space and idunno are null
 		space: PropTypes.object,
 
@@ -55,46 +55,31 @@ export class VoltageArea extends React.Component {
 
 		canvasFacts: PropTypes.object,
 	};
+}
 
-	constructor(props) {
-		super(props);
-		//debugger;
-		// should be a functional component
-		// this.state = {
-		// 	// should just use forceUpdate on our comp obj instead!
-		// 	// I guess I am.  The state for this is the voltDisp obj and the voltageBuffer,
-		// 	// which have internal changes but the obj ref never changes.
-		// 	changeSerial: 0,
-		// };
 
-		if (traceVoltageArea)
-			console.log(`⚡️ the new VoltageArea:`, this);
+// ultimately, this is a <svg node with a <path inside it
+function VoltageArea(props) {
+	const p = props;
+	const v = p.vDisp;
+	if (traceVoltageArea)
+		console.log(`⚡️ the new VoltageArea:`, this);
 
-		this.cnDrag = new clickNDrag(this.mouseDown, this.onEvent, this.mouseUp);
+	let [renderCtr, setRenderCtr] = useState(1);
+	if (traceVoltageArea)
+		console.log(`⚡️ VoltageArea  constructor done`);
 
-		// GET RID OF THIS breaking change: ref attrs no longer get passed node refs, gotta use this
-		//this.voltageAreaRef = createRef();
-
-		if (traceVoltageArea)
-			console.log(`⚡️ VoltageArea  constructor done`);
-	}
-
-	componentWillUnmount() {
-		this.cnDrag.liquidate();
-	}
 
 	/* ***************************************************  click & drag */
 
 	// has the user dragged beyond the top/bottom?
-	strayOutside(newVoltage) {
-		const p = this.props;
-		const v = p.vDisp;
+	function strayOutside(newVoltage) {
 
 		// dragged outside? scroll, or stretch.  The amount per mouseMove is
 		// supposed to be cpu-speed-independent, on whole.  If you just make it
 		// 'feel' right, it goes way too fast in 5 or 10 years.
 		let now = performance.now();
-		let howLong = (now - this.lastDragOutside) / DOUBLING_TIME;
+		let howLong = (now - lastDragOutside) / DOUBLING_TIME;
 		if (traceScrollStretch)
 			console.log(`⚡️ strayOutside down how close?  newVoltage=${newVoltage} v.bottomVolts=${v.bottomVolts} `);
 		if (newVoltage < v.bottomVolts) {
@@ -114,7 +99,7 @@ export class VoltageArea extends React.Component {
 			if (traceScrollStretch)
 				v.dumpVoltDisplay('   after stretching up');
 
-			this.lastDragOutside = now;
+			lastDragOutside = now;
 		}
 		else if (newVoltage > v.maxTop) {
 			// dragging up
@@ -133,36 +118,32 @@ export class VoltageArea extends React.Component {
 			if (traceScrollStretch)
 				v.dumpVoltDisplay('⚡️ after stretching up');
 
-			this.lastDragOutside = now;
+			lastDragOutside = now;
 		}
 		else
-			this.lastDragOutside = null;
+			lastDragOutside = null;
 	}
 
-	mouseDown =
+	const mouseDown =
 	(cnDrag, ev) => {
-		// set svg area to accept mouse events
-		// no gotta catch wheel events cnDrag.arenaEl.style.pointerEvents = 'visible';  // auto all none
 	}
 
 	// every time user changes one datapoint.  Also set points interpolated between.
 	// returns false if it failed and needs to be done again.  True means it succeeded.
-	onEvent =
+	const onEvent =
 	(cnDrag, ev) => {
-		const p = this.props;
-		const v = p.vDisp;
 		let phase = ev.type;
 
 		// shift key gives you steady voltage as you drag across, but if you do it on the down
 		// click, we don't know where to start
-		let newVoltage = this.latestVoltage;
+		let newVoltage = latestVoltage;
 		if (! ev.shiftKey || phase == 'mousedown') {
 			newVoltage = v.yUpsideDown.invert(cnDrag.yArena);
 		}
 
 		let ix = Math.round(v.xScale.invert(ev.clientX));
 
-		if (ix == this.latestIx && Math.abs(newVoltage - this.latestVoltage) < v.heightVolts * .01)
+		if (ix == latestIx && Math.abs(newVoltage - latestVoltage) < v.heightVolts * .01)
 			return;  // same old same old; these events come too fast
 
 		if (traceDragging) {
@@ -179,11 +160,11 @@ export class VoltageArea extends React.Component {
 		else {
 			// other times, draw a straight linear line through.  d3_scaleLinear from d3
 			// cuz sometimes mouse skips.
-			let tweenScale = d3_scaleLinear([this.latestIx, ix], [this.latestVoltage, newVoltage]);
+			let tweenScale = d3_scaleLinear([latestIx, ix], [latestVoltage, newVoltage]);
 
 			// tween to each point in between
-			let hi = Math.max(this.latestIx, ix);
-			let lo = Math.min(this.latestIx, ix);
+			let hi = Math.max(latestIx, ix);
+			let lo = Math.min(latestIx, ix);
 			for (let ixx = lo; ixx <= hi; ixx++) {
 				if (traceTweening)
 					console.log(`⚡️ tweening: set point [${ixx}] to ${tweenScale(ixx).toFixed(4)}`)
@@ -192,40 +173,41 @@ export class VoltageArea extends React.Component {
 			if (traceTweening) console.log(`⚡️ tweening done`)
 		}
 
-		this.latestIx = ix;
-		this.latestVoltage = newVoltage;
+		latestIx = ix;
+		latestVoltage = newVoltage;
 
-		this.strayOutside(newVoltage);
+		strayOutside(newVoltage);
 
-		this.updateVoltageArea();
+		//updateVoltageArea();  ??
+
+		setRenderCtr(renderCtr + 1);  // cause a rerender
 		return true;
 	}
 
 	// called upon mouseup or a move without mouse down
-	mouseUp =
+	const mouseUp =
 	(cnDrag, ev) => {
-		const p = this.props;
-		const v = p.vDisp;
-
 		// must also switch the svg to pass thru mouse events otherwise other stuff can't get clicks
 		// no gotta catch wheel events  cnDrag.arenaEl.style.pointerEvents = 'none';
 
 		if (traceDragging) {
 			console.log(`⚡️ mouse UP on point (%f,%f) voltage @ ix=%d stopped at %f`,
 				cnDrag.xArena, cnDrag.yArena,
-				this.latestIx, v.voltageBuffer[this.latestIx]);
+				latestIx, v.voltageBuffer[latestIx]);
 		}
 
 		// remind everybody that this episode is over.  Tune in next week.  next mousedown.
-		this.latestIx = this.latestVoltage = undefined;
+		latestIx = latestVoltage = undefined;
 
 		if (traceDragging)
 			v.dumpVoltage(p.space, v.voltageBuffer, 8);
 	}
 
-	wheelHandler =
+	// the click n drag object manages dragging voltage segmments
+	const cnDrag = useRef(new clickNDrag(mouseDown, onEvent, mouseUp));
+
+	const wheelHandler =
 	(ev) => {
-		let v = this.props.vDisp;
 		let deltaAmount;
 
 		// the scrollHeight changes at any time so calculate it on the fly
@@ -256,153 +238,139 @@ export class VoltageArea extends React.Component {
 		ev.stopPropagation();
 	}
 
+
 	/* *************************************************** rendering */
 
 	// tell the VoltageArea (that;s us) that something in the
 	// space.voltageBuffer changed.  Sometimes called from above. This gets set
 	// into the space, when it's available.
-	updateVoltageArea =
-	() => {
-		if (traceRendering)
-			console.log(`⚡️ VoltageArea.updateVoltageArea`);
-		//this.props.vDisp.findVoltExtremes();
-		this.forceUpdate();
-	}
+	// 	const updateVoltageArea =
+	// 	() => {
+	// 		if (traceRendering)
+	// 			console.log(`⚡️ VoltageArea.updateVoltageArea`);
+	// 		forceUpdate();
+	// 	}
 
-	componentDidUpdate() {
-		// the constructor probably won't have space, but here it will.  should.
-		const p = this.props;
-		if (p.space && p.vDisp) {
-			p.vDisp.updateVoltageArea = this.updateVoltageArea;
-			p.space.updateVoltageArea = this.updateVoltageArea;}
-		else
-			console.warn(`⚡️  VoltageArea, no space! ${p.space}.  Is there also no vDisp?  ${p.vDisp}`);
-	}
+	// 	componentDidUpdate() {
+	// 		// the constructor probably won't have space, but here it will.  should.
+	// 		const p = this.props;
+	// 		if (p.space && p.vDisp) {
+	// 			p.vDisp.updateVoltageArea = this.updateVoltageArea;
+	// 			p.space.updateVoltageArea = this.updateVoltageArea;}
+	// 		else
+	// 			console.warn(`⚡️  VoltageArea, no space! ${p.space}.  Is there also no vDisp?  ${p.vDisp}`);
+	// 	}
 
-
-	// the main path is the voltage, but for continuum WELL we also draw end blocks, and also...
-	renderPaths() {
-		const p = this.props;
-		const v = p.vDisp;
-		if (!p.space)
-			return <></>;
-
-		// collects ALL svg to be rendered
-		let paths = [];
-
+	function renderBumpers() {
 		// we want the bumpers on the end to show even if we're not showing 'voltage'
 		switch (p.space.dimensions[0].continuum) {
 			case qe.contWELL:
-				// stone slabs on each end on the borders vaguely means 'quantum well'.
-				paths.push(
-					<rect className='left wellSlab' key='left'
-						x={0} y={0}
-						width={this.barWidth +'px'} height={p.canvasFacts.height +'px'}
-					/>
-				);
-				paths.push(
-					<rect className='right wellSlab' key='right'
-						x={(p.canvasFacts.width - this.barWidth) +'px'} y={0}
-						width={this.barWidth +'px'} height={p.canvasFacts.height +'px'}
-					/>
-				);
 				if (traceSlabs)
 					console.info(`installed slabs: width=${p.canvasFacts.width} `
-						+`height=${p.canvasFacts.height}  this.barWidth=${this.barWidth}`);
+						+`height=${p.canvasFacts.height}  barWidth=${barWidth}`);
+				// stone slabs on each end on the borders vaguely means 'quantum well'.
+				return <g className='bumpers' >
+					<rect className='left wellSlab' key='left'
+						x={0} y={0}
+						width={barWidth +'px'} height={p.canvasFacts.height +'px'}
+					/>
+					<rect className='right wellSlab' key='right'
+						x={(p.canvasFacts.width - barWidth) +'px'} y={0}
+						width={barWidth +'px'} height={p.canvasFacts.height +'px'}
+					/>
+				</g>;
 				break;
 
 			case qe.contENDLESS:
-				break;
+				return undefined;
 
 			default: throw new Error(`bad continuum ${p.space.dimensions.continuum}`);
 		}
 
-		// the lines themselves: exactly overlapping.  tactile wider than visible.
-// 		if (traceRendering)
-// 			console.log(`⚡️      pathAttribute: showVoltage=${p.showVoltage}   isHovering=${this.isHovering}`);
-// 		if ('always' == p.showVoltage || ('hover' == p.showVoltage && this.isHovering)) {
-			const pathAttribute = v.makeVoltagePathAttribute(v.yScale);
-			if (traceRendering)
-				console.log(`⚡️ VoltageArea.pathAttribute: `, pathAttribute);
+	}
 
-			// for showVoltage on hover, need this to  hover over
-			paths.push(
+	// this one actually draws the voltage line
+	function renderVoltagePath() {
+		// the lines themselves: exactly overlapping.  tactile wider than visible.
+		// 		if (traceRendering)
+		// 			console.log(`⚡️      pathAttribute: showVoltage=${p.showVoltage}   isHovering=${isHovering}`);
+		// 		if ('always' == p.showVoltage || ('hover' == p.showVoltage && isHovering)) {
+		const pathAttribute = v.makeVoltagePathAttribute(v.yScale);
+		if (traceRendering)
+			console.log(`⚡️ VoltageArea.pathAttribute: `, pathAttribute);
+
+		return <>
+			<path className='visibleLine' key='visibleLine'
+				d={pathAttribute} />
+			<path className='tactileLine' key='tactileLine'
+				d={pathAttribute}
+				ref={cnDrag.refTarget} />
+
+		</>;
+	}
+
+	// axis for voltage.  Makes no sense if no axis there.
+	function renderAxes() {
+		let axis = d3_axisLeft(v.yUpsideDown);
+		axis.ticks(3);
+
+		let voltageAxis = ReactFauxDOM.createElement('g');
+		//let voltageAxis = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+		let vAx = d3_select(voltageAxis);
+		vAx.attr('class', 'voltageAxis');
+
+		let txX = p.canvasFacts.width - barWidth;
+		let txY = p.canvasFacts.height;
+		vAx.attr('transform', `translate(${txX}, ${txY})`);
+		vAx.call(axis);
+		//debugger;
+		return voltageAxis.toReact();
+	}
+
+	if (! p.space)
+		return '';  // too early
+	let barWidth = p.canvasFacts.width / p.space.nPoints;
+	if (traceRendering)
+		console.log(`⚡️ VArea.render, barWidth:${barWidth}  cFacts:`,
+			p.canvasFacts);
+
+	if (traceRendering) {
+		console.info(`canvasFacts: width=${p.canvasFacts.width} `
+			+`height=${p.canvasFacts.height}  barWidth=${barWidth}`);
+	}
+
+	v.setVoltScales(p.canvasFacts.width, p.canvasFacts.height, p.space.N);
+
+	// these elements show and hide
+	let vClass = p.showVoltage +'ShowVoltage';
+
+	let vArea = (
+		<svg className='VoltageArea'
+			viewBox={`0 0 ${p.canvasFacts.width} ${p.canvasFacts.height}`}
+			width={p.canvasFacts.width} height={p.canvasFacts.height}
+			ref={cnDrag.refArena}
+			onWheel={wheelHandler}
+		>
+
+			{renderBumpers()}
+
+			<g className={'optionalVoltage ' + vClass}>
+				{/* for showVoltage on hover, need this to  hover over */}
 				<rect className='hoverBox' key='hoverBox'
 					x={0} y={0} width={p.canvasFacts.width} height={p.canvasFacts.height}
 					/>
-			);
 
-			// this one actually draws the voltage line
-			paths.push(
-				<path className='visibleLine' key='visibleLine'
-					d={pathAttribute} />
-			);
+				{renderVoltagePath()}
+				{renderAxes()}
+			</g>
 
-			// you click on this one
-			//onMouseDown={ev => this.mouseDown(ev)}
-			paths.push(
-				<path className='tactileLine' key='tactileLine'
-					d={pathAttribute}
-					ref={this.cnDrag.refTarget} />
-			);
+		</svg>
+	);
 
+	if (traceRendering)
+		console.log(`⚡️ VoltageArea render done`);
 
-			// axis for voltage.  Makes no sense if no axis there.
-			// but the way d3 draws on GL is different - should use svg  instead
-			let axis = d3_axisLeft(v.yUpsideDown);
-			axis.ticks(3);
-
-			let voltageAxis = ReactFauxDOM.createElement('g');
-			//let voltageAxis = document.createElementNS('http://www.w3.org/2000/svg', 'g');
-			let vAx = d3_select(voltageAxis);
-			vAx.attr('class', 'voltageAxis');
-
-			let txX = p.canvasFacts.width - this.barWidth;
-			let txY = p.canvasFacts.height;
-			vAx.attr('transform', `translate(${txX}, ${txY})`);
-			vAx.call(axis);
-			//debugger;
-			paths.push(voltageAxis.toReact());
-// 		}
-		return paths
-	}
-
-	render() {
-		const p = this.props;
-		if (! p.space)
-			return '';  // too early
-		this.barWidth = p.canvasFacts.width / p.space.nPoints;
-		if (traceRendering)
-			console.log(`⚡️ VArea.render, barWidth:${this.barWidth}  cFacts:`,
-				p.canvasFacts);
-
-		if (traceRendering) {
-			console.info(`canvasFacts: width=${p.canvasFacts.width} `
-				+`height=${p.canvasFacts.height}  barWidth=${this.barWidth}`);
-		}
-
-		let v = p.vDisp;
-		v.setVoltScales(p.canvasFacts.width, p.canvasFacts.height, p.space.N);
-
-		let vClass = p.showVoltage +'ShowVoltage';
-		let vArea = (
-			<svg className={'VoltageArea ' + vClass}
-				viewBox={`0 0 ${p.canvasFacts.width} ${p.canvasFacts.height}`}
-				width={p.canvasFacts.width} height={p.canvasFacts.height}
-				ref={this.cnDrag.refArena}
-				onWheel={this.wheelHandler}
-			>
-
-				{this.renderPaths()}
-			</svg>
-		);
-
-		if (traceRendering)
-			console.log(`⚡️ VoltageArea render done`);
-
-		return vArea;
-	}
-
+	return vArea;
 }
 
 export default VoltageArea;
