@@ -33,9 +33,9 @@ class GLView extends React.Component {
 		// We can't jut use the promise ourselves; we have to know which avatar
 		avatar: PropTypes.object.isRequired,
 		space: PropTypes.object.isRequired,
-		
-		// our caller needs the gl ctx itself
-		setGl: PropTypes.func.isRequired,
+
+		// if our caller needs the gl ctx itself
+		setGl: PropTypes.func,
 
 		// the width and height we measure; should be width & height of canvas
 		canvasFacts: PropTypes.object.isRequired,
@@ -73,8 +73,8 @@ class GLView extends React.Component {
 		this.ctxFactory.glProm
 		.then(gl => {
 			this.gl = gl;
-			p.setGl(gl);
-			
+			p.setGl?.(gl);
+
 			this.tagObject = this.ctxFactory.tagObject;
 
 			canvas.glview = this;
@@ -85,7 +85,7 @@ class GLView extends React.Component {
 			this.initViewClass();
 
 			// finally!
-			if (traceSetup) 
+			if (traceSetup)
 				console.log(`🖼 GLView ${p.viewName}: canvas, gl, view and the drawing done`);
 		})
 	}
