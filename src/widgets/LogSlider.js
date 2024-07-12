@@ -91,12 +91,12 @@ class LogSlider extends React.Component {
 		this.maxIndex = powerToIndex(p.stepsPerDecade, p.sliderMax, p.substitutes);
 	}
 
-	mouseDown =
+	pointerDown =
 	ev => {
 		const p = this.props;
-		if (traceThisSlider.test(p.unique)) console.info(`mouseDown avgValue=`, this.avgValue);
+		if (traceThisSlider.test(p.unique)) console.info(`pointerDown avgValue=`, this.avgValue);
 		this.avgValue = +ev.currentTarget.value;
-		ev.target.pointerCapture(ev.pointerId);
+		ev.target.setPointerCapture(ev.pointerId);
 	}
 
 	handleSlide =
@@ -150,7 +150,7 @@ class LogSlider extends React.Component {
 					value={val}
 					list={uniqueId}
 					onInput={this.handleSlide}
-					onMouseDown={this.mouseDown}
+					onPointerDown={this.pointerDown}
 					style={p.inputStyle ?? {}}
 				/>
 				<datalist id={uniqueId} >{createGoodPowers(spd, p.sliderMin, p.sliderMax, p.substitutes)}</datalist>
