@@ -76,7 +76,7 @@ export const spongeFactor = 100;
 // 		thumbY = Math.min(thumbFreedom, Math.max(0, ev.pageY - offsetInsideThumb - topOfRail));
 // 		let frac = 1 - thumbY / thumbFreedom;  // 1=scrolled to top, 0=scrolled to bottom
 //
-// 		// scrollVoltHandler() changes VoltageArea scales, userScroll() calcs and changes bottomVolts
+// 		// scrollVoltHandler() changes VoltArea scales, userScroll() calcs and changes bottomVolts
 // 		savedProps.scrollVoltHandler(savedProps.vDisp.userScroll(frac));
 // 		if (traceDragging) {
 // 			savedProps.vDisp.dumpVoltDisplay(
@@ -98,7 +98,7 @@ export const spongeFactor = 100;
 
 
 function setPT() {
-	VoltageSidebar.propTypes = {
+	VoltSidebar.propTypes = {
 		width: PropTypes.number.isRequired,  // width: fixed or zero
 		height: PropTypes.number.isRequired,  // ultimately we'll get this from the element itself
 
@@ -111,7 +111,7 @@ function setPT() {
 }
 
 
-function VoltageSidebar(props) {
+function VoltSidebar(props) {
 	if (!props) return '';  // too early
 	let sidebarWidth = props.width;
 
@@ -142,7 +142,7 @@ function VoltageSidebar(props) {
 
 
 	// render.  The buttons are almost square.
-	return (<aside className='VoltageSidebar'
+	return (<aside className='VoltSidebar'
 			onPointerEnter={pointerEnter} onPointerLeave={pointerLeave} >
 		<p/>
 
@@ -174,7 +174,7 @@ function VoltageSidebar(props) {
 }
 setPT();
 
-export default VoltageSidebar;
+export default VoltSidebar;
 
 
 

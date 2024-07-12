@@ -7,12 +7,12 @@
 import React, {useRef, useState, useReducer} from 'react';
 import PropTypes from 'prop-types';
 
-import VoltageArea from '../volts/VoltageArea.js';
-import VoltageSidebar from '../volts/VoltageSidebar.js';
+import VoltArea from '../volts/VoltArea.js';
+import VoltSidebar from '../volts/VoltSidebar.js';
 import {getASetting, storeASetting} from '../utils/storeSettings.js';
 
 
-const VOLTAGE_SIDEBAR_WIDTH = 32;  // passed down to VoltageSidebar.  Seems to want to be 32
+const VOLTAGE_SIDEBAR_WIDTH = 32;  // passed down to VoltSidebar.  Seems to want to be 32
 
 
 function setPT() {
@@ -97,13 +97,13 @@ function VoltOverlay(props) {
 	// (but see another mechanism in the sidebar!)
 	return <section className={(p.showVoltage ?? 'hover') + 'ShowVoltage VoltOverlay'}
 			style={{width: p.width}} >
-		<VoltageSidebar width={VOLTAGE_SIDEBAR_WIDTH} height={p.height}
+		<VoltSidebar width={VOLTAGE_SIDEBAR_WIDTH} height={p.height}
 			vDisp={p.vDisp}
 			showVoltage={p.showVoltage}
 			scrollVoltHandler={scrollVoltHandler}
 			zoomVoltHandler={zoomVoltHandler}
 		/>
-		<VoltageArea
+		<VoltArea
 			vDisp={p.vDisp}
 			showVoltage={p.showVoltage}
 			space={p.space}

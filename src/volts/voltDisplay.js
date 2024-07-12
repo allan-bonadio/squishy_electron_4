@@ -164,11 +164,11 @@ export class voltDisplay {
 	}
 
 	// set our xScale and yScale according to the numbers passed in, and our own settings
-	// used by VoltageArea to plot potential
+	// used by VoltArea to plot potential
 	setVoltScales(canvasWidth, canvasHeight, nPoints) {
 		isOK(this.bottomVolts); isOK(this.heightVolts); isOK(canvasHeight); isOK(canvasWidth);
 
-		// these are used to draw the voltage path line in VoltageArea
+		// these are used to draw the voltage path line in VoltArea
 		this.yScale = scaleLinear([this.bottomVolts, this.bottomVolts + this.heightVolts], [0, canvasHeight]);
 		this.yUpsideDown = scaleLinear([this.bottomVolts, this.bottomVolts + this.heightVolts], [canvasHeight, 0]);
 		this.xScale = scaleLinear([0, nPoints-1], [0, canvasWidth]);
@@ -192,7 +192,7 @@ export class voltDisplay {
 		storeASetting('voltageSettings', 'heightVolts', +this.heightVolts);
 		//storeASetting('voltageSettings', 'minBottom', +this.minBottom);
 
-		// this function is set in the VoltageArea constructor
+		// this function is set in the VoltArea constructor
 		this.updateVoltageArea();
 	}
 
@@ -240,9 +240,9 @@ export class voltDisplay {
 
 	// pre-calc variables needed for evaluating the voltage familiarly
 	slotVoltageSetup(voltageParams) {
-		const {voltageSlide, slotWidth} = voltageParams;
+		const {voltageCenter, slotWidth} = voltageParams;
 		const toIx = (this.end - this.start) / 100;  // converts 0...100 across to  0...N
-		this.offset = voltageSlide * toIx;
+		this.offset = voltageCenter * toIx;
 
 		const halfSlotWidth = slotWidth * toIx / 2;
 		this.edgeStart = round(this.offset - halfSlotWidth);
@@ -251,11 +251,11 @@ export class voltDisplay {
 
 	// pre-calc variables needed for evaluating the voltage familiarly
 	canyonVoltageSetup(voltageParams) {
-		const {voltageSlide, slotWidth} = voltageParams;
+		const {voltageCenter, slotWidth} = voltageParams;
 
 		const toIx = (this.end - this.start) / 100;  // converts 0...100 across to  0...N
 		this.halfN = (this.end - this.start) / 2;
-		this.offset = voltageSlide * toIx;
+		this.offset = voltageCenter * toIx;
 	}
 
 	canyonVoltage(ix, voltageParams) {
@@ -275,10 +275,10 @@ export class voltDisplay {
 
 	// generate a canyon, flat etc voltage potential in the given array, according to params.
 	setFamiliarVoltage(voltageParams) {
-		let {voltageSlide, voltageBreed, canyonPower, canyonScale, slotScale, slotWidth} = voltageParams;
-		if (canyonPower == undefined || canyonScale == undefined || slotScale == undefined || voltageSlide == undefined)
+		let {voltageCenter, voltageBreed, canyonPower, canyonScale, slotScale, slotWidth} = voltageParams;
+		if (canyonPower == undefined || canyonScale == undefined || slotScale == undefined || voltageCenter == undefined)
 			throw `bad Voltage params: slotScale=${slotScale}, canyonPower=${canyonPower}, canyonScale=${canyonScale},
-				voltageSlide=${voltageSlide}`;
+				voltageCenter=${voltageCenter}`;
 
 		if (traceFamiliar)
 			console.log(`⚡️ starting setFamiliarVoltage(`, voltageParams);

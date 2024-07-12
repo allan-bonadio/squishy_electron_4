@@ -411,7 +411,7 @@ class eWave {
 			`waveBreed=${waveParams.waveBreed}   `+
 			`waveFrequency UI=${waveParams.waveFrequency.toFixed(2)}/N   `+
 			`pulseWidth UI=${waveParams.pulseWidth.toFixed(2)}%   `+
-			`pulseOffset UI=${waveParams.pulseOffset.toFixed(2)}%`);
+			`pulseCenter UI=${waveParams.pulseCenter.toFixed(2)}%`);
 		}
 
 		switch (waveParams.waveBreed) {
@@ -424,11 +424,11 @@ class eWave {
 			break;
 
 		case 'gaussian':
-			this.setGaussianWave(+waveParams.waveFrequency, +waveParams.pulseWidth, +waveParams.pulseOffset);
+			this.setGaussianWave(+waveParams.waveFrequency, +waveParams.pulseWidth, +waveParams.pulseCenter);
 			break;
 
 		case 'chord':
-			this.setChordWave(+waveParams.waveFrequency, +waveParams.pulseWidth, +waveParams.pulseOffset);
+			this.setChordWave(+waveParams.waveFrequency, +waveParams.pulseWidth, +waveParams.pulseCenter);
 			break;
 
 		default:

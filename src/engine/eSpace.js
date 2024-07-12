@@ -91,7 +91,7 @@ export class eSpace {
 		if (traceFamiliarWave) console.log(`🚀  done with setFamiliarWave():`,
 			JSON.stringify(this.mainEWave.wave));
 
-		this.sIntStats = new inteStats(this);
+		this.sInteStats = new inteStats(this);
 		if (traceSpace) console.log(`🚀  done creating eSpace:`, this);
 	}
 
@@ -171,7 +171,7 @@ export class eSpace {
 			continuum: dim.continuum};
 	}
 
-	updateVoltageArea = null;  // will be filled in in VoltageArea.js
+	updateVoltageArea = null;  // will be filled in in VoltArea.js
 			// after a few renders
 }
 

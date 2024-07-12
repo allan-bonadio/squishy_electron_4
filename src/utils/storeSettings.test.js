@@ -114,13 +114,13 @@ describe('cx2rgb tests', () => {
 	testParam('waveParams', 'waveBreed', 'chord', ['circular', 'standing', 'gaussian', 'chord']);
 	testParam('waveParams', 'waveFrequency', 16, {min: -100, max: 100, step: 0.5});
 	testParam('waveParams', 'pulseWidth', 20, {min: 1, max: 100});
-	testParam('waveParams', 'pulseOffset', 30, {min: 0, max: 100});
+	testParam('waveParams', 'pulseCenter', 30, {min: 0, max: 100});
 
 	/* ************************************ voltageParams */
 	testParam('voltageParams', 'voltageBreed', 'flat', ['flat', 'canyon']);
 	testParam('voltageParams', 'canyonPower', 0, {min: -4, max: 4});
 	testParam('voltageParams', 'canyonScale', 0, {min: -10, max: 10});
-	testParam('voltageParams', 'voltageSlide', 50, {min: 0, max: 100});
+	testParam('voltageParams', 'voltageCenter', 50, {min: 0, max: 100});
 
 
 	testParam('voltageSettings', 'showVoltage', true, [true, false]);  // not really the same as the rest...

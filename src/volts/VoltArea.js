@@ -38,7 +38,7 @@ let DOUBLING_TIME = 2000;
 
 
 function setPT() {
-	VoltageArea.propTypes = {
+	VoltArea.propTypes = {
 		// includes scrollSetting, heightVolts, measuredMinVolts, measuredMaxVolts, xScale, yScale
 		vDisp: PropTypes.object,
 
@@ -58,11 +58,11 @@ function setPT() {
 
 
 // ultimately, this is a <svg node with a <path inside it
-function VoltageArea(props) {
+function VoltArea(props) {
 	const p = props;
 	const v = p.vDisp;
 	if (traceVoltageArea)
-		console.log(`⚡️ the new VoltageArea:`, this);
+		console.log(`⚡️ the new VoltArea:`, this);
 
 	/* ***************************************************  click & drag */
 
@@ -236,19 +236,19 @@ function VoltageArea(props) {
 	// this is bogus: an integer incrementing as a surrogate instead of a more complex state array
 // 	let [renderCtr, setRenderCtr] = useState(1);
 // 	if (traceVoltageArea)
-// 		console.log(`⚡️ VoltageArea  constructor done`);
+// 		console.log(`⚡️ VoltArea  constructor done`);
 //
 // 	function updateVoltageArea() {
 // 		setRenderCtr(renderCtr + 1);  // cause a rerender
 // 	}
 
-	// tell the VoltageArea (that;s us) that something in the
+	// tell the VoltArea (that;s us) that something in the
 	// space.voltageBuffer changed.  Sometimes called from above. This gets set
 	// into the space, when it's available.
 	// 	const updateVoltageArea =
 	// 	() => {
 	// 		if (traceRendering)
-	// 			console.log(`⚡️ VoltageArea.updateVoltageArea`);
+	// 			console.log(`⚡️ VoltArea.updateVoltageArea`);
 	// 		forceUpdate();
 	// 	}
 
@@ -259,7 +259,7 @@ function VoltageArea(props) {
 	// 			p.vDisp.updateVoltageArea = this.updateVoltageArea;
 	// 			p.space.updateVoltageArea = this.updateVoltageArea;}
 	// 		else
-	// 			console.warn(`⚡️  VoltageArea, no space! ${p.space}.  Is there also no vDisp?  ${p.vDisp}`);
+	// 			console.warn(`⚡️  VoltArea, no space! ${p.space}.  Is there also no vDisp?  ${p.vDisp}`);
 	// 	}
 
 	// this one actually draws the voltage line
@@ -270,7 +270,7 @@ function VoltageArea(props) {
 		// 		if ('always' == p.showVoltage || ('hover' == p.showVoltage && isHovering)) {
 		const pathAttribute = v.makeVoltagePathAttribute(v.yScale);
 		if (traceRendering)
-			console.log(`⚡️ VoltageArea.pathAttribute: `, pathAttribute);
+			console.log(`⚡️ VoltArea.pathAttribute: `, pathAttribute);
 
 		return <>
 			<path className='visibleLine' key='visibleLine'
@@ -318,7 +318,7 @@ function VoltageArea(props) {
 	let vClass = p.showVoltage +'ShowVoltage';
 
 	let vArea = (
-		<svg className='VoltageArea'
+		<svg className='VoltArea'
 			viewBox={`0 0 ${p.canvasFacts.width} ${p.canvasFacts.height}`}
 			width={p.canvasFacts.width} height={p.canvasFacts.height}
 			ref={cnDrag.refArena}
@@ -338,9 +338,9 @@ function VoltageArea(props) {
 	);
 
 	if (traceRendering)
-		console.log(`⚡️ VoltageArea render done`);
+		console.log(`⚡️ VoltArea render done`);
 
 	return vArea;
 }
 
-export default VoltageArea;
+export default VoltArea;

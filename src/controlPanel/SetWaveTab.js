@@ -32,7 +32,7 @@ function setPT() {
 			waveBreed: PropTypes.oneOf(['circular', 'standing', 'gaussian', 'chord', ]),
 			waveFrequency: PropTypes.number,
 			pulseWidth: PropTypes.number,
-			pulseOffset: PropTypes.number,
+			pulseCenter: PropTypes.number,
 		}).isRequired,
 
 		// sets it only in the ControlPanel state for subsequent SetWave click
@@ -93,8 +93,8 @@ class SetWaveTab extends React.Component {
 	setPulseWidth = pulseWidth => {
 		this.setState({pulseWidth}, () => this.regenerateMiniGraphWave());
 	}
-	setPulseOffset = pulseOffset => {
-		this.setState({pulseOffset}, () => this.regenerateMiniGraphWave());
+	setPulseCenter = pulseCenter => {
+		this.setState({pulseCenter}, () => this.regenerateMiniGraphWave());
 	}
 
 	// canvasFacts is for the big view the the user resizes; the setWave GLView is fixed size
@@ -105,8 +105,8 @@ class SetWaveTab extends React.Component {
 		const s = this.state;
 
 		// take other stuff out of the state.  just want the wave params.
-		const {waveBreed, waveFrequency, pulseWidth, pulseOffset} = s;
-		this.props.saveMainWave({waveBreed, waveFrequency, pulseWidth, pulseOffset});
+		const {waveBreed, waveFrequency, pulseWidth, pulseCenter} = s;
+		this.props.saveMainWave({waveBreed, waveFrequency, pulseWidth, pulseCenter});
 	}
 
 	render() {
@@ -143,11 +143,11 @@ class SetWaveTab extends React.Component {
 
 			<TextNSlider className='offset' label='offset, %'
 				style={{display: needOffset ? 'block' :  'none'}}
-				value={+s.pulseOffset}
-				min={alternateMinMaxs.waveParams.pulseOffset.min}
-				max={alternateMinMaxs.waveParams.pulseOffset.max}
+				value={+s.pulseCenter}
+				min={alternateMinMaxs.waveParams.pulseCenter.min}
+				max={alternateMinMaxs.waveParams.pulseCenter.max}
 				step={2}
-				handleChange={this.setPulseOffset}
+				handleChange={this.setPulseCenter}
 			/>
 
 		</>;

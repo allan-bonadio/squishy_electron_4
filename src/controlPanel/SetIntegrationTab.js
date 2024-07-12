@@ -86,7 +86,7 @@ function SetIntegrationTab(props) {
 
 		</div>
 		{
-			props.space?.sIntStats.renderAllStats()
+			props.space?.sInteStats.renderAllStats()
 			// why doesn't this show up!??!?!
 			//typeof statGlobals != 'undefined' && statGlobals.renderIStats()
 		}

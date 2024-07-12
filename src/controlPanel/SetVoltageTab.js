@@ -230,12 +230,12 @@ function SetVoltageTab(props) {
 			</div>
 
 			{/* voltage slide for offset, all except flag.  0% to 100%.  */}
-			<input type='range' className='voltageSlide'
-				value={vParams.voltageSlide ?? alternateStoreDefaults.voltageParams.voltageSlide}
-				min={vMinsMaxes.voltageSlide.min}
-				max={vMinsMaxes.voltageSlide.max}
+			<input type='range' className='voltageCenter'
+				value={vParams.voltageCenter ?? alternateStoreDefaults.voltageParams.voltageCenter}
+				min={vMinsMaxes.voltageCenter.min}
+				max={vMinsMaxes.voltageCenter.max}
 				step={5}
-				onChange={ev => setVParams({voltageSlide: ev.target.valueAsNumber})}
+				onChange={ev => setVParams({voltageCenter: ev.target.valueAsNumber})}
 				onPointerDown={capture}
 				style={{visibility: 'flat' == breed ? 'hidden' : 'visible'}}
 			/>
@@ -260,8 +260,8 @@ function SetVoltageTab(props) {
 			<div />
 			<input type='range' className='slotWidth'
 				value={vParams.slotWidth ?? alternateStoreDefaults.voltageParams.slotWidth}
-				min={vMinsMaxes.voltageSlide.min}
-				max={vMinsMaxes.voltageSlide.max}
+				min={vMinsMaxes.voltageCenter.min}
+				max={vMinsMaxes.voltageCenter.max}
 				step={.1}
 				onChange={ev => setVParams({slotWidth: ev.target.valueAsNumber})}
 				onPointerDown={capture}

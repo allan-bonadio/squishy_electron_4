@@ -77,7 +77,7 @@ class sAnimator {
 
 
 			// update dom elements in integration tab to latest stats
-			this.space.sIntStats.displayAllStats(this.inteTimes, this.grinder);
+			this.space.sInteStats.displayAllStats(this.inteTimes, this.grinder);
 
 		//this.inteTimes.endReloadVarsNBuffer =
 		let endDrawTime = performance.now();

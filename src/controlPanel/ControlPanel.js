@@ -331,8 +331,8 @@ export class ControlPanel extends React.Component {
 	createShowingTab() {
 		const p = this.props;
 		const s = this.state;
-		const {waveBreed, waveFrequency, pulseWidth, pulseOffset} = s;
-		const {canyonPower, canyonScale, slotWidth, slotScale, voltageSlide} = s;
+		const {waveBreed, waveFrequency, pulseWidth, pulseCenter} = s;
+		const {canyonPower, canyonScale, slotWidth, slotScale, voltageCenter} = s;
 
 		switch (s.showingTab) {
 		case 'wave':
@@ -340,7 +340,7 @@ export class ControlPanel extends React.Component {
 			// waveParams handed in are the defaults as stored in storeSettings
 			return <SetWaveTab
 				saveMainWave={this.saveMainWave}
-				waveParams={{waveBreed, waveFrequency, pulseWidth, pulseOffset,}}
+				waveParams={{waveBreed, waveFrequency, pulseWidth, pulseCenter,}}
 				setCPState={this.setCPState}
 				space={this.space}
 			/>;
@@ -349,7 +349,7 @@ export class ControlPanel extends React.Component {
 			// setVoltageHandler={this.setVoltageHandler}
 			//setVoltageAndUpdate={this.setVoltageAndUpdate}
 			return <SetVoltageTab
-				voltageParams={{ canyonPower, canyonScale, slotWidth, slotScale, voltageSlide,}}
+				voltageParams={{ canyonPower, canyonScale, slotWidth, slotScale, voltageCenter,}}
 				changeShowVoltage={p.changeShowVoltage}
 				showVoltage={p.showVoltage}
 			/>;

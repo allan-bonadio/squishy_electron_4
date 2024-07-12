@@ -199,13 +199,13 @@ export function createStoreSettings() {
 	makeParam('waveParams', 'waveBreed', 'gaussian', ['circular', 'standing', 'gaussian', 'chord']);
 	makeParam('waveParams', 'waveFrequency', 6, {min: -100, max: 100, step: 0.5});
 	makeParam('waveParams', 'pulseWidth', 10, {min: 1, max: 100});
-	makeParam('waveParams', 'pulseOffset', 20, {min: 0, max: 100});
+	makeParam('waveParams', 'pulseCenter', 20, {min: 0, max: 100});
 
 	/* ************************************ voltage */
 	// the voltage controls   volts ≈ canyonScale * x ** canyonPower sortof
-	// where x is centered at voltageSlide across
+	// where x is centered at voltageCenter across
 	makeParam('voltageParams', 'voltageBreed', 'flat', ['flat', 'slot', 'block', 'canyon']);
-	makeParam('voltageParams', 'voltageSlide', 50, {min: 0, max: 100});
+	makeParam('voltageParams', 'voltageCenter', 50, {min: 0, max: 100});
 
 	makeParam('voltageParams', 'slotWidth', 10, {min: 0, max: 100});  // 0 to 100 despite appearance
 	makeParam('voltageParams', 'slotScale', EFFECTIVE_VOLTS, {min: 0, max: AMPLE_VOLTS});
