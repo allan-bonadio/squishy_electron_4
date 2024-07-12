@@ -28,6 +28,7 @@ class GLView extends React.Component {
 		// lets try this with plain old CSS and let the containers dictate sizes
 		width: PropTypes.number,
 		height: PropTypes.number,
+		//left: PropTypes.number,  // offset on left side
 
 		// Our caller gets these from eSpaceCreatedPromise; so it must be resolved by now.
 		// We can't jut use the promise ourselves; we have to know which avatar
@@ -153,10 +154,10 @@ class GLView extends React.Component {
 		// We want them to reflect actual pixels on the screen; should be same as client W&H
 		// offset outer W&H includes borders, 1px on all sides
 		let cWidth = p.width - 2, cHeight = p.height - 2;
-		if (this.canvas) {
-			cWidth = this.canvas.clientWidth;
-			cHeight = this.canvas.clientHeight;
-		}
+		// if (this.canvas) {
+		// 	cWidth = this.canvas.clientWidth;
+		// 	cHeight = this.canvas.clientHeight;
+		// }
 		if (traceGeometry) {
 			// facts are filled in in componentDidUpdate() so the first render, there's none.
 			// Soon in componentDidUpdate() the canvas facts will be updated.
@@ -173,6 +174,7 @@ class GLView extends React.Component {
 			/>
 		)
 		// took out style={{width: `${p.width}px`, height: `${p.height}px`}}
+		// took out style={{left: p.left +'px'}}
 	}
 
 	// how did you tell if the canvas resized?  It aways gets a render.
