@@ -7,12 +7,12 @@ import {scaleLinear} from 'd3-scale';
 import {EFFECTIVE_VOLTS, VALLEY_FACTOR, TOO_MANY_VOLTS} from './voltConstants.js';
 import {getAGroup, storeASetting} from '../utils/storeSettings.js';
 
-let traceFamiliar = true;
-let tracePathAttribute = true;
+let traceFamiliar = false;
+let tracePathAttribute = false;
 let tracePathIndividualPoints = false
 
 let traceVoltArithmetic = false;
-let traceVoltScales = true;
+let traceVoltScales = false;
 let traceScrolling = false;
 let traceZooming = false;
 
@@ -210,14 +210,10 @@ export class voltDisplay {
 		this.saveScroll();
 	}
 
-	// called when human zooms in or out.  pass +1 or -1.  heightVolts will
-	// usually be an integer power of zoomFactor, x latest set from decideBottomHeightVolts() or zero.
+	// called when human zooms in or out.  pass +1 or -1.  heightVolts expands or contracts a fixed  factor up and down.
 	zoomVoltHandler(inOut) {
 		// keep looking at same place
 		let midView = this.bottomVolts + this.heightVolts/2;
-
-		// want to keep the scrollbar in the same place.
-		//let scrollFraction = (this.bottomVolts - this.minBottom) / this.heightVolts;  // ??
 
 		if (traceZooming)
 			this.dumpVoltDisplay(`zoom START ${inOut}: old midView=${midView}  sFrac=${scrollFraction}`);

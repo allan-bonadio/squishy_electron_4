@@ -133,13 +133,7 @@ export class SquishPanel extends React.Component {
 					'neverShowVoltage');
 			voEl.classList.add(newSetting + 'ShowVoltage');
 		}
-		//setSV(document.querySelector('.SquishPanel .voltageOverlay'));
 		setSV(document.querySelector('.SquishPanel .optionalVoltage'));
-// 		if (voltageOverlay) {
-// 			voltageOverlay.classList.remove('alwaysShowVoltage', 'hoverShowVoltage',
-// 					'neverShowVoltage');
-// 			voltageOverlay.classList.add(newSetting + 'ShowVoltage');
-// 		}
 	}
 
 	// dump the view buffer, from the JS side.  Why not use the C++ version?
@@ -152,15 +146,6 @@ export class SquishPanel extends React.Component {
 		for (let i = 0; i < nRows; i++)
 			console.log(_(vb[i*4]), _(vb[i*4+1]), _(vb[i*4+2]), _(vb[i*4+3]));
 	}
-
-	// get this from the control panel every time user changes it
-	//setFramePeriod =
-	//(period) => {
-	//	//this.framePeriod = period;
-	//	if (this.animator)
-	//		this.animator.framePeriod = period;
-	//}
-
 
 	/* ******************************************************* rendering */
 	// Base function that draws the WebGL, whether during iteration, or during idle times if params change.
