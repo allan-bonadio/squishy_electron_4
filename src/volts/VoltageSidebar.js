@@ -97,8 +97,6 @@ export const spongeFactor = 100;
 // }
 
 
-/* ***************************************************** scrollbar  */
-
 function setPT() {
 	VoltageSidebar.propTypes = {
 		width: PropTypes.number.isRequired,  // width: fixed or zero
@@ -108,7 +106,7 @@ function setPT() {
 
 		// Same as voltage area, this shows and hides along with it
 		// but won't draw anything if the checkbox is off
-		showVoltage: PropTypes.string.isRequired,
+		//showVoltage: PropTypes.string,
 	}
 }
 
@@ -133,11 +131,11 @@ function VoltageSidebar(props) {
 	// buttons can make the voltage stuff disappear.  these make sure
 	// the voltage still shows if the mouse is over the sidebar.
 	const pointerEnter = ev => {
-		const vo = document.querySelector('.WaveView .voltageOverlay');
+		const vo = document.querySelector('.WaveView .VoltOverlay');
 		if (vo) vo.style.visibility = 'visible';
 	};
 	const pointerLeave = ev => {
-		const vo = document.querySelector('.WaveView .voltageOverlay');
+		const vo = document.querySelector('.WaveView .VoltOverlay');
 		if (vo) vo.style.visibility = '';
 	};
 

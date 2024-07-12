@@ -4,7 +4,7 @@
 ** Copyright (C) 2021-2024 Tactile Interactive, all rights reserved
 */
 
-import React, {useRef, useState} from 'react';
+import React, {useRef, useState, useReducer} from 'react';
 
 import PropTypes from 'prop-types';
 
@@ -25,12 +25,11 @@ import './volts.scss';
 
 let traceVoltageArea = false;
 
-let traceRendering = true;
+let traceRendering = false;
 let traceDragging = false;
 let traceTweening = false;
 let tracedWheel = false;
 
-let traceSlabs = false;
 let traceScrollStretch = false;
 
 // how long it takes, in milliseconds, dragging outside of the main voltage area,
@@ -40,18 +39,18 @@ let DOUBLING_TIME = 2000;
 
 function setPT() {
 	VoltageArea.propTypes = {
-		// for first couple of renders, space and idunno are null
-		space: PropTypes.object,
-
-		// this can be null if stuff isn't ready.  these are now determined by css.
-		height: PropTypes.number,
-
 		// includes scrollSetting, heightVolts, measuredMinVolts, measuredMaxVolts, xScale, yScale
 		vDisp: PropTypes.object,
 
 		// this component is always rendered so it retains its state,
 		// but won't draw anything if the checkbox is off
 		showVoltage: PropTypes.string.isRequired,
+
+		// for first couple of renders, space and idunno are null
+		space: PropTypes.object,
+
+		// this can be null if stuff isn't ready.  these are now determined by css.
+		height: PropTypes.number,
 
 		canvasFacts: PropTypes.object,
 	};
@@ -64,11 +63,6 @@ function VoltageArea(props) {
 	const v = p.vDisp;
 	if (traceVoltageArea)
 		console.log(`⚡️ the new VoltageArea:`, this);
-
-	let [renderCtr, setRenderCtr] = useState(1);
-	if (traceVoltageArea)
-		console.log(`⚡️ VoltageArea  constructor done`);
-
 
 	/* ***************************************************  click & drag */
 
@@ -178,9 +172,7 @@ function VoltageArea(props) {
 
 		strayOutside(newVoltage);
 
-		//updateVoltageArea();  ??
-
-		setRenderCtr(renderCtr + 1);  // cause a rerender
+		updateVoltageArea();
 		return true;
 	}
 
@@ -241,6 +233,15 @@ function VoltageArea(props) {
 
 	/* *************************************************** rendering */
 
+	// this is bogus: an integer incrementing as a surrogate instead of a more complex state array
+// 	let [renderCtr, setRenderCtr] = useState(1);
+// 	if (traceVoltageArea)
+// 		console.log(`⚡️ VoltageArea  constructor done`);
+//
+// 	function updateVoltageArea() {
+// 		setRenderCtr(renderCtr + 1);  // cause a rerender
+// 	}
+
 	// tell the VoltageArea (that;s us) that something in the
 	// space.voltageBuffer changed.  Sometimes called from above. This gets set
 	// into the space, when it's available.
@@ -260,34 +261,6 @@ function VoltageArea(props) {
 	// 		else
 	// 			console.warn(`⚡️  VoltageArea, no space! ${p.space}.  Is there also no vDisp?  ${p.vDisp}`);
 	// 	}
-
-	function renderBumpers() {
-		// we want the bumpers on the end to show even if we're not showing 'voltage'
-		switch (p.space.dimensions[0].continuum) {
-			case qe.contWELL:
-				if (traceSlabs)
-					console.info(`installed slabs: width=${p.canvasFacts.width} `
-						+`height=${p.canvasFacts.height}  barWidth=${barWidth}`);
-				// stone slabs on each end on the borders vaguely means 'quantum well'.
-				return <g className='bumpers' >
-					<rect className='left wellSlab' key='left'
-						x={0} y={0}
-						width={barWidth +'px'} height={p.canvasFacts.height +'px'}
-					/>
-					<rect className='right wellSlab' key='right'
-						x={(p.canvasFacts.width - barWidth) +'px'} y={0}
-						width={barWidth +'px'} height={p.canvasFacts.height +'px'}
-					/>
-				</g>;
-				break;
-
-			case qe.contENDLESS:
-				return undefined;
-
-			default: throw new Error(`bad continuum ${p.space.dimensions.continuum}`);
-		}
-
-	}
 
 	// this one actually draws the voltage line
 	function renderVoltagePath() {
@@ -351,9 +324,6 @@ function VoltageArea(props) {
 			ref={cnDrag.refArena}
 			onWheel={wheelHandler}
 		>
-
-			{renderBumpers()}
-
 			<g className={'optionalVoltage ' + vClass}>
 				{/* for showVoltage on hover, need this to  hover over */}
 				<rect className='hoverBox' key='hoverBox'

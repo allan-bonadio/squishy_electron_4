@@ -10,22 +10,31 @@
 // comes from the window width.  hmmm...
 .WaveView {
 	position: relative;
-	display: flex;
+	//display: flex;
 	width: 100%;
 
-	// view area is the canvas, GLView and everything that should be the same size
-	// like the voltage area.  EXCLUDING the voltage sidebar.
-	// height and width set in the Render method.
-	.viewArea {
-		flex: 1 1 auto;
-		position: relative;
+	.bumper {
+		position: absolute;
 		height: 100%;
+		background-color: common.$voltageColor;
+
+		&.right {
+			right: 0;
+		}
+	}
+
+
+	// view area is the canvas in the GLView and everything that should be the same size
+	// like the voltage area.  Including the voltage sidebar.  Excluding the bumpers.
+	// height set by WaveView heigit, and width set in the Render method depending on continuum.
+	.viewArea {
+		height: 100%;
+		position: absolute;
 
 		/* canvas itself: bottom layer */
 		canvas.GLView {
 			position: absolute;
 			display: block;
-			width: 100%;
 			height: 100%;
 			border: 1px #666 inset;
 			z-index: 10;
@@ -39,7 +48,7 @@
 			width: 100%;
 			height: 100%;
 
-			// numbers in upper corners
+			// numbers in upper corners.  Note, INSIDE the bumpers, not on top
 			.northWestWrapper, .northEastWrapper {
 				position: absolute;
 				top: .5em;

@@ -1,6 +1,6 @@
 /*
 ** volts -- CSS for voltage stuff as shown in the WaveView
-** Copyright (C) 2021-2024 Tactile Interactive, all rights reserved
+** Copyright (C) 2024-2024 Tactile Interactive, all rights reserved
 */
 
 @use "../widgets/common.scss";
@@ -16,19 +16,22 @@
 	.hoverShowVoltage:hover {visibility: visible}
 	.neverShowVoltage {visibility: hidden}
 
-	// encloses the actual glview, the timeOverlay, and the voltageOverlay
-	// the voltageOverlay is what hides/shows with mouseover (see above)
-	.viewArea .voltageOverlay {
+	// encloses the actual glview, the timeOverlay, and the VoltOverlay
+	// the VoltOverlay is what hides/shows with mouseover (see above)
+	.viewArea .VoltOverlay {
 		display: block;
+		position: absolute;
+		width: 100%;
+		height: 100%;
+
 
 		.VoltageArea {
-			position: relative;
+			position: absolute;
 			width: 100%;
 			height: 100%;
 			z-index: 30;
 			transform: scale(1, -1);
 			pointer-events: all;
-			// hmmm lemme think about this... pointer-events: none;  // need to click through for size box
 
 			// for pointer enter/leave events
 			.hoverBox {
@@ -48,11 +51,6 @@
 				fill: transparent;
 				pointer-events: stroke;  // but this is sensitive
 				cursor: pointer;
-			}
-
-			rect.wellSlab {
-				fill: common.$voltageColor;
-
 			}
 
 			.voltageAxis {
@@ -78,10 +76,7 @@
 			height: 100%;
 			display: flex;
 			flex-direction: column;
-			float: right;
 			z-index: 35;
-
-			//border: 1px #666 outset;
 
 			// but particpates in its parent's row flex box.  Width and display set by code in WaveView.render()
 			text-align: center;
@@ -99,7 +94,6 @@
 				border-radius: 1em;
 				color: common.$voltageColor;
 				padding: 0;
-				//visibility: visible;
 				border: .5px solid common.$voltageMuchDarkerColor;
 
 				pointer-events: auto;
@@ -116,40 +110,8 @@
 				flex: 1 1 0em;
 			}
 
-			// .voltRail {
-			// 	position: relative;
-			// 	flex: 1 1;
-			// 	margin: 2px;
-			// 	border: 1px inset #aaa;
-			// 	background-color: common.$voltageColor;
-			//
-			// 	.voltThumb {
-			// 		position: absolute;
-			// 		left: 0;
-			// 		right: 0;
-			// 		height: 2em;
-			// 		line-height: 2em;
-			// 		cursor: ns-resize;
-			//
-			// 		border: 1px outset #aaa;
-			// 		background-color: common.$voltageDarkerColor;
-			//
-			// 		text-align: center;
-			// 	}
-			// }
-
-			//input[type=range] {
-			//	display: block;
-			//	width: 100%;
-			//	flex: 1 1;
-			//	appearance: slider-vertical;  // works on safari & chrome, not firefox
-			//	color: #000;
-			//	background-color: #voltageColor;
-			//	border: none;
-			//	accent-color: #fd0;
-			//}
 		}
-	}  // end of viewArea voltageOverlay
+	}  // end of viewArea VoltOverlay
 
 }
 

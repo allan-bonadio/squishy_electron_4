@@ -18,19 +18,20 @@ import qe from '../engine/qe.js';
 import './WaveView.scss';
 import {getASetting, storeASetting} from '../utils/storeSettings.js';
 
-import VoltageArea from '../volts/VoltageArea.js';
-import VoltageSidebar from '../volts/VoltageSidebar.js';
+import VoltOverlay from '../volts/VoltOverlay.js';
 import GLView from '../gl/GLView.js';
 import {eSpaceCreatedPromise} from '../engine/eEngine.js';
 
+let traceBumpers = false;
 
 let traceScaling = false;
 let traceDragCanvasHeight = false;
 let traceWidth = false;
 
-// size of the size box at lower right of canvas; also width of the voltage sidebar
-const sizeBoxSize = 24;
-const voltageSidebarWidth = 32;  // passed down to VoltageSidebar.  Seems to want to be 32
+// size of the size box at lower right of canvas.  If you change this, also change $sizeBoxSize in the .scss
+const SIZE_BOX_SIZE = 24;
+const BUMPER_WIDTH = 16;
+
 
 export class WaveView extends React.Component {
 	static propTypes = {
@@ -57,9 +58,7 @@ export class WaveView extends React.Component {
 			height: getASetting('miscSettings', 'waveViewHeight'),  // pixels
 			space: null,  // set when promise comes in
 
-			// No!  dom and he row flex decides canvasWidth: props.width - (props.showVoltage * voltageSidebarWidth),
-
-			// These are in
+			// This is from the space
 			vDisp: null,
 		}
 		// directly measured Canvas width & height and maybe more set by
@@ -104,7 +103,7 @@ export class WaveView extends React.Component {
 			throw `this.gl ≠ gl !`;
 	}
 
-	// we finally have a canvas; rush its dimensions up here.  Early in
+	// GLView finally has a canvas; rush its dimensions up here.  Early in
 	// startup, either or both might be undefined, ignores those
 	setCanvasFacts =
 	(width, height) => {
@@ -148,7 +147,7 @@ export class WaveView extends React.Component {
 
 	/* ************************************************************************ resizing */
 
-	// these are for resizing the WaveView ONLY.
+	// these are for resizing the WaveView ONLY with the size box
 	mouseDown =
 	ev => {
 		this.resizing = true;
@@ -192,24 +191,6 @@ export class WaveView extends React.Component {
 		ev.stopPropagation();
 	}
 
-	/* ************************************************************************ interaction */
-
-	// the actual bottomVolts is ignored; what's important is to tell us that it changed
-	scrollVoltHandler =
-	bottomVolts => {
-		this.setState({bottomVolts: bottomVolts});
-		this.vDisp.setVoltScales(this.canvasFacts.width, this.state.height, this.props.space.nPoints);
-	}
-
-	// handles zoom in/out buttons    They pass +1 or -1.  heightVolts will usually be an integer power of zoomFactor.
-	zoomVoltHandler =
-	upDown => {
-		const v = this.vDisp;
-		v.userZoom(upDown);
-		this.setState({heightVolts: v.heightVolts});
-		this.vDisp.setVoltScales(this.canvasFacts.width, this.state.height, this.props.space.nPoints);
-	}
-
 	/* ************************************************************************ render */
 
 	render() {
@@ -230,9 +211,13 @@ export class WaveView extends React.Component {
 
 		// sometimes a fraction of a pixel causes the horiz scroll bar
 		// to kick in.  avoid that without messing up everything.
-		let widthForCanvas = p.width - .5;
-		if (p.showVoltage)
-			widthForCanvas -= voltageSidebarWidth + .5;
+		let widthForCanvas = p.width - 1;
+
+		// make room for the bumpers for WELL continuum
+		let bumperWidth = (qe.contWELL == p.space?.dimensions[0].continuum)
+			? BUMPER_WIDTH
+			: 0;
+		widthForCanvas -= 2 * bumperWidth;
 
 		if (traceWidth) {
 			console.log(`🏄 WaveView render, width=${this.waveViewEl?.clientWidth}`+
@@ -242,7 +227,7 @@ export class WaveView extends React.Component {
 		// can't make a real GLView until we have the space!  until then, show spinner
 		let glView;
 		if (s.space) {
-			glView = <GLView width={widthForCanvas} height={s.height}
+			glView = <GLView width={widthForCanvas} height={s.height} left={bumperWidth}
 				space={this.space} avatar={this.space.mainEAvatar}
 				viewClassName='flatViewDef' viewName='mainView'
 				setGl={this.setGl}
@@ -254,13 +239,32 @@ export class WaveView extends React.Component {
 				{spinner}
 			</div>;
 		}
+
+		// if there's no vDisp yet (cuz no space yet), the voltOverlay gets all mucked up.  So just avoid it.
+		let voltOverlay;
+		if (s.vDisp){
+			voltOverlay = <VoltOverlay
+				space={s.space}
+				height={s.height}
+				width={widthForCanvas}
+				left={bumperWidth}
+				showVoltage={s.showVoltage}
+				vDisp={this.vDisp}
+				canvasFacts={this.canvasFacts}
+			/>
+		}
+
 		return (
 		<div className='WaveView'  ref={el => this.waveViewEl = el}
-				style={{height: `${s.height}px`}}>
-			<div className='viewArea' >
+					style={{height: `${s.height}px`}}>
+
+			<div className='bumper left' key='left' style={{width: bumperWidth +'px'}} />
+			<div className='viewArea' key='viewArea'
+						style={{maxWidth: widthForCanvas +'px', left: bumperWidth +'px'}}>
 				{glView}
 
-				<section className='timeOverlay' >
+				<section className='timeOverlay'
+						style={{maxWidth: widthForCanvas +'px'}}>
 					<div className='northWestWrapper'>
 						<span className='voNorthWest'>{elapsedTime}</span> ps
 					</div>
@@ -270,28 +274,14 @@ export class WaveView extends React.Component {
 
 					<img className='sizeBox' src='/images/sizeBox4.png' alt='size box'
 						onMouseDown={this.mouseDown}
-						style={{width: `${sizeBoxSize}px`, height: `${sizeBoxSize}px`}} />
+						style={{width: `${SIZE_BOX_SIZE}px`, height: `${SIZE_BOX_SIZE}px`}} />
 
-					{spinner}
 				</section>
 
-				<section className={p.showVoltage + 'ShowVoltage voltageOverlay'} >
-					<VoltageSidebar width={voltageSidebarWidth} height={s.height}
-						vDisp={this.vDisp}
-						showVoltage={p.showVoltage}
-						scrollVoltHandler={this.scrollVoltHandler}
-						zoomVoltHandler={this.zoomVoltHandler}
-					/>
-					<VoltageArea
-						space={s.space}
-						height={s.height}
-						showVoltage={p.showVoltage}
-						vDisp={this.vDisp}
-						canvasFacts={this.canvasFacts}
-					/>
-				</section>
 
+				{voltOverlay}
 			</div>
+			<div className='bumper right' key='right' style={{width: bumperWidth +'px'} } />
 
 		</div>
 		);
