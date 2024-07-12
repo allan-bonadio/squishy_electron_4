@@ -71,7 +71,6 @@ qGrinder::qGrinder(qSpace *sp, qAvatar *av, int nGrinderThreads, const char *lab
 
 	// use these for grinding
 	voltage = sp->voltage;
-	voltageFactor = sp->voltageFactor;
 	d2Coeff = sp->dimensions[0].d2Coeff;
 
 	strncpy(label, lab, MAX_LABEL_LEN);
@@ -105,9 +104,9 @@ qGrinder::qGrinder(qSpace *sp, qAvatar *av, int nGrinderThreads, const char *lab
 			label,
 			space->magic >> 24,  space->magic >> 16, space->magic >> 8, space->magic,
 			space->label);
-		printf("         nDimesions=%d   nStates=%d nPoints=%d voltage=%p voltageFactor=%lf spectrumLength=%d  samplePoint=%d\n",
+		printf("         nDimesions=%d   nStates=%d nPoints=%d voltage=%p spectrumLength=%d  samplePoint=%d\n",
 			space->nDimensions, space->nStates, space->nPoints,
-			space->voltage, space->voltageFactor, space->spectrumLength,
+			space->voltage, space->spectrumLength,
 			samplePoint);
 	}
 	sentinel = true;
@@ -188,8 +187,6 @@ void qGrinder::formatDirectOffsets(void) {
 
 	printf("\n");
 	makePointerGetter(voltage);
-	makeDoubleGetter(voltageFactor);
-	//makeDoubleSetter(voltageFactor);
 
 	makeDoubleGetter(divergence);
 
@@ -221,8 +218,8 @@ void qGrinder::dumpObj(const char *title) {
 	speedyLog("        elapsedTime=%lf, frameSerial=%d, dt=%lf, \n",
 		elapsedTime, frameSerial, space->dt);
 
-	speedyLog("        qflick=%p, voltage=%p, voltageFactor=%lf, qspect=%p\n",
-		qflick, voltage, voltageFactor, qspect);
+	speedyLog("        qflick=%p, voltage=%p, qspect=%p\n",
+		qflick, voltage, qspect);
 
 	speedyLog("        shouldBeIntegrating: %hhu   isIntegrating: %hhu   pleaseFFT=%hhu \n",
 		shouldBeIntegrating, isIntegrating, pleaseFFT);

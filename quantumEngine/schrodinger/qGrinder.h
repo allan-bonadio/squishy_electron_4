@@ -94,7 +94,6 @@ struct qGrinder {
 
 	// pointer grabbed from the space.  Same buffer as in space.
 	double *voltage;
-	double voltageFactor;  // aligned by 8
 
 	// how long (thread time) it took to do the latest frame, all threads added together
 	double totalCalcTime;

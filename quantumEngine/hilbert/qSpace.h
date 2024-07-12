@@ -75,7 +75,6 @@ public:
 
 	// part of the space; it helps to define the lay of the land
 	double *voltage;
-	double voltageFactor;  // now a constant 1.0 (?)
 	void dumpVoltage(const char *title);
 
 	// Dimensions are listed from outer to inner as with the resulting 𝜓 array:

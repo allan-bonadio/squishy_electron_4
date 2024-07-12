@@ -142,7 +142,6 @@ class eWave {
 	get start() { return this.ints[5]; }
 	get end() { return this.ints[6]; }
 	get continuum() { return this.ints[7]; }
-
 	/* **************************** end of direct accessors */
 
 	/* **************************************************************** dumping */

@@ -49,12 +49,10 @@ class eAvatar {
 	// are passed by pointer and you need to allocate them in JS (eg see
 	// eAvatar.constructor)
 
-
- 	get _space() { return this.ints[1]; }
- 	get _qwave() { return this.ints[2]; }
- 	get _vBuffer() { return this.ints[7]; }
- 	get _label() { return this.pointer + 32; }
-
+	get _space() { return this.ints[1]; }
+	get _qwave() { return this.ints[2]; }
+	get _vBuffer() { return this.ints[5]; }
+	get _label() { return this.pointer + 24; }
 
 	/* **************************** end of direct accessors */
 

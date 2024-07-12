@@ -24,7 +24,6 @@ struct qAvatar {
 
 	// pointer grabbed from the space.  Same buffer as in space.
 	double *voltage;
-	double voltageFactor;  // aligned by 8
 
 	// the qViewBuffer to be passed to webgl.  qAvatar is a visual thing after all.
 	// Avatar owns the qViewBuffer
