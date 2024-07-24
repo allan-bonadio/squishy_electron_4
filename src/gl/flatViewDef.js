@@ -10,8 +10,8 @@ import {ticDrawing} from './ticDrawing.js';
 
 class flatViewDef extends abstractViewDef {
 
-	constructor(viewName, glview, space, avatar) {
-		super(viewName, glview, space, avatar);
+	constructor(viewName, ambiance, space, avatar) {
+		super(viewName, ambiance, space, avatar);
 
 		if (! this.space || !this.avatar) {
 			debugger;

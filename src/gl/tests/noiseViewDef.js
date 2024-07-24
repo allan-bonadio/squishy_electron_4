@@ -103,8 +103,8 @@ export class noiseDrawing extends abstractDrawing {
 
 
 export class noiseViewDef extends abstractViewDef {
-	constructor(viewName, glview, space, avatar) {
-		super(viewName, glview, space, avatar);
+	constructor(viewName, ambiance, space, avatar) {
+		super(viewName, ambiance, space, avatar);
 
 		if (! this.space || !this.avatar) {
 			throw  new Error(`noiseViewDef: being created without space or avatar`);

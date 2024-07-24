@@ -27,16 +27,17 @@ export class abstractViewDef {
 	// viewName: personal name for the viewDef instance, for error msgs
 	// canvas: real <canvas> DOM element, after it's been created by React
 	// class name from instance: vu.constructor.name   from class: vuClass.name
-	constructor(viewName, glView, space, avatar) {
+	constructor(viewName, ambiance, space, avatar) {
 		this.viewName = viewName;
-		this.canvas = glView.canvas;
-		this.gl = glView.gl;
-		this.tagObject = glView.tagObject;
+		this.canvas = ambiance.canvas;
+		this.gl = ambiance.gl;
+		this.tagObject = ambiance.tagObject;
 		if (! this.canvas) throw new Error(`abstractViewDef: being created without canvas`);
 
 		this.space = space;
 		this.avatar = avatar;
 
+		// boolean cuz I can't find any docs telling me how to use vao, in detail
 		this.perDrawingVAO = perDrawingVAO;
 
 		if (!this.perDrawingVAO) {
@@ -121,7 +122,7 @@ export class abstractViewDef {
 	}
 
 	/* ************************************************** dom interactivity */
-	// maybe i should get rid of this
+	// maybe i should get rid of this TODO
 	domSetupForAllDrawings(canvas) {
 		this.drawings.forEach(drawing => {
 			if (drawing.domSetup)

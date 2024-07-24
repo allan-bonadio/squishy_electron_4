@@ -34,7 +34,7 @@ const viewClassNamez = {
 	star: starViewDef,
 }
 
-
+gonna have to rewrite this as a function
 export class mockGLView {
 	constructor(viewClassName, viewName) {
 		this.state = {canvas: null};

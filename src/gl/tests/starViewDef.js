@@ -123,8 +123,8 @@ export class starDrawing extends abstractDrawing {
 
 
 export class starViewDef extends abstractViewDef {
-	constructor(viewName, glview, space, avatar) {
-		super(viewName, glview, space, avatar);
+	constructor(viewName, ambiance, space, avatar) {
+		super(viewName, ambiance, space, avatar);
 
 		if (! this.space || !this.avatar) {
 			throw  new Error(`starViewDef: being created without space or avatar`);
