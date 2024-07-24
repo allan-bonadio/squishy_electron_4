@@ -3,10 +3,10 @@
 ** Copyright (C) 2023-2024 Tactile Interactive, all rights reserved
 */
 
-import ctxFactory from '../ctxFactory.js';
+import glAmbiance from '../glAmbiance.js';
 import {mockSpace, mockAvatar, mockGLView} from './mockGLView.js';
-import {starViewDef} from './starViewDef.js';
-import {noiseViewDef} from './noiseViewDef.js';
+import {starScene} from './starScene.js';
+import {noiseScene} from './noiseScene.js';
 
 // pretend jquery
 window.$ = document.querySelector.bind(document);
@@ -92,10 +92,10 @@ function selectContinuum(ev) {
 
 /* ************************************************************* star handlers */
 
-starViewDef.typesList = [];
+starScene.typesList = [];
 
 function setupPenTypes() {
-	let typesList = starViewDef.typesList = localStorage.penType;
+	let typesList = starScene.typesList = localStorage.penType;
 	if (typesList)
 		typesList = typesList.split(' ').filter(c => c);
 	else
@@ -104,20 +104,20 @@ function setupPenTypes() {
 		check.checked = typesList.includes(check.value);
 		check.addEventListener('click', selectPenTypes);
 	});
-	starViewDef.typesList = typesList;
+	starScene.typesList = typesList;
 }
 // menu for drawing type(s)
 function selectPenTypes(ev) {
 	let target = ev.target;
 	if (target.checked) {
-		starViewDef.typesList.push(target.value);
+		starScene.typesList.push(target.value);
 	}
 	else {
-		let pos = starViewDef.typesList.indexOf(target.value);
+		let pos = starScene.typesList.indexOf(target.value);
 		if (pos >= 0)
-			starViewDef.typesList.splice(pos, 1);
+			starScene.typesList.splice(pos, 1);
 	}
-	localStorage.penType = starViewDef.typesList.join(' ');
+	localStorage.penType = starScene.typesList.join(' ');
 }
 
 

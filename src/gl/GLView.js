@@ -4,13 +4,13 @@
 */
 
 // GLView  wraps a canvas for display.  Via webgl.
-// And the Drawing and ViewDef machinery mgmt
+// And the Drawing and Scene machinery mgmt
 
 import React, {useState, useRef, useEffect} from 'react';
 import PropTypes from 'prop-types';
 
 import {listOfViewClasses} from './listOfViewClasses.js';
-import ctxFactory from './ctxFactory.js';
+import glAmbiance from './glAmbiance.js';
 
 let traceSetup = false;
 let traceGeometry = false;
@@ -80,7 +80,7 @@ function GLView(props) {
 	let effViewRef = useRef(null);
 	let effectiveView = effViewRef.current;
 
-	// set up the view class - what kind of drawings it has.  Base classes abstractDrawing and abstractViewDef
+	// set up the view class - what kind of drawings it has.  Base classes abstractDrawing and abstractScene
 	// must do this after the canvas AND the space exist.
 	const initViewClass =
 	(ambiance) => {
@@ -166,14 +166,14 @@ function GLView(props) {
 					canvasNode2);
 
 			// now set up gl context
-			const ambiance = new ctxFactory(canvasNode2);
+			const ambiance = new glAmbiance(canvasNode2);
 			ambiance.glProm
 			.then(gl => {
 				//this.gl = gl;
 				p.setGl?.(gl);  // setGl should always be there
 				gl.viewport(0, 0, canvasNode2.clientWidth, canvasNode2.clientHeight);
 
-				//this.tagObject = this.ctxFactory.tagObject;
+				//this.tagObject = this.glAmbiance.tagObject;
 				//canvasNode.glview = this;
 
 				canvasNode2.viewName = p.viewName;

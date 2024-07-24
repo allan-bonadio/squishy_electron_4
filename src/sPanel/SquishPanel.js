@@ -26,7 +26,7 @@ let tracePromises = false;
 let traceSquishPanel = false;
 let traceWidth = false;
 
-const DEFAULT_VIEW_CLASS_NAME = 'flatViewDef';
+const DEFAULT_VIEW_CLASS_NAME = 'flatScene';
 
 
 /* ************************************************ Context */
