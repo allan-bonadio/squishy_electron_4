@@ -11,7 +11,7 @@ import {getASetting} from '../utils/storeSettings.js';
 
 let traceCreation = false;
 let traceIntegration = false;
-let traceTriggerIteration = true;
+let traceTriggerIteration = false;
 
 // a qGrinder manages frame of a wave
 class eGrinder {

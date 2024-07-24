@@ -33,7 +33,7 @@ static bool traceIntegrationDetailed = false;
 static bool traceJustWave = false;
 
 static bool dumpFFHiResSpectums = false;
-static bool traceIProd = true;
+static bool traceIProd = false;
 
 static bool traceConstructor = false;
 
