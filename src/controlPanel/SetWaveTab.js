@@ -97,8 +97,8 @@ class SetWaveTab extends React.Component {
 		this.setState({pulseCenter}, () => this.regenerateMiniGraphWave());
 	}
 
-	// canvasFacts is for the big view the the user resizes; the setWave GLView is fixed size
-	setCanvasFacts = () => {}
+	// canvasInnerDims is for the big view the the user resizes; the setWave GLView is fixed size
+	setCanvasInnerDims = () => {}
 
 	saveMainWave =
 	() => {
@@ -157,8 +157,8 @@ class SetWaveTab extends React.Component {
 			glView = <GLView width={MINI_WIDTH} height={MINI_HEIGHT}
 						space={s.space} avatar={this.miniGraphAvatar}
 						viewClassName='flatViewDef' viewName='setWaveMiniGraph'
-						canvasFacts={{width: MINI_WIDTH, height: MINI_HEIGHT}}
-						setCanvasFacts={this.setCanvasFacts}
+						canvasInnerDims={{width: MINI_WIDTH, height: MINI_HEIGHT}}
+						setCanvasInnerDims={this.setCanvasInnerDims}
 					/>
 		}
 

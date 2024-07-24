@@ -33,7 +33,7 @@ function setPT() {
 		// but won't draw anything if the checkbox is off
 		showVoltage: PropTypes.string,
 
-		canvasFacts: PropTypes.object,
+		canvasInnerDims: PropTypes.object,
 	};
 }
 
@@ -108,7 +108,7 @@ function VoltOverlay(props) {
 			showVoltage={p.showVoltage}
 			space={p.space}
 			height={p.height}
-			canvasFacts={p.canvasFacts}
+			canvasInnerDims={p.canvasInnerDims}
 		/>
 	</section>
 }
