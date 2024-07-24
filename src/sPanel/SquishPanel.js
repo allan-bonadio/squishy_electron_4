@@ -173,25 +173,24 @@ export class SquishPanel extends React.Component {
 			+ ` body.clientWidth=${document.body.clientWidth}`);
 
 		return (
-				<div id={this.props.id} className="SquishPanel">
-					<WaveView
-						width={p.width}
-						space={this.space}
-						showVoltage={s.showVoltage}
-						sPanel={this}
-					/>
-					<ControlPanel
-						changeShowVoltage={this.changeShowVoltage}
-						showVoltage={s.showVoltage}
+			<div id={this.props.id} className="SquishPanel">
+				<WaveView
+					outerWidth = {p.width}
+					showVoltage={s.showVoltage}
+					sPanel={this}
+				/>
+				<ControlPanel
+					changeShowVoltage={this.changeShowVoltage}
+					showVoltage={s.showVoltage}
 
-						redrawWholeMainWave={this.redrawWholeMainWave}
+					redrawWholeMainWave={this.redrawWholeMainWave}
 
-						iStats={this.iStats}
+					iStats={this.iStats}
 
-						animator={this.animator}
-						sPanel={this}
-					/>
-				</div>
+					animator={this.animator}
+					sPanel={this}
+				/>
+			</div>
 		);
 	}
 }

@@ -3,7 +3,8 @@
 ** Copyright (C) 2023-2024 Tactile Interactive, all rights reserved
 */
 
-// Creates a webgl context from the canvas upon startup.  Starts either webgl1 or 2
+// Creates a webgl context from the canvas upon startup.  includes gl,
+// canvas node, and this 'tag object'.  Starts either webgl1 or 2
 // depending on what's available.
 
 // webgl-lint: sigh.
