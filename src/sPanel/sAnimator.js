@@ -9,20 +9,17 @@ import SquishPanel from './SquishPanel.js';
 import CommonDialog from '../widgets/CommonDialog.js';
 import {getASetting} from '../utils/storeSettings.js';
 import {thousands, thousandsSpaces} from '../utils/formatNumber.js';
+import qe from '../engine/qe.js';
 
-let traceStats = false;
 let traceTheViewBuffer = false;
 let traceHeartbeats = false;
-let traceIntegrations = false;
-let traceFramePeriods = false;
-let traceRAFPeriods = false;
-
-const onceInAWhile = 1023;
-const everySoOften = 1023;
+let tracerAFPeriod = false;
+let traceFrameMenuRates = true;
 
 // rAF should certainly call more often than this many ms
 const MAX_rAF_PERIOD =  50;
 
+const round = Math.round;
 
 // Note: the sAnimator is NOT a React Component!  Just an object created in the SquishPanel
 class sAnimator {
@@ -110,17 +107,65 @@ class sAnimator {
 		this.rAFHandler(performance.now());
 	}
 
+	// given new frameRateMenuFreqs changed,
+	// figure out the new <option items for the frame rate menu, and place them
+	rewriteFrameRateMenu() {
+		const frameRateMenu = document.querySelector(`.frameRateBox .rateSelector`);
+		if (!frameRateMenu) return;  // ???
+
+		let optElements = [];
+		this.frameRateMenuFreqs.forEach(rate => {
+			if (qe.FASTEST == rate) {
+				optElements.push(`<option value=${qe.FASTEST}>Fastest</option>`);
+			}
+			else if (rate >= 1) {
+				// 1 per sec or more - phrase it this way
+				optElements.push(`<option value=${rate}>${rate} per sec</option>`);
+			}
+			else {
+				optElements.push(`<option value=${rate}>every ${1 / rate} sec</option>`);
+			}
+
+		});
+		frameRateMenu.innerHTML = optElements.join('\n');
+	}
+
 	// given new animationFP or anything else changed, or init, refigure
 	// all the frame periods
-	recalcAnimationFP(animationFP) {
-		// if user uses the menu, will change this
-		//let targetFP = getASetting('frameSettings', 'framePeriod');
+	// based on the detected screen frame rate, choose items on the Frame Rate menu
+	recalcFrameMenuRates(animationRate) {
+		// start the list on the Frame Rate menu.  Start with first two.
+		this.frameRateMenuFreqs = [qe.FASTEST, animationRate];
 
-		// these JS calculations have been in ms.  (all  durations)
-		// getTimeDouble() in c++ returns time as a double float, in
-		// seconds. Also note these performance.now() and rAF times are
-		// from app startup, not wallclock.
-		this.grinder.animationFP = this.avgAnimationFP * 0.001;
+		let aRate = animationRate
+		while (round(aRate / 2) * 2 == aRate) {
+			// even!
+			aRate /= 2;
+			this.frameRateMenuFreqs.push(aRate);
+		}
+		while (round(aRate / 3) * 3 == aRate) {
+			// divisible by 3!
+			aRate /= 3;
+			this.frameRateMenuFreqs.push(aRate);
+		}
+		while (round(aRate / 5) * 5 == aRate) {
+			// divisible by 5!  My monitor does 85/sec so this is important
+			// but x5 is a big jump, so... just use a fraction
+			this.frameRateMenuFreqs.push(round(aRate / 2 - 0.01));
+			aRate /= 5;
+			this.frameRateMenuFreqs.push(aRate);
+		}
+
+		// depending on the original rate, we could be left with a big number or 1.
+		// now just halve the rate till you get to...
+		while (aRate > 1) {
+			aRate = round(aRate / 2);
+			this.frameRateMenuFreqs.push(aRate);
+		}
+
+		// Then, these are fixed for everybody
+		this.frameRateMenuFreqs = this.frameRateMenuFreqs.concat([.5, .2, .1, 1/15, 1/30, 1/60]);
+		if (traceFrameMenuRates) console.log(`traceFrameMenuRates: `, this.frameRateMenuFreqs)
 	}
 
 	// we have to measure requestAnimationFrame()'s animationFP in case
@@ -138,14 +183,13 @@ class sAnimator {
 		// the debugger.
 		this.avgAnimationFP  =
 			Math.min(MAX_rAF_PERIOD, (animationFP + 3 * this.avgAnimationFP) / 4);
-		this.inteTimes.rAFPeriod = this.avgAnimationFP;
 
 		// IF the frame period changed from recent cycles,
 		if (Math.abs(animationFP - this.avgAnimationFP) > 4) {
 			// something's changing, let it settle down.  Some timing
 			// fumbles are tolerable while this is on.
 			this.unstableFP = true;
-			if (traceFramePeriods) console.log(`🎥  aniFP change!  animationFP=${animationFP}  `
+			if (tracerAFPeriod) console.log(`🎥  aniFP change!  animationFP=${animationFP}  `
 				+ ` this.avgAnimationFP = ${this.avgAnimationFP}  `
 				+ `abs diff = ${Math.abs(animationFP - this.avgAnimationFP)} `);
 		}
@@ -154,7 +198,20 @@ class sAnimator {
 			if (this.unstableFP) {
 				// it's calmed down!  the threads can now recalibrate.
 				this.unstableFP = false;
-				this.recalcAnimationFP(animationFP);
+
+				// round the FREQUENCY to an int
+				let animationRate = round(1000 / this.avgAnimationFP);
+				animationFP = this.inteTimes.rAFPeriod = 1000 / animationRate;
+				this.recalcFrameMenuRates(animationRate);
+				this.rewriteFrameRateMenu();
+
+				// and soon, even more accurate
+				setTimeout(() => {
+					animationRate = round(1000 / this.avgAnimationFP);
+					animationFP = this.inteTimes.rAFPeriod = 1000 / animationRate;
+					this.recalcFrameMenuRates(animationRate);
+					this.rewriteFrameRateMenu();
+				}, 1000);
 			}
 		}
 	}

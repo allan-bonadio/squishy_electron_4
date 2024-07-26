@@ -89,6 +89,9 @@ let commonConstants = [
 	// all values are |𝜓| <1, and typically |𝜓| > roundoff error
 	// these are not really the radius, it's more rectangular, but pretty much the same idea
 	{name: 'ERROR_RADIUS', cppType: 'double', value: 1e-12},
+
+	// out-of-band value that means Fastest on frame speed menu
+	{name: 'FASTEST', cppType: 'double', value: 9_999},
 ];
 
 
