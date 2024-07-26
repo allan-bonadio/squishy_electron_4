@@ -78,6 +78,7 @@ struct qGrinder {
 	void reportException(const char *message, const char *code = "reported");
 	void reportException(std::runtime_error *ex, const char *code = "reported");
 
+	// number of integration steps executed for each
 	// dynamically adjusted so integration calculation of a frame takes
 	// about as much time as a screen refresh frame, as set by the user.
 	int stepsPerFrame;
@@ -110,8 +111,10 @@ struct qGrinder {
 	struct qThread *threads;
 
 	int nGrinderThreads;  // total number of gThread threads we'll use for integrating
+			// mostly constant, although there's plans to gradually add/remove threads
 
-	// Although isIntegrating, do only this many more frames before stopping.  Like 1 for single step.
+	// Although isIntegrating, do only this many more frames before
+	// stopping.  Like 1 for single step.  Ought to change this.  TODO
 	int justNFrames;
 
 	#ifdef USING_ATOMICS

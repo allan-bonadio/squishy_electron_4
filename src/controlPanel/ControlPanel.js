@@ -133,7 +133,7 @@ export class ControlPanel extends React.Component {
 	}
 
 	// set freq of frame, which is 1, 2, 4, 8, ... some float number of times per second you want frames.
-	// freq is how the CPToolbar handles it, but we keep the period in the ControlPanel state,
+	// freq is how the CPToolbar UI, handles it, but we keep the period in the ControlPanel state,
 	setFrameFrequency =
 	freq =>{
 		// set it in the settings, controlpanel state, and SquishPanel's state, too.
@@ -176,7 +176,7 @@ export class ControlPanel extends React.Component {
 		//	= storeASetting('frameSettings', 'shouldBeIntegrating', true);
 		//this.setState({shouldBeIntegrating: true});
 
-		// must do this to start iteration loop going in the thread(s)
+		// must do this to start each iteration going in the thread(s)
 		this.grinder.triggerIteration();
 
 		//console.log(`startAnimating done: shouldBeIntegrating =${space.grinder.shouldBeIntegrating}   `);

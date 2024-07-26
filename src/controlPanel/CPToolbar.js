@@ -34,21 +34,17 @@ function CPToolbar(props) {
 		console.info(`CPToolbar(props)  props=`, props);
 	const {frameFrequency, setFrameFrequency} = props;
 
+	// these are just defaults; see sAnimator.js for how it's reset based on scan rate
 	const repRates = <>
 		<option key='60' value='60'>60 per sec</option>
 		<option key='30' value='30'>30 per sec</option>
-		<option key='20' value='20'>20 per sec</option>
 		<option key='10' value='10'>10 per sec</option>
-		<option key='8' value='8'>8 per sec</option>
 		<option key='6' value='6'>6 per sec</option>
-		<option key='4' value='4'>4 per sec</option>
-		<option key='3' value='3'>3 per sec</option>
 		<option key='2' value='2'>2 per sec</option>
 		<option key='1' value='1'>1 per sec</option>
 		<option key='.5' value='0.500'>every 2 sec</option>
 		<option key='.2' value='0.200'>every 5 sec</option>
 		<option key='.1' value='0.100'>every 10 sec</option>
-		<option key='.05' value='0.050'>every 20 sec</option>
 		<option key='.0166666666' value='0.0166666666'>every minute</option>
 	</>;
 
