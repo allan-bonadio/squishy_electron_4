@@ -5,7 +5,7 @@
 
 import {expect, test, jest} from '@jest/globals';
 import voltDisplay from './voltDisplay.js';
-import {dumpJsStack} from './errors.js';
+import {dumpJsStack} from '../utils/errors.js';
 
 import qe from '../engine/qe.js';
 

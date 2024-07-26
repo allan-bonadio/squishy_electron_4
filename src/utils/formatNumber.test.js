@@ -1,7 +1,7 @@
 
+import {thousandsSpaces, toSiSuffix} from './formatNumber.js';
+import {stepsPerDecadeStepFactors} from './powers.js';
 
-// TODO make real tests out of this
-// testing
 //for (let ff = 1e-30;  ff < 1e30; ff *= 12345) {
 //	console.log(`${ff.toPrecision(5)} = ${toSiUnits(ff, 6)}`);
 //}
@@ -45,7 +45,7 @@ describe(`test thousands() and `, () => {
 			console.log();
 		}
 	}
- testThousands();
+	 testThousands();
 
 
 });

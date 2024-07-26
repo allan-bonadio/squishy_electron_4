@@ -4,7 +4,7 @@
 */
 
 import {expect} from '@jest/globals';
-import cx2rgb from './cx2rgb.glsl.js';
+import {cx2rgb} from './cx2rgb.txlated.js';
 
 let traceConfirm = true;
 
