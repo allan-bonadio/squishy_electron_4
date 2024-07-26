@@ -41,7 +41,7 @@ static bool traceKinks = false;
 
 static bool traceAggregate = false;
 static bool traceSingleStep = false;
-static bool traceThreadsHaveFinished = false;
+static bool traceThreadsHaveFinished = true;
 
 // RK2
 #define MIDPOINT_METHOD
@@ -354,8 +354,8 @@ void qGrinder::oneFrame() {
 
 /* ********************************************************** threaded integration  */
 
+// add up ALL the threads' frameCalcTime and keep a running average
 void qGrinder::aggregateCalcTime(void) {
-	// add up ALL the threads' frameCalcTime and keep a running average
 	totalCalcTime = 0;
 	maxCalcTime = 0;
 	for (int ix = 0; ix < nGrinderThreads; ix++) {
@@ -370,7 +370,7 @@ void qGrinder::aggregateCalcTime(void) {
 	stepsPerFrame += (stepsPerFrame / maxCalcTime) * (animationFP - maxCalcTime);
 
 	if (traceAggregate) {
-		speedyLog(" qGrinder 🪓 aggregate time summed: %5.6lf  maxed: %5.6lf\n",
+		speedyLog(" qGrinder 🪓 aggregate time summed: %5.6lf ms, maxed: %5.6lf ms\n",
 			totalCalcTime, maxCalcTime);
 		speedyLog("       animationFP: %5.6lf  new stepsPerFrame: %d time per step: %5.8lf µs\n",
 			animationFP, stepsPerFrame, maxCalcTime/stepsPerFrame * 1e6);
@@ -383,7 +383,9 @@ void qGrinder::threadsHaveFinished() {
 	if (traceThreadsHaveFinished) speedyLog("🪓 qGrinder::threadsHaveFinished starts\n");
 	aggregateCalcTime();
 
-	// single step (or a few steps): are we done yet?
+	// single step (or a few steps): are we done yet? we shouldn't do
+	// single step this way; should just have shouldBeIntegrating off
+	// while triggering.  TODO
 	if (justNFrames) {
 		if (traceSingleStep) speedyLog("🪓 ss: justNFrames = %d\n", justNFrames);
 		--justNFrames;
@@ -496,8 +498,10 @@ void qGrinder::triggerIteration() {
 
 }
 
-// start a new frame calculating by starting each/all gThread threads.
-// This is called from JS, therefore the UI thread.
+// start iterating, starting each/all gThread threads. Iteration will
+// trigger the next frame, and so on.  This starts it, and
+// shouldBeIntegrating should also be true.  Unless you want it to stop
+// after one frame. This is called from JS, therefore the UI thread.
 void grinder_triggerIteration(qGrinder *grinder) {
 	grinder->triggerIteration();
 }

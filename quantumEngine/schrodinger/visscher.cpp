@@ -159,7 +159,7 @@ void qGrinder::hitReal(qCx *newW, qCx *oldW, qCx *hamiltW, double dt) {
 	qflick->fixThoseBoundaries(newW);
 	//elapsedTime += dt/2;  // could be 0 or already dt/2
 
-	if (traceVischerBench) speedyLog("      hitReal, done: time=%lf\n",
+	if (traceVischerBench) speedyLog("      hitReal, done: time=%lf ms\n",
 		getTimeDouble());
 	if (traceRealStep) speedyLog("🧶 end of hitReal\n");
 }
@@ -180,7 +180,7 @@ void qGrinder::hitImaginary(qCx *newW, qCx *oldW, qCx *hamiltW, double dt) {
 	qflick->fixThoseBoundaries(newW);
 	//elapsedTime += dt/2;  // could be 0 or already dt/2
 
-	if (traceVischerBench) speedyLog("      hitImaginary done: time=%lf\n",
+	if (traceVischerBench) speedyLog("      hitImaginary done: time=%lf ms\n",
 		getTimeDouble());
 	if (traceImaginaryStep) speedyLog("🧶 end of hitImaginary");
 

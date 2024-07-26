@@ -47,8 +47,9 @@ void grinderThread::gThreadWork(void) {
 	double endCalc = getTimeDouble();
 	frameCalcTime = endCalc - startCalc;
 
-	if (traceWork) speedyLog("🔪 end of gThreadWork; shouldBeIntegrating=%d  isIntegrating=%d\n",
- 				grinder->shouldBeIntegrating, grinder->isIntegrating);
+	if (traceWork) speedyLog("🔪 end of gThreadWork; frame time=%8.4lf ms, "
+		"shouldBeIntegrating=%d  isIntegrating=%d\n",
+ 			frameCalcTime, grinder->shouldBeIntegrating, grinder->isIntegrating);
 }
 
 // do the atomics and synchronization, and call gThreadWork().  runs repeatedly.
