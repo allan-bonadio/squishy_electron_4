@@ -14,7 +14,7 @@ import qe from '../engine/qe.js';
 let traceTheViewBuffer = false;
 let traceHeartbeats = false;
 let tracerAFPeriod = false;
-let traceFrameMenuRates = true;
+let traceFrameMenuRates = false;
 
 // rAF should certainly call more often than this many ms
 const MAX_rAF_PERIOD =  50;

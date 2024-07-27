@@ -91,7 +91,7 @@ let commonConstants = [
 	{name: 'ERROR_RADIUS', cppType: 'double', value: 1e-12},
 
 	// out-of-band value that means Fastest on frame speed menu
-	{name: 'FASTEST', cppType: 'double', value: 9_999},
+	{name: 'FASTEST', cppType: 'double', value: 999_999},
 ];
 
 
@@ -159,9 +159,10 @@ function generateQeJs() {
 	export const qe = {};
 
 	export function defineQEngineFuncs() {
+		// needs to run this in the app with emscripten set up for cwrap to exist
+		// or punt on it for node.js situations like unit tests
 		// eslint-disable-next-line no-restricted-globals
-		cwrap = self.Module.cwrap;
-	\n${defineFuncBody.join('\n')}
+		cwrap = globalThis.Module?.cwrap ?? (() => {});
 
 		// constants shared with C++
 	${JsConsts.join('\n\t')}
