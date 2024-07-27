@@ -1,7 +1,21 @@
 
+2024 Jul 26 ============================================= squishy_electron_4
+
+Convergence:von Neumann criteria
+
+If DE is ∂u / ∂t = α (∂² u / ∂ x²)
+
+then the reqiurement is
+
+α ∆t / (∆x)² < ½
+
+∆t < ½ (∆x)² / α
+
+in our case, α = - ℏ² / 2m_e =
+
+
+
 2024 May 2 ============================================= squishy_electron_4
-
-
 
 Finalizing the version using pthreads successfully with one thread.
 but now it's busted.  no integration.
