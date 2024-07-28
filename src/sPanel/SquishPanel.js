@@ -29,12 +29,7 @@ let traceWidth = false;
 const DEFAULT_VIEW_CLASS_NAME = 'flatScene';
 
 
-/* ************************************************ Context */
 
-// this will be available all over the squish panel.  so maybe I don't have to
-// mess around with these props so much. how did i go so long without learning
-// contexts?
-const SpaceContext = React.createContext({space: null});
 
 /* ************************************************ construction & reconstruction */
 
@@ -55,13 +50,22 @@ export class SquishPanel extends React.Component {
 			debugger;
 			location = location;  // eslint-disable-line no-restricted-globals
 		}
+
+		this.spaceCtx = React.createContext(null);
+
+
 		SquishPanel.squishPanelConstructed++;
 
 		this.state = {
 			mainViewClassName: DEFAULT_VIEW_CLASS_NAME,
 
 			showVoltage:  getASetting('voltageSettings', 'showVoltage'),
+
+			// the space for this SP.
+			space: null,
 		};
+
+
 
 		if (traceSquishPanel) console.log(`👑 SquishPanel constructor done`);
 	}
@@ -173,28 +177,29 @@ export class SquishPanel extends React.Component {
 			+ ` body.clientWidth=${document.body.clientWidth}`);
 
 		return (
-			<div id={this.props.id} className="SquishPanel">
-				<WaveView
-					outerWidth = {p.width}
-					showVoltage={s.showVoltage}
-					sPanel={this}
-				/>
-				<ControlPanel
-					changeShowVoltage={this.changeShowVoltage}
-					showVoltage={s.showVoltage}
+			<this.spaceCtx.Provider value={s.space}>
 
-					redrawWholeMainWave={this.redrawWholeMainWave}
+				<article id={this.props.id} className="SquishPanel">
+					<WaveView
+						outerWidth = {p.width}
+						showVoltage={s.showVoltage}
+						sPanel={this}
+					/>
+					<ControlPanel
+						changeShowVoltage={this.changeShowVoltage}
+						showVoltage={s.showVoltage}
 
-					iStats={this.iStats}
+						redrawWholeMainWave={this.redrawWholeMainWave}
 
-					animator={this.animator}
-					sPanel={this}
-				/>
-			</div>
+						iStats={this.iStats}
+
+						animator={this.animator}
+						sPanel={this}
+					/>
+				</article>
+			</this.spaceCtx.Provider>
 		);
 	}
 }
-
-SquishPanel.contextType = SpaceContext;
 
 export default SquishPanel;
