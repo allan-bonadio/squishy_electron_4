@@ -41,7 +41,7 @@ static bool traceKinks = false;
 
 static bool traceAggregate = false;
 static bool traceSingleStep = false;
-static bool traceThreadsHaveFinished = true;
+static bool traceThreadsHaveFinished = false;
 
 // RK2
 #define MIDPOINT_METHOD

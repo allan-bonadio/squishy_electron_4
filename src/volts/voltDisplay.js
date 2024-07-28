@@ -186,14 +186,14 @@ export class voltDisplay {
 
 	/* ******************************************************************* interaction */
 
-	// called after user changed bottom and/or  height.
+	// called after user changed bottom and/or  height (zoomed or scrolled).
 	saveScroll() {
 		storeASetting('voltageSettings', 'bottomVolts', +this.bottomVolts);
 		storeASetting('voltageSettings', 'heightVolts', +this.heightVolts);
 		//storeASetting('voltageSettings', 'minBottom', +this.minBottom);
 
 		// this function is set in the VoltArea constructor
-		this.updateVoltageArea();
+		//this.updateVoltageArea();
 	}
 
 	// called when user scrolls up or down.
