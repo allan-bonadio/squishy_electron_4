@@ -3,7 +3,7 @@
 ** Copyright (C) 2022-2024 Tactile Interactive, all rights reserved
 */
 
-import qe from '../engine/qe.js';
+import qeFuncs from '../engine/qeFuncs.js';
 
 /* ****************************************************** diagnostics */
 
@@ -34,9 +34,9 @@ window.cppErrorStack = '';
 // class of errors that come from inside C++
 class cppError extends Error {
 	constructor(exNumber) {
-		super('from C++: ' + window.UTF8ToString(qe.getCppExceptionMessage(exNumber)));
+		super('from C++: ' + window.UTF8ToString(qeFuncs.getCppExceptionMessage(exNumber)));
 
-		console.info(`🧯 cppError(${exNumber}) =>`, window.UTF8ToString(qe.getCppExceptionMessage(exNumber)));
+		console.info(`🧯 cppError(${exNumber}) =>`, window.UTF8ToString(qeFuncs.getCppExceptionMessage(exNumber)));
 		this.exPointer = exNumber;
 	}
 

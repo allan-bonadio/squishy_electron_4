@@ -1,8 +1,5 @@
 import sAnimator from './sAnimator';
-import qe from '../engine/qe.js';
-
-// need this for qe to work
-defineQEngineFuncs();
+import qeConsts from '../engine/qeConsts.js';
 
 // this function we're testing.  Answer comes as an object dummySA.frameRateMenuFreqs[]
 const dummySA = {};
@@ -40,7 +37,7 @@ describe(`sAnimator recalcFrameMenuRates() `, () => {
 		//console.log(`the dummy SA is: `, dummySA);
 		//console.log(`the dummySA.frameRateMenuFreqs is: `, dummySA.frameRateMenuFreqs);
 		recalcFrameMenuRates(animationFP);
-		expect(dummySA.frameRateMenuFreqs[0]).toEqual(qe.FASTEST);
+		expect(dummySA.frameRateMenuFreqs[0]).toEqual(qeConsts.FASTEST);
 		expect(dummySA.frameRateMenuFreqs[1]).toEqual(expectedFirst);
 		expect(dummySA.frameRateMenuFreqs).toEqual(list);
 	});

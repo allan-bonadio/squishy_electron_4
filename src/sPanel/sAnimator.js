@@ -9,7 +9,8 @@ import SquishPanel from './SquishPanel.js';
 import CommonDialog from '../widgets/CommonDialog.js';
 import {getASetting} from '../utils/storeSettings.js';
 import {thousands, thousandsSpaces} from '../utils/formatNumber.js';
-import qe from '../engine/qe.js';
+import qeFuncs from '../engine/qeFuncs.js';
+import qeConsts from '../engine/qeConsts.js';
 
 let traceTheViewBuffer = false;
 let traceHeartbeats = false;
@@ -115,8 +116,8 @@ class sAnimator {
 
 		let optElements = [];
 		this.frameRateMenuFreqs.forEach(rate => {
-			if (qe.FASTEST == rate) {
-				optElements.push(`<option value=${qe.FASTEST}>Fastest</option>`);
+			if (qeConsts.FASTEST == rate) {
+				optElements.push(`<option value=${qeConsts.FASTEST}>Fastest</option>`);
 			}
 			else if (rate >= 1) {
 				// 1 per sec or more - phrase it this way
@@ -135,7 +136,7 @@ class sAnimator {
 	// based on the detected screen frame rate, choose items on the Frame Rate menu
 	recalcFrameMenuRates(animationRate) {
 		// start the list on the Frame Rate menu.  Start with first two.
-		this.frameRateMenuFreqs = [qe.FASTEST, animationRate];
+		this.frameRateMenuFreqs = [qeConsts.FASTEST, animationRate];
 
 		let aRate = animationRate
 		while (round(aRate / 2) * 2 == aRate) {
@@ -227,7 +228,7 @@ class sAnimator {
 		// an error (eg divergence) will halt integration.  Start Over will put it back.
 		if (this.grinder.hadException) {
 			this.cPanel.shouldBeIntegrating = false;
-			this.errorMessage = qe.grinder_getExceptionMessage(this.grinder.pointer);
+			this.errorMessage = qeFuncs.grinder_getExceptionMessage(this.grinder.pointer);
 			if (!this.errorMessage) this.errorMessage = 'Bogus Error';
 			console.error(`had Exception!  '${this.errorMessage}' `);
 			debugger;  // won't stop if we're not in the debugger

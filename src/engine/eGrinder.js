@@ -6,7 +6,7 @@
 //import inteStats from '../controlPanel/inteStats.js';
 //import statGlobals from '../controlPanel/statGlobals.js';
 import {prepForDirectAccessors} from '../utils/directAccessors.js';
-import qe from './qe.js';
+import qeFuncs from './qeFuncs.js';
 import {getASetting} from '../utils/storeSettings.js';
 
 let traceCreation = false;
@@ -36,7 +36,7 @@ class eGrinder {
 		this.ewave.liquidate();
 		this.space = this.ewave = this.vBuffer = null;
 
-		//qe.grinder_delete(this.pointer);
+		//qeFuncs.grinder_delete(this.pointer);
 	}
 
 	/* *************************************************************** Direct Accessors */
@@ -101,18 +101,18 @@ class eGrinder {
 				+`shouldBeIntegrating=${this.shouldBeIntegrating}  isIntegrating=${this.isIntegrating} `
 				+`voltageFactor=${this.voltageFactor}`);
 		}
-		qe.grinder_triggerIteration(this.pointer);
+		qeFuncs.grinder_triggerIteration(this.pointer);
 	}
 
 	// Grind one frame - Single Threaded - deprecated sortof
 	// for testing maybe keep the single threaded way
 	// can throw std::runtime_error("divergence")
 	oneFrame() {
-		qe.grinder_oneFrame(this.pointer);
+		qeFuncs.grinder_oneFrame(this.pointer);
 	}
 
 	askForFFT() {
-		qe.grinder_askForFFT(this.pointer);
+		qeFuncs.grinder_askForFFT(this.pointer);
 	}
 
 }

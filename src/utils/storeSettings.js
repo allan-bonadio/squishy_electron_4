@@ -4,7 +4,7 @@
 */
 
 import {isPowerOf2} from './powers.js';
-import qe from '../engine/qe.js';
+import qeConsts from '../engine/qeConsts.js';
 import {EFFECTIVE_VOLTS, AMPLE_VOLTS} from '../volts/voltConstants.js';
 
 // what a disaster.   I made this whole subsystem, storeSettings (aka New)
@@ -183,8 +183,8 @@ export function createStoreSettings() {
 
 	// see also resolution dialog to change these
 	makeParam('spaceParams', 'N', 64,  N => isPowerOf2(N) );
-	makeParam('spaceParams', 'continuum', qe.contENDLESS,
-		[qe.contDISCRETE, qe.contWELL, qe.contENDLESS]);
+	makeParam('spaceParams', 'continuum', qeConsts.contENDLESS,
+		[qeConsts.contDISCRETE, qeConsts.contWELL, qeConsts.contENDLESS]);
 	makeParam('spaceParams', 'spaceLength', 16, {min: 1e-3, max: 1e7});
 
 	/* ************************************ waveParams */

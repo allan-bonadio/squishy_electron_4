@@ -2,7 +2,7 @@
 ** eSpace - the JS representations of the c++ qSpace object
 ** Copyright (C) 2021-2024 Tactile Interactive, all rights reserved
 */
-import qe from './qe.js';
+import qeFuncs from './qeFuncs.js';
 import inteStats from '../controlPanel/inteStats.js';
 import {prepForDirectAccessors} from '../utils/directAccessors.js';
 import voltDisplay from '../volts/voltDisplay.js';
@@ -49,20 +49,20 @@ export class eSpace {
 		if (eSpace.theSpace)
 			throw new Error('creating second space')
 		// this actually does it over on the C++ side
-		this.pointer = qe.startNewSpace(spaceLabel);
+		this.pointer = qeFuncs.startNewSpace(spaceLabel);
 		prepForDirectAccessors(this, this.pointer);
 
 		// make each dimension (someday there'll be more than 1)
 		//let nPoints = 1, nStates = 1;
 		this.dimensions = dims.map(d => {
-				qe.addSpaceDimension(this.pointer, d.N, d.continuum, d.spaceLength, d.label);  // c++
+				qeFuncs.addSpaceDimension(this.pointer, d.N, d.continuum, d.spaceLength, d.label);  // c++
 
 				let dim = new eDimension(d)
 				return dim;
 			}
 		);
 
-		qe.completeNewSpace(this.pointer, N_THREADS);
+		qeFuncs.completeNewSpace(this.pointer, N_THREADS);
 
 		// direct access into the voltage buffer
 		this.voltageBuffer = new Float64Array(window.Module.HEAPF64.buffer,
@@ -85,7 +85,7 @@ export class eSpace {
 		// by default it's set to 1s, or zeroes?  but we want something good.
 		let waveParams = getAGroup('waveParams');
 		this.mainEWave.setFamiliarWave(waveParams);  //  SquishPanel re-does this for SetWave
-		qe.grinder_copyFromAvatar(this.grinder.pointer, this.mainEAvatar.pointer);
+		qeFuncs.grinder_copyFromAvatar(this.grinder.pointer, this.mainEAvatar.pointer);
 
 		this.miniGraphAvatar.ewave.setFamiliarWave(waveParams);  //  SquishPanel re-does this for SetWave
 		if (traceFamiliarWave) console.log(`🚀  done with setFamiliarWave():`,
@@ -118,7 +118,7 @@ export class eSpace {
 
 			// finally, get rid of the C++ object
 			if (traceSpace) console.log(`🚀  done  eSpace:`, this);
-			qe.deleteFullSpace(this.pointer);
+			qeFuncs.deleteFullSpace(this.pointer);
 		} catch (ex) {
 			// eslint-disable-next-line no-ex-assign
 			ex = interpretCppException(ex);

@@ -6,7 +6,7 @@
 import {expect, test, jest} from '@jest/globals';
 import {getASetting, storeASetting, getAGroup, storeAGroup} from '../utils/storeSettings.js';
 import {isPowerOf2} from './powers.js';
-import qe from '../engine/qe.js';
+import qeConsts from '../engine/qeConsts.js';
 
 let traceObj = false;
 
@@ -102,7 +102,8 @@ describe('cx2rgb tests', () => {
 
 	// how to do this correctly with the defined constants???
 	//testParam('spaceParams', 'continuum', 2, [0, 1, 2]);
-	testParam('spaceParams', 'continuum', qe.contENDLESS, [qe.contDISCRETE, qe.contWELL, qe.contENDLESS]);
+	testParam('spaceParams', 'continuum', qeConsts.contENDLESS,
+		[qeConsts.contDISCRETE, qeConsts.contWELL, qeConsts.contENDLESS]);
 
 	/* ************************************ waveParams */
 

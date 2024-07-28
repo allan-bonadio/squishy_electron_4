@@ -14,7 +14,7 @@ import SetResolutionTab from './SetResolutionTab.js';
 import SetIntegrationTab from './SetIntegrationTab.js';
 import {getASetting, storeASetting, getAGroup, storeAGroup} from '../utils/storeSettings.js';
 import {eSpaceCreatedPromise} from '../engine/eEngine.js';
-import qe from '../engine/qe.js';
+import qeFuncs from '../engine/qeFuncs.js';
 import {interpretCppException, wrapForExc} from '../utils/errors.js';
 
 let traceSetPanels = false;

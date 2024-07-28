@@ -14,7 +14,7 @@ import PropTypes from 'prop-types';
 
 import eSpace from '../engine/eSpace.js';
 import {thousands, thousandsSpaces} from '../utils/formatNumber.js';
-import qe from '../engine/qe.js';
+import qeConsts from '../engine/qeConsts.js';
 import './WaveView.scss';
 import {getASetting, storeASetting} from '../utils/storeSettings.js';
 
@@ -205,7 +205,7 @@ export class WaveView extends React.Component {
 		let elapsedTime = '0';
 		let frameSerial = '0';
 		if (this.grinder) {
-			// after qe has been initialized
+			// after qeConsts has been initialized
 			elapsedTime = thousands(this.grinder.elapsedTime.toFixed(4));
 			frameSerial = thousands(this.grinder.frameSerial);
 		}
@@ -214,7 +214,7 @@ export class WaveView extends React.Component {
 			: <img className='spinner' alt='spinner' src='/images/eclipseOnTransparent.gif' />;
 
 		// make room for the bumpers for WELL continuum
-		let bumperWidth = (qe.contWELL == this.space?.dimensions[0].continuum)
+		let bumperWidth = (qeConsts.contWELL == this.space?.dimensions[0].continuum)
 			? BUMPER_WIDTH
 			: 0;
 
