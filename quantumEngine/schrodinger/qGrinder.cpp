@@ -19,7 +19,7 @@
 #include "../greiman/qAvatar.h"
 #include "qThread.h"
 #include "qGrinder.h"
-#include "grinderThread.h"
+#include "grWorker.h"
 #include "../debroglie/qFlick.h"
 #include "../fourier/qSpectrum.h"
 #include "../fourier/fftMain.h"
@@ -86,7 +86,7 @@ qGrinder::qGrinder(qSpace *sp, qAvatar *av, int nGrinderThreads, const char *lab
 
 
 	// should this come earlier?
-	grinderThread::createGrinderThreads(this);
+	grWorker::createGrinderThreads(this);
 
 	samplePoint = space->dimensions[0].N / 3 + space->dimensions[0].start;
 
@@ -286,7 +286,7 @@ void qGrinder::tallyUpKinks(qWave *qwave) {
 // visscher steps (eg 10 or 100 or 500). Actually does stepsPerFrame + ½
 // steps; four half hits, im at start and re at finish, to adapt to
 // Visscher timing, then synchronized timing. Maybe this should be in
-// grinderThread?  Multi-threads will have to be done with totally different code.
+// grWorker?  Multi-threads will have to be done with totally different code.
 void qGrinder::oneFrame() {
 	if (traceIntegration) {
 		speedyLog("qGrinder 🪓 starting oneFrame() "
@@ -359,7 +359,7 @@ void qGrinder::aggregateCalcTime(void) {
 	totalCalcTime = 0;
 	maxCalcTime = 0;
 	for (int ix = 0; ix < nGrinderThreads; ix++) {
-		grinderThread *sl = gThreads[ix];
+		grWorker *sl = gThreads[ix];
 		if (sl) {
 			totalCalcTime += sl->frameCalcTime;
 			maxCalcTime = fmax(maxCalcTime, sl->frameCalcTime);

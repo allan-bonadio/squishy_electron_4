@@ -23,7 +23,7 @@
 	out.
 
 	[Not implemented yet; not sure if we need it — Upon notification and
-	activation, each grinderThread, atomically add one to
+	activation, each grWorker, atomically add one to
 	grinder.startAtomic, and immediately proceed to integration. When
 	startAtomic gets to nGrinderThreads, that last thread locks startAtom
 	again, anticipating next frame synch.  Yeah, I think we need this;
@@ -46,14 +46,14 @@
 */
 
 
-struct grinderThread {
+struct grWorker {
 	qThread *thread;  // points to corresponding thread
 	qGrinder *grinder;  // all point to the same grinder
 	int serial;  // same as thread serial
 	//bool isDone;  // false while still working
 
 	// makes its own qThread
-	grinderThread(qGrinder *gr);
+	grWorker(qGrinder *gr);
 
 	// creates all threads, etc
 	static void createGrinderThreads(qGrinder *grinder);

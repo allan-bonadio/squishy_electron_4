@@ -1,27 +1,27 @@
 /*
-** grinderThread -- one thread that's doing iteration
+** grWorker -- one thread that's doing iteration
 ** Copyright (C) 2023-2024 Tactile Interactive, all rights reserved
 */
 
 
 #include "qThread.h"
 #include "qGrinder.h"
-#include "grinderThread.h"
+#include "grWorker.h"
 
 static bool traceStart = false;
 static bool traceWork = false;
 static bool traceFinish = false;
 static bool traceSync = false;
 
-/* *********************************************** grinderThread */
+/* *********************************************** grWorker */
 
 // indexed by thread serial, there may be gaps.
 // for threads that AREN'T gThreads
-static grinderThread *sla[MAX_THREADS];
-grinderThread **qGrinder::gThreads = sla;
+static grWorker *sla[MAX_THREADS];
+grWorker **qGrinder::gThreads = sla;
 
 // do the work: integration
-void grinderThread::gThreadWork(void) {
+void grWorker::gThreadWork(void) {
 	int nWas;
 
 	if (traceWork)  {
@@ -54,7 +54,7 @@ void grinderThread::gThreadWork(void) {
 
 // do the atomics and synchronization, and call gThreadWork().  runs repeatedly.
 // Catches exceptions; copies them to grinder for the JS to pick up, continues.
-void grinderThread::gThreadLoop(void) {
+void grWorker::gThreadLoop(void) {
 	while (true) {
 		try {
 			int nWas;
@@ -64,7 +64,7 @@ void grinderThread::gThreadLoop(void) {
 			// it'll lock and unlock, then start its integration work.
 			// so they all start at roughly the same time.
 			#ifdef USING_ATOMICS
-			if (traceSync) speedyLog("🏁 🔪 at Starting Gate in grinderThread::gThreadLoop- "
+			if (traceSync) speedyLog("🏁 🔪 at Starting Gate in grWorker::gThreadLoop- "
 				"startAtomic=%d (stopped= -1, go=0) 🏁\n",
 				grinder->startAtomic);
 			speedyFlush();
@@ -147,13 +147,13 @@ void grinderThread::gThreadLoop(void) {
 
 /* *********************************************** creation and startup */
 
-// wrapper for pthread to start the thread.  arg is the grinderThread ptr.  requestAnimationFrame.
+// wrapper for pthread to start the thread.  arg is the grWorker ptr.  requestAnimationFrame.
 static void *sStarter(void *st) {
 	if (traceStart)
-		speedyLog("🔪 grinderThread: starting\n");
+		speedyLog("🔪 grWorker: starting\n");
 
 	// runs forever. never returns.  catches its exceptions.
-	((grinderThread *) st)->gThreadLoop();
+	((grWorker *) st)->gThreadLoop();
 
 	return NULL;
 }
@@ -161,7 +161,7 @@ static void *sStarter(void *st) {
 
 // initialize this as being idle, before starting an integration task.
 // All the grinders are the same object; all the threads are differrent.
-grinderThread::grinderThread(qGrinder *gr)
+grWorker::grWorker(qGrinder *gr)
 	: grinder(gr) {
 
 	thread = new qThread(&sStarter, (void *) this);
@@ -173,16 +173,16 @@ grinderThread::grinderThread(qGrinder *gr)
 
 
 // static; creates all gThread threads; runs early
-void grinderThread::createGrinderThreads(qGrinder *grinder) {
+void grWorker::createGrinderThreads(qGrinder *grinder) {
 
 	for (int t = 0; t < grinder->nGrinderThreads; t++) {
 		// actual pthread won't start till the next event loop i think
-		grinderThread *gThread = new grinderThread(grinder);
+		grWorker *gThread = new grWorker(grinder);
 		grinder->gThreads[gThread->thread->serial] = gThread;
-		speedyLog("🔪  grinderThread::createGrinderThreads() created A GrinderThread(%d) \n", gThread->serial);
+		speedyLog("🔪  grWorker::createGrinderThreads() created A GrinderThread(%d) \n", gThread->serial);
 	}
 
-	speedyLog("🔪  grinderThread created %d gThreads \n", grinder->nGrinderThreads);
+	speedyLog("🔪  grWorker created %d gThreads \n", grinder->nGrinderThreads);
 };
 
 

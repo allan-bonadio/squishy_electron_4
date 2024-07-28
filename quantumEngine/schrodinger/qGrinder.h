@@ -30,7 +30,7 @@ a Hit: advancement by dt of one of many parts of the calculation.  As of this wr
 
 struct qThread;
 struct qStage;
-struct grinderThread;
+struct grWorker;
 
 struct qGrinder {
 	qGrinder(qSpace *, struct qAvatar *av, int nGrinderThreads, const char *label);
@@ -139,7 +139,7 @@ struct qGrinder {
 	// guards grinder->nFinishedThreads, frameCalcTime, etc
 	pthread_mutex_t finishMx;
 
-	// number of grinderThread s that have started/finished integration yet; incremented up to nGrinderThreads
+	// number of grWorker s that have started/finished integration yet; incremented up to nGrinderThreads
 	int nStartedThreads;
 	int nFinishedThreads;
 	#endif
@@ -153,7 +153,7 @@ struct qGrinder {
 	// figure out the total elapsed time for each thread, average of all, max of all...
 	void aggregateCalcTime(void);
 
-	static grinderThread **gThreads;
+	static grWorker **gThreads;
 
 	// when trace msgs display just one point (to avoid overwhelming output),
 	// this is the one.

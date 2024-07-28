@@ -24,7 +24,7 @@ bool traceThreads = false;
 
 
 // the function called in each thread-specific main loop, 60x/sec
-// NO see grinderThread
+// NO see grWorker
 //static void mainLooper(void *arg) {
 //	qThread *thread = (qThread *) arg;
 //	//printf("🐴  mainLooper entered with qthread=%p\n", thread);
