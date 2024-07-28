@@ -1,6 +1,6 @@
 
 import {thousandsSpaces, toSiSuffix} from './formatNumber.js';
-import {stepsPerDecadeStepFactors} from './powers.js';
+import {stepsPerDecadeStepFactors, indexToPower, powerToIndex} from '../utils/powers.js';
 
 //for (let ff = 1e-30;  ff < 1e30; ff *= 12345) {
 //	console.log(`${ff.toPrecision(5)} = ${toSiUnits(ff, 6)}`);
