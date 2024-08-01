@@ -54,7 +54,7 @@ let exportsSrc  = [
 	// ************************* grinder
 
 	// for the older, same-thread integration, or to be run in a/the thread
-	{name: 'grinder_triggerIteration', args: ['number'], retType: null},
+	// now done with js Atomics {name: 'grinder_triggerIteration', args: ['number'], retType: null},
 
 	// only needed if UI thread does a frame's worth of integration
 	{name: 'grinder_oneFrame', args: ['number'], retType: null},
