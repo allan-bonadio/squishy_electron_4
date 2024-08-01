@@ -228,7 +228,7 @@ export function createStoreSettings() {
 
 	// set in integration tab
 	makeParam('frameSettings', 'shouldBeIntegrating', true,  [false, true]);
-	makeParam('frameSettings', 'framePeriod', 50, {min: 16, max: 60_001});
+	makeParam('frameSettings', 'chosenFP', 50, {min: 16, max: 60_001});
 	makeParam('frameSettings', 'dtStretch', 1, {min: .001, max: 1, });
 	//makeParam('frameSettings', 'stepsPerFrame', 10, {min: 2, max: 50});
 	//makeParam('frameSettings', 'lowPassFilter', 50, {min: 0, max: 75});

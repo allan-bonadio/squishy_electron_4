@@ -21,23 +21,29 @@ let traceFrameMenuRates = false;
 const MAX_rAF_PERIOD =  50;
 
 const round = Math.round;
+const abs = Math.abs;
+
 
 // Note: the sAnimator is NOT a React Component!  Just an object created in the SquishPanel
 class sAnimator {
 
 	// spanel is SquishPanel
-	constructor(spanel, space) {
+	constructor(spanel, space, pickupFreqs) {
 		this.sPanel = spanel;
 		this.cPanel = spanel.cPanel;
 		this.space = space;
 		this.grinder = space.grinder;
 
+		this.pickupFreqs = pickupFreqs;
+
 		// ticks and benchmarks
 		const now = performance.now();
 		//this.timeForNextTic = now + 10;  // default so we can get rolling
 
+		this.frameProgress = 0;
+		this.chosenFP = getASetting('frameSettings', 'chosenFP')
 		this.inteTimes = {totalDrawTime: 0};
-		this.initAnimationFP();
+		this.initVideoFP();
 
 		// stick ?allowRunningDiagnosticCycle at the end of URL to show runningDiagnosticCycle panel
 		// advance forward with each iter.  NOT SAME as shown on WaveView!
@@ -90,14 +96,15 @@ class sAnimator {
 
 	/* ************************************************ Frame timing */
 
-	// animationFP = animation frame period, from requestAnimatioFrame().  Depends
-	// on video; often 60/sec.  Can change as window moves to different monitor
-	// or monitor frame rate changes (settings).
+	// videoFP = measured frame period from requestAnimatioFrame().  Depends on
+	// video; often 60/sec => 16.666...  Can change as window moves to different
+	// monitor or monitor frame rate changes (settings).  See machine control panel.
+	// avgVideoFP = running avg, smoothed.  We use this as videoFP
 
-	// start up all the frame period numbers.  once.
-	initAnimationFP() {
+	// start up all the frame period numbers.  once.  So undefined don't make NaNs.
+	initVideoFP() {
 		// defaults - will work until set by real life
-		this.avgAnimationFP = 18;
+		this.avgVideoFP = 18;
 		this.prevFrame = performance.now();
 		this.unstableFP = true;
 
@@ -110,35 +117,40 @@ class sAnimator {
 
 	// given new frameRateMenuFreqs changed,
 	// figure out the new <option items for the frame rate menu, and place them
-	rewriteFrameRateMenu() {
-		const frameRateMenu = document.querySelector(`.frameRateBox .rateSelector`);
-		if (!frameRateMenu) return;  // ???
+	// rewriteFrameRateMenu() {
+	// 	const frameRateMenu = document.querySelector(`.frameRateBox .rateSelector`);
+	// 	if (!frameRateMenu) return;  // ???
+	//
+	// 	let optElements = [];
+	// 	this.frameRateMenuFreqs.forEach(rate => {
+	// 		if (qeConsts.FASTEST == rate) {
+	// 			optElements.push(`<option value=${qeConsts.FASTEST}>Fastest</option>`);
+	// 		}
+	// 		else if (rate > 1) {
+	// 			// 1 per sec or more - phrase it this way
+	// 			optElements.push(`<option value=${rate}>${rate} per sec</option>`);
+	// 		}
+	// 		else if (rate == 1) {
+	// 			// 1 per sec or more - phrase it this way
+	// 			optElements.push(`<option value=${rate}>once per sec</option>`);
+	// 		}
+	// 		else {
+	// 			optElements.push(`<option value=${rate}>every ${1 / rate} sec</option>`);
+	// 		}
+	//
+	// 	});
+	// 	frameRateMenu.innerHTML = optElements.join('\n');
+	// }
 
-		let optElements = [];
-		this.frameRateMenuFreqs.forEach(rate => {
-			if (qeConsts.FASTEST == rate) {
-				optElements.push(`<option value=${qeConsts.FASTEST}>Fastest</option>`);
-			}
-			else if (rate >= 1) {
-				// 1 per sec or more - phrase it this way
-				optElements.push(`<option value=${rate}>${rate} per sec</option>`);
-			}
-			else {
-				optElements.push(`<option value=${rate}>every ${1 / rate} sec</option>`);
-			}
-
-		});
-		frameRateMenu.innerHTML = optElements.join('\n');
-	}
-
-	// given new animationFP or anything else changed, or init, refigure
+	// given new videoFP or anything else changed, or init, refigure
 	// all the frame periods
 	// based on the detected screen frame rate, choose items on the Frame Rate menu
-	recalcFrameMenuRates(animationRate) {
-		// start the list on the Frame Rate menu.  Start with first two.
-		this.frameRateMenuFreqs = [qeConsts.FASTEST, animationRate];
+	recalcFrameMenuRates(videoRate) {
+		console.log(`🎥 recalcFrameMenuRates(${videoRate}) `)
+		// start the list on the Frame Rate menu.
+		this.frameRateMenuFreqs = [qeConsts.FASTEST, videoRate];
 
-		let aRate = animationRate
+		let aRate = videoRate
 		while (round(aRate / 2) * 2 == aRate) {
 			// even!
 			aRate /= 2;
@@ -164,58 +176,105 @@ class sAnimator {
 			this.frameRateMenuFreqs.push(aRate);
 		}
 
-		// Then, these are fixed for everybody
+		// Then, these are fixed for all videoFPs
 		this.frameRateMenuFreqs = this.frameRateMenuFreqs.concat([.5, .2, .1, 1/15, 1/30, 1/60]);
-		if (traceFrameMenuRates) console.log(`traceFrameMenuRates: `, this.frameRateMenuFreqs)
+		this.pickupFreqs(this.frameRateMenuFreqs);
+
+		if (traceFrameMenuRates) console.log(`🎥 traceFrameMenuRates: `, this.frameRateMenuFreqs)
 	}
 
-	// we have to measure requestAnimationFrame()'s animationFP in case
+	// we have to measure requestAnimationFrame()'s videoFP in case
 	// it changes: user moves window to screen with diff refresh rate,
 	// or user changes refresh rate in control panel
-	measureAndUpdateFramePeriods(now) {
-		let animationFP = now - this.prevFrame;
+	measureAndUpdateVideoFP(now) {
+		let videoFP = now - this.prevFrame;
 		this.prevFrame = now;
-		//this.rAFPeriod = animationFP;
+		//this.rAFPeriod = videoFP;
 
-		// this jiggles around quite a  bit so smooth it.  I think
-		// individual periods lag into next period, so long periods come
-		// next to short periods, so this averages out pretty well.
-		// And, it's never more than 1/20 sec, unless I'm tinkering in
-		// the debugger.
-		this.avgAnimationFP  =
-			Math.min(MAX_rAF_PERIOD, (animationFP + 3 * this.avgAnimationFP) / 4);
+		// this jiggles around quite a  bit so smooth it.  I think individual
+		// periods lag into next period, so long periods come next to short
+		// periods, so this averages out pretty well. And, it's never more than
+		// 1/20 sec, unless I'm tinkering in the debugger.
+		this.avgVideoFP  =
+			Math.min(MAX_rAF_PERIOD, (videoFP + 3 * this.avgVideoFP) / 4);
 
 		// IF the frame period changed from recent cycles,
-		if (Math.abs(animationFP - this.avgAnimationFP) > 4) {
+		if (abs(videoFP - this.avgVideoFP) > 4) {
 			// something's changing, let it settle down.  Some timing
 			// fumbles are tolerable while this is on.
 			this.unstableFP = true;
-			if (tracerAFPeriod) console.log(`🎥  aniFP change!  animationFP=${animationFP}  `
-				+ ` this.avgAnimationFP = ${this.avgAnimationFP}  `
-				+ `abs diff = ${Math.abs(animationFP - this.avgAnimationFP)} `);
+			if (tracerAFPeriod) console.log(`🎥  aniFP change!  videoFP=${videoFP}  `
+				+ ` this.avgVideoFP = ${this.avgVideoFP}  `
+				+ `abs diff = ${abs(videoFP - this.avgVideoFP)} `);
 		}
 		else {
-			// if the animationFP changed recently/last time, but is settling down
+			// if the videoFP changed recently/last time, but is settling down
 			if (this.unstableFP) {
 				// it's calmed down!  the threads can now recalibrate.
 				this.unstableFP = false;
 
-				// round the FREQUENCY to an int
-				let animationRate = round(1000 / this.avgAnimationFP);
-				animationFP = this.inteTimes.rAFPeriod = 1000 / animationRate;
-				this.recalcFrameMenuRates(animationRate);
-				this.rewriteFrameRateMenu();
+				const setAnimationFP = () => {
+					// round the FREQUENCY to an int
+					let videoRate = round(1000 / this.avgVideoFP);
+					videoFP = this.inteTimes.rAFPeriod = 1000 / videoRate;
+					this.recalcFrameMenuRates(videoRate);
+					this.grinder.videoFP = videoFP;
+					//this.videoFP = videoFP;
+				}
 
-				// and soon, even more accurate
-				setTimeout(() => {
-					animationRate = round(1000 / this.avgAnimationFP);
-					animationFP = this.inteTimes.rAFPeriod = 1000 / animationRate;
-					this.recalcFrameMenuRates(animationRate);
-					this.rewriteFrameRateMenu();
-				}, 1000);
+				setAnimationFP();
+
+				// and soon, even more accurate.  After this, it's usually
+				// exactly what's in the control panel for this vid display.
+				setTimeout(setAnimationFP, 1000);
 			}
 		}
 	}
+
+	/* *************************************  retrieving chosen frequency setting */
+
+	// given an FP that may be from a different set of frameRateMenuFreqs, find
+	// the closest frequency that's listed in the menus.  Note this takes in a
+	// PERIOD but returns a FREQUENCY (rate)
+	findNearestMenuFreq(anFP) {
+		const frmf = this.frameRateMenuFreqs;
+		const aRate = 1000 / anFP;
+
+		// first some special values that won't work with the loop
+		if (qeConsts.FASTEST == anFP)
+			return qeConsts.FASTEST;
+
+		//console.log(`here it iz: aRate=${aRate}, frmf.length=${frmf.length}   frmf=`, frmf);
+		if (aRate < frmf[frmf.length - 1])
+			return frmf[frmf.length - 1];
+
+		if (aRate > frmf[1])
+			return frmf[1];
+
+		// now find space between two rates
+		debugger;
+		let f;
+		for (f = 1; aRate <= frmf[f]; f++) {
+			if (aRate == frmf[f])
+				return aRate;  // most typical
+		}
+
+		// ok now we're between; which is closer?
+		if (abs(aRate - frmf[f]) > abs(aRate - frmf[f - 1]))
+			return frmf[f - 1];
+		else
+			return frmf[f];
+	}
+
+	// Get chosen frame rate from storage, but make sure it's listed in the menu.
+	// Rounding to a menu freq usually not needed, but from the store, it may have been
+	// a different videoFP, different set of freqs.  Need this to clear up ambiguities.
+	// Then you can set the <select to the returned value and it'll set to one of the given items.
+	getChosenRateFromStorage() {
+		return this.findNearestMenuFreq(getASetting('frameSettings', 'chosenFP'));
+	}
+
+	/* *************************************  runningDiagnosticCycle of circular wave*/
 
 	rAFHandler =
 	now => {
@@ -225,36 +284,56 @@ class sAnimator {
 			return;
 		this.alreadyRAF = true;
 
+		const grinder = this.grinder;
+
 		// an error (eg divergence) will halt integration.  Start Over will put it back.
-		if (this.grinder.hadException) {
+		if (grinder.hadException) {
 			this.cPanel.shouldBeIntegrating = false;
-			this.errorMessage = qeFuncs.grinder_getExceptionMessage(this.grinder.pointer);
+			this.errorMessage = qeFuncs.grinder_getExceptionMessage(grinder.pointer);
 			if (!this.errorMessage) this.errorMessage = 'Bogus Error';
 			console.error(`had Exception!  '${this.errorMessage}' `);
 			debugger;  // won't stop if we're not in the debugger
 			const ex = new Error(this.errorMessage);
-			ex.code  = UTF8ToString(this.grinder._exceptionCode);
+			ex.code  = UTF8ToString(grinder._exceptionCode);
 
 			// throwing in the rAF handler is problematic, but a dialog isn't.
 			CommonDialog.openErrorDialog({message: this.errorMessage},
 				`while integrating Schrodinger's`);
-			this.grinder.hadException = false;
+			grinder.hadException = false;
 		}
 
 		if (traceTheViewBuffer) {
-			let ddd=new Date();
+			let ddd = new Date();
 			let time = ddd.getSeconds() + ddd.getMilliseconds() / 1e9;
-			console.log(`🎥 needsRepaint=${this.grinder.needsRepaint} latest frame `
-				+ `${this.grinder.frameSerial} at :${time.toFixed(3)} `);
+			console.log(`🎥 needsRepaint=${grinder.needsRepaint} latest frame `
+				+ `${grinder.frameSerial} at :${time.toFixed(3)} `);
 		}
 
-		// this is turned on after each frame is ground
-		if (this.grinder.needsRepaint) {
+		//console.log(`🎥 qeConsts.FASTEST=${qeConsts.FASTEST}  this.chosenFP=${this.chosenFP}`)
+		if (grinder.shouldBeIntegrating && qeConsts.FASTEST != this.chosenFP) {
+			// do the integration, if on a numerical frame rate.
+			// NOT fastest, so integration is only triggered according to the chosen rate
+			this.frameProgress += this.avgVideoFP;
+			if (this.frameProgress >= this.chosenFP) {
+				// time for another grind.  Trigger the threads.
+				// 	Atomics.store(grinder.ints, this.startAtomicOffset, 0);
+				// 	let nWoke = Atomics.notify(grinder.ints, grinder.startAtomicOffset);
+				this.grinder.triggerIteration();
+
+				// even if the chosenFP doesn't evenly divide by videoFP,
+				// this'll do it (approximately) right.  Leftovers goes into next period.
+				// you might get like chosen/video = 6 6 5 6 6 6 5 6 6 5 but user won't notice
+				this.frameProgress -= this.chosenFP
+			}
+		}
+
+		// this is turned on after each frame is ground, in c++.  but only if it's ground.
+		if (grinder.needsRepaint) {
 			this.drawLatestFrame();
-			this.grinder.needsRepaint = false;
+			grinder.needsRepaint = false;
 		}
 
-		this.measureAndUpdateFramePeriods(now);
+		this.measureAndUpdateVideoFP(now);
 
 		requestAnimationFrame(this.rAFHandler);
 		this.alreadyRAF = false;

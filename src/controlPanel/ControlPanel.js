@@ -15,10 +15,13 @@ import SetIntegrationTab from './SetIntegrationTab.js';
 import {getASetting, storeASetting, getAGroup, storeAGroup} from '../utils/storeSettings.js';
 import {eSpaceCreatedPromise} from '../engine/eEngine.js';
 import qeFuncs from '../engine/qeFuncs.js';
+import qeConsts from '../engine/qeConsts.js';
 import {interpretCppException, wrapForExc} from '../utils/errors.js';
 
 let traceSetPanels = false;
 let traceStartStop = false;
+
+
 
 // integrations always need specific numbers of steps.  But there's always one
 // more. maybe this should be defined in the grinder.  Hey, isn't this really
@@ -27,14 +30,6 @@ const N_EXTRA_STEPS = 0.5;
 
 export class ControlPanel extends React.Component {
 	static propTypes = {
-		//frameAnimate: PropTypes.func.isRequired,
-
-		// these are the actual functions that change the main qWave and ultimately
-		// the WaveView on the screen
-		// when user chooses 'set wave'
-		//// this should move into controlPanel from squishPanel
-		//populateFamiliarVoltage: PropTypes.func.isRequired,
-
 		// the showVoltage bool is kept by the Squish Panel; probably should by the WaveView
 		changeShowVoltage: PropTypes.func.isRequired,
 		showVoltage: PropTypes.string.isRequired,
@@ -51,7 +46,7 @@ export class ControlPanel extends React.Component {
 
 		sPanel: PropTypes.object.isRequired,
 
-		//tellMeWhenVoltsChanged: PropTypes.func.isRequired,
+		frameRateMenuFreqs: PropTypes.array,
 	}
 
 	constructor(props) {
@@ -63,7 +58,7 @@ export class ControlPanel extends React.Component {
 
 		// most of the state is kept here.  But, also, in the store settings for the next page reload.
 		this.state = {
-			framePeriod: getASetting('frameSettings', 'framePeriod'),
+			chosenFP: getASetting('frameSettings', 'chosenFP'),
 
 			// defaults for sliders
 			dtStretch: getASetting('frameSettings', 'dtStretch'),
@@ -74,15 +69,18 @@ export class ControlPanel extends React.Component {
 
 			// a copy of shouldBeIntegrating, to update this panel when it's changed
 			shouldBeIntegrating: getASetting('frameSettings', 'shouldBeIntegrating'),
+
+			...getAGroup('waveParams'),
+			...getAGroup('voltageParams'),
 		}
-		this.framePeriod = this.state.framePeriod;  // everybody uses this one
+		this.chosenFP = this.state.chosenFP;
 
 		// pour these directly into the initial state.  The control panel saves
 		// these params in its state, but they're not saved in localStorage until a user clicks
 		// SetWave or SetVoltage.
-		let waveParams = getAGroup('waveParams');
-		let voltageParams = getAGroup('voltageParams');
-		Object.assign(this.state, waveParams, voltageParams);
+		// let waveParams = ;
+		// let voltageParams = ;
+		// Object.assign(this.state, waveParams, voltageParams);
 
 		// we can't init some stuff till we get the space.  But we also can't until this constructor runs.
 		eSpaceCreatedPromise.then(space => {
@@ -125,21 +123,32 @@ export class ControlPanel extends React.Component {
 
 	/* ******************************************************* start/stop */
 
-	setFramePeriod =
+	// set it JUST for the animator and grinder
+	setChosenFP =
 	(period) => {
-		//this.framePeriod = period;
-		if (this.animator)
-			this.animator.framePeriod = period;
+		const an = this.props.animator;
+		if (an) {
+			an.chosenFP = period;
+			an.frameProgress = 0;
+		}
+
+		// now tell the grinder.  Next chosenFP, it'll go into effect
+		if (this.grinder)
+			this.grinder.chosenFP = period;
 	}
 
 	// set freq of frame, which is 1, 2, 4, 8, ... some float number of times per second you want frames.
 	// freq is how the CPToolbar UI, handles it, but we keep the period in the ControlPanel state,
-	setFrameFrequency =
+	setChosenRate =
 	freq =>{
 		// set it in the settings, controlpanel state, and SquishPanel's state, too.
-		this.framePeriod = 1000. / +freq;
-		this.setState({framePeriod: storeASetting('frameSettings', 'framePeriod', this.framePeriod)});
-		this.setFramePeriod(this.framePeriod);  // so squish panel can adjust the heartbeat
+		this.chosenFP = 1000. / +freq;
+		if (qeConsts.FASTEST == freq)
+			this.chosenFP = qeConsts.FASTEST;
+
+		// now set it in all 4 places this variable is duplicated... (sorry)
+		this.setState({chosenFP: storeASetting('frameSettings', 'chosenFP', this.chosenFP)});
+		this.setChosenFP(this.chosenFP);  // so squish panel can adjust the heartbeat
 	}
 
 	// need to keep grinder's variable and our state in sync for sbi.
@@ -168,7 +177,7 @@ export class ControlPanel extends React.Component {
 	startAnimating =
 	() => {
 		if (!this.space) return;  // too early.  mbbe should gray out the button?
-		if (this.shouldBeIntegrating) return;  // already on.  how'd this happen?
+		//if (this.shouldBeIntegrating) return;  // already on.  how'd this happen?
 
 		if (traceStartStop) console.info(`startAnimating starts, triggering iteration`);
 		// set it true as you store it in store; then set state
@@ -186,7 +195,7 @@ export class ControlPanel extends React.Component {
 	stopAnimating =
 	() => {
 		if (!this.space) return;  // too early.  mbbe should gray out the button?
-		if (!this.shouldBeIntegrating) return;  // already off.  how'd this happen?
+		//if (!this.shouldBeIntegrating) return;  // already off.  how'd this happen?
 
 		// set it false as you store it in store; then set state
 		this.shouldBeIntegrating = false;
@@ -293,39 +302,7 @@ export class ControlPanel extends React.Component {
 		console.log(`🎛️ setDtStretch: dt = ${this.space.dt}   dtStretch= ${dtStretch} stretchedDt=${this.grinder.stretchedDt}`)
 	}
 
-	//setStepsPerFrame =
-	//stepsPerFrame => {
-	//	try {
-	//		if (traceSetPanels) console.log(`js setStepsPerFrame(${stepsPerFrame})`);
-	//		storeASetting('frameSettings', 'stepsPerFrame', stepsPerFrame);
-	//		this.setState({stepsPerFrame});
-	//		this.grinder.stepsPerFrame = stepsPerFrame;
-	//
-	//		// dt needs to be recalculated if either of these change
-	//		this.grinder.dt = this.state.deltaT / (stepsPerFrame + N_EXTRA_STEPS);
-	//		//console.log(`setStepsPerFrame: dt = ${this.grinder.dt} = deltaT ${this.state.deltaT} / spf+1=${ (stepsPerFrame + N_EXTRA_STEPS)}`)
-	//	} catch (ex) {
-	//		ex = interpretCppException(ex);
-	//		console.error(`setStepsPerFrame error:`, ex.stack ?? ex.message ?? ex);
-	//		////debugger;
-	//	}
-	//}
-	//
-	//// sets the LPF in both SPanel state AND in the C++ area
-	//setLowPassFilter =
-	//lowPassFilter => {
-	//	if (traceSetPanels) console.log(`js setLowPassFilter(${lowPassFilter})`)
-	//
-	//	let lpf = storeASetting('frameSettings', 'lowPassFilter', lowPassFilter);
-	//	this.setState({lowPassFilter: lpf});
-	//
-	//	// here's where it converts from percent to the C++ style integer number of freqs
-	//	this.grinder.lowPassFilter = Math.round(lpf / 200 * this.state.N);
-	//}
-
-
-
-	/* ********************************************** render  pieces */
+	/* ********************************************** tabs */
 
 	// whichever tab is showing right now
 	createShowingTab() {
@@ -391,8 +368,9 @@ export class ControlPanel extends React.Component {
 		//setVoltageHandler={this.setVoltageHandler}
 		return <div className='ControlPanel'>
 			<CPToolbar
-				frameFrequency={1000. / s.framePeriod}
-				setFrameFrequency={this.setFrameFrequency}
+				chosenRate={1000. / s.chosenFP}
+				setChosenRate={this.setChosenRate}
+				frameRateMenuFreqs={p.frameRateMenuFreqs}
 
 				shouldBeIntegrating={this.shouldBeIntegrating ?? false}
 

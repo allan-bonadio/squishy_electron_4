@@ -7,14 +7,35 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import eSpace from '../engine/eSpace.js';
 import {ShowVoltageControl} from './SetVoltageTab.js';
+import qeConsts from '../engine/qeConsts.js';
 
 let traceCPToolbar = false;
 
+window.dbLog = console.log;
+
+// frequencies are per second numbers.  We want nice labels.
+function optionForFreq(rate) {
+	if (qeConsts.FASTEST == rate) {
+		return <option value={qeConsts.FASTEST} key={qeConsts.FASTEST}>Fastest</option>;
+	}
+	else if (rate > 1) {
+		// 1 per sec or more - phrase it this way
+		return <option value={rate} key={rate}>{rate} per sec</option>;
+	}
+	else if (rate == 1) {
+		// 1 per sec or more - phrase it this way
+		return <option value={rate} key={rate}>once per sec</option>;
+	}
+	else {
+		return <option value={rate} key={rate}>every {1 / rate} sec</option>;
+	}
+}
 
 function setPT() {
 	CPToolbar.propTypes = {
-		frameFrequency: PropTypes.number.isRequired,
-		setFrameFrequency: PropTypes.func.isRequired,
+		chosenRate: PropTypes.number.isRequired,
+		setChosenRate: PropTypes.func.isRequired,
+		frameRateMenuFreqs: PropTypes.array,
 
 		shouldBeIntegrating: PropTypes.bool.isRequired,
 
@@ -31,35 +52,27 @@ function setPT() {
 
 function CPToolbar(props) {
 	if (traceCPToolbar)
-		console.info(`CPToolbar(props)  props=`, props);
-	const {frameFrequency, setFrameFrequency} = props;
+		dbLog(`🧰 CPToolbar(props=`, props, `) `);
+	let {chosenRate, setChosenRate, frameRateMenuFreqs} = props;
 
-	// these are just defaults; see sAnimator.js for how it's reset based on scan rate
-	const repRates = <>
-		<option key='60' value='60'>60 per sec</option>
-		<option key='30' value='30'>30 per sec</option>
-		<option key='10' value='10'>10 per sec</option>
-		<option key='6' value='6'>6 per sec</option>
-		<option key='2' value='2'>2 per sec</option>
-		<option key='1' value='1'>1 per sec</option>
-		<option key='.5' value='0.500'>every 2 sec</option>
-		<option key='.2' value='0.200'>every 5 sec</option>
-		<option key='.1' value='0.100'>every 10 sec</option>
-		<option key='.0166666666' value='0.0166666666'>every minute</option>
-	</>;
+	// early on, the animator isn't there, nor this variable, so supply a lame but effective default
+	frameRateMenuFreqs ??= [60, 8, 1, 1/60];
+
+	// these are just startup defaults; see sAnimator.js for how it's actually set based on scan rate
+	const rateOptions = frameRateMenuFreqs.map(freq => optionForFreq(freq));
 
 	// nail this down so roundoff error doesn't spoil everything.
 	// It's always of the form n or 1/n where n is an integer
-	const apparentFrequency = (frameFrequency >= 1)
-		? Math.round(frameFrequency)
-		: (1 / Math.round(1 / frameFrequency)).toFixed(3);
+	// const apparentFrequency = (chosenRate >= 1)
+	// 	? Math.round(chosenRate)
+	// 	: (1 / Math.round(1 / chosenRate)).toFixed(3);
 
 	return <div className='CPToolbar'>
 		<div className='frameRateBox'>
 			frame rate:<br />
-			<select className='rateSelector' name='rateSelector' value={apparentFrequency}
-					onChange={ev => setFrameFrequency(ev.currentTarget.value)} >
-				{repRates}
+			<select className='rateSelector' name='rateSelector' value={chosenRate}
+					onChange={ev => setChosenRate(ev.currentTarget.value)} >
+				{rateOptions}
 			</select>
 		</div>
 
@@ -68,7 +81,7 @@ function CPToolbar(props) {
 		<button className={`startStopToggle startStopTool`}
 			onClick={ev => {
 				if (traceCPToolbar)
-					console.info(`CPToolbar props.cPanel.startStop -> (props)  props=`, props);
+					dbLog(`🧰 CPToolbar props.cPanel.startStop -> (props)  props=`, props);
 				props.cPanel.startStop(ev)
 			}}>
 			{ props.shouldBeIntegrating
@@ -79,7 +92,7 @@ function CPToolbar(props) {
 		<button className={`stepButton startStopTool`}
 			onClick={ev=>{
 				if (traceCPToolbar)
-					console.info(`CPToolbar props.cPanel.singleFrame -> (props)  props=`, props);
+					dbLog(`🧰 CPToolbar props.cPanel.singleFrame -> (props)  props=`, props);
 				props.cPanel.singleFrame(ev);
 			}}>
 			<big>►</big> ▌

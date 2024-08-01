@@ -63,6 +63,9 @@ export class SquishPanel extends React.Component {
 
 			// the space for this SP.
 			space: null,
+
+			//  this will get filled in when the rAF mesurements get settled down in sAnimator
+			frameRateMenuFreqs: null,
 		};
 
 
@@ -84,7 +87,9 @@ export class SquishPanel extends React.Component {
 			this.space = space;
 			this.setState({space});  // maybe i don't need this if it's in the context?
 
-			this.animator = new sAnimator(this, space);
+			// CPToolbar needs frameRateMenuFreqs to draw the menu.  If it exists yet.
+			const pickupFreqs = (freqs) => this.setState({frameRateMenuFreqs: freqs});
+			this.animator = new sAnimator(this, space, pickupFreqs);
 
 			this.mainEAvatar = space.mainEAvatar;
 			this.grinder = space.grinder;
@@ -192,7 +197,7 @@ export class SquishPanel extends React.Component {
 						redrawWholeMainWave={this.redrawWholeMainWave}
 
 						iStats={this.iStats}
-
+						frameRateMenuFreqs={s.frameRateMenuFreqs}
 						animator={this.animator}
 						sPanel={this}
 					/>
