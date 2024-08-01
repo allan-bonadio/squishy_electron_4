@@ -15,7 +15,7 @@
 // in qSpace. It's a temporary hack until I figure out a better way.
 // Whereas you'd say makeDoubleGetter(dx) for the dx double in the main
 // object, you'd say makeNamedDoubleGetter(dx0, dimensions[0].dx) for
-// the dx double in the struct array 0th element.  See the code.
+// the dx double in the embedded array dimensions, 0th element.  See the code.
 // Probably I'll have one getter to get the dimension struct and one for
 // the variable in it, sometime in the future.
 
@@ -34,7 +34,7 @@
 #define makeNamedIntGetter(name, field)  printf("\tget " #name  "() { return this.ints[%d]; }\n", intOffset(field));
 #define makeIntSetter(field)  printf("\tset " #field  "(a) { this.ints[%d] = a; }\n", intOffset(field));
 
-// Just need this offset
+// Just need this offset in the JS
 #define makeIntOffset(field)  printf("\t"  #field  "Offset = %d;\n", intOffset(field));
 
 // like makeIntGetter() but creates a different name so as to not conflict with actual JS field in same class.
