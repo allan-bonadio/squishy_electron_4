@@ -51,40 +51,45 @@ class eGrinder {
 	get frameSerial() { return this.ints[3]; }
 	set frameSerial(a) { this.ints[3] = a; }
 
-	get justNFrames() { return this.ints[32]; }
-	set justNFrames(a) { this.ints[32] = a; }
-	get totalCalcTime() { return this.doubles[11]; }
-	get maxCalcTime() { return this.doubles[12]; }
-	get divergence() { return this.doubles[13]; }
-	get shouldBeIntegrating() { return Boolean(this.bools[160]); }
-	set shouldBeIntegrating(a) { this.bools[160] = a; }
-	get isIntegrating() { return Boolean(this.bools[161]); }
-	set isIntegrating(a) { this.bools[161] = a; }
-	get pleaseFFT() { return Boolean(this.bools[162]); }
-	set pleaseFFT(a) { this.bools[162] = a; }
-	get needsRepaint() { return Boolean(this.bools[163]); }
-	set needsRepaint(a) { this.bools[163] = a; }
+	get justNFrames() { return this.ints[34]; }
+	set justNFrames(a) { this.ints[34] = a; }
+	get totalCalcTime() { return this.doubles[12]; }
+	get maxCalcTime() { return this.doubles[13]; }
+	get divergence() { return this.doubles[14]; }
+
+	get shouldBeIntegrating() { return Boolean(this.bools[168]); }
+	set shouldBeIntegrating(a) { this.bools[168] = a; }
+	get isIntegrating() { return Boolean(this.bools[169]); }
+	set isIntegrating(a) { this.bools[169] = a; }
+	get pleaseFFT() { return Boolean(this.bools[170]); }
+	set pleaseFFT(a) { this.bools[170] = a; }
+
+	get needsRepaint() { return Boolean(this.bools[171]); }
+	set needsRepaint(a) { this.bools[171] = a; }
 	get hadException() { return Boolean(this.bools[63]); }
 	set hadException(a) { this.bools[63] = a; }
 	get _exceptionCode() { return this.pointer + 48; }
 
 	get stretchedDt() { return this.doubles[3]; }
 	set stretchedDt(a) { this.doubles[3] = a; }
-	get nGrinderThreads() { return this.ints[31]; }
-	get animationFP() { return this.doubles[9]; }
-	set animationFP(a) { this.doubles[9] = a; }
+	get nGrinderThreads() { return this.ints[33]; }
+	get videoFP() { return this.doubles[9]; }
+	set videoFP(a) { this.doubles[9] = a; }
+	get chosenFP() { return this.doubles[10]; }
+	set chosenFP(a) { this.doubles[10] = a; }
+	startAtomicOffset = 35;
 
-	get _qflick() { return this.ints[20]; }
+	get _qflick() { return this.ints[22]; }
 
-	get _voltage() { return this.ints[21]; }
-	get divergence() { return this.doubles[13]; }
+	get _voltage() { return this.ints[23]; }
+	get divergence() { return this.doubles[14]; }
 
-	get _qspect() { return this.ints[28]; }
-	get _stages() { return this.ints[29]; }
-	get _threads() { return this.ints[30]; }
-	get _label() { return this.pointer + 144; }
-	get sentinel() { return Boolean(this.bools[164]); }
+	get _qspect() { return this.ints[30]; }
+	get _stages() { return this.ints[31]; }
+	get _threads() { return this.ints[32]; }
+	get _label() { return this.pointer + 152; }
 
+	get sentinel() { return Boolean(this.bools[172]); }
 
  	/* ******************* end of direct accessors */
 
@@ -101,7 +106,11 @@ class eGrinder {
 				+`shouldBeIntegrating=${this.shouldBeIntegrating}  isIntegrating=${this.isIntegrating} `
 				+`voltageFactor=${this.voltageFactor}`);
 		}
-		qeFuncs.grinder_triggerIteration(this.pointer);
+		Atomics.store(grinder.ints, this.startAtomicOffset, 0);
+		let nWoke = Atomics.notify(grinder.ints, grinder.startAtomicOffset);
+		//console.log(`🎥 nWoke:`, nWoke);
+
+		//qeFuncs.grinder_triggerIteration(this.pointer);
 	}
 
 	// Grind one frame - Single Threaded - deprecated sortof
