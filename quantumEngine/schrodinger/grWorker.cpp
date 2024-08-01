@@ -13,6 +13,9 @@ static bool traceWork = false;
 static bool traceFinish = false;
 static bool traceSync = false;
 
+static bool traceWorkOccasionally = false;
+static int occasionally = 0;
+
 /* *********************************************** grWorker */
 
 // indexed by thread serial, there may be gaps.
@@ -24,16 +27,20 @@ grWorker **qGrinder::gThreads = sla;
 void grWorker::gThreadWork(void) {
 	int nWas;
 
+	// this one generates a message every iteration.  GADS!  lots of output.
 	if (traceWork)  {
-		speedyLog("🔪              thread #%d: shouldBeIntegrating=%d  isIntegrating=%d.  "
+		speedyLog("🔪        thread #%d: shouldBeIntegrating=%d  isIntegrating=%d.  "
 			"nFinishedThreads=%d\n",
 			serial, grinder->shouldBeIntegrating, grinder->isIntegrating,
-			#ifdef USING_ATOMICS
 			grinder->finishAtomic
-			#else
-			grinder->nFinishedThreads
-			#endif
-			);
+		);
+	}
+
+	// this one, maybe every several seconds or less.  Feel free to adjust.
+	if (traceWorkOccasionally && occasionally-- < 0) {
+		speedyLog("🔪 grWorker working...shouldBeIntegrating=%d startAtomic=%d\n",
+			grinder->shouldBeIntegrating, grinder->startAtomic);
+		occasionally = 200;
 	}
 
 	// Gonna do an integration frame.  set starting time, under lockf
@@ -53,6 +60,7 @@ void grWorker::gThreadWork(void) {
 }
 
 // do the atomics and synchronization, and call gThreadWork().  runs repeatedly.
+// Or blocked on startAtomic.
 // Catches exceptions; copies them to grinder for the JS to pick up, continues.
 void grWorker::gThreadLoop(void) {
 	while (true) {
@@ -63,16 +71,17 @@ void grWorker::gThreadLoop(void) {
 			// All other gThread threads will also be waiting for startMx.  When this one gets its chance,
 			// it'll lock and unlock, then start its integration work.
 			// so they all start at roughly the same time.
-			#ifdef USING_ATOMICS
 			if (traceSync) speedyLog("🏁 🔪 at Starting Gate in grWorker::gThreadLoop- "
 				"startAtomic=%d (stopped= -1, go=0) 🏁\n",
 				grinder->startAtomic);
 			speedyFlush();
 
 			// wait forever to get notified, when startAtomic changes from -1 to zero
-			int howEnded = emscripten_atomic_wait_u32(&grinder->startAtomic, -1, ATOMICS_WAIT_DURATION_INFINITE);
+			// emscripten_atomic_wait_u32() doesn't work here so use the futex call
+			printf("startAtomic: pointer: %p   size: %lu   \n", &grinder->startAtomic, sizeof(grinder->startAtomic));
+			int howEnded = emscripten_futex_wait(&grinder->startAtomic, -1, 1e12);
 			if (traceSync) speedyLog("🔪 after atomic wait on startAtomic=%d (shdbe 0) and wait "
-				"returned %d ok=0, ≠1, timeout=2\n",
+				"returned %d ok=0, ≠1, timeout= ∞\n",
 				emscripten_atomic_load_u32(&grinder->startAtomic), howEnded);
 			speedyFlush();
 
@@ -88,41 +97,21 @@ void grWorker::gThreadLoop(void) {
 // 			nWas++;
 
 			//speedyLog("after increment on startAtomic=%d (shdbe 1 or more)\n", nWas);
-
-			#else
-
-			pthread_mutex_lock(&grinder->startMx);
-				nWas = ++grinder->nStartedThreads;
-			pthread_mutex_unlock(&grinder->startMx);
-
-			// upon last one started, lock the mutex again for next cycle
-			if (nWas >= grinder->nGrinderThreads)
-				pthread_mutex_lock(&grinder->startMx);
-
-			#endif
 			// I don't think we really need this counting for start....?
 			if (traceStart)
 				speedyLog("🔪 start of work, nStarted=%d\n", nWas);
 			speedyFlush();
 
-
 			gThreadWork();
 			speedyFlush();
 
-
 			// tell the boss we're done
-			#ifdef USING_ATOMICS
-			if (traceSync) speedyLog("🔪 before increment on finishAtomic=%d (shdbe 0)\n", grinder->finishAtomic);
+			if (traceSync) speedyLog("🔪 before increment on finishAtomic=%d (shdbe 0)\n",
+				grinder->finishAtomic);
 			nWas = emscripten_atomic_add_u32(&grinder->finishAtomic, 1);  // returns number BEFORE incr
 			nWas++;
-			if (traceSync) speedyLog("🔪 after increment on finishAtomic=%d (shdbe 1 or more)\n", grinder->finishAtomic);
-
-			#else
-
-			pthread_mutex_lock(&grinder->finishMx);
-				nWas = ++grinder->nFinishedThreads;
-			pthread_mutex_unlock(&grinder->finishMx);
-			#endif
+			if (traceSync) speedyLog("🔪 after increment on finishAtomic=%d (shdbe 1 or more)\n",
+				grinder->finishAtomic);
 
 			if (traceFinish) {
 				speedyLog("🔪 finishing work on thread %d, nFinished=%d\n",
