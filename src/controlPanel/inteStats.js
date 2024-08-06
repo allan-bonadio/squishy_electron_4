@@ -142,7 +142,6 @@ class inteStats {
 		const sm = this.statsMap;
 
 		// some of these aren't here when we need them.  Grinder numbers come from c++
-		//let frameCalcTime = 0;
 		if (grinder) {
 			this.display(sm.divergence, grinder.divergence, 0, (value, element) => {
 				let dv = grinder.divergence;
@@ -163,8 +162,7 @@ class inteStats {
 				}
 			});
 
-			this.display(sm.frameCalcTime, grinder.maxCalcTime * 1000);  // seconds to ms
-			//frameCalcTime = grinder.frameCalcTime;
+			this.display(sm.frameCalcTime, grinder.maxCalcTime );
 		}
 
 
