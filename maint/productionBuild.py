@@ -5,6 +5,7 @@ import os
 import subprocess
 import time
 
+print('This is NOT the correct one to use; just an experiment')
 
 def runMe(argv):
 	subprocess.run(argv, timeout=10, check=True, encoding='utf8')

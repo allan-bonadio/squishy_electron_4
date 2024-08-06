@@ -12,6 +12,8 @@ I get it.  Standing wave freq 0 => nans.
 
 - need a button to reset ALL params and settings
 
+- need a hamburger menu for things like the above.
+
 
 ## GL & WaveView
 
@@ -35,10 +37,6 @@ Needs fixing.
 
 - set voltage: valley should prohibit negative powers and negative
 factors.  Also, displays upside down.
-
-- the potential stuff now shows/hides as the mouse hovers over the
-waveview.  The other mechanisms to show voltage shouild be removed or
-disabled or something.
 
 - Voltage sidebar should be made part of the voltage stuff, showing and
 hiding with it.  Get rid of that scrollbar that doesn't do anything and
