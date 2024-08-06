@@ -33,7 +33,7 @@ export class eDimension {
 /* **************************************************************** eSpace */
 // this is how you create a qSpace - start from JS and call this.
 // call like this:
-// new eSpace([{N: 128, continuum: qe.contENDLESS,coord: 'x'}], spaceLabelString)
+// new eSpace([{N: 128, continuum: qeConsts.contENDLESS,coord: 'x'}], spaceLabelString)
 // labels must be unique.  Modeled after qSpace in C++,
 // does all dimensions in constructor, at least.
 // Coords are the same if two dims are parallel, eg two particles with x coords.

@@ -241,7 +241,7 @@ export class ControlPanel extends React.Component {
 		this.grinder.frameSerial = 0;
 
 		mainEWave.setFamiliarWave(waveParams);  // eSpace does this initially
-		qe.grinder_copyFromAvatar(this.grinder.pointer, this.mainEAvatar.pointer);
+		qeFuncs.grinder_copyFromAvatar(this.grinder.pointer, this.mainEAvatar.pointer);
 		p.redrawWholeMainWave();
 	}
 
@@ -271,7 +271,7 @@ export class ControlPanel extends React.Component {
 				if (this.grinder.isIntegrating)
 					space.grinder.pleaseFFT = true;  // remind me after next iter
 				else
-					qe.grinder_askForFFT(space.grinder.pointer);  // do it now
+					qeFuncs.grinder_askForFFT(space.grinder.pointer);  // do it now
 			}
 		});
 	}
