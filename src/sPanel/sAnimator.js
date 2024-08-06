@@ -146,9 +146,10 @@ class sAnimator {
 	// all the frame periods
 	// based on the detected screen frame rate, choose items on the Frame Rate menu
 	recalcFrameMenuRates(videoRate) {
-		console.log(`🎥 recalcFrameMenuRates(${videoRate}) `)
+		//console.log(`🎥 recalcFrameMenuRates(${videoRate}) `)
 		// start the list on the Frame Rate menu.
-		this.frameRateMenuFreqs = [qeConsts.FASTEST, videoRate];
+		this.frameRateMenuFreqs = [videoRate];  // can't figure out how to do FASTEST
+		//this.frameRateMenuFreqs = [qeConsts.FASTEST, videoRate];
 
 		let aRate = videoRate
 		while (round(aRate / 2) * 2 == aRate) {
@@ -274,7 +275,7 @@ class sAnimator {
 		return this.findNearestMenuFreq(getASetting('frameSettings', 'chosenFP'));
 	}
 
-	/* *************************************  runningDiagnosticCycle of circular wave*/
+	/* *************************************  the heartbeat */
 
 	rAFHandler =
 	now => {

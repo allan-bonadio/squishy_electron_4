@@ -13,9 +13,6 @@ import {select as d3_select} from 'd3-selection';
 import {axisLeft as d3_axisLeft} from 'd3-axis';
 
 import ReactFauxDOM from 'react-faux-dom';
-
-//import qe from '../engine/qe.js';
-
 import clickNDrag from '../widgets/clickNDrag.js';
 import './volts.scss';
 

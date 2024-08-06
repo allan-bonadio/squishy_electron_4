@@ -11,7 +11,7 @@
 static bool traceStart = false;
 static bool traceWork = false;
 static bool traceFinish = false;
-static bool traceSync = false;
+static bool traceSync = true;
 
 static bool traceWorkOccasionally = false;
 static int occasionally = 0;
@@ -71,18 +71,22 @@ void grWorker::gThreadLoop(void) {
 			// All other gThread threads will also be waiting for startMx.  When this one gets its chance,
 			// it'll lock and unlock, then start its integration work.
 			// so they all start at roughly the same time.
-			if (traceSync) speedyLog("🏁 🔪 at Starting Gate in grWorker::gThreadLoop- "
-				"startAtomic=%d (stopped= -1, go=0) 🏁\n",
-				grinder->startAtomic);
+			if (traceSync) {
+				speedyLog("🏁 🔪 at Starting Gate in grWorker::gThreadLoop "
+					"startAtomic=%d (stopped= -1, go=0) pointer: %p   size: %lu  🏁\n",
+					grinder->startAtomic, &grinder->startAtomic, sizeof(grinder->startAtomic));
+			}
 			speedyFlush();
 
 			// wait forever to get notified, when startAtomic changes from -1 to zero
 			// emscripten_atomic_wait_u32() doesn't work here so use the futex call
-			printf("startAtomic: pointer: %p   size: %lu   \n", &grinder->startAtomic, sizeof(grinder->startAtomic));
 			int howEnded = emscripten_futex_wait(&grinder->startAtomic, -1, 1e12);
-			if (traceSync) speedyLog("🔪 after atomic wait on startAtomic=%d (shdbe 0) and wait "
-				"returned %d ok=0, ≠1, timeout= ∞\n",
-				emscripten_atomic_load_u32(&grinder->startAtomic), howEnded);
+
+			if (traceSync) {
+				speedyLog("🏁 🔪 after atomic wait on startAtomic=%d (shdbe 0) and wait "
+					"returned howEnded=%d ok=0, ≠1, timeout= ∞  🏁\n",
+					emscripten_atomic_load_u32(&grinder->startAtomic), howEnded);
+			}
 			speedyFlush();
 
 			// now we count each thread as it starts up
