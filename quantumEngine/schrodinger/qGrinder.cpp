@@ -243,7 +243,7 @@ void qGrinder::copyToAvatar(qAvatar *avatar) {
 	qflick->copyBuffer(avatar->qwave, qflick);  // from buffer zero
 }
 
-/* ********************************************************** tally & measure divergence */
+/* **********************************************************  divergence */
 
 static int tally = 0;
 
@@ -278,6 +278,30 @@ void qGrinder::tallyUpKinks(qWave *qwave) {
 		speedyLog("🪓 tallyUpKinks result: tally/2= %d out of %d or %5.1f %%\n",
 			tally/2, N, 100.0 * tally / N / 2);
 	divergence = tally/2;
+}
+
+// see how many alternating derivatives we have.  Then convert to a user-visible
+// number and issue errors or warnings
+void qGrinder::measureDivergence() {
+	tallyUpKinks(qflick);
+	if (divergence > 20) {
+		int N = space->dimensions[0].N;
+
+		if (divergence > N * 15 / 16) {
+			char buf[64];
+			snprintf(buf, 64, "🪓 🪓 wave is DIVERGING, divergence=%4.4g %% 🔥 🧨", divergence);
+			shouldBeIntegrating = isIntegrating = false;
+
+			// js code intercepts this exact spelling
+			reportException("Sorry, your wave integration diverged! Try a shorter "
+				"stretch factor for ∆t.  Click Start Over to try again.", "diverged");
+		}
+		else {
+			// not bad yet
+			speedyLog("🪓 wave starting to Diverge, divergence=%4.4g / %d 🧨\n",
+				divergence, N);
+		}
+	}
 }
 
 /* ********************************************************** doing Integration */
@@ -380,20 +404,24 @@ void qGrinder::aggregateCalcTime(void) {
 
 // runs in the thread loop, only in the last thread to finish integration in an integration frame.
 void qGrinder::threadsHaveFinished() {
-	if (traceThreadsHaveFinished) speedyLog("🪓 qGrinder::threadsHaveFinished starts\n");
+	double thfTime;
+	if (traceThreadsHaveFinished) {
+		thfTime = getTimeDouble();
+		speedyLog("🪓 qGrinder::threadsHaveFinished starts\n");
+	}
 	aggregateCalcTime();
 
 	// single step (or a few steps): are we done yet? we shouldn't do
 	// single step this way; should just have shouldBeIntegrating off
 	// while triggering.  TODO
-	if (justNFrames) {
-		if (traceSingleStep) speedyLog("🪓 ss: justNFrames = %d\n", justNFrames);
-		--justNFrames;
-		if (0 >= justNFrames) {
-			shouldBeIntegrating = false;
-			if (traceSingleStep) speedyLog("🪓 ss turned off sbi: justNFrames = %d\n", justNFrames);
-		}
-	}
+// 	if (justNFrames) {
+// 		if (traceSingleStep) speedyLog("🪓 ss: justNFrames = %d\n", justNFrames);
+// 		--justNFrames;
+// 		if (0 >= justNFrames) {
+// 			shouldBeIntegrating = false;
+// 			if (traceSingleStep) speedyLog("🪓 ss turned off sbi: justNFrames = %d\n", justNFrames);
+// 		}
+// 	}
 
 	if (traceIntegration)  {
 		speedyLog("🪓                ...in threadsHaveFinished().  justNFrames=%d and "
@@ -419,44 +447,34 @@ void qGrinder::threadsHaveFinished() {
 	// thing that'll happen is the image will be part one frame and part
 	// the next frame.
 	copyToAvatar(avatar);
-	needsRepaint = true;
-	if (traceThreadsHaveFinished) speedyLog("🪓 threadsHaveFinished()— copied latest wave"
-		" to avatar needsRepaint=%d  shouldBeIntegrating=%d   isIntegrating=%d\n",
-			needsRepaint, shouldBeIntegrating, isIntegrating);
 
-	if (this->pleaseFFT) analyzeWaveFFT(qflick, "before fourierFilter()");
+	needsRepaint = true;
+
+	if (traceThreadsHaveFinished)
+		speedyLog("🪓 threadsHaveFinished()— copyToAvatar() in %10.6lf ms - needsRepaint=%d"
+			" shouldBeIntegrating=%d   isIntegrating=%d\n",
+			getTimeDouble() - thfTime, needsRepaint, shouldBeIntegrating, isIntegrating);
+
+	if (this->pleaseFFT)
+		analyzeWaveFFT(qflick, "latest fft");
 	this->pleaseFFT = false;
 
-	// see how many alternating derivatives we have
-	tallyUpKinks(qflick);
-	if (divergence > 10) {
-		int N = space->dimensions[0].N;
-
-		if (divergence > N * 15 / 16) {
-			char buf[64];
-			snprintf(buf, 64, "🪓 🪓 wave is DIVERGING, divergence=%4.4g %% 🔥 🧨", divergence);
-			shouldBeIntegrating = isIntegrating = false;
-
-			// js code intercepts this exact spelling
-			reportException("Sorry, your wave integration diverged! Try a shorter "
-				"stretch factor for ∆t.  Click Start Over to try again.", "diverged");
-		}
-		else {
-			speedyLog("🪓 wave starting to Diverge, divergence=%4.4g / %d 🧨\n",
-				divergence, N);
-		}
-	}
+	measureDivergence();
 
 	// ready for new frame
 	// check whether we've stopped and leave it locked or unlocked for the next cycle.
 	// this retriggers every frametime, if the chosenFP is FASTEST.
-	if (isIntegrating && FASTEST == chosenFP)
-		emscripten_atomic_store_u32(&startAtomic, 0);  // start next iteration ASAP
-	else
-		emscripten_atomic_store_u32(&startAtomic, -1);  // stop integration, wait for JS to retrigger
+	// if (isIntegrating && FASTEST == chosenFP)
+	// 	emscripten_atomic_store_u32(&startAtomic, 0);  // start next iteration ASAP
+	// else
+	emscripten_atomic_store_u32(&startAtomic, -1);  // stop integration, wait for JS to retrigger
 	emscripten_atomic_store_u32(&finishAtomic, 0);
-	if (traceThreadsHaveFinished) speedyLog("🪓  so now startAtomic=%d   and finishAtomic=%d\n",
+
+	if (traceThreadsHaveFinished) {
+		speedyLog("🪓  threads have finished in %10.6lf ms; startAtomic=%d finishAtomic=%d\n",
+		getTimeDouble() - thfTime,
 		emscripten_atomic_load_u32(&startAtomic), emscripten_atomic_load_u32(&finishAtomic));
+	}
 
 }
 

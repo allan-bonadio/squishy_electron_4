@@ -110,6 +110,7 @@ struct qGrinder {
 	double maxCalcTime;  // and max of all threads
 
 	double divergence;  // divergence measure
+	void measureDivergence(void);
 
 	// for the fourier filter.  Call the function first time you need it.
 	// owned if non-null
