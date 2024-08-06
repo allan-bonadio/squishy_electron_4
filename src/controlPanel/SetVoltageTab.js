@@ -17,7 +17,7 @@ let MINI_WIDTH = 300;
 let MINI_HEIGHT = 150;
 
 
-// used in multiple places
+// used in multiple places?
 // can't figure out how to get hover working.  grrrr.
 export function ShowVoltageControl(props) {
 	return <label className='ShowVoltageControl' >
