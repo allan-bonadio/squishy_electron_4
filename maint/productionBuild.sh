@@ -8,6 +8,8 @@ cd $SQUISH_ROOT
 maint/scanForTraces.py || exit $?
 #maint/scanForTraces.sh || exit $?
 
+maint/cppSymlinks.py -
+
 echo "🎁 🔨 Clean and Build Production Squishy Electron"  `date +%c`
 echo you can do either make build or npm build, same
 

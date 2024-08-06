@@ -1,1 +1,16 @@
+# stuff that's built for production
+
 doc
+
+
+# symlinks used for development so you can see  c++ sources in debugger
+building
+debroglie
+fourier
+greiman
+hilbert
+schrodinger
+testing
+wasm
+
+
