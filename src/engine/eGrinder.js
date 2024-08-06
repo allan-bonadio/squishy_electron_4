@@ -106,8 +106,8 @@ class eGrinder {
 				+`shouldBeIntegrating=${this.shouldBeIntegrating}  isIntegrating=${this.isIntegrating} `
 				+`voltageFactor=${this.voltageFactor}`);
 		}
-		Atomics.store(grinder.ints, this.startAtomicOffset, 0);
-		let nWoke = Atomics.notify(grinder.ints, grinder.startAtomicOffset);
+		Atomics.store(this.ints, this.startAtomicOffset, 0);
+		let nWoke = Atomics.notify(this.ints, this.startAtomicOffset);
 		//console.log(`🎥 nWoke:`, nWoke);
 
 		//qeFuncs.grinder_triggerIteration(this.pointer);
