@@ -18,7 +18,8 @@ let fs;  // filled in after promise is resolved
 
 // the exports list.
 // in C++: each function must be declared 'export "C" ...'
-// in JS: import qe from 'engine/qe', then use qe.funcname()
+// in JS: import qeConsts from 'engine/qeConsts', then use qeConsts.funcname()
+// and: import qeFuncs from 'engine/qeFuncs', then use qeFuncs.constName()
 // also must call defineQEngineFuncs() after C++ is initialized
 // Very often, object pointers are passed in as numbers from JS, which keeps pointers for significant objects
 // then, in C++, those arguments are just the right type.  ez peazy.
@@ -53,7 +54,7 @@ let exportsSrc  = [
 	// ************************* grinder
 
 	// for the older, same-thread integration, or to be run in a/the thread
-	{name: 'grinder_triggerIteration', args: ['number'], retType: null},
+	// now done with js Atomics {name: 'grinder_triggerIteration', args: ['number'], retType: null},
 
 	// only needed if UI thread does a frame's worth of integration
 	{name: 'grinder_oneFrame', args: ['number'], retType: null},
@@ -89,10 +90,13 @@ let commonConstants = [
 	// all values are |𝜓| <1, and typically |𝜓| > roundoff error
 	// these are not really the radius, it's more rectangular, but pretty much the same idea
 	{name: 'ERROR_RADIUS', cppType: 'double', value: 1e-12},
+
+	// out-of-band value that means Fastest on frame speed menu
+	{name: 'FASTEST', cppType: 'double', value: 999_999},
 ];
 
 
-/* ************************************************************************** Generate Files */
+/* *********************************** Generate .h Files */
 // since the template strings all have tabs on most lines from the source,
 // I remove them often after the string is made.  Except some lines don't need it...
 // i'm inserting various newlines and tabs here and there to make them look nice.
@@ -134,50 +138,80 @@ function generateCommonConstants() {
 }
 
 
-// qe.js file, funcs and constants for the js side
+/* *********************************** Generate .js Files */
+// qeFuncs.js and qeConsts.js files, funcs and constants for the js side
+// New!  qeFuncs.js and qeConsts.js
 
-function generateQeJs() {
+
+// the funcs need emscripten's cwrap() to wrap them; only available in browser while running
+// and after this function runs
+function generateQeFuncs() {
 	// the JS file with the stub JS funcs that call the c++ funcs.  convert json's double " to single '
 	let defineFuncBody = exportsSrc.map(funcDesc => {
-		return `\t\tqe.${funcDesc.name} = cwrap('${funcDesc.name}', `+
+		return `\t\tqeFuncs.${funcDesc.name} = cwrap('${funcDesc.name}', `+
 			`${JSON.stringify(funcDesc.retType).replace(/\x22/g, '\x27')}, `+
 			`${JSON.stringify(funcDesc.args).replace(/\x22/g, '\x27')});`;
 	});
 
-	const JsConsts = commonConstants.map(co => `\tqe.${co.name} = ${co.value};`);
-
-	let code = `/*
-	** qe - quantum engine interface
+	let funcCode = `/*
+	** qeFuncs - quantum engine functions shared js ⇆  C++
 	** this file generated ${new Date()}
 	** by the file SquishyElectron/quantumEngine/building/genExports.js
 	*/
 
 	let cwrap;
-	export const qe = {};
+	export const qeFuncs = {};
 
 	export function defineQEngineFuncs() {
+		// needs to run this in the app with emscripten set up for cwrap to exist
+		// or punt on it for node.js situations like unit tests
 		// eslint-disable-next-line no-restricted-globals
-		cwrap = self.Module.cwrap;
-	\n${defineFuncBody.join('\n')}
+		cwrap = globalThis.Module.cwrap;
 
-		// constants shared with C++
-	${JsConsts.join('\n\t')}
+${defineFuncBody.join('\n')}
+
 	}
 
-	window.defineQEngineFuncs = defineQEngineFuncs;  // just in case
-	window.qe = qe;
+	globalThis.defineQEngineFuncs = defineQEngineFuncs;  // just in case
+	globalThis.qeFuncs = qeFuncs;
 
-	export default qe;
+	export default qeFuncs;
 	\n`;
 	if (traceOutput)
-		console.log('qe.js:\n' + code);
-	let cleanCode = code.replace(/\n\t/g, '\n');  // tabs from above string
+		console.log('qeFuncs.js:\n' + funcCode);
+	let cleanCode = funcCode.replace(/\n\t/g, '\n');  // tabs from above string
 	if (traceOutput)
-		console.log('qe.js:\n' + cleanCode);
+		console.log('qeFuncs.js:\n' + cleanCode);
 
-	fs.writeFile(`${process.env.SQUISH_ROOT}/src/engine/qe.js`, cleanCode,
+	fs.writeFile(`${process.env.SQUISH_ROOT}/src/engine/qeFuncs.js`, cleanCode,
 		ex => ex && console.error(ex));
 }
+
+function generateQeConsts() {
+
+	const JsConsts = commonConstants.map(co => `\tqeConsts.${co.name} = ${co.value};`);
+
+	let constCode = `/*
+	** qeConsts - quantum engine constants shared js ⇆  C++
+	** this file generated ${new Date()}
+	** by the file SquishyElectron/quantumEngine/building/genExports.js
+	*/
+
+	const qeConsts = {};
+	${JsConsts.join('\n\t')}
+	export default qeConsts;
+	`;
+
+	if (traceOutput)
+		console.log('qeConsts.js:\n' + constCode);
+	let cleanCode = constCode.replace(/\n\t/g, '\n');  // tabs from above string
+	if (traceOutput)
+		console.log('qeConsts.js:\n' + cleanCode);
+
+	fs.writeFile(`${process.env.SQUISH_ROOT}/src/engine/qeConsts.js`, cleanCode,
+		ex => ex && console.error(ex));
+}
+
 
 /* ************************************************************************** main */
 
@@ -187,8 +221,10 @@ fsProm.then(fsModule => {
 
 	// now write out the 3 files
 	generateExports();
+	generateQeFuncs();
+
 	generateCommonConstants();
-	generateQeJs();
+	generateQeConsts();
 	console.log(`genExports done `);
 	// now give it time to finish, and Node will quit
 }).catch(ex => {

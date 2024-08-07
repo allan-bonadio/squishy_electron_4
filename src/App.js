@@ -11,7 +11,7 @@ import CommonDialog from './widgets/CommonDialog.js';
 import DocReader from './widgets/DocReader.js';
 import {eSpaceCreatedPromise} from './engine/eEngine.js';
 
-let traceResize = true;
+let traceResize = false;
 
 class App extends React.Component {
 	constructor(props) {
@@ -20,10 +20,9 @@ class App extends React.Component {
 
 		this.state = {
 			// somehow if we set these, we get strange sizing problems with the scroll bar.
-			//clientWidth: document.body.clientWidth,  // window width as of constructor
-			//clientHeight: document.body.clientHeight,
+			clientWidth: document.body.clientWidth,  // window width as of constructor
 
-			// should roughly equal
+			// part of startup
 			cppRunning: false,
 
 			// non-null when dialog is showing
@@ -43,7 +42,8 @@ class App extends React.Component {
 			if (traceResize)
 				console.log(`🍦  App Mount: window resize, from bodyClientWidth=${bodyClientWidth} to ${this.appEl?.clientWidth}`, ev);
 			console.assert(ev.currentTarget === window, `ev.currentTarget =?== window`);
-			bodyClientWidth = this.appEl?.clientWidth
+
+			bodyClientWidth = document.body.clientWidth;
 
 			// if we don't set the state here, nobody redraws.  Otherwise, get body.clientWidth directly.
 			this.setState({clientWidth: bodyClientWidth});
@@ -63,7 +63,7 @@ class App extends React.Component {
 			//debugger;
 		}
 
-		// if they got the URL with ?intro=1 on the end, open the introduction
+		// if they got the URL with ?intro=1 on the end, open the introduction doc reader
 		if ('?intro=1' == location.search) {    // eslint-disable-line no-restricted-globals
 			setTimeout(() => {
 				DocReader.openWithUri('/intro/intro1.html');
@@ -82,7 +82,7 @@ class App extends React.Component {
 		localStorage.fontSize = fontSize;
 	}
 
-	// render all these letter buttons
+	// render all these letter buttons.  Each is 1.25x bigger than the previous.
 	renderFontSizer() {
 		return <aside className='fontSizer'>
 			<span style={{fontSize: '10.24px'}} onClick={this.setFontSize}>A</span>
@@ -114,10 +114,11 @@ class App extends React.Component {
 		if (s.cppRunning) {
 			// real squishpanel
 			sqPanel = <SquishPanel id='theSquishPanel'
-				width={this.appEl?.clientWidth ?? document.body.clientWidth}/>;
-			if (this.appEl?.clientWidth != document.body.clientWidth)
-					console.log(`🍦 render if cppRunning, appEl?.clientWidth=${this.appEl?.clientWidth} ≠ body.clientWidth=${document.body.clientWidth} this.appEl=`, this.appEl);
-
+				width={s.clientWidth} />;
+			//if (this.appEl?.clientWidth != document.body.clientWidth)
+					console.log(`🍦 render if cppRunning, appEl?.clientWidth=${this.appEl?.clientWidth} ≠ `
+							+`body.clientWidth=${document.body.clientWidth} state.clientWidth=${s.clientWidth} this.appEl=`,
+							this.appEl);
 		}
 		else {
 			// spinner tells ppl we're working on it
@@ -142,7 +143,6 @@ class App extends React.Component {
 					<img id='emscriptenLogo' src='logos/emscriptenLogo.svg' alt='powered by Emscripten'/>
 					<img id='webassemblyLogo' src='logos/webassemblyLogo.svg'  alt='powered by WebAssembly'/>
 					<img id='webglLogo' src='logos/webglLogo.svg'  alt='powered by WebGL'/>
-					<img id='openglLogo' src='logos/openglLogo.svg'  alt='powered by OpenGL'/>
 				</footer>
 			</main>
 		);

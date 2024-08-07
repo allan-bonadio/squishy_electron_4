@@ -28,7 +28,6 @@ maybe we allocate buffers in blocs of 6 * nPoints doubles, so they're easier to 
 
 // stuff missing: boundaries wraparound, incrementing elapsed time
 // how to get at real/imag given a pointer to imag/real
-// premultiply the voltageFactor
 // not N, but N + (0 or 2) call it Nb
 
 struct {
@@ -55,7 +54,7 @@ void stepOneReal(double *newReal, double *oldReal, double *hamiltReal, double *h
 	double d2𝜓 = hamiltImag[ix-1] + hamiltImag[ix+1] - hamiltImag[ix] * 2;
 
 	// total hamiltonian including voltage
-	double H𝜓 = d2𝜓 + voltage[ix] * voltageFactor * hamiltReal[ix];
+	double H𝜓 = d2𝜓 + voltage[ix] * hamiltReal[ix];
 
 	// new = old + 𝛥𝜓 dt   note subtraction
 	newReal[ix] = oldReal[ix] - dt * H𝜓;
@@ -68,7 +67,7 @@ void stepOneImag(double *newImag, double *oldImag, double *hamiltReal, double *h
 	double d2𝜓 = hamiltReal[ix-1] + hamiltReal[ix+1] - hamiltReal[ix] * 2;
 
 	// total hamiltonian
-	double H𝜓 = d2𝜓 + voltage[ix] * voltageFactor * hamiltImag[ix];
+	double H𝜓 = d2𝜓 + voltage[ix] * hamiltImag[ix];
 
 	// note addition
 	newImag[ix] = oldImag[ix] + dt * H𝜓;

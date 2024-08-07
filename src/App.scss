@@ -31,7 +31,7 @@ var {
 }
 
 small {
-	font-size: .8em;  // one step smaller
+	font-size: .8em;  // one step smaller, powers of 0.8
 }
 
 big {
@@ -95,6 +95,17 @@ input[type=range] {
 	//height: 4em;
 // 	background-color: #4cf;
 // 	color: #fc4
+}
+
+select {
+	//appearance: none;
+	background-color: #eef;
+	font-size: 1em;
+	padding: .2em .5em;
+	height: 2em;
+	border-color: #888;
+	box-shadow: outset #0008 .3em .3em .3em;
+	border-radius: 0 .5em 0 .5em;
 }
 
 .LogSlider {

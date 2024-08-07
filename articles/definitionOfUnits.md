@@ -225,7 +225,7 @@ voltage times the charge of 1 electron.
 
 Move the coefficients on the left to the right:
 
-∂/∂t 𝜓 = - iU𝜓 / ℏ + iℏ/(2m_e 𝜉²) ∂²/∂ix² 𝜓
+∂/∂t 𝜓 = - iU𝜓/ℏ + iℏ/(2m_e 𝜉²)  ∂²/∂ix²  𝜓
 
 That is how integration proceeds, calculating d𝜓 for each time step.
 The coefficient  on the double derivative is the 'diffusivity' 𝛼

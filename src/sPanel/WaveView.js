@@ -14,36 +14,37 @@ import PropTypes from 'prop-types';
 
 import eSpace from '../engine/eSpace.js';
 import {thousands, thousandsSpaces} from '../utils/formatNumber.js';
-import qe from '../engine/qe.js';
-import './view.scss';
+import qeConsts from '../engine/qeConsts.js';
+import './WaveView.scss';
 import {getASetting, storeASetting} from '../utils/storeSettings.js';
 
-import VoltageArea from './VoltageArea.js';
-import VoltageSidebar from './VoltageSidebar.js';
+import VoltOverlay from '../volts/VoltOverlay.js';
 import GLView from '../gl/GLView.js';
 import {eSpaceCreatedPromise} from '../engine/eEngine.js';
 
+let traceBumpers = false;
 
 let traceScaling = false;
 let traceDragCanvasHeight = false;
 let traceWidth = false;
 
-// size of the size box at lower right of canvas; also width of the voltage sidebar
-const sizeBoxSize = 24;
-const voltageSidebarWidth = 32;  // passed down to VoltageSidebar.  Seems to want to be 32
+// size of the size box at lower right of canvas.  If you change this, also change $sizeBoxSize in the .scss
+const SIZE_BOX_SIZE = 24;
+const BUMPER_WIDTH = 16;
+
 
 export class WaveView extends React.Component {
 	static propTypes = {
 		// the title of the view
 		viewName: PropTypes.string,
 
-		space: PropTypes.instanceOf(eSpace),
+		// no!  handed in by promise space: PropTypes.instanceOf(eSpace),
 
 		// handed in, pixels.  Width of whole waveview,
 		// including sidebar.  Canvas is 1 pixel smaller all around.
-		width: PropTypes.number,
+		outerWidth: PropTypes.number.isRequired,
 
-		showVoltage: PropTypes.bool.isRequired,
+		showVoltage: PropTypes.string.isRequired,
 
 		sPanel: PropTypes.object.isRequired,
 	};
@@ -54,21 +55,20 @@ export class WaveView extends React.Component {
 		this.sPanel.wView = this;
 
 		this.state = {
-			height: getASetting('miscSettings', 'waveViewHeight'),  // pixels
-			space: null,  // set when promise comes in
+			outerHeight: getASetting('miscSettings', 'waveViewHeight'),  // pixels
 
-			// No!  dom and he row flex decides canvasWidth: props.width - (props.showVoltage * voltageSidebarWidth),
+			// no!  handed in by promise space: null,  // set when promise comes in
 
-			// These are in
+			// This is from the space
 			vDisp: null,
 		}
-		// directly measured Canvas width & height and maybe more set by
-		// the lower levels with setCanvasFacts() and passed to the
-		// lower levels. gotta be initialized in setCanvasFacts()
-		this.canvasFacts = {width: 0, height: 0};
+		// directly measured Canvas innr width & height and maybe more set by
+		// the lower levels with setCanvasInnerDims() and passed to the
+		// lower levels. correctly initialized in setCanvasInnerDims()
+		this.canvasInnerDims = {width: props.outerWidth - 2, height: this.state.outerHeight - 2};
 
-		this.formerWidth = props.width;
-		this.formerHeight = this.state.height;
+		this.formerWidth = props.outerWidth;
+		this.formerHeight = this.state.outerHeight;
 		this.formerShowVoltage = props.showVoltage;
 
 		// make the proptypes shuddup about it being undefined
@@ -104,21 +104,22 @@ export class WaveView extends React.Component {
 			throw `this.gl ≠ gl !`;
 	}
 
-	// we finally have a canvas; rush its dimensions up here.  Early in
+	// GLView finally has a canvas; rush its dimensions up here.  Early in
 	// startup, either or both might be undefined, ignores those
-	setCanvasFacts =
-	(width, height) => {
-		if (width)
-			this.canvasFacts.width = width;
+	setCanvasInnerDims =
+	(innerWidth, height) => {
+		if (innerWidth)
+			this.canvasInnerDims.width = innerWidth;
 		if (height) {
-			height += 2;
-			this.canvasFacts.height = height;
-			if (height != this.state.height)
-				this.setState({height: height});
+			this.canvasInnerDims.height = height;
+
+			// height is kept in WaveView state; width comes from props from win width
+			// canvas has 1px border between inner and outer
+			if (height + 2 != this.state.outerHeight)
+				this.setState({outerHeight: height + 2});
 		}
 		if (traceWidth)
-			console.log(`🏄 WaveView canvasFacts, width=${width}   height: ${height}  `);
-		this.gl.viewport(0, 0, width, height);
+			console.log(`🏄 WaveView canvasInnerDims, width=${innerWidth}   height: ${height}  `);
 	}
 
 	componentDidUpdate() {
@@ -130,29 +131,31 @@ export class WaveView extends React.Component {
 		// a lot, including resizing the canvas.
 		if (this.mainEAvatar && (this.formerShowVoltage != p.showVoltage
 					|| this.formerWidth != this.waveViewEl.clientWidth
-					|| this.formerHeight != s.height) ) {
+					|| this.formerHeight != s.outerHeight) ) {
 			if (traceScaling) {
 				console.log(`🏄 mainEAvatar=${this.mainEAvatar.label}
 				formerShowVoltage=${this.formerShowVoltage}   showVoltage=${p.showVoltage}
 				formerWidth=${this.formerWidth}   wv.clientWidth=${this.waveViewEl.clientWidth}
-				formerHeight=${this.formerHeight}   height=${s.height}`);
+				formerHeight=${this.formerHeight}   height=${s.outerHeight}`);
 			}
-			this.formerWidth = p.width;
-			this.formerHeight = s.height;
+			// thee formers are OUTER sizes
+			this.formerWidth = p.outerWidth;
+			this.formerHeight = s.outerHeight;
 			this.formerShowVoltage = p.showVoltage;
-			console.log(`canvasFacts was ${this.canvasFacts.width}W ; WV is now ${p.width}W`);
+			console.log(`canvasInnerDims was ${this.canvasInnerDims.width}W ; WV is now `
+				+ `${p.outerWidth}W`);
 
-			this.vDisp.setVoltScales(this.canvasFacts.width, s.height, p.space.nPoints);
+			this.vDisp.setVoltScales(this.canvasInnerDims.width, s.outerHeight - 2, this.space.nPoints);
 		}
 	}
 
 	/* ************************************************************************ resizing */
 
-	// these are for resizing the WaveView ONLY.
+	// these are for resizing the WaveView ONLY with the size box
 	mouseDown =
 	ev => {
 		this.resizing = true;
-		this.yOffset = this.state.height - ev.pageY;
+		this.yOffset = this.state.outerHeight - ev.pageY;
 		if (traceDragCanvasHeight)
 			console.info(`🏄 mouse down ${ev.pageX} ${ev.pageY} offset=${this.yOffset}`);
 		const b = document.body;
@@ -167,7 +170,7 @@ export class WaveView extends React.Component {
 	mouseMove =
 	ev => {
 		const vHeight = ev.pageY + this.yOffset;
-		if (this.state.height != vHeight)
+		if (this.state.outerHeight != vHeight)
 			this.setState({height: vHeight});
 		storeASetting('miscSettings', 'waveViewHeight', vHeight);
 		if (traceDragCanvasHeight)
@@ -192,48 +195,6 @@ export class WaveView extends React.Component {
 		ev.stopPropagation();
 	}
 
-	/* ************************************************************************ volts */
-
-	// the actual bottomVolts is ignored; what's important is to tell us that it changed
-	scrollVoltHandler =
-	bottomVolts => {
-		this.setState({bottomVolts: bottomVolts});
-		this.vDisp.setVoltScales(this.canvasFacts.width, this.state.height, this.props.space.nPoints);
-	}
-
-	// handles zoom in/out buttons    They pass +1 or -1.  heightVolts will usually be an integer power of zoomFactor.
-	zoomVoltHandler =
-	upDown => {
-		const v = this.vDisp;
-		v.userZoom(upDown);
-		this.setState({heightVolts: v.heightVolts});
-		this.vDisp.setVoltScales(this.canvasFacts.width, this.state.height, this.props.space.nPoints);
-	}
-
-	// when user moves mouse over the canvas (or WaveView whichh is kindofthe same area)
-	// the voltage stuff appears and disappears.
-	// onMouseEnter={this.mouseEnter} onMouseLeave={this.mouseLeave}
-	mouseEnter =
-	ev => {
-		// non-react
-		const voltageArea = document.querySelector('.VoltageArea');
-		if (voltageArea)
-			voltageArea.style.display = 'inline';
-	}
-
-	mouseLeave =
-	ev => {
-		const voltageArea = document.querySelector('.VoltageArea');
-		if (voltageArea)
-			voltageArea.style.display = 'none';
-	}
-
-	componentDidMount() {
-		const wv = document.querySelector('.WaveView');
-		wv.addEventListener('mouseleave', this.mouseLeave);
-		wv.addEventListener('mouseenter', this.mouseEnter);
-	}
-
 	/* ************************************************************************ render */
 
 	render() {
@@ -244,47 +205,71 @@ export class WaveView extends React.Component {
 		let elapsedTime = '0';
 		let frameSerial = '0';
 		if (this.grinder) {
-			// after qe has been initialized
+			// after qeConsts has been initialized
 			elapsedTime = thousands(this.grinder.elapsedTime.toFixed(4));
 			frameSerial = thousands(this.grinder.frameSerial);
 		}
 
-		const spinner = p.space ? ''
+		const spinner = this.space ? ''
 			: <img className='spinner' alt='spinner' src='/images/eclipseOnTransparent.gif' />;
+
+		// make room for the bumpers for WELL continuum
+		let bumperWidth = (qeConsts.contWELL == this.space?.dimensions[0].continuum)
+			? BUMPER_WIDTH
+			: 0;
 
 		// sometimes a fraction of a pixel causes the horiz scroll bar
 		// to kick in.  avoid that without messing up everything.
-		let widthForCanvas = p.width - .5;
-		if (p.showVoltage)
-			widthForCanvas -= voltageSidebarWidth + .5;
+		let innerWidthForCanvas = p.outerWidth - 1 - 2 * bumperWidth;
 
 		if (traceWidth) {
-			console.log(`🏄 WaveView render, width=${this.waveViewEl?.clientWidth}`+
-			`  parent.clientWidth: ${this.waveViewEl?.parentNode.clientWidth}   widthForCanvas=${widthForCanvas}`);
+			console.log(`🏄 WaveView render, outerWidth=${this.waveViewEl?.clientWidth}`
+				+ `  parent.clientWidth: ${this.waveViewEl?.parentNode.clientWidth}   `
+				+` innerWidthForCanvas=${innerWidthForCanvas}`);
 		}
 
 		// can't make a real GLView until we have the space!  until then, show spinner
 		let glView;
-		if (s.space) {
-			glView = <GLView width={widthForCanvas} height={s.height}
+		if (this.space) {
+			glView = <GLView innerWidth={innerWidthForCanvas} innerHeight={s.outerHeight - 2} left={bumperWidth}
 				space={this.space} avatar={this.space.mainEAvatar}
-				viewClassName='flatViewDef' viewName='mainView'
+				viewClassName='flatScene' viewName='mainView'
 				setGl={this.setGl}
-				canvasFacts={this.canvasFacts}  setCanvasFacts={this.setCanvasFacts}
+				canvasInnerDims={this.canvasInnerDims}  setCanvasInnerDims={this.setCanvasInnerDims}
 			/>
 		}
 		else {
-			let glView = <div style={{width: widthForCanvas, height: s.height}} >
+			let glView = <div className='spinnerBox'
+						style={{width: innerWidthForCanvas , height: s.outerHeight - 2}} >
 				{spinner}
 			</div>;
 		}
+
+		// if there's no vDisp yet (cuz no space yet), the voltOverlay gets all mucked up.  So just avoid it.
+		let voltOverlay;
+		if (s.vDisp){
+			voltOverlay = <VoltOverlay
+				space={this.space}
+				height={s.outerHeight - 2}
+				width={innerWidthForCanvas}
+				left={bumperWidth}
+				showVoltage={s.showVoltage}
+				vDisp={this.vDisp}
+				canvasInnerDims={this.canvasInnerDims}
+			/>
+		}
+
 		return (
 		<div className='WaveView'  ref={el => this.waveViewEl = el}
-				style={{height: `${s.height}px`}}>
-			<div className='viewArea' >
+					style={{height: `${s.outerHeight}px`}}>
+
+			<div className='bumper left' key='left' style={{width: bumperWidth +'px'}} />
+			<div className='viewArea' key='viewArea'
+						style={{maxWidth: (innerWidthForCanvas + 2) +'px', left: bumperWidth +'px'}}>
 				{glView}
 
-				<section className='viewOverlay' >
+				<section className='timeOverlay'
+						style={{maxWidth: innerWidthForCanvas +'px'}}>
 					<div className='northWestWrapper'>
 						<span className='voNorthWest'>{elapsedTime}</span> ps
 					</div>
@@ -294,26 +279,14 @@ export class WaveView extends React.Component {
 
 					<img className='sizeBox' src='/images/sizeBox4.png' alt='size box'
 						onMouseDown={this.mouseDown}
-						style={{width: `${sizeBoxSize}px`, height: `${sizeBoxSize}px`}} />
+						style={{width: `${SIZE_BOX_SIZE}px`, height: `${SIZE_BOX_SIZE}px`}} />
 
-					{spinner}
 				</section>
 
-				<VoltageArea
-					space={s.space}
-					height={s.height}
-					showVoltage={p.showVoltage}
-					vDisp={this.vDisp}
-					canvasFacts={this.canvasFacts}
-				/>
 
+				{voltOverlay}
 			</div>
-			<VoltageSidebar width={voltageSidebarWidth} height={s.height}
-				vDisp={this.vDisp}
-				showVoltage={p.showVoltage}
-				scrollVoltHandler={this.scrollVoltHandler}
-				zoomVoltHandler={this.zoomVoltHandler}
-			/>
+			<div className='bumper right' key='right' style={{width: bumperWidth +'px'} } />
 
 		</div>
 		);

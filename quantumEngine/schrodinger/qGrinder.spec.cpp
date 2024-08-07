@@ -49,7 +49,6 @@ TEST(qGrinder, CheckGrinderConstructor)
 	proveItsMine(qgrinder->qflick->waves[1], space->nPoints * sizeof(qCx));
 
 	POINTERS_EQUAL(space->voltage, qgrinder->voltage);
-	DOUBLES_EQUAL(space->voltageFactor, qgrinder->voltageFactor, ERROR_RADIUS);
 
 	POINTERS_EQUAL(NULL, qgrinder->qspect);
 	qSpectrum *spect = qgrinder->getSpectrum();

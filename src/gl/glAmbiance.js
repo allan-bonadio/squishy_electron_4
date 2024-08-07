@@ -1,9 +1,10 @@
 /*
-** ctxFactory -- additional code for GLView shared  with testsRunner.html
+** glAmbiance -- additional code & settings for doing GL drawing and etc
 ** Copyright (C) 2023-2024 Tactile Interactive, all rights reserved
 */
 
-// Creates a webgl context from the canvas upon startup.  Starts either webgl1 or 2
+// Creates a webgl context from the canvas upon startup.  includes gl,
+// canvas node, and this 'tag object'.  Starts either webgl1 or 2
 // depending on what's available.
 
 // webgl-lint: sigh.
@@ -33,12 +34,12 @@ export function tooOldTerminate(what) {
 	throw `So long, and thanks for all the fish!`;
 }
 
-/* ********************************************************** actual ctxFactory class */
+/* ********************************************************** actual glAmbiance class */
 
 // create one of these for each canvas, to get the gl context, and other prep.
 // Returns a promise because webgl-lint must load asynchronously.
 // Promise resolves with gl, when it's all ready.
-class ctxFactory {
+class glAmbiance {
 	// this decides it - feel free to change this
 	static preferWebGL2 = true;
 
@@ -46,11 +47,11 @@ class ctxFactory {
 		this.canvas = canvas;
 		this.attachEventHandlers();  // might return errors about context creation/loss
 
-		if (ctxFactory.preferWebGL2)
+		if (glAmbiance.preferWebGL2)
 			this.setupGL2(canvas);
 		if (!this.gl)
 			this.setupGL1(canvas);
-		if (!ctxFactory.preferWebGL2 && !this.gl)
+		if (!glAmbiance.preferWebGL2 && !this.gl)
 			this.setupGL2(canvas);
 		if (!this.gl)
 			tooOldTerminate(`Sorry, your browser's WebGL is kinidof old.`);
@@ -132,5 +133,5 @@ class ctxFactory {
 };
 
 
-export default ctxFactory;
+export default glAmbiance;
 

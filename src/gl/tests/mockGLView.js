@@ -4,11 +4,11 @@
 */
 
 import 'https://greggman.github.io/webgl-lint/webgl-lint.js';
-import ctxFactory from '../ctxFactory.js';
-import abstractViewDef from '../abstractViewDef.js';
+import glAmbiance from '../glAmbiance.js';
+import abstractScene from '../abstractScene.js';
 
-import flatViewDef from '../flatViewDef.js';
-import starViewDef from './starViewDef.js';
+import flatScene from '../flatScene.js';
+import starScene from './starScene.js';
 
 // this mostly replicates GLView in a lame sortof way
 // I think we have a global namespace here... not sure
@@ -30,11 +30,11 @@ export const mockSpace = {
 };
 
 const viewClassNamez = {
-	flat: flatViewDef,
-	star: starViewDef,
+	flat: flatScene,
+	star: starScene,
 }
 
-
+gonna have to rewrite this as a function
 export class mockGLView {
 	constructor(viewClassName, viewName) {
 		this.state = {canvas: null};
@@ -57,13 +57,13 @@ export class mockGLView {
 		this.canvas = canvas;
 
 		// note deffault is wgl1
-		ctxFactory.preferWebGL2 = (localStorage.version == '2');
+		glAmbiance.preferWebGL2 = (localStorage.version == '2');
 
-		this.ctxFactory = new ctxFactory(canvas);
-		this.ctxFactory.glProm
+		this.glAmbiance = new glAmbiance(canvas);
+		this.glAmbiance.glProm
 		.then(gl => {
 			this.gl = gl;
-			this.tagObject = this.ctxFactory.tagObject;
+			this.tagObject = this.glAmbiance.tagObject;
 
 			canvas.glview = this;
 			canvas.viewName = this.viewName;

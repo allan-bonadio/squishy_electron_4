@@ -9,34 +9,35 @@
 let perDrawingVAO = true;   // false;
 
 
-// Each abstractViewDef subclass is a definition of a kind of picture or view;
+// Each abstractScene subclass is a definition of a kind of picture or view;
 // one per each kind of view. Each drawing is a definition of a part of a view
-// (usually drawn with 1 program).  A ViewDef has one or more drawings in it.  A
-// WaveView hosts an instance of the ViewDef and is a React component enclosing
+// (usually drawn with 1 program).  A Scene has one or more drawings in it.  A
+// WaveView hosts an instance of the Scene and is a React component enclosing
 // the canvas.
 
 /* ****************************************  */
 
 
 // This is the superclass of all view defs; with common webgl and space plumbing.
-// viewName is not the viewClassName, which is one of flatViewDef, garlandView, ...
+// viewName is not the viewClassName, which is one of flatScene, garlandView, ...
 // there should be ONE of these per canvas, so each WaveView should have 1.
-export class abstractViewDef {
+export class abstractScene {
 
 	/* ************************************************** construction */
 	// viewName: personal name for the viewDef instance, for error msgs
 	// canvas: real <canvas> DOM element, after it's been created by React
 	// class name from instance: vu.constructor.name   from class: vuClass.name
-	constructor(viewName, glView, space, avatar) {
+	constructor(viewName, ambiance, space, avatar) {
 		this.viewName = viewName;
-		this.canvas = glView.canvas;
-		this.gl = glView.gl;
-		this.tagObject = glView.tagObject;
-		if (! this.canvas) throw new Error(`abstractViewDef: being created without canvas`);
+		this.canvas = ambiance.canvas;
+		this.gl = ambiance.gl;
+		this.tagObject = ambiance.tagObject;
+		if (! this.canvas) throw new Error(`abstractScene: being created without canvas`);
 
 		this.space = space;
 		this.avatar = avatar;
 
+		// boolean cuz I can't find any docs telling me how to use vao, in detail
 		this.perDrawingVAO = perDrawingVAO;
 
 		if (!this.perDrawingVAO) {
@@ -121,7 +122,7 @@ export class abstractViewDef {
 	}
 
 	/* ************************************************** dom interactivity */
-	// maybe i should get rid of this
+	// maybe i should get rid of this TODO
 	domSetupForAllDrawings(canvas) {
 		this.drawings.forEach(drawing => {
 			if (drawing.domSetup)
@@ -130,5 +131,5 @@ export class abstractViewDef {
 
 	}
 }
-export default abstractViewDef;
+export default abstractScene;
 

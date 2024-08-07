@@ -44,7 +44,6 @@ qAvatar::qAvatar(qSpace *sp, const char *lab)
 
 	qwave = new qWave(space);
 	voltage = sp->voltage;
-	voltageFactor = sp->voltageFactor;
 
 	strncpy(label, lab, MAX_LABEL_LEN);
 	label[MAX_LABEL_LEN] = 0;
@@ -55,11 +54,11 @@ qAvatar::qAvatar(qSpace *sp, const char *lab)
 
 	if (traceSpace) {
 		printf("the qSpace for avatar %s:   magic=%c%c%c%c label=%s nDimesions=%d  "
-			"nStates=%d nPoints=%d voltage=%p voltageFactor=%lf spectrumLength=%d  \n",
+			"nStates=%d nPoints=%d voltage=%p  spectrumLength=%d  \n",
 			label,
 			space->magic >> 24,  space->magic >> 16, space->magic >> 8, space->magic,
 			space->label, space->nDimensions, space->nStates, space->nPoints,
-			space->voltage, space->voltageFactor, space->spectrumLength);
+			space->voltage, space->spectrumLength);
 		qDimension *dims = space->dimensions;
 		printf("      its qDimension:   N=%d start=%d end=%d ",
 			dims->N, dims->start, dims->end);

@@ -4,33 +4,34 @@
 */
 
 #include <pthread.h>
+#include <emscripten/threading.h>
 
-// so are we doing atomics or mutexes?
-#define USING_ATOMICS
-#ifdef USING_ATOMICS
-#include <emscripten/atomic.h>
-#else
-// nope - it's all in pthread.h
-#endif
+/* Some Calculation/Grinder terms:
+a Frame: is an amount of calculation correspoinding to one refresh of
+the video display. Doesn't have to be synchronized with the screen
+refreshes; just the amount of calculation done for it.  Typically
+hundreds of steps.
 
+a Step: is an mount of calculation to advance the model ∆t or dt time.
 
-/* Some terms:
-a Frame: is an amount of calculation correspoinding to one refresh of the display.
-	Doesn't have to be synchronized with the screen refreshes; just the amount of
-	calculation done for it.
+a Hit: advancement by dt of one of many parts of the calculation.  As of
+this writing, there are four hits to a step: two Vischer real+imag, and
+two Midpoint first+last.
 
-a Step: is an mount of calculation to advance the model dt time.
-	(Really ∆t but it's tedious entering the delta character.)
+Some sortof overlapping terms on timing:
 
-a Hit: advancement by dt of one of many parts of the calculation.  As of this writing,
-	there are four hits to a step: two Vischer real imag,
-	and two Midpoint first and last.
+videoFP: video frame period is the period it takes the screen to do one
+scan.  rAF calls you that many times.  Often 16⅔ or 20 ms.
+
+chosenFP: period chosen from the 'frame rate' menu, which shows rates
+not periods.  So user chooses 20 fps and the chosenFP would be 50ms.
+chosenFP should be an even multiple of videoFP but isn't always.
 
 */
 
 struct qThread;
 struct qStage;
-struct grinderThread;
+struct grWorker;
 
 struct qGrinder {
 	qGrinder(qSpace *, struct qAvatar *av, int nGrinderThreads, const char *label);
@@ -78,6 +79,7 @@ struct qGrinder {
 	void reportException(const char *message, const char *code = "reported");
 	void reportException(std::runtime_error *ex, const char *code = "reported");
 
+	// number of integration steps executed for each frame
 	// dynamically adjusted so integration calculation of a frame takes
 	// about as much time as a screen refresh frame, as set by the user.
 	int stepsPerFrame;
@@ -85,8 +87,16 @@ struct qGrinder {
 	/* *********************************************** integrating */
 
 	// scan period of the screen = target rate for a frame of grinding
-	// In seconds, with fractions.  comes from sAnimator.
-	double animationFP;
+	// In milliseconds, with fractions.  comes from sAnimator.
+	double videoFP;
+
+	// the frame speed most recently chosen by user, as number of
+	// milliseconds. should be a multiple of videoFP (?)  Actually
+	// we use this as an indicator as to whether rate is
+	// 'fastest' qeConsts.FASTEST  Otherwise, the JS triggers a new frame calc based on
+	// rAF.
+	double chosenFP;
+
 
 	// a subclass of  qWave, it has multiple waves to do grinding with
 	// this grinder OWNS the qFlick & is responsible for deleting it
@@ -94,7 +104,6 @@ struct qGrinder {
 
 	// pointer grabbed from the space.  Same buffer as in space.
 	double *voltage;
-	double voltageFactor;  // aligned by 8
 
 	// how long (thread time) it took to do the latest frame, all threads added together
 	double totalCalcTime;
@@ -110,37 +119,23 @@ struct qGrinder {
 	struct qStage *stages;
 	struct qThread *threads;
 
-	int nGrinderThreads;  // total number of gThread threads we'll use for integrating
+	int nGrinderThreads;  // total number of grWorker threads we'll use for integrating
+			// mostly constant, although there's plans to gradually add/remove threads
 
-	// Although isIntegrating, do only this many more frames before stopping.  Like 1 for single step.
+	// Although isIntegrating, do only this many more frames before
+	// stopping.  Like 1 for single step.  Ought to change this.  TODO
 	int justNFrames;
 
-	#ifdef USING_ATOMICS
 	// Starts at -1 = waiting at starting line, or set it to 0 to launch
-	// a frame.  All the threads atomic_wait, waiting for this to turn
+	// an integration.  All the threads atomic_wait, waiting for this to turn
 	// nonnegative.
 	_Atomic int startAtomic;
 
 	// starts at 0.  As each thread finishes their iteration work, they
 	// atomically increment it.  The thread that increments it to
-	// nGrinderThreads, knows it's the last and calls threadsHaveFinished()
+	// nGrinderThreads, knows it's the last and starts threadsHaveFinished()
 	_Atomic int finishAtomic;
 
-	#else
-
-	// All threads start (roughly) all at once when this is unlocked.
-	// Then, each gThread thread, who have all requested an lock of the
-	// startMx, each get to lock it, add one to nStartedThreads, and
-	// immediately unlock it, and proceed to integration.
-	pthread_mutex_t startMx;
-
-	// guards grinder->nFinishedThreads, frameCalcTime, etc
-	pthread_mutex_t finishMx;
-
-	// number of grinderThread s that have started/finished integration yet; incremented up to nGrinderThreads
-	int nStartedThreads;
-	int nFinishedThreads;
-	#endif
 
 	void triggerIteration(void);
 
@@ -151,7 +146,7 @@ struct qGrinder {
 	// figure out the total elapsed time for each thread, average of all, max of all...
 	void aggregateCalcTime(void);
 
-	static grinderThread **gThreads;
+	static grWorker **gThreads;
 
 	// when trace msgs display just one point (to avoid overwhelming output),
 	// this is the one.
@@ -182,7 +177,7 @@ struct qGrinder {
 	// make sure the subsequent fields are aligned!  or frame is painfully slow.
 
 	// Actually do integration, single thread only.
-	// must maintain stepsPerFrame to match animationFP, but not necessarily sync with it
+	// must maintain stepsPerFrame to match videoFP, but not necessarily sync with it
 	void oneFrame(void);
 
 	// visscher.  Calculate new from old; use hamiltonian to calculate d𝜓
@@ -215,7 +210,7 @@ struct qGrinder {
 extern "C" {
 	//void grinder_initThreadIntegration(qGrinder *grinder, int threadSerial);
 	void grinder_oneFrame(qGrinder *grinder);
-	void grinder_triggerIteration(qGrinder *grinder);
+	//void grinder_triggerIteration(qGrinder *grinder);
 
 	void grinder_askForFFT(qGrinder *grinder);
 

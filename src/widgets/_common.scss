@@ -8,7 +8,10 @@
 $voltageLighterColor: #ffe;
 $voltageColor: #fec;
 $voltageDarkerColor: #ec8;
+$voltageMuchDarkerColor: #640;
 
-$sizeBoxSize: 32px;
+// if you change this, also change SIZE_BOX_SIZE in JS
+$sizeBoxSize: 24px;
+
 
 $docReaderBackground: #fff;

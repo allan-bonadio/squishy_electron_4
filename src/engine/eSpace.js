@@ -2,10 +2,10 @@
 ** eSpace - the JS representations of the c++ qSpace object
 ** Copyright (C) 2021-2024 Tactile Interactive, all rights reserved
 */
-import qe from './qe.js';
+import qeFuncs from './qeFuncs.js';
 import inteStats from '../controlPanel/inteStats.js';
 import {prepForDirectAccessors} from '../utils/directAccessors.js';
-import voltDisplay from '../utils/voltDisplay.js';
+import voltDisplay from '../volts/voltDisplay.js';
 import eAvatar from './eAvatar.js';
 import eGrinder from './eGrinder.js';
 import {getAGroup} from '../utils/storeSettings.js';
@@ -49,20 +49,20 @@ export class eSpace {
 		if (eSpace.theSpace)
 			throw new Error('creating second space')
 		// this actually does it over on the C++ side
-		this.pointer = qe.startNewSpace(spaceLabel);
+		this.pointer = qeFuncs.startNewSpace(spaceLabel);
 		prepForDirectAccessors(this, this.pointer);
 
 		// make each dimension (someday there'll be more than 1)
 		//let nPoints = 1, nStates = 1;
 		this.dimensions = dims.map(d => {
-				qe.addSpaceDimension(this.pointer, d.N, d.continuum, d.spaceLength, d.label);  // c++
+				qeFuncs.addSpaceDimension(this.pointer, d.N, d.continuum, d.spaceLength, d.label);  // c++
 
 				let dim = new eDimension(d)
 				return dim;
 			}
 		);
 
-		qe.completeNewSpace(this.pointer, N_THREADS);
+		qeFuncs.completeNewSpace(this.pointer, N_THREADS);
 
 		// direct access into the voltage buffer
 		this.voltageBuffer = new Float64Array(window.Module.HEAPF64.buffer,
@@ -85,13 +85,13 @@ export class eSpace {
 		// by default it's set to 1s, or zeroes?  but we want something good.
 		let waveParams = getAGroup('waveParams');
 		this.mainEWave.setFamiliarWave(waveParams);  //  SquishPanel re-does this for SetWave
-		qe.grinder_copyFromAvatar(this.grinder.pointer, this.mainEAvatar.pointer);
+		qeFuncs.grinder_copyFromAvatar(this.grinder.pointer, this.mainEAvatar.pointer);
 
 		this.miniGraphAvatar.ewave.setFamiliarWave(waveParams);  //  SquishPanel re-does this for SetWave
 		if (traceFamiliarWave) console.log(`🚀  done with setFamiliarWave():`,
 			JSON.stringify(this.mainEWave.wave));
 
-		this.sIntStats = new inteStats(this);
+		this.sInteStats = new inteStats(this);
 		if (traceSpace) console.log(`🚀  done creating eSpace:`, this);
 	}
 
@@ -118,7 +118,7 @@ export class eSpace {
 
 			// finally, get rid of the C++ object
 			if (traceSpace) console.log(`🚀  done  eSpace:`, this);
-			qe.deleteFullSpace(this.pointer);
+			qeFuncs.deleteFullSpace(this.pointer);
 		} catch (ex) {
 			// eslint-disable-next-line no-ex-assign
 			ex = interpretCppException(ex);
@@ -130,26 +130,25 @@ export class eSpace {
 	// see qSpace.cpp and directAccessors.h to regenerate this.
 
 	get _voltage() { return this.ints[1]; }
-	get voltageFactor() { return this.doubles[1]; }
 
-	get N() { return this.ints[4]; }
-	get continuum() { return this.ints[5]; }
-	get start() { return this.ints[6]; }
-	get end() { return this.ints[7]; }
-	get nStates0() { return this.ints[8]; }
-	get nPoints0() { return this.ints[9]; }
-	get spectrumLength0() { return this.ints[14]; }
-	get dx0() { return this.doubles[5]; }
-	get _label0() { return this.pointer + 60; }
-	get dt() { return this.doubles[19]; }
-	get nDimensions() { return this.ints[40]; }
-	get nStates() { return this.ints[41]; }
-	get nPoints() { return this.ints[42]; }
-	get spectrumLength() { return this.ints[43]; }
-	get _mainAvatar() { return this.ints[44]; }
-	get _miniGraphAvatar() { return this.ints[45]; }
-	get _qgrinder() { return this.ints[46]; }
-	get _label() { return this.pointer + 188; }
+	get N() { return this.ints[2]; }
+	get continuum() { return this.ints[3]; }
+	get start() { return this.ints[4]; }
+	get end() { return this.ints[5]; }
+	get nStates0() { return this.ints[6]; }
+	get nPoints0() { return this.ints[7]; }
+	get spectrumLength0() { return this.ints[12]; }
+	get dx0() { return this.doubles[4]; }
+	get _label0() { return this.pointer + 52; }
+	get dt() { return this.doubles[18]; }
+	get nDimensions() { return this.ints[38]; }
+	get nStates() { return this.ints[39]; }
+	get nPoints() { return this.ints[40]; }
+	get spectrumLength() { return this.ints[41]; }
+	get _mainAvatar() { return this.ints[42]; }
+	get _miniGraphAvatar() { return this.ints[43]; }
+	get _qgrinder() { return this.ints[44]; }
+	get _label() { return this.pointer + 180; }
 
 	/* **************************** end of direct accessors */
 
@@ -171,7 +170,8 @@ export class eSpace {
 			continuum: dim.continuum};
 	}
 
-	updateVoltageArea = null;  // will be filled in in VoltageArea.js
+	updateVoltageArea = null;  // will be filled in in VoltArea.js
+			// after a few renders
 }
 
 export default eSpace;

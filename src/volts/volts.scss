@@ -1,0 +1,117 @@
+/*
+** volts -- CSS for voltage stuff as shown in the WaveView
+** Copyright (C) 2024-2024 Tactile Interactive, all rights reserved
+*/
+
+@use "../widgets/common.scss";
+
+// top of the WaveView where the graphics goes.  Height dictated by where the
+// user last dragged the resize box in the corner, in WaveView state.  Width
+// comes from the window width.  hmmm...
+.WaveView {
+	// the setting for showVoltage chooses one of these
+	// display:none gets no events.  so change visibilty instead.
+	.alwaysShowVoltage {visibility: visible}
+	.hoverShowVoltage {visibility: hidden}
+	.hoverShowVoltage:hover {visibility: visible}
+	.neverShowVoltage {visibility: hidden}
+
+	// encloses the actual glview, the timeOverlay, and the VoltOverlay
+	// the VoltOverlay is what hides/shows with mouseover (see above)
+	.viewArea .VoltOverlay {
+		display: block;
+		position: absolute;
+		width: 100%;
+		height: 100%;
+
+
+		.VoltArea {
+			position: absolute;
+			width: 100%;
+			height: 100%;
+			z-index: 30;
+			transform: scale(1, -1);
+			pointer-events: all;
+
+			// for pointer enter/leave events
+			.hoverBox {
+				fill: transparent;
+			}
+
+			path.visibleLine {
+				stroke: common.$voltageColor;
+				stroke-width: 3px;
+				fill: transparent;
+				pointer-events: none;
+			}
+
+			path.tactileLine {
+				stroke: none;
+				stroke-width: 20px;
+				fill: transparent;
+				pointer-events: stroke;  // but this is sensitive
+				cursor: pointer;
+			}
+
+			.voltageAxis {
+				stroke: common.$voltageColor;
+				fill: none;
+				font-family: georgia, helvetica, sans-serif;
+				font-size: .7em;
+
+				// for some reason, the labels that d3 generates have all the text upside down.
+				// also have to offset them the height of the canvas...
+				g {
+					scale: 1 -1;
+				}
+			}
+
+		}  // end of VoltArea
+
+		// buttons etc to scroll and zoom the voltage
+		.VoltSidebar {
+			// this is a column flex box
+			position: absolute;
+			right: .5em;
+			height: 100%;
+			display: flex;
+			flex-direction: column;
+			z-index: 35;
+
+			// but particpates in its parent's row flex box.  Width and display set by code in WaveView.render()
+			text-align: center;
+
+			background-color: transparent;
+			pointer-events: none;
+
+
+			// scroll & zoom in/out buttons
+			button {
+				display: inline;
+				background-color: transparent;
+				width: 2em;
+				height: 2em;
+				border-radius: 1em;
+				color: common.$voltageColor;
+				padding: 0;
+				border: .5px solid common.$voltageMuchDarkerColor;
+
+				pointer-events: auto;
+			}
+			button:hover {
+				border-color: common.$voltageColor;
+			}
+			button:active {
+				background-color: #640;
+			}
+
+			// we use p as spacers between the buttons
+			p {
+				flex: 1 1 0em;
+			}
+
+		}
+	}  // end of viewArea VoltOverlay
+
+}
+

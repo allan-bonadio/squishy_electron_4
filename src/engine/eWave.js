@@ -5,7 +5,7 @@
 
 // There is no eBuffer or eSpectrum; C++ deals with those exclusively
 
-import {qe} from './qe.js';
+import qeConsts from './qeConsts.js';
 import cx2rgb from '../gl/cx2rgb/cx2rgb.txlated.js';
 import {cppObjectRegistry, prepForDirectAccessors} from '../utils/directAccessors.js';
 import eSpace from './eSpace.js';
@@ -142,7 +142,6 @@ class eWave {
 	get start() { return this.ints[5]; }
 	get end() { return this.ints[6]; }
 	get continuum() { return this.ints[7]; }
-
 	/* **************************** end of direct accessors */
 
 	/* **************************************************************** dumping */
@@ -227,18 +226,18 @@ class eWave {
 		const w = this.wave;
 
 		switch (continuum) {
-		case qe.contDISCRETE:
+		case qeConsts.contDISCRETE:
 			// no neighbor-to-neighbor crosstalk, well except...
 			// I guess whatever the hamiltonion says.  Everybody's got a hamiltonian.
 			break;
 
-		case qe.contWELL:
+		case qeConsts.contWELL:
 			// the points on the end are ∞ voltage, but the arithmetic goes bonkers
 			// if I actually set the voltage to ∞.  Remember complex values 2 doubles
 			w[0] = w[1] = w[end2] = w[end2+1] = 0;
 			break;
 
-		case qe.contENDLESS:
+		case qeConsts.contENDLESS:
 			// the points on the end get set to the opposite side.  Remember this is for complex, 2x floats
 			w[0] = w[end2-2];
 			w[1]  = w[end2-1];
@@ -281,7 +280,7 @@ class eWave {
 
 		// For a well, the boundary points ARE part of the wave, so do the whole thing
 		let dAngle;
-		if (this.space.continuum == qe.contWELL) {
+		if (this.space.continuum == qeConsts.contWELL) {
 			end2 += start2;
 			start2 = 0;
 			dAngle = Math.PI / (N + 2) * (+n);
@@ -304,7 +303,7 @@ class eWave {
 		const {start, end, N} = this.space.startEnd;
 		let pulseWidth = pulseWidthUi * N / 100;  // now in units of X; needn't be an integer
 		let freq = freqUi;
-		if (this.continuum == qe.contENDLESS)
+		if (this.continuum == qeConsts.contENDLESS)
 			freq = Math.round(freq);  // must be an integer if endless
 
 		// must be half-odd-integer cuz the peak is between two integers..
@@ -411,7 +410,7 @@ class eWave {
 			`waveBreed=${waveParams.waveBreed}   `+
 			`waveFrequency UI=${waveParams.waveFrequency.toFixed(2)}/N   `+
 			`pulseWidth UI=${waveParams.pulseWidth.toFixed(2)}%   `+
-			`pulseOffset UI=${waveParams.pulseOffset.toFixed(2)}%`);
+			`pulseCenter UI=${waveParams.pulseCenter.toFixed(2)}%`);
 		}
 
 		switch (waveParams.waveBreed) {
@@ -424,11 +423,11 @@ class eWave {
 			break;
 
 		case 'gaussian':
-			this.setGaussianWave(+waveParams.waveFrequency, +waveParams.pulseWidth, +waveParams.pulseOffset);
+			this.setGaussianWave(+waveParams.waveFrequency, +waveParams.pulseWidth, +waveParams.pulseCenter);
 			break;
 
 		case 'chord':
-			this.setChordWave(+waveParams.waveFrequency, +waveParams.pulseWidth, +waveParams.pulseOffset);
+			this.setChordWave(+waveParams.waveFrequency, +waveParams.pulseWidth, +waveParams.pulseCenter);
 			break;
 
 		default:

@@ -7,6 +7,11 @@
 #define MAX_THREADS 254
 //#define UNDECIDED -1
 
+
+Not currently in use
+
+
+
 struct progress;
 struct abacus;
 

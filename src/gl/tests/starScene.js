@@ -3,7 +3,7 @@
 ** Copyright (C) 2021-2024 Tactile Interactive, all rights reserved
 */
 
-import {abstractViewDef} from '../abstractViewDef.js';
+import {abstractScene} from '../abstractScene.js';
 import {abstractDrawing} from '../abstractDrawing.js';
 import {viewUniform, viewAttribute} from '../viewVariable.js';
 
@@ -111,7 +111,7 @@ export class starDrawing extends abstractDrawing {
 		this.cornerColorUni.reloadVariable();
 
 		// for EACH type, that's enabled, draw with it.  fun!
-		starViewDef.typesList.forEach(type => {
+		starScene.typesList.forEach(type => {
 
 			gl.drawArrays(gl[type], 0, corners.nTuples);
 		})
@@ -122,12 +122,12 @@ export class starDrawing extends abstractDrawing {
 /* **************************************************************** Star View Def */
 
 
-export class starViewDef extends abstractViewDef {
-	constructor(viewName, glview, space, avatar) {
-		super(viewName, glview, space, avatar);
+export class starScene extends abstractScene {
+	constructor(viewName, ambiance, space, avatar) {
+		super(viewName, ambiance, space, avatar);
 
 		if (! this.space || !this.avatar) {
-			throw  new Error(`starViewDef: being created without space or avatar`);
+			throw  new Error(`starScene: being created without space or avatar`);
 		}
 
 		// create relevant drawings
@@ -135,6 +135,6 @@ export class starViewDef extends abstractViewDef {
 	}
 }
 
-export default starViewDef;
+export default starScene;
 
-starViewDef.viewClassName = 'starViewDef';
+starScene.viewClassName = 'starScene';

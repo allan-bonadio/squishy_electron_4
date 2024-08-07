@@ -6,7 +6,7 @@
 /* superclass of all drawings.  A drawing is a piece of code that draws one thing on
 a GL canvas.  It's got v&f shaders, a source of data, and a Draw function.
 But it does NOT own the canvas or gl object - that's shared among all drawings on a view.
-THat's why drawings are not the same thing as ViewDefs: a viewDef has zero or more drawings.
+THat's why drawings are not the same thing as Scenes: a viewDef has zero or more drawings.
 
 drawings must include:
 - vertex and frag shaders, probably backtic strings
@@ -25,7 +25,7 @@ let traceAttrNames = false;
 export class abstractDrawing {
 
 	/* ************************************************** construction */
-	// viewDef is eg flatViewDef instance.  Here we add ourselves to the ViewDef list of drawings.
+	// viewDef is eg flatScene instance.  Here we add ourselves to the Scene list of drawings.
 	// Constructor of subclasses passes in the drawingName; a literal, it isn't one of their arguments
 	constructor(viewDef, drawingName) {
 		this.viewDef = viewDef;
@@ -57,6 +57,9 @@ export class abstractDrawing {
 	// tell GL that this is the vao and program to use
 	setDrawing() {
 		const gl = this.gl;
+		if (!this.program || !this.vao)
+			throw `in drawing: bad program=${this.program} or vao=${this.vao}`;
+
 		gl.useProgram(this.program);
 		gl.bindVertexArray(this.vao);
 	}
@@ -79,18 +82,18 @@ export class abstractDrawing {
 		var success = gl.getShaderParameter(shader, gl.COMPILE_STATUS);
 		if (success) return shader;
 
+		// error in compilation
 		const msg = gl.getShaderInfoLog(shader);
 		gl.deleteShader(shader);
 		throw new Error(`Error compiling ${shType} shader for ${this.viewName}: ${msg}`);
 	}
 
 	// call this with your sources in setShaders().
-	// must have attached vertexShaderSrc and fragmentShaderSrc already
-	// Will set fragmentShader and vertexShader as compiled to this
-	// also program, for use with useProgram(), if it all compiles
+	// must have attached vertexShaderSrc and fragmentShaderSrc already.
+	// Will set fragmentShader and vertexShader as compiled to those srcs.
+	// Creates program, for use with useProgram(), if it all compiles.
 	compileProgram() {
 		const {gl} = this;
-		this.setDrawing();
 
 		// create program (and vao?) for this drawing, and put them into use
 		const program = gl.createProgram();
@@ -112,6 +115,7 @@ export class abstractDrawing {
 
 		if (success) {
 			this.program = program;
+			this.setDrawing();  // is this needed?!
 
 			if (traceAttrNames)
 				this.dumpAttrNames('right after link');

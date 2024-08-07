@@ -5,7 +5,7 @@
 
 import React from 'react';
 
-import qe from '../engine/qe.js';
+import qeConsts from '../engine/qeConsts.js';
 import CommonDialog from '../widgets/CommonDialog.js';
 import {powerToIndex} from '../utils/powers.js';
 import LogSlider from '../widgets/LogSlider.js';

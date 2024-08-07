@@ -93,13 +93,13 @@ void qGrinder::pointReal(qCx *newW, qCx *oldW, qCx *hamiltW, double volts, doubl
 
 	// total hamiltonian including voltage (remember hamiltW isn't the hamiltonian,
 	// just the 𝜓 used to calculate the hamiltonian!)
-	double U𝜓 = volts * voltageFactor * hamiltW->re * inverseℏ;
+	double U𝜓 = volts * hamiltW->re * inverseℏ;
 	double H𝜓 = d2𝜓i + U𝜓;
 	if (traceΔE && samplePoint == usedIx) {
 		printf(" 🧶  viss: real ΔE: kinetic/ℏ=%8.4lf  potential/ℏ=%8.4lf  total/ℏ=%8.4lf  ",
 			d2𝜓i / hamiltW->re, U𝜓/hamiltW->re, H𝜓 / hamiltW->re);
-		printf("   potential U: volts=%8.4lf  voltageFactor=%8.4lf  inverseℏ=%8.4lf  ",
-			volts, voltageFactor, inverseℏ);
+		printf("   potential U: volts=%8.4lf  inverseℏ=%8.4lf  ",
+			volts, inverseℏ);
 		printf("   so U must  be  = %8.4lf, in moxies\n",
 			U𝜓 / hamiltW->re * ℏ);
 	}
@@ -121,7 +121,7 @@ void qGrinder::pointImaginary(qCx *newW, qCx *oldW, qCx *hamiltW, double volts, 
 	if (traceImaginaryStep) speedyLog("    🧶 pointImaginary\n");
 
 	// total hamiltonian
-	double H𝜓 = d2𝜓r + volts * voltageFactor * hamiltW->im * inverseℏ;
+	double H𝜓 = d2𝜓r + volts * hamiltW->im * inverseℏ;
 	if (traceΔE && samplePoint == usedIx) {
 		printf(" 🧶  viss: imag ΔE: kinetic=%1.4lf  potential=%1.4lf  total=%1.4lf\n",
 			d2𝜓r / hamiltW->im, (H𝜓 - d2𝜓r)/hamiltW->im, H𝜓 / hamiltW->im);
@@ -159,7 +159,7 @@ void qGrinder::hitReal(qCx *newW, qCx *oldW, qCx *hamiltW, double dt) {
 	qflick->fixThoseBoundaries(newW);
 	//elapsedTime += dt/2;  // could be 0 or already dt/2
 
-	if (traceVischerBench) speedyLog("      hitReal, done: time=%lf\n",
+	if (traceVischerBench) speedyLog("      hitReal, done: time=%lf ms\n",
 		getTimeDouble());
 	if (traceRealStep) speedyLog("🧶 end of hitReal\n");
 }
@@ -180,7 +180,7 @@ void qGrinder::hitImaginary(qCx *newW, qCx *oldW, qCx *hamiltW, double dt) {
 	qflick->fixThoseBoundaries(newW);
 	//elapsedTime += dt/2;  // could be 0 or already dt/2
 
-	if (traceVischerBench) speedyLog("      hitImaginary done: time=%lf\n",
+	if (traceVischerBench) speedyLog("      hitImaginary done: time=%lf ms\n",
 		getTimeDouble());
 	if (traceImaginaryStep) speedyLog("🧶 end of hitImaginary");
 

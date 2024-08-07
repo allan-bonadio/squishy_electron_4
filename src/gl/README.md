@@ -5,8 +5,8 @@ These files are concerned with webgl for Squishy Electron.  See view directory f
 
 * GLView.js - react component that wraps the <canvas and interfaces directly with the rest of the JS code.
 * abstract*.js - base classes for viewDefs and drawings
-* *Def.js - ViewDef classes, instances manage one or more Drawing instances
-* *Drawing.js - Drawing classes; each draws one piece of stuff for a ViewDef
+* *Def.js - Scene classes, instances manage one or more Drawing instances
+* *Drawing.js - Drawing classes; each draws one piece of stuff for a Scene
 
 
 # drawing modules
@@ -21,8 +21,8 @@ Sets up the inputs and arrays, passes to GL, draws.
 ## view defs
 Sortof a framework around the drawing situation.
 Roughly corresponds to an Avatar?  not really...
-* abstractViewDef.js  - abstract superclass of ViewDefs, although you can use them as-is for smoke testing
-* flatDrawingViewDef.js - view def for flat stereotypical bargraph of wave
+* abstractScene.js  - abstract superclass of Scenes, although you can use them as-is for smoke testing
+* flatDrawingScene.js - view def for flat stereotypical bargraph of wave
 
 ## misc drawing code
 * viewVariable.js - helps drawing modules with the variables passed into GL

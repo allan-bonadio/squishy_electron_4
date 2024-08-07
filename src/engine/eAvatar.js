@@ -5,7 +5,7 @@
 
 import {cppObjectRegistry, prepForDirectAccessors} from '../utils/directAccessors.js';
 import eWave from './eWave.js';
-import qe from './qe.js';
+import qeFuncs from './qeFuncs.js';
 
 let traceCreation = false;
 let traceHighest = false;
@@ -49,28 +49,26 @@ class eAvatar {
 	// are passed by pointer and you need to allocate them in JS (eg see
 	// eAvatar.constructor)
 
-
- 	get _space() { return this.ints[1]; }
- 	get _qwave() { return this.ints[2]; }
- 	get _vBuffer() { return this.ints[7]; }
- 	get _label() { return this.pointer + 32; }
-
+	get _space() { return this.ints[1]; }
+	get _qwave() { return this.ints[2]; }
+	get _vBuffer() { return this.ints[5]; }
+	get _label() { return this.pointer + 24; }
 
 	/* **************************** end of direct accessors */
 
 	// this just gets the pointer to the view buffer...  the JS array
 	getViewBuffer() {
-		return cppObjectRegistry[qe.avatar_getViewBuffer(this.pointer)];
+		return cppObjectRegistry[qeFuncs.avatar_getViewBuffer(this.pointer)];
 	}
 
 	// qAvatar functions run from here
 	dumpViewBuffer(title) {
-		qe.avatar_dumpViewBuffer(this.pointer, title)
+		qeFuncs.avatar_dumpViewBuffer(this.pointer, title)
 	}
 
 	loadViewBuffer() {
 		// flatDrawing will use this for tweaking the highest uniform
-		this.highest = qe.avatar_loadViewBuffer(this.pointer);
+		this.highest = qeFuncs.avatar_loadViewBuffer(this.pointer);
 		if (!this.smoothHighest)
 			this.smoothHighest = this.highest;
 		else
@@ -83,7 +81,7 @@ class eAvatar {
 
 	// delete the eAvatar and qAvatar and its owned buffers
 	deleteAvatar() {
-		qe.avatar_delete(this.pointer);
+		qeFuncs.avatar_delete(this.pointer);
 	}
 }
 

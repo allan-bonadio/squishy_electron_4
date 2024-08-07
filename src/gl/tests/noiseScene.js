@@ -3,7 +3,7 @@
 ** Copyright (C) 2021-2024 Tactile Interactive, all rights reserved
 */
 
-import {abstractViewDef} from '../abstractViewDef.js';
+import {abstractScene} from '../abstractScene.js';
 import {abstractDrawing} from '../abstractDrawing.js';
 import {viewUniform, viewAttribute} from '../viewVariable.js';
 
@@ -102,12 +102,12 @@ export class noiseDrawing extends abstractDrawing {
 /* **************************************************************** Noise View Def */
 
 
-export class noiseViewDef extends abstractViewDef {
-	constructor(viewName, glview, space, avatar) {
-		super(viewName, glview, space, avatar);
+export class noiseScene extends abstractScene {
+	constructor(viewName, ambiance, space, avatar) {
+		super(viewName, ambiance, space, avatar);
 
 		if (! this.space || !this.avatar) {
-			throw  new Error(`noiseViewDef: being created without space or avatar`);
+			throw  new Error(`noiseScene: being created without space or avatar`);
 		}
 
 		// create relevant drawings
@@ -115,6 +115,6 @@ export class noiseViewDef extends abstractViewDef {
 	}
 }
 
-export default noiseViewDef;
+export default noiseScene;
 
-noiseViewDef.viewClassName = 'noiseViewDef';
+noiseScene.viewClassName = 'noiseScene';

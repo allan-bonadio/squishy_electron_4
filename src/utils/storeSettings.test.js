@@ -6,7 +6,7 @@
 import {expect, test, jest} from '@jest/globals';
 import {getASetting, storeASetting, getAGroup, storeAGroup} from '../utils/storeSettings.js';
 import {isPowerOf2} from './powers.js';
-import qe from '../engine/qe.js';
+import qeConsts from '../engine/qeConsts.js';
 
 let traceObj = false;
 
@@ -102,7 +102,8 @@ describe('cx2rgb tests', () => {
 
 	// how to do this correctly with the defined constants???
 	//testParam('spaceParams', 'continuum', 2, [0, 1, 2]);
-	testParam('spaceParams', 'continuum', qe.contENDLESS, [qe.contDISCRETE, qe.contWELL, qe.contENDLESS]);
+	testParam('spaceParams', 'continuum', qeConsts.contENDLESS,
+		[qeConsts.contDISCRETE, qeConsts.contWELL, qeConsts.contENDLESS]);
 
 	/* ************************************ waveParams */
 
@@ -114,20 +115,20 @@ describe('cx2rgb tests', () => {
 	testParam('waveParams', 'waveBreed', 'chord', ['circular', 'standing', 'gaussian', 'chord']);
 	testParam('waveParams', 'waveFrequency', 16, {min: -100, max: 100, step: 0.5});
 	testParam('waveParams', 'pulseWidth', 20, {min: 1, max: 100});
-	testParam('waveParams', 'pulseOffset', 30, {min: 0, max: 100});
+	testParam('waveParams', 'pulseCenter', 30, {min: 0, max: 100});
 
 	/* ************************************ voltageParams */
 	testParam('voltageParams', 'voltageBreed', 'flat', ['flat', 'canyon']);
 	testParam('voltageParams', 'canyonPower', 0, {min: -4, max: 4});
 	testParam('voltageParams', 'canyonScale', 0, {min: -10, max: 10});
-	testParam('voltageParams', 'canyonOffset', 50, {min: 0, max: 100});
+	testParam('voltageParams', 'voltageCenter', 50, {min: 0, max: 100});
 
 
 	testParam('voltageSettings', 'showVoltage', true, [true, false]);  // not really the same as the rest...
 
 	/* ************************************ frameSettings */
 	testParam('frameSettings', 'shouldBeIntegrating', false,  [false, true]);
-	testParam('frameSettings', 'framePeriod', 50, {min: 16, max: 60_001});
+	testParam('frameSettings', 'chosenFP', 50, {min: 16, max: 60_001});
 	testParam('frameSettings', 'dtStretch', 1, {min: .1, max: 10.0, });
 	//testParam('frameSettings', 'stepsPerFrame', 100, {min: 10, max: 1e5});
 	//testParam('frameSettings', 'lowPassFilter', 50, {min: 0, max: 75});

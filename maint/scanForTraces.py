@@ -26,19 +26,14 @@ if 0 == cpl.returncode:
 
 print()
 print("🟦 🟦 🟦 🟦 🟦 🟦 🟦 🟦 🟦 🟦  JavaScript")
-
-os.chdir(SQUISH_ROOT + '/quantumEngine')
+print("Sorry but searching in JavaScriippt might not work I think")
+os.chdir(SQUISH_ROOT + '/src')
 #cd $SQUISH_ROOT/src
 
 cpl = subprocess.run(['grep', '-ERnI', '^(let|const) trace.* = true;', '.'])
 if 0 == cpl.returncode:
-	print("🔧 🔧 Try global regex search     bool trace.* = true;  ")
+	print("     ... 🔧 🔧 Try instead global regex search     bool trace.* = true;  ")
 	retCode = 33
-#if grep  -ERnI '^(let|const) trace.* = true;' *
-#then
-#print("🔧 🔧 Try global regex search     ^(let|const) trace.* = true;  ")
-#exit 33
-#fi
 
 print()
 print("🟦 🟦 🟦 🟦 🟦 🟦 🟦 🟦 🟦 🟦 done scaning sources")

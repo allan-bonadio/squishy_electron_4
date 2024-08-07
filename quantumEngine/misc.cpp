@@ -11,13 +11,13 @@
 
 static bool traceExceptions = false;
 
-// return elapsed real time since last page reload, in seconds, only for tracing
-// seems like it's down to miliseconds or even a bit smaller
+// return elapsed real time since last page reload, in Milliseconds, just like JS
+// seems like accuracy down to miliseconds or even a bit smaller
 double getTimeDouble(void)
 {
     struct timespec ts;
     clock_gettime(CLOCK_MONOTONIC, &ts);
-    return ts.tv_sec + ts.tv_nsec / 1e9;
+    return ts.tv_sec * 1000 + ts.tv_nsec / 1e6;
 }
 
 /* ****************** constants */
@@ -41,7 +41,7 @@ bool traceSpeedyLog = false;
 #define MAX_ONE_LOG_LEN  400
 static char speedyBuf[MAX_BUF_LEN];
 static int speedyCursor = 0;
-static double startTime = getTimeDouble();
+//static double startTime = getTimeDouble();
 
 
 void speedyLog(const char* format, ...) {

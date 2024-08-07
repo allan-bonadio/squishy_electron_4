@@ -16,7 +16,7 @@ class inteStats {
 		this.addStat('Frame Calc Time'    , 'frameCalcTime', 'ms');
 		this.addStat('Draw Time'                  , 'totalDrawTime', 'ms');
 		//this.addStat('Total For Frame'   , 'totalForFrame', 'ms');
-//		this.addStat('Frame Period'      , 'framePeriod', 'ms');
+//		this.addStat('Frame Period'      , 'chosenFP', 'ms');
 //		this.addStat('Frames Per Sec'   , 'framesPerSec', '/sec');
 		this.addStat('rAF Period'   , 'rAFPeriod', 'ms');
 

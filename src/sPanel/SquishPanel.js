@@ -15,7 +15,7 @@ import ControlPanel from '../controlPanel/ControlPanel.js';
 import {eSpaceCreatedPromise} from '../engine/eEngine.js';
 
 import {interpretCppException} from '../utils/errors.js';
-import WaveView from '../view/WaveView.js';
+import WaveView from './WaveView.js';
 import sAnimator from './sAnimator.js';
 
 import {getASetting, storeASetting} from '../utils/storeSettings.js';
@@ -26,15 +26,10 @@ let tracePromises = false;
 let traceSquishPanel = false;
 let traceWidth = false;
 
-const DEFAULT_VIEW_CLASS_NAME = 'flatViewDef';
+const DEFAULT_VIEW_CLASS_NAME = 'flatScene';
 
 
-/* ************************************************ Context */
 
-// this will be available all over the squish panel.  so maybe I don't have to
-// mess around with these props so much. how did i go so long without learning
-// contexts?
-const SpaceContext = React.createContext({space: null});
 
 /* ************************************************ construction & reconstruction */
 
@@ -50,19 +45,30 @@ export class SquishPanel extends React.Component {
 		super(props);
 
 		if (SquishPanel.squishPanelConstructed) {
-			// should not be called twice!  now that i've got craco and space recreate relods the page,
-			// I shouldn't need this anymore, right ?!?!?!?!?  TODO
-			console.log(`👑 annoying hot reload; continue to really reload page...🙄  👿 🤢 😵 🤬 😭 😠`);
+			// should not be called twice!
+			console.error(`👑 annoying hot reload...🙄  👿 🤢 😵 🤬 😭 😠`);
 			debugger;
 			location = location;  // eslint-disable-line no-restricted-globals
 		}
+
+		this.spaceCtx = React.createContext(null);
+
+
 		SquishPanel.squishPanelConstructed++;
 
 		this.state = {
 			mainViewClassName: DEFAULT_VIEW_CLASS_NAME,
 
 			showVoltage:  getASetting('voltageSettings', 'showVoltage'),
+
+			// the space for this SP.
+			space: null,
+
+			//  this will get filled in when the rAF mesurements get settled down in sAnimator
+			frameRateMenuFreqs: null,
 		};
+
+
 
 		if (traceSquishPanel) console.log(`👑 SquishPanel constructor done`);
 	}
@@ -81,7 +87,9 @@ export class SquishPanel extends React.Component {
 			this.space = space;
 			this.setState({space});  // maybe i don't need this if it's in the context?
 
-			this.animator = new sAnimator(this, space);
+			// CPToolbar needs frameRateMenuFreqs to draw the menu.  If it exists yet.
+			const pickupFreqs = (freqs) => this.setState({frameRateMenuFreqs: freqs});
+			this.animator = new sAnimator(this, space, pickupFreqs);
 
 			this.mainEAvatar = space.mainEAvatar;
 			this.grinder = space.grinder;
@@ -118,10 +126,23 @@ export class SquishPanel extends React.Component {
 	// others managed from ControlPanel
 	// can i move these to the control panel?
 
-	toggleShowVoltage =
+	// as long as this alo apppears in the CPToolbar, has to be here
+	changeShowVoltage =
 	ev => {
-		this.setState({showVoltage: ev.target.checked});
-		storeASetting('voltageSettings', 'showVoltage', ev.target.checked);
+		let newSetting = ev.target.value;
+		this.setState({showVoltage: newSetting});
+		storeASetting('voltageSettings', 'showVoltage', newSetting);
+
+		// now make it effective.  This class and css do it.
+		// this stays until the next render, which will also generate the same className.
+		// this will have to get more specific if/when there's multiple squish panels
+		const setSV = voEl => {
+			if (!voEl) return;
+			voEl.classList.remove('alwaysShowVoltage', 'hoverShowVoltage',
+					'neverShowVoltage');
+			voEl.classList.add(newSetting + 'ShowVoltage');
+		}
+		setSV(document.querySelector('.SquishPanel .optionalVoltage'));
 	}
 
 	// dump the view buffer, from the JS side.  Why not use the C++ version?
@@ -134,15 +155,6 @@ export class SquishPanel extends React.Component {
 		for (let i = 0; i < nRows; i++)
 			console.log(_(vb[i*4]), _(vb[i*4+1]), _(vb[i*4+2]), _(vb[i*4+3]));
 	}
-
-	// get this from the control panel every time user changes it
-	//setFramePeriod =
-	//(period) => {
-	//	//this.framePeriod = period;
-	//	if (this.animator)
-	//		this.animator.framePeriod = period;
-	//}
-
 
 	/* ******************************************************* rendering */
 	// Base function that draws the WebGL, whether during iteration, or during idle times if params change.
@@ -170,29 +182,29 @@ export class SquishPanel extends React.Component {
 			+ ` body.clientWidth=${document.body.clientWidth}`);
 
 		return (
-				<div id={this.props.id} className="SquishPanel">
+			<this.spaceCtx.Provider value={s.space}>
+
+				<article id={this.props.id} className="SquishPanel">
 					<WaveView
-						width={p.width}
-						space={this.space}
+						outerWidth = {p.width}
 						showVoltage={s.showVoltage}
 						sPanel={this}
 					/>
 					<ControlPanel
-						toggleShowVoltage={this.toggleShowVoltage}
+						changeShowVoltage={this.changeShowVoltage}
 						showVoltage={s.showVoltage}
 
 						redrawWholeMainWave={this.redrawWholeMainWave}
 
 						iStats={this.iStats}
-
+						frameRateMenuFreqs={s.frameRateMenuFreqs}
 						animator={this.animator}
 						sPanel={this}
 					/>
-				</div>
+				</article>
+			</this.spaceCtx.Provider>
 		);
 	}
 }
-
-SquishPanel.contextType = SpaceContext;
 
 export default SquishPanel;

@@ -39,7 +39,6 @@ TEST(qAvatar, CheckAvatarConstructor)
 	LONGS_EQUAL(space->nPoints, avatar->qwave->nPoints);
 
 	POINTERS_EQUAL(space->voltage, avatar->voltage);
-	DOUBLES_EQUAL(space->voltageFactor, avatar->voltageFactor, ERROR_RADIUS);
 
 	POINTERS_EQUAL(avatar, avatar->qvBuffer->avatar);
 	POINTERS_EQUAL(avatar->vBuffer, avatar->qvBuffer->vBuffer);

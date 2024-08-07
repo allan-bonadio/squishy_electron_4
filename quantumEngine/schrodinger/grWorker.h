@@ -4,14 +4,18 @@
 */
 
 /*
-	grinder.isIntegrating and grinder.startAtom and .finishAtom synchronize all the gThreadThreads.
+	grinder.isIntegrating and grinder.startAtom and .finishAtom
+	synchronize all the gThreadThreads.  (This discussion isn't entirely
+	accurate, read the code.)
 
 	Start of cycle:
-	All grinderThreads are halted, waiting on startAtomic, where -1 means locked, and >=0 means unlocked.
-	isIntegrating should be false, as that indicates not active.
+	All grinderThreads are halted, waiting on startAtomic, where -1
+	means locked, and >=0 means unlocked. isIntegrating should be false,
+	as that indicates not active.
 
 	To start integration, qGrinder::triggerIteration() is called
-	(however). startAtomic is atomically set to zero, isIntegrating is
+	(however), or a Atomic.notify is called from JS.
+	Eithr way, .startAtomic is atomically set to zero, isIntegrating is
 	set to true, and a notify is done on startAtomic.  All of the
 	grinderThreads launch all together (simultaneously?).  They all run
 	this algorithm that requires them to start simultaneously, and to
@@ -19,7 +23,7 @@
 	out.
 
 	[Not implemented yet; not sure if we need it — Upon notification and
-	activation, each grinderThread, atomically add one to
+	activation, each grWorker, atomically add one to
 	grinder.startAtomic, and immediately proceed to integration. When
 	startAtomic gets to nGrinderThreads, that last thread locks startAtom
 	again, anticipating next frame synch.  Yeah, I think we need this;
@@ -36,18 +40,20 @@
 	grinder.isIntegrating.  If true, the startAtomic is unlocked again
 	to trigger the next cycle.
 
-	[Single step should be done this way — start integrating with trigger, but never set shouldBeIntegrating on, so  that at the end of the cycle, integration will turn off.]
+	[Single step should be done this way — start integrating with
+	trigger, but never set shouldBeIntegrating on, so  that at the end
+	of the cycle, integration will turn off.]
 */
 
 
-struct grinderThread {
+struct grWorker {
 	qThread *thread;  // points to corresponding thread
 	qGrinder *grinder;  // all point to the same grinder
 	int serial;  // same as thread serial
 	//bool isDone;  // false while still working
 
 	// makes its own qThread
-	grinderThread(qGrinder *gr);
+	grWorker(qGrinder *gr);
 
 	// creates all threads, etc
 	static void createGrinderThreads(qGrinder *grinder);
@@ -59,7 +65,7 @@ struct grinderThread {
 	void gThreadLoop(void);
 
 	// timing of the most recent integration; startCalc and endCalc sampled when
-	// they're stored, beginning and end of integration frame
+	// they're stored, beginning and end of integration frame.  ms.
 	double startCalc;
 	double frameCalcTime;
 };

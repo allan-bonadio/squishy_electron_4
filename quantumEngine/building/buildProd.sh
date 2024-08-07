@@ -15,7 +15,8 @@ export MAX_LABEL_LEN=31
 export DEBUG='-gsource-map --source-map-base /qEng/ '
 export OPTIMIZE='-O3 -flto --closure 1 '
 
-
+# see in dev version
+export MALLOC=emmalloc
 
 
 echo 🎁 🎁 🎁 🎁 🎁 🎁 🎁 🎁 🎁 🎁 🎁 🎁 🎁 🎁 🎁 🎁 🎁 🎁  compile

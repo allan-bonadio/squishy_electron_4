@@ -17,6 +17,7 @@ const suffixes = [
 const suffixMid = suffixes.indexOf('');
 
 // return a string for this real number, with greek/roman suffixes for the exponent
+// returns {mantissa: digits, suffix: si suffix, iTHous = equivalent si suffix as integer power}
 export function toSiPieces(f) {
 	const thousands = Math.log10(f) / 3;
 	const iThous = Math.floor(thousands);
@@ -29,9 +30,15 @@ export function toSiPieces(f) {
 
 // return a string for this real number, with greek/roman suffixes instead of exponent
 export function toSiSuffix(f, nDigits) {
-	const pieces = toSiPieces(f);
+	if (f === 0)
+		return '0';
 
-	return pieces.mantissa.toPrecision(nDigits) + pieces.suffix;
+	const pieces = toSiPieces(f);
+	const num = pieces.mantissa.toPrecision(nDigits) + pieces.suffix;
+	if (f < 0)
+		return '-' + num;
+	else
+		return num;
 }
 
 
@@ -51,13 +58,13 @@ export function thousands(n) {
 // put spaces between triples of digits.  ALWAYS positive reals.  Also decimal places.
 // not sure why I did this cuz it's built in to intl but in case you have an
 // ancient browser ... but if you do, you can't run webassembly or GL...
-export function thousandsSpaces(n) {
+export function thousandsSpaces(n, nDigits = 10) {
 	// round off to nearest millionth - 6 digits past dec pt
 	n = Math.round(n * 1e6) / 1e6;
 	let nInt = Math.floor(n);
 	let nFrac = (n) % 1;
-	if (n < 1e-12) {
-		return toSiSuffix(n, 10);
+	if (n != 0 && n < 1e-12) {
+		return toSiSuffix(n, nDigits);
 	}
 
 	let nuPart = 'z';

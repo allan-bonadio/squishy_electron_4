@@ -3,7 +3,7 @@
 ** Copyright (C) 2021-2024 Tactile Interactive, all rights reserved
 */
 
-import {qe, defineQEngineFuncs} from './qe.js';
+import {defineQEngineFuncs} from './qeFuncs.js';
 import App from '../App.js';
 import {interpretCppException, excRespond} from '../utils/errors.js';
 import {resetObjectRegistry} from '../utils/directAccessors.js';

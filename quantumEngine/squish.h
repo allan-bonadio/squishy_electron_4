@@ -15,7 +15,7 @@
 
 #include "commonConstants.h"
 
-// return elapsed time since last page reload, in seconds
+// return elapsed time since last page reload, in Milliseconds
 extern double getTimeDouble(void);
 
 extern const double ℏ;  //  = 105.4571817 pfg nm^2 / ps, Plank's reduced

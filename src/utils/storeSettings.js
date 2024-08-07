@@ -4,8 +4,8 @@
 */
 
 import {isPowerOf2} from './powers.js';
-import qe from '../engine/qe.js';
-import LOTS_OF_VOLTS from './lotsOfVolts.js';
+import qeConsts from '../engine/qeConsts.js';
+import {EFFECTIVE_VOLTS, AMPLE_VOLTS} from '../volts/voltConstants.js';
 
 // what a disaster.   I made this whole subsystem, storeSettings (aka New)
 // but somehow the compiler fucks it up,
@@ -183,8 +183,8 @@ export function createStoreSettings() {
 
 	// see also resolution dialog to change these
 	makeParam('spaceParams', 'N', 64,  N => isPowerOf2(N) );
-	makeParam('spaceParams', 'continuum', qe.contENDLESS,
-		[qe.contDISCRETE, qe.contWELL, qe.contENDLESS]);
+	makeParam('spaceParams', 'continuum', qeConsts.contENDLESS,
+		[qeConsts.contDISCRETE, qeConsts.contWELL, qeConsts.contENDLESS]);
 	makeParam('spaceParams', 'spaceLength', 16, {min: 1e-3, max: 1e7});
 
 	/* ************************************ waveParams */
@@ -199,31 +199,36 @@ export function createStoreSettings() {
 	makeParam('waveParams', 'waveBreed', 'gaussian', ['circular', 'standing', 'gaussian', 'chord']);
 	makeParam('waveParams', 'waveFrequency', 6, {min: -100, max: 100, step: 0.5});
 	makeParam('waveParams', 'pulseWidth', 10, {min: 1, max: 100});
-	makeParam('waveParams', 'pulseOffset', 20, {min: 0, max: 100});
+	makeParam('waveParams', 'pulseCenter', 20, {min: 0, max: 100});
 
 	/* ************************************ voltage */
-	// the voltage controls
-	makeParam('voltageParams', 'voltageBreed', 'flat', ['flat', 'canyon', 'double']);
-	makeParam('voltageParams', 'canyonPower', 2, {min: 0, max: 6});
-	makeParam('voltageParams', 'canyonScale', LOTS_OF_VOLTS * .1, {min: 0, max: LOTS_OF_VOLTS});
-	makeParam('voltageParams', 'canyonOffset', 50, {min: 0, max: 100});
+	// the voltage controls   volts ≈ canyonScale * x ** canyonPower sortof
+	// where x is centered at voltageCenter across
+	makeParam('voltageParams', 'voltageBreed', 'flat', ['flat', 'slot', 'block', 'canyon']);
+	makeParam('voltageParams', 'voltageCenter', 50, {min: 0, max: 100});
+
+	makeParam('voltageParams', 'slotWidth', 10, {min: 0, max: 100});  // 0 to 100 despite appearance
+	makeParam('voltageParams', 'slotScale', EFFECTIVE_VOLTS, {min: 0, max: AMPLE_VOLTS});
+
+	makeParam('voltageParams', 'canyonPower', 2, {min: 0.1, max: 20});
+	makeParam('voltageParams', 'canyonScale', EFFECTIVE_VOLTS, {min: 0, max: AMPLE_VOLTS});
 
 	// where voltage line shows
-	makeParam('voltageSettings', 'showVoltage', true, [true, false]);
+	makeParam('voltageSettings', 'showVoltage', 'hover', ['always', 'hover', 'never']);
 
 	// voltage at bottom of wave view, 𝚫voltage of wave view height
-	const extremes = {min: -1000 * LOTS_OF_VOLTS, max: 1000 * LOTS_OF_VOLTS}
-	makeParam('voltageSettings', 'bottomVolts', -LOTS_OF_VOLTS, extremes);
-	makeParam('voltageSettings', 'heightVolts', 2 * LOTS_OF_VOLTS,
-		{min: LOTS_OF_VOLTS * .001, max: LOTS_OF_VOLTS * 1000});
-	makeParam('voltageSettings', 'minBottom', -.5, extremes);  // soon to be deprecated
+	const extremes = {min: -1000 * EFFECTIVE_VOLTS, max: 1000 * EFFECTIVE_VOLTS}
+	makeParam('voltageSettings', 'bottomVolts', -EFFECTIVE_VOLTS, extremes);
+	makeParam('voltageSettings', 'heightVolts', 2 * EFFECTIVE_VOLTS,
+		{min: EFFECTIVE_VOLTS * .001, max: EFFECTIVE_VOLTS * 1000});
+	//makeParam('voltageSettings', 'minBottom', -.5, extremes);  // soon to be deprecated
 	// always = min + 2 * heightVolts makeParam('voltageSettings', 'maxBottom', 16, {min: -256, max: 256});
 
 	/* ************************************ frameSettings */
 
 	// set in integration tab
 	makeParam('frameSettings', 'shouldBeIntegrating', true,  [false, true]);
-	makeParam('frameSettings', 'framePeriod', 50, {min: 16, max: 60_001});
+	makeParam('frameSettings', 'chosenFP', 50, {min: 16, max: 60_001});
 	makeParam('frameSettings', 'dtStretch', 1, {min: .001, max: 1, });
 	//makeParam('frameSettings', 'stepsPerFrame', 10, {min: 2, max: 50});
 	//makeParam('frameSettings', 'lowPassFilter', 50, {min: 0, max: 75});

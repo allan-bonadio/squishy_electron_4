@@ -13,6 +13,11 @@
 
 #include "CppUTest/TestHarness.h"
 
+
+Not currently in use
+
+
+
 static qSpace *space;
 static qGrinder *qgrinder;
 static qFlick *qflick;
