@@ -5,7 +5,8 @@ description: Effects of a Limited Wave Representation
 
 # Discrete Frequencies
 
-Squishy Electron stores your wave as a sequence of numbers, one per point.  You change this in the Space tab. The **resolution you choose has a profound effect** on the wave and how things are calculated.  An important part of your wave is the frequencies it has in it.  The numbers of frequencies that can show up there is exactly equal to the number of points in your wave.
+Squishy Electron stores your wave as a sequence of numbers, one per point.  You change this in the Space tab. The **resolution you choose has a profound effect** on the wave and how things are calculated.  An important part of your wave is the frequencies it has in it.  In fact, you could say that your wave is entirely the frequencies it's made up from.
+The numbers of frequencies that can show up there is exactly equal to the number of points in your wave.
 
 Let's take an example.  Let's say you have a wave with a resolution of 16.  (You should use a higher frequency, but here you'll be able to see what's going on.)  If you have a resolution of 16 points, that means you can have 16 different frequencies mixed into your wave.  No more.  This includes the positive frequencies moving right, and the negative frequencies moving left.
 
@@ -13,7 +14,7 @@ Because it's a complex-number wave, it might be **hard to see** what's going on.
 
 [line graph of sine wave, freq 3, res 16]
 
-Here you see a wave with frequency 3, in a space with resolution 16.  There's 3 humps, and three gutters.  Now, the line you see is a perfect sine wave - more like real life.  The circled points are where the perfect wave gets sampled - almost like we **measure the height of the wave** (positive or negative) **only at those 16 points**.  And, that's all that Squishy Electron can see, because those are the only numbers it has in memory for the wave.  And, all of the information about that wave is encoded in those 16 numbers.
+Here you see a wave with frequency 3, in a space with resolution 16.  There's 3 crests (high points), and three troughs (low points).  Now, the line you see is a perfect sine wave - more like real life.  The circled points are where the perfect wave gets sampled - almost like we **measure the height of the wave** (positive or negative) **only at those 16 points**.  And, that's all that Squishy Electron can see, because those are the only numbers it has in memory for the wave.  And, all of the information about that wave is encoded in those 16 numbers.
 
 
 It's not like real life - there seems to be no limit to the resolution that a real quantum mechanical wave can have in real life.  That would take an infinite number of data points, and your computer just doesn't have that much memory.

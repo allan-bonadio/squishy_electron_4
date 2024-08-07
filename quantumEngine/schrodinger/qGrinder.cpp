@@ -13,6 +13,8 @@
 //#include <condition_variable>
 #include <pthread.h>
 #include <stdatomic.h>
+//#include <emscripten/wasm_worker.h>
+
 // looking for emscripten_futex_wait() - it's not here #include <emscripten/atomic.h>
 
 #include "../hilbert/qSpace.h"
