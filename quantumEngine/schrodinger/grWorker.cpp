@@ -11,7 +11,7 @@
 static bool traceStart = false;
 static bool traceWork = false;
 static bool traceFinish = false;
-static bool traceSync = true;
+static bool traceSync = false;
 
 static bool traceWorkOccasionally = false;
 static int occasionally = 0;

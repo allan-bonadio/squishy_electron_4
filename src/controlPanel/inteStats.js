@@ -12,7 +12,7 @@ class inteStats {
 		this.statsMap = {};  // by name
 		this.statsList = [];  // by serial
 
-		this.addStat('Divergence'         , 'divergence', '%');
+		this.addStat('Divergence'         , 'divergence', 'points');
 		this.addStat('Frame Calc Time'    , 'frameCalcTime', 'ms');
 		this.addStat('Draw Time'                  , 'totalDrawTime', 'ms');
 		//this.addStat('Total For Frame'   , 'totalForFrame', 'ms');
@@ -154,7 +154,7 @@ class inteStats {
 				}
 				else {
 					// color will go red -> orange -> yellow, also size 1em -> 2em
-					let green = (dv - 50) / 50 * 255;
+					let green = (dv - 50) / 50 * 240;
 					element.style.color = `rgb(255, ${green}, 0)`;
 					element.style.fontSize = (dv / 50) + 'em';
 					element.style.textShadow = '0 0 3px #0008';
