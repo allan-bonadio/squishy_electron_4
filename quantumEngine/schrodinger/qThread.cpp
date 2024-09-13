@@ -16,23 +16,6 @@ bool traceThreads = false;
 
 /* ********************************************************************************** threads */
 
-// ok so this is pthreads
-
-
-// the function called in each thread-specific main loop, 60x/sec
-// NO see grWorker
-//static void mainLooper(void *arg) {
-//	qThread *thread = (qThread *) arg;
-//	//printf("🐴  mainLooper entered with qthread=%p\n", thread);
-//	thread->dumpAThread("mainLooper entered");
-//	//printf("mainLooper entered with qthread=%p,  qt-handler=%p\n",
-//	//	 thread->handler);
-//	//qGrinder *grinder = (qGrinder *) qt->handle;
-//
-//
-//	(*thread->handler)(thread->arg);
-//}
-
 // each thread does this upon startup; runs this func
 // the function that runs the whole thread, executes in the thread thread
 // argument in: it's own qtThread object.  Makes main loop for thread,

@@ -19,9 +19,9 @@ static int occasionally = 0;
 /* *********************************************** grWorker */
 
 // indexed by thread serial, there may be gaps.
-// for threads that AREN'T gThreads
+// for threads that AREN'T grWorkers
 static grWorker *sla[MAX_THREADS];
-grWorker **qGrinder::gThreads = sla;
+grWorker **qGrinder::grWorkers = sla;
 
 // do the work: integration
 void grWorker::gThreadWork(void) {
@@ -122,7 +122,7 @@ void grWorker::gThreadLoop(void) {
 					serial, nWas);
 			}
 
-			if (nWas >= grinder->nGrinderThreads) {
+			if (nWas >= grinder->nGrWorkers) {
 				// this must be the last thread to finish in this integration frame!
 				grinder->threadsHaveFinished();
 			}
@@ -166,16 +166,16 @@ grWorker::grWorker(qGrinder *gr)
 
 
 // static; creates all gThread threads; runs early
-void grWorker::createGrinderThreads(qGrinder *grinder) {
+void grWorker::createGrWorkers(qGrinder *grinder) {
 
-	for (int t = 0; t < grinder->nGrinderThreads; t++) {
+	for (int t = 0; t < grinder->nGrWorkers; t++) {
 		// actual pthread won't start till the next event loop i think
 		grWorker *gThread = new grWorker(grinder);
-		grinder->gThreads[gThread->thread->serial] = gThread;
-		speedyLog("🔪  grWorker::createGrinderThreads() created A GrinderThread(%d) \n", gThread->serial);
+		grinder->grWorkers[gThread->thread->serial] = gThread;
+		speedyLog("🔪  grWorker::createGrWorkers() created A grWorker %d\n", gThread->serial);
 	}
 
-	speedyLog("🔪  grWorker created %d gThreads \n", grinder->nGrinderThreads);
+	speedyLog("🔪  grWorker created %d grWorkers \n", grinder->nGrWorkers);
 };
 
 

@@ -1,5 +1,5 @@
 /*
-** gThread thread -- info for a thread that does real integration crunching
+** grinder worker -- info for a thread that does real integration crunching
 ** Copyright (C) 2023-2024 Tactile Interactive, all rights reserved
 */
 
@@ -25,14 +25,14 @@
 	[Not implemented yet; not sure if we need it — Upon notification and
 	activation, each grWorker, atomically add one to
 	grinder.startAtomic, and immediately proceed to integration. When
-	startAtomic gets to nGrinderThreads, that last thread locks startAtom
+	startAtomic gets to nGrWorkers, that last thread locks startAtom
 	again, anticipating next frame synch.  Yeah, I think we need this;
 	works fine now cuz there's just one thread.  We also need that extra
 	tail thread to run threadsHaveFinished().]
 
 
 	Threads, when they finish, count up, atomically incrementing with grinder.finishAtomic.
-	When it gets to nGrinderThreads, that means that all threads have finished,
+	When it gets to nGrWorkers, that means that all threads have finished,
 	so that last thread calls grinder.threadsHaveFinished(), which cleans up.
 	[OR starts in the finishing thread]
 
@@ -56,7 +56,7 @@ struct grWorker {
 	grWorker(qGrinder *gr);
 
 	// creates all threads, etc
-	static void createGrinderThreads(qGrinder *grinder);
+	static void createGrWorkers(qGrinder *grinder);
 
 	// actually gets called each frame.  Not strictly synchronized inter-thread, but runs from
 	// requestAnimationFrame()

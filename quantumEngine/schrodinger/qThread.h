@@ -54,9 +54,6 @@ struct qThread {
 	static int nCreatedThreads;
 	static int nRunningThreads;
 	static qThread **threadsList;
-
-	//static std::atomic_flag changingActive;
-
 };
 
 

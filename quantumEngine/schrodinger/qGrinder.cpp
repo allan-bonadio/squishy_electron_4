@@ -48,13 +48,13 @@ static std::runtime_error nullException("");
 // create new grinder, complete with its own stage buffers. make sure
 // these values are doable by the sliders' steps. Space is definitely
 // created by creation time here, although a few details left  to do.
-qGrinder::qGrinder(qSpace *sp, qAvatar *av, int nGrinderThreads, const char *lab)
+qGrinder::qGrinder(qSpace *sp, qAvatar *av, int nGrWorkers, const char *lab)
 	: space(sp), avatar(av), elapsedTime(0), frameSerial(0), stretchedDt(60),
 		integrationEx(nullException), exceptionCode(""), _zero(0), hadException(false),
 		shouldBeIntegrating(false), isIntegrating(false), justNFrames(0),
 		stepsPerFrame(10),
 		pleaseFFT(false), videoFP(.05),
-		nGrinderThreads(nGrinderThreads) {
+		nGrWorkers(nGrWorkers) {
 
 	magic = 'Grnd';
 
@@ -75,7 +75,7 @@ qGrinder::qGrinder(qSpace *sp, qAvatar *av, int nGrinderThreads, const char *lab
 	atomic_init(&finishAtomic, 0);
 
 	// should this come earlier?
-	grWorker::createGrinderThreads(this);
+	grWorker::createGrWorkers(this);
 
 	samplePoint = space->dimensions[0].N / 3 + space->dimensions[0].start;
 
@@ -169,7 +169,7 @@ void qGrinder::formatDirectOffsets(void) {
 	makeDoubleGetter(stretchedDt);
 	makeDoubleSetter(stretchedDt);
 
-	makeIntGetter(nGrinderThreads);
+	makeIntGetter(nGrWorkers);
 
 	makeDoubleGetter(videoFP);
 	makeDoubleSetter(videoFP);
@@ -382,8 +382,8 @@ void qGrinder::oneFrame() {
 void qGrinder::aggregateCalcTime(void) {
 	totalCalcTime = 0;
 	maxCalcTime = 0;
-	for (int ix = 0; ix < nGrinderThreads; ix++) {
-		grWorker *sl = gThreads[ix];
+	for (int ix = 0; ix < nGrWorkers; ix++) {
+		grWorker *sl = grWorkers[ix];
 		if (sl) {
 			totalCalcTime += sl->frameCalcTime;
 			maxCalcTime = fmax(maxCalcTime, sl->frameCalcTime);

@@ -34,7 +34,7 @@ struct qStage;
 struct grWorker;
 
 struct qGrinder {
-	qGrinder(qSpace *, struct qAvatar *av, int nGrinderThreads, const char *label);
+	qGrinder(qSpace *, struct qAvatar *av, int nGrWorkers, const char *label);
 	~qGrinder(void);
 	void formatDirectOffsets(void);
 	void dumpObj(const char *title);
@@ -120,7 +120,7 @@ struct qGrinder {
 	struct qStage *stages;
 	struct qThread *threads;
 
-	int nGrinderThreads;  // total number of grWorker threads we'll use for integrating
+	int nGrWorkers;  // total number of grWorker threads we'll use for integrating
 			// mostly constant, although there's plans to gradually add/remove threads
 
 	// Although isIntegrating, do only this many more frames before
@@ -134,20 +134,20 @@ struct qGrinder {
 
 	// starts at 0.  As each thread finishes their iteration work, they
 	// atomically increment it.  The thread that increments it to
-	// nGrinderThreads, knows it's the last and starts threadsHaveFinished()
+	// nGrWorkers, knows it's the last and starts threadsHaveFinished()
 	_Atomic int finishAtomic;
 
-
+	// (formerly) called by JS to start a frame calc; now done in JS
 	void triggerIteration(void);
 
 	// called once per frame, at the end after last thread finishes (by last thread).
-	// Does several things needed to be done once per cyclle.
+	// Does several things needed to be done once per cycle.
 	void threadsHaveFinished(void);
 
 	// figure out the total elapsed time for each thread, average of all, max of all...
 	void aggregateCalcTime(void);
 
-	static grWorker **gThreads;
+	static grWorker **grWorkers;
 
 	// when trace msgs display just one point (to avoid overwhelming output),
 	// this is the one.

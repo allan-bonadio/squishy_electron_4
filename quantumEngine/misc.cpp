@@ -63,7 +63,8 @@ void speedyLog(const char* format, ...) {
 
     va_end(args);
 	if (traceSpeedyLog)
-		printf("🌪 🌪 🌪 speedyLog fmt='%s' speedyCursor=%d  log so far:\n‹%s›\n", format, speedyCursor, speedyBuf);
+		printf("🌪 🌪 🌪 speedyLog fmt='%s' speedyCursor=%d  log so far:\n‹%s›\n",
+			format, speedyCursor, speedyBuf);
 }
 
 // finally, print it out
@@ -71,7 +72,7 @@ void speedyFlush(void) {
 	if (traceSpeedyLog)
 		printf("🌪 🌪 🌪 speedyFlush speedyCursor=%d \n", speedyCursor);
 	if (speedyBuf[0])
-		printf("%s", speedyBuf);
+		printf("%s\n", speedyBuf);
 	speedyCursor = 0;
 	speedyBuf[0] = 0;
 }
