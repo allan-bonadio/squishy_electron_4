@@ -6,7 +6,7 @@
 import {expect} from '@jest/globals';
 import {cx2rgb} from './cx2rgb.txlated.js';
 
-let traceConfirm = true;
+let traceConfirm = false;
 
 // THis is a Jest testfile.  Do 'npm test' and it'll run along with the rest.
 

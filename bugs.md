@@ -1,5 +1,7 @@
 #  bugs and wishlist items for Squishy Electron
 
+- Find a replacement for CreateReactApp - no longer supported
+
 
 ## Control Panel
 
@@ -13,6 +15,8 @@ I get it.  Standing wave freq 0 => nans.
 - need a button to reset ALL params and settings
 
 - need a hamburger menu for things like the above.
+
+- StartOver displays a kinked wave - cick a second time and it's ok
 
 
 ## GL & WaveView
@@ -28,24 +32,25 @@ I get it.  Standing wave freq 0 => nans.
 
 - should have x axis on the bottom marked in nm
 
+- frame number and elapsed ps don't display anywhere  near right
+
 
 ## Voltage
+
+- voltage setting doesn't work anymore!?!?
+
+- voltage line is too short horizontally.  I think only when it first starts up.
 
 - voltage area: dragging beyond bounds should expand scale.  Actually,
 now, it just breaks stuff and gives you a really low or high boundary.
 Needs fixing.
 
-- set voltage: valley should prohibit negative powers and negative
-factors.  Also, displays upside down.
-
-- Voltage sidebar should be made part of the voltage stuff, showing and
-hiding with it.  Get rid of that scrollbar that doesn't do anything and
-make up/down arrows.  That and the resize box all on the right side.
-
 - option to have voltage relax back to zero (or whatever's set in the
 tab)
 
-## Integration
+- reset voltage doesn't reset voltage range
+
+## Space and Integration
 
 - multiple threads.  Break up wave into segments, with borders; one seg
 per thread. And way of each thread claiming the border and moving it in
@@ -55,13 +60,13 @@ or out depending.  Matrix of atoms.
 - I think it doesn't conserve energy - gotta check this out.  I'm pretty
 certain it doesn't. But now I have FFTs to measure it at least.
 
-- Is the frame count correct?  If not, fix it.
-
 - RK4?
 
-- Gotta have some way to control the speed.  Goes up or down x8
+- for Well contimuum, need start and end to be nailed to zero, and N-1 points between.
 
 ## Docs
+
+- need to integrate specific help topics into the app with little (i) buttons
 
 - more documentation about... divergence
 
