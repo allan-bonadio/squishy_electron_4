@@ -7,16 +7,20 @@
 #include <emscripten/threading.h>
 
 /* Some Calculation/Grinder terms:
+
 a Frame: is an amount of calculation correspoinding to one refresh of
 the video display. Doesn't have to be synchronized with the screen
 refreshes; just the amount of calculation done for it.  Typically
 hundreds of steps.
 
-a Step: is an mount of calculation to advance the model ∆t or dt time.
+a Step: is a calculation to advance the model ∆t or dt time.
 
 a Hit: advancement by dt of one of many parts of the calculation.  As of
 this writing, there are four hits to a step: two Vischer real+imag, and
-two Midpoint first+last.
+two Midpoint first+last.  (May be for whole buffer, or for just one pt)
+
+a Point is one number in a buffer, one state of the qm system, and/or any
+associated numbers in parallel buffers like voltage.
 
 Some sortof overlapping terms on timing:
 
@@ -150,7 +154,7 @@ struct qGrinder {
 	static grWorker **grWorkers;
 
 	// when trace msgs display just one point (to avoid overwhelming output),
-	// this is the one.
+	// this is the one.  (last i checked, 1/3 of the way)
 	int samplePoint;
 
 	// mostly for debugging

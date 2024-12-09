@@ -59,7 +59,7 @@ export class WaveView extends React.Component {
 
 			// no!  handed in by promise space: null,  // set when promise comes in
 
-			// This is from the space
+			// This is from the space.  Should this even be in the state?
 			vDisp: null,
 		}
 		// directly measured Canvas innr width & height and maybe more set by
@@ -142,8 +142,8 @@ export class WaveView extends React.Component {
 			this.formerWidth = p.outerWidth;
 			this.formerHeight = s.outerHeight;
 			this.formerShowVoltage = p.showVoltage;
-			console.log(`canvasInnerDims was ${this.canvasInnerDims.width}W ; WV is now `
-				+ `${p.outerWidth}W`);
+			//console.log(`canvasInnerDims was ${this.canvasInnerDims.width}W ; WV is now `
+			//	+ `${p.outerWidth}W`);
 
 			this.vDisp.setVoltScales(this.canvasInnerDims.width, s.outerHeight - 2, this.space.nPoints);
 		}

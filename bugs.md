@@ -1,6 +1,13 @@
 #  bugs and wishlist items for Squishy Electron
 
-- Find a replacement for CreateReactApp - no longer supported
+- Find a replacement for CreateReactApp - no longer supported:
+	** - Vite, seems comparable complexity to CRA
+	* *- Next.js, more complex.  Does server side rendering & SEO stuff
+	- Remix, similar to Next, but different.
+	- Gatsby, uses GraphQL
+	- Expo, has it’s own templating language
+	For squish, I don't need a server so I think Vite is best (say veet)
+
 
 
 ## Control Panel
@@ -54,15 +61,15 @@ tab)
 
 - multiple threads.  Break up wave into segments, with borders; one seg
 per thread. And way of each thread claiming the border and moving it in
-or out depending.  Matrix of atoms.
+or out depending.
 
 
 - I think it doesn't conserve energy - gotta check this out.  I'm pretty
-certain it doesn't. But now I have FFTs to measure it at least.
+certain it doesn't. But now I have FFTs to measure it at least.  If you think about it, pushing up the potential will certainly increase energy.
 
 - RK4?
 
-- for Well contimuum, need start and end to be nailed to zero, and N-1 points between.
+√- for Well contimuum, need start and end to be nailed to zero, and N-1 points between.
 
 ## Docs
 
