@@ -281,10 +281,7 @@ export class ControlPanel extends React.Component {
 	// fills in the voltage buffer with values most recently set for voltageParams
 	// called when user clicks reset voltage on cptoolbar
 	resetVoltage =
-	() => {
-		this.space.vDisp.setFamiliarVoltage(getAGroup('voltageParams'));
-		this.space.updateVoltageArea();
-	}
+	() => this.space.vDisp.setFamiliarVoltage(getAGroup('voltageParams'));
 
 	setShowingTab =
 	tabCode => {

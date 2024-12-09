@@ -65,31 +65,42 @@ function VoltOverlay(props) {
 	(ix, volts) => voltDispatch({ix, volts});
 
 	// these are in our state, but ALSO in the vDisp, and settings, so keep them synched.
-	const [bottomVolts, setBottomVolts] = useState(v.bottomVolts);
+	const [bottomVolts, _setBottomVolts] = useState(v.bottomVolts);
 	v.bottomVolts = bottomVolts;
 	if (getASetting('voltageSettings', 'bottomVolts') != bottomVolts)
 			storeASetting('voltageSettings', 'bottomVolts', bottomVolts);
 
-	const [heightVolts, setHeightVolts] = useState(v.heightVolts);
+	const [heightVolts, _setHeightVolts] = useState(v.heightVolts);
 	v.heightVolts = heightVolts;
 	if (getASetting('voltageSettings', 'heightVolts') != heightVolts)
 			storeASetting('voltageSettings', 'heightVolts', heightVolts);
 
+	// practically speaking, use these functions whenever you set stuff.
+	// They set state, so  immediately after, changes will not be apparent.
+	v.setAPoint = setAPoint;
+	v.setBottomVolts = (bv) => {
+		_setBottomVolts(bv);
+		storeASetting('voltageSettings', 'bottomVolts', bv);
+	}
+	v.setHeightVolts = (hv) => {
+		_setHeightVolts(hv);
+		storeASetting('voltageSettings', 'heightVolts', hv);
+	}
 	/* ************************************************************************ interaction */
 
 	// the actual bottomVolts is ignored; what's important is to tell us that it changed
-	const scrollVoltHandler =
-	bottomVolts => {
-		setBottomVolts(bottomVolts);
-	}
+//	const scrollVoltHandler =
+//	bottomVolts => {
+//		v.setBottomVolts(bottomVolts);
+//	}
 
-	// handles zoom in/out buttons    They pass +1 or -1.
-	const zoomVoltHandler =
-	upDown => {
-		v.zoomVoltHandler(upDown);
-		setBottomVolts(v.bottomVolts);
-		setHeightVolts(v.heightVolts);
-	}
+	// handles zoom in/out buttons, and other widening/narrowing of range    They pass +1 or -1.
+//	const zoomVoltHandler =
+//	upDown => {
+//		v.zoomVoltHandler(upDown);
+//		//v.setBottomVolts(v.bottomVolts);
+//		//v.setHeightVolts(v.heightVolts);
+//	}
 
 	/* ************************************************************************ rendering */
 
@@ -100,8 +111,8 @@ function VoltOverlay(props) {
 		<VoltSidebar width={VOLTAGE_SIDEBAR_WIDTH} height={p.height}
 			vDisp={p.vDisp}
 			showVoltage={p.showVoltage}
-			scrollVoltHandler={scrollVoltHandler}
-			zoomVoltHandler={zoomVoltHandler}
+			scrollVoltHandler={v.setBottomVolts}
+			zoomVoltHandler={v.zoomVoltHandler}
 		/>
 		<VoltArea
 			vDisp={p.vDisp}
@@ -109,6 +120,7 @@ function VoltOverlay(props) {
 			space={p.space}
 			height={p.height}
 			canvasInnerDims={p.canvasInnerDims}
+			setAPoint={setAPoint}
 		/>
 	</section>
 }

@@ -18,84 +18,6 @@ export const spongeFactor = 100;
 
 
 
-// ***************************************************** scrollbar interaction */
-// const body = document.body;
-//
-// // we need these to stick around.  Attach these to something before we get multiple SquishPanels someday.
-//
-// let railEl;
-// let thumbEl;
-//
-// // page Y coords of thumb when moved to the top of its rail
-// let topOfRail;
-//
-// // mousedown Y coord of mouse rel to top of thumb
-// let offsetInsideThumb;
-//
-//
-// // thumb's offsetTop upon click down.  If null, no drag is in progress.
-// // the pixel version of .bottomVolts, upside down
-// let offsetTop = null;
-//
-// // every time function is called, we set the props here.  There's only one so we can use this global.
-// let savedProps;
-//
-// // the offset between top of the scrollbar and the top of the thumb, = offsetTop while dragging
-// let thumbY;
-//
-// let railHeight;
-//
-// // maxBottom - minBottom in pixels
-// let thumbFreedom;
-//
-// // putting them here so they don't have to be recompiled every render
-//
-// const mouseDown =
-// (ev) => {
-// 	ev.preventDefault();
-// 	ev.stopPropagation();
-//
-// 	offsetTop = ev.target.offsetTop;  // the thumb's offset from top of rail
-// 	offsetInsideThumb = ev.nativeEvent.offsetY;  // like <32
-// 	topOfRail = ev.pageY - offsetInsideThumb - offsetTop;
-//
-// 	// only registered while dragging
-// 	body.addEventListener('mousemove', thumbSlide);
-// 	//body.addEventListener('mouseleave', mouseUp);
-// 	body.addEventListener('mouseup', mouseUp);
-// }
-//
-// // called upon mouseMove, Up and Leave
-// const thumbSlide =
-// (ev) => {
-// 	ev.preventDefault();
-// 	ev.stopPropagation();
-//
-// 	if ((ev.buttons & 1) && offsetTop != null) {
-// 		// must use page coords cuz the event handler is attached to doc body
-// 		thumbY = Math.min(thumbFreedom, Math.max(0, ev.pageY - offsetInsideThumb - topOfRail));
-// 		let frac = 1 - thumbY / thumbFreedom;  // 1=scrolled to top, 0=scrolled to bottom
-//
-// 		// scrollVoltHandler() changes VoltArea scales, userScroll() calcs and changes bottomVolts
-// 		savedProps.scrollVoltHandler(savedProps.vDisp.userScroll(frac));
-// 		if (traceDragging) {
-// 			savedProps.vDisp.dumpVoltDisplay(
-// 				`🍟 mouse Move thumbY=${thumbY} thumbFreedom=${thumbFreedom} shd be constant`);
-// 		}
-// 	}
-// }
-//
-// // called upon mouseup or a mouse leave
-// const mouseUp =
-// (ev) => {
-// 	thumbSlide(ev);
-// 	offsetTop = null;  // says mouse is up
-//
-// 	body.removeEventListener('mousemove', thumbSlide);
-// 	//body.removeEventListener('mouseleave', mouseUp);
-// 	body.removeEventListener('mouseup', mouseUp);
-// }
-
 
 function setPT() {
 	VoltSidebar.propTypes = {
@@ -141,7 +63,7 @@ function VoltSidebar(props) {
 
 
 
-	// render.  The buttons are almost square.
+	// render.  The buttons are almost square.  The + and – are emojis
 	return (<aside className='VoltSidebar'
 			onPointerEnter={pointerEnter} onPointerLeave={pointerLeave} >
 		<p/>

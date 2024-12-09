@@ -66,7 +66,7 @@ export class eSpace {
 
 		// direct access into the voltage buffer
 		this.voltageBuffer = new Float64Array(window.Module.HEAPF64.buffer,
-				this._voltage, this.nPoints);;
+				this._voltage, this.nPoints);
 		this.vDisp = voltDisplay.newForSpace(this);
 		let voltageParams = getAGroup('voltageParams');
 		this.vDisp.setFamiliarVoltage(voltageParams);
@@ -169,9 +169,6 @@ export class eSpace {
 		return {start2: dim.start*2, end2: dim.end*2, N: dim.N, nPoints2: this.nPoints * 2,
 			continuum: dim.continuum};
 	}
-
-	updateVoltageArea = null;  // will be filled in in VoltArea.js
-			// after a few renders
 }
 
 export default eSpace;

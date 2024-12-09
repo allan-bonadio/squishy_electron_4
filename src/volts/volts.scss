@@ -89,20 +89,23 @@
 			button {
 				display: inline;
 				background-color: transparent;
-				width: 2em;
-				height: 2em;
-				border-radius: 1em;
+				width: 1em;
+				line-height: 1em;
+				font-size: 1.953125em;  // 3 sizes larger
+				font-weight: 700;
+				//border-radius: .5em;
 				color: common.$voltageColor;
 				padding: 0;
-				border: .5px solid common.$voltageMuchDarkerColor;
+				//border: .5px solid common.$voltageMuchDarkerColor;
+				border: none;
 
 				pointer-events: auto;
 			}
-			button:hover {
-				border-color: common.$voltageColor;
-			}
+//			button:hover {
+//				border-color: common.$voltageColor;
+//			}
 			button:active {
-				background-color: #640;
+				color: common.$voltageDarkerColor;
 			}
 
 			// we use p as spacers between the buttons

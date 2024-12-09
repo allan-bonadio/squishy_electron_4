@@ -43,7 +43,7 @@ describe(`findVoltExtremes() method`, () => {
 		 //console.info(`findVoltExtremes() method`);
 		// shouldn't matter what the settings passed in are
 		volts16 = new Float64Array(16);  // all zeroes, right?
-		vDisp = new voltDisplay(0, 16, volts16,
+		vDisp = new voltDisplay('test findVoltExtremes', 0, 16, volts16,
 			{showVoltage: true, heightVolts: 0, bottomVolts: 0,});
 
 	})
@@ -115,7 +115,7 @@ describe(`voltage creation & consistency`, () => {
 
 	])(`voltDisplay created w/%j  should yield %o`, (settings, mungeFunc, expected) => {
 		mungeFunc?.();
-		vDisp = new voltDisplay(0, 16, volts16,
+		vDisp = new voltDisplay('test created', 0, 16, volts16,
 			{showVoltage: true, ...settings});
 		tryOutConsistency(vDisp);
 
@@ -132,7 +132,7 @@ describe(`voltDisplay Zoom`, () => {
 	let vDisp;
 	beforeAll(() => {
 		volts16 = new Float64Array(16);  // all zeroes, right?
-		vDisp = new voltDisplay(0, 16, volts16);
+		vDisp = new voltDisplay('test Zoom', 0, 16, volts16);
 	});
 
 	// these numbers have been rounded to make it all shorter.
