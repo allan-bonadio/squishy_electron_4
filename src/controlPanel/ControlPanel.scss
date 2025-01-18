@@ -43,6 +43,7 @@
 
 	.CPToolbar {
 		float: none;
+		user-select: none;
 
 		.frameRateBox {
 			display: inline-block;
