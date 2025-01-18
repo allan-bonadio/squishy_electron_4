@@ -12,6 +12,7 @@ static bool traceStart = false;
 static bool traceWork = false;
 static bool traceFinish = false;
 static bool traceSync = false;
+static bool traceCreation = false;
 
 static bool traceWorkOccasionally = false;
 static int occasionally = 0;
@@ -162,9 +163,6 @@ grWorker::grWorker(qGrinder *gr)
 }
 // no destructor - never freed
 
-
-
-
 // static; creates all gThread threads; runs early
 void grWorker::createGrWorkers(qGrinder *grinder) {
 
@@ -172,11 +170,11 @@ void grWorker::createGrWorkers(qGrinder *grinder) {
 		// actual pthread won't start till the next event loop i think
 		grWorker *gThread = new grWorker(grinder);
 		grinder->grWorkers[gThread->thread->serial] = gThread;
-		speedyLog("🔪  grWorker::createGrWorkers() created A grWorker %d\n", gThread->serial);
+		if (traceCreation)
+			speedyLog("🔪  grWorker::createGrWorkers() created A grWorker #%d\n",
+				gThread->serial);
 	}
 
-	speedyLog("🔪  grWorker created %d grWorkers \n", grinder->nGrWorkers);
+	if (traceCreation)
+		speedyLog("🔪  grWorker created %d grWorkers \n", grinder->nGrWorkers);
 };
-
-
-

@@ -7,7 +7,7 @@ import {scaleLinear} from 'd3-scale';
 import {EFFECTIVE_VOLTS, VALLEY_FACTOR, TOO_MANY_VOLTS} from './voltConstants.js';
 import {getAGroup, storeASetting} from '../utils/storeSettings.js';
 
-let traceFamiliar = true;
+let traceFamiliar = false;
 let tracePathAttribute = false;
 let tracePathIndividualPoints = false
 

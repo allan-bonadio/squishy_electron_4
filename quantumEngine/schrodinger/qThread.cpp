@@ -27,7 +27,7 @@ static void *tStart(void *qtx) {
 	//printf("🐴 qThread::ok confirmed in tStart #%d!\n", qt->serial);
 
 	// since this is the thread execcuting, it should show up in its log in the debugger?
-	qt->dumpAThread("thread starting up()");
+	if (traceThreads) qt->dumpAThread("thread starting up()");
 
 	(*qt->handler)(qt->arg);
 
