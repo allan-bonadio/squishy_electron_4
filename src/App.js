@@ -11,7 +11,8 @@ import CommonDialog from './widgets/CommonDialog.js';
 import DocReader from './widgets/DocReader.js';
 import {eSpaceCreatedPromise} from './engine/eEngine.js';
 
-let traceResize = false;
+let traceResize = true;
+let traceState = true;
 
 class App extends React.Component {
 	constructor(props) {
@@ -19,49 +20,79 @@ class App extends React.Component {
 		App.me = this;
 
 		this.state = {
-			// somehow if we set these, we get strange sizing problems with the scroll bar.
-			clientWidth: document.body.clientWidth,  // window width as of constructor
+			// somehow if we set these, we get strange sizing problems with the scroll bar.  ?? fixing i think
+			// the canvas needs the literal width (in px) for its width attr.
+			// We want it to exactly conform like it's a regular element.  So
+			// put it in the  state and make sure it changes whenerver the
+			// window width changes.  And pass it down.
+			// no always get it from this.bodyWidth: 500,  // will be corrected a bit later
 
-			// part of startup
+			// part of startup to get the q engine running
 			cppRunning: false,
 
 			// non-null when dialog is showing
 			dialogContent: null,
 		};
+		if (traceState)
+			console.log(`init App state to:`, this.state);
 
-		eSpaceCreatedPromise.then(space => this.setState({cppRunning: true}));
+		// temporary
+		this.bodyWidth = document.body.clientWidth;
+
+		eSpaceCreatedPromise.then(space =>{
+			// there's lots of thens on this promise, so cppRunning won't be on for many of them
+			this.setState({cppRunning: true})
+
+			// everything squishes around upon startup, especially after the space is created, so do this a bit later
+			setTimeout(this.widthDidChange, 200);
+		});
+	}
+
+	// respond properly whenever width changed (usually user & sizebox).  Cuz canvas
+	// needs to resize itself.  Don't bother passing it in; we'll do the right thing.
+	widthDidChange = () => {
+		this.bodyWidth = document.body.clientWidth;
+		this.setState({bodyWidth: this.bodyWidth});  // triggers rerenders & resizes
+		if (traceResize)
+			console.log(`🍦 App Mount window resize: set this.bodyWidth= ${this.bodyWidth}`);
+
+		// the doc reader tries to track the window size
+		DocReader.setDimensions(this.bodyWidth);
 	}
 
 	// once at startup, shortly after first render
 	componentDidMount() {
-		let bodyClientWidth = document.body.clientWidth;
+		let timeout;
 
 		// keep track of any window width changes, to reset the canvas and svg
 		// add listener only executed once
 		window.addEventListener('resize', ev => {
-			if (traceResize)
-				console.log(`🍦  App Mount: window resize, from bodyClientWidth=${bodyClientWidth} to ${this.appEl?.clientWidth}`, ev);
+			if (traceResize) {
+				console.log(`🍦  App Mount: resize, body.clientSize: `
+					+` ${document.body.clientWidth}  ${document.body.clientHeight}. \nevent`, ev);
+			}
 			console.assert(ev.currentTarget === window, `ev.currentTarget =?== window`);
 
-			bodyClientWidth = document.body.clientWidth;
+			// another resize event!  postpone again
+			if (timeout)
+				clearTimeout(timeout);
+			timeout = setTimeout(() => {
+				// finally settled down
+				timeout = null;
+				this.widthDidChange();
+			}, 200);
 
-			// if we don't set the state here, nobody redraws.  Otherwise, get body.clientWidth directly.
-			this.setState({clientWidth: bodyClientWidth});
-			if (traceResize) console.log(`🍦 App Mount window resize: set s.clientWidth to bodyClientWidth= ${bodyClientWidth}`);
-
-			// the doc reader tries to track the window size
-			DocReader.setDimensions(bodyClientWidth);
 		});
 
 		// meanwhile, sometimes the first render starts before the vertical scrollbar kicks in,
 		// cuz there's nothing in the page yet.  This confuses everybody, but give it a kick.
 		// NO somehow if I don't init clientWidth in constructor, this catches and fixes it
-		if (this.state.clientWidth != bodyClientWidth) {
-			if (traceResize)
-				console.log(`🍦 mounting resize cuz scrollbar: ${this.state.clientWidth} --> ${bodyClientWidth} `);
-			this.setState({clientWidth: bodyClientWidth});
-			//debugger;
-		}
+		//if (this.state.clientWidth != this.bodyWidth) {
+		//	if (traceResize)
+		//		console.log(`🍦 ‼️mounting resize cuz scrollbar: ${this.state.clientWidth} --> ${this.bodyWidth} `);
+		//	this.setState({clientWidth: this.bodyWidth});
+		//	//debugger;
+		//}
 
 		// if they got the URL with ?intro=1 on the end, open the introduction doc reader
 		if ('?intro=1' == location.search) {    // eslint-disable-line no-restricted-globals
@@ -107,24 +138,25 @@ class App extends React.Component {
 	render() {
 		const s = this.state;
 
+		if (!this.bodyWidth) debugger;
+
 		// until things start up.  Must always have a className theSquishPanel for tooOldTerminate()
 		let sqPanel;
-
-
 		if (s.cppRunning) {
 			// real squishpanel
-			sqPanel = <SquishPanel id='theSquishPanel'
-				width={s.clientWidth} />;
-			//if (this.appEl?.clientWidth != document.body.clientWidth)
-					console.log(`🍦 render if cppRunning, appEl?.clientWidth=${this.appEl?.clientWidth} ≠ `
-							+`body.clientWidth=${document.body.clientWidth} state.clientWidth=${s.clientWidth} this.appEl=`,
-							this.appEl);
+			sqPanel = <SquishPanel id='theSquishPanel' bodyWidth={this.bodyWidth} />;
+			//sqPanel = <SquishPanel id='theSquishPanel' width={s.bodyWidth} />;
+			//if (this.appEl?.bodyWidth != document.body.clientWidth)
+			console.log(`🍦 App renders SquishPanel when cppRunning, `
+					+`body.clientWidth=${document.body.clientWidth} body scrollWidth=${document.body.scrollWidth} `
+					+ `this.bodyWidth=${this.bodyWidth} this.appEl=`, this.appEl);
 		}
 		else {
 			// spinner tells ppl we're working on it
 			sqPanel= <div id='theSquishPanel' >
 				<img className='spinner' alt='spinner' src='/images/eclipseOnTransparent.gif' />
 			</div>;
+			console.log(`🍦 render when NOT cppRunning, body.clientWidth=${document.body.clientWidth}`);
 		}
 
 		return (
@@ -138,6 +170,7 @@ class App extends React.Component {
 				</h2>
 
 				{sqPanel}
+
 				<CommonDialog  dialogContent={s.dialogContent} setDialog={this.setDialog} />
 				<footer>
 					<img id='emscriptenLogo' src='logos/emscriptenLogo.svg' alt='powered by Emscripten'/>

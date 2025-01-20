@@ -21,10 +21,12 @@ function setPT() {
 		space: PropTypes.object,
 
 		// this can be null if stuff isn't ready.  these are now determined by css.
-		height: PropTypes.number,
+		canvasInnerDims: PropTypes.object,
+		bumperWidth: PropTypes.number,
+		//height: PropTypes.number,
+		//width: PropTypes.number,
 
-		width: PropTypes.number,
-		left: PropTypes.number,
+		//left: PropTypes.number,
 
 		// includes scrollSetting, heightVolts, measuredMinVolts, measuredMaxVolts, xScale, yScale
 		vDisp: PropTypes.object,
@@ -33,7 +35,6 @@ function setPT() {
 		// but won't draw anything if the checkbox is off
 		showVoltage: PropTypes.string,
 
-		canvasInnerDims: PropTypes.object,
 	};
 }
 
@@ -108,7 +109,8 @@ function VoltOverlay(props) {
 	// (but see another mechanism in the sidebar!)
 	return <section className={(p.showVoltage ?? 'hover') + 'ShowVoltage VoltOverlay'}
 			style={{width: p.width}} >
-		<VoltSidebar width={VOLTAGE_SIDEBAR_WIDTH} height={p.height}
+		<VoltSidebar width={VOLTAGE_SIDEBAR_WIDTH}
+			canvasInnerDims={p.canvasInnerDims}
 			vDisp={p.vDisp}
 			showVoltage={p.showVoltage}
 			scrollVoltHandler={v.setBottomVolts}
@@ -118,11 +120,12 @@ function VoltOverlay(props) {
 			vDisp={p.vDisp}
 			showVoltage={p.showVoltage}
 			space={p.space}
-			height={p.height}
 			canvasInnerDims={p.canvasInnerDims}
 			setAPoint={setAPoint}
 		/>
-	</section>
+	</section>;
+
+	// n=removed height={p.height} from VOltArea in favor of canvasInnerDims
 }
 //, left: p.left
 

@@ -4,7 +4,7 @@
 */
 
 // GLView  wraps a canvas for display.  Via webgl.
-// And the Drawing and Scene machinery mgmt
+// And the Drawing and Scene machinery mgmt.  General for all gl canvases.
 
 import React, {useState, useRef, useEffect} from 'react';
 import PropTypes from 'prop-types';
@@ -12,32 +12,41 @@ import PropTypes from 'prop-types';
 import {listOfViewClasses} from './listOfViewClasses.js';
 import glAmbiance from './glAmbiance.js';
 
-let traceSetup = false;
-let traceGeometry = false;
+let traceSetup = true;
+let traceGeometry = true;
 
 // this one dumps large buffers
 let tracePainting = false;
 
+const whType = PropTypes.shape({
+	width: PropTypes.number,
+	height: PropTypes.number
+});
+
 function setPT() {
 	GLView.propTypes = {
 		viewClassName: PropTypes.string.isRequired,
-		viewName: PropTypes.string,
+		sceneName: PropTypes.string,
 
-		// lets try this with plain old CSS and let the containers dictate sizes
-		innerHeight: PropTypes.number,
-		height: PropTypes.number,
+		// the width and height dictated from above by user's resizing
+		selectedOuterDims: whType,
+
+ 		// the width and height we measure; should be inner width & height of canvas
+		canvasInnerDims: whType,
+		setCanvasInnerDims: PropTypes.func.isRequired,
+
+
+		// object with specific values needed in drawing; for waveview= {bumperWidth}
+		specialInfo: PropTypes.object,
 
 		// Our caller gets these from eSpaceCreatedPromise; so it must be resolved by now.
-		// We can't jut use the promise ourselves; we have to know which avatar
+		// We can't just use the promise ourselves; we have to know which avatar
 		avatar: PropTypes.object.isRequired,
 		space: PropTypes.object.isRequired,
 
 		// if our caller needs the gl ctx itself, otherwise undef
 		setGl: PropTypes.func,
 
-		// the width and height we measure; should be inner width & height of canvas
-		canvasInnerDims: PropTypes.object.isRequired,
-		setCanvasInnerDims: PropTypes.func.isRequired,
 	};
 }
 
@@ -49,9 +58,12 @@ function setPT() {
 function GLView(props) {
 	const p = props;
 
+	if (traceGeometry)
+		console.log(`GLView: props:`,  props);
+
 	// static propTypes = {
 	// 	viewClassName: PropTypes.string.isRequired,
-	// 	viewName: PropTypes.string,
+	// 	sceneName: PropTypes.string,
 	//
 	// 	// lets try this with plain old CSS and let the containers dictate sizes
 	// 	width: PropTypes.number,
@@ -71,11 +83,11 @@ function GLView(props) {
 	// 	setCanvasInnerDims: PropTypes.func.isRequired,
 	// }
 	// static defaultProps = {
-	// 	viewName: 'gl view',
+	// 	sceneName: 'gl view',
 	// }
 
 	// we have to get the canvas node, to get a gl context.  Then we need to render again.
-	const [canvasNode, setCanvasNode] = useState(null);
+	let [canvasNode, setCanvasNode] = useState(null);
 	const canvasRef = useRef(null);
 	let effViewRef = useRef(null);
 	let effectiveView = effViewRef.current;
@@ -87,7 +99,7 @@ function GLView(props) {
 		let vClass = listOfViewClasses[p.viewClassName];
 
 		// MUST use the props.avatar!  we can't get it from the space, cuz which one?
-		effectiveView = new vClass(p.viewName, ambiance, p.space, p.avatar);
+		effectiveView = new vClass(p.sceneName, ambiance, p.space, p.avatar);
 		effViewRef.current = effectiveView;
 
 		effectiveView.completeView();
@@ -96,7 +108,7 @@ function GLView(props) {
 		p.avatar.doRepaint = doRepaint;
 		// intrinsic to avatar p.avatar.reStartDrawing = reStartDrawing;
 		//p.avatar.setGlViewport = setGlViewport;
-		if (traceSetup) console.log(`🖼 GLView ${p.viewName} ${p.avatar.label}: done with initViewClass`);
+		if (traceSetup) console.log(`🖼 GLView ${p.sceneName} ${p.avatar.label}: done with initViewClass`);
 	}
 
 	// repaint whole GL image.  this is repainting a canvas with GL.
@@ -105,115 +117,94 @@ function GLView(props) {
 	const doRepaint =
 	() => {
 		if (tracePainting)
-			console.log(`🖼 GLView ${p.viewName} ${p.avatar.label}: start doRepaint  effectiveView=${effectiveView}`);
+			console.log(`🖼 GLView ${p.sceneName} ${p.avatar.label}: start doRepaint  effectiveView=${effectiveView}`);
 		if (! effectiveView)
 			return null;  // too early
 
 		if (tracePainting)
-			p.avatar.ewave.dump(`🖼 GLView ${p.viewName}: got the ewave right here`);
+			p.avatar.ewave.dump(`🖼 GLView ${p.sceneName}: got the ewave right here`);
 
 		// copy from latest wave to view buffer (c++) & pick up highest
 		p.avatar.loadViewBuffer();
 		if (tracePainting)
-			p.avatar.dumpViewBuffer(`🖼 GLView ${p.viewName}: loaded ViewBuffer`);
+			p.avatar.dumpViewBuffer(`🖼 GLView ${p.sceneName}: loaded ViewBuffer`);
 
 		// draw
 		effectiveView.drawAllDrawings();
 		if (tracePainting)
-			console.log(`🖼 GLView ${p.viewName} ${p.avatar.label}: doRepaint done drawing`);
+			console.log(`🖼 GLView ${p.sceneName} ${p.avatar.label}: doRepaint done drawing`);
 
 		return; //{endReloadVarsNBuffer, endDrawTime};
 	}
 
 	if (traceGeometry) {
-		let facts = p.canvasInnerDims;
-		console.log(`🖼 GLView rend '${p.viewName}': canvas=${canvasNode?.nodeName}
-			Facts.w: ${facts.width}      Facts.h: ${facts.height}`);
-		console.log(`     widths:  canvas parent clientWidth: ${canvasNode?.parentNode?.clientWidth ?? 'no canv'}`);
+		let cid = p.canvasInnerDims;
+		let cwid = canvasNode?.parentNode?.clientWidth ?? 'no canv yet';
+		console.log(`🖼 GLView rend '${p.sceneName}': canvas=${canvasNode?.nodeName}
+			inner width: ${cid.width}      inner height: ${cid.height}`);
+		console.log(`     widths:  canvas parent clientWidth: ${cwid}`);
 
-		// facts are filled in in componentDidUpdate() so the first render, there's none.
-		// Soon in componentDidUpdate() the canvas facts will be updated.
-		console.log(`🖼 GLView final canvas width: ${p.innerWidth}      final innerHeight: ${p.innerHeight}
-			Facts.width: ${facts.width}      Facts.innerHeight: ${facts.height}`);
+		// cid are filled in in componentDidUpdate() so the first render, there's none.
+		// Soon in componentDidUpdate() the canvas cid will be updated.
+		console.log(`🖼 GLView final canvas width: ${cid.width} `
+			+`final innerHeight: ${cid.height}`);
 	}
 
-	//let cWidth = p.innerHeight - 2, cHeight = p.innerHeight - 2;
-	// if (canvasNode) {
-	// 	cWidth = canvasNode.clientWidth;
-	// 	p.innerHeight = canvasNode.clientHeight;
+	const setupGLContext = () => {
+		const ambiance = new glAmbiance(canvasNode);
+		ambiance.glProm
+		.then(gl => {
+			//this.gl = gl;
+			p.setGl?.(gl);  // setGl should always be there
+			gl.viewport(0, 0, canvasNode.clientWidth, canvasNode.clientHeight);
 
-	// this is meant to run after each render
-	useEffect(() => {
-			let canvasNode2 = canvasNode;  // I need to use it immediately
-			if (canvasRef.current) {
-				if (!canvasNode2) {
-					// note this is only good within this useEffect callback
-					canvasNode2 = canvasRef.current;
-					setCanvasNode(canvasNode2);
-				}
-			}
-			else
-				return;
+			//this.tagObject = this.glAmbiance.tagObject;
+			//canvasNode.glview = this;
 
-			p.setCanvasInnerDims(canvasNode2.clientWidth, canvasNode2.clientHeight);
-
-			// the rest of this is first-time stuff, not needed in repeat renders (typically for resizes)
-			if (canvasNode == canvasRef.current)
-				return;
+			canvasNode.squishViewName = p.sceneName;
+			initViewClass(ambiance);
 
 			if (traceSetup)
-				console.log(`🖼 GLView ${p.viewName}: setCanvasNode completed`,
-					canvasNode2);
+				console.log(`🖼 GLView ${p.sceneName}: canvas, gl, view and the drawing done`);
+		});
+	}
 
-			// now set up gl context
-			const ambiance = new glAmbiance(canvasNode2);
-			ambiance.glProm
-			.then(gl => {
-				//this.gl = gl;
-				p.setGl?.(gl);  // setGl should always be there
-				gl.viewport(0, 0, canvasNode2.clientWidth, canvasNode2.clientHeight);
+	// can't do these first time around.
+	const canvasFollowup = () => {
+		if (!canvasNode || canvasRef.current !== canvasNode) {
+			if (!canvasRef.current)
+				return;  // no canvas yet, nothing to draw on
 
-				//this.tagObject = this.glAmbiance.tagObject;
-				//canvasNode.glview = this;
+			// new canvas or differnt canvas (how could this happen?!?)
+			setCanvasNode(canvasRef.current);
+			canvasNode = canvasRef.current;
 
-				canvasNode2.viewName = p.viewName;
-				initViewClass(ambiance);
+			setupGLContext();
+		}
 
-				if (traceSetup)
-					console.log(`🖼 GLView ${p.viewName}: canvas, gl, view and the drawing done`);
-			});
+		// no canvas node, nothing much to do
+		if (canvasNode) {
+			p.setCanvasInnerDims(canvasNode.clientWidth, canvasNode.clientHeight);
+			doRepaint();
+		}
 
-		},
-		[canvasRef.current, canvasNode?.clientWidth, canvasNode?.clientHeight]
-	);
+		if (traceSetup) {
+			console.log(`🖼 GLView ${p.sceneName}: canvasFollowup(): completed, canvasNode=`,
+				canvasNode);
+		}
+	}
+	useEffect(canvasFollowup);
 
-
-	// how did you tell if the canvas resized?  It aways gets a render.  so should gl paint.
-	// I can abbreviate this.  Make sure its called after the above, for the first time (?)
-	useEffect(() => {
-		doRepaint();
-
-		// this wil alert everybody if the user changed the canvas dims
-		// the first time, the gl ctx might not be there yet
-		// be careful with this, if the height changes, this will make it rerender for ever
-// 		if (gl)
-// 			props.setCanvasInnerDims(canvas.clientWidth, canvas.clientHeight);
-// 		const p = props;
-// 		p.canvasInnerDims.width = canvas.clientWidth;
-// 		p.canvasInnerDims.height = canvas.clientHeight;
-	});
-
-	// the canvas w&h attributes define its inner coord system
-	// We want them to reflect actual pixels on the screen; should be same as client W&H
-	// outer W&H includes borders, 1px on all sides
+	// the canvas w&h attributes define its inner coord system (not element's size)
+	// We want them to reflect actual pixels on the screen; should be same as canv inner W&H
+	// outer W&H includes borders, 1px on all sides, fits inside div.viewArea, parent.
+	// Shouldn't need css to set size.
 	return (
 		<canvas className='GLView'
-			width={(p.innerWidth + 2) + 'px'} height={(p.innerHeight + 2) + 'px'}
+			width={props.selectedOuterDims.width - 2} height={props.selectedOuterDims.height - 2}
 			ref={canvasRef}
 		/>
 	)
-	// took out style={{width: `${p.width}px`, height: `${p.height}px`}}
-	// took out style={{left: p.left +'px'}}
 }
 
 export default GLView;

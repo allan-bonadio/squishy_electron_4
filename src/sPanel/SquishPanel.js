@@ -36,7 +36,7 @@ const DEFAULT_VIEW_CLASS_NAME = 'flatScene';
 export class SquishPanel extends React.Component {
 	static propTypes = {
 		id: PropTypes.string.isRequired,
-		width: PropTypes.number,
+		bodyWidth: PropTypes.number.isRequired,
 	};
 
 	static squishPanelConstructed = 0;
@@ -50,11 +50,11 @@ export class SquishPanel extends React.Component {
 			debugger;
 			location = location;  // eslint-disable-line no-restricted-globals
 		}
+		SquishPanel.squishPanelConstructed++;
 
 		this.spaceCtx = React.createContext(null);
 
 
-		SquishPanel.squishPanelConstructed++;
 
 		this.state = {
 			mainViewClassName: DEFAULT_VIEW_CLASS_NAME,
@@ -178,7 +178,7 @@ export class SquishPanel extends React.Component {
 		const p = this.props;
 		const s = this.state;
 
-		if (traceWidth) console.log(`👑 SquishPanel render, p.width=${p.width} `
+		if (traceWidth) console.log(`👑 SquishPanel render, p.bodyWidth=${p.bodyWidth} `
 			+ ` body.clientWidth=${document.body.clientWidth}`);
 
 		return (
@@ -186,7 +186,7 @@ export class SquishPanel extends React.Component {
 
 				<article id={this.props.id} className="SquishPanel">
 					<WaveView
-						outerWidth = {p.width}
+						outerWidth = {p.bodyWidth}
 						showVoltage={s.showVoltage}
 						sPanel={this}
 					/>

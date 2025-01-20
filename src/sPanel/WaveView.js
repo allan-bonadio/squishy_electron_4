@@ -26,9 +26,10 @@ let traceBumpers = false;
 
 let traceScaling = false;
 let traceDragCanvasHeight = false;
-let traceWidth = false;
+let traceWidth = true;
 
-// size of the size box at lower right of canvas.  If you change this, also change $sizeBoxSize in the .scss
+// size of the size box at lower right of canvas.  If you change this, also
+// change $sizeBoxSize in  _common.scss
 const SIZE_BOX_SIZE = 24;
 const BUMPER_WIDTH = 16;
 
@@ -36,12 +37,12 @@ const BUMPER_WIDTH = 16;
 export class WaveView extends React.Component {
 	static propTypes = {
 		// the title of the view
-		viewName: PropTypes.string,
+		sceneName: PropTypes.string,
 
 		// no!  handed in by promise space: PropTypes.instanceOf(eSpace),
 
 		// handed in, pixels.  Width of whole waveview,
-		// including sidebar.  Canvas is 1 pixel smaller all around.
+		// including sidebar, bumpers and border.  Canvas is 1 pixel smaller all around for border.
 		outerWidth: PropTypes.number.isRequired,
 
 		showVoltage: PropTypes.string.isRequired,
@@ -51,20 +52,23 @@ export class WaveView extends React.Component {
 
 	constructor(props) {
 		super(props);
+
+		// is this a bad idea?
 		this.sPanel = props.sPanel;
 		this.sPanel.wView = this;
 
 		this.state = {
+			// height of just the canvas + 2px, as set by user with size box
 			outerHeight: getASetting('miscSettings', 'waveViewHeight'),  // pixels
 
 			// no!  handed in by promise space: null,  // set when promise comes in
 
-			// This is from the space.  Should this even be in the state?
-			vDisp: null,
+			// This is from the space.  Should this even be in the state?  well, whether it's there affects rendering
+			//vDisp: null,
 		}
-		// directly measured Canvas innr width & height and maybe more set by
+		// directly measured Canvas innr width & height and maybe more, set by
 		// the lower levels with setCanvasInnerDims() and passed to the
-		// lower levels. correctly initialized in setCanvasInnerDims()
+		// lower levels. correctly set in setCanvasInnerDims().  Bumpers are INSIDE this.
 		this.canvasInnerDims = {width: props.outerWidth - 2, height: this.state.outerHeight - 2};
 
 		this.formerWidth = props.outerWidth;
@@ -84,8 +88,9 @@ export class WaveView extends React.Component {
 			this.grinder = space.grinder;
 			this.mainEAvatar = space.mainEAvatar;
 
+			// am I asking for trouble here?
 			this.vDisp = space.vDisp;
-			this.setState({vDisp: this.vDisp});  // not needed if it's in the context?
+			//this.setState({vDisp: this.vDisp});  // not needed if it's in the context?
 		})
 		.catch(ex => {
 			console.error(`eSpaceCreatedPromise failed`);
@@ -107,19 +112,24 @@ export class WaveView extends React.Component {
 	// GLView finally has a canvas; rush its dimensions up here.  Early in
 	// startup, either or both might be undefined, ignores those
 	setCanvasInnerDims =
-	(innerWidth, height) => {
+	(innerWidth, innerHeight) => {
 		if (innerWidth)
 			this.canvasInnerDims.width = innerWidth;
-		if (height) {
-			this.canvasInnerDims.height = height;
+		if (innerHeight) {
+			this.canvasInnerDims.height = innerHeight;
 
-			// height is kept in WaveView state; width comes from props from win width
-			// canvas has 1px border between inner and outer
-			if (height + 2 != this.state.outerHeight)
-				this.setState({outerHeight: height + 2});
+			// height is kept in WaveView state.innerHeight;
+			// width comes from props from window width
+			// canvas has 1px border between inner and outer; includes area for bumpers
+			if (innerHeight + 2 != this.state.outerHeight) {
+				this.setState({outerHeight: innerHeight + 2});
+				debugger;
+			}
 		}
-		if (traceWidth)
-			console.log(`🏄 WaveView canvasInnerDims, width=${innerWidth}   height: ${height}  `);
+		if (traceWidth) {
+			console.log(`🏄 WaveView setCanvasInnerDims, `
+				+` width=${innerWidth}   height: ${innerHeight}  `);
+		}
 	}
 
 	componentDidUpdate() {
@@ -127,25 +137,26 @@ export class WaveView extends React.Component {
 		const s = this.state;
 
 		// only need this when the WaveView outer dims change, either a user
-		// resize or show/hide the voltage.  On that occasion, we have to adjust
+		// change height or window change width.  On that occasion, we have to adjust
 		// a lot, including resizing the canvas.
 		if (this.mainEAvatar && (this.formerShowVoltage != p.showVoltage
-					|| this.formerWidth != this.waveViewEl.clientWidth
+					|| this.formerWidth != p.outerWidth
 					|| this.formerHeight != s.outerHeight) ) {
 			if (traceScaling) {
 				console.log(`🏄 mainEAvatar=${this.mainEAvatar.label}
-				formerShowVoltage=${this.formerShowVoltage}   showVoltage=${p.showVoltage}
-				formerWidth=${this.formerWidth}   wv.clientWidth=${this.waveViewEl.clientWidth}
-				formerHeight=${this.formerHeight}   height=${s.outerHeight}`);
+				formerShowVoltage=${this.formerShowVoltage} ≟ showVoltage=${p.showVoltage}
+				formerWidth=${this.formerWidth} ≟ outerWidth=${p.outerWidth}
+				formerHeight=${this.formerHeight} ≟ outerHeight=${s.outerHeight}`);
 			}
-			// thee formers are OUTER sizes
+			// the formers are OUTER sizes
 			this.formerWidth = p.outerWidth;
 			this.formerHeight = s.outerHeight;
 			this.formerShowVoltage = p.showVoltage;
 			//console.log(`canvasInnerDims was ${this.canvasInnerDims.width}W ; WV is now `
 			//	+ `${p.outerWidth}W`);
 
-			this.vDisp.setVoltScales(this.canvasInnerDims.width, s.outerHeight - 2, this.space.nPoints);
+			// pass the inner width to the volt machinery
+			this.vDisp.setVoltScales(p.outerWidth - 2, s.outerHeight - 2, this.space.nPoints);
 		}
 	}
 
@@ -210,66 +221,76 @@ export class WaveView extends React.Component {
 			frameSerial = thousands(this.grinder.frameSerial);
 		}
 
-		const spinner = this.space ? ''
-			: <img className='spinner' alt='spinner' src='/images/eclipseOnTransparent.gif' />;
-
-		// make room for the bumpers for WELL continuum
+		// make room for the bumpers for WELL continuum (both sides)
 		let bumperWidth = (qeConsts.contWELL == this.space?.dimensions[0].continuum)
 			? BUMPER_WIDTH
 			: 0;
 
 		// sometimes a fraction of a pixel causes the horiz scroll bar
 		// to kick in.  avoid that without messing up everything.
-		let innerWidthForCanvas = p.outerWidth - 1 - 2 * bumperWidth;
+		//let innerWidthForCanvas = p.outerWidth - 1 - 2 * bumperWidth;
 
 		if (traceWidth) {
-			console.log(`🏄 WaveView render, outerWidth=${this.waveViewEl?.clientWidth}`
-				+ `  parent.clientWidth: ${this.waveViewEl?.parentNode.clientWidth}   `
-				+` innerWidthForCanvas=${innerWidthForCanvas}`);
+			console.log(`🏄 WaveView render, outerWidth=${p.outerWidth}`
+				+` bumperWidth=${bumperWidth}`);
 		}
 
-		// can't make a real GLView until we have the space!  until then, show spinner
+		 // innerWidth={p.outerWidth - 2} innerHeight={s.outerHeight - 2}
+
+		// can't make a real GLView until we have the space!
 		let glView;
 		if (this.space) {
-			glView = <GLView innerWidth={innerWidthForCanvas} innerHeight={s.outerHeight - 2} left={bumperWidth}
+			glView = <GLView
+				specialInfo={{bumperWidth}}
 				space={this.space} avatar={this.space.mainEAvatar}
-				viewClassName='flatScene' viewName='mainView'
+				viewClassName='flatScene' sceneName='mainView'
 				setGl={this.setGl}
-				canvasInnerDims={this.canvasInnerDims}  setCanvasInnerDims={this.setCanvasInnerDims}
+				selectedOuterDims={{width: p.outerWidth, height: s.outerHeight}}
+				canvasInnerDims={this.canvasInnerDims}
+				setCanvasInnerDims={this.setCanvasInnerDims}
 			/>
 		}
 		else {
+			// until then, show spinner, not actually a GLView
+			const spinner = this.space
+				? ''
+				: <img className='spinner' alt='spinner' src='/images/eclipseOnTransparent.gif' />;
+
 			let glView = <div className='spinnerBox'
-						style={{width: innerWidthForCanvas , height: s.outerHeight - 2}} >
+						style={{width: p.outerWidth - 1 , height: s.outerHeight - 2}} >
 				{spinner}
 			</div>;
 		}
 
-		// if there's no vDisp yet (cuz no space yet), the voltOverlay gets all mucked up.  So just avoid it.
-		let voltOverlay;
-		if (s.vDisp){
+		// if there's no vDisp yet (cuz no space yet), the voltOverlay gets all
+		// mucked up.  So just avoid it.
+		let voltOverlay = '';
+		if (this.vDisp){
 			voltOverlay = <VoltOverlay
 				space={this.space}
-				height={s.outerHeight - 2}
-				width={innerWidthForCanvas}
-				left={bumperWidth}
 				showVoltage={s.showVoltage}
 				vDisp={this.vDisp}
 				canvasInnerDims={this.canvasInnerDims}
-			/>
+				bumperWidth={bumperWidth}
+			/>;
+
+			// removed:
+			//height={s.outerHeight - 2}
+			//width={p.outerWidth - 2}
 		}
 
+		// removed  ref={el => this.waveViewEl = el}
 		return (
-		<div className='WaveView'  ref={el => this.waveViewEl = el}
+		<div className='WaveView'
 					style={{height: `${s.outerHeight}px`}}>
 
 			<div className='bumper left' key='left' style={{width: bumperWidth +'px'}} />
 			<div className='viewArea' key='viewArea'
-						style={{maxWidth: (innerWidthForCanvas + 2) +'px', left: bumperWidth +'px'}}>
+						style={{maxWidth: (this.canvasInnerDims.width + 2) +'px', left: bumperWidth +'px'}}>
 				{glView}
 
 				<section className='timeOverlay'
-						style={{maxWidth: innerWidthForCanvas +'px'}}>
+						style={{maxWidth: this.canvasInnerDims.width +'px'}}>
 					<div className='northWestWrapper'>
 						<span className='voNorthWest'>{elapsedTime}</span> ps
 					</div>

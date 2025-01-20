@@ -47,9 +47,10 @@ function setPT() {
 		space: PropTypes.object,
 
 		// this can be null if stuff isn't ready.  these are now determined by css.
-		height: PropTypes.number,
+		// no use canvasInnerDims  height: PropTypes.number,
 
-		canvasInnerDims: PropTypes.object,
+		canvasInnerDims: PropTypes.object.isRequired,
+		bumperWidth: PropTypes.number.isRequired,
 
 		// changing a buffer point should only be done thru this func
 		setAPoint: PropTypes.func,
@@ -357,8 +358,9 @@ function VoltArea(props) {
 			<g className={'optionalVoltage ' + vClass}>
 				{/* for showVoltage on hover, need this to  hover over */}
 				<rect className='hoverBox' key='hoverBox'
-					x={0} y={0} width={p.canvasInnerDims.width} height={p.canvasInnerDims.height}
-					/>
+					x={0} y={0}
+					width={p.canvasInnerDims.width} height={p.canvasInnerDims.height}
+				/>
 
 				{renderVoltagePath()}
 				{renderAxes()}

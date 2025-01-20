@@ -21,8 +21,10 @@ export const spongeFactor = 100;
 
 function setPT() {
 	VoltSidebar.propTypes = {
-		width: PropTypes.number.isRequired,  // width: fixed or zero
-		height: PropTypes.number.isRequired,  // ultimately we'll get this from the element itself
+		width: PropTypes.number.isRequired,  // width of sidebar: fixed or zero
+
+		canvasInnerDims: PropTypes.object.isRequired,
+		bumperWidth: PropTypes.number,
 
 		vDisp: PropTypes.instanceOf(voltDisplay),
 
