@@ -36,12 +36,12 @@ const viewClassNamez = {
 
 gonna have to rewrite this as a function
 export class mockGLView {
-	constructor(viewClassName, viewName) {
+	constructor(viewClassName, sceneName) {
 		this.state = {canvas: null};
 		this.space = mockSpace;
 		this.avatar = mockAvatar;
 
-		this.viewName = viewName;
+		this.sceneName = sceneName;
 		this.viewClassName = viewClassName;
 	}
 
@@ -66,12 +66,12 @@ export class mockGLView {
 			this.tagObject = this.glAmbiance.tagObject;
 
 			canvas.glview = this;
-			canvas.viewName = this.viewName;
+			canvas.sceneName = this.sceneName;
 
 			this.initViewClass();
 
 			// finally!
-			console.log(`🖼 🖼 mockGLView ${this.viewName}: created!`);
+			console.log(`🖼 🖼 mockGLView ${this.sceneName}: created!`);
 		})
 	}
 
@@ -80,7 +80,7 @@ export class mockGLView {
 
 	// instantiate the view class we'll use
 	initViewClass() {
-		console.log(`initViewClass: viewClassName=${this.viewClassName} viewName${this.viewName}`);
+		console.log(`initViewClass: viewClassName=${this.viewClassName} sceneName${this.sceneName}`);
 
 		// already got it this.viewClassName = viewClassName;
 		let vClass = viewClassNamez[this.viewClassName];

@@ -76,19 +76,19 @@ void main() {
 
 // the original display that's worth watching: flat upside down hump graph
 export class flatDrawing extends abstractDrawing {
-	constructor(viewDef) {
-		super(viewDef, 'flatDrawing');
+	constructor(scene) {
+		super(scene, 'flatDrawing');
 
 		this.vertexShaderSrc = vertexSrc;
 		this.fragmentShaderSrc = fragmentSrc;
 	}
 
-	// one time set up of variables for this drawing, every time canvas and viewDef is recreated
+	// one time set up of variables for this drawing, every time canvas and scene is recreated
 	createVariables() {
 		this.setDrawing();
 
 		if (traceFlatDrawing)
-			console.log(`🫓 flatDrawing ${this.viewName}: creatingVariables`);
+			console.log(`🫓 flatDrawing ${this.outerDims}: creatingVariables`);
 
 		// loads view buffer from corresponding wave, calculates highest norm.
 		// Need this for starting values for highest & smoothHighest
@@ -99,10 +99,10 @@ export class flatDrawing extends abstractDrawing {
 		this.maxHeightUniform = new viewUniform('maxHeight', this,
 			() => {
 				if (traceHighest)
-					console.log(`🫓 flatDrawing reloading ${this.viewName}: highest=${this.avatar.highest.toFixed(5)}  smoothHighest=${this.avatar.smoothHighest.toFixed(5)}`);
+					console.log(`🫓 flatDrawing reloading ${this.outerDims}: highest=${this.avatar.highest.toFixed(5)}  smoothHighest=${this.avatar.smoothHighest.toFixed(5)}`);
 
 				// add in a few percent
-				return {value: this.avatar.smoothHighest * this.viewDef.PADDING_ON_BOTTOM, type: '1f'};
+				return {value: this.avatar.smoothHighest * this.scene.PADDING_ON_BOTTOM, type: '1f'};
 			}
 		);
 
@@ -128,7 +128,7 @@ export class flatDrawing extends abstractDrawing {
 	}
 
 	draw() {
-		if (traceFlatDrawing) console.log(`🫓 flatDrawing ${this.viewName}, ${this.avatarLabel}: `+
+		if (traceFlatDrawing) console.log(`🫓 flatDrawing ${this.outerDims}, ${this.avatarLabel}: `+
 			` drawing ${this.vertexCount/2} points`);
 		const gl = this.gl;
 		this.setDrawing();
@@ -147,7 +147,7 @@ export class flatDrawing extends abstractDrawing {
 
 		// i think this is problematic
 		if (traceViewBufAfterDrawing) {
-			this.avatar.dumpViewBuffer(`finished drawing ${this.viewName} in flatDrawing.js; drew buf:`);
+			this.avatar.dumpViewBuffer(`finished drawing ${this.outerDims} in flatDrawing.js; drew buf:`);
 			console.log(`barWidthUniform=${this.barWidthUniform.getFunc()}    `
 				+`maxHeightUniform=${this.maxHeightUniform.getFunc()}`);
 		}

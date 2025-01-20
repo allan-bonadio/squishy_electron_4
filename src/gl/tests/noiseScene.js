@@ -103,8 +103,8 @@ export class noiseDrawing extends abstractDrawing {
 
 
 export class noiseScene extends abstractScene {
-	constructor(viewName, ambiance, space, avatar) {
-		super(viewName, ambiance, space, avatar);
+	constructor(sceneName, ambiance, space, avatar) {
+		super(sceneName, ambiance, space, avatar);
 
 		if (! this.space || !this.avatar) {
 			throw  new Error(`noiseScene: being created without space or avatar`);

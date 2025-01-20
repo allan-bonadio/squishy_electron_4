@@ -19,16 +19,16 @@ let perDrawingVAO = true;   // false;
 
 
 // This is the superclass of all view defs; with common webgl and space plumbing.
-// viewName is not the viewClassName, which is one of flatScene, garlandView, ...
+// sceneName is not the viewClassName, which is one of flatScene, garlandView, ...
 // there should be ONE of these per canvas, so each WaveView should have 1.
 export class abstractScene {
 
 	/* ************************************************** construction */
-	// viewName: personal name for the viewDef instance, for error msgs
+	// sceneName: personal name for the scene instance, for error msgs
 	// canvas: real <canvas> DOM element, after it's been created by React
 	// class name from instance: vu.constructor.name   from class: vuClass.name
-	constructor(viewName, ambiance, space, avatar) {
-		this.viewName = viewName;
+	constructor(sceneName, ambiance, space, avatar) {
+		this.sceneName = sceneName;
 		this.canvas = ambiance.canvas;
 		this.gl = ambiance.gl;
 		this.tagObject = ambiance.tagObject;

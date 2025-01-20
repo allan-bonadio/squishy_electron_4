@@ -36,7 +36,7 @@ dumpOneAttr(gl, id, name = '') {
 dumpAttrNames(gl, title) {
 	//console.log(`abstractDrawing.attrTypes=`, abstractDrawing.attrTypes);
 
-	//console.log(`𒑐 dumpAttrNames for viewdef ${this.viewName} drawing ${this.drawingName}: ${title}`);
+	//console.log(`𒑐 dumpAttrNames for viewdef ${this.sceneName} drawing ${this.drawingName}: ${title}`);
 	//this.viewDef.attrVariableNames
 	//this.this.gl.getAttribLocation(drawing.program, varName);
 

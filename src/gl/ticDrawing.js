@@ -66,8 +66,8 @@ void main() {
 
 // the original display that's worth watching: tic upside down hump graph
 export class ticDrawing extends abstractDrawing {
-	constructor(viewDef) {
-		super(viewDef, 'ticDrawing');
+	constructor(scene) {
+		super(scene, 'ticDrawing');
 
 		// we always use this for our coordinates, generated on the fly
 		this.coordBuffer = new Float32Array(BUFFER_MAX_NTICS * FLOATS_PER_TIC);
@@ -76,22 +76,22 @@ export class ticDrawing extends abstractDrawing {
 		this.fragmentShaderSrc = fragmentSrc;
 	}
 
-	// one time set up of variables for this drawing, every time canvas and viewDef is recreated
+	// one time set up of variables for this drawing, every time canvas and scene is recreated
 	createVariables() {
 		this.setDrawing();
 		if (traceTicDrawing)
-			console.log(`➤ ➤ ➤ ticDrawing ${this.viewName}: creatingVariables`);
+			console.log(`➤ ➤ ➤ ticDrawing ${this.sceneName}: creatingVariables`);
 
 		// same as in flatDrawing, y is in units of ψ
 		this.maxHeightUniform = new viewUniform('maxHeight', this,
 			() => {
 				if (traceHighest)
-					console.log(`ticDrawing reloading ${this.viewName}: `+
+					console.log(`ticDrawing reloading ${this.sceneName}: `+
 						` highest=${this.avatar.highest?.toFixed(5)} `+
 						` smoothHighest=${this.avatar.smoothHighest?.toFixed(5)}`);
 
 				// add in a few percent
-				return {value: this.avatar.smoothHighest * this.viewDef.PADDING_ON_BOTTOM,
+				return {value: this.avatar.smoothHighest * this.scene.PADDING_ON_BOTTOM,
 					type: '1f'};
 			}
 		);
@@ -108,7 +108,7 @@ export class ticDrawing extends abstractDrawing {
 		let ticOrigin = -1;
 
 		if (traceHighest)
-			console.log(`➤ ➤ ➤ ticDrawing ${this.viewName}, ${this.avatarLabel}:`+
+			console.log(`➤ ➤ ➤ ticDrawing ${this.sceneName}, ${this.avatarLabel}:`+
 				` highest is ${this.avatar.highest?.toFixed(6)}`);
 
 		// number of tics on left side, comes from the flatDrawing scalebut handle it if it isn't drawing
@@ -135,7 +135,7 @@ export class ticDrawing extends abstractDrawing {
 
 		this.vertexCount = nTics * VERTICES_PER_TIC;
 		if (traceDumpVertices) {
-			console.log(`➤ ➤ ➤ generateTics ${this.viewName}, ${this.avatarLabel}:`+
+			console.log(`➤ ➤ ➤ generateTics ${this.sceneName}, ${this.avatarLabel}:`+
 				` created ${this.vertexCount} vertices for ${nTics} tics`);
 			for (let t = 0; t < nTics; t++) {
 				let f = t * FLOATS_PER_TIC;
@@ -151,7 +151,7 @@ export class ticDrawing extends abstractDrawing {
 
 	draw() {
 		if (traceTicDrawing)
-			console.log(`➤ ➤ ➤ ticDrawing drawing ${this.viewName}, ${this.avatarLabel}: `+
+			console.log(`➤ ➤ ➤ ticDrawing drawing ${this.sceneName}, ${this.avatarLabel}: `+
 				` start draw ${this.vertexCount/2} tics`);
 		if (this.vertexCount <= 0)
 			return;
