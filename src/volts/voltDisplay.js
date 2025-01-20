@@ -153,8 +153,9 @@ export class voltDisplay {
 
 	// set our xScale and yScale according to the numbers passed in, and our own settings
 	// used by VoltArea to plot potential.  X in units of dx, Y in units of volts
+	// I think I call this too many times (?)
 	setVoltScales(canvasWidth, canvasHeight, nPoints) {
-		isOK(this.bottomVolts); isOK(this.heightVolts); isOK(canvasHeight); isOK(canvasWidth);
+		isOK(this.bottomVolts); isOK(this.heightVolts); isOK(canvasWidth); isOK(canvasHeight);
 
 		// these are used to draw the voltage path line in VoltArea
 		this.yScale = scaleLinear([this.bottomVolts, this.bottomVolts + this.heightVolts], [0, canvasHeight]);

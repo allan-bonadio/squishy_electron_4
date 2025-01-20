@@ -38,6 +38,7 @@ static bool traceKinks = false;
 static bool traceAggregate = false;
 static bool traceSingleStep = false;
 static bool traceThreadsHaveFinished = false;
+static bool traceDivergence = false;
 
 // RK2
 #define MIDPOINT_METHOD
@@ -298,8 +299,10 @@ void qGrinder::measureDivergence() {
 		}
 		else {
 			// not bad yet
-			speedyLog("🪓 wave starting to Diverge, divergence=%4.4g / %d 🧨\n",
-				divergence, N);
+			if (traceDivergence) {
+				speedyLog("🪓 wave starting to Diverge, divergence=%4.4g / %d 🧨",
+					divergence, N);
+			}
 		}
 	}
 }

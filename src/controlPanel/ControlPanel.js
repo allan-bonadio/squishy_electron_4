@@ -44,7 +44,7 @@ export class ControlPanel extends React.Component {
 
 		animator: PropTypes.object,
 
-		sPanel: PropTypes.object.isRequired,
+		//sPanel: PropTypes.object.isRequired,
 
 		frameRateMenuFreqs: PropTypes.array,
 	}
@@ -53,8 +53,8 @@ export class ControlPanel extends React.Component {
 		super(props);
 		//debugger;
 		ControlPanel.me = this;  // TODO get rid of this
-		this.sPanel = props.sPanel;
-		this.sPanel.cPanel = this;
+		//this.sPanel = props.sPanel;
+		//this.sPanel.cPanel = this;
 
 		// most of the state is kept here.  But, also, in the store settings for the next page reload.
 		this.state = {
