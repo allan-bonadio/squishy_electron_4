@@ -9,7 +9,7 @@ import qeConsts from '../engine/qeConsts.js';
 import CommonDialog from '../widgets/CommonDialog.js';
 import {powerToIndex} from '../utils/powers.js';
 import LogSlider from '../widgets/LogSlider.js';
-import {eSpaceCreatedPromise} from '../engine/eEngine.js';
+//import {eSpaceCreatedPromise} from '../engine/eEngine.js';
 import {getASetting, storeAGroup} from '../utils/storeSettings.js';
 
 export default class ResolutionDialog extends React.Component {

@@ -47,7 +47,7 @@ void main() {
 	}
 	y = 1. - 2. * y;
 
-	// figure out x, basically the point index
+	// figure out x, basically the point index; map to -1...+1
 	float x;
 	x = float(int(vertexSerial) / 2) * barWidth * 2. - 1.;
 
@@ -99,15 +99,18 @@ export class flatDrawing extends abstractDrawing {
 		this.maxHeightUniform = new viewUniform('maxHeight', this,
 			() => {
 				if (traceHighest)
-					console.log(`🫓 flatDrawing reloading ${this.outerDims}: highest=${this.avatar.highest.toFixed(5)}  smoothHighest=${this.avatar.smoothHighest.toFixed(5)}`);
+					console.log(`🫓 flatDrawing reloading outer: ${this.outerDims}: `
+						+` highest=${this.avatar.highest.toFixed(5)} `
+						+` smoothHighest=${this.avatar.smoothHighest.toFixed(5)}`);
 
 				// add in a few percent
 				return {value: this.avatar.smoothHighest * this.scene.PADDING_ON_BOTTOM, type: '1f'};
 			}
 		);
 
+		// barWidth: width of each bargraph bar, in raw GL coords -1...+1
 		let nPoints = this.nPoints = this.space.nPoints;
-		let barWidth = 1 / (nPoints - 1);
+		let barWidth;  // = 1 / (nPoints - 1);
 		if (traceFlatDrawing) console.log(`🫓 barWidth= ${barWidth}`);
 		this.barWidthUniform = new viewUniform('barWidth', this,
 			() => {
@@ -127,9 +130,12 @@ export class flatDrawing extends abstractDrawing {
 		//this.gl.bindVertexArray(null);
 	}
 
+	// called for each image frame on th canvas
 	draw() {
-		if (traceFlatDrawing) console.log(`🫓 flatDrawing ${this.outerDims}, ${this.avatarLabel}: `+
-			` drawing ${this.vertexCount/2} points`);
+		if (traceFlatDrawing) {
+			console.log(`🫓 flatDrawing ${this.outerDims}, ${this.avatarLabel}: `
+				+` drawing ${this.vertexCount/2} points`);
+		}
 		const gl = this.gl;
 		this.setDrawing();
 

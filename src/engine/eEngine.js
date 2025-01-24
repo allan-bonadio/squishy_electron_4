@@ -37,7 +37,12 @@ function resetSpaceCreatedPromise() {
 		console.log(`spaceCreatedPromise 🐣 ... created but NOT YET RESOLVED`);
 	return prom;
 }
-// for the first time when app starts up
+
+// for the first time when app starts up.  Because eSpaceCreatedPromise is an
+// exported variable, that means there can only be one of them.  Therefore, only
+// one space, and only one SquishPanel.  I was hoping to be able to have more
+// than one SquishPanel.  Maybe if they all share the same spact... or if I pass
+// down yet another variable down multiple layers of components...
 export let eSpaceCreatedPromise = resetSpaceCreatedPromise();
 
 // the Space for the SquishPanel

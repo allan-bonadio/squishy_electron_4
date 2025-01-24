@@ -3,9 +3,9 @@
 ** Copyright (C) 2023-2024 Tactile Interactive, all rights reserved
 */
 
-// Creates a webgl context from the canvas upon startup.  includes gl,
-// canvas node, and this 'tag object'.  Starts either webgl1 or 2
-// depending on what's available.
+// Creates a webgl context from the canvas upon startup.  Also handles a number
+// of details; choosing between webgl1 or 2, attaches shims for features in 2
+// that are absent in 1, a few other things.  includes gl, canvas node, and some squirrelly code.
 
 // webgl-lint: sigh.
 // the gl Tests aren't tuned in to node_modules; use the https form for those.
@@ -54,7 +54,7 @@ class glAmbiance {
 		if (!glAmbiance.preferWebGL2 && !this.gl)
 			this.setupGL2(canvas);
 		if (!this.gl)
-			tooOldTerminate(`Sorry, your browser's WebGL is kinidof old.`);
+			tooOldTerminate(`Sorry, your browser's WebGL is kindof old.`);
 
 		// caller must wait for this before it's ready to go
 		if (webglLintProm) {
@@ -120,7 +120,8 @@ class glAmbiance {
 		return gl;
 	}
 
-	// not sure if any of these are useful - seems to only address context loss; when does this happen?
+	// Watch for errors from GL.  not sure if any of these are useful - seems to
+	// only address context loss; when does this happen?
 	listenerFunc =
 	ev => console.warn(`WebGL event '${ev.type}':`, ev);
 
@@ -132,6 +133,7 @@ class glAmbiance {
 	}
 };
 
+// TODO: need a function that just returns the promise so caller
+// doesn't have to go thru this creation junk
 
 export default glAmbiance;
-

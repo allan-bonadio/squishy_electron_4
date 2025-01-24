@@ -83,6 +83,7 @@ export class ticDrawing extends abstractDrawing {
 			console.log(`➤ ➤ ➤ ticDrawing ${this.sceneName}: creatingVariables`);
 
 		// same as in flatDrawing, y is in units of ψ
+		// TODO: should rename viewUniform to sceneUniform?  or drawingUniform?
 		this.maxHeightUniform = new viewUniform('maxHeight', this,
 			() => {
 				if (traceHighest)
@@ -96,6 +97,7 @@ export class ticDrawing extends abstractDrawing {
 			}
 		);
 
+		// TODO: should rename viewAttribute to drawingAttribute?
 		this.endPointAttr = new viewAttribute('endPoint', this, FLOATS_PER_VERTEX, () => {
 			return this.generateTics();
 		});
@@ -103,7 +105,7 @@ export class ticDrawing extends abstractDrawing {
 
 	// generate the current tics, for the attribute's getFunc
 	generateTics() {
-		// x, in clip coords
+		// x, in clip coords.  Width is really length of tic
 		let ticWidth = 20 / this.gl.drawingBufferWidth;
 		let ticOrigin = -1;
 

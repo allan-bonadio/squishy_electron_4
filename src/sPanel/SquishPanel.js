@@ -52,8 +52,6 @@ export class SquishPanel extends React.Component {
 		}
 		SquishPanel.squishPanelConstructed++;
 
-		this.spaceCtx = React.createContext(null);
-
 
 
 		this.state = {
@@ -67,6 +65,11 @@ export class SquishPanel extends React.Component {
 			//  this will get filled in when the rAF mesurements get settled down in sAnimator
 			frameRateMenuFreqs: null,
 		};
+
+		// um, I think we want multiple things in the space context.  The space,
+		// the promise for the space, dunno what else.  Hmmm the hooks docs
+		// use one per variable.  I think you can't do that in class components.
+		this.spaceCtx = React.createContext(null);
 
 
 

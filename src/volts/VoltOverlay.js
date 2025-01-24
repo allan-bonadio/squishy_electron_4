@@ -21,12 +21,8 @@ function setPT() {
 		space: PropTypes.object,
 
 		// this can be null if stuff isn't ready.  these are now determined by css.
-		canvasInnerDims: PropTypes.object,
-		bumperWidth: PropTypes.number,
-		//height: PropTypes.number,
-		//width: PropTypes.number,
-
-		//left: PropTypes.number,
+		canvasInnerDims: PropTypes.object.isRequired,
+		bumperWidth: PropTypes.number.isRequired,
 
 		// includes scrollSetting, heightVolts, measuredMinVolts, measuredMaxVolts, xScale, yScale
 		vDisp: PropTypes.object,
@@ -34,7 +30,6 @@ function setPT() {
 		// this component is always rendered so it retains its state,
 		// but won't draw anything if the checkbox is off
 		showVoltage: PropTypes.string,
-
 	};
 }
 
@@ -122,6 +117,7 @@ function VoltOverlay(props) {
 			space={p.space}
 			canvasInnerDims={p.canvasInnerDims}
 			setAPoint={setAPoint}
+			bumperWidth={p.bumperWidth}
 		/>
 	</section>;
 

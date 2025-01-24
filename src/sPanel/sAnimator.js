@@ -76,12 +76,12 @@ class sAnimator {
 		this.inteTimes.frameDrawPeriod = startDrawTime - this.inteTimes.prevDrawTime;
 		this.inteTimes.prevDrawTime = startDrawTime;
 
-			this.space.mainEAvatar.doRepaint?.();
-			this.showTimeNFrame();  // part of the draw time
+		this.space.mainEAvatar.doRepaint?.();
+		this.showTimeNFrame();  // part of the draw time
 
 
-			// update dom elements in integration tab to latest stats
-			this.space.sInteStats.displayAllStats(this.inteTimes, this.grinder);
+		// update dom elements in integration tab to latest stats
+		this.space.sInteStats.displayAllStats(this.inteTimes, this.grinder);
 
 		//this.inteTimes.endReloadVarsNBuffer =
 		let endDrawTime = performance.now();
