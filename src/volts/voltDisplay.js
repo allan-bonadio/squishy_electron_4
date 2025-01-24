@@ -154,21 +154,22 @@ export class voltDisplay {
 	// set our xScale and yScale according to the numbers passed in, and our own settings
 	// used by VoltArea to plot potential.  X in units of dx, Y in units of volts
 	// I think I call this too many times (?)
-	setVoltScales(canvasWidth, canvasHeight, nPoints) {
+	setVoltScales(canvasWidth, canvasHeight, nPoints, bumperWidth) {
 		isOK(this.bottomVolts); isOK(this.heightVolts); isOK(canvasWidth); isOK(canvasHeight);
 
 		// these are used to draw the voltage path line in VoltArea
 		this.yScale = scaleLinear([this.bottomVolts, this.bottomVolts + this.heightVolts], [0, canvasHeight]);
 		this.canvasHeight = canvasHeight;
 		this.yUpsideDown = scaleLinear([this.bottomVolts, this.bottomVolts + this.heightVolts], [canvasHeight, 0]);
-		this.xScale = scaleLinear([0, nPoints-1], [0, canvasWidth]);
+
+		this.xScale = scaleLinear([0, nPoints-1], [bumperWidth, canvasWidth - bumperWidth]);
 
 		if (traceVoltScales) {
-			console.log(`⚡️ ⚡️   voltagearea.setVoltScales()  done\n X domain & range: `);
-			console.log(`    X domain & range: `, this.xScale.domain(), this.xScale.range());
-			console.log(`    Y domain & range: `, this.yScale.domain(),  this.yScale.range());
-			console.log(`    Y UpsideDown: `, this.yUpsideDown.domain(),  this.yUpsideDown.range());
-			console.log(`    Zero at: `, this.xScale(0),  this.yScale(0),  this.yUpsideDown(0));
+			console.log(`⚡️ ⚡️   voltagearea.setVoltScales()  done
+			    X domain & range: `, this.xScale.domain(), this.xScale.range(), `
+				Y domain & range: `, this.yScale.domain(),  this.yScale.range(), `
+			    Y UpsideDown: `, this.yUpsideDown.domain(),  this.yUpsideDown.range(), `
+			    Zero at: `, this.xScale(0),  this.yScale(0),  this.yUpsideDown(0));
 		}
 		return true;
 	}

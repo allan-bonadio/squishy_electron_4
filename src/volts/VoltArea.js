@@ -336,14 +336,16 @@ function VoltArea(props) {
 
 	if (! p.space)
 		return '';  // too early
-	let barWidth = p.canvasInnerDims.width / p.space.nPoints;
+
+	// width of each bar
+	let barWidth = (p.canvasInnerDims.width - 2 * p.bumperWidth) / p.space.nPoints;
 	if (traceRendering) {
-		console.log(`⚡️ VArea.render, barWidth:${barWidth} canvasInnerDims: `
-			+`width=${p.canvasInnerDims.width}  height=${p.canvasInnerDims.height} `
-			+` barWidth=${barWidth}`);
+		console.log(`⚡️ VoltArea.render, barWidth:${barWidth} canvasInnerDims:
+			width=${p.canvasInnerDims.width}  height=${p.canvasInnerDims.height}
+			barWidth=${barWidth}`);
 	}
 
-	v.setVoltScales(p.canvasInnerDims.width, p.canvasInnerDims.height, p.space.N);
+	v.setVoltScales(p.canvasInnerDims.width, p.canvasInnerDims.height, p.space.N, p.bumperWidth);
 
 	// these elements show and hide
 	let vClass = p.showVoltage +'ShowVoltage';

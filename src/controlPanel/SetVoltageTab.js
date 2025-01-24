@@ -144,7 +144,7 @@ function SetVoltageTab(props) {
 		//debugger;
 
 		v.setAppropriateRange(vParams);
-		v.setVoltScales(MINI_WIDTH, MINI_HEIGHT, This.space.nPoints);
+		v.setVoltScales(MINI_WIDTH, MINI_HEIGHT, This.space.nPoints, 0);
 
 		// fill the voltage buffer
 		v.setFamiliarVoltage(vParams);
@@ -161,15 +161,6 @@ function SetVoltageTab(props) {
 
 	// start pointer capture on this drag
 	const capture = (ev) => ev.target.setPointerCapture(ev.pointerId);
-
-// 			<input type='range' className='canyonPower'
-// 				value={vParams.canyonPower ?? alternateStoreDefaults.voltageParams.canyonPower}
-// 				min={vMinsMaxes.canyonPower.min} max={vMinsMaxes.canyonPower.max}
-// 				step={.5}
-// 				onChange={ev => setVParams({canyonPower: ev.target.valueAsNumber})}
-// 				onPointerDown={capture}
-// 				style={{visibility: 'canyon' == breed ? 'visible' : 'hidden'}}
-// 			/>
 
 	// draw minigraph, and wrap it with sliders on 3 sides, depending on breed
 	function renderFirstRow(breed, vMinsMaxes) {
