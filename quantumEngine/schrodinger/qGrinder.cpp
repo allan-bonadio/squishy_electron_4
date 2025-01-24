@@ -52,7 +52,7 @@ static std::runtime_error nullException("");
 qGrinder::qGrinder(qSpace *sp, qAvatar *av, int nGrWorkers, const char *lab)
 	: space(sp), avatar(av), elapsedTime(0), frameSerial(0), stretchedDt(60),
 		integrationEx(nullException), exceptionCode(""), _zero(0), hadException(false),
-		shouldBeIntegrating(false), isIntegrating(false), justNFrames(0),
+		shouldBeIntegrating(false), isIntegrating(false),
 		stepsPerFrame(10),
 		pleaseFFT(false), videoFP(.05),
 		nGrWorkers(nGrWorkers) {
@@ -99,7 +99,8 @@ qGrinder::qGrinder(qSpace *sp, qAvatar *av, int nGrWorkers, const char *lab)
 			space->voltage, space->spectrumLength,
 			samplePoint);
 	}
-	sentinel = true;
+	sentinel = grSENTINEL_VALUE;
+	//printf("should be equal: %d %d\n", (int) sentinel, (int) grSENTINEL_VALUE);
 
 	FORMAT_DIRECT_OFFSETS;
 };
@@ -130,25 +131,59 @@ void qGrinder::formatDirectOffsets(void) {
 	// don't need magic
 	printf("🪓 🪓 --------------- starting qGrinder direct access JS getters & setters--------------\n\n");
 	// these can come in any order; the .h file determines the memory layout
+	// but keep in same order as the .h file so I don't go crazy.  Commented ones don't have js accessors.
 
+	/* ************************* pointers  for large blocks */
 	makePointerGetter(space);
+	makePointerGetter(qflick);
+	// avatar
+	makePointerGetter(voltage);
+	makePointerGetter(qspect);
 	printf("\n");
 
-	/* *********************************************** scalars */
+	/* ************************* timing */
+	// stepsPerFrame
+	makeDoubleGetter(videoFP);
+	makeDoubleSetter(videoFP);
+	makeDoubleGetter(chosenFP);
+	makeDoubleSetter(chosenFP);
 
+	makeDoubleGetter(totalCalcTime);
+	makeDoubleGetter(maxCalcTime);
+	printf("\n");
+
+	/* ************************* grinding */
+
+	makeDoubleGetter(stretchedDt);
+	makeDoubleSetter(stretchedDt);
+	// d2Coeff
+	makeDoubleGetter(divergence);
 	makeDoubleGetter(elapsedTime);
 	makeDoubleSetter(elapsedTime);
 	makeIntGetter(frameSerial);
 	makeIntSetter(frameSerial);
-	printf("\n");
-	makeIntGetter(justNFrames);
-	makeIntSetter(justNFrames);
+	// samplePoint
+	// grWorkers
+	makeIntGetter(nGrWorkers);
 
-	makeDoubleGetter(totalCalcTime);
-	makeDoubleGetter(maxCalcTime);
-	makeDoubleGetter(divergence);
-
+	makeIntOffset(startAtomic);
+	makeIntGetter(startAtomic);
+	// finishAtomic
 	printf("\n");
+
+	/* ************************* exceptions */
+
+	// integrationEx
+	makeStringPointer(exceptionCode);
+
+	makeBoolGetter(hadException);
+	makeBoolSetter(hadException);
+	// _zero
+
+	makeStringPointer(label);
+	printf("\n");
+
+	/* ************************* booleans & bytes at end */
 
 	makeBoolGetter(shouldBeIntegrating);
 	makeBoolSetter(shouldBeIntegrating);
@@ -157,52 +192,11 @@ void qGrinder::formatDirectOffsets(void) {
 
 	makeBoolGetter(pleaseFFT);
 	makeBoolSetter(pleaseFFT);
-	printf("\n");
 
 	makeBoolGetter(needsRepaint);
 	makeBoolSetter(needsRepaint);
 
-	makeBoolGetter(hadException);
-	makeBoolSetter(hadException);
-	makeStringPointer(exceptionCode);
-
-	printf("\n");
-	makeDoubleGetter(stretchedDt);
-	makeDoubleSetter(stretchedDt);
-
-	makeIntGetter(nGrWorkers);
-
-	makeDoubleGetter(videoFP);
-	makeDoubleSetter(videoFP);
-	makeDoubleGetter(chosenFP);
-	makeDoubleSetter(chosenFP);
-
-	makeIntOffset(startAtomic);
-	makeIntGetter(startAtomic);
-
-	/* *********************************************** waves & buffers */
-
-	printf("\n");
-	makePointerGetter(qflick);
-
-	printf("\n");
-	makePointerGetter(voltage);
-
-	makeDoubleGetter(divergence);
-
-//	printf("\n");
-//	makePointerGetter(scratchQWave);
-
-	printf("\n");
-	makePointerGetter(qspect);
-
-	makePointerGetter(stages);
-	makePointerGetter(threads);
-
-	makeStringPointer(label);
-
-	makeBoolGetter(sentinel);  // should always be value true; only for validation
-
+	makeByteGetter(sentinel);  // should always be value grSENTINEL_VALUE; only for validation
 
 	printf("\n🪓 🪓 --------------- done with qGrinder direct access --------------\n");
 }
@@ -244,7 +238,7 @@ void qGrinder::copyToAvatar(qAvatar *avatar) {
 	qflick->copyBuffer(avatar->qwave, qflick);  // from buffer zero
 }
 
-/* **********************************************************  divergence */
+/* **********************************************************   */
 
 static int tally = 0;
 
@@ -278,19 +272,19 @@ void qGrinder::tallyUpKinks(qWave *qwave) {
 	if (traceKinks)
 		speedyLog("🪓 tallyUpKinks result: tally/2= %d out of %d or %5.1f %%\n",
 			tally/2, N, 100.0 * tally / N / 2);
-	divergence = tally/2;
+	 = tally/2;
 }
 
 // see how many alternating derivatives we have.  Then convert to a user-visible
 // number and issue errors or warnings
-void qGrinder::measureDivergence() {
+void qGrinder::measure() {
 	tallyUpKinks(qflick);
-	if (divergence > 20) {
+	if ( > 20) {
 		int N = space->dimensions[0].N;
 
-		if (divergence > N * 15 / 16) {
+		if ( > N * 15 / 16) {
 			char buf[64];
-			snprintf(buf, 64, "🪓 🪓 wave is DIVERGING, divergence=%4.4g %% 🔥 🧨", divergence);
+			snprintf(buf, 64, "🪓 🪓 wave is DIVERGING, =%4.4g %% 🔥 🧨", );
 			shouldBeIntegrating = isIntegrating = false;
 
 			// js code intercepts this exact spelling
@@ -299,9 +293,9 @@ void qGrinder::measureDivergence() {
 		}
 		else {
 			// not bad yet
-			if (traceDivergence) {
-				speedyLog("🪓 wave starting to Diverge, divergence=%4.4g / %d 🧨",
-					divergence, N);
+			if (trace) {
+				speedyLog("🪓 wave starting to Diverge, =%4.4g / %d 🧨",
+					, N);
 			}
 		}
 	}
@@ -427,9 +421,9 @@ void qGrinder::threadsHaveFinished() {
 // 	}
 
 	if (traceIntegration)  {
-		speedyLog("🪓                ...in threadsHaveFinished().  justNFrames=%d and "
+		speedyLog("🪓                ...in threadsHaveFinished().  "
 			"shouldBeIntegrating=%d   isIntegrating=%d\n",
-			justNFrames, shouldBeIntegrating, isIntegrating);
+			shouldBeIntegrating, isIntegrating);
 	}
 
 	// isIntegrating is on otherwise we wouldn't be here.
@@ -462,7 +456,7 @@ void qGrinder::threadsHaveFinished() {
 		analyzeWaveFFT(qflick, "latest fft");
 	this->pleaseFFT = false;
 
-	measureDivergence();
+	measure();
 
 	// ready for new frame
 	// check whether we've stopped and leave it locked or unlocked for the next cycle.

@@ -7,7 +7,7 @@
 // See how these are used in qGrinder.cpp and qSpace.cpp . Use one of these
 // printf macros, in *::formatDirectOffsets(),  for each field from your .h file
 // you want to share with JS. You should arrange the fields in the .h file from
-// wides (doubles) to narrows (bools) for safer alignment, or just count bytes.
+// wides (doubles) to narrows (bools or bytes) for safer alignment, or just count bytes.
 // Include or omit fields and setters in C++ depending on if you use these macros in
 // the JS proxy class, in JS.
 
@@ -19,10 +19,12 @@
 // Probably I'll have one getter to get the dimension struct and one for
 // the variable in it, sometime in the future.
 
-// use for bool field, or anything 1 byte
+// use for bool field, or anything 1 byte.  probably should rename this all from bool to byte.
 #define byteOffset(field)  (int) ((byte *) &this->field - (byte *) this)
-#define makeBoolGetter(field)  printf("\tget " #field  "() { return Boolean(this.bools[%d]); }\n", byteOffset(field));
-#define makeBoolSetter(field)  printf("\tset " #field  "(a) { this.bools[%d] = a; }\n", byteOffset(field));
+#define makeBoolGetter(field)  printf("\tget " #field  "() { return Boolean(this.bytes[%d]); }\n", byteOffset(field));
+#define makeBoolSetter(field)  printf("\tset " #field  "(a) { this.bytes[%d] = Boolean(a); }\n", byteOffset(field));
+
+#define makeByteGetter(field)  printf("\tget "  #field  "() { return this.bytes[%d]; }\n", byteOffset(field));
 
 // use for a standard C string
 #define makeStringPointer(field)  printf("\tget _" #field  "() { return this.pointer + %d; }\n", byteOffset(field));
@@ -34,11 +36,11 @@
 #define makeNamedIntGetter(name, field)  printf("\tget " #name  "() { return this.ints[%d]; }\n", intOffset(field));
 #define makeIntSetter(field)  printf("\tset " #field  "(a) { this.ints[%d] = a; }\n", intOffset(field));
 
-// Just need this offset in the JS
+// Just need this offset in the JS, like so JS can get at the atomics
 #define makeIntOffset(field)  printf("\t"  #field  "Offset = %d;\n", intOffset(field));
 
 // like makeIntGetter() but creates a different name so as to not conflict with actual JS field in same class.
-// This will return to JS the C++ pointer value, which can be wrapped into a JS class.
+// This will return to JS the C++ pointer value, which can be wrapped into a JS e-class.
 // No corresponding setter cuz only C++ sets the pointers in constructors or other
 #define makePointerGetter(field)  printf("\tget _" #field  "() { return this.ints[%d]; }\n", intOffset(field));
 

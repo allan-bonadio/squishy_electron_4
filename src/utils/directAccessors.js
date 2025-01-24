@@ -29,7 +29,7 @@ export function prepForDirectAccessors(_this, pointer) {
 	// (these are not used for arrays or buffers)
 	_this.doubles = new Float64Array(window.Module.HEAPF64.buffer, pointer, 40);
 	_this.ints = new Int32Array(window.Module.HEAP32.buffer, pointer, 80);
-	_this.bools = new Uint8Array(window.Module.HEAPU8.buffer, pointer, 320);
+	_this.bytes = new Uint8Array(window.Module.HEAPU8.buffer, pointer, 320);
 
 	cppObjectRegistry[pointer] = _this;
 }

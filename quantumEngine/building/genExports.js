@@ -93,6 +93,9 @@ let commonConstants = [
 
 	// out-of-band value that means Fastest on frame speed menu
 	{name: 'FASTEST', cppType: 'double', value: 999_999},
+
+	// phony bool value that marks the end of a qGrinder object
+	{name: 'grSENTINEL_VALUE', cppType: 'bool', value: 123},
 ];
 
 

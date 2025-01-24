@@ -37,6 +37,8 @@ struct qThread;
 struct qStage;
 struct grWorker;
 
+// TODO: I should break this up: spin off qIterator with the down and dirty
+// stuff that has to be fast.
 struct qGrinder {
 	qGrinder(qSpace *, struct qAvatar *av, int nGrWorkers, const char *label);
 	~qGrinder(void);
@@ -46,140 +48,33 @@ struct qGrinder {
 	void copyFromAvatar(qAvatar *avatar);
 	void copyToAvatar(qAvatar *avatar);
 
-	int magic;
-	qSpace *space;
-	qAvatar *avatar;
+	/* ************************* error handling */
 
-	/* *********************************************** JS accessible */
-	// please keep alignment stable and correct!  See also eGrinder.js
-	// Keep arranged from larger to smaller - doubles (or pairs of ints), then ints, then bools
-
-	// total number of times thru the number cruncher.
-	int frameSerial;
-
-	// how much time we've integrated, from creation.  pseudo-pico-seconds.  Since we've eliminated
-	// all the actual physical constants from the math, why not choose our own definition
-	// of what a second is?  Resets to zero every so often.
-	double elapsedTime;
-
-	// = dtStretch * space->dt
-	double stretchedDt;
-
-	double d2Coeff;
-
-	// any exception thrown or discovered in a thread.  Message is human-readable.
-	std::runtime_error integrationEx;
-
-	// non-human error code for parts of the code that have to intercept
-	// specific exceptions by exact spelling
-	char exceptionCode[14];
-	char _zero;
-
-	// use this with integrationEx, which JS cannot read, but getExceptionMessage() can.
-	bool hadException;  // aligned to 8 bytes again
 	const char *getExceptionMessage(void);
-
 	// set integrationEx to exception with message; optionally set code, too
 	void reportException(const char *message, const char *code = "reported");
 	void reportException(std::runtime_error *ex, const char *code = "reported");
 
-	// number of integration steps executed for each frame
-	// dynamically adjusted so integration calculation of a frame takes
-	// about as much time as a screen refresh frame, as set by the user.
-	int stepsPerFrame;
+	/* ************************* FFT to checkout momentum */
 
-	/* *********************************************** integrating */
+	struct qSpectrum *getSpectrum(void);
 
-	// scan period of the screen = target rate for a frame of grinding
-	// In milliseconds, with fractions.  comes from sAnimator.
-	double videoFP;
+	// set pleaseFFt from JS (only if in the middle of frame)
+	void askForFFT(void);
 
-	// the frame speed most recently chosen by user, as number of
-	// milliseconds. should be a multiple of videoFP (?)  Actually
-	// we use this as an indicator as to whether rate is
-	// 'fastest' qeConsts.FASTEST  Otherwise, the JS triggers a new frame calc based on
-	// rAF.
-	double chosenFP;
-
-
-	// a subclass of  qWave, it has multiple waves to do grinding with
-	// this grinder OWNS the qFlick & is responsible for deleting it
-	struct qFlick *qflick;
-
-	// pointer grabbed from the space.  Same buffer as in space.
-	double *voltage;
-
-	// how long (thread time) it took to do the latest frame, all threads added together
-	double totalCalcTime;
-	double maxCalcTime;  // and max of all threads
-
-	double divergence;  // divergence measure
-	void measureDivergence(void);
-
-	// for the fourier filter.  Call the function first time you need it.
-	// owned if non-null
-	struct qSpectrum *qspect;
-	qSpectrum *getSpectrum(void);
-
-	struct qStage *stages;
-	struct qThread *threads;
-
-	int nGrWorkers;  // total number of grWorker threads we'll use for integrating
-			// mostly constant, although there's plans to gradually add/remove threads
-
-	// Although isIntegrating, do only this many more frames before
-	// stopping.  Like 1 for single step.  Ought to change this.  TODO
-	int justNFrames;
-
-	// Starts at -1 = waiting at starting line, or set it to 0 to launch
-	// an integration.  All the threads atomic_wait, waiting for this to turn
-	// nonnegative.
-	_Atomic int startAtomic;
-
-	// starts at 0.  As each thread finishes their iteration work, they
-	// atomically increment it.  The thread that increments it to
-	// nGrWorkers, knows it's the last and starts threadsHaveFinished()
-	_Atomic int finishAtomic;
-
-	// (formerly) called by JS to start a frame calc; now done in JS
-	void triggerIteration(void);
+	/* ************************* threads */
 
 	// called once per frame, at the end after last thread finishes (by last thread).
 	// Does several things needed to be done once per cycle.
 	void threadsHaveFinished(void);
 
+	/* ************************* grinding calculations */
+
+	// called by JS to start a frame calc (maybe) now done in JS
+	void triggerIteration(void);
+
 	// figure out the total elapsed time for each thread, average of all, max of all...
 	void aggregateCalcTime(void);
-
-	static grWorker **grWorkers;
-
-	// when trace msgs display just one point (to avoid overwhelming output),
-	// this is the one.  (last i checked, 1/3 of the way)
-	int samplePoint;
-
-	// mostly for debugging
-	char label[MAX_LABEL_LEN + 1];
-
-	// for alignment: put the rest of these last
-
-	// true if thread(s) should start a new integration upon next event cycle, false if not
-	// Synchronized with the interactive simulation switch, visible and changeable in JS.
-	bool shouldBeIntegrating;
-
-	// same as shouldBeIntegrating, except this is synchronized with the integration threads.
-	// Does not change while integration frame being calculated.  So all threads are on the same page.
-	bool isIntegrating;
-
-	// set pleaseFFt from JS (only if in the middle of frame)
-	void askForFFT(void);
-
-	// true = please do an FFT after the current frame ends
-	bool pleaseFFT;
-
-	// grinding turns this on upon a new grind, so JS goes and repaints it
-	bool needsRepaint;
-
-	// make sure the subsequent fields are aligned!  or frame is painfully slow.
 
 	// Actually do integration, single thread only.
 	// must maintain stepsPerFrame to match videoFP, but not necessarily sync with it
@@ -201,9 +96,131 @@ struct qGrinder {
 	//void fourierFilter(int lowPassFilter);
 
 	void tallyUpKinks(struct qWave *qwave);
+	void measureDivergence(void);
 
-	// this because I keep on forgetting to do the direct accessors
-	bool sentinel;
+
+	/* *********************************************** instance variables */
+	// please keep alignment stable and correct!  See also eGrinder.js Keep
+	// arranged from larger to smaller - often doubles (or pairs of ints), then
+	// ints, then bools.  Give or take.
+	int magic;
+
+	/* ************************* pointers  for large blocks */
+	qSpace *space;
+	qAvatar *avatar;
+
+	// a subclass of  qWave, it has multiple waves to do grinding with
+	// this grinder OWNS the qFlick & is responsible for deleting it
+	struct qFlick *qflick;
+
+	// pointer grabbed from the space.  Same buffer as in space.
+	double *voltage;
+
+	// for the fourier filter.  Call the function first time you need it.
+	// owned if non-null
+	struct qSpectrum *qspect;
+
+	/* ************************* timing */
+
+	// number of integration steps executed for each frame
+	// dynamically adjusted so integration calculation of a frame takes
+	// about as much time as a screen refresh frame, as set by the user.
+	int stepsPerFrame;
+
+	// scan period of the screen = target rate for a frame of grinding
+	// In milliseconds, with fractions.  comes from sAnimator.
+	double videoFP;
+
+	// the frame speed most recently chosen by user, as number of
+	// milliseconds. should be a multiple of videoFP (?)  Actually
+	// we use this as an indicator as to whether rate is
+	// 'fastest' qeConsts.FASTEST  Otherwise, the JS triggers a new frame calc based on
+	// rAF.
+	double chosenFP;
+
+	// how long (thread time) it took to do the latest frame, all threads added together
+	double totalCalcTime;
+	double maxCalcTime;  // and max of all threads
+
+	/* ************************* grinding & integrating */
+
+	// = dtStretch * space->dt
+	double stretchedDt;
+
+	double d2Coeff;
+
+	double divergence;  // divergence measure
+
+	// how much time we've integrated, from creation.  pseudo-pico-seconds.  Since we've eliminated
+	// all the actual physical constants from the math, why not choose our own definition
+	// of what a second is?  Resets to zero every so often.
+	double elapsedTime;
+
+	// total number of times (frames) thru the number cruncher.
+	int frameSerial;
+
+	// when trace msgs display just one point (to avoid overwhelming output),
+	// this is the one.  (last i checked, 1/3 of the way)
+	int samplePoint;
+
+	// for the abacus or multithreaded integration which isn't even designed yet.
+//	struct qStage *stages;
+//	struct qThread *threads;
+
+	static grWorker **grWorkers;
+
+	int nGrWorkers;  // total number of grWorker threads we'll use for integrating
+			// mostly constant, although there's plans to gradually add/remove threads
+
+	// Starts at -1 = waiting at starting line, or set it to 0 to launch
+	// an integration.  All the threads atomic_wait, waiting for this to turn
+	// nonnegative.
+	_Atomic int startAtomic;
+
+	// starts at 0.  As each thread finishes their iteration work, they
+	// atomically increment it.  The thread that increments it to
+	// nGrWorkers, knows it's the last and starts threadsHaveFinished()
+	_Atomic int finishAtomic;
+
+	/* ************************* exceptions */
+
+	// any exception thrown or discovered in a thread.  Message is human-readable.
+	// I think this is 56 bytes, multiple of double float
+	std::runtime_error integrationEx;
+
+	// non-human error code for parts of the code that have to intercept
+	// specific exceptions by exact spelling
+	char exceptionCode[14];
+	char _zero;  // make sure null byte at end
+
+	// use this with integrationEx, which JS cannot read, but getExceptionMessage() can.
+	bool hadException;  // aligned to 8 bytes again
+
+
+	// mostly for debugging
+	char label[MAX_LABEL_LEN + 1];
+
+	/* ************************* booleans & bytes at end */
+	// for alignment: put the rest of these last
+
+	// true if thread(s) should start a new integration upon next event cycle, false if not
+	// Synchronized with the interactive simulation switch, visible and changeable in JS.
+	bool shouldBeIntegrating;
+
+	// same as shouldBeIntegrating, except this is synchronized with the
+	// integration threads. Does not change while integration frame being
+	// calculated.  So all threads are on the same page.
+	bool isIntegrating;
+
+	// true = please do an FFT at some time... waiting for something fourier
+	bool pleaseFFT;
+
+	// grinding turns this on upon a new grind, so JS goes and repaints it
+	bool needsRepaint;
+
+	// this because I keep on forgetting to redo the direct accessors.
+	// should  be grSENTINEL_VALUE
+	byte sentinel;
 };
 
 /* ************************************************************ Units and Phys Constants */
