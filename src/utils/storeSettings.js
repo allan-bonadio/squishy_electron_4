@@ -238,7 +238,7 @@ export function createStoreSettings() {
 	makeParam('miscSettings', 'showingTab', 'wave', ['wave', 'voltage', 'space', 'integration']);
 
 	// set by size box on main view
-	makeParam('miscSettings', 'waveViewHeight', 400, {min: 50, max: 1e4});
+	makeParam('miscSettings', 'waveViewHeight', 402, {min: 50, max: 1e4});
 
 }
 
