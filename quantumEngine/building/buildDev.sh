@@ -14,6 +14,7 @@ cd ..
 # see 80% down in https://emscripten.org/docs/tools_reference/emcc.html
 # i think --threadprofiler is only for pthreads
 
+# TODO: get rid of this build difiference betw prod & dev; it's for debugging anyway.  15.
 # keep MAX_LABEL_LEN+1 a multiple of 4 or 8 for alignment, eg 7, 15 or 31
 export MAX_LABEL_LEN=15
 
@@ -60,7 +61,7 @@ export MALLOC=emmalloc-memvalidate
 
 echo ℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏ compile
 building/buildCommon.sh || exit 93
-echo ℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏ done
+echo ℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏ done`date +%d/H:%M:%S`
 
 exit 0
 
