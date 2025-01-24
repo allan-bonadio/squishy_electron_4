@@ -53,11 +53,12 @@ export class abstractScene {
 
 	// the final call to set it up does all viewClassName-specific stuff
 	// other subclassers override what they want
+	// TODO: rename completeView to completeScene
 	completeView() {
 		this.compileShadersOnDrawings();
 		this.createVariablesOnDrawings();
 
-		// call again if canvas outer dimensions change
+		// call again if canvas outer dimensions change  WRONG doesn't do bumpers
 		this.gl.viewport(0, 0, this.canvas.width, this.canvas.height);
 
 		// kick it off by drawing it once
@@ -65,7 +66,7 @@ export class abstractScene {
 
 		// and set up interactivity
 		// maybe i should get rid of this
-		this.domSetupForAllDrawings(this.canvas);
+		//this.domSetupForAllDrawings(this.canvas);
 	}
 
 	/* ****************************************** Shader s */
@@ -123,13 +124,13 @@ export class abstractScene {
 
 	/* ************************************************** dom interactivity */
 	// maybe i should get rid of this TODO
-	domSetupForAllDrawings(canvas) {
-		this.drawings.forEach(drawing => {
-			if (drawing.domSetup)
-				drawing.domSetup(canvas);
-		});
-
-	}
+	//domSetupForAllDrawings(canvas) {
+	//	this.drawings.forEach(drawing => {
+	//		if (drawing.domSetup)
+	//			drawing.domSetup(canvas);
+	//	});
+	//
+	//}
 }
 export default abstractScene;
 
