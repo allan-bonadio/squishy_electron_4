@@ -44,7 +44,7 @@ class App extends React.Component {
 			this.setState({cppRunning: true})
 
 			// everything squishes around upon startup, especially after the space is created, so do this a bit later
-			setTimeout(this.widthDidChange, 200);
+			setTimeout(this.widthDidChange, 300);
 		});
 	}
 
@@ -54,7 +54,7 @@ class App extends React.Component {
 		this.bodyWidth = document.body.clientWidth;
 		this.setState({bodyWidth: this.bodyWidth});  // triggers rerenders & resizes
 		if (traceResize)
-			console.log(`🍦 App Mount window resize: set this.bodyWidth= ${this.bodyWidth}`);
+			console.log(`🍦 widthDidChange: set this.bodyWidth= ${this.bodyWidth}`);
 
 		// the doc reader tries to track the window size
 		DocReader.setDimensions(this.bodyWidth);
@@ -68,7 +68,7 @@ class App extends React.Component {
 		// add listener only executed once
 		window.addEventListener('resize', ev => {
 			if (traceResize) {
-				console.log(`🍦  App Mount: resize, body.clientSize: `
+				console.log(`🍦  resize ev, body.clientSize: `
 					+` ${document.body.clientWidth}  ${document.body.clientHeight}. \nevent`, ev);
 			}
 			console.assert(ev.currentTarget === window, `ev.currentTarget =?== window`);
@@ -80,7 +80,7 @@ class App extends React.Component {
 				// finally settled down
 				timeout = null;
 				this.widthDidChange();
-			}, 200);
+			}, 300);
 
 		});
 
@@ -173,9 +173,18 @@ class App extends React.Component {
 
 				<CommonDialog  dialogContent={s.dialogContent} setDialog={this.setDialog} />
 				<footer>
-					<img id='emscriptenLogo' src='logos/emscriptenLogo.svg' alt='powered by Emscripten'/>
-					<img id='webassemblyLogo' src='logos/webassemblyLogo.svg'  alt='powered by WebAssembly'/>
-					<img id='webglLogo' src='logos/webglLogo.svg'  alt='powered by WebGL'/>
+					<aside id='traceOnScreen'>
+						<p className='A' />
+						<p className='B' />
+						<p className='C' />
+					</aside>
+
+					<img id='emscriptenLogo' src='logos/emscriptenLogo.svg'
+						alt='powered by Emscripten'/>
+					<img id='webassemblyLogo' src='logos/webassemblyLogo.svg'
+						alt='powered by WebAssembly'/>
+					<img id='webglLogo' src='logos/webglLogo.svg'
+						alt='powered by WebGL'/>
 				</footer>
 			</main>
 		);
