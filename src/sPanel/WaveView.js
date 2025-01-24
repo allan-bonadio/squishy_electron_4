@@ -52,6 +52,7 @@ export class WaveView extends React.Component {
 
 	constructor(props) {
 		super(props);
+		PropTypes.checkPropTypes(WaveView.propTypes, props, 'prop', 'GLView');
 
 		// is this a bad idea?
 		this.sPanel = props.sPanel;
@@ -62,9 +63,6 @@ export class WaveView extends React.Component {
 			outerHeight: getASetting('miscSettings', 'waveViewHeight'),  // pixels
 
 			// no!  handed in by promise space: null,  // set when promise comes in
-
-			// This is from the space.  Should this even be in the state?  well, whether it's there affects rendering
-			//vDisp: null,
 		}
 		// directly measured Canvas innr width & height and maybe more, set by
 		// the lower levels with setCanvasInnerDims() and passed to the
@@ -77,6 +75,12 @@ export class WaveView extends React.Component {
 
 		// make the proptypes shuddup about it being undefined
 		this.vDisp = null;
+
+		// make room for the bumpers for WELL continuum (both sides).  Note that
+		// continuum can change only when page reloads.
+		this.bumperWidth = (qeConsts.contWELL == this.space?.dimensions[0].continuum)
+			? BUMPER_WIDTH
+			: 0;
 
 		eSpaceCreatedPromise
 		.then(space => {
@@ -123,7 +127,7 @@ export class WaveView extends React.Component {
 			// canvas has 1px border between inner and outer; includes area for bumpers
 			if (innerHeight + 2 != this.state.outerHeight) {
 				this.setState({outerHeight: innerHeight + 2});
-				debugger;
+				debugger;  // never happens!
 			}
 		}
 		if (traceWidth) {
@@ -143,20 +147,23 @@ export class WaveView extends React.Component {
 					|| this.formerWidth != p.outerWidth
 					|| this.formerHeight != s.outerHeight) ) {
 			if (traceScaling) {
-				console.log(`🏄 mainEAvatar=${this.mainEAvatar.label}
-				formerShowVoltage=${this.formerShowVoltage} ≟ showVoltage=${p.showVoltage}
-				formerWidth=${this.formerWidth} ≟ outerWidth=${p.outerWidth}
-				formerHeight=${this.formerHeight} ≟ outerHeight=${s.outerHeight}`);
+				console.log(`🏄 Resizing  👀 mainEAvatar=${this.mainEAvatar.label}
+				formerShowVoltage=${this.formerShowVoltage} ≟➔ showVoltage=${p.showVoltage}
+				formerWidth=${this.formerWidth} ≟➔ outerWidth=${p.outerWidth}
+				formerHeight=${this.formerHeight} ≟➔ outerHeight=${s.outerHeight}`);
 			}
 			// the formers are OUTER sizes
 			this.formerWidth = p.outerWidth;
 			this.formerHeight = s.outerHeight;
 			this.formerShowVoltage = p.showVoltage;
-			//console.log(`canvasInnerDims was ${this.canvasInnerDims.width}W ; WV is now `
-			//	+ `${p.outerWidth}W`);
+			if (traceWidth) {
+				console.log(`🏄 WaveView canvasInner width was ${this.canvasInnerDims.width};  `
+					+ `now outer width = ${p.outerWidth}`);
+			}
 
 			// pass the inner width to the volt machinery
-			this.vDisp.setVoltScales(p.outerWidth - 2, s.outerHeight - 2, this.space.nPoints);
+			this.vDisp.setVoltScales(p.outerWidth - 2, s.outerHeight - 2,
+				this.space.nPoints, this.bumperWidth);
 		}
 	}
 
@@ -206,7 +213,7 @@ export class WaveView extends React.Component {
 		ev.stopPropagation();
 	}
 
-	/* ************************************************************************ render */
+	/* ********************************************************* render */
 
 	render() {
 		const p = this.props;
@@ -221,18 +228,13 @@ export class WaveView extends React.Component {
 			frameSerial = thousands(this.grinder.frameSerial);
 		}
 
-		// make room for the bumpers for WELL continuum (both sides)
-		let bumperWidth = (qeConsts.contWELL == this.space?.dimensions[0].continuum)
-			? BUMPER_WIDTH
-			: 0;
-
 		// sometimes a fraction of a pixel causes the horiz scroll bar
 		// to kick in.  avoid that without messing up everything.
 		//let innerWidthForCanvas = p.outerWidth - 1 - 2 * bumperWidth;
 
 		if (traceWidth) {
 			console.log(`🏄 WaveView render, outerWidth=${p.outerWidth}`
-				+` bumperWidth=${bumperWidth}`);
+				+` bumperWidth=${this.bumperWidth}`);
 		}
 
 		 // innerWidth={p.outerWidth - 2} innerHeight={s.outerHeight - 2}
@@ -241,14 +243,14 @@ export class WaveView extends React.Component {
 		let glView;
 		if (this.space) {
 			glView = <GLView
-				specialInfo={{bumperWidth}}
-				space={this.space} avatar={this.space.mainEAvatar}
-				viewClassName='flatScene' sceneName='mainView'
-				setGl={this.setGl}
-				selectedOuterDims={{width: p.outerWidth, height: s.outerHeight}}
-				canvasInnerDims={this.canvasInnerDims}
-				setCanvasInnerDims={this.setCanvasInnerDims}
-			/>
+				specialInfo={{bumperWidth: p.bumperWidth}} avatar={s.space.mainEAvatar}
+				viewClassName='flatScene' p='mainView'  sceneName='mainWave' setGl={this.setGl}
+				selectedOuterDims={{width: p.outerWidth, height: s.outerHeight}} space={s.space}
+				canvasInnerDims={this.canvasInnerDims} setCanvasInnerDims={this.setCanvasInnerDims}
+				canvasDrawingRegion={{x: this.bumperWidth, y: 0,
+					width: this.canvasInnerDims.width - this.bumperWidth,
+					height:this.canvasInnerDims.height	}}
+			/>;
 		}
 		else {
 			// until then, show spinner, not actually a GLView
@@ -268,10 +270,8 @@ export class WaveView extends React.Component {
 		if (this.vDisp){
 			voltOverlay = <VoltOverlay
 				space={this.space}
-				showVoltage={s.showVoltage}
-				vDisp={this.vDisp}
-				canvasInnerDims={this.canvasInnerDims}
-				bumperWidth={bumperWidth}
+				showVoltage={s.showVoltage} vDisp={this.vDisp}
+				canvasInnerDims={this.canvasInnerDims} bumperWidth={this.bumperWidth}
 			/>;
 
 			// removed:
@@ -284,9 +284,9 @@ export class WaveView extends React.Component {
 		<div className='WaveView'
 					style={{height: `${s.outerHeight}px`}}>
 
-			<div className='bumper left' key='left' style={{width: bumperWidth +'px'}} />
+			<div className='bumper left' key='left' style={{width: this.bumperWidth +'px'}} />
 			<div className='viewArea' key='viewArea'
-						style={{maxWidth: (this.canvasInnerDims.width + 2) +'px', left: bumperWidth +'px'}}>
+						style={{maxWidth: (this.canvasInnerDims.width + 2) +'px', left: this.bumperWidth +'px'}}>
 				{glView}
 
 				<section className='timeOverlay'
@@ -307,7 +307,7 @@ export class WaveView extends React.Component {
 
 				{voltOverlay}
 			</div>
-			<div className='bumper right' key='right' style={{width: bumperWidth +'px'} } />
+			<div className='bumper right' key='right' style={{width: this.bumperWidth +'px'} } />
 
 		</div>
 		);
