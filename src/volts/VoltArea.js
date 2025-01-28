@@ -49,8 +49,9 @@ function setPT() {
 		// this can be null if stuff isn't ready.  these are now determined by css.
 		// no use canvasInnerDims  height: PropTypes.number,
 
-		canvasInnerDims: PropTypes.object.isRequired,
-		bumperWidth: PropTypes.number.isRequired,
+		drawingLeft: PropTypes.number.isRequired,
+		drawingWidth: PropTypes.number.isRequired,
+		canvasInnerHeight: PropTypes.number.isRequired,
 
 		// changing a buffer point should only be done thru this func
 		setAPoint: PropTypes.func,
@@ -326,8 +327,9 @@ function VoltArea(props) {
 		let vAx = d3_select(voltageAxis);
 		vAx.attr('class', 'voltageAxis');
 
-		let txX = p.canvasInnerDims.width - barWidth;
-		let txY = p.canvasInnerDims.height;
+		// not sure how much to move axis in from right side
+		let txX = p.drawingLeft + p.drawingWidth - 32;
+		let txY = p.canvasInnerHeight;
 		vAx.attr('transform', `translate(${txX}, ${txY})`);
 		vAx.call(axis);
 		//debugger;
@@ -338,34 +340,34 @@ function VoltArea(props) {
 		return '';  // too early
 
 	// width of each bar
-	let barWidth = (p.canvasInnerDims.width - 2 * p.bumperWidth) / p.space.nPoints;
+	let barWidth = p.drawingWidth / p.space.nPoints;
 	if (traceRendering) {
-		console.log(`⚡️ VoltArea.render, barWidth:${barWidth} canvasInnerDims:
-			width=${p.canvasInnerDims.width}  height=${p.canvasInnerDims.height}
+		console.log(`⚡️ VoltArea.render, drawing left:${p.drawingLeft}
+			width=${p.drawingWidth}  height=${p.canvasInnerHeight}
 			barWidth=${barWidth}`);
 	}
 
-	v.setVoltScales(p.canvasInnerDims.width, p.canvasInnerDims.height, p.space.N, p.bumperWidth);
+	v.setVoltScales(p.drawingLeft, p.drawingWidth, p.canvasInnerHeight);
 
 	// these elements show and hide
 	let vClass = p.showVoltage +'ShowVoltage';
 
 	let vArea = (
 		<svg className='VoltArea'
-			viewBox={`0 0 ${p.canvasInnerDims.width} ${p.canvasInnerDims.height}`}
-			width={p.canvasInnerDims.width} height={p.canvasInnerDims.height}
+			viewBox={`${p.drawingLeft} 0 ${p.drawingWidth} ${p.canvasInnerHeight}`}
+			x={p.drawingLeft} width={p.drawingWidth} height={p.canvasInnerHeight}
 			ref={svgRef}
 			onWheel={wheelHandler} onPointerMove={pointerMove} onPointerUp={pointerUp}
 		>
 			<g className={'optionalVoltage ' + vClass}>
 				{/* for showVoltage on hover, need this to  hover over */}
 				<rect className='hoverBox' key='hoverBox'
-					x={0} y={0}
-					width={p.canvasInnerDims.width} height={p.canvasInnerDims.height}
+					x={p.drawingLeft} y={0}
+					width={p.drawingWidth} height={p.canvasInnerHeight}
 				/>
 
-				{renderVoltagePath()}
 				{renderAxes()}
+				{renderVoltagePath()}
 			</g>
 
 		</svg>
