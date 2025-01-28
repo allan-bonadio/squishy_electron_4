@@ -3,6 +3,7 @@
 ** Copyright (C) 2021-2024 Tactile Interactive, all rights reserved
 */
 
+import qeConsts from '../engine/qeConsts.js';
 import {scaleLinear} from 'd3-scale';
 import {EFFECTIVE_VOLTS, VALLEY_FACTOR, TOO_MANY_VOLTS} from './voltConstants.js';
 import {getAGroup, storeASetting} from '../utils/storeSettings.js';
@@ -12,7 +13,7 @@ let tracePathAttribute = false;
 let tracePathIndividualPoints = false
 
 let traceVoltArithmetic = false;
-let traceVoltScales = false;
+let traceVoltScales = true;
 let traceScrolling = false;
 let traceZooming = false;
 
@@ -31,15 +32,16 @@ const isOK = (c) => {
 }
 
 // this contains the voltage scrolling and zooming numbers and what's visible.
-// Not a component; just an object
+// NOT A COMPONENT; just an object
 export class voltDisplay {
 	// make it from given settings obj. Note we don't get the buffer from the space,
 	// cuz the Voltage minigraph needs its own buffer
-	constructor(label, start, end, voltageBuffer, settings) {
+	constructor(label, start, end, continuum, voltageBuffer, settings) {
 		// point-by-point voltage values, + start and end of voltage buffer, aligned with waves
 		this.label = label;
 		this.start = start;
 		this.end = end;
+		this.continuum = continuum;
 		this.voltageBuffer = voltageBuffer;
 
 		if (settings) {
@@ -64,7 +66,7 @@ export class voltDisplay {
 	// create a voltDisplay the way the space needs it
 	static newForSpace(space) {
 		let vDisp = new voltDisplay('space',
-			space.start, space.end,
+			space.start, space.end, space.dimensions[0].continuum,
 			space.voltageBuffer,
 			getAGroup('voltageSettings')
 		);
@@ -154,15 +156,17 @@ export class voltDisplay {
 	// set our xScale and yScale according to the numbers passed in, and our own settings
 	// used by VoltArea to plot potential.  X in units of dx, Y in units of volts
 	// I think I call this too many times (?)
-	setVoltScales(canvasWidth, canvasHeight, nPoints, bumperWidth) {
-		isOK(this.bottomVolts); isOK(this.heightVolts); isOK(canvasWidth); isOK(canvasHeight);
+	setVoltScales(drawingLeft, drawingWidth, canvasHeight) {
+		isOK(this.bottomVolts); isOK(this.heightVolts);
+		isOK(drawingLeft); isOK(drawingWidth); isOK(canvasHeight);
 
 		// these are used to draw the voltage path line in VoltArea
 		this.yScale = scaleLinear([this.bottomVolts, this.bottomVolts + this.heightVolts], [0, canvasHeight]);
 		this.canvasHeight = canvasHeight;
 		this.yUpsideDown = scaleLinear([this.bottomVolts, this.bottomVolts + this.heightVolts], [canvasHeight, 0]);
 
-		this.xScale = scaleLinear([0, nPoints-1], [bumperWidth, canvasWidth - bumperWidth]);
+		// the actual datapoints are on the edges between bars.  So, 8 states = nPoints=10 means 9 bars.
+		this.xScale = scaleLinear([0, this.end], [drawingLeft, drawingLeft + drawingWidth]);
 
 		if (traceVoltScales) {
 			console.log(`⚡️ ⚡️   voltagearea.setVoltScales()  done
@@ -177,16 +181,6 @@ export class voltDisplay {
 
 	/* ******************************************************************* interaction */
 
-	// called after user changed bottom and/or  height (zoomed or scrolled).
-//	scrollChanged() {
-//		storeASetting('voltageSettings', 'bottomVolts', +this.bottomVolts);
-//		storeASetting('voltageSettings', 'heightVolts', +this.heightVolts);
-//		//storeASetting('voltageSettings', 'minBottom', +this.minBottom);
-//
-//		// make it render.  this function is set in the VoltArea constructor
-//		this.updateVoltageArea();
-//	}
-
 	// called when user scrolls up or down.
 	// frac = fraction of a height, 1=scrolled to top, one click.  -1=scrolled toward bottom, one click.
 	// Other scroll mechanisms pass other proportional numbers
@@ -199,7 +193,8 @@ export class voltDisplay {
 			console.info(`userScroll(frac=${frac}) => bottomVolts=${this.bottomVolts}`);
 	}
 
-	// called when human zooms in or out.  pass +1 or -1.  heightVolts expands or contracts a fixed  factor up and down.
+	// called when human zooms in or out.  pass +1 or -1.  heightVolts expands
+	// or contracts a fixed  factor up and down.
 	zoomVoltHandler(inOut) {
 		// keep looking at same place
 		let midView = this.bottomVolts + this.heightVolts/2;
@@ -382,11 +377,43 @@ export class voltDisplay {
 		let points = this.points;
 		let x, y, pt;
 
-		if (start) points[0] = points[end] = '';
-
 		// get ready to stop and start the path if needed
 		let didMove = false, didLine = false;
-		for (let ix = start; ix < end; ix++) {
+		switch (this.continuum) {
+		case qeConsts.contDISCRETE:
+			throw new Error(`discrete continuum in makeVoltagePathAttribute`);
+
+		case qeConsts.contWELL:
+			// potential at the ends of the well are infinite; therefore regular points run start ... end-1.
+			// just do a line going up on each end.
+			x = this.xScale(this.start);
+			points[0] = `M${x},1e9`;
+			didMove = true;
+			didLine = false;
+
+			// should I get rid of this if the point at end-1 is NAN?
+			x = this.xScale(this.end-1);
+			points[this.end-1] = `L${x},1e9`;
+			break;
+
+		case qeConsts.contENDLESS:
+			// make the voltage buffer wraparound
+			voltageBuffer[0] = voltageBuffer[end-1];
+			voltageBuffer[end] = voltageBuffer[1];
+
+			// we're doing the whole thing
+			start = 0;
+			end = this.start + this.end;
+			didMove = false;
+			didLine = false;
+			break;
+
+		default:
+			debugger;
+			throw new Error(`⚡️  bad continuum '${continuum}' in  makeVoltagePathAttribute()`);
+		}
+
+		for (let ix = start; ix <= end; ix++) {
 			x = this.xScale(ix);
 			if ((x==null) || !isFinite(x))
 				debugger;

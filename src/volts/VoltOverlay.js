@@ -21,7 +21,8 @@ function setPT() {
 		space: PropTypes.object,
 
 		// this can be null if stuff isn't ready.  these are now determined by css.
-		canvasInnerDims: PropTypes.object.isRequired,
+		canvasInnerWidth: PropTypes.number.isRequired,
+		canvasInnerHeight: PropTypes.number.isRequired,
 		bumperWidth: PropTypes.number.isRequired,
 
 		// includes scrollSetting, heightVolts, measuredMinVolts, measuredMaxVolts, xScale, yScale
@@ -54,7 +55,6 @@ function VoltOverlay(props) {
 
 	// the Hooks way
 	const [vState, voltDispatch] = useReducer(voltReducer, v.voltageBuffer);  // see reducer above
-	// vState === v.voltageBuffer now, so I don't have to set it or anything
 
 	// use this function to actually set a point in the voltage buffer, instead of just a regular assignment
 	const setAPoint =
@@ -82,21 +82,6 @@ function VoltOverlay(props) {
 		_setHeightVolts(hv);
 		storeASetting('voltageSettings', 'heightVolts', hv);
 	}
-	/* ************************************************************************ interaction */
-
-	// the actual bottomVolts is ignored; what's important is to tell us that it changed
-//	const scrollVoltHandler =
-//	bottomVolts => {
-//		v.setBottomVolts(bottomVolts);
-//	}
-
-	// handles zoom in/out buttons, and other widening/narrowing of range    They pass +1 or -1.
-//	const zoomVoltHandler =
-//	upDown => {
-//		v.zoomVoltHandler(upDown);
-//		//v.setBottomVolts(v.bottomVolts);
-//		//v.setHeightVolts(v.heightVolts);
-//	}
 
 	/* ************************************************************************ rendering */
 
@@ -105,21 +90,24 @@ function VoltOverlay(props) {
 	return <section className={(p.showVoltage ?? 'hover') + 'ShowVoltage VoltOverlay'}
 			style={{width: p.width}} >
 		<VoltSidebar width={VOLTAGE_SIDEBAR_WIDTH}
-			canvasInnerDims={p.canvasInnerDims}
 			vDisp={p.vDisp}
+			drawingRight={p.canvasInnerWidth - p.bumperWidth}
+			canvasInnerHeight={p.canvasInnerHeight}
 			showVoltage={p.showVoltage}
 			scrollVoltHandler={v.setBottomVolts}
 			zoomVoltHandler={v.zoomVoltHandler}
 		/>
 		<VoltArea
 			vDisp={p.vDisp}
+			drawingLeft={p.bumperWidth}
+			drawingWidth={p.canvasInnerWidth - 2 * p.bumperWidth}
+			canvasInnerHeight={p.canvasInnerHeight}
 			showVoltage={p.showVoltage}
 			space={p.space}
-			canvasInnerDims={p.canvasInnerDims}
 			setAPoint={setAPoint}
-			bumperWidth={p.bumperWidth}
 		/>
 	</section>;
+	//			bumperWidth={p.bumperWidth}
 
 	// n=removed height={p.height} from VOltArea in favor of canvasInnerDims
 }

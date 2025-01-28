@@ -23,7 +23,8 @@ function setPT() {
 	VoltSidebar.propTypes = {
 		width: PropTypes.number.isRequired,  // width of sidebar: fixed or zero
 
-		canvasInnerDims: PropTypes.object.isRequired,
+		drawingRight: PropTypes.number.isRequired,
+		canvasInnerHeight: PropTypes.number.isRequired,
 		bumperWidth: PropTypes.number,
 
 		vDisp: PropTypes.instanceOf(voltDisplay),
