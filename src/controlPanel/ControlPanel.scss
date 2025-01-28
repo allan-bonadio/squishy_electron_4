@@ -191,7 +191,7 @@
 	--miniGraphHeight: 150px;
 
 	.setVoltageTab {
-		width: calc( 50em + --miniGraphWidth );
+		width: calc( 50em + 200px);
 		height: auto;
 
 		// this is the whole left panel, the title and the breed selector, etc

@@ -114,18 +114,18 @@ class eGrinder {
 		let nWoke = Atomics.notify(this.ints, this.startAtomicOffset);
 		//console.log(`🎥 nWoke:`, nWoke);
 
-		//qeFuncs.grinder_triggerIteration(this.pointer);
+		//qeFuncs.this_triggerIteration(this.pointer);
 	}
 
 	// Grind one frame - Single Threaded - deprecated sortof
 	// for testing maybe keep the single threaded way
 	// can throw std::runtime_error("divergence")
 	oneFrame() {
-		qeFuncs.grinder_oneFrame(this.pointer);
+		qeFuncs.this_oneFrame(this.pointer);
 	}
 
 	askForFFT() {
-		qeFuncs.grinder_askForFFT(this.pointer);
+		qeFuncs.this_askForFFT(this.pointer);
 	}
 
 }

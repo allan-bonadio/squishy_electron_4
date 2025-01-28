@@ -42,7 +42,7 @@ static void *tStart(void *qtx) {
 //	printf("🦒  💥 🌪 emscripten_set_main_loop_arg() finished ️"
 //		"I guess we don't get here until ... I dunno\n");
 
-	// wait, this ends the thread....
+	// wait,np this ends the thread....
 	return NULL;
 };
 
