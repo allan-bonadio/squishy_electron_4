@@ -240,6 +240,7 @@ void qGrinder::copyToAvatar(qAvatar *avatar) {
 
 /* **********************************************************   */
 
+// sloppy sloppy
 static int tally = 0;
 
 // if these two derivatives differ in sign, increment the tally.
@@ -253,10 +254,10 @@ static void difft(double p, double q, double r) {
 void qGrinder::tallyUpKinks(qWave *qwave) {
 	tally = 0;
 	qCx *wave = qwave->wave;
-	qCx a = wave[qwave->start - 1];
-	qCx b = wave[qwave->start];
+	qCx a = wave[qwave->start];
+	qCx b = wave[qwave->start + 1];
 	qCx c;
-	for (int ix = qwave->start + 1; ix <= qwave->end; ix++) {
+	for (int ix = qwave->start + 2; ix <= qwave->end; ix++) {
 		c = wave[ix];
 
 		difft(a.re, b.re, c.re);
@@ -272,19 +273,19 @@ void qGrinder::tallyUpKinks(qWave *qwave) {
 	if (traceKinks)
 		speedyLog("🪓 tallyUpKinks result: tally/2= %d out of %d or %5.1f %%\n",
 			tally/2, N, 100.0 * tally / N / 2);
-	 = tally/2;
+	divergence = tally/2;
 }
 
 // see how many alternating derivatives we have.  Then convert to a user-visible
 // number and issue errors or warnings
-void qGrinder::measure() {
+void qGrinder::measureDivergence() {
 	tallyUpKinks(qflick);
-	if ( > 20) {
+	if (divergence > 20) {
 		int N = space->dimensions[0].N;
 
-		if ( > N * 15 / 16) {
+		if (divergence > N * 15 / 16) {
 			char buf[64];
-			snprintf(buf, 64, "🪓 🪓 wave is DIVERGING, =%4.4g %% 🔥 🧨", );
+			snprintf(buf, 64, "🪓 🪓 wave is DIVERGING, =%4.4g %% 🔥 🧨", divergence);
 			shouldBeIntegrating = isIntegrating = false;
 
 			// js code intercepts this exact spelling
@@ -293,9 +294,9 @@ void qGrinder::measure() {
 		}
 		else {
 			// not bad yet
-			if (trace) {
-				speedyLog("🪓 wave starting to Diverge, =%4.4g / %d 🧨",
-					, N);
+			if (traceDivergence) {
+				speedyLog("🪓 wave starting to Diverge, divergence=%4.4g / %d 🧨",
+					divergence, N);
 			}
 		}
 	}
@@ -456,7 +457,7 @@ void qGrinder::threadsHaveFinished() {
 		analyzeWaveFFT(qflick, "latest fft");
 	this->pleaseFFT = false;
 
-	measure();
+	measureDivergence();
 
 	// ready for new frame
 	// check whether we've stopped and leave it locked or unlocked for the next cycle.
