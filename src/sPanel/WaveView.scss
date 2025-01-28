@@ -10,41 +10,52 @@
 // comes from the window width.  hmmm...
 .WaveView {
 	position: relative;
-	//display: flex;
+	display: flex;
 	width: 100%;
 
-	.bumper {
+
+	/* canvas itself: bottom layer - outside of widget area*/
+	canvas.GLView {
 		position: absolute;
+		display: block;
+		height: 100%;  // will conform to widgetArea
+		width: 100%;
+		border: 1px #666 inset;
+		z-index: 10;
+	}
+
+	// bumpers only show in Well continuum.
+	.bumper {
+		// width set by JS either zero or bumper width
 		height: 100%;
 		background-color: common.$voltageColor;
-
-		&.right {
-			right: 0;
-		}
+		flex: 0 0;  // no growing/shrinking, but style attr sets flex-basis
+		z-index: 20;
 	}
 
 
-	// view area is the canvas in the GLView and everything that should be the same size
-	// like the voltage area.  Including the voltage sidebar.  Excluding the bumpers.
-	// height set by WaveView heigit, and width set in the Render method depending on continuum.
-	.viewArea {
+	// widget area, overlaying
+	// most of the widgets
+	// overlaying the wave drawing are here, like the voltage line, voltage axis, buttons, grow box....
+	// Fitting between the bumpers cuz if they go over the bumpers you can't see them.
+	// height set by WaveView height, and width set by flex depending on continuum.
+	// see also volts.scss for more widgetArea
+	.widgetArea {
 		height: 100%;
-		position: absolute;
+		flex: 1 1;
+		z-index: 20;
+		display: relative;
 
-		/* canvas itself: bottom layer */
-		canvas.GLView {
-			position: absolute;
-			display: block;
-			height: 100%;
-			border: 1px #666 inset;
-			z-index: 10;
+		// dragging the voltage line right where an axis lable is, avoid text selection
+		.voltageAxis {
+			user-select: none;
 		}
 
 		// overlay with frame count, virtual time and other stuff, on top of canvas
 		.timeOverlay {
 			position: absolute;
 			pointer-events: none;  // need to click through for voltage
-			z-index: 40;
+			z-index: 30;
 			width: 100%;
 			height: 100%;
 
@@ -52,31 +63,30 @@
 			.northWestWrapper, .northEastWrapper {
 				position: absolute;
 				top: .5em;
-				z-index: 10;
 				text-shadow: 1px 1px 3px #800f;
 			}
 
 			.northWestWrapper { left: 2em; }
 			.northEastWrapper { right: 2em; }
-
-			.sizeBox {
-				position: absolute;
-				pointer-events: auto;
-				bottom: 1px;
-				right: 0;
-				width: common.$sizeBoxSize; height: common.$sizeBoxSize;
-				z-index: 20;
-				cursor: ns-resize;
-				opacity: 0.1;
-				background-image: linear-gradient(45deg #fff, #000, #fff, #000, #fff, #000, #fff, #000);
-
-
-				&:hover { opacity: 1; }
-				&:active { opacity: 1; }
-			}
 		}
 
-	}  // end of viewArea
+		.sizeBox {
+			position: absolute;
+			pointer-events: auto;
+			bottom: 1px;
+			right: 0;
+			width: common.$sizeBoxSize; height: common.$sizeBoxSize;
+			z-index: 20;
+			cursor: ns-resize;
+			opacity: 0.1;
+			background-image: linear-gradient(45deg #fff, #000, #fff, #000, #fff, #000, #fff, #000);
+
+
+			&:hover { opacity: 1; }
+			&:active { opacity: 1; }
+		}
+
+	}  // end of widgetArea
 
 }
 

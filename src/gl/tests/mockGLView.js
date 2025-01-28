@@ -3,6 +3,8 @@
 ** Copyright (C) 2023-2024 Tactile Interactive, all rights reserved
 */
 
+TODO: rename to mockGLScene
+
 import 'https://greggman.github.io/webgl-lint/webgl-lint.js';
 import glAmbiance from '../glAmbiance.js';
 import abstractScene from '../abstractScene.js';
@@ -36,6 +38,10 @@ const viewClassNamez = {
 
 gonna have to rewrite this as a function
 export class mockGLView {
+	proptypes: {
+		specialInfo: PropTypes.object,
+	}
+
 	constructor(viewClassName, sceneName) {
 		this.state = {canvas: null};
 		this.space = mockSpace;
@@ -87,7 +93,7 @@ export class mockGLView {
 		this.testViewClasses[this.viewClassName] =
 			this.effectiveView =
 			new vClass(this.viewClassName, this, mockSpace, mockAvatar);
-		this.effectiveView.completeView();
+		this.effectiveView.completeView(specialInfo);
 		this.avatar.doRepaint = this.doRepaint;
 
 	}
@@ -96,7 +102,7 @@ export class mockGLView {
 	doRepaint() {
 		console.log('doRepaint');
 		mockAvatar.loadViewBuffer();
-		this.effectiveView.drawAllDrawings();
+		this.effectiveView.drawAllDrawings(width, height, p.specialInfo);
 	}
 
 };

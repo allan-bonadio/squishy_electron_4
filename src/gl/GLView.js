@@ -13,21 +13,18 @@ import PropTypes from 'prop-types';
 import {listOfViewClasses} from './listOfViewClasses.js';
 import glAmbiance from './glAmbiance.js';
 
-let traceSetup = true;
-let traceGeometry = true;
+let traceSetup = false;
+let traceGeometry = false;
 
 function traceOnScreen(msg) {
-	document.querySelector('#traceOnScreen').innerHTML = msg;
+	const traceOnScreen = document.querySelector('#traceOnScreen .A');
+	if (traceOnScreen)
+		traceOnScreen.innerHTML = msg;
 }
 
 
 // this one dumps large buffers
 let tracePainting = false;
-
-const whType = PropTypes.shape({
-	width: PropTypes.number,
-	height: PropTypes.number
-});
 
 function setPT() {
 	GLView.propTypes = {
@@ -39,24 +36,16 @@ function setPT() {
 		avatar: PropTypes.object.isRequired,
 		space: PropTypes.object.isRequired,
 
-		// the width and height dictated from above by user's resizing
-		selectedOuterDims: whType.isRequired,
-
- 		// the width and height we measure; should be inner width & height of canvas
-		canvasInnerDims: whType.isRequired,
-		setCanvasInnerDims: PropTypes.func,
-
-		// omits bumpers, in flatDrawing
-		canvasDrawingRegion: PropTypes.shape({
-			x: PropTypes.number, y: PropTypes.number,
-			width: PropTypes.number, height: PropTypes.number
-		}),
+ 		// inner width & height of canvas
+		// keep these separate  so any change will trigger render
+		canvasInnerWidth: PropTypes.number.isRequired,
+		canvasInnerHeight: PropTypes.number.isRequired,
 
 		// object with specific values needed in drawing; for waveview= {bumperWidth}
 		specialInfo: PropTypes.object,
 
-		// if our caller needs the gl ctx itself, otherwise undef
-		setGl: PropTypes.func,
+		// if our caller needs the canvas and gl ctx itself, otherwise undef
+		setGlCanvas: PropTypes.func,
 	};
 }
 
@@ -68,14 +57,7 @@ function GLView(props) {
 	PropTypes.checkPropTypes(GLView.propTypes, props, 'prop', 'GLView');
 	const p = props;
 
-	//if (traceGeometry && 'mainWave' == p.sceneName)
-	//	console.log(`GLView: props:`,  props);
-
-	// optional; defaults to canvasInnerDims
-	const canvasDrawingRegion = p.canvasDrawingRegion
-		?? {x: 0, y: 0, ...p.canvasInnerDims};
-
-	// we have to get the canvas node, to get a gl context.  Then we need to render again.
+	// we have to keep the canvas node, to get a gl context.  Then we need to render again.
 	let [canvasNode, setCanvasNode] = useState(null);
 	const canvasRef = useRef(null);
 
@@ -97,7 +79,7 @@ function GLView(props) {
 		effectiveView = new vClass(p.sceneName, ambiance, p.space, p.avatar);
 		effViewRef.current = effectiveView;
 
-		effectiveView.completeView();
+		effectiveView.completeView(p.specialInfo);
 
 		// now that there's an avatar, we can set these functions so everybody can use them.
 		p.avatar.doRepaint = doRepaint;
@@ -106,18 +88,6 @@ function GLView(props) {
 		if (traceSetup) console.log(`🖼 GLView ${p.sceneName} ${p.avatar.label}: `
 			+` done with initViewClass`);
 	};
-
-	// GL needs this to know where on canvas to draw
-	const setViewport = () => {
-		gl.viewport(canvasDrawingRegion.x, canvasDrawingRegion.y,
-			canvasDrawingRegion.width, canvasDrawingRegion.height);
-
-		if (traceGeometry && 'mainWave' == p.sceneName) {
-			let cdr = canvasDrawingRegion;
-			traceOnScreen(`🖼 GLView.setViewport for ${p.sceneName}, set `
-				+` draw region: x=${cdr.x} y=${cdr.y} w=${cdr.width} h=${cdr.height} `);
-		}
-	}
 
 	// repaint whole GL image.  this is repainting a canvas with GL.
 	// This is not 'render' as in React; react places the canvas element
@@ -132,15 +102,13 @@ function GLView(props) {
 		if (tracePainting)
 			p.avatar.ewave.dump(`🖼 GLView ${p.sceneName}: got the ewave right here`);
 
-		//setViewport(effectiveView.gl);
-
 		// copy from latest wave to view buffer (c++) & pick up highest
 		p.avatar.loadViewBuffer();
 		if (tracePainting)
 			p.avatar.dumpViewBuffer(`🖼 GLView ${p.sceneName}: loaded ViewBuffer`);
 
 		// draw
-		effectiveView.drawAllDrawings();
+		effectiveView.drawAllDrawings(p.canvasInnerWidth, p.canvasInnerHeight, p.specialInfo);
 		if (tracePainting)
 			console.log(`🖼 GLView ${p.sceneName} ${p.avatar.label}: doRepaint done drawing`);
 
@@ -148,11 +116,9 @@ function GLView(props) {
 	}
 
 	if (traceGeometry && 'mainWave' == p.sceneName) {
-		let cid = p.canvasInnerDims;
-		let cdr = canvasDrawingRegion;
 		console.log(`🖼 GLView rend '${p.sceneName}': canvas=${canvasNode?.nodeName}
-			inner width: ${cid.width}      inner height: ${cid.height}
-			draw reg: x=${cdr.x} y=${cdr.y} w=${cdr.width} h=${cdr.height} `);
+			draw reg: w=${p.canvasInnerWidth} h=${p.canvasInnerHeight} `);
+		//  x=${cdr.x} y=${cdr.y}
 	}
 
 	const setupGLContext = () => {
@@ -161,11 +127,10 @@ function GLView(props) {
 		.then(newGl => {
 			gl = newGl;
 			glRef.current = gl;
-			p.setGl?.(gl);
+			p.setGlCanvas?.(gl);
 
 			canvasNode.squishViewName = p.sceneName;
 			initViewClass(ambiance);
-			setViewport(gl);  // just upon init
 
 			if (traceSetup)
 				console.log(`🖼 GLView ${p.sceneName}: canvas, gl, view and the drawing done`);
@@ -180,17 +145,13 @@ function GLView(props) {
 				return;  // no canvas yet, nothing to draw on
 
 			// new canvas or differnt canvas (how could this happen?!?)
-			setCanvasNode(canvasRef.current);
 			canvasNode = canvasRef.current;
+			setCanvasNode(canvasNode);  // save for us
 
 			setupGLContext();
 		}
 
-		// no canvas node, nothing much to do
-		if (canvasNode) {
-			p.setCanvasInnerDims?.(canvasNode.clientWidth, canvasNode.clientHeight);
-			doRepaint();
-		}
+		doRepaint();
 
 		if (traceSetup) {
 			console.log(`🖼 GLView ${p.sceneName}: canvasFollowup(): completed, canvasNode=`,
@@ -202,20 +163,18 @@ function GLView(props) {
 	// the canvas w&h attributes define its inner coord system (not element's
 	// size) We want them to reflect actual pixels on the screen; should be same
 	// as canv inner W&H outer W&H includes borders, 1px on all sides, fits
-	// inside div.viewArea, parent. wait i thought viewport did it?  Do that at
+	// inside div.widgetArea, parent. wait i thought viewport did it?  Do that at
 	// the same time as adjusting the canvas size so they happen at the same
 	// time.
-	setViewport(gl);
 
-	// Shouldn't need css to set size.
+	// style attribute needed to set canvas physical width/height.
 	return (
 		<canvas className='GLView'
-			width={props.selectedOuterDims.width - 2}
-			height={props.selectedOuterDims.height - 2}
+			width={p.canvasInnerWidth} height={p.canvasInnerHeight}
+			style={{width: p.canvasInnerWidth + 'px', height: p.canvasInnerHeight + 'px'}}
 			ref={canvasRef}
 		/>
 	)
 }
 
 export default GLView;
-
