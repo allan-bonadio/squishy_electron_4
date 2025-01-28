@@ -75,7 +75,8 @@ function SetVoltageTab(props) {
 			voltDisplay.copyVolts(This.miniGraphBuffer, space.voltageBuffer);
 
 			// each voltDisplay manages a voltage context; this one does the minigraph one
-			This.miniVolts = new voltDisplay('miniVolts', space.start, space.end,
+			This.miniVolts = new voltDisplay('miniVolts',
+				space.start, space.end, space.dimensions[0].continuum,
 				This.miniGraphBuffer, getAGroup('voltageSettings'));
 
 			setThis(This);
@@ -116,19 +117,19 @@ function SetVoltageTab(props) {
 				<input type='radio' className='slotBreed' name='breed'
 					checked={'slot' == breed}
 					onChange={ev => setVParams({voltageBreed: 'slot'})}/>
-				⨆ Slot
+				<big> ⨆</big> Slot
 			</label>
 			<label>
 				<input type='radio' className='blockBreed' name='breed'
 					checked={'block' == breed}
 					onChange={ev => setVParams({voltageBreed: 'block'})}/>
-				⨅ Block
+				<big> ⨅</big> Block
 			</label>
 			<label>
 				<input type='radio' className='canyonBreed' name='breed'
 					checked={'canyon' == breed}
 					onChange={ev => setVParams({voltageBreed: 'canyon'})}/>
-				⋎ Canyon
+				<big> ⋎</big> Canyon
 			</label>
 		</div>;
 	}
@@ -144,7 +145,7 @@ function SetVoltageTab(props) {
 		//debugger;
 
 		v.setAppropriateRange(vParams);
-		v.setVoltScales(MINI_WIDTH, MINI_HEIGHT, This.space.nPoints, 0);
+		v.setVoltScales(0, MINI_WIDTH, MINI_HEIGHT);
 
 		// fill the voltage buffer
 		v.setFamiliarVoltage(vParams);
