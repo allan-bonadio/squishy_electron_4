@@ -151,19 +151,12 @@ fair amount of overhead for each call; trace it in the debugger to see.
 This is why I made the DirectAccess system; see directAccessors.h, and
 classes that use it: e/qWave, e/qGrinder, Avatar
 
-this is automatically done in the build scripts so you don't have to put them into your .profile or whatever files:
-
-. /dvl/emscripten/emsdk/emsdk_env.sh
-
-
---------------------
-
 ### node and python
 
 Emscripten has its own version of Python (3.9 or so), and also its own version of node (v16 or beyond).
 It'll use its own versions so don't worry about any version(s) you already have installed.
 
-oh yeah, here:
+oh yeah, here, but change the version #s:
 emsdk uninstall node-14.15.5-64bit
 emsdk uninstall python-3.9.2-1-64bit
 
