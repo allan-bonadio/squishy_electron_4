@@ -100,10 +100,12 @@ export class starDrawing extends abstractDrawing {
 		//this.cornerAttr.attachArray(corners, 2);
 	}
 
-	draw() {
+	draw(width, height, specialInfo) {
 		const gl = this.gl;
 		this.setDrawing();
 		//debugger;
+
+		gl.viewport(0, 0, width, height);
 
 		// is this a good place to do this?
 		gl.lineWidth(1.0);  // it's the only option anyway

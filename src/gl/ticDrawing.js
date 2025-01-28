@@ -151,7 +151,7 @@ export class ticDrawing extends abstractDrawing {
 		return cb;
 	}
 
-	draw() {
+	draw(width, height, specialInfo) {
 		if (traceTicDrawing)
 			console.log(`➤ ➤ ➤ ticDrawing drawing ${this.sceneName}, ${this.avatarLabel}: `+
 				` start draw ${this.vertexCount/2} tics`);
@@ -160,6 +160,7 @@ export class ticDrawing extends abstractDrawing {
 
 		const gl = this.gl;
 		this.setDrawing();
+		gl.viewport(0, 0, width, height);
 
 		this.viewVariables.forEach(v => v.reloadVariable());
 

@@ -87,10 +87,12 @@ export class noiseDrawing extends abstractDrawing {
 		this.colorsAttr = new viewAttribute('colors', this, 2, () => {return {value: colors, type: 'vec2'}});
 	}
 
-	draw() {
+	draw(width, height, specialInfo) {
 		const gl = this.gl;
 		this.setDrawing();
 		debugger;
+
+		gl.viewport(... drawing calculates this on the fly);
 
 		//this.cornerColorUni.reloadVariable();
 

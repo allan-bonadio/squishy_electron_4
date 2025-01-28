@@ -130,7 +130,9 @@ export class abstractDrawing {
 			${this.scene.sceneName} ${this.drawingName}: ${msg}`);
 	}
 
-
+	draw(width, height, specialInfo) {
+		console.error(`abstract drawing draw(${width, height})`);
+	}
 
 }
 

@@ -54,15 +54,16 @@ export class abstractScene {
 	// the final call to set it up does all viewClassName-specific stuff
 	// other subclassers override what they want
 	// TODO: rename completeView to completeScene
-	completeView() {
+	completeView(specialInfo) {
 		this.compileShadersOnDrawings();
 		this.createVariablesOnDrawings();
 
 		// call again if canvas outer dimensions change  WRONG doesn't do bumpers
-		this.gl.viewport(0, 0, this.canvas.width, this.canvas.height);
+		// No!  difft for each drawing
+		// this.gl.viewport(0, 0, this.canvas.width, this.canvas.height);
 
 		// kick it off by drawing it once
-		this.drawAllDrawings();
+		this.drawAllDrawings(this.canvas.width, this.canvas.height, specialInfo);
 
 		// and set up interactivity
 		// maybe i should get rid of this
@@ -107,7 +108,7 @@ export class abstractScene {
 		gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 	}
 
-	drawAllDrawings() {
+	drawAllDrawings(width, height, specialInfo) {
 		// not specific to any drawing; I guess it's kindof a drawing itself
 		this.drawBackground();
 
@@ -118,7 +119,7 @@ export class abstractScene {
 			drawing.viewVariables.forEach(v => v.reloadVariable());
 
 			if (!drawing.skipDrawing)
-				drawing.draw();
+				drawing.draw(width, height, specialInfo);
 		});
 	}
 

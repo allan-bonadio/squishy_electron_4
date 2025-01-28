@@ -108,13 +108,21 @@ export class flatDrawing extends abstractDrawing {
 			}
 		);
 
-		// barWidth: width of each bargraph bar, in raw GL coords -1...+1
+
+		// WELL continuum:  potential at the ends of the well are infinite; so
+		// psi on the border points is zero. These are the boundary datapoints,
+		// so for N=8, 10 edges between 9 bars, 7 between and 2 on ends.
+
+		// for ENDLESS, we wrap around one bar, so if N=8, there's two border bar at 0 and 8.
+		// there's 7 bars between.  9 bars total, 10 edges, matching the 10 = nPoints
+		// So, the same for WELL and ENDLESS
+
+		// barWidth: width of each bargraph bar
 		let nPoints = this.nPoints = this.space.nPoints;
-		let barWidth;  // = 1 / (nPoints - 1);
+		let barWidth;
 		if (traceFlatDrawing) console.log(`🫓 barWidth= ${barWidth}`);
 		this.barWidthUniform = new viewUniform('barWidth', this,
 			() => {
-				//barWidth = this.gl.canvas.width / (nPoints - 1)
 				barWidth = 1 / (nPoints - 1)
 				return { value: barWidth, type: '1f' };
 			}
@@ -127,17 +135,20 @@ export class flatDrawing extends abstractDrawing {
 			return this.avatar.vBuffer;
 		});
 
-		//this.gl.bindVertexArray(null);
+		// see  abstractDrawing for bindVertexArray()
 	}
 
 	// called for each image frame on th canvas
-	draw() {
+	draw(width, height, specialInfo) {
 		if (traceFlatDrawing) {
 			console.log(`🫓 flatDrawing ${this.outerDims}, ${this.avatarLabel}: `
 				+` drawing ${this.vertexCount/2} points`);
 		}
 		const gl = this.gl;
 		this.setDrawing();
+
+		let bw = specialInfo.bumperWidth;
+		gl.viewport(bw, 0, width - 2 * bw, height);
 
 		this.viewVariables.forEach(v => v.reloadVariable());
 		gl.drawArrays(gl.TRIANGLE_STRIP, 0, this.vertexCount);
