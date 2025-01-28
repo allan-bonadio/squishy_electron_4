@@ -95,6 +95,7 @@ struct qGrinder {
 	// kill high frequencies via FFTs
 	//void fourierFilter(int lowPassFilter);
 
+	// measuring divergence
 	void tallyUpKinks(struct qWave *qwave);
 	void measureDivergence(void);
 

@@ -11,8 +11,8 @@ import CommonDialog from './widgets/CommonDialog.js';
 import DocReader from './widgets/DocReader.js';
 import {eSpaceCreatedPromise} from './engine/eEngine.js';
 
-let traceResize = true;
-let traceState = true;
+let traceResize = false;
+let traceState = false;
 
 class App extends React.Component {
 	constructor(props) {

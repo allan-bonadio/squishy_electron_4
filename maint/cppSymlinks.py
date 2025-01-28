@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 import sys, os
 
+# I think we need this for the CHrome debugger to work in C++ code
+
 os.chdir(os.environ['SQUISH_ROOT'] + '/public')
 
 dirNames = 'building', 'debroglie', 'fourier', 'greiman', 'hilbert', 'schrodinger', 'testing', 'wasm'
