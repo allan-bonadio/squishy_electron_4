@@ -6,7 +6,7 @@
 wasm/quantumEngine.wasm wasm/quantumEngine.js : *.cpp *.h */*.h */*.cpp building/exports.json building/build*.sh building/allCpp.list
 	building/buildDev.sh
 
-building/exports.json commonConstants.h ../src/engine/qe.js : building/genExports.js
+building/exports.json commonConstants.h ../src/engine/qeConsts.js ../src/engine/qeFuncs.js : building/genExports.js
 	building/genExports.js
 
 # just in the quantumEngine dir
