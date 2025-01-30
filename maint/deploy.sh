@@ -59,7 +59,8 @@ sftp -p $NAKODA_SKEY  allan@nakoda -b - -N <<PETULANT_OLIGARCHS
 	pwd
 
 	put maint/install.sh
-	put maint/activate.sh
+	put maint/useBuild
+	chmod 755 useBuild
 	ls -l
 
 	bye
