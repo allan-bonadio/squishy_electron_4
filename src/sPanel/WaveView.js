@@ -24,7 +24,7 @@ import {eSpaceCreatedPromise} from '../engine/eEngine.js';
 
 let traceBumpers = false;
 
-let traceScaling = true;
+let traceScaling = false;
 let traceDragCanvasHeight = false;
 let traceWidth = false;
 

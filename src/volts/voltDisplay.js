@@ -13,7 +13,7 @@ let tracePathAttribute = false;
 let tracePathIndividualPoints = false
 
 let traceVoltArithmetic = false;
-let traceVoltScales = true;
+let traceVoltScales = false;
 let traceScrolling = false;
 let traceZooming = false;
 

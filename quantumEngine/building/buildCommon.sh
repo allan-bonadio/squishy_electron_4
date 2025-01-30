@@ -45,7 +45,7 @@ EXPORTS="-sEXPORTED_FUNCTIONS=@building/exports.json -sEXPORTED_RUNTIME_METHODS=
 DEFINES=" -DqDEV_VERSION -DMAX_LABEL_LEN=$MAX_LABEL_LEN -DMAX_DIMENSIONS=$MAX_DIMENSIONS "
 INCLUDES=" -I$EMSDK/upstream/emscripten/cache/sysroot/include -include emscripten.h -include squish.h "
 
-# INVOKE_RUN=0 and IGNORE_MISSING_MAIN avoids main.cpp main()
+# INVOKE_RUN=0 and IGNORE_MISSING_MAIN avoids main.cpp main() - not what we're doing
 MISC="-sFILESYSTEM=0 -sINVOKE_RUN=1 -Wno-limited-postlink-optimizations -sSUPPORT_LONGJMP=0"
 
 
@@ -54,11 +54,6 @@ MISC="-sFILESYSTEM=0 -sINVOKE_RUN=1 -Wno-limited-postlink-optimizations -sSUPPOR
 N_THREADS=1
 
 # we want wasm_workers, but for now, all we can use is pthreads and all its overhead.
-# from emscripten docs for -sENVIRONMENT :
-#   We detect whether we are a pthread at runtime, but that’s set for
-#   workers and not for the main file so it wouldn’t make sense to specify
-#   here.
-# so am I supposed to compile the worker code separately?  docs unclear but this works.
 # --proxy-to-worker   NO!
 export WORKERS=" -pthread   -sENVIRONMENT=web,worker -sPTHREAD_POOL_SIZE=$N_THREADS  -DN_THREADS=$N_THREADS "
 
@@ -79,7 +74,7 @@ allCpp=`cat building/allCpp.list`
 
 rm -rf wasm/*
 
-# show optios while compiling and linking
+# show options while compiling and linking
 set -x
 $EMSDK/upstream/emscripten/emcc -o wasm/quantumEngine.js \
 	$DEBUG $OPTIMIZE  $SAFETY  $FEATURES  $PROFILING  \
@@ -90,6 +85,15 @@ $EMSDK/upstream/emscripten/emcc -o wasm/quantumEngine.js \
 set +x
 
 ls -lt wasm
+echo "done at"  `date +%a%d,%H:%M:%S`
+# should have produced, eg:
+# -rw-r--r--  1 allan  staff    99805 Jan 28 23:29 quantumEngine.js
+# -rw-r--r--  1 allan  staff     5825 Jan 28 23:29 quantumEngine.worker.js
+# -rwxr-xr-x  1 allan  staff  1961552 Jan 28 23:29 quantumEngine.wasm
+# -rw-r--r--  1 allan  staff   151139 Jan 28 23:29 quantumEngine.wasm.map
+
+
+# guide to some options
 
 # -ffast-math: lets the compiler make aggressive, potentially-lossy assumptions
 # about floating-point math.  probably good to have.
@@ -103,10 +107,6 @@ ls -lt wasm
 # tried this in testing but I got all these alignment problems (or maybe just messages)
 # -fsanitize=undefined  \
 
-# we're not done yet!  Make the JS files better.
-#cat js/pre-js.js wasm/quantumEngine.js js/post-js.js > wasm/quantumEngine.main.js
-#echo "window.N_THREADS = $N_THREADS" > wasm/quantumEngine.thread.js
-#cat js/pre-thread.js wasm/quantumEngine.worker.js js/post-thread.js >> wasm/quantumEngine.thread.js
 
 # compiler hints and links:
 # https://emscripten.org/docs/tools_reference/emcc.html

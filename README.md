@@ -32,21 +32,21 @@ Unit tests (not enough) are with the code files with .spec.cpp or .test.js suffi
 
 - src - the main JS sources
   -  App.* - top level JS
-  -  controlPanel - all the stuff south of the main display
-  -  engine - interface to the C++
-  -  gl - WebGL code
-  -  sPanel - main SquishPanel code
+  -  controlPanel - all the stuff south of the main wave display
+  -  engine - JS interface to the C++
+  -  gl - WebGL code, called by WaveView
+  -  sPanel - main SquishPanel code, encloses controlPanel and WaveView
   -  utils - misc non-html functions
-  -  view - main display, uses gl
+  -  volts - code to deal with the Voltage line and associated stuff
   -  widgets - misc React components used in multiple places
 
 - public - misc files that the web app needs to be served, like index.html
   These files will  be copied into the runnable site; symlinks followed.
   -  fonts/ - math fonts for docs
-    index.html, manifest.json, robots.txt - the usual
-    images/ - pngs etc used in app
-    logos/ - svgs and pngs that are logos, incl favicon
-    qEng/ - symlinks to the quantum engine compiled objects
+  -  index.html, manifest.json, robots.txt - the usual
+  -  images/ - pngs etc used in app
+  -  logos/ - svgs and pngs that are logos, incl favicon
+  -  qEng/ - symlinks to the quantum engine compiled objects
 
 - LICENSE, node_modules/, package-lock.json, package.json - the usual
 - Makefile - mostly runs stuff in quantumEngine
@@ -59,13 +59,13 @@ Unit tests (not enough) are with the code files with .spec.cpp or .test.js suffi
   -  Makefile - how to compile it all
   -  building/ - scripts to compile it all
   -  commonConstants.h - generated
-  -  debroglie/ - wave buffers
+  -  debroglie/ - wave buffers (Louis)
   -  directAccessors.h - a way for JS to access C++ object fields directly
-  -  fourier/ - FFT code
-  -  greiman/ - Avatar, view buffer and other visual stuff
-  -  hilbert/ - mostly the qSpace
+  -  fourier/ - FFT code (Joseph)
+  -  greiman/ - Avatar, view buffer and other visual stuff (April)
+  -  hilbert/ - mostly the qSpace (david)
   -  main.cpp - main C++ function, runs when C++ starts up
-  -  schrodinger/ - code that actually integrates Schrodinger's equation
+  -  schrodinger/ - code that actually integrates Schrodinger's equation (erwin)
   -  squish.h - global include file
   -  testing/ - scripts etc specifically for testing C++ code
   -  wasm/ - compiled WASM & JS output both dev and prod
@@ -76,11 +76,11 @@ Scripts
 To run scripts this project, you need to export SQUISH_ROOT to point to the
 root directory in one of your login files like this:
 
-export SQUISH_ROOT='/opt/dvl/squishyElectron/squishy_electron_4'
+`export SQUISH_ROOT='/opt/dvl/squishyElectron/squishy_electron_4'``
 
 For testing the C++, you need to install CppUTest, and put this also in your profile:
 
-export CPPUTEST_HOME=/opt/dvl/cpputest/cpputest-3.8
+`export CPPUTEST_HOME=/opt/dvl/cpputest/cpputest-3.8`
 
 Usually the file ~/.profile works; if you already have another file with
 a name like ~/.\*profile\*, that would probably be better.  Otherwise,
@@ -89,7 +89,7 @@ create .profile .
 If you're using BASH, you might also like to put this in your ~/.bashrc
 file, or if you have an existing ~/.*rc file for your shell:
 
-source $SQUISH_ROOT/maint/aliases.sh
+`source $SQUISH_ROOT/maint/aliases.sh`
 
 it'll define some aliases to quickly zip around among the important directories in the terminal.
 
@@ -101,39 +101,44 @@ This is C++ code that runs directly in the browser.  It relies on
 On top of that, the
 [Emscripten](https://emscripten.org)
 package compiles and links C++ to make
-.wasm and other object files.  So, if you want to build the C++ part, you have
+`.wasm` and other object files.  So, if you want to build the C++ part, you have
 to install it.
 
 
 
 Export qEMSCRIPTEN to point to the directory in one of your login files like .profile :
 
-export qEMSCRIPTEN=/opt/dvl/emscripten
+`export qEMSCRIPTEN=/opt/dvl/emscripten`
 
 The scripts will be expecting it.
 
-## internal operation
+## quantumEngine internals
 
-
-- a 'Space' describes where the electron travels.  (Classes qSpace in
+- a 'Space' describes where the electron lives and travels within.  (Classes qSpace in
 C++ or eSpace in JS.)  Most important parts:
-- N = number of datapoints in
-	a wave, always a power of two, typically 32 thru 512
-- continuum = int enum that describes the edges of the space: wall or endless These two
-values dictate the wave buffers allocated all over.  If the user changes
-either, everything is tossed and reallocated.
+	- N = number of datapoints in
+		a wave, maybe a power of two, typically 32 thru 512
+	- continuum = int enum that describes the edges of the space: wall or endless These two
+	values dictate the wave buffers allocated all over.  If the user changes
+	either, everything is tossed and reallocated, as the page reloads.
 
 - a 'Wave' is an array of N psi  values, each a complex number (two doubles, class qCx).  There's actually several classes:
-	- qWave and eWave is a quantum system state; wrapped array of complex nums
-	- qSpectrum is an FFT of a qWave; wrapped array of complex nums
-	- qBuffer is the superclass of the qWave and qSpectrum
-	- qWaves usually have an extra point on each end to aid in calculations, so if N=32, there's 66 double floats in the buffer.  Methods named fixBoundaries() automatically implement the details.
+	- `qWave` and `eWave` is a quantum system state; wrapped array of complex nums
+	- `qSpectrum` is an FFT of a `qWave`; wrapped array of complex nums
+	- `qBuffer` is the superclass of the `qWave` and `qSpectrum`
+	- `qFlick` is a `qWave` with multiple wave buffers, used in iteration
 
-- an 'Avatar' manages display of a Wave.  There's two per space; the second one is for the Set Wave minigraph.  It owns a qViewBuffer, which is ultimately handed to WebGL.  (to be merged into avatar)
+qWaves usually have an extra point on each end to aid in calculations, so if
+N=32, there's 66 double floats in the buffer.  Methods named fixBoundaries()
+automatically implement the details.  For ENDLESS, the ends are each copied from
+the other end of the buffer each iteration to make it work.  For WELL, each is
+set to zero, permanently.
+
+- an 'Avatar' manages display of a Wave.  There's two per space; the second one is for the Set Wave minigraph.  It owns a qViewBuffer, which is ultimately handed to WebGL.  (qViewBuffer to be merged into avatar)
 
 - a 'Grinder' manages the integration.  grWorker is top level for a thread that integrates the differential equation.
 
-Currently the only supported space is 1-dimensional, but we have plans.
+Currently the only supported space is 1-dimensional, but we have optimistic plans.
 
 --------------------
 
@@ -141,13 +146,18 @@ Currently the only supported space is 1-dimensional, but we have plans.
 
 [Get Started with Emscripten](https://emscripten.org/docs/getting_started/downloads.html)
 
-This generates the interface code for Squishy Electron
 
-    quantumEngine/building/genExports.js
+### genExports.js
+
+This script generates the C++ - JS code glue for Squishy Electron, including .js and json.
+
+`quantumEngine/building/genExports.js`
 
 Go change that file as you add more C++ exports you want to call from
-JS.  They all have to be "C" functions, see the code.  Note there's a
-fair amount of overhead for each call; trace it in the debugger to see.
+JS.  They all have to be "C" functions, see the code.
+
+Note there's a
+fair amount of JS overhead for each C++ call; trace it in the debugger to see.
 This is why I made the DirectAccess system; see directAccessors.h, and
 classes that use it: e/qWave, e/qGrinder, Avatar
 
@@ -157,11 +167,13 @@ Emscripten has its own version of Python (3.9 or so), and also its own version o
 It'll use its own versions so don't worry about any version(s) you already have installed.
 
 oh yeah, here, but change the version #s:
+```
 emsdk uninstall node-14.15.5-64bit
 emsdk uninstall python-3.9.2-1-64bit
+```
 
 get the installed version numbers:
-./emsdk list
+`./emsdk list`
 
 ----------------------
 
@@ -181,7 +193,7 @@ As of this writing, it's set to port 6600; see `.env.development` for the curren
 npm build will generate the subdirectory **build**, with everything you need on the server.  See also Serving section.
 
 
-## serving Sqishy Electron
+## Serving Sqishy Electron
 
 It has to be served HTTPS.  Even for development!  I use a self-signed certificate at home;
 [for a public site, see Lets Encrypt](https://letsencrypt.org/)

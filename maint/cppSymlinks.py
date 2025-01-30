@@ -1,7 +1,9 @@
 #!/usr/bin/env python3
 import sys, os
 
-# I think we need this for the CHrome debugger to work in C++ code
+print('''We need these symlinks for the CHrome debugger to work in C++
+	so the debugger can reach through these directory names to get to the corresponding files.
+	Must re-run this after doing a production build.''')
 
 os.chdir(os.environ['SQUISH_ROOT'] + '/public')
 
@@ -15,7 +17,9 @@ def usage():
 
 
 if len(sys.argv) <= 1:
-	usage
+	usage()
+	print("missing arguments")
+	sys.exit(1)
 
 if sys.argv[1] == '+':
 	if os.access('schrodinger', os.F_OK, follow_symlinks=False):
