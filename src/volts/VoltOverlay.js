@@ -1,7 +1,7 @@
 /*
 ** Volt Overlay -- the offwhite voltage line, and its tactile accessories
 **	      for Squishy Electron
-** Copyright (C) 2024-2024 Tactile Interactive, all rights reserved
+** Copyright (C) 2024-2025 Tactile Interactive, all rights reserved
 */
 
 import React, {useRef, useState, useReducer} from 'react';

@@ -1,6 +1,6 @@
 /*
 ** glAmbiance -- additional code & settings for doing GL drawing and etc
-** Copyright (C) 2023-2024 Tactile Interactive, all rights reserved
+** Copyright (C) 2023-2025 Tactile Interactive, all rights reserved
 */
 
 // Creates a webgl context from the canvas upon startup.  Also handles a number

@@ -1,6 +1,6 @@
 /*
 ** view variable -- maintaining and attaching webgl Attribute and Uniform variables
-** Copyright (C) 2021-2024 Tactile Interactive, all rights reserved
+** Copyright (C) 2021-2025 Tactile Interactive, all rights reserved
 */
 
 let traceGLCalls = false;

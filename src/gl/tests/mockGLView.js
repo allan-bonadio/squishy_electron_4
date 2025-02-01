@@ -1,6 +1,6 @@
 /*
 ** mockGLView -- substitute for the real GLView in tests
-** Copyright (C) 2023-2024 Tactile Interactive, all rights reserved
+** Copyright (C) 2023-2025 Tactile Interactive, all rights reserved
 */
 
 TODO: rename to mockGLScene

@@ -1,7 +1,7 @@
 #!/bin/bash
 ##
 ## Build Common code for Development & Production quantum engine
-## Copyright (C) 2023-2024 Tactile Interactive, all rights reserved
+## Copyright (C) 2023-2025 Tactile Interactive, all rights reserved
 ##
 
 # script to compile emscripten/C++ sources into WebAssembly

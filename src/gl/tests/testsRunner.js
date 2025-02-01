@@ -1,6 +1,6 @@
 /*
 ** testRunner -- js for in-browser webgl tests  with testsRunner.html
-** Copyright (C) 2023-2024 Tactile Interactive, all rights reserved
+** Copyright (C) 2023-2025 Tactile Interactive, all rights reserved
 */
 
 import glAmbiance from '../glAmbiance.js';

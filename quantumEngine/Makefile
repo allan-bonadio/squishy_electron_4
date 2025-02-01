@@ -1,6 +1,6 @@
 ##
 ## Makefile -- makefile for quantum engine, for compiling the C++
-## Copyright (C) 2021-2024 Tactile Interactive, all rights reserved
+## Copyright (C) 2021-2025 Tactile Interactive, all rights reserved
 ##
 
 wasm/quantumEngine.wasm wasm/quantumEngine.js : *.cpp *.h */*.h */*.cpp building/exports.json building/build*.sh building/allCpp.list

@@ -1,6 +1,6 @@
 /*
 ** flat drawing -- draw a 1d quantum wave as a 2d bargraph (band across top)
-** Copyright (C) 2021-2024 Tactile Interactive, all rights reserved
+** Copyright (C) 2021-2025 Tactile Interactive, all rights reserved
 */
 
 import {abstractDrawing} from './abstractDrawing.js';

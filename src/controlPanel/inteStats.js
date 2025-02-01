@@ -1,6 +1,6 @@
 /*
 ** Integration Statistics -- nodes for display of integration stats
-** Copyright (C) 2024-2024 Tactile Interactive, all rights reserved
+** Copyright (C) 2024-2025 Tactile Interactive, all rights reserved
 */
 
 // holds all statistics shown on the Integration tab
