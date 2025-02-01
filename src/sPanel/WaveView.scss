@@ -70,24 +70,24 @@
 			.northEastWrapper { right: 2em; }
 		}
 
-		.sizeBox {
-			position: absolute;
-			pointer-events: auto;
-			bottom: 1px;
-			right: 0;
-			width: common.$sizeBoxSize; height: common.$sizeBoxSize;
-			z-index: 20;
-			cursor: ns-resize;
-			opacity: 0.1;
-			background-image: linear-gradient(45deg #fff, #000, #fff, #000, #fff, #000, #fff, #000);
-
-
-			&:hover { opacity: 1; }
-			&:active { opacity: 1; }
-		}
 
 	}  // end of widgetArea
 
+	.sizeBox {
+		position: absolute;
+		pointer-events: auto;
+		bottom: 1px;
+		right: 0;
+		width: common.$sizeBoxSize; height: common.$sizeBoxSize;
+		z-index: 50;
+		cursor: ns-resize;
+		opacity: 0.5;
+		background-image: linear-gradient(45deg #fff, #000, #fff, #000, #fff, #000, #fff, #000);
+
+
+		&:hover { opacity: 1; }
+		&:active { opacity: 1; }
+	}
 }
 
 .spinner {

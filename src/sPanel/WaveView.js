@@ -44,8 +44,9 @@ export class WaveView extends React.Component {
 
 		// no!  handed in by promise space: PropTypes.instanceOf(eSpace),
 
-		// handed in, pixels.  Width of whole waveview,
-		// including sidebar, bumpers and border.  Canvas is CANVAS_BORDER_THICKNESS pixel smaller all around for border.
+		// handed in, pixels.  Width of whole waveview, including sidebar,
+		// bumpers and border.  Canvas is CANVAS_BORDER_THICKNESS pixel smaller
+		// all around for border.
 		outerWidth: PropTypes.number.isRequired,
 
 		showVoltage: PropTypes.string.isRequired,
@@ -140,6 +141,9 @@ export class WaveView extends React.Component {
 
 			this.updateInnerDims();
 
+			// trigger a render
+			this.setState({height: s.outerHeight});
+
 			// the formers are OUTER sizes
 			this.formerWidth = p.outerWidth;
 			this.formerHeight = s.outerHeight;
@@ -154,44 +158,47 @@ export class WaveView extends React.Component {
 	/* ************************************************************************ resizing */
 
 	// these are for resizing the WaveView ONLY with the size box
-	mouseDown =
+	pointerDown =
 	ev => {
 		this.resizing = true;
 		this.yOffset = this.state.outerHeight - ev.pageY;
 		if (traceDragCanvasHeight)
-			console.info(`🏄 mouse down ${ev.pageX} ${ev.pageY} offset=${this.yOffset}`);
+			console.info(`🏄 pointer down ${ev.pageX} ${ev.pageY} offset=${this.yOffset}`);
+		ev.target.setPointerCapture(ev.pointerId);
+
+		// I'll bet, with pointerCapture, TODO: you can make all these listeners perpetual.
 		const b = document.body;
-		b.addEventListener('mousemove', this.mouseMove);
-		b.addEventListener('mouseup', this.mouseUp);
-		b.addEventListener('mouseleave', this.mouseUp);
+		b.addEventListener('pointermove', this.pointerMove);
+		b.addEventListener('pointerup', this.pointerUp);
+		b.addEventListener('pointerleave', this.pointerUp);
 
 		ev.preventDefault();
 		ev.stopPropagation();
 	}
 
-	mouseMove =
+	pointerMove =
 	ev => {
 		const vHeight = ev.pageY + this.yOffset;
 		if (this.state.outerHeight != vHeight)
-			this.setState({height: vHeight});
+			this.setState({outerHeight: vHeight});
 		storeASetting('miscSettings', 'waveViewHeight', vHeight);
 		if (traceDragCanvasHeight)
-			console.info(`🏄 mouse drag ${ev.pageX} ${ev.pageY}  newheight=${ev.pageY + this.yOffset}`);
+			console.info(`🏄 pointer drag ${ev.pageX} ${ev.pageY}  newheight=${ev.pageY + this.yOffset}`);
 
 		ev.preventDefault();
 		ev.stopPropagation();
 	}
 
-	mouseUp =
+	pointerUp =
 	ev => {
 		if (traceDragCanvasHeight)
-			console.info(`🏄 mouse up ${ev.pageX} ${ev.pageY}`);
+			console.info(`🏄 pointer up ${ev.pageX} ${ev.pageY}`);
 		this.resizing = false;
 
 		const b = document.body;
-		b.removeEventListener('mousemove', this.mouseMove);
-		b.removeEventListener('mouseup', this.mouseUp);
-		b.removeEventListener('mouseleave', this.mouseUp);
+		b.removeEventListener('pointermove', this.pointerMove);
+		b.removeEventListener('pointerup', this.pointerUp);
+		b.removeEventListener('pointerleave', this.pointerUp);
 
 		ev.preventDefault();
 		ev.stopPropagation();
@@ -276,14 +283,14 @@ export class WaveView extends React.Component {
 						frame <span className='voNorthEast'>{thousandsSpaces(frameSerial)}</span>
 					</div>
 
-					<img className='sizeBox' src='/images/sizeBox4.png' alt='size box'
-						onMouseDown={this.mouseDown}
-						style={{width: `${SIZE_BOX_SIZE}px`, height: `${SIZE_BOX_SIZE}px`}} />
-
 				</section>
 
 
 				{voltOverlay}
+
+				<img className='sizeBox' src='/images/sizeBox4.png' alt='size box'
+					onPointerDown={this.pointerDown}
+					style={{width: `${SIZE_BOX_SIZE}px`, height: `${SIZE_BOX_SIZE}px`}} />
 			</div>
 			<div className='bumper right' key='right'
 				style={{flexBasis: this.bumperWidth +'px', height: this.canvasInnerHeight}} />
