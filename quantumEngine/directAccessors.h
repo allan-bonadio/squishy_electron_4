@@ -25,6 +25,7 @@
 #define makeBoolSetter(field)  printf("\tset " #field  "(a) { this.bytes[%d] = Boolean(a); }\n", byteOffset(field));
 
 #define makeByteGetter(field)  printf("\tget "  #field  "() { return this.bytes[%d]; }\n", byteOffset(field));
+#define makeByteSetter(field)  printf("\tset " #field  "(a) { this.bytes[%d] = a; }\n", byteOffset(field));
 
 // use for a standard C string
 #define makeStringPointer(field)  printf("\tget _" #field  "() { return this.pointer + %d; }\n", byteOffset(field));

@@ -100,9 +100,10 @@ qGrinder::qGrinder(qSpace *sp, qAvatar *av, int nGrWorkers, const char *lab)
 			samplePoint);
 	}
 	sentinel = grSENTINEL_VALUE;
-	//printf("should be equal: %d %d\n", (int) sentinel, (int) grSENTINEL_VALUE);
+	printf("qGrinder:103 sentinel should be equal: %d %d\n", (int) sentinel, (int) grSENTINEL_VALUE);
 
 	FORMAT_DIRECT_OFFSETS;
+	if (sentinel != grSENTINEL_VALUE) printf("106 should be equal: %d %d\n", (int) sentinel, (int) grSENTINEL_VALUE);
 };
 
 qGrinder::~qGrinder(void) {
@@ -197,6 +198,7 @@ void qGrinder::formatDirectOffsets(void) {
 	makeBoolSetter(needsRepaint);
 
 	makeByteGetter(sentinel);  // should always be value grSENTINEL_VALUE; only for validation
+	makeByteSetter(sentinel);  // only until we answer why it's doing that
 
 	printf("\n🪓 🪓 --------------- done with qGrinder direct access --------------\n");
 }
@@ -478,9 +480,10 @@ void qGrinder::threadsHaveFinished() {
 
 
 // start a new frame calculating by starting each/all gThread threads.
-// This is called from JS, therefore the UI thread.
-// Each frame will trigger the next to continue integration?
-// Actually we can do this from JS with Atomic.store and .notify
+// This can be called from JS, therefore the UI thread.
+// Each frame will trigger the next to continue integration
+// Now we do this from JS with Atomic.store and .notify instead
+// (but I want to be able to fall back on this if needed so don't remove it.)
 void qGrinder::triggerIteration() {
 	if (traceIntegration)  {
 		speedyLog("🪓 qGrinder::triggerIteration(): shouldBeIntegrating=%d   isIntegrating=%d\n",
