@@ -36,9 +36,6 @@ class App extends React.Component {
 		if (traceState)
 			console.log(`init App state to:`, this.state);
 
-		// temporary
-		this.bodyWidth = document.body.clientWidth;
-
 		eSpaceCreatedPromise.then(space =>{
 			// there's lots of thens on this promise, so cppRunning won't be on for many of them
 			this.setState({cppRunning: true})
@@ -48,10 +45,14 @@ class App extends React.Component {
 		});
 	}
 
+	get bodyWidth() {
+		return document.body.clientWidth;
+	}
+
 	// respond properly whenever width changed (usually user & sizebox).  Cuz canvas
 	// needs to resize itself.  Don't bother passing it in; we'll do the right thing.
 	widthDidChange = () => {
-		this.bodyWidth = document.body.clientWidth;
+		//this.bodyWidth = document.body.clientWidth;
 		this.setState({bodyWidth: this.bodyWidth});  // triggers rerenders & resizes
 		if (traceResize)
 			console.log(`🍦 widthDidChange: set this.bodyWidth= ${this.bodyWidth}`);
@@ -69,7 +70,7 @@ class App extends React.Component {
 		window.addEventListener('resize', ev => {
 			if (traceResize) {
 				console.log(`🍦  resize ev, body.clientSize: `
-					+` ${document.body.clientWidth}  ${document.body.clientHeight}. \nevent`, ev);
+					+` ${this.bodyWidth}  ${document.body.clientHeight}. \nevent`, ev);
 			}
 			console.assert(ev.currentTarget === window, `ev.currentTarget =?== window`);
 
@@ -156,7 +157,7 @@ class App extends React.Component {
 			sqPanel= <div id='theSquishPanel' >
 				<img className='spinner' alt='spinner' src='/images/eclipseOnTransparent.gif' />
 			</div>;
-			console.log(`🍦 render when NOT cppRunning, body.clientWidth=${document.body.clientWidth}`);
+			console.log(`🍦 render when NOT cppRunning, body.clientWidth=${this.bodyWidth}`);
 		}
 
 		return (
