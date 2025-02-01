@@ -57,7 +57,7 @@
 			.voltageAxis {
 				stroke: common.$voltageColor;
 				fill: none;
-				font-family: georgia, helvetica, sans-serif;
+				font-family: verdana, helvetica, sans-serif;
 				font-size: .7em;
 
 				// for some reason, the labels that d3 generates have all the text upside down.
