@@ -4,11 +4,11 @@
 */
 
 /*
-a long array of qCx complex numbers, plus some other info
+a long array of qCx complex numbers, plus some other meta info
 
 Data structures used for these buffers:
 qCx *wave  # wave: just an array of complex nums that's nPoints long
-	In JS, it turns into a Float64Array with 2nPoints numbers
+	In JS, it turns into a Float64Array with 2*nPoints numbers
 qBuffer - object, superclass of qWave and qSpectrum
 qWave - object that owns a single wave, and points to its space
 qSpectrum - object that owns a single qSpectrum, and points to its space
