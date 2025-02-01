@@ -167,14 +167,19 @@ function GLView(props) {
 	// the same time as adjusting the canvas size so they happen at the same
 	// time.
 
+	// canvasNode might not be there yet... will this work?
+	let cWidth = p.canvasInnerWidth;
+	let cHeight = p.canvasInnerHeight;
+
 	// style attribute needed to set canvas physical width/height.
 	return (
 		<canvas className='GLView'
-			width={p.canvasInnerWidth} height={p.canvasInnerHeight}
-			style={{width: p.canvasInnerWidth + 'px', height: p.canvasInnerHeight + 'px'}}
+			width={cWidth}
+			height={cHeight}
+			style={{width: cWidth + 'px', height: cHeight + 'px'}}
 			ref={canvasRef}
 		/>
-	)
+	);
 }
 
 export default GLView;
