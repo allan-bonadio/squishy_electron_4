@@ -6,7 +6,7 @@
 import {defineQEngineFuncs} from './qeFuncs.js';
 import App from '../App.js';
 import {interpretCppException, excRespond} from '../utils/errors.js';
-import {resetObjectRegistry} from '../utils/directAccessors.js';
+//import {resetObjectRegistry} from '../utils/directAccessors.js';
 import {getASetting, storeASetting, createStoreSettings} from '../utils/storeSettings.js';
 import eSpace from './eSpace.js';
 //import eThread from './eThread.js';
@@ -25,6 +25,7 @@ export let MAX_DIMENSIONS, MAX_LABEL_LEN, N_THREADS;
 // Create the promise tout de suite when app starts, so everybody can get at it.
 // Recreate it when you know you're about to recreate the space and everything.
 
+// TODO: I don't need this crap anymore, right?
 let eSpaceCreatedSucceed, eSpaceCreatedFail;
 function resetSpaceCreatedPromise() {
 	let prom = new Promise((succeed, fail) => {
