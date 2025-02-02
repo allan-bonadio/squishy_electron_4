@@ -9,8 +9,8 @@
 let perDrawingVAO = true;   // false;
 
 
-// Each abstractScene subclass is a definition of a kind of picture or view;
-// one per each kind of view. Each drawing is a definition of a part of a view
+// Each abstractScene subclass is a definition of a kind of picture or scene;
+// one per each kind of scene. Each drawing is a definition of a part of a scene
 // (usually drawn with 1 program).  A Scene has one or more drawings in it.  A
 // WaveView hosts an instance of the Scene and is a React component enclosing
 // the canvas.
@@ -18,8 +18,8 @@ let perDrawingVAO = true;   // false;
 /* ****************************************  */
 
 
-// This is the superclass of all view defs; with common webgl and space plumbing.
-// sceneName is not the viewClassName, which is one of flatScene, garlandView, ...
+// This is the superclass of all scene defs; with common webgl and space plumbing.
+// sceneName is not the sceneClassName, which is one of flatScene, garlandView, ...
 // there should be ONE of these per canvas, so each WaveView should have 1.
 export class abstractScene {
 
@@ -46,15 +46,15 @@ export class abstractScene {
 			this.tagObject(this.vao, `${this.constructor.name}-${avatar.label}-vao`);
 		}
 
-		// all of the drawings in this view
+		// all of the drawings in this scene
 		// they get prepared, and drawn, in this same order
 		this.drawings = [];
 	}
 
-	// the final call to set it up does all viewClassName-specific stuff
+	// the final call to set it up does all sceneClassName-specific stuff
 	// other subclassers override what they want
-	// TODO: rename completeView to completeScene
-	completeView(specialInfo) {
+	// TODO: rename completeScene to completeScene
+	completeScene(specialInfo) {
 		this.compileShadersOnDrawings();
 		this.createVariablesOnDrawings();
 

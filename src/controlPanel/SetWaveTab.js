@@ -154,7 +154,7 @@ class SetWaveTab extends React.Component {
 			// warning: this +2 is a defined constant in WaveView
 			glView = <GLView
 						space={s.space} avatar={this.miniGraphAvatar}
-						viewClassName='flatScene' sceneName='setWaveMiniGraph'
+						sceneClassName='flatScene' sceneName='setWaveMiniGraph'
 //				selectedOuterWidth={p.selectedOuterWidth}
 //				selectedOuterHeight={p.selectedOuterHeight}
 //						selectedOuterDims={{width: MINI_WIDTH + 2, height: MINI_HEIGHT + 2}}

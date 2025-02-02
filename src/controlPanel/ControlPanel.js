@@ -228,7 +228,7 @@ export class ControlPanel extends React.Component {
 
 	/* ********************************************** wave */
 
-	// given these params, put it into effect and display it on the wave view
+	// given these params, put it into effect and display it on the wave scene
 	// This is most of 'Reset Wave'  NOT for regular iteration
 	setAndPaintMainWave =
 	waveParams => {
@@ -261,7 +261,7 @@ export class ControlPanel extends React.Component {
 		storeAGroup('waveParams', waveParams);
 	}
 
-	// generate an FFT of the wave.  In the JS console.  TODO: make a real GL view out of this
+	// generate an FFT of the wave.  In the JS console.  TODO: make a real GL view out of the spectrum!
 	clickOnFFT(space)
 	{
 		wrapForExc(() => {

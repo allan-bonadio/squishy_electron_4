@@ -55,7 +55,7 @@ export class SquishPanel extends React.Component {
 
 
 		this.state = {
-			mainViewClassName: DEFAULT_VIEW_CLASS_NAME,
+			mainSceneClassName: DEFAULT_VIEW_CLASS_NAME,
 
 			showVoltage:  getASetting('voltageSettings', 'showVoltage'),
 

@@ -10,7 +10,7 @@ import React, {useState, useRef, useEffect} from 'react';
 import PropTypes from 'prop-types';
 
 // TODO should rename this listOfSceneClasses
-import {listOfViewClasses} from './listOfViewClasses.js';
+import {listOfSceneClasses} from './listOfSceneClasses.js';
 import glAmbiance from './glAmbiance.js';
 
 let traceSetup = false;
@@ -28,7 +28,7 @@ let tracePainting = false;
 
 function setPT() {
 	GLView.propTypes = {
-		viewClassName: PropTypes.string.isRequired,
+		sceneClassName: PropTypes.string.isRequired,
 		sceneName: PropTypes.string,
 
 		// Our caller gets these from eSpaceCreatedPromise; so it must be resolved by now.
@@ -61,32 +61,31 @@ function GLView(props) {
 	let [canvasNode, setCanvasNode] = useState(null);
 	const canvasRef = useRef(null);
 
-	// TODO: should rename viewRef into sceneRef
-	let effViewRef = useRef(null);
-	let effectiveView = effViewRef.current;
+	let effSceneRef = useRef(null);
+	let effectiveScene = effSceneRef.current;
 	let glRef = useRef(null);
 	let gl = glRef.current;
 
 	// set up the view class - what kind of drawings it has.  Base classes
 	// abstractDrawing and abstractScene must do this after the canvas AND the
-	// space exist.  TODO: rename this to initSceneClass
-	const initViewClass =
+	// space exist.
+	const initSceneClass =
 	(ambiance) => {
 		// TODO: rename these to sceneClass  listOfSceneClasses   p.sceneClassName
-		let vClass = listOfViewClasses[p.viewClassName];
+		let sClass = listOfSceneClasses[p.sceneClassName];
 
 		// MUST use the props.avatar!  we can't get it from the space, cuz which one?
-		effectiveView = new vClass(p.sceneName, ambiance, p.space, p.avatar);
-		effViewRef.current = effectiveView;
+		effectiveScene = new sClass(p.sceneName, ambiance, p.space, p.avatar);
+		effSceneRef.current = effectiveScene;
 
-		effectiveView.completeView(p.specialInfo);
+		effectiveScene.completeScene(p.specialInfo);
 
 		// now that there's an avatar, we can set these functions so everybody can use them.
 		p.avatar.doRepaint = doRepaint;
 		// intrinsic to avatar p.avatar.reStartDrawing = reStartDrawing;
 		//p.avatar.setGlViewport = setGlViewport;
 		if (traceSetup) console.log(`🖼 GLView ${p.sceneName} ${p.avatar.label}: `
-			+` done with initViewClass`);
+			+` done with initSceneClass`);
 	};
 
 	// repaint whole GL image.  this is repainting a canvas with GL.
@@ -94,9 +93,9 @@ function GLView(props) {
 	// and this function redraws on the canvas (with gl).
 	const doRepaint =
 	() => {
-		if (! effectiveView) {
+		if (! effectiveScene) {
 			if (tracePainting)
-				console.log(`🖼 GLView ${p.avatar.label}: too early for doRepaint  effectiveView=${effectiveView}`);
+				console.log(`🖼 GLView ${p.avatar.label}: too early for doRepaint  effectiveScene=${effectiveScene}`);
 			return null;  // too early
 		}
 		if (tracePainting)
@@ -108,7 +107,7 @@ function GLView(props) {
 			p.avatar.dumpViewBuffer(`🖼 GLView ${p.sceneName}: loaded ViewBuffer`);
 
 		// draw
-		effectiveView.drawAllDrawings(p.canvasInnerWidth, p.canvasInnerHeight, p.specialInfo);
+		effectiveScene.drawAllDrawings(p.canvasInnerWidth, p.canvasInnerHeight, p.specialInfo);
 		if (tracePainting)
 			console.log(`🖼 GLView ${p.sceneName} ${p.avatar.label}: doRepaint done drawing`);
 
@@ -130,7 +129,7 @@ function GLView(props) {
 			p.setGlCanvas?.(gl);
 
 			canvasNode.squishViewName = p.sceneName;
-			initViewClass(ambiance);
+			initSceneClass(ambiance);
 
 			if (traceSetup)
 				console.log(`🖼 GLView ${p.sceneName}: canvas, gl, view and the drawing done`);

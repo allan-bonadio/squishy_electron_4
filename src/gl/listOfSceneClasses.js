@@ -6,11 +6,11 @@
 import {abstractScene} from './abstractScene.js';
 import flatScene from './flatScene.js';
 
-let traceViewClasses = false;
+let traceSceneClasses = false;
 
 // unfortunately, we hafe to have a list of all the view types.  here.
 // this will appear in the resolution dialog
-export const listOfViewClasses = {
+export const listOfSceneClasses = {
 	abstractScene,  // wait a minute, this can't draw by itself...
 
 	//starScene,  // simple for testinig ... makes its own inputs
@@ -18,7 +18,7 @@ export const listOfViewClasses = {
 	flatScene,
 };
 
-if (traceViewClasses)
-	console.log(`list of view classes:`, listOfViewClasses);
+if (traceSceneClasses)
+	console.log(`list of view classes:`, listOfSceneClasses);
 
-export default listOfViewClasses;
+export default listOfSceneClasses;

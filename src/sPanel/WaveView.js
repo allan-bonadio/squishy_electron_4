@@ -229,7 +229,7 @@ export class WaveView extends React.Component {
 		if (this.space) {
 			glView = <GLView
 				space={s.space} avatar={s.space.mainEAvatar}
-				viewClassName='flatScene' sceneName='mainWave'
+				sceneClassName='flatScene' sceneName='mainWave'
 				canvasInnerWidth={this.canvasInnerWidth}
 				canvasInnerHeight={this.canvasInnerHeight}
 				setGlCanvas={this.setGlCanvas}

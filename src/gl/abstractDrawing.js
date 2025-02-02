@@ -5,7 +5,7 @@
 
 /* superclass of all drawings.  A drawing is a piece of code that draws one thing on
 a GL canvas.  It's got v&f shaders, a source of data, and a Draw function.
-But it does NOT own the canvas or gl object - that's shared among all drawings on a view.
+But it does NOT own the canvas or gl object - that's shared among all drawings on a effSceneRef.
 THat's why drawings are not the same thing as Scenes: a scene has zero or more drawings.
 
 drawings must include:
@@ -13,7 +13,7 @@ drawings must include:
 - a class which extends abstractDrawing and has methods:
 	- drawing instance name
 	- contructor sets shaders sources
-	- createVariables() to prep the variables, uniform and attr; see viewVariable.js
+	- createVariables() to prep the variables, uniform and attr; see drawingVariable.js
 		Some of those automatically reload on each frame
 	- draw() to issue actual drawing commands after reloading variables
 */

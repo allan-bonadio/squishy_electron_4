@@ -5,7 +5,7 @@
 
 import {abstractDrawing} from './abstractDrawing.js';
 // eslint-disable-next-line no-unused-vars
-import {viewUniform, viewAttribute} from './viewVariable.js';
+import {drawingUniform, drawingAttribute} from './drawingVariable.js';
 
 let traceDumpVertices = false;
 let traceTicDrawing = false;
@@ -83,8 +83,8 @@ export class ticDrawing extends abstractDrawing {
 			console.log(`➤ ➤ ➤ ticDrawing ${this.sceneName}: creatingVariables`);
 
 		// same as in flatDrawing, y is in units of ψ
-		// TODO: should rename viewUniform to sceneUniform?  or drawingUniform?
-		this.maxHeightUniform = new viewUniform('maxHeight', this,
+		// TODO: should rename drawingUniform to sceneUniform?  or drawingUniform?
+		this.maxHeightUniform = new drawingUniform('maxHeight', this,
 			() => {
 				if (traceHighest)
 					console.log(`ticDrawing reloading ${this.sceneName}: `+
@@ -97,8 +97,8 @@ export class ticDrawing extends abstractDrawing {
 			}
 		);
 
-		// TODO: should rename viewAttribute to drawingAttribute?
-		this.endPointAttr = new viewAttribute('endPoint', this, FLOATS_PER_VERTEX, () => {
+		// TODO: should rename drawingAttribute to drawingAttribute?
+		this.endPointAttr = new drawingAttribute('endPoint', this, FLOATS_PER_VERTEX, () => {
 			return this.generateTics();
 		});
 	}

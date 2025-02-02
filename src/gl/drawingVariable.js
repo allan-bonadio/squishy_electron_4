@@ -9,12 +9,13 @@ let traceAttributes = false;
 
 // attr arrays and uniforms that can change on every frame.
 // you can set a static value or a function that'll return it
+// The set is drawing-specific.
 
 // superclass for all of these.
-export class viewVariable {
-	// the drawing is the view or the drawing it's used in.  Must have a:
+export class drawingVariable {
+	// the drawing is what it's used in.  Must have a:
 	// gl, viewVariables array, program,
-	// getFunc will be called before each frame to refresh the value
+	// getFunc will AUTOMATICALLY be called before each frame to refresh the value
 	constructor(varName, drawing, getFunc) {
 		this.drawing = drawing;
 		this.gl = drawing.gl;
@@ -39,7 +40,7 @@ export class viewVariable {
 //		gl.useProgram(drawing.program);
 //		gl.bindVertexArray(drawing.vao);
 
-		if (traceGLCalls) console.log(`𒐿 created viewVariable '${varName}', drawing:`, drawing);
+		if (traceGLCalls) console.log(`𒐿 created drawingVariable '${varName}', drawing:`, drawing);
 	}
 }
 
@@ -61,14 +62,14 @@ function isFiniteAr(value) {
 
 // uniforms don't vary from one vertex to another
 // create this as many times as you have uniforms as input to either or both shaders
-export class viewUniform extends viewVariable {
+export class drawingUniform extends drawingVariable {
 	constructor(varName, drawing, getFunc) {
 		super(varName, drawing, getFunc);
 
 		// this turns out to be an internal magic object
 		this.uniformLoc = this.gl.getUniformLocation(this.drawing.program, varName);
 		if (!this.uniformLoc) throw new Error(`Cannot find uniform loc for uniform variable ${varName}`);
-		if (traceUniforms) console.log(`𒐿 created viewUniform '${varName}'`);
+		if (traceUniforms) console.log(`𒐿 created drawingUniform '${varName}'`);
 
 		this.reloadVariable();
 	}
@@ -108,7 +109,7 @@ export class viewUniform extends viewVariable {
 		gl[method].apply(gl, args);
 
 		if (traceUniforms) {
-			console.log(`𒐿 viewUniform reloaded U variable '${this.varName}' in `);
+			console.log(`𒐿 drawingUniform reloaded U variable '${this.varName}' in `);
 			console.log(`            ${this.drawing.avatarLabel} uniform gl.${method}`
 				+`  (${args[0].constructor.name}, ${args[1]}, ${args[2]} ) `);
 		}
@@ -125,7 +126,7 @@ export class viewUniform extends viewVariable {
 // always float32.  getFunc must return a Float32TypedArray with a non-array property
 // 'nTuples' that gives the number of rows or vertices used, each tupleWidth number of floats
 // eg for x & y, tupleWidth=2.  sequence of several tuples gets draw, however.
-export class viewAttribute extends viewVariable {
+export class drawingAttribute extends drawingVariable {
 	constructor(varName, drawing, tupleWidth, getFunc = () => {}) {
 		super(varName, drawing, getFunc);
 		const gl = this.gl;
@@ -136,7 +137,7 @@ export class viewAttribute extends viewVariable {
 		const attrLocation = this.attrLocation = this.gl.getAttribLocation(drawing.program, varName);
 
 		if (attrLocation < 0)
-			throw new Error(`𒐿 viewAttribute:attr loc for '${varName}' is bad: `+ attrLocation);
+			throw new Error(`𒐿 drawingAttribute:attr loc for '${varName}' is bad: `+ attrLocation);
 
 		// create gl GPU buffer
 		const glBuffer = this.glBuffer = gl.createBuffer();
@@ -151,7 +152,7 @@ export class viewAttribute extends viewVariable {
 				this.attrLocation,
 				tupleWidth, gl.FLOAT,
 				false, tupleWidth * 4, 0);  // normalize, stride, offset
-		if (traceGLCalls) console.log(`𒐿  viewAttribute '${this.varName}' connected to its glBuffer to tupleWidth=${tupleWidth}`);
+		if (traceGLCalls) console.log(`𒐿  drawingAttribute '${this.varName}' connected to its glBuffer to tupleWidth=${tupleWidth}`);
 
 		// we haven't touched the actual JS data yet, this does it
 		this.reloadVariable();
@@ -179,7 +180,7 @@ export class viewAttribute extends viewVariable {
 		gl.bufferData(gl.ARRAY_BUFFER, floatArray, gl.DYNAMIC_DRAW);
 
 		if (traceAttributes) {
-			console.log(`𒐿 viewAttribute '${this.varName}' reloaded, ${this.nTuples}`
+			console.log(`𒐿 drawingAttribute '${this.varName}' reloaded, ${this.nTuples}`
 				+ ` tuples of ${this.tupleWidth} floats each:`);
 			for (let t = 0; t < this.nTuples; t++) {
 				let line = `[${t}]  `;

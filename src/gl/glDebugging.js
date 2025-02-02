@@ -97,7 +97,7 @@ dumpAttrNames(gl, title) {
 //		console.log(`--- available GL extensions:\n${available_extensions.join('\n')}`);
 //	}
 
-	//static viewClassName: 'abstractScene';
+	//static sceneClassName: 'abstractScene';
 
 }
 /* *********************************************************** end of CFTW */

@@ -5,12 +5,12 @@
 
 import {abstractScene} from '../abstractScene.js';
 import {abstractDrawing} from '../abstractDrawing.js';
-import {viewUniform, viewAttribute} from '../viewVariable.js';
+import {drawingUniform, drawingAttribute} from '../drawingVariable.js';
 
 
 let corners;
 
-// create this table the way viewAttribute likes it
+// create this table the way drawingAttribute likes it
 function createVertices() {
 	// create the data for the corners attribute
 	const sin = Math.sin;
@@ -88,7 +88,7 @@ export class starDrawing extends abstractDrawing {
 		//debugger;
 
 		this.cornerColorUni =
-			new viewUniform('cornerColorUni', this,
+			new drawingUniform('cornerColorUni', this,
 				() => {
 					return {value: [0, 1, .5, 1], type: '4fv'}
 				}
@@ -96,7 +96,7 @@ export class starDrawing extends abstractDrawing {
 
 		createVertices();
 
-		this.cornerAttr = new viewAttribute('corner', this, 2, () => corners);
+		this.cornerAttr = new drawingAttribute('corner', this, 2, () => corners);
 		//this.cornerAttr.attachArray(corners, 2);
 	}
 
@@ -139,4 +139,4 @@ export class starScene extends abstractScene {
 
 export default starScene;
 
-starScene.viewClassName = 'starScene';
+starScene.sceneClassName = 'starScene';

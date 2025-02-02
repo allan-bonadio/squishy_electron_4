@@ -31,7 +31,7 @@ export const mockSpace = {
 
 };
 
-const viewClassNamez = {
+const sceneClassNamez = {
 	flat: flatScene,
 	star: starScene,
 }
@@ -42,13 +42,13 @@ export class mockGLView {
 		specialInfo: PropTypes.object,
 	}
 
-	constructor(viewClassName, sceneName) {
+	constructor(sceneClassName, sceneName) {
 		this.state = {canvas: null};
 		this.space = mockSpace;
 		this.avatar = mockAvatar;
 
 		this.sceneName = sceneName;
-		this.viewClassName = viewClassName;
+		this.sceneClassName = sceneClassName;
 	}
 
 	// just pretend
@@ -74,26 +74,26 @@ export class mockGLView {
 			canvas.glview = this;
 			canvas.sceneName = this.sceneName;
 
-			this.initViewClass();
+			this.initSceneClass();
 
 			// finally!
 			console.log(`🖼 🖼 mockGLView ${this.sceneName}: created!`);
 		})
 	}
 
-	testViewClasses = {
+	testSceneClasses = {
 	}
 
 	// instantiate the view class we'll use
-	initViewClass() {
-		console.log(`initViewClass: viewClassName=${this.viewClassName} sceneName${this.sceneName}`);
+	initSceneClass() {
+		console.log(`initSceneClass: sceneClassName=${this.sceneClassName} sceneName${this.sceneName}`);
 
-		// already got it this.viewClassName = viewClassName;
-		let vClass = viewClassNamez[this.viewClassName];
-		this.testViewClasses[this.viewClassName] =
+		// already got it this.sceneClassName = sceneClassName;
+		let sClass = sceneClassNamez[this.sceneClassName];
+		this.testSceneClasses[this.sceneClassName] =
 			this.effectiveView =
-			new vClass(this.viewClassName, this, mockSpace, mockAvatar);
-		this.effectiveView.completeView(specialInfo);
+			new sClass(this.sceneClassName, this, mockSpace, mockAvatar);
+		this.effectiveView.completeScene(specialInfo);
 		this.avatar.doRepaint = this.doRepaint;
 
 	}

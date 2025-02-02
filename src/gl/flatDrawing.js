@@ -5,7 +5,7 @@
 
 import {abstractDrawing} from './abstractDrawing.js';
 import cx2rgb from './cx2rgb/cx2rgb.glsl.js';
-import {viewUniform, viewAttribute} from './viewVariable.js';
+import {drawingUniform, drawingAttribute} from './drawingVariable.js';
 
 let traceViewBufAfterDrawing = false;
 let traceHighest = false;
@@ -96,7 +96,7 @@ export class flatDrawing extends abstractDrawing {
 		this.avatar.loadViewBuffer();
 
 
-		this.maxHeightUniform = new viewUniform('maxHeight', this,
+		this.maxHeightUniform = new drawingUniform('maxHeight', this,
 			() => {
 				if (traceHighest)
 					console.log(`🫓 flatDrawing reloading outer: ${this.outerDims}: `
@@ -121,7 +121,7 @@ export class flatDrawing extends abstractDrawing {
 		let nPoints = this.nPoints = this.space.nPoints;
 		let barWidth;
 		if (traceFlatDrawing) console.log(`🫓 barWidth= ${barWidth}`);
-		this.barWidthUniform = new viewUniform('barWidth', this,
+		this.barWidthUniform = new drawingUniform('barWidth', this,
 			() => {
 				barWidth = 1 / (nPoints - 1)
 				return { value: barWidth, type: '1f' };
@@ -130,7 +130,7 @@ export class flatDrawing extends abstractDrawing {
 
 		this.vertexCount = nPoints * 2;  // nPoints * vertsPerBar
 		this.rowFloats = 4;
-		this.rowAttr = new viewAttribute('row', this, this.rowFloats, () => {
+		this.rowAttr = new drawingAttribute('row', this, this.rowFloats, () => {
 			this.avatar.vBuffer.nTuples = this.vertexCount;
 			return this.avatar.vBuffer;
 		});
