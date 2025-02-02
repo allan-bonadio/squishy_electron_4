@@ -19,7 +19,7 @@ import './WaveView.scss';
 import {getASetting, storeASetting} from '../utils/storeSettings.js';
 
 import VoltOverlay from '../volts/VoltOverlay.js';
-import GLView from '../gl/GLView.js';
+import GLScene from '../gl/GLScene.js';
 import {eSpaceCreatedPromise} from '../engine/eEngine.js';
 
 let traceBumpers = false;
@@ -56,7 +56,7 @@ export class WaveView extends React.Component {
 
 	constructor(props) {
 		super(props);
-		PropTypes.checkPropTypes(WaveView.propTypes, props, 'prop', 'GLView');
+		PropTypes.checkPropTypes(WaveView.propTypes, props, 'prop', 'GLScene');
 
 		// is this a bad idea?
 		this.sPanel = props.sPanel;
@@ -224,10 +224,10 @@ export class WaveView extends React.Component {
 				+` bumperWidth=${this.bumperWidth}`);
 		}
 
-		// can't make a real GLView until we have the space!
-		let glView;
+		// can't make a real GLScene until we have the space!
+		let glScene;
 		if (this.space) {
-			glView = <GLView
+			glScene = <GLScene
 				space={s.space} avatar={s.space.mainEAvatar}
 				sceneClassName='flatScene' sceneName='mainWave'
 				canvasInnerWidth={this.canvasInnerWidth}
@@ -237,12 +237,12 @@ export class WaveView extends React.Component {
 			/>;
 		}
 		else {
-			// until then, show spinner, not actually a GLView
+			// until then, show spinner, not actually a GLScene
 			const spinner = this.space
 				? ''
 				: <img className='spinner' alt='spinner' src='/images/eclipseOnTransparent.gif' />;
 
-			let glView = <div className='spinnerBox'
+			let glScene = <div className='spinnerBox'
 						style={{width: p.outerWidth - CANVAS_BORDER_THICKNESS ,
 							height: s.outerHeight - DOUBLE_THICKNESS}} >
 				{spinner}
@@ -263,11 +263,11 @@ export class WaveView extends React.Component {
 
 		let betweenBumpers = this.canvasInnerWidth - 2 * this.bumperWidth;
 
-		// the glView is one layer.  Over that is the bumpers and widget area betweeen them.
+		// the glScene is one layer.  Over that is the bumpers and widget area betweeen them.
 		return (
 		<div className='WaveView' style={{height: `${s.outerHeight}px`}}>
 
-			{glView}
+			{glScene}
 
 			<div className='bumper left' key='left'
 				style={{flexBasis: this.bumperWidth +'px', height: this.canvasInnerHeight}} />

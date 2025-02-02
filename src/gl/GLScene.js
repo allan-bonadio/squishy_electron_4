@@ -1,9 +1,9 @@
 /*
-** GLView -- a webgl image
+** GLScene -- a webgl image
 ** Copyright (C) 2021-2025 Tactile Interactive, all rights reserved
 */
 
-// GLView  wraps a canvas for display.  Via webgl.
+// GLScene  wraps a canvas for display.  Via webgl.
 // And the Drawing and Scene machinery mgmt.  General for all gl canvases.
 
 import React, {useState, useRef, useEffect} from 'react';
@@ -27,7 +27,7 @@ function traceOnScreen(msg) {
 let tracePainting = false;
 
 function setPT() {
-	GLView.propTypes = {
+	GLScene.propTypes = {
 		sceneClassName: PropTypes.string.isRequired,
 		sceneName: PropTypes.string,
 
@@ -49,12 +49,12 @@ function setPT() {
 	};
 }
 
-// For each GLView, there's one:
+// For each GLScene, there's one:
 // - canvas, and one gl context
 // - one viewdef that encloses one or more drawings
 // Can NOT instantiate this until after the space promise has resolved
-function GLView(props) {
-	PropTypes.checkPropTypes(GLView.propTypes, props, 'prop', 'GLView');
+function GLScene(props) {
+	PropTypes.checkPropTypes(GLScene.propTypes, props, 'prop', 'GLScene');
 	const p = props;
 
 	// we have to keep the canvas node, to get a gl context.  Then we need to render again.
@@ -84,7 +84,7 @@ function GLView(props) {
 		p.avatar.doRepaint = doRepaint;
 		// intrinsic to avatar p.avatar.reStartDrawing = reStartDrawing;
 		//p.avatar.setGlViewport = setGlViewport;
-		if (traceSetup) console.log(`🖼 GLView ${p.sceneName} ${p.avatar.label}: `
+		if (traceSetup) console.log(`🖼 GLScene ${p.sceneName} ${p.avatar.label}: `
 			+` done with initSceneClass`);
 	};
 
@@ -95,27 +95,27 @@ function GLView(props) {
 	() => {
 		if (! effectiveScene) {
 			if (tracePainting)
-				console.log(`🖼 GLView ${p.avatar.label}: too early for doRepaint  effectiveScene=${effectiveScene}`);
+				console.log(`🖼 GLScene ${p.avatar.label}: too early for doRepaint  effectiveScene=${effectiveScene}`);
 			return null;  // too early
 		}
 		if (tracePainting)
-			p.avatar.ewave.dump(`🖼 GLView ${p.sceneName}: got the ewave right here`);
+			p.avatar.ewave.dump(`🖼 GLScene ${p.sceneName}: got the ewave right here`);
 
 		// copy from latest wave to view buffer (c++) & pick up highest
 		p.avatar.loadViewBuffer();
 		if (tracePainting)
-			p.avatar.dumpViewBuffer(`🖼 GLView ${p.sceneName}: loaded ViewBuffer`);
+			p.avatar.dumpViewBuffer(`🖼 GLScene ${p.sceneName}: loaded ViewBuffer`);
 
 		// draw
 		effectiveScene.drawAllDrawings(p.canvasInnerWidth, p.canvasInnerHeight, p.specialInfo);
 		if (tracePainting)
-			console.log(`🖼 GLView ${p.sceneName} ${p.avatar.label}: doRepaint done drawing`);
+			console.log(`🖼 GLScene ${p.sceneName} ${p.avatar.label}: doRepaint done drawing`);
 
 		return; //{endReloadVarsNBuffer, endDrawTime};
 	}
 
 	if (traceGeometry && 'mainWave' == p.sceneName) {
-		console.log(`🖼 GLView rend '${p.sceneName}': canvas=${canvasNode?.nodeName}
+		console.log(`🖼 GLScene rend '${p.sceneName}': canvas=${canvasNode?.nodeName}
 			draw reg: w=${p.canvasInnerWidth} h=${p.canvasInnerHeight} `);
 		//  x=${cdr.x} y=${cdr.y}
 	}
@@ -132,7 +132,7 @@ function GLView(props) {
 			initSceneClass(ambiance);
 
 			if (traceSetup)
-				console.log(`🖼 GLView ${p.sceneName}: canvas, gl, view and the drawing done`);
+				console.log(`🖼 GLScene ${p.sceneName}: canvas, gl, view and the drawing done`);
 		});
 	}
 
@@ -153,7 +153,7 @@ function GLView(props) {
 		doRepaint();
 
 		if (traceSetup) {
-			console.log(`🖼 GLView ${p.sceneName}: canvasFollowup(): completed, canvasNode=`,
+			console.log(`🖼 GLScene ${p.sceneName}: canvasFollowup(): completed, canvasNode=`,
 				canvasNode);
 		}
 	}
@@ -172,7 +172,7 @@ function GLView(props) {
 
 	// style attribute needed to set canvas physical width/height.
 	return (
-		<canvas className='GLView'
+		<canvas className='GLScene'
 			width={cWidth}
 			height={cHeight}
 			style={{width: cWidth + 'px', height: cHeight + 'px'}}
@@ -181,4 +181,4 @@ function GLView(props) {
 	);
 }
 
-export default GLView;
+export default GLScene;

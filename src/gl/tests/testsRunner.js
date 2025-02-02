@@ -4,7 +4,7 @@
 */
 
 import glAmbiance from '../glAmbiance.js';
-import {mockSpace, mockAvatar, mockGLView} from './mockGLView.js';
+import {mockSpace, mockAvatar, mockGLScene} from './mockGLScene.js';
 import {starScene} from './starScene.js';
 import {noiseScene} from './noiseScene.js';
 
@@ -53,7 +53,7 @@ function startGLView() {
 	canvas.setAttribute('height', height);
 	canvas.style.height = height + 'px';
 
-	glView = new mockGLView(localStorage.completeScene ?? 'star', 'mockGLView Runner');
+	glView = new mockGLScene(localStorage.completeScene ?? 'star', 'mockGLScene Runner');
 
 	// really set as a ref by React when page renders first time
 	glView.setGLCanvas($('canvas'));

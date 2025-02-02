@@ -8,7 +8,7 @@ import PropTypes from 'prop-types';
 import {scaleLinear} from 'd3-scale';
 
 
-import GLView from '../gl/GLView.js';
+import GLScene from '../gl/GLScene.js';
 import TextNSlider from '../widgets/TextNSlider.js';
 import {} from '../utils/storeSettings.js';
 import {getAGroup, alternateMinMaxs} from '../utils/storeSettings.js';
@@ -16,7 +16,7 @@ import {getAGroup, alternateMinMaxs} from '../utils/storeSettings.js';
 import {eSpaceCreatedPromise} from '../engine/eEngine.js';
 import {interpretCppException} from '../utils/errors.js';
 
-// fixed size GLView at start
+// fixed size GLScene at start
 const MINI_WIDTH = 300;
 const MINI_HEIGHT = 150;
 
@@ -63,7 +63,7 @@ class SetWaveTab extends React.Component {
 			this.miniGraphAvatar = space.miniGraphAvatar;
 			this.miniGraphEWave = this.miniGraphAvatar.ewave;
 
-			// space in the state will allow the GLView to start showing, therefore initializing
+			// space in the state will allow the GLScene to start showing, therefore initializing
 			this.setState({space});
 		})
 		.catch(rex => {
@@ -149,18 +149,12 @@ class SetWaveTab extends React.Component {
 
 		</>;
 
-		let glView = '';
+		let glScene = '';
 		if (s.space) {
 			// warning: this +2 is a defined constant in WaveView
-			glView = <GLView
+			glScene = <GLScene
 						space={s.space} avatar={this.miniGraphAvatar}
 						sceneClassName='flatScene' sceneName='setWaveMiniGraph'
-//				selectedOuterWidth={p.selectedOuterWidth}
-//				selectedOuterHeight={p.selectedOuterHeight}
-//						selectedOuterDims={{width: MINI_WIDTH + 2, height: MINI_HEIGHT + 2}}
-//						canvasDrawingRegion={{x: 0, y: 0,
-//							width: MINI_WIDTH + 2,
-//							height: MINI_HEIGHT + 2}}
 						specialInfo={{bumperWidth: 0}}
 					/>
 		}
@@ -202,7 +196,7 @@ class SetWaveTab extends React.Component {
 			<div className='waveTabCol'>
 				&nbsp;
 				<div className='waveMiniGraph'>
-					{glView}
+					{glScene}
 				</div>
 
 				<button className='setWaveButton' onClick={ev => this.saveMainWave(this.state)}>

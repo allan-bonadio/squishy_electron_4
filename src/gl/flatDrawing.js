@@ -92,7 +92,7 @@ export class flatDrawing extends abstractDrawing {
 
 		// loads view buffer from corresponding wave, calculates highest norm.
 		// Need this for starting values for highest & smoothHighest
-		// this is NOT where it gets called after each iter; see GLView for that
+		// this is NOT where it gets called after each iter; see GLScene for that
 		this.avatar.loadViewBuffer();
 
 

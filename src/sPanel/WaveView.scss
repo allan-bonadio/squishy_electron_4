@@ -15,7 +15,7 @@
 
 
 	/* canvas itself: bottom layer - outside of widget area*/
-	canvas.GLView {
+	canvas.GLScene {
 		position: absolute;
 		display: block;
 		height: 100%;  // will conform to widgetArea

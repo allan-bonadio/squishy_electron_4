@@ -1,5 +1,5 @@
 /*
-** mockGLView -- substitute for the real GLView in tests
+** mockGLScene -- substitute for the real GLScene in tests
 ** Copyright (C) 2023-2025 Tactile Interactive, all rights reserved
 */
 
@@ -12,7 +12,7 @@ import abstractScene from '../abstractScene.js';
 import flatScene from '../flatScene.js';
 import starScene from './starScene.js';
 
-// this mostly replicates GLView in a lame sortof way
+// this mostly replicates GLScene in a lame sortof way
 // I think we have a global namespace here... not sure
 const $ = document.querySelector;
 const $$=document.querySelectorAll;
@@ -37,7 +37,7 @@ const sceneClassNamez = {
 }
 
 gonna have to rewrite this as a function
-export class mockGLView {
+export class mockGLScene {
 	proptypes: {
 		specialInfo: PropTypes.object,
 	}
@@ -77,7 +77,7 @@ export class mockGLView {
 			this.initSceneClass();
 
 			// finally!
-			console.log(`🖼 🖼 mockGLView ${this.sceneName}: created!`);
+			console.log(`🖼 🖼 mockGLScene ${this.sceneName}: created!`);
 		})
 	}
 
@@ -108,4 +108,4 @@ export class mockGLView {
 };
 
 // does this do anything?
-export default mockGLView;
+export default mockGLScene;
