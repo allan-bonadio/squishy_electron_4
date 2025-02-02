@@ -52,9 +52,6 @@ export class ControlPanel extends React.Component {
 	constructor(props) {
 		super(props);
 		//debugger;
-		ControlPanel.me = this;  // TODO get rid of this
-		//this.sPanel = props.sPanel;
-		//this.sPanel.cPanel = this;
 
 		// most of the state is kept here.  But, also, in the store settings for the next page reload.
 		this.state = {
@@ -261,7 +258,7 @@ export class ControlPanel extends React.Component {
 		storeAGroup('waveParams', waveParams);
 	}
 
-	// generate an FFT of the wave.  In the JS console.  TODO: make a real GL view out of the spectrum!
+	// generate an FFT of the wave.  In the JS console.  TODO: make a real GLScene out of the spectrum!
 	clickOnFFT(space)
 	{
 		wrapForExc(() => {

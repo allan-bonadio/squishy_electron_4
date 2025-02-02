@@ -9,7 +9,6 @@
 import React, {useState, useRef, useEffect} from 'react';
 import PropTypes from 'prop-types';
 
-// TODO should rename this listOfSceneClasses
 import {listOfSceneClasses} from './listOfSceneClasses.js';
 import glAmbiance from './glAmbiance.js';
 
@@ -71,7 +70,6 @@ function GLScene(props) {
 	// space exist.
 	const initSceneClass =
 	(ambiance) => {
-		// TODO: rename these to sceneClass  listOfSceneClasses   p.sceneClassName
 		let sClass = listOfSceneClasses[p.sceneClassName];
 
 		// MUST use the props.avatar!  we can't get it from the space, cuz which one?

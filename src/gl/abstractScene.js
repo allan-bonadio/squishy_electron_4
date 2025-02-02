@@ -53,7 +53,6 @@ export class abstractScene {
 
 	// the final call to set it up does all sceneClassName-specific stuff
 	// other subclassers override what they want
-	// TODO: rename completeScene to completeScene
 	completeScene(specialInfo) {
 		this.compileShadersOnDrawings();
 		this.createVariablesOnDrawings();
@@ -122,16 +121,6 @@ export class abstractScene {
 				drawing.draw(width, height, specialInfo);
 		});
 	}
-
-	/* ************************************************** dom interactivity */
-	// maybe i should get rid of this TODO
-	//domSetupForAllDrawings(canvas) {
-	//	this.drawings.forEach(drawing => {
-	//		if (drawing.domSetup)
-	//			drawing.domSetup(canvas);
-	//	});
-	//
-	//}
 }
 export default abstractScene;
 

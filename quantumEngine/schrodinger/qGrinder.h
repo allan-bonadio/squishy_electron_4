@@ -37,7 +37,7 @@ struct qThread;
 struct qStage;
 struct grWorker;
 
-// TODO: I should break this up: spin off qIterator with the down and dirty
+// TODO: I should break up qGrinder: spin off qIterator with the down and dirty
 // stuff that has to be fast.
 struct qGrinder {
 	qGrinder(qSpace *, struct qAvatar *av, int nGrWorkers, const char *label);

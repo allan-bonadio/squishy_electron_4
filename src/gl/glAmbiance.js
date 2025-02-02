@@ -133,7 +133,4 @@ class glAmbiance {
 	}
 };
 
-// TODO: need a function that just returns the promise so caller
-// doesn't have to go thru this creation junk
-
 export default glAmbiance;

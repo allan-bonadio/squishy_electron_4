@@ -3,8 +3,6 @@
 ** Copyright (C) 2023-2025 Tactile Interactive, all rights reserved
 */
 
-TODO: rename to mockGLScene
-
 import 'https://greggman.github.io/webgl-lint/webgl-lint.js';
 import glAmbiance from '../glAmbiance.js';
 import abstractScene from '../abstractScene.js';

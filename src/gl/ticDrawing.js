@@ -83,7 +83,6 @@ export class ticDrawing extends abstractDrawing {
 			console.log(`➤ ➤ ➤ ticDrawing ${this.sceneName}: creatingVariables`);
 
 		// same as in flatDrawing, y is in units of ψ
-		// TODO: should rename drawingUniform to sceneUniform?  or drawingUniform?
 		this.maxHeightUniform = new drawingUniform('maxHeight', this,
 			() => {
 				if (traceHighest)
@@ -97,7 +96,6 @@ export class ticDrawing extends abstractDrawing {
 			}
 		);
 
-		// TODO: should rename drawingAttribute to drawingAttribute?
 		this.endPointAttr = new drawingAttribute('endPoint', this, FLOATS_PER_VERTEX, () => {
 			return this.generateTics();
 		});
