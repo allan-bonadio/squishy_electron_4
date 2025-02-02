@@ -142,7 +142,7 @@ export class WaveView extends React.Component {
 			this.updateInnerDims();
 
 			// trigger a render
-			this.setState({height: s.outerHeight});
+			this.setState({outerHeight: s.outerHeight});
 
 			// the formers are OUTER sizes
 			this.formerWidth = p.outerWidth;
@@ -165,19 +165,15 @@ export class WaveView extends React.Component {
 		if (traceDragCanvasHeight)
 			console.info(`🏄 pointer down ${ev.pageX} ${ev.pageY} offset=${this.yOffset}`);
 		ev.target.setPointerCapture(ev.pointerId);
-
-		// I'll bet, with pointerCapture, TODO: you can make all these listeners perpetual.
-		const b = document.body;
-		b.addEventListener('pointermove', this.pointerMove);
-		b.addEventListener('pointerup', this.pointerUp);
-		b.addEventListener('pointerleave', this.pointerUp);
-
 		ev.preventDefault();
 		ev.stopPropagation();
 	}
 
 	pointerMove =
 	ev => {
+		if (!this.resizing)
+			return;
+
 		const vHeight = ev.pageY + this.yOffset;
 		if (this.state.outerHeight != vHeight)
 			this.setState({outerHeight: vHeight});
@@ -189,17 +185,13 @@ export class WaveView extends React.Component {
 		ev.stopPropagation();
 	}
 
+	// usually I send pointerLeave events here, but now with pointerCapture, maybe it doesn't matter.
+	// I do get pointerLeave events, but only after pointerUp, if the pointer is out of the size box.
 	pointerUp =
 	ev => {
 		if (traceDragCanvasHeight)
 			console.info(`🏄 pointer up ${ev.pageX} ${ev.pageY}`);
 		this.resizing = false;
-
-		const b = document.body;
-		b.removeEventListener('pointermove', this.pointerMove);
-		b.removeEventListener('pointerup', this.pointerUp);
-		b.removeEventListener('pointerleave', this.pointerUp);
-
 		ev.preventDefault();
 		ev.stopPropagation();
 	}
@@ -289,7 +281,8 @@ export class WaveView extends React.Component {
 				{voltOverlay}
 
 				<img className='sizeBox' src='/images/sizeBox4.png' alt='size box'
-					onPointerDown={this.pointerDown}
+					onPointerDown={this.pointerDown} onPointerUp={this.pointerUp}
+					onPointerMove={this.pointerMove} onPointerLeave={this.pointerUp}
 					style={{width: `${SIZE_BOX_SIZE}px`, height: `${SIZE_BOX_SIZE}px`}} />
 			</div>
 			<div className='bumper right' key='right'
