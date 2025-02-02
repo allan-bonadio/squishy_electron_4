@@ -27,6 +27,8 @@ extern const double inverseℏ;  //  = 1 / ℏ;  // units ps / pfg nm^2
 
 extern const double NaN;
 
+#define MAX_LABEL_LEN 15
+
 #ifdef qDEV_VERSION
 	extern void qCheck(qCx aCx, const char *where = "", int index = -999999999);
 	extern void qCheckReset(void);

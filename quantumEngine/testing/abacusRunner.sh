@@ -15,8 +15,6 @@ echo "Abacus Lab Test runner args: db=debugger"
 # create a space-sep list of ALL the runtime cpp files (almost all)
 allCpp=`cat building/allCpp.list`
 
-# keep (MAX_LABEL_LEN+1) a multiple of 4, 8, 16, 32 or 8 for alignment, eg 7, 15 or 31
-MAX_LABEL_LEN=7
 MAX_DIMENSIONS=2
 
 
@@ -29,7 +27,7 @@ set -x
 g++ -o wasm/abacusLab -Wno-tautological-undefined-compare  \
 	-g -O0 \
 	-std=c++11 -fexceptions  \
-	-DqDEV_VERSION -DMAX_LABEL_LEN=$MAX_LABEL_LEN -DMAX_DIMENSIONS=$MAX_DIMENSIONS \
+	-DqDEV_VERSION  -DMAX_DIMENSIONS=$MAX_DIMENSIONS \
 	-include squish.h \
 	schrodinger/abacusLab.cpp schrodinger/abacus.cpp testing/testingHelpers.cpp \
 	$allCpp \

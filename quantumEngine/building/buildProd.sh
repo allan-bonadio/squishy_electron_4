@@ -8,10 +8,6 @@
 cd `dirname $0`
 cd ..
 
-# keep MAX_LABEL_LEN+1 a multiple of 4 or 8 for alignment, eg 7, 15 or 31
-# TODO: get rid of this build difiference betw prod & dev; it's for debugging anyway.  15.
-export MAX_LABEL_LEN=15
-
 # in the short term, keep some tracing stuff in; we'll be debugging the production version!
 export DEBUG='-gsource-map --source-map-base /qEng/ '
 export OPTIMIZE='-O3 -flto --closure 1 '

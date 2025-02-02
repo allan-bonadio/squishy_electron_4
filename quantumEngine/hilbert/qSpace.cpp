@@ -40,9 +40,6 @@ qSpace::qSpace(const char *lab)
 	strncpy(label, lab, MAX_LABEL_LEN);
 	label[MAX_LABEL_LEN] = 0;
 
-	if (MAX_LABEL_LEN != 7 && MAX_LABEL_LEN != 15 && MAX_LABEL_LEN != 31)
-		throw std::runtime_error("🚀 🚀 bad value for MAX_LABEL_LEN defined at compiler");
-
 	if (traceQSpace) {
 		printf("🚀 🚀 qSpace::qSpace() constructor done this= %p, length %lx\n",
 			(this), sizeof(qSpace));

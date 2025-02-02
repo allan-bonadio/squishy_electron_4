@@ -73,8 +73,6 @@ public:
 
 /* ************************************************************ the space */
 
-// MAX_LABEL_LEN and MAX_DIMENSIONS defined in whichever build script
-
 struct qSpace {
 public:
 	qSpace(const char *label);

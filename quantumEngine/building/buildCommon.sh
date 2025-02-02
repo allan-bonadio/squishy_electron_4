@@ -42,7 +42,7 @@ FEATURES="-ffast-math  -lembind  $D_E_C"
 # them. Construct the compile command in pieces - so many params
 
 EXPORTS="-sEXPORTED_FUNCTIONS=@building/exports.json -sEXPORTED_RUNTIME_METHODS=@building/runMethods.json"
-DEFINES=" -DqDEV_VERSION -DMAX_LABEL_LEN=$MAX_LABEL_LEN -DMAX_DIMENSIONS=$MAX_DIMENSIONS "
+DEFINES=" -DqDEV_VERSION -DMAX_DIMENSIONS=$MAX_DIMENSIONS "
 INCLUDES=" -I$EMSDK/upstream/emscripten/cache/sysroot/include -include emscripten.h -include squish.h "
 
 # INVOKE_RUN=0 and IGNORE_MISSING_MAIN avoids main.cpp main() - not what we're doing

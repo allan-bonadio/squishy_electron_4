@@ -14,12 +14,6 @@ cd ..
 # see 80% down in https://emscripten.org/docs/tools_reference/emcc.html
 # i think --threadprofiler is only for pthreads
 
-# TODO: get rid of this build difiference betw prod & dev; it's for debugging anyway.  15.
-# keep MAX_LABEL_LEN+1 a multiple of 4 or 8 for alignment, eg 7, 15 or 31
-export MAX_LABEL_LEN=15
-
-
-
 # -sEMIT_PRODUCERS_SECTION = put info on which compiler/linker/language was
 # built.  Mostly irrelevant.  add it here if you want.
 export DEBUG='-g3 -gsource-map --source-map-base /qEng/ '

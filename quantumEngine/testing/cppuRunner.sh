@@ -74,10 +74,6 @@ fi
 # create a space-sep list of ALL the runtime cpp files (almost all)
 allCpp=`cat building/allCpp.list`
 
-# keep (MAX_LABEL_LEN+1) a multiple of 4, 8, 16, 32 for alignment, ie 7, 15 or 31
-#  It's just for debug labels, no big deal.
-MAX_LABEL_LEN=7
-
 # number of dimensions of the state array.  Currently only 1 is supported.
 # If we do spin on the electron, or a y coordinate or something, it'll go up.
 MAX_DIMENSIONS=2
@@ -96,7 +92,7 @@ g++ -o wasm/cppuTestBin -Wno-tautological-undefined-compare  \
 	-g -O0 \
 	-std=c++11 -fexceptions  \
 	-DqDEV_VERSION \
-	-DMAX_LABEL_LEN=$MAX_LABEL_LEN -DMAX_DIMENSIONS=$MAX_DIMENSIONS \
+	-DMAX_DIMENSIONS=$MAX_DIMENSIONS \
 	-I$CPPUTEST_HOME/include \
 	-L$CPPUTEST_HOME/lib -lCppUTest -lCppUTestExt \
 	-include squish.h  \
