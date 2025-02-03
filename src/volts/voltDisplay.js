@@ -393,7 +393,7 @@ export class voltDisplay {
 		let points = this.points;
 		let x, y, pt;
 
-		//let y = usedYScale(voltageBuffer[start]);  //qe.get1DVoltage(dim.start);
+		//let y = usedYScale(voltageBuffer[start]);  //qeFuncs.get1DVoltage(dim.start);
 		//let x = this.xScale(start);
 		if (start) points[0] = points[end] = '';
 

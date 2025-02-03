@@ -5,6 +5,8 @@
 
 import React from 'react';
 
+
+import qeFuncs from '../engine/qeFuncs.js';
 import qeConsts from '../engine/qeConsts.js';
 import CommonDialog from '../widgets/CommonDialog.js';
 import {powerToIndex} from '../utils/powers.js';
@@ -134,21 +136,21 @@ export default class ResolutionDialog extends React.Component {
 		return <section className='continuum'>
 			<div className='continuumTitle'>what kind of space:</div>
 			<label  className='contENDLESS'  key='contENDLESS'>
-				<input type='radio' name='continuum'  value={qe.contENDLESS}
-					checked={s.continuum == qe.contENDLESS}
+				<input type='radio' name='continuum'  value={qeConsts.contENDLESS}
+					checked={s.continuum == qeConsts.contENDLESS}
 					onChange={onChange}
 					style={{fontWeight:
-						(s.continuum == qe.contENDLESS)
+						(s.continuum == qeConsts.contENDLESS)
 						? 'bold'
 						: 'normal'}}/>
 				Endless &nbsp;
 				<small>wrapping around from right to left</small>
 			</label>
 			<label  className='contWELL'  key='contWELL'>
-				<input type='radio' name='continuum'  value={qe.contWELL}
-					checked={s.continuum == qe.contWELL}
+				<input type='radio' name='continuum'  value={qeConsts.contWELL}
+					checked={s.continuum == qeConsts.contWELL}
 					onChange={onChange}
-					style={{fontWeight: (s.continuum == qe.contWELL) ? 'bold' : 'normal'}}/>
+					style={{fontWeight: (s.continuum == qeConsts.contWELL) ? 'bold' : 'normal'}}/>
 				Well &nbsp;
 				<small>with walls on the ends that a
 				<br/>wave packet will bounce against</small>

@@ -81,7 +81,7 @@ function startUpEverything() {
 	if (traceStartup) console.log(`QEngineFuncs 🐣  defined`);
 
 	// create the system for storing prefs and settings
-	// must come After defineQEngineFuncs() cuz it uses continuum constants on qe
+	// must come After defineQEngineFuncs() cuz it uses continuum constants on qeConsts
 	createStoreSettings();
 	if (traceStartup) console.log(`StoreSettings 🐣  created`);
 
