@@ -155,6 +155,8 @@ class SetWaveTab extends React.Component {
 			glScene = <GLScene
 						space={s.space} avatar={this.miniGraphAvatar}
 						sceneClassName='flatScene' sceneName='setWaveMiniGraph'
+						canvasInnerWidth={MINI_WIDTH}
+						canvasInnerHeight={MINI_HEIGHT}
 						specialInfo={{bumperWidth: 0}}
 					/>
 		}
