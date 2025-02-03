@@ -51,8 +51,9 @@ class eAvatar {
 
 	get _space() { return this.ints[1]; }
 	get _qwave() { return this.ints[2]; }
-	get _vBuffer() { return this.ints[5]; }
-	get _label() { return this.pointer + 24; }
+	get _voltage() { return this.ints[3]; }
+	get _vBuffer() { return this.ints[4]; }
+	get _label() { return this.pointer + 20; }
 
 	/* **************************** end of direct accessors */
 

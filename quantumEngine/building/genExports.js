@@ -95,7 +95,7 @@ let commonConstants = [
 	{name: 'FASTEST', cppType: 'double', value: 999_999},
 
 	// phony bool value that marks the end of a qGrinder object
-	{name: 'grSENTINEL_VALUE', cppType: 'bool', value: 123},
+	{name: 'grSENTINEL_VALUE', cppType: 'byte', value: 123},
 ];
 
 
@@ -119,7 +119,8 @@ function generateExports() {
 
 // commonConstants.h , needed by C++ AND js
 function generateCommonConstants() {
-	const hConsts = commonConstants.map(co => `const ${co.cppType} ${co.name} = ${co.value};`);
+	const hConsts = commonConstants.map(co =>
+		`const ${co.cppType} ${co.name} = ${co.value};`);
 
 	let commonH = `/*
 	** commonConstants.h - shared constants between JS and C++

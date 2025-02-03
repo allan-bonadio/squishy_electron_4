@@ -3,6 +3,7 @@
 ** Copyright (C) 2021-2025 Tactile Interactive, all rights reserved
 */
 
+// obsolete... right?
 
 // always dynamically allocated.  use name qvBuffer for the qViewBuffer instance
 struct qViewBuffer {

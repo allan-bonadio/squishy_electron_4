@@ -13,10 +13,6 @@
 #include "../debroglie/qWave.h"
 #include "qViewBuffer.h"
 
-static const bool traceViewBuffer = false;
-static const bool traceHighest = false;
-static const bool traceInDetail = false;
-
 // August Ferdinand Möbius invented homogenous coordinates
 
 qViewBuffer::qViewBuffer(qSpace *space, qAvatar *av)
@@ -154,21 +150,5 @@ float qViewBuffer::loadViewBuffer(void) {
 	return highest;
 }
 
-// for the JS side
-extern "C" {
-	void avatar_dumpViewBuffer(qAvatar *avatar, const char *title) {
-		avatar->qvBuffer->dumpViewBuffer(title);
-	}
 
-	// return the vbuffer, raw floats
-	float *avatar_getViewBuffer(qAvatar *avatar) {
-		return avatar->qvBuffer->vBuffer;
-	}
-
-	// load up the Avatar's view buffer based on the Avatar's wave buffer
-	// returns the highest height of norm of wave entries
-	double avatar_loadViewBuffer(qAvatar *avatar) {
-		return avatar->qvBuffer->loadViewBuffer();
-	}
-}
 
