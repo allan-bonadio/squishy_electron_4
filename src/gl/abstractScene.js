@@ -108,6 +108,8 @@ export class abstractScene {
 	}
 
 	drawAllDrawings(width, height, specialInfo) {
+		if (!width || !height) debugger;
+
 		// not specific to any drawing; I guess it's kindof a drawing itself
 		this.drawBackground();
 
