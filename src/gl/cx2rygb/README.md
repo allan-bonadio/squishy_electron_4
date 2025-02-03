@@ -13,7 +13,7 @@ green 0,1,0                     red 1,0,0
 
 Guns are constant 1 when angle is next to gun color.
 2 guns are always nonzero unless you're exactly on a rgb color, when only that one is.
-Each side also has a gradient, one other color that's increasing/decreasing.
+Each side also has a gradient, on other color that's increasing/decreasing.
 
 Note that the display numbers go to 1 whereas the complex x & y only go to √ 1/2
 so we multiply by √2 .
