@@ -1,5 +1,5 @@
 /*
-** Voltage Area -- the white voltage line, and its tactile
+** Voltage Area -- the off-white voltage line, and its tactile
 **	      interactions when the user moves it.  for Squishy Electron
 ** Copyright (C) 2021-2024 Tactile Interactive, all rights reserved
 */
@@ -14,7 +14,8 @@ import {axisLeft as d3_axisLeft} from 'd3-axis';
 
 import ReactFauxDOM from 'react-faux-dom';
 
-//import qe from '../engine/qe.js';
+//import qeConsts from '../engine/qeConsts.js';
+//import qeFuncs from '../engine/qeFuncs.js';
 
 import clickNDrag from '../widgets/clickNDrag.js';
 import './volts.scss';
@@ -234,23 +235,23 @@ function VoltArea(props) {
 	/* *************************************************** rendering */
 
 	// this is bogus: an integer incrementing as a surrogate instead of a more complex state array
-// 	let [renderCtr, setRenderCtr] = useState(1);
-// 	if (traceVoltageArea)
-// 		console.log(`⚡️ VoltArea  constructor done`);
-//
-// 	function updateVoltageArea() {
-// 		setRenderCtr(renderCtr + 1);  // cause a rerender
-// 	}
+	let [renderCtr, setRenderCtr] = useState(1);
+	if (traceVoltageArea)
+		console.log(`⚡️ VoltArea  constructor done`);
 
-	// tell the VoltArea (that;s us) that something in the
-	// space.voltageBuffer changed.  Sometimes called from above. This gets set
-	// into the space, when it's available.
-	// 	const updateVoltageArea =
-	// 	() => {
-	// 		if (traceRendering)
-	// 			console.log(`⚡️ VoltArea.updateVoltageArea`);
-	// 		forceUpdate();
-	// 	}
+	function updateVoltageArea() {
+		setRenderCtr(renderCtr + 1);  // cause a rerender
+	}
+
+	tell the VoltArea (that;s us) that something in the
+	space.voltageBuffer changed.  Sometimes called from above. This gets set
+	into the space, when it's available.
+		const updateVoltageArea =
+		() => {
+			if (traceRendering)
+				console.log(`⚡️ VoltArea.updateVoltageArea`);
+			forceUpdate();
+		}
 
 	// 	componentDidUpdate() {
 	// 		// the constructor probably won't have space, but here it will.  should.
@@ -303,12 +304,8 @@ function VoltArea(props) {
 	if (! p.space)
 		return '';  // too early
 	let barWidth = p.canvasInnerDims.width / p.space.nPoints;
-	if (traceRendering)
-		console.log(`⚡️ VArea.render, barWidth:${barWidth}  cFacts:`,
-			p.canvasInnerDims);
-
 	if (traceRendering) {
-		console.info(`canvasInnerDims: width=${p.canvasInnerDims.width} `
+		console.info(`⚡️ canvasInnerDims: width=${p.canvasInnerDims.width} `
 			+`height=${p.canvasInnerDims.height}  barWidth=${barWidth}`);
 	}
 
