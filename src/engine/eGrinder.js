@@ -28,11 +28,12 @@ class eGrinder {
 		//console.log(`matching sentinel:
 		//qeConsts.grSENTINEL_VALUE=${qeConsts.grSENTINEL_VALUE} !==
 		//this.sentinel=${this.sentinel}`)
+//
+//		console.log(`sentinels: ${qeConsts.grSENTINEL_VALUE}  ${this.sentinel}`);
+//this.sentinel = qeConsts.grSENTINEL_VALUE;  // try this
 
-		console.log(`sentinels: ${qeConsts.grSENTINEL_VALUE}  ${this.sentinel}`);
-this.sentinel = qeConsts.grSENTINEL_VALUE;  // try this
-//		if (qeConsts.grSENTINEL_VALUE !== this.sentinel)
-//			throw "🔥 🔥 Grinder offsets not correct 🔥 🔥";
+		if (qeConsts.grSENTINEL_VALUE !== this.sentinel)
+			throw "🔥 🔥 Grinder offsets not correct (36) 🔥 🔥";
 		if (traceCreation)
 			console.log(`🪚 eGrinder constructed:`, this);
 	}
@@ -114,9 +115,8 @@ this.sentinel = qeConsts.grSENTINEL_VALUE;  // try this
 		// old way: doing it by C++
 		//qeFuncs.this_triggerIteration(this.pointer);
 
-		// this ought to work although I still don't know why it turns from 123 to 1
 		if (qeConsts.grSENTINEL_VALUE !== this.sentinel)
-			throw "🔥 🔥 Grinder offsets aren't correct 🔥 🔥";
+			throw "🔥 🔥 Grinder offsets aren't correct (119) 🔥 🔥";
 	}
 
 	// Grind one frame - Single Threaded - deprecated sortof

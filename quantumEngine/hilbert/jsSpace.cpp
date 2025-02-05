@@ -71,8 +71,6 @@ qSpace *completeNewSpace(qSpace *space, int nGrWorkers) {
 	if (traceAvatarDetail) printf("🚀 created mainAvatar\n");
 
 	qGrinder *qgrinder = space->qgrinder = new qGrinder(space, mainAvatar, nGrWorkers, "mainGrinder");
-	if (qgrinder->sentinel != grSENTINEL_VALUE)
-		printf("74 should be equal: %d ==? %d\n", (int) qgrinder->sentinel, (int) grSENTINEL_VALUE);
 
 	space->miniGraphAvatar = new qAvatar(space, "miniGraph");
 
