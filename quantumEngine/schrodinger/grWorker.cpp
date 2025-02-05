@@ -136,6 +136,7 @@ void grWorker::gThreadLoop(void) {
 			printf("🔪 Error (saved to grinder) during gThreadLoop: %s\n", ex.what());
 		}
 	}
+	throw std::runtime_error("grWorker::gThreadLoop()  ∞ loop actually ending and returning");
 }
 
 
