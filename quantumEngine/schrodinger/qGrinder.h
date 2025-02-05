@@ -148,16 +148,22 @@ struct qGrinder {
 	// = dtStretch * space->dt
 	double stretchedDt;
 
+	// this is ℏ / 2 m_e dx², the coefficient on Schrodinger's for the second
+	// derivative. dx is the linear spacing between datapoints.  Actually,  this
+	// should be specific to the dimension that we're integrating along.  So it
+	// only applies to the 0-ith dimension, the only one we have now.  I'll
+	// figure out a better way when we get to more dimensions.
 	double d2Coeff;
 
 	double divergence;  // divergence measure
 
-	// how much time we've integrated, from creation.  pseudo-pico-seconds.  Since we've eliminated
-	// all the actual physical constants from the math, why not choose our own definition
-	// of what a second is?  Resets to zero every so often.
+	// how much time we've integrated, from creation.  pico-seconds of quantum
+	// time.  Resets to zero every so often.
 	double elapsedTime;
 
-	// total number of times (frames) thru the number cruncher.
+	// total number of times (frames) thru the number cruncher.  Somehow it's
+	// always even cuz two halves are done to get all the variables to the
+	// beginning again.
 	int frameSerial;
 
 	// when trace msgs display just one point (to avoid overwhelming output),
@@ -173,8 +179,8 @@ struct qGrinder {
 	int nGrWorkers;  // total number of grWorker threads we'll use for integrating
 			// mostly constant, although there's plans to gradually add/remove threads
 
-	// Starts at -1 = waiting at starting line, or set it to 0 to launch
-	// an integration.  All the threads atomic_wait, waiting for this to turn
+	// Lock that starts at -1 = waiting at starting line, or set it to 0 to launch
+	// an integration.  All the threads atomic_wait on this, waiting for this to turn
 	// nonnegative.
 	_Atomic int startAtomic;
 

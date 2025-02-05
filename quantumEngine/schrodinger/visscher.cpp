@@ -144,6 +144,7 @@ void qGrinder::pointImaginary(qCx *newW, qCx *oldW, qCx *hamiltW, double volts, 
 
 
 // ******************************************************** whole wave methods
+// these work the same whether ENDLESS or WELL.
 
 // first step: advance the 𝜓.re one dt, from t to t + dt
 // oldW points to buffer with real = 𝜓.re(t)    imag = 𝜓.im(t + dt/2)

@@ -120,7 +120,7 @@ class SetWaveTab extends React.Component {
 		highestFrequency = Math.min(
 			alternateMinMaxs.waveParams.waveFrequency.max, highestFrequency);
 
-		const sliders = <>
+		const waveParamSliders = <>
 			<TextNSlider className='waveFrequency' label='frequency'
 				value={+s.waveFrequency}
 				min={-highestFrequency}
@@ -161,7 +161,7 @@ class SetWaveTab extends React.Component {
 					/>
 		}
 
-		const radios = <div className='waveTabCol middle'>
+		const breedSelector = <div className='waveTabCol breedSelector'>
 			<label>
 				circular
 				<input type='radio' checked={'circular' == breed} name='circular'
@@ -188,12 +188,12 @@ class SetWaveTab extends React.Component {
 		</div>;
 
 		return <div className='SetWaveTab'>
-			<div className='waveTabCol'>
+			<div className='waveTabCol waveParamSliders'>
 				<h3>Design a new Wave</h3>
-				{sliders}
+				{waveParamSliders}
 			</div>
 
-			{radios}
+			{breedSelector}
 
 			<div className='waveTabCol'>
 				&nbsp;
