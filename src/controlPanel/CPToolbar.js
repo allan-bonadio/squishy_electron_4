@@ -61,12 +61,7 @@ function CPToolbar(props) {
 	// these are just startup defaults; see sAnimator.js for how it's actually set based on scan rate
 	const rateOptions = frameRateMenuFreqs.map(freq => optionForFreq(freq));
 
-	// nail this down so roundoff error doesn't spoil everything.
-	// It's always of the form n or 1/n where n is an integer
-	// const apparentFrequency = (chosenRate >= 1)
-	// 	? Math.round(chosenRate)
-	// 	: (1 / Math.round(1 / chosenRate)).toFixed(3);
-
+	let runningClass = props.shouldBeIntegrating ? 'running' : '';
 	return <div className='CPToolbar'>
 		<div className='frameRateBox'>
 			frame rate:<br />
@@ -78,7 +73,7 @@ function CPToolbar(props) {
 
 		<span className='toolSpacer' style={{width: '.3em'}}></span>
 
-		<button className={`startStopToggle startStopTool`}
+		<button className={`startStopToggle startStopTool ${runningClass}`}
 			onClick={ev => {
 				if (traceCPToolbar)
 					dbLog(`🧰 CPToolbar props.cPanel.startStop -> (props)  props=`, props);
