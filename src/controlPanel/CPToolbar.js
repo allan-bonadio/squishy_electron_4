@@ -45,7 +45,6 @@ function setPT() {
 
 		resetWave: PropTypes.func.isRequired,
 		resetVoltage: PropTypes.func.isRequired,
-		changeShowVoltage: PropTypes.func.isRequired,
 		showVoltage: PropTypes.string.isRequired,
 	};
 }
