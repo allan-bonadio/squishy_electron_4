@@ -9,7 +9,7 @@
 // user last dragged the resize box in the corner, in WaveView state.  Width
 // comes from the window width.  hmmm...
 .WaveView {
-	// the setting for showVoltage chooses one of these
+	// the setting for showVoltage chooses one of these classes for different things...
 	// display:none gets no events.  so change visibilty instead.
 	.alwaysShowVoltage {visibility: visible}
 	.hoverShowVoltage {visibility: hidden}
@@ -69,36 +69,37 @@
 
 		}  // end of VoltArea
 
-		// buttons etc to scroll and zoom the voltage
+		// buttons on right to scroll and zoom the voltage
 		.VoltSidebar {
 			// this is a column flex box
 			position: absolute;
-			right: .5em;
-			height: 100%;
 			display: flex;
 			flex-direction: column;
+			right: 0;  // snug against right bumper or right edge
+			// width set in JS in VoltSidebar
+			height: 100%;  // percent of waveview which is relative pos
+			font-size: 32px;   // fixed; not proportional  to ambient font size
 			z-index: 35;
 
 			// but particpates in its parent's row flex box.  Width and display set by code in WaveView.render()
 			text-align: center;
 
+			//background-color: #f006;  // testing
 			background-color: transparent;
-			pointer-events: none;
+			pointer-events: none;  // but subelements DO have pointer-events
 			user-select: none;
 
 
 			// scroll & zoom in/out buttons
 			button {
 				display: inline;
-				background-color: transparent;
 				width: 1em;
 				line-height: 1em;
-				font-size: 1.953125em;  // 3 sizes larger
 				font-weight: 700;
-				//border-radius: .5em;
+				background-color: transparent;
 				color: common.$voltageColor;
 				padding: 0;
-				//border: .5px solid common.$voltageMuchDarkerColor;
+				margin: 0;
 				border: none;
 
 				pointer-events: auto;

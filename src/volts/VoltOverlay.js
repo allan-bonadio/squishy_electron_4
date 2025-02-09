@@ -11,10 +11,6 @@ import VoltArea from '../volts/VoltArea.js';
 import VoltSidebar from '../volts/VoltSidebar.js';
 import {getASetting, storeASetting} from '../utils/storeSettings.js';
 
-
-const VOLTAGE_SIDEBAR_WIDTH = 32;  // passed down to VoltSidebar.  Seems to want to be 32
-
-
 function setPT() {
 	VoltOverlay.propTypes = {
 		// for first couple of renders, space and idunno are null
@@ -89,9 +85,10 @@ function VoltOverlay(props) {
 	// (but see another mechanism in the sidebar!)
 	return <section className={(p.showVoltage ?? 'hover') + 'ShowVoltage VoltOverlay'}
 			style={{width: p.width}} >
-		<VoltSidebar width={VOLTAGE_SIDEBAR_WIDTH}
+		<VoltSidebar
 			vDisp={p.vDisp}
 			drawingRight={p.canvasInnerWidth - p.bumperWidth}
+			bumperWidth={p.bumperWidth}
 			canvasInnerHeight={p.canvasInnerHeight}
 			showVoltage={p.showVoltage}
 			scrollVoltHandler={v.setBottomVolts}

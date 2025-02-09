@@ -19,6 +19,7 @@ import './WaveView.scss';
 import {getASetting, storeASetting} from '../utils/storeSettings.js';
 
 import VoltOverlay from '../volts/VoltOverlay.js';
+import {WELL_BUMPER_WIDTH, SIZE_BOX_SIZE} from '../volts/voltConstants.js';
 import GLScene from '../gl/GLScene.js';
 import {eSpaceCreatedPromise} from '../engine/eEngine.js';
 
@@ -28,14 +29,10 @@ let traceScaling = false;
 let traceDragCanvasHeight = false;
 let traceWidth = false;
 
-// size of the size box at lower right of canvas.  If you change this, also
-// change $sizeBoxSize in  _common.scss
-const SIZE_BOX_SIZE = 24;
-const BUMPER_WIDTH = 16;
-
 const CANVAS_BORDER_THICKNESS = 1;
 const DOUBLE_THICKNESS = 2 * CANVAS_BORDER_THICKNESS;
 
+const round = (n) => Math.round(n, 1);
 
 export class WaveView extends React.Component {
 	static propTypes = {
@@ -64,15 +61,18 @@ export class WaveView extends React.Component {
 
 		this.state = {
 			// height of just the canvas + DOUBLE_THICKNESSpx, as set by user with size box
-			outerHeight: getASetting('miscSettings', 'waveViewHeight'),  // pixels
+			outerHeight: round(getASetting('miscSettings', 'waveViewHeight')),  // integer pixels
 
 			// no!  handed in by promise space: null,  // set when promise comes in
 		}
 
-		this.updateInnerDims();
+		// on the off chance this is not yet an integer, keep our rounded version of the number
+		this.outerWidth = round(props.outerWidth);
 
-		this.formerWidth = props.outerWidth;
-		this.formerHeight = this.state.outerHeight;
+		this.updateInnerDims();  // after outerWidth done
+
+		this.formerWidth = this.outerWidth;
+		this.formerHeight = round(this.state.outerHeight);
 		this.formerShowVoltage = props.showVoltage;
 
 		// make the proptypes shuddup about it being undefined
@@ -91,7 +91,7 @@ export class WaveView extends React.Component {
 			// make room for the bumpers for WELL continuum (both sides).  Note that
 			// continuum can change only when page reloads.
 			this.bumperWidth = (qeConsts.contWELL == space.dimensions[0].continuum)
-				? BUMPER_WIDTH
+				? WELL_BUMPER_WIDTH
 				: 0;
 
 			this.vDisp = space.vDisp;
@@ -103,8 +103,8 @@ export class WaveView extends React.Component {
 	}
 
 	updateInnerDims() {
-		this.canvasInnerWidth = this.props.outerWidth - DOUBLE_THICKNESS;
-		this.canvasInnerHeight = this.state.outerHeight - DOUBLE_THICKNESS;
+		this.canvasInnerWidth = round(this.outerWidth - DOUBLE_THICKNESS);
+		this.canvasInnerHeight = round(this.state.outerHeight - DOUBLE_THICKNESS);
 	}
 
 	// we finally have a canvas; give me a copy so I can save it
@@ -128,14 +128,14 @@ export class WaveView extends React.Component {
 		// change height or window change width.  On that occasion, we have to adjust
 		// a lot, including resizing the canvas.
 		if (this.mainEAvatar && (this.formerShowVoltage != p.showVoltage
-					|| this.formerWidth != p.outerWidth
+					|| this.formerWidth != this.outerWidth
 					|| this.formerHeight != s.outerHeight) ) {
 
 			// Size of window & canvas changed!  (or, will change soon)
 			if (traceScaling) {
 				console.log(`🏄 Resizing  👀 mainEAvatar=${this.mainEAvatar.label}
 				formerShowVoltage=${this.formerShowVoltage} ≟➔ showVoltage=${p.showVoltage}
-				formerWidth=${this.formerWidth} ≟➔ outerWidth=${p.outerWidth}
+				formerWidth=${this.formerWidth} ≟➔ outerWidth=${this.outerWidth}
 				formerHeight=${this.formerHeight} ≟➔ outerHeight=${s.outerHeight}`);
 			}
 
@@ -144,13 +144,13 @@ export class WaveView extends React.Component {
 			// trigger a render
 			this.setState({outerHeight: s.outerHeight});
 
-			// the formers are OUTER sizes
-			this.formerWidth = p.outerWidth;
+			// the formers are OUTER sizes.  All these should be integers by now.
+			this.formerWidth = this.outerWidth;
 			this.formerHeight = s.outerHeight;
 			this.formerShowVoltage = p.showVoltage;
 			if (traceWidth) {
 				console.log(`🏄 WaveView canvasInner width is ${this.canvasInnerWidth};  `
-					+ `now outer width = ${p.outerWidth}`);
+					+ `now outer width = ${this.outerWidth}`);
 			}
 		}
 	}
@@ -161,7 +161,7 @@ export class WaveView extends React.Component {
 	pointerDown =
 	ev => {
 		this.resizing = true;
-		this.yOffset = this.state.outerHeight - ev.pageY;
+		this.yOffset = round(this.state.outerHeight - ev.pageY);
 		if (traceDragCanvasHeight)
 			console.info(`🏄 pointer down ${ev.pageX} ${ev.pageY} offset=${this.yOffset}`);
 		ev.target.setPointerCapture(ev.pointerId);
@@ -174,7 +174,7 @@ export class WaveView extends React.Component {
 		if (!this.resizing)
 			return;
 
-		const vHeight = ev.pageY + this.yOffset;
+		const vHeight = round(ev.pageY + this.yOffset);
 		if (this.state.outerHeight != vHeight)
 			this.setState({outerHeight: vHeight});
 		storeASetting('miscSettings', 'waveViewHeight', vHeight);
@@ -212,7 +212,7 @@ export class WaveView extends React.Component {
 		}
 
 		if (traceWidth) {
-			console.log(`🏄 WaveView render, outerWidth=${p.outerWidth}`
+			console.log(`🏄 WaveView render, outerWidth=${this.outerWidth}`
 				+` bumperWidth=${this.bumperWidth}`);
 		}
 
@@ -235,7 +235,7 @@ export class WaveView extends React.Component {
 				: <img className='spinner' alt='spinner' src='/images/eclipseOnTransparent.gif' />;
 
 			let glScene = <div className='spinnerBox'
-						style={{width: p.outerWidth - CANVAS_BORDER_THICKNESS ,
+						style={{width: this.outerWidth - CANVAS_BORDER_THICKNESS ,
 							height: s.outerHeight - DOUBLE_THICKNESS}} >
 				{spinner}
 			</div>;
@@ -247,7 +247,7 @@ export class WaveView extends React.Component {
 		if (this.vDisp){
 			voltOverlay = <VoltOverlay
 				space={this.space}
-				showVoltage={s.showVoltage} vDisp={this.vDisp}
+				showVoltage={p.showVoltage} vDisp={this.vDisp}
 				canvasInnerWidth={this.canvasInnerWidth} canvasInnerHeight={this.canvasInnerHeight}
 				bumperWidth={this.bumperWidth}
 			/>;

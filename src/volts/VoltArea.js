@@ -33,7 +33,6 @@ let traceScrollStretch = false;
 // to double the scroll or heightVolts
 let DOUBLING_TIME = 2000;
 
-
 function setPT() {
 	VoltArea.propTypes = {
 		// includes scrollSetting, heightVolts, measuredMinVolts, measuredMaxVolts, xScale, yScale
@@ -328,7 +327,7 @@ function VoltArea(props) {
 		vAx.attr('class', 'voltageAxis');
 
 		// not sure how much to move axis in from right side
-		let txX = p.drawingLeft + p.drawingWidth - 32;
+		let txX = p.drawingLeft + p.drawingWidth;
 		let txY = p.canvasInnerHeight;
 		vAx.attr('transform', `translate(${txX}, ${txY})`);
 		vAx.call(axis);
@@ -360,7 +359,8 @@ function VoltArea(props) {
 			onWheel={wheelHandler} onPointerMove={pointerMove} onPointerUp={pointerUp}
 		>
 			<g className={'optionalVoltage ' + vClass}>
-				{/* for showVoltage on hover, need this to  hover over */}
+				{/* for showVoltage on hover, need this to  hover over.  No ev handlers here,
+					but the .alwaysShowVoltage etc classes' :hover doesn't catch them othrwise */}
 				<rect className='hoverBox' key='hoverBox'
 					x={p.drawingLeft} y={0}
 					width={p.drawingWidth} height={p.canvasInnerHeight}
@@ -372,6 +372,8 @@ function VoltArea(props) {
 
 		</svg>
 	);
+
+
 
 	if (traceRendering)
 		console.log(`⚡️ VoltArea render done`);
