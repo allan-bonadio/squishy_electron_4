@@ -109,7 +109,7 @@ export class voltDisplay {
 		console.log(txt.join(''));
 	}
 
-	/* ******************************************************************* height and bottom calculations */
+	/* ******************************************************* height and bottom calculations */
 
 	// actually measure the current voltage signal, get min & max
 	findVoltExtremes() {
@@ -153,7 +153,9 @@ export class voltDisplay {
 		}
 	}
 
-	// set our xScale and yScale according to the numbers passed in, and our own settings
+	/* ***************************************************************** Rendering */
+
+ 	// set our xScale and yScale according to the numbers passed in, and our own settings
 	// used by VoltArea to plot potential.  X in units of dx, Y in units of volts
 	// I think I call this too many times (?)
 	setVoltScales(drawingLeft, drawingWidth, canvasHeight) {
@@ -169,14 +171,18 @@ export class voltDisplay {
 			[canvasHeight, 0]);
 		this.canvasHeight = canvasHeight;
 
-		// the actual datapoints are on the edges between bars.
-		// So, 8 states means nPoints=10 means 9 bars.  Sortof.
-		// for contENDLESS, this means 10 bars drawn cuz it duplicates the
-		// boundary bar on each end.  Resonant wavelength is 8.
-		// for contWELL, this means the data edges on each end are zero, with 8
-		// actual datapoints for the state.  Resonant wavelength is 9.
+		// the actual datapoints are on the edges between segments.
+		// So, 8 states means nPoints=10 means 9 or 10 segments.  Sortof.
+		// For contENDLESS, this means 9 segments drawn cuz it duplicates the
+		//     boundary bar on each end.  Resonant wavelength is 8.
+		// For contWELL, this means the data edges on each end are zero, with 8
+		//     actual datapoints for the state.  10 segments drawn, although the
+		//     outer 2 go off to infinity.  Resonant wavelength is 9.
+		// no that's not  right....
+		let most = this.end;
+		//let most = (qeConsts.contENDLESS == this.continuum) ? this.end :  this.start + this.end;
 		this.xScale = scaleLinear(
-			[0, this.start + this.end],
+			[0, most],
 			[drawingLeft, drawingLeft + drawingWidth]);
 
 		if (traceVoltScales) {
@@ -189,6 +195,115 @@ export class voltDisplay {
 		return true;
 	}
 
+	// make the value for the 'd' attribute on an svg <path element
+	// from start to end, on your space, using std volts array from WaveView
+	// usedYScale is either yScale or yUpsideDown; your choice
+	makeVoltagePathAttribute(usedYScale) {
+		let start = this.start;
+		let end = this.end;
+		if (tracePathAttribute)
+			console.log(`⚡️voltDisplay.makePathAttribute(${start}, ${end})`);
+
+		// for tracing.  long decimal numbers are depresssing
+		const tpip = (x, y, title = '') => {if (tracePathIndividualPoints)
+			console.log(`    ⚡️${title} x=${x}  y=${y}`)};
+
+		// yawn too early?
+		if (! usedYScale) {
+			if (tracePathAttribute)
+				console.warn(`⚡️ 🧨  makePathAttribute(): no yScale so punting`);
+			return `M0,0`;
+		}
+
+		const voltageBuffer = this.voltageBuffer;
+
+		// array to collect small snippets of text like '371,226' or
+		// 'L371,226'.  Avoid recreating array.
+		this.points ??= new Array(this.end + this.start);
+		let points = this.points;
+		let x, y, pt;
+
+		if (tracePathIndividualPoints)
+			console.log(`⚡️ makeVoltagePathAttribute pts `);
+
+		// get ready to stop and start the path if needed
+		let didMove = false, didLine = false;
+		switch (this.continuum) {
+		case qeConsts.contDISCRETE:
+			throw new Error(`discrete continuum in makeVoltagePathAttribute`);
+
+		case qeConsts.contWELL:
+			// potential at the ends of the well are 'infinite'; therefore regular points run start ... end-1.
+			// just do a line going up on each end.  skyHigh isn't ∞ but should get slanted line
+			let skyHigh = usedYScale(this.bottomVolts + 5 * this.heightVolts).toFixed(1);
+
+			x = this.xScale(0).toFixed(1);
+			points[0] = `M${x},` + skyHigh;
+			didMove = true;
+			didLine = false;
+			tpip(x, skyHigh, '️left bumper');
+
+			// should I get rid of this if the point at end-1 is NAN?  probably.  unlikely, though
+			x = this.xScale(end).toFixed(1);
+			points[end] = `L${x},` + skyHigh;
+			tpip(x, skyHigh, '️right bumper');
+			break;
+
+		case qeConsts.contENDLESS:
+			// make the voltage buffer wraparound
+			voltageBuffer[0] = voltageBuffer[end-1];
+			voltageBuffer[end] = voltageBuffer[1];
+
+			// we're doing the whole thing nicluding the wraparound ends
+			start = 0;
+			end = this.start + this.end;
+			didMove = false;
+			didLine = false;
+			break;
+
+		default:
+			debugger;
+			throw new Error(`⚡️  bad continuum '${continuum}' in  makeVoltagePathAttribute()`);
+		}
+
+		for (let ix = start; ix < end; ix++) {
+			x = this.xScale(ix);
+			if ((x==null) || !isFinite(x))
+				debugger;
+			x = x.toFixed(1);
+
+			// ±∞ come out as NaN.
+			y = usedYScale(voltageBuffer[ix]);
+			if (isNaN(y) || y < -TOO_MANY_VOLTS || y > TOO_MANY_VOLTS) {
+				// Absent.  the line ends here, for this pt and maybe a few more; just omit it
+				didMove = didLine = false;
+				pt = '';
+			}
+			else {
+				y = y.toFixed(1);
+				tpip(x, y, ix);
+
+				// didLine is there because  you can say M3,4 L5,6 7,8 9,10
+				// you don't have to repeat the L every segment..
+				pt = `${x},${y}`;
+				if (!didMove) {
+					pt = 'M' + pt;
+					didMove = true;
+				}
+				else if (!didLine) {
+					pt = 'L' + pt;
+					didLine = true;
+				}
+			}
+			points[ix] = pt;
+		}
+
+		// spaces between xy pairs make them easier to read, and they repeat L
+		let final = points.join(' ');
+		if (tracePathAttribute)
+			console.log(`final path attribute`, final);
+		return final;
+	}
 
 	/* ******************************************************************* interaction */
 
@@ -220,7 +335,7 @@ export class voltDisplay {
 	}
 
 
-	/* ******************************************************************* familiar potential filling */
+	/* ******************************************************************* familiar voltage filling */
 
 	// fill the buffer with a constant from A to B
 	fillVoltage(fillWith, start = this.start, end = this.end) {
@@ -364,116 +479,7 @@ export class voltDisplay {
 			this.dumpVoltDisplay(`setAppropriateRange(): `);
 	}
 
-	/* **************************************************************************** Rendering */
-	// make the value for the 'd' attribute on an svg <path element
-	// from start to end, on your space, using std volts array from WaveView
-	// usedYScale is either yScale or yUpsideDown; your choice
-	makeVoltagePathAttribute(usedYScale) {
-		let start = this.start;
-		let end = this.end;
-		if (tracePathAttribute)
-			console.log(`⚡️voltDisplay.makePathAttribute(${start}, ${end})`);
 
-		// for tracing.  long decimal numbers are depresssing
-		const tpip = (x, y, title = '') => {if (tracePathIndividualPoints)
-			console.log(`    ⚡️${title} x=${x}  y=${y}`)};
-
-		// yawn too early?
-		if (! usedYScale) {
-			if (tracePathAttribute)
-				console.warn(`⚡️ 🧨  makePathAttribute(): no yScale so punting`);
-			return `M0,0`;
-		}
-
-		const voltageBuffer = this.voltageBuffer;
-
-		// array to collect small snippets of text like '371,226' or
-		// 'L371,226'.  Avoid recreating array.
-		this.points ??= new Array(this.end + this.start);
-		let points = this.points;
-		let x, y, pt;
-
-		if (tracePathIndividualPoints)
-			console.log(`⚡️ makeVoltagePathAttribute pts `);
-
-		// get ready to stop and start the path if needed
-		let didMove = false, didLine = false;
-		switch (this.continuum) {
-		case qeConsts.contDISCRETE:
-			throw new Error(`discrete continuum in makeVoltagePathAttribute`);
-
-		case qeConsts.contWELL:
-			// potential at the ends of the well are 'infinite'; therefore regular points run start ... end-1.
-			// just do a line going up on each end.  skyHigh isn't ∞ but should get slanted line
-			let skyHigh = usedYScale(this.bottomVolts + 5 * this.heightVolts).toFixed(1);
-
-			x = this.xScale(0).toFixed(1);
-			points[0] = `M${x},` + skyHigh;
-			didMove = true;
-			didLine = false;
-			tpip(x, skyHigh, '️left bumper');
-
-			// should I get rid of this if the point at end-1 is NAN?  probably.  unlikely, though
-			x = this.xScale(end).toFixed(1);
-			points[end] = `L${x},` + skyHigh;
-			tpip(x, skyHigh, '️right bumper');
-			break;
-
-		case qeConsts.contENDLESS:
-			// make the voltage buffer wraparound
-			voltageBuffer[0] = voltageBuffer[end-1];
-			voltageBuffer[end] = voltageBuffer[1];
-
-			// we're doing the whole thing nicluding the wraparound ends
-			start = 0;
-			end = this.start + this.end;
-			didMove = false;
-			didLine = false;
-			break;
-
-		default:
-			debugger;
-			throw new Error(`⚡️  bad continuum '${continuum}' in  makeVoltagePathAttribute()`);
-		}
-
-		for (let ix = start; ix < end; ix++) {
-			x = this.xScale(ix);
-			if ((x==null) || !isFinite(x))
-				debugger;
-			x = x.toFixed(1);
-
-			// ±∞ come out as NaN.
-			y = usedYScale(voltageBuffer[ix]);
-			if (isNaN(y) || y < -TOO_MANY_VOLTS || y > TOO_MANY_VOLTS) {
-				// Absent.  the line ends here, for this pt and maybe a few more; just omit it
-				didMove = didLine = false;
-				pt = '';
-			}
-			else {
-				y = y.toFixed(1);
-				tpip(x, y, ix);
-
-				// didLine is there because  you can say M3,4 L5,6 7,8 9,10
-				// you don't have to repeat the L every segment..
-				pt = `${x},${y}`;
-				if (!didMove) {
-					pt = 'M' + pt;
-					didMove = true;
-				}
-				else if (!didLine) {
-					pt = 'L' + pt;
-					didLine = true;
-				}
-			}
-			points[ix] = pt;
-		}
-
-		// spaces between xy pairs make them easier to read, and they repeat L
-		let final = points.join(' ');
-		if (tracePathAttribute)
-			console.log(`final path attribute`, final);
-		return final;
-	}
 }
 
 export default voltDisplay;
