@@ -73,6 +73,7 @@ function VoltArea(props) {
 	let tactileEl = tactileRef.current;
 	const visibleRef = useRef();
 	let visibleEl = visibleRef.current;
+	//const dragCountRef = useRef(0);
 
 	// phony state variable that changes when buffer changes.  I tried using the whole buffer for this; no.
  	//let [changeCounter, setChangeCounter] = useState(0);
@@ -81,6 +82,7 @@ function VoltArea(props) {
 	let dragging = false;
 	let latestVoltage;
 	let latestIx;
+
 
 	/* ***************************************************  click & drag */
 
@@ -206,7 +208,8 @@ function VoltArea(props) {
 		// only react if the LEFT button is down
 		if (ev.buttons & 1) {
 			// bring me all the events, even outside the svg
-			svgEl.setPointerCapture(ev.pointerId);
+			// somehow this breaks drawing the voltage line  🤔
+			//svgEl.setPointerCapture(ev.pointerId);
 
 			dragging = true;
 			onePoint(ev);
@@ -226,7 +229,7 @@ function VoltArea(props) {
 		}
 	}
 
-	// called upon pointerup
+	// called upon pointerup or pointerleave
 	const pointerUp =
 	(ev) => {
 		// ev.buttons is zero here, this is called after button(s) released
@@ -356,7 +359,8 @@ function VoltArea(props) {
 			viewBox={`${p.drawingLeft} 0 ${p.drawingWidth} ${p.canvasInnerHeight}`}
 			x={p.drawingLeft} width={p.drawingWidth} height={p.canvasInnerHeight}
 			ref={svgRef}
-			onWheel={wheelHandler} onPointerMove={pointerMove} onPointerUp={pointerUp}
+			onWheel={wheelHandler} onPointerMove={pointerMove}
+			onPointerUp={pointerUp} onPointerLeave={pointerUp}
 		>
 			<g className={'optionalVoltage ' + vClass}>
 				{/* for showVoltage on hover, need this to  hover over.  No ev handlers here,
