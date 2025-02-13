@@ -1,6 +1,6 @@
 /*
 ** qAvatar -- the instance and simulation of a quantum mechanical wave in a space
-** Copyright (C) 2021-2024 Tactile Interactive, all rights reserved
+** Copyright (C) 2021-2025 Tactile Interactive, all rights reserved
 */
 
 // formerly called: Manifestation, Incarnation, Timeline, ... formerly part of qSpace
@@ -10,13 +10,23 @@ struct qAvatar {
 	qAvatar(qSpace *, const char *label);
 	~qAvatar(void);
 	void formatDirectOffsets(void);
+
+	// print metadata
 	void dumpObj(const char *title);
 
-	int magic;
-	qSpace *space;
+	// transcribes the complex double numbers (2x8 = 16by) in qwave
+	// into dual rows of 4 single floats in vBuffer (2x4x4 = )
+	float loadViewBuffer(void);
+
+	// dump, boring table with 4 columns
+	void dumpViewBuffer(const char *title = NULL);
+
 
 
 	/* *********************************************** wave */
+
+	int magic;
+	qSpace *space;
 
 	// our main qWave, either for the WaveView or the SetWave tab
 	// this avatar OWNS the qWave & is responsible for deleting it
@@ -25,10 +35,8 @@ struct qAvatar {
 	// pointer grabbed from the space.  Same buffer as in space.
 	double *voltage;
 
-	// the qViewBuffer to be passed to webgl.  qAvatar is a visual thing after all.
-	// Avatar owns the qViewBuffer
-	struct qViewBuffer *qvBuffer;
-	float *vBuffer;  // aligned by 4, not 8
+	// the gl buffer, not the qWave buffer.  always dynamically allocated.
+	float *vBuffer;  // aligned by 4 for single floats, not 8
 
 	// rename to initThreadIntegration
 	//void initIntegrationLoop(int xxx, int nThreads, int nStages);

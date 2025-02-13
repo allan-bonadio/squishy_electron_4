@@ -1,15 +1,12 @@
 #!/bin/bash
 ##
 ## Build Production -- build script for quantum engine Production production
-## Copyright (C) 2022-2024 Tactile Interactive, all rights reserved
+## Copyright (C) 2022-2025 Tactile Interactive, all rights reserved
 ##
 
 # script to compile emscripten/C++ sources into WebAssembly
 cd `dirname $0`
 cd ..
-
-# keep MAX_LABEL_LEN+1 a multiple of 4 or 8 for alignment, eg 7, 15 or 31
-export MAX_LABEL_LEN=31
 
 # in the short term, keep some tracing stuff in; we'll be debugging the production version!
 export DEBUG='-gsource-map --source-map-base /qEng/ '

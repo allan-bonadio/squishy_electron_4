@@ -1,6 +1,6 @@
 /*
 ** errors - helpers for error handling and debugging
-** Copyright (C) 2022-2024 Tactile Interactive, all rights reserved
+** Copyright (C) 2022-2025 Tactile Interactive, all rights reserved
 */
 
 import qeFuncs from '../engine/qeFuncs.js';

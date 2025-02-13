@@ -1,11 +1,11 @@
 /*
 ** flat drawing -- draw a 1d quantum wave as a 2d bargraph (band across top)
-** Copyright (C) 2021-2024 Tactile Interactive, all rights reserved
+** Copyright (C) 2021-2025 Tactile Interactive, all rights reserved
 */
 
 import {abstractDrawing} from './abstractDrawing.js';
 import cx2rgb from './cx2rgb/cx2rgb.glsl.js';
-import {viewUniform, viewAttribute} from './viewVariable.js';
+import {drawingUniform, drawingAttribute} from './drawingVariable.js';
 
 let traceViewBufAfterDrawing = false;
 let traceHighest = false;
@@ -47,7 +47,7 @@ void main() {
 	}
 	y = 1. - 2. * y;
 
-	// figure out x, basically the point index
+	// figure out x, basically the point index; map to -1...+1
 	float x;
 	x = float(int(vertexSerial) / 2) * barWidth * 2. - 1.;
 
@@ -76,42 +76,53 @@ void main() {
 
 // the original display that's worth watching: flat upside down hump graph
 export class flatDrawing extends abstractDrawing {
-	constructor(viewDef) {
-		super(viewDef, 'flatDrawing');
+	constructor(scene) {
+		super(scene, 'flatDrawing');
 
 		this.vertexShaderSrc = vertexSrc;
 		this.fragmentShaderSrc = fragmentSrc;
 	}
 
-	// one time set up of variables for this drawing, every time canvas and viewDef is recreated
+	// one time set up of variables for this drawing, every time canvas and scene is recreated
 	createVariables() {
 		this.setDrawing();
 
 		if (traceFlatDrawing)
-			console.log(`🫓 flatDrawing ${this.viewName}: creatingVariables`);
+			console.log(`🫓 flatDrawing ${this.outerDims}: creatingVariables`);
 
 		// loads view buffer from corresponding wave, calculates highest norm.
 		// Need this for starting values for highest & smoothHighest
-		// this is NOT where it gets called after each iter; see GLView for that
+		// this is NOT where it gets called after each iter; see GLScene for that
 		this.avatar.loadViewBuffer();
 
 
-		this.maxHeightUniform = new viewUniform('maxHeight', this,
+		this.maxHeightUniform = new drawingUniform('maxHeight', this,
 			() => {
 				if (traceHighest)
-					console.log(`🫓 flatDrawing reloading ${this.viewName}: highest=${this.avatar.highest.toFixed(5)}  smoothHighest=${this.avatar.smoothHighest.toFixed(5)}`);
+					console.log(`🫓 flatDrawing reloading outer: ${this.outerDims}: `
+						+` highest=${this.avatar.highest.toFixed(5)} `
+						+` smoothHighest=${this.avatar.smoothHighest.toFixed(5)}`);
 
 				// add in a few percent
-				return {value: this.avatar.smoothHighest * this.viewDef.PADDING_ON_BOTTOM, type: '1f'};
+				return {value: this.avatar.smoothHighest * this.scene.PADDING_ON_BOTTOM, type: '1f'};
 			}
 		);
 
+
+		// WELL continuum:  potential at the ends of the well are infinite; so
+		// psi on the border points is zero. These are the boundary datapoints,
+		// so for N=8, 10 edges between 9 bars, 7 between and 2 on ends.
+
+		// for ENDLESS, we wrap around one bar, so if N=8, there's two border bar at 0 and 8.
+		// there's 7 bars between.  9 bars total, 10 edges, matching the 10 = nPoints
+		// So, the same for WELL and ENDLESS
+
+		// barWidth: width of each bargraph bar
 		let nPoints = this.nPoints = this.space.nPoints;
-		let barWidth = 1 / (nPoints - 1);
+		let barWidth;
 		if (traceFlatDrawing) console.log(`🫓 barWidth= ${barWidth}`);
-		this.barWidthUniform = new viewUniform('barWidth', this,
+		this.barWidthUniform = new drawingUniform('barWidth', this,
 			() => {
-				//barWidth = this.gl.canvas.width / (nPoints - 1)
 				barWidth = 1 / (nPoints - 1)
 				return { value: barWidth, type: '1f' };
 			}
@@ -119,19 +130,25 @@ export class flatDrawing extends abstractDrawing {
 
 		this.vertexCount = nPoints * 2;  // nPoints * vertsPerBar
 		this.rowFloats = 4;
-		this.rowAttr = new viewAttribute('row', this, this.rowFloats, () => {
+		this.rowAttr = new drawingAttribute('row', this, this.rowFloats, () => {
 			this.avatar.vBuffer.nTuples = this.vertexCount;
 			return this.avatar.vBuffer;
 		});
 
-		//this.gl.bindVertexArray(null);
+		// see  abstractDrawing for bindVertexArray()
 	}
 
-	draw() {
-		if (traceFlatDrawing) console.log(`🫓 flatDrawing ${this.viewName}, ${this.avatarLabel}: `+
-			` drawing ${this.vertexCount/2} points`);
+	// called for each image frame on th canvas
+	draw(width, height, specialInfo) {
+		if (traceFlatDrawing) {
+			console.log(`🫓 flatDrawing ${this.outerDims}, ${this.avatarLabel}: `
+				+` drawing ${this.vertexCount/2} points`);
+		}
 		const gl = this.gl;
 		this.setDrawing();
+
+		let bw = specialInfo.bumperWidth;
+		gl.viewport(bw, 0, width - 2 * bw, height);
 
 		this.viewVariables.forEach(v => v.reloadVariable());
 		gl.drawArrays(gl.TRIANGLE_STRIP, 0, this.vertexCount);
@@ -147,7 +164,7 @@ export class flatDrawing extends abstractDrawing {
 
 		// i think this is problematic
 		if (traceViewBufAfterDrawing) {
-			this.avatar.dumpViewBuffer(`finished drawing ${this.viewName} in flatDrawing.js; drew buf:`);
+			this.avatar.dumpViewBuffer(`finished drawing ${this.outerDims} in flatDrawing.js; drew buf:`);
 			console.log(`barWidthUniform=${this.barWidthUniform.getFunc()}    `
 				+`maxHeightUniform=${this.maxHeightUniform.getFunc()}`);
 		}

@@ -1,6 +1,6 @@
 /*
 ** SetWave tab -- render the Wave tab on the control panel
-** Copyright (C) 2021-2024 Tactile Interactive, all rights reserved
+** Copyright (C) 2021-2025 Tactile Interactive, all rights reserved
 */
 
 import React from 'react';
@@ -8,7 +8,7 @@ import PropTypes from 'prop-types';
 import {scaleLinear} from 'd3-scale';
 
 
-import GLView from '../gl/GLView.js';
+import GLScene from '../gl/GLScene.js';
 import TextNSlider from '../widgets/TextNSlider.js';
 import {} from '../utils/storeSettings.js';
 import {getAGroup, alternateMinMaxs} from '../utils/storeSettings.js';
@@ -16,7 +16,7 @@ import {getAGroup, alternateMinMaxs} from '../utils/storeSettings.js';
 import {eSpaceCreatedPromise} from '../engine/eEngine.js';
 import {interpretCppException} from '../utils/errors.js';
 
-// fixed size GLView at start
+// fixed size GLScene at start
 const MINI_WIDTH = 300;
 const MINI_HEIGHT = 150;
 
@@ -63,7 +63,7 @@ class SetWaveTab extends React.Component {
 			this.miniGraphAvatar = space.miniGraphAvatar;
 			this.miniGraphEWave = this.miniGraphAvatar.ewave;
 
-			// space in the state will allow the GLView to start showing, therefore initializing
+			// space in the state will allow the GLScene to start showing, therefore initializing
 			this.setState({space});
 		})
 		.catch(rex => {
@@ -96,9 +96,6 @@ class SetWaveTab extends React.Component {
 	setPulseCenter = pulseCenter => {
 		this.setState({pulseCenter}, () => this.regenerateMiniGraphWave());
 	}
-
-	// canvasInnerDims is for the big view the the user resizes; the setWave GLView is fixed size
-	setCanvasInnerDims = () => {}
 
 	saveMainWave =
 	() => {
@@ -152,13 +149,15 @@ class SetWaveTab extends React.Component {
 
 		</>;
 
-		let glView = '';
+		let glScene = '';
 		if (s.space) {
-			glView = <GLView width={MINI_WIDTH} height={MINI_HEIGHT}
+			// warning: this +2 is a defined constant in WaveView
+			glScene = <GLScene
 						space={s.space} avatar={this.miniGraphAvatar}
-						viewClassName='flatScene' viewName='setWaveMiniGraph'
-						canvasInnerDims={{width: MINI_WIDTH, height: MINI_HEIGHT}}
-						setCanvasInnerDims={this.setCanvasInnerDims}
+						sceneClassName='flatScene' sceneName='setWaveMiniGraph'
+						canvasInnerWidth={MINI_WIDTH}
+						canvasInnerHeight={MINI_HEIGHT}
+						specialInfo={{bumperWidth: 0}}
 					/>
 		}
 
@@ -199,7 +198,7 @@ class SetWaveTab extends React.Component {
 			<div className='waveTabCol'>
 				&nbsp;
 				<div className='waveMiniGraph'>
-					{glView}
+					{glScene}
 				</div>
 
 				<button className='setWaveButton' onClick={ev => this.saveMainWave(this.state)}>

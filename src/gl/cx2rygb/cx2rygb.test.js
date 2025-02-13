@@ -1,12 +1,12 @@
 /*
 ** complex to color testing -- all the widgets below the displayed canvas
-** Copyright (C) 2021-2024 Tactile Interactive, all rights reserved
+** Copyright (C) 2021-2025 Tactile Interactive, all rights reserved
 */
 
 import {expect} from '@jest/globals';
 import {cx2rygb} from './cx2rygb.txlated.js';
 
-let traceConfirm = true;
+let traceConfirm = false;
 
 // THis is a Jest testfile.  Do 'npm test' and it'll run along with the rest.
 

@@ -1,7 +1,7 @@
 /*
 ** visscher -- schrodinger ODE integration by staggering re and im
 **			by half dt, Visscher second order accuracy
-** Copyright (C) 2021-2024 Tactile Interactive, all rights reserved
+** Copyright (C) 2021-2025 Tactile Interactive, all rights reserved
 */
 
 #include "../hilbert/qSpace.h"
@@ -15,6 +15,7 @@ static bool traceRealStep = false;  // in detail
 static bool traceImaginaryStep = false;  // in detail
 static bool traceVischerBench = false;
 static bool traceMidpoint = false;
+static bool traceVoltage = false;
 
 
 /*
@@ -56,7 +57,7 @@ this is our second derivative wrt x:
 ix is the integer index into each length dimension.  The actual distance is dx * ix; determined by
 the length (supplied by user) and N, for each dimension of the space.
 
-// The following uses nanometers, picoseconds, etc as described in definiionOfUnits.md
+// The following uses nanometers, picoseconds, etc as described in definitionOfUnits.md
 //
 // squish units:
 // ℏ = 105.4571817 pfg nm^2 / ps
@@ -77,7 +78,7 @@ dx is a field on the qDimension in the qSpace.
 
 
 // ******************************************************** single point methods
-int usedIx;  // trace only
+int usedIx, infrequent = 0;  // trace only
 
 // Thes functions do a single point of a hit.  They are handed pointers
 // to THE point they are to do.  The hamiltonian (to be split off in the
@@ -87,9 +88,15 @@ void qGrinder::pointReal(qCx *newW, qCx *oldW, qCx *hamiltW, double volts, doubl
 	// second deriv wrt x of psi, multiplied by that coeff
 	double d2𝜓i = (hamiltW[-1].im + hamiltW[+1].im - hamiltW->im * 2) * d2Coeff;
 
-	if (traceRealStep && samplePoint == usedIx) speedyLog(
+	if (traceRealStep && samplePoint == usedIx) {
+		speedyLog(
 		"    🧶 pointReal[%d] d2𝜓i=%3.8lf  hamiltW=%5.5lf %5.5lf %5.5lf and d2Coeff %3.8lf\n",
-		samplePoint, d2𝜓i, hamiltW[-1].im, hamiltW[+1].im, hamiltW->im, d2Coeff);
+		usedIx, d2𝜓i, hamiltW[-1].im, hamiltW[+1].im, hamiltW->im, d2Coeff);
+	}
+	if (traceVoltage && samplePoint == usedIx && ((infrequent++ & 1023) == 0)) {
+//		speedyLog("hiay\n");
+		speedyLog("    🧶 voltage[%d] V=%12.3lf\n", usedIx, volts);
+	}
 
 	// total hamiltonian including voltage (remember hamiltW isn't the hamiltonian,
 	// just the 𝜓 used to calculate the hamiltonian!)
@@ -154,7 +161,7 @@ void qGrinder::hitReal(qCx *newW, qCx *oldW, qCx *hamiltW, double dt) {
 	// or better, make substitutes for hitReal and stepImag
 	for (int ix = dims->start; ix < dims->end; ix++) {
 		usedIx = ix;
-		pointReal(newW + ix, oldW + ix, hamiltW + ix, voltage[ix],dt);
+		pointReal(newW + ix, oldW + ix, hamiltW + ix, voltage[ix], dt);
 	}
 	qflick->fixThoseBoundaries(newW);
 	//elapsedTime += dt/2;  // could be 0 or already dt/2

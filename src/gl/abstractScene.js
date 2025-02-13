@@ -1,6 +1,6 @@
 /*
 ** abstract View Def -- superclass for all the views, which live inside the WaveView
-** Copyright (C) 2021-2024 Tactile Interactive, all rights reserved
+** Copyright (C) 2021-2025 Tactile Interactive, all rights reserved
 */
 
 // should have one VAO per viewdef, or per drawing?
@@ -9,8 +9,8 @@
 let perDrawingVAO = true;   // false;
 
 
-// Each abstractScene subclass is a definition of a kind of picture or view;
-// one per each kind of view. Each drawing is a definition of a part of a view
+// Each abstractScene subclass is a definition of a kind of picture or scene;
+// one per each kind of scene. Each drawing is a definition of a part of a scene
 // (usually drawn with 1 program).  A Scene has one or more drawings in it.  A
 // WaveView hosts an instance of the Scene and is a React component enclosing
 // the canvas.
@@ -18,17 +18,17 @@ let perDrawingVAO = true;   // false;
 /* ****************************************  */
 
 
-// This is the superclass of all view defs; with common webgl and space plumbing.
-// viewName is not the viewClassName, which is one of flatScene, garlandView, ...
+// This is the superclass of all scene defs; with common webgl and space plumbing.
+// sceneName is not the sceneClassName, which is one of flatScene, garlandView, ...
 // there should be ONE of these per canvas, so each WaveView should have 1.
 export class abstractScene {
 
 	/* ************************************************** construction */
-	// viewName: personal name for the viewDef instance, for error msgs
+	// sceneName: personal name for the scene instance, for error msgs
 	// canvas: real <canvas> DOM element, after it's been created by React
 	// class name from instance: vu.constructor.name   from class: vuClass.name
-	constructor(viewName, ambiance, space, avatar) {
-		this.viewName = viewName;
+	constructor(sceneName, ambiance, space, avatar) {
+		this.sceneName = sceneName;
 		this.canvas = ambiance.canvas;
 		this.gl = ambiance.gl;
 		this.tagObject = ambiance.tagObject;
@@ -46,26 +46,27 @@ export class abstractScene {
 			this.tagObject(this.vao, `${this.constructor.name}-${avatar.label}-vao`);
 		}
 
-		// all of the drawings in this view
+		// all of the drawings in this scene
 		// they get prepared, and drawn, in this same order
 		this.drawings = [];
 	}
 
-	// the final call to set it up does all viewClassName-specific stuff
+	// the final call to set it up does all sceneClassName-specific stuff
 	// other subclassers override what they want
-	completeView() {
+	completeScene(specialInfo) {
 		this.compileShadersOnDrawings();
 		this.createVariablesOnDrawings();
 
-		// call again if canvas outer dimensions change
-		this.gl.viewport(0, 0, this.canvas.width, this.canvas.height);
+		// call again if canvas outer dimensions change  WRONG doesn't do bumpers
+		// No!  difft for each drawing
+		// this.gl.viewport(0, 0, this.canvas.width, this.canvas.height);
 
 		// kick it off by drawing it once
-		this.drawAllDrawings();
+		this.drawAllDrawings(this.canvas.width, this.canvas.height, specialInfo);
 
 		// and set up interactivity
 		// maybe i should get rid of this
-		this.domSetupForAllDrawings(this.canvas);
+		//this.domSetupForAllDrawings(this.canvas);
 	}
 
 	/* ****************************************** Shader s */
@@ -106,7 +107,9 @@ export class abstractScene {
 		gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 	}
 
-	drawAllDrawings() {
+	drawAllDrawings(width, height, specialInfo) {
+		if (!width || !height) debugger;
+
 		// not specific to any drawing; I guess it's kindof a drawing itself
 		this.drawBackground();
 
@@ -117,18 +120,8 @@ export class abstractScene {
 			drawing.viewVariables.forEach(v => v.reloadVariable());
 
 			if (!drawing.skipDrawing)
-				drawing.draw();
+				drawing.draw(width, height, specialInfo);
 		});
-	}
-
-	/* ************************************************** dom interactivity */
-	// maybe i should get rid of this TODO
-	domSetupForAllDrawings(canvas) {
-		this.drawings.forEach(drawing => {
-			if (drawing.domSetup)
-				drawing.domSetup(canvas);
-		});
-
 	}
 }
 export default abstractScene;

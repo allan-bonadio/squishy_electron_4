@@ -1,8 +1,9 @@
 /*
 ** View Buffer -- a wrapped buffer of float32s meant to be sent to webgl and the gpu
-** Copyright (C) 2021-2024 Tactile Interactive, all rights reserved
+** Copyright (C) 2021-2025 Tactile Interactive, all rights reserved
 */
 
+// obsolete... right?
 
 // always dynamically allocated.  use name qvBuffer for the qViewBuffer instance
 struct qViewBuffer {

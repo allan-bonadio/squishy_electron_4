@@ -1,6 +1,6 @@
 /*
 ** squish.h -- common defines for the C++ part of squishyelectron
-** Copyright (C) 2022-2024 Tactile Interactive, all rights reserved
+** Copyright (C) 2022-2025 Tactile Interactive, all rights reserved
 */
 
 // include this in almost all C++ sources
@@ -26,6 +26,8 @@ extern const double ℏOver2m_e;  // = ℏ / (2 * m_e);  // units nm^2 / ps
 extern const double inverseℏ;  //  = 1 / ℏ;  // units ps / pfg nm^2
 
 extern const double NaN;
+
+#define MAX_LABEL_LEN 15
 
 #ifdef qDEV_VERSION
 	extern void qCheck(qCx aCx, const char *where = "", int index = -999999999);

@@ -1,6 +1,6 @@
 /*
 ** Integration Statistics -- nodes for display of integration stats
-** Copyright (C) 2024-2024 Tactile Interactive, all rights reserved
+** Copyright (C) 2024-2025 Tactile Interactive, all rights reserved
 */
 
 // holds all statistics shown on the Integration tab
@@ -12,7 +12,7 @@ class inteStats {
 		this.statsMap = {};  // by name
 		this.statsList = [];  // by serial
 
-		this.addStat('Divergence'         , 'divergence', '%');
+		this.addStat('Divergence'         , 'divergence', 'points');
 		this.addStat('Frame Calc Time'    , 'frameCalcTime', 'ms');
 		this.addStat('Draw Time'                  , 'totalDrawTime', 'ms');
 		//this.addStat('Total For Frame'   , 'totalForFrame', 'ms');
@@ -142,7 +142,6 @@ class inteStats {
 		const sm = this.statsMap;
 
 		// some of these aren't here when we need them.  Grinder numbers come from c++
-		//let frameCalcTime = 0;
 		if (grinder) {
 			this.display(sm.divergence, grinder.divergence, 0, (value, element) => {
 				let dv = grinder.divergence;
@@ -155,7 +154,7 @@ class inteStats {
 				}
 				else {
 					// color will go red -> orange -> yellow, also size 1em -> 2em
-					let green = (dv - 50) / 50 * 255;
+					let green = (dv - 50) / 50 * 240;
 					element.style.color = `rgb(255, ${green}, 0)`;
 					element.style.fontSize = (dv / 50) + 'em';
 					element.style.textShadow = '0 0 3px #0008';
@@ -163,8 +162,7 @@ class inteStats {
 				}
 			});
 
-			this.display(sm.frameCalcTime, grinder.maxCalcTime * 1000);  // seconds to ms
-			//frameCalcTime = grinder.frameCalcTime;
+			this.display(sm.frameCalcTime, grinder.maxCalcTime );
 		}
 
 

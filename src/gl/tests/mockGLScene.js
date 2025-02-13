@@ -1,6 +1,6 @@
 /*
-** mockGLView -- substitute for the real GLView in tests
-** Copyright (C) 2023-2024 Tactile Interactive, all rights reserved
+** mockGLScene -- substitute for the real GLScene in tests
+** Copyright (C) 2023-2025 Tactile Interactive, all rights reserved
 */
 
 import 'https://greggman.github.io/webgl-lint/webgl-lint.js';
@@ -10,7 +10,7 @@ import abstractScene from '../abstractScene.js';
 import flatScene from '../flatScene.js';
 import starScene from './starScene.js';
 
-// this mostly replicates GLView in a lame sortof way
+// this mostly replicates GLScene in a lame sortof way
 // I think we have a global namespace here... not sure
 const $ = document.querySelector;
 const $$=document.querySelectorAll;
@@ -29,20 +29,24 @@ export const mockSpace = {
 
 };
 
-const viewClassNamez = {
+const sceneClassNamez = {
 	flat: flatScene,
 	star: starScene,
 }
 
 gonna have to rewrite this as a function
-export class mockGLView {
-	constructor(viewClassName, viewName) {
+export class mockGLScene {
+	proptypes: {
+		specialInfo: PropTypes.object,
+	}
+
+	constructor(sceneClassName, sceneName) {
 		this.state = {canvas: null};
 		this.space = mockSpace;
 		this.avatar = mockAvatar;
 
-		this.viewName = viewName;
-		this.viewClassName = viewClassName;
+		this.sceneName = sceneName;
+		this.sceneClassName = sceneClassName;
 	}
 
 	// just pretend
@@ -66,28 +70,28 @@ export class mockGLView {
 			this.tagObject = this.glAmbiance.tagObject;
 
 			canvas.glview = this;
-			canvas.viewName = this.viewName;
+			canvas.sceneName = this.sceneName;
 
-			this.initViewClass();
+			this.initSceneClass();
 
 			// finally!
-			console.log(`🖼 🖼 mockGLView ${this.viewName}: created!`);
+			console.log(`🖼 🖼 mockGLScene ${this.sceneName}: created!`);
 		})
 	}
 
-	testViewClasses = {
+	testSceneClasses = {
 	}
 
 	// instantiate the view class we'll use
-	initViewClass() {
-		console.log(`initViewClass: viewClassName=${this.viewClassName} viewName${this.viewName}`);
+	initSceneClass() {
+		console.log(`initSceneClass: sceneClassName=${this.sceneClassName} sceneName${this.sceneName}`);
 
-		// already got it this.viewClassName = viewClassName;
-		let vClass = viewClassNamez[this.viewClassName];
-		this.testViewClasses[this.viewClassName] =
+		// already got it this.sceneClassName = sceneClassName;
+		let sClass = sceneClassNamez[this.sceneClassName];
+		this.testSceneClasses[this.sceneClassName] =
 			this.effectiveView =
-			new vClass(this.viewClassName, this, mockSpace, mockAvatar);
-		this.effectiveView.completeView();
+			new sClass(this.sceneClassName, this, mockSpace, mockAvatar);
+		this.effectiveView.completeScene(specialInfo);
 		this.avatar.doRepaint = this.doRepaint;
 
 	}
@@ -96,10 +100,10 @@ export class mockGLView {
 	doRepaint() {
 		console.log('doRepaint');
 		mockAvatar.loadViewBuffer();
-		this.effectiveView.drawAllDrawings();
+		this.effectiveView.drawAllDrawings(width, height, p.specialInfo);
 	}
 
 };
 
 // does this do anything?
-export default mockGLView;
+export default mockGLScene;

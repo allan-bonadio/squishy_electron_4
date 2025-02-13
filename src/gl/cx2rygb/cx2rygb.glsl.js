@@ -1,6 +1,6 @@
 /*
 ** cx2rygb -- GLSL code for mapping cx numbers to rainbow colors
-** Copyright (C) 2021-2024 Tactile Interactive, all rights reserved
+** Copyright (C) 2021-2025 Tactile Interactive, all rights reserved
 */
 
 // alternate - try octagon where i=yellow, -1=green, -i=blue and as usual red=1

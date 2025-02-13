@@ -46,14 +46,18 @@ marked.use(markedKatex(katexOptions));
 let template;
 let nDirsWalked, nFilesTried, nFilesPassedThru, nFilesSymlinked, nMDFilesCompiled;
 
-console.log(`•••••••••• compile docs with Markd + katex ••••••••••
-compileDocs # prompts to delete the public/doc contents, then does all
-compileDocs --batch # no prompt, no delete, does all
-compileDocs colophon.md intro/intro1.md  # just does those two files
-`);
+function usage() {
+	console.log(`•••••••••• compile docs with Markd + katex ••••••••••
+		usage:
+		compileDocs # prompts to delete the public/doc contents, then does all
+		compileDocs --batch # no prompt, no delete, does all
+		compileDocs colophon.md intro/intro1.md  # just does those two files
+	`);
+}
 
 if (!process.env.SQUISH_ROOT) {
 	console.error(`Must define env var SQUISH_ROOT!`);
+	usage();
 	process.exit(1);
 }
 process.chdir(process.env.SQUISH_ROOT +`/docGen`);
@@ -77,6 +81,7 @@ const readTextFile =
 const catchException =
 (ex, where) => {
 	console.error(`Error ${where}:`, ex.stack ?? ex.message ?? ex);
+	usage();
 	debugger;
 }
 
@@ -228,6 +233,7 @@ function symlinkFile(filePath) {
 
 // it's a file, but what kind?  trust the suffix.
 function compileAFile(filePath) {
+	console.log(`compileDocs: compileAFile: ${filePath}`);
 	if (filePath.endsWith('.DS_Store'))
 		return `${filePath} avoided`;
 	let dot = filePath.lastIndexOf('.');
@@ -252,6 +258,7 @@ function compileAFile(filePath) {
 // without a slash on the front or end of path
 function compileADir(dirPath) {
 	let docPath = makeOutputPath(dirPath);
+	console.log(`compileDocs: compileADir: ${dirPath}`);
 
 	// don't forget to actually CREATE the directory!
 	// "Calling .mkdir() when path exists doesn't error when recursive is true."

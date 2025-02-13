@@ -1,6 +1,6 @@
 /*
 ** Control Panel -- all the widgets below the displayed canvas
-** Copyright (C) 2021-2024 Tactile Interactive, all rights reserved
+** Copyright (C) 2021-2025 Tactile Interactive, all rights reserved
 */
 
 import React from 'react';
@@ -44,7 +44,7 @@ export class ControlPanel extends React.Component {
 
 		animator: PropTypes.object,
 
-		sPanel: PropTypes.object.isRequired,
+		//sPanel: PropTypes.object.isRequired,
 
 		frameRateMenuFreqs: PropTypes.array,
 	}
@@ -52,9 +52,6 @@ export class ControlPanel extends React.Component {
 	constructor(props) {
 		super(props);
 		//debugger;
-		ControlPanel.me = this;  // TODO get rid of this
-		this.sPanel = props.sPanel;
-		this.sPanel.cPanel = this;
 
 		// most of the state is kept here.  But, also, in the store settings for the next page reload.
 		this.state = {
@@ -228,7 +225,7 @@ export class ControlPanel extends React.Component {
 
 	/* ********************************************** wave */
 
-	// given these params, put it into effect and display it on the wave view
+	// given these params, put it into effect and display it on the wave scene
 	// This is most of 'Reset Wave'  NOT for regular iteration
 	setAndPaintMainWave =
 	waveParams => {
@@ -261,7 +258,7 @@ export class ControlPanel extends React.Component {
 		storeAGroup('waveParams', waveParams);
 	}
 
-	// generate an FFT of the wave.  In the JS console.  TODO: make a real GL view out of this
+	// generate an FFT of the wave.  In the JS console.  TODO: make a real GLScene out of the spectrum!
 	clickOnFFT(space)
 	{
 		wrapForExc(() => {
@@ -281,10 +278,7 @@ export class ControlPanel extends React.Component {
 	// fills in the voltage buffer with values most recently set for voltageParams
 	// called when user clicks reset voltage on cptoolbar
 	resetVoltage =
-	() => {
-		this.space.vDisp.setFamiliarVoltage(getAGroup('voltageParams'));
-		this.space.updateVoltageArea();
-	}
+	() => this.space.vDisp.setFamiliarVoltage(getAGroup('voltageParams'));
 
 	setShowingTab =
 	tabCode => {

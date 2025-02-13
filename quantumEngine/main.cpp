@@ -1,6 +1,6 @@
 /*
 ** Main -- top level source file for running Squishy Electron
-** Copyright (C) 2021-2024 Tactile Interactive, all rights reserved
+** Copyright (C) 2021-2025 Tactile Interactive, all rights reserved
 */
 
 #include "hilbert/qSpace.h"
@@ -14,11 +14,11 @@
 // call this JS callback so JS knows we're up and ready.
 // Hand it some numbers from the builder script.
 // all these param names must be lower case for some reason.
-EM_JS(int, qeStarted, (int max_dimensions, int max_label_len, int n_threads), {
+EM_JS(int, qeStarted, (int max_dimensions, int n_threads), {
 	// sometimes these things start in the wrong order
 	let inter = setInterval(() => {
 		if (window.startUpFromCpp) {
-			window.startUpFromCpp(max_dimensions, max_label_len, n_threads);
+			window.startUpFromCpp(max_dimensions, n_threads);
 			clearInterval(inter);
 		}
 	}, 100);
@@ -29,7 +29,7 @@ EM_JS(int, qeStarted, (int max_dimensions, int max_label_len, int n_threads), {
 int main() {
 	printf(" 🐣 bonjour le monde!\n");
 
-	qeStarted(MAX_DIMENSIONS, MAX_LABEL_LEN, N_THREADS);
+	qeStarted(MAX_DIMENSIONS, N_THREADS);
 	return 0;
 }
 

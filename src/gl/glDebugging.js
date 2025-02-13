@@ -1,6 +1,6 @@
 /*
 ** vao Dump -- show me what's in a vao
-** Copyright (C) 2023-2024 Tactile Interactive, all rights reserved
+** Copyright (C) 2023-2025 Tactile Interactive, all rights reserved
 */
 
 // this sure doesn't enlighten any.  I was hoping to get info about the current VAO.
@@ -36,7 +36,7 @@ dumpOneAttr(gl, id, name = '') {
 dumpAttrNames(gl, title) {
 	//console.log(`abstractDrawing.attrTypes=`, abstractDrawing.attrTypes);
 
-	//console.log(`𒑐 dumpAttrNames for viewdef ${this.viewName} drawing ${this.drawingName}: ${title}`);
+	//console.log(`𒑐 dumpAttrNames for viewdef ${this.sceneName} drawing ${this.drawingName}: ${title}`);
 	//this.viewDef.attrVariableNames
 	//this.this.gl.getAttribLocation(drawing.program, varName);
 
@@ -97,7 +97,7 @@ dumpAttrNames(gl, title) {
 //		console.log(`--- available GL extensions:\n${available_extensions.join('\n')}`);
 //	}
 
-	//static viewClassName: 'abstractScene';
+	//static sceneClassName: 'abstractScene';
 
 }
 /* *********************************************************** end of CFTW */

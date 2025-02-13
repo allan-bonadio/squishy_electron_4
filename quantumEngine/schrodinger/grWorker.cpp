@@ -1,6 +1,6 @@
 /*
 ** grWorker -- one thread that's doing iteration
-** Copyright (C) 2023-2024 Tactile Interactive, all rights reserved
+** Copyright (C) 2023-2025 Tactile Interactive, all rights reserved
 */
 
 
@@ -12,6 +12,7 @@ static bool traceStart = false;
 static bool traceWork = false;
 static bool traceFinish = false;
 static bool traceSync = false;
+static bool traceCreation = false;
 
 static bool traceWorkOccasionally = false;
 static int occasionally = 0;
@@ -19,9 +20,9 @@ static int occasionally = 0;
 /* *********************************************** grWorker */
 
 // indexed by thread serial, there may be gaps.
-// for threads that AREN'T gThreads
+// for threads that AREN'T grWorkers
 static grWorker *sla[MAX_THREADS];
-grWorker **qGrinder::gThreads = sla;
+grWorker **qGrinder::grWorkers = sla;
 
 // do the work: integration
 void grWorker::gThreadWork(void) {
@@ -71,18 +72,22 @@ void grWorker::gThreadLoop(void) {
 			// All other gThread threads will also be waiting for startMx.  When this one gets its chance,
 			// it'll lock and unlock, then start its integration work.
 			// so they all start at roughly the same time.
-			if (traceSync) speedyLog("🏁 🔪 at Starting Gate in grWorker::gThreadLoop- "
-				"startAtomic=%d (stopped= -1, go=0) 🏁\n",
-				grinder->startAtomic);
+			if (traceSync) {
+				speedyLog("🏁 🔪 at Starting Gate in grWorker::gThreadLoop "
+					"startAtomic=%d (stopped= -1, go=0) pointer: %p   size: %lu  🏁\n",
+					grinder->startAtomic, &grinder->startAtomic, sizeof(grinder->startAtomic));
+			}
 			speedyFlush();
 
 			// wait forever to get notified, when startAtomic changes from -1 to zero
 			// emscripten_atomic_wait_u32() doesn't work here so use the futex call
-			printf("startAtomic: pointer: %p   size: %lu   \n", &grinder->startAtomic, sizeof(grinder->startAtomic));
 			int howEnded = emscripten_futex_wait(&grinder->startAtomic, -1, 1e12);
-			if (traceSync) speedyLog("🔪 after atomic wait on startAtomic=%d (shdbe 0) and wait "
-				"returned %d ok=0, ≠1, timeout= ∞\n",
-				emscripten_atomic_load_u32(&grinder->startAtomic), howEnded);
+
+			if (traceSync) {
+				speedyLog("🏁 🔪 after atomic wait on startAtomic=%d (shdbe 0) and wait "
+					"returned howEnded=%d ok=0, ≠1, timeout= ∞  🏁\n",
+					emscripten_atomic_load_u32(&grinder->startAtomic), howEnded);
+			}
 			speedyFlush();
 
 			// now we count each thread as it starts up
@@ -118,7 +123,7 @@ void grWorker::gThreadLoop(void) {
 					serial, nWas);
 			}
 
-			if (nWas >= grinder->nGrinderThreads) {
+			if (nWas >= grinder->nGrWorkers) {
 				// this must be the last thread to finish in this integration frame!
 				grinder->threadsHaveFinished();
 			}
@@ -158,21 +163,18 @@ grWorker::grWorker(qGrinder *gr)
 }
 // no destructor - never freed
 
-
-
-
 // static; creates all gThread threads; runs early
-void grWorker::createGrinderThreads(qGrinder *grinder) {
+void grWorker::createGrWorkers(qGrinder *grinder) {
 
-	for (int t = 0; t < grinder->nGrinderThreads; t++) {
+	for (int t = 0; t < grinder->nGrWorkers; t++) {
 		// actual pthread won't start till the next event loop i think
 		grWorker *gThread = new grWorker(grinder);
-		grinder->gThreads[gThread->thread->serial] = gThread;
-		speedyLog("🔪  grWorker::createGrinderThreads() created A GrinderThread(%d) \n", gThread->serial);
+		grinder->grWorkers[gThread->thread->serial] = gThread;
+		if (traceCreation)
+			speedyLog("🔪  grWorker::createGrWorkers() created A grWorker #%d\n",
+				gThread->serial);
 	}
 
-	speedyLog("🔪  grWorker created %d gThreads \n", grinder->nGrinderThreads);
+	if (traceCreation)
+		speedyLog("🔪  grWorker created %d grWorkers \n", grinder->nGrWorkers);
 };
-
-
-

@@ -1,12 +1,12 @@
 /*
 ** e Engine - main interface in JS to the quantumEngine in C++ and Emscripten
-** Copyright (C) 2021-2024 Tactile Interactive, all rights reserved
+** Copyright (C) 2021-2025 Tactile Interactive, all rights reserved
 */
 
 import {defineQEngineFuncs} from './qeFuncs.js';
 import App from '../App.js';
 import {interpretCppException, excRespond} from '../utils/errors.js';
-import {resetObjectRegistry} from '../utils/directAccessors.js';
+//import {resetObjectRegistry} from '../utils/directAccessors.js';
 import {getASetting, storeASetting, createStoreSettings} from '../utils/storeSettings.js';
 import eSpace from './eSpace.js';
 //import eThread from './eThread.js';
@@ -19,12 +19,13 @@ let tracePromises = false;
 /* ****************************************************** app startup */
 
 // c++ main() calls us to tell us that it's up, and to pass some fundamental sizes
-export let MAX_DIMENSIONS, MAX_LABEL_LEN, N_THREADS;
+export let MAX_DIMENSIONS, N_THREADS;
 
 // this promise resolves when the main space is created.
 // Create the promise tout de suite when app starts, so everybody can get at it.
 // Recreate it when you know you're about to recreate the space and everything.
 
+// TODO: I don't need this crap anymore, right?
 let eSpaceCreatedSucceed, eSpaceCreatedFail;
 function resetSpaceCreatedPromise() {
 	let prom = new Promise((succeed, fail) => {
@@ -37,7 +38,12 @@ function resetSpaceCreatedPromise() {
 		console.log(`spaceCreatedPromise 🐣 ... created but NOT YET RESOLVED`);
 	return prom;
 }
-// for the first time when app starts up
+
+// for the first time when app starts up.  Because eSpaceCreatedPromise is an
+// exported variable, that means there can only be one of them.  Therefore, only
+// one space, and only one SquishPanel.  I was hoping to be able to have more
+// than one SquishPanel.  Maybe if they all share the same spact... or if I pass
+// down yet another variable down multiple layers of components...
 export let eSpaceCreatedPromise = resetSpaceCreatedPromise();
 
 // the Space for the SquishPanel
@@ -100,9 +106,8 @@ function startUpEverything() {
 // finally started up.  Once only, at page load. do NOT export this; it's global
 // cuz quantumEngine.js, the compiled C++ proxy, has to have access to it early
 // on, and it's CJS and can't reach JS module exports.
-function startUpFromCpp(maxDims, maxLab, nThreads) {
+function startUpFromCpp(maxDims, nThreads) {
 	MAX_DIMENSIONS = maxDims;
-	MAX_LABEL_LEN = maxLab;
 	N_THREADS = nThreads;
 
 	window.cppRuntimeInitialized();

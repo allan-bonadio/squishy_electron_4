@@ -1,12 +1,13 @@
 /*
 ** eGrinder - the JS interface to c++ numbercrunching the Schrodinger's equation
-** Copyright (C) 2023-2024 Tactile Interactive, all rights reserved
+** Copyright (C) 2023-2025 Tactile Interactive, all rights reserved
 */
 
 //import inteStats from '../controlPanel/inteStats.js';
 //import statGlobals from '../controlPanel/statGlobals.js';
 import {prepForDirectAccessors} from '../utils/directAccessors.js';
 import qeFuncs from './qeFuncs.js';
+import qeConsts from './qeConsts.js';
 import {getASetting} from '../utils/storeSettings.js';
 
 let traceCreation = false;
@@ -24,8 +25,14 @@ class eGrinder {
 		this.avatar = avatar;
 		avatar.grinder = this;
 
-		if (this.sentinel !== true)
-			throw "🔥 🔥 Grinder offsets not correct 🔥 🔥";
+		//console.log(`matching sentinel:
+		//qeConsts.grSENTINEL_VALUE=${qeConsts.grSENTINEL_VALUE} !==
+		//this.sentinel=${this.sentinel}`)
+
+		console.log(`sentinels: ${qeConsts.grSENTINEL_VALUE}  ${this.sentinel}`);
+this.sentinel = qeConsts.grSENTINEL_VALUE;  // try this
+//		if (qeConsts.grSENTINEL_VALUE !== this.sentinel)
+//			throw "🔥 🔥 Grinder offsets not correct 🔥 🔥";
 		if (traceCreation)
 			console.log(`🪚 eGrinder constructed:`, this);
 	}
@@ -44,52 +51,45 @@ class eGrinder {
 	// are passed by pointer and you need to allocate them in JS (eg see
 	// eGrinder.constructor)
 
-	get _space() { return this.ints[1]; }
 
-	get elapsedTime() { return this.doubles[2]; }
-	set elapsedTime(a) { this.doubles[2] = a; }
-	get frameSerial() { return this.ints[3]; }
-	set frameSerial(a) { this.ints[3] = a; }
+ 	get _space() { return this.ints[1]; }
+ 	get _qflick() { return this.ints[3]; }
+ 	get _voltage() { return this.ints[4]; }
+ 	get _qspect() { return this.ints[5]; }
 
-	get justNFrames() { return this.ints[34]; }
-	set justNFrames(a) { this.ints[34] = a; }
-	get totalCalcTime() { return this.doubles[12]; }
-	get maxCalcTime() { return this.doubles[13]; }
-	get divergence() { return this.doubles[14]; }
+ 	get videoFP() { return this.doubles[4]; }
+ 	set videoFP(a) { this.doubles[4] = a; }
+ 	get chosenFP() { return this.doubles[5]; }
+ 	set chosenFP(a) { this.doubles[5] = a; }
+ 	get totalCalcTime() { return this.doubles[6]; }
+ 	get maxCalcTime() { return this.doubles[7]; }
 
-	get shouldBeIntegrating() { return Boolean(this.bools[168]); }
-	set shouldBeIntegrating(a) { this.bools[168] = a; }
-	get isIntegrating() { return Boolean(this.bools[169]); }
-	set isIntegrating(a) { this.bools[169] = a; }
-	get pleaseFFT() { return Boolean(this.bools[170]); }
-	set pleaseFFT(a) { this.bools[170] = a; }
+ 	get stretchedDt() { return this.doubles[8]; }
+ 	set stretchedDt(a) { this.doubles[8] = a; }
+ 	get divergence() { return this.doubles[10]; }
+ 	get elapsedTime() { return this.doubles[11]; }
+ 	set elapsedTime(a) { this.doubles[11] = a; }
+ 	get frameSerial() { return this.ints[24]; }
+ 	set frameSerial(a) { this.ints[24] = a; }
+ 	get nGrWorkers() { return this.ints[26]; }
+ 	startAtomicOffset = 27;
+ 	get startAtomic() { return this.ints[27]; }
 
-	get needsRepaint() { return Boolean(this.bools[171]); }
-	set needsRepaint(a) { this.bools[171] = a; }
-	get hadException() { return Boolean(this.bools[63]); }
-	set hadException(a) { this.bools[63] = a; }
-	get _exceptionCode() { return this.pointer + 48; }
+ 	get _exceptionCode() { return this.pointer + 124; }
+ 	get hadException() { return Boolean(this.bytes[139]); }
+ 	set hadException(a) { this.bytes[139] = Boolean(a); }
+ 	get _label() { return this.pointer + 140; }
 
-	get stretchedDt() { return this.doubles[3]; }
-	set stretchedDt(a) { this.doubles[3] = a; }
-	get nGrinderThreads() { return this.ints[33]; }
-	get videoFP() { return this.doubles[9]; }
-	set videoFP(a) { this.doubles[9] = a; }
-	get chosenFP() { return this.doubles[10]; }
-	set chosenFP(a) { this.doubles[10] = a; }
-	startAtomicOffset = 35;
-
-	get _qflick() { return this.ints[22]; }
-
-	get _voltage() { return this.ints[23]; }
-	get divergence() { return this.doubles[14]; }
-
-	get _qspect() { return this.ints[30]; }
-	get _stages() { return this.ints[31]; }
-	get _threads() { return this.ints[32]; }
-	get _label() { return this.pointer + 152; }
-
-	get sentinel() { return Boolean(this.bools[172]); }
+ 	get shouldBeIntegrating() { return Boolean(this.bytes[156]); }
+ 	set shouldBeIntegrating(a) { this.bytes[156] = Boolean(a); }
+ 	get isIntegrating() { return Boolean(this.bytes[157]); }
+ 	set isIntegrating(a) { this.bytes[157] = Boolean(a); }
+ 	get pleaseFFT() { return Boolean(this.bytes[158]); }
+ 	set pleaseFFT(a) { this.bytes[158] = Boolean(a); }
+ 	get needsRepaint() { return Boolean(this.bytes[159]); }
+ 	set needsRepaint(a) { this.bytes[159] = Boolean(a); }
+ 	get sentinel() { return this.bytes[160]; }
+ 	set sentinel(a) { this.bytes[160] = a; }
 
  	/* ******************* end of direct accessors */
 
@@ -99,7 +99,8 @@ class eGrinder {
 //	+` thing, and sometimes it just runs off the rails.  You can click on the Reset Wave `
 //	+` button; lower frequencies and more space points will help.`;
 
-	// call this to trigger all the threads to do the next iteration
+	// call this to trigger all the threads to do the next iteration.  We COULD do this in C++
+	// but the Atomics api can do it, too.
 	triggerIteration() {
 		if (traceTriggerIteration) {
 			console.log(`🪚 eGrinder.triggerIteration, ${this.pointer.toString(16)} starting  `
@@ -110,7 +111,12 @@ class eGrinder {
 		let nWoke = Atomics.notify(this.ints, this.startAtomicOffset);
 		//console.log(`🎥 nWoke:`, nWoke);
 
+		// old way: doing it by C++
 		//qeFuncs.this_triggerIteration(this.pointer);
+
+		// this ought to work although I still don't know why it turns from 123 to 1
+		if (qeConsts.grSENTINEL_VALUE !== this.sentinel)
+			throw "🔥 🔥 Grinder offsets aren't correct 🔥 🔥";
 	}
 
 	// Grind one frame - Single Threaded - deprecated sortof

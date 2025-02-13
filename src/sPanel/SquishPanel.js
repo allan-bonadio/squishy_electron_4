@@ -1,7 +1,7 @@
 /*
 ** squish panel -- like a self-contained quantum system, including space,
 ** 				waves, and drawings and interactivity.
-** Copyright (C) 2021-2024 Tactile Interactive, all rights reserved
+** Copyright (C) 2021-2025 Tactile Interactive, all rights reserved
 */
 
 // SquishPanel has a 1:1 relationship with the c++ qSpace.
@@ -36,7 +36,7 @@ const DEFAULT_VIEW_CLASS_NAME = 'flatScene';
 export class SquishPanel extends React.Component {
 	static propTypes = {
 		id: PropTypes.string.isRequired,
-		width: PropTypes.number,
+		bodyWidth: PropTypes.number.isRequired,
 	};
 
 	static squishPanelConstructed = 0;
@@ -50,14 +50,12 @@ export class SquishPanel extends React.Component {
 			debugger;
 			location = location;  // eslint-disable-line no-restricted-globals
 		}
-
-		this.spaceCtx = React.createContext(null);
-
-
 		SquishPanel.squishPanelConstructed++;
 
+
+
 		this.state = {
-			mainViewClassName: DEFAULT_VIEW_CLASS_NAME,
+			mainSceneClassName: DEFAULT_VIEW_CLASS_NAME,
 
 			showVoltage:  getASetting('voltageSettings', 'showVoltage'),
 
@@ -67,6 +65,11 @@ export class SquishPanel extends React.Component {
 			//  this will get filled in when the rAF mesurements get settled down in sAnimator
 			frameRateMenuFreqs: null,
 		};
+
+		// um, I think we want multiple things in the space context.  The space,
+		// the promise for the space, dunno what else.  Hmmm the hooks docs
+		// use one per variable.  I think you can't do that in class components.
+		this.spaceCtx = React.createContext(null);
 
 
 
@@ -178,7 +181,7 @@ export class SquishPanel extends React.Component {
 		const p = this.props;
 		const s = this.state;
 
-		if (traceWidth) console.log(`👑 SquishPanel render, p.width=${p.width} `
+		if (traceWidth) console.log(`👑 SquishPanel render, p.bodyWidth=${p.bodyWidth} `
 			+ ` body.clientWidth=${document.body.clientWidth}`);
 
 		return (
@@ -186,7 +189,7 @@ export class SquishPanel extends React.Component {
 
 				<article id={this.props.id} className="SquishPanel">
 					<WaveView
-						outerWidth = {p.width}
+						outerWidth = {p.bodyWidth}
 						showVoltage={s.showVoltage}
 						sPanel={this}
 					/>

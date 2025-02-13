@@ -3,7 +3,7 @@ These files are concerned with webgl for Squishy Electron.  See view directory f
 
 # Strategic Files
 
-* GLView.js - react component that wraps the <canvas and interfaces directly with the rest of the JS code.
+* GLScene.js - react component that wraps the <canvas and interfaces directly with the rest of the JS code.
 * abstract*.js - base classes for viewDefs and drawings
 * *Def.js - Scene classes, instances manage one or more Drawing instances
 * *Drawing.js - Drawing classes; each draws one piece of stuff for a Scene
@@ -32,12 +32,10 @@ Roughly corresponds to an Avatar?  not really...
 * cx2rygb - convert a complex number to a RYGB color + translator to .js
 * cx2rygb/cx2rygb.glsl.js - GLSL code to calculate colors based on complex numbers
 
-# GL variables
-* viewVariable.js - helps drawing modules with the variables passed into GL
-
 # other
 * README.md - this file
 * curiosity.js - test code to explore WebGL; retrieves all settings and other stuff, interesting!
+* drawingVariable.js - helps drawing modules with the variables passed into GL
 
 
 # RYGB

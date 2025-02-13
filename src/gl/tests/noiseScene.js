@@ -1,11 +1,11 @@
 /*
 ** Noise View Def -- an old prototype used to develop the View Variable system
-** Copyright (C) 2021-2024 Tactile Interactive, all rights reserved
+** Copyright (C) 2021-2025 Tactile Interactive, all rights reserved
 */
 
 import {abstractScene} from '../abstractScene.js';
 import {abstractDrawing} from '../abstractDrawing.js';
-import {viewUniform, viewAttribute} from '../viewVariable.js';
+import {drawingUniform, drawingAttribute} from '../drawingVariable.js';
 
 
 const IMAGE_WIDTH = 256;
@@ -13,7 +13,7 @@ const IMAGE_PIXELS = IMAGE_WIDTH * IMAGE_WIDTH;
 let vertices = new Float32Array(IMAGE_PIXELS * 2);  // vec2
 let colors = new Float32Array(IMAGE_PIXELS * 3);  // vec3
 
-// create this table the way viewAttribute likes it
+// create this table the way drawingAttribute likes it
 function createNoise() {
 	for (let x = 0; x < IMAGE_WIDTH; x++) {
 		for (let y = 0; y < IMAGE_WIDTH; y++) {
@@ -78,19 +78,21 @@ export class noiseDrawing extends abstractDrawing {
 		//debugger;
 
 		this.imageWidthUni =
-			new viewUniform('imageWidth', this,
+			new drawingUniform('imageWidth', this,
 				() => { return {value: IMAGE_WIDTH, type: 'i'}});
 
 		createVertices();
 
-		this.verticesAttr = new viewAttribute('vertices', this, 2, () => {return {value: vertices, type: 'vec2'}});
-		this.colorsAttr = new viewAttribute('colors', this, 2, () => {return {value: colors, type: 'vec2'}});
+		this.verticesAttr = new drawingAttribute('vertices', this, 2, () => {return {value: vertices, type: 'vec2'}});
+		this.colorsAttr = new drawingAttribute('colors', this, 2, () => {return {value: colors, type: 'vec2'}});
 	}
 
-	draw() {
+	draw(width, height, specialInfo) {
 		const gl = this.gl;
 		this.setDrawing();
 		debugger;
+
+		gl.viewport(... drawing calculates this on the fly);
 
 		//this.cornerColorUni.reloadVariable();
 
@@ -103,8 +105,8 @@ export class noiseDrawing extends abstractDrawing {
 
 
 export class noiseScene extends abstractScene {
-	constructor(viewName, ambiance, space, avatar) {
-		super(viewName, ambiance, space, avatar);
+	constructor(sceneName, ambiance, space, avatar) {
+		super(sceneName, ambiance, space, avatar);
 
 		if (! this.space || !this.avatar) {
 			throw  new Error(`noiseScene: being created without space or avatar`);
@@ -117,4 +119,4 @@ export class noiseScene extends abstractScene {
 
 export default noiseScene;
 
-noiseScene.viewClassName = 'noiseScene';
+noiseScene.sceneClassName = 'noiseScene';

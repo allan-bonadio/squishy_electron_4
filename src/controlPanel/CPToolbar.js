@@ -1,6 +1,6 @@
 /*
 ** control panel toolbar -- toolbar immediately below WaveView
-** Copyright (C) 2021-2024 Tactile Interactive, all rights reserved
+** Copyright (C) 2021-2025 Tactile Interactive, all rights reserved
 */
 
 import React from 'react';
@@ -116,17 +116,21 @@ function CPToolbar(props) {
 			</div>
 
 			<div className='toolbarRow'>
-				<button onClick={ev => this.cPanel.clickOnFFT(props.space)}>
-					FFT
-				</button>
 				&nbsp;
 
-				<ShowVoltageControl showVoltage={props.showVoltage}
-					changeShowVoltage={props.changeShowVoltage} />
 			</div>
 		</div>
 	</div>;
 }
+
+// stuff that I removed and I'm too chicken to delete
+// 				<ShowVoltageControl showVoltage={props.showVoltage}
+// 					changeShowVoltage={props.changeShowVoltage} />
+
+// 				<button onClick={ev => this.cPanel.clickOnFFT(props.space)}>
+// 					FFT
+// 				</button>
+
 
 setPT();
 

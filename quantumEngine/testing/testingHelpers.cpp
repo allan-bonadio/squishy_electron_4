@@ -1,6 +1,6 @@
 /*
 ** testing helpers -- C++ general utilities to help with unit tests and other tests
-** Copyright (C) 2023-2024 Tactile Interactive, all rights reserved
+** Copyright (C) 2023-2025 Tactile Interactive, all rights reserved
 */
 
 #include <stdexcept>

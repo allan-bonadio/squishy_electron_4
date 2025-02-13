@@ -1,6 +1,6 @@
 /*
 ** qThread -- manage the thread(s) that are doing iteration
-** Copyright (C) 2023-2024 Tactile Interactive, all rights reserved
+** Copyright (C) 2023-2025 Tactile Interactive, all rights reserved
 */
 
 #include <stdexcept>
@@ -16,23 +16,6 @@ bool traceThreads = false;
 
 /* ********************************************************************************** threads */
 
-// ok so this is pthreads
-
-
-// the function called in each thread-specific main loop, 60x/sec
-// NO see grWorker
-//static void mainLooper(void *arg) {
-//	qThread *thread = (qThread *) arg;
-//	//printf("🐴  mainLooper entered with qthread=%p\n", thread);
-//	thread->dumpAThread("mainLooper entered");
-//	//printf("mainLooper entered with qthread=%p,  qt-handler=%p\n",
-//	//	 thread->handler);
-//	//qGrinder *grinder = (qGrinder *) qt->handle;
-//
-//
-//	(*thread->handler)(thread->arg);
-//}
-
 // each thread does this upon startup; runs this func
 // the function that runs the whole thread, executes in the thread thread
 // argument in: it's own qtThread object.  Makes main loop for thread,
@@ -44,7 +27,7 @@ static void *tStart(void *qtx) {
 	//printf("🐴 qThread::ok confirmed in tStart #%d!\n", qt->serial);
 
 	// since this is the thread execcuting, it should show up in its log in the debugger?
-	qt->dumpAThread("thread starting up()");
+	if (traceThreads) qt->dumpAThread("thread starting up()");
 
 	(*qt->handler)(qt->arg);
 

@@ -1,6 +1,6 @@
 /*
 ** resolution dialog -- what you get from the resolution tab in CP
-** Copyright (C) 2021-2024 Tactile Interactive, all rights reserved
+** Copyright (C) 2021-2025 Tactile Interactive, all rights reserved
 */
 
 import React from 'react';
@@ -11,7 +11,7 @@ import qeConsts from '../engine/qeConsts.js';
 import CommonDialog from '../widgets/CommonDialog.js';
 import {powerToIndex} from '../utils/powers.js';
 import LogSlider from '../widgets/LogSlider.js';
-import {eSpaceCreatedPromise} from '../engine/eEngine.js';
+//import {eSpaceCreatedPromise} from '../engine/eEngine.js';
 import {getASetting, storeAGroup} from '../utils/storeSettings.js';
 
 export default class ResolutionDialog extends React.Component {

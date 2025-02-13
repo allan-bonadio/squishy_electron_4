@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 /*
 ** glTranslate.js - crude translator for GLSL => JS, just for testing purposes
-** Copyright (C) 2022-2024 Tactile Interactive, all rights reserved
+** Copyright (C) 2022-2025 Tactile Interactive, all rights reserved
 */
 
 import fs from 'fs';

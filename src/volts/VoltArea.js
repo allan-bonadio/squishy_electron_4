@@ -1,7 +1,7 @@
 /*
 ** Voltage Area -- the off-white voltage line, and its tactile
 **	      interactions when the user moves it.  for Squishy Electron
-** Copyright (C) 2021-2024 Tactile Interactive, all rights reserved
+** Copyright (C) 2021-2025 Tactile Interactive, all rights reserved
 */
 
 import React, {useRef, useState, useReducer} from 'react';
@@ -13,10 +13,6 @@ import {select as d3_select} from 'd3-selection';
 import {axisLeft as d3_axisLeft} from 'd3-axis';
 
 import ReactFauxDOM from 'react-faux-dom';
-
-//import qeConsts from '../engine/qeConsts.js';
-//import qeFuncs from '../engine/qeFuncs.js';
-
 import clickNDrag from '../widgets/clickNDrag.js';
 import './volts.scss';
 
@@ -29,7 +25,7 @@ let traceVoltageArea = false;
 let traceRendering = false;
 let traceDragging = false;
 let traceTweening = false;
-let tracedWheel = false;
+let traceWheel = false;
 
 let traceScrollStretch = false;
 
@@ -51,9 +47,14 @@ function setPT() {
 		space: PropTypes.object,
 
 		// this can be null if stuff isn't ready.  these are now determined by css.
-		height: PropTypes.number,
+		// no use canvasInnerDims  height: PropTypes.number,
 
-		canvasInnerDims: PropTypes.object,
+		drawingLeft: PropTypes.number.isRequired,
+		drawingWidth: PropTypes.number.isRequired,
+		canvasInnerHeight: PropTypes.number.isRequired,
+
+		// changing a buffer point should only be done thru this func
+		setAPoint: PropTypes.func,
 	};
 }
 
@@ -63,14 +64,31 @@ function VoltArea(props) {
 	const p = props;
 	const v = p.vDisp;
 	if (traceVoltageArea)
-		console.log(`⚡️ the new VoltArea:`, this);
+		console.log(`⚡️ starting VoltArea`);
+
+	// element refs
+	const svgRef = useRef();
+	let svgEl = svgRef.current;
+	let svgRect = svgEl?.getBoundingClientRect();
+	const tactileRef = useRef();
+	let tactileEl = tactileRef.current;
+	const visibleRef = useRef();
+	let visibleEl = visibleRef.current;
+
+	// phony state variable that changes when buffer changes.  I tried using the whole buffer for this; no.
+ 	//let [changeCounter, setChangeCounter] = useState(0);
+
+	// variables while dragging
+	let dragging = false;
+	let latestVoltage;
+	let latestIx;
 
 	/* ***************************************************  click & drag */
 
 	// has the user dragged beyond the top/bottom?
 	function strayOutside(newVoltage) {
 
-		// dragged outside? scroll, or stretch.  The amount per mouseMove is
+		// dragged outside? scroll, or stretch.  The amount per pointerMove is
 		// supposed to be cpu-speed-independent, on whole.  If you just make it
 		// 'feel' right, it goes way too fast in 5 or 10 years.
 		let now = performance.now();
@@ -119,42 +137,40 @@ function VoltArea(props) {
 			lastDragOutside = null;
 	}
 
-	const mouseDown =
-	(cnDrag, ev) => {
-	}
-
 	// every time user changes one datapoint.  Also set points interpolated between.
 	// returns false if it failed and needs to be done again.  True means it succeeded.
-	const onEvent =
-	(cnDrag, ev) => {
+	const onePoint =
+	(ev) => {
 		let phase = ev.type;
+		if (!svgRect)
+			return;  // can't drag voltage till after first render
 
 		// shift key gives you steady voltage as you drag across, but if you do it on the down
 		// click, we don't know where to start
 		let newVoltage = latestVoltage;
-		if (! ev.shiftKey || phase == 'mousedown') {
-			newVoltage = v.yUpsideDown.invert(cnDrag.yArena);
+		if (! ev.shiftKey || phase == 'pointerdown') {
+			newVoltage = v.yUpsideDown.invert(ev.clientY - svgRect.y);
 		}
 
-		let ix = Math.round(v.xScale.invert(ev.clientX));
+		let ix = Math.round(v.xScale.invert(ev.clientX - svgRect.x));
+		ix = Math.max(Math.min(ix, v.end-1), v.start);  // dragging off the end
 
 		if (ix == latestIx && Math.abs(newVoltage - latestVoltage) < v.heightVolts * .01)
 			return;  // same old same old; these events come too fast
 
 		if (traceDragging) {
-			console.log(`⚡️ mouse %s on point (%f,%f) voltage @ ix=%d changing from %f to %f`,
-				phase,
-				cnDrag.xArena, cnDrag.yArena,
-				ix, v.voltageBuffer[ix], newVoltage);
+			console.log(`⚡⚡️ ${phase} on point (${ev.clientX.toFixed(1)}, ${ev.clientY.toFixed(1)}) `
+				+` voltage @ ix=${ix} changing from ${v.voltageBuffer[ix].toFixed(0)} to ${newVoltage.toFixed(0)}`);
 		}
 
-		if (phase == 'mousedown') {
+		if (phase == 'pointerdown') {
 			// the first time, all you can do is the one point
-			v.voltageBuffer[ix] = newVoltage;
+			p.setAPoint(ix, newVoltage);
+			//v.voltageBuffer[ix] = newVoltage;
 		}
 		else {
-			// other times, draw a straight linear line through.  d3_scaleLinear from d3
-			// cuz sometimes mouse skips.
+			// other times, tween a straight linear line from last.  d3_scaleLinear from d3
+			// cuz sometimes pointer skips.
 			let tweenScale = d3_scaleLinear([latestIx, ix], [latestVoltage, newVoltage]);
 
 			// tween to each point in between
@@ -162,8 +178,10 @@ function VoltArea(props) {
 			let lo = Math.min(latestIx, ix);
 			for (let ixx = lo; ixx <= hi; ixx++) {
 				if (traceTweening)
-					console.log(`⚡️ tweening: set point [${ixx}] to ${tweenScale(ixx).toFixed(4)}`)
-				v.voltageBuffer[ixx] = tweenScale(ixx);
+					console.log(`⚡️ tweening: set point [${ixx}] to ${tweenScale(ixx).toFixed(4)}`);
+
+				p.setAPoint(ixx, tweenScale(ixx));
+				//v.voltageBuffer[ixx] = tweenScale(ixx);
 			}
 			if (traceTweening) console.log(`⚡️ tweening done`)
 		}
@@ -171,61 +189,95 @@ function VoltArea(props) {
 		latestIx = ix;
 		latestVoltage = newVoltage;
 
-		strayOutside(newVoltage);
+		//strayOutside(newVoltage);
 
-		updateVoltageArea();
-		return true;
+		// now show it. generate a new path attribute for both lines.  Same attr value.
+		// Go around React for speed.
+		let dAttr = v.makeVoltagePathAttribute(v.yScale);
+		tactileEl.setAttribute('d', dAttr);
+		visibleEl.setAttribute('d', dAttr);
 	}
 
-	// called upon mouseup or a move without mouse down
-	const mouseUp =
-	(cnDrag, ev) => {
-		// must also switch the svg to pass thru mouse events otherwise other stuff can't get clicks
-		// no gotta catch wheel events  cnDrag.arenaEl.style.pointerEvents = 'none';
-
-		if (traceDragging) {
-			console.log(`⚡️ mouse UP on point (%f,%f) voltage @ ix=%d stopped at %f`,
-				cnDrag.xArena, cnDrag.yArena,
-				latestIx, v.voltageBuffer[latestIx]);
-		}
-
-		// remind everybody that this episode is over.  Tune in next week.  next mousedown.
-		latestIx = latestVoltage = undefined;
-
+	// pointer down on the path.tactile element.  The VoltArea function is not called during dragging; only at the end.
+	const pointerDown =
+	(ev) => {
 		if (traceDragging)
-			v.dumpVoltage(p.space, v.voltageBuffer, 8);
+			console.log(`👈 👆  pointerDown on tactile Line`, this, ev);
+
+		// only react if the LEFT button is down
+		if (ev.buttons & 1) {
+			// bring me all the events, even outside the svg
+			svgEl.setPointerCapture(ev.pointerId);
+
+			dragging = true;
+			onePoint(ev);
+			ev.preventDefault();
+			ev.stopPropagation();
+		}
 	}
 
-	// the click n drag object manages dragging voltage segmments
-	const cnDrag = useRef(new clickNDrag(mouseDown, onEvent, mouseUp));
+	// for a move, do mostly what the other events do
+	const pointerMove =
+	(ev) => {
+		// only react if it was properly started on a pointerDown in the VoltArea, and still down
+		if ((ev.buttons & 1) && dragging) {
+			onePoint(ev);
+			ev.preventDefault();
+			ev.stopPropagation();
+		}
+	}
 
+	// called upon pointerup
+	const pointerUp =
+	(ev) => {
+		// ev.buttons is zero here, this is called after button(s) released
+		if (dragging) {
+			if (traceDragging) {
+				console.log(`⚡⚡️ pointer UP on point (${ev.clientX.toFixed(1)}, ${ev.clientY.toFixed(1)}) `
+					+` voltage @ ix=${latestIx} changing from ${v.voltageBuffer[latestIx].toFixed(0)}`
+					+` to ${latestVoltage.toFixed(0)}`);
+			}
+
+			// remind everybody that this episode is over.  Tune in next week.  next pointerdown.
+			dragging = false;
+			latestIx = latestVoltage = undefined;
+			//setChangeCounter(changeCounter++);
+
+			if (traceDragging)
+				v.dumpVoltage('pointer up', 8);
+			ev.preventDefault();
+			ev.stopPropagation();
+		}
+	}
+
+// we only do vertical.  right now.  Moves the voltage line (but not its voltage)
 	const wheelHandler =
 	(ev) => {
-		let deltaAmount;
+		let deltaPixels;
 
-		// the scrollHeight changes at any time so calculate it on the fly
 		switch (ev.deltaMode) {
 		case WheelEvent.DOM_DELTA_PIXEL:
-			deltaAmount = ev.deltaY;
+			deltaPixels = ev.deltaY;
 			break;
 
 		case WheelEvent.DOM_DELTA_LINE:
-			deltaAmount = ev.deltaY * Math.sqrt(v.scrollHeight);
+			deltaPixels = ev.deltaY * Math.sqrt(v.canvasHeight);
 			break;
 
 		case WheelEvent.DOM_DELTA_PAGE:
-			deltaAmount = ev.deltaY * v.scrollHeight;
+			deltaPixels = ev.deltaY * v.canvasHeight;
 			break;
 		}
 
-		// convert pixels delta to voltage delta to fraction delta
-		let fracAmount = v.yScale.invert(deltaAmount) / v.heightVolts;
-		v.userScroll(fracAmount);
-		if (tracedWheel)
-			console.log(`wheel event: deltaY=${ev.deltaY}  deltaMode=${ev.deltaMode} scaled delta=${v.yScale.invert(deltaAmount)} fracAmount=${fracAmount}`, ev);
-		// i gotta get rid of this frac shit, it should scroll in volts like you would expect!
-		// meanwhile, the yScale is an absolute converter; I need a relative converter.
-		// try converting delta + bottom in pixels into volts and subtract bottom volts
+		// convert pixels delta to voltage delta to fraction delta fractiion of whole heightVolts
+		let fracAmount = -deltaPixels / v.canvasHeight;
+		//let fracAmount = v.yScale.invert(deltaPixels) / v.heightVolts;
+		v.scrollVoltHandler(fracAmount);
+		if (traceWheel) {
+			console.log(`wheel event: deltaY=${ev.deltaY}  deltaMode=${ev.deltaMode} `
+				+` scaled delta=${v.yScale.invert(deltaPixels)} fracAmount=${fracAmount}`,
+				ev);
+		}
 
 		// can't cuz it's passive ev.preventDefault();
 		ev.stopPropagation();
@@ -234,67 +286,50 @@ function VoltArea(props) {
 
 	/* *************************************************** rendering */
 
-	// this is bogus: an integer incrementing as a surrogate instead of a more complex state array
-	let [renderCtr, setRenderCtr] = useState(1);
-	if (traceVoltageArea)
-		console.log(`⚡️ VoltArea  constructor done`);
-
-	function updateVoltageArea() {
-		setRenderCtr(renderCtr + 1);  // cause a rerender
-	}
-
-	tell the VoltArea (that;s us) that something in the
-	space.voltageBuffer changed.  Sometimes called from above. This gets set
-	into the space, when it's available.
-		const updateVoltageArea =
-		() => {
-			if (traceRendering)
-				console.log(`⚡️ VoltArea.updateVoltageArea`);
-			forceUpdate();
-		}
-
-	// 	componentDidUpdate() {
-	// 		// the constructor probably won't have space, but here it will.  should.
-	// 		const p = this.props;
-	// 		if (p.space && p.vDisp) {
-	// 			p.vDisp.updateVoltageArea = this.updateVoltageArea;
-	// 			p.space.updateVoltageArea = this.updateVoltageArea;}
-	// 		else
-	// 			console.warn(`⚡️  VoltArea, no space! ${p.space}.  Is there also no vDisp?  ${p.vDisp}`);
-	// 	}
+	// tell the VoltArea (that;s us) that something in the (space or
+	// vDisp).voltageBuffer changed.  Or the bottom or height.  Sometimes called
+	// from above. This gets set into the space, when it's available.
+//	const updateVoltageArea =
+//	() => {
+//		if (traceRendering)
+//			console.log(`⚡️ VoltArea.updateVoltageArea`);
+//
+//		// so update everybody who keeps this
+//		//setChangeCounter(changeCounter++);  // so react rerenders
+//	}
+//	// these places need this function too
+//	v.updateVoltageArea = updateVoltageArea;
+//	p.space.updateVoltageArea = updateVoltageArea;
 
 	// this one actually draws the voltage line
 	function renderVoltagePath() {
 		// the lines themselves: exactly overlapping.  tactile wider than visible.
-		// 		if (traceRendering)
-		// 			console.log(`⚡️      pathAttribute: showVoltage=${p.showVoltage}   isHovering=${isHovering}`);
-		// 		if ('always' == p.showVoltage || ('hover' == p.showVoltage && isHovering)) {
 		const pathAttribute = v.makeVoltagePathAttribute(v.yScale);
 		if (traceRendering)
 			console.log(`⚡️ VoltArea.pathAttribute: `, pathAttribute);
 
 		return <>
-			<path className='visibleLine' key='visibleLine'
+			<path className='visibleLine' key='visibleLine' ref={visibleRef}
 				d={pathAttribute} />
-			<path className='tactileLine' key='tactileLine'
+			<path className='tactileLine' key='tactileLine' ref={tactileRef}
 				d={pathAttribute}
-				ref={cnDrag.refTarget} />
-
+				onPointerDown={pointerDown} />
 		</>;
 	}
 
 	// axis for voltage.  Makes no sense if no axis there.
 	function renderAxes() {
 		let axis = d3_axisLeft(v.yUpsideDown);
-		axis.ticks(3);
+		axis.ticks(6);
 
 		let voltageAxis = ReactFauxDOM.createElement('g');
 		//let voltageAxis = document.createElementNS('http://www.w3.org/2000/svg', 'g');
 		let vAx = d3_select(voltageAxis);
 		vAx.attr('class', 'voltageAxis');
 
-		let txX = p.canvasInnerDims.width - barWidth;
-		let txY = p.canvasInnerDims.height;
+		// not sure how much to move axis in from right side
+		let txX = p.drawingLeft + p.drawingWidth - 32;
+		let txY = p.canvasInnerHeight;
 		vAx.attr('transform', `translate(${txX}, ${txY})`);
 		vAx.call(axis);
 		//debugger;
@@ -303,32 +338,36 @@ function VoltArea(props) {
 
 	if (! p.space)
 		return '';  // too early
-	let barWidth = p.canvasInnerDims.width / p.space.nPoints;
+
+	// width of each bar
+	let barWidth = p.drawingWidth / p.space.nPoints;
 	if (traceRendering) {
-		console.info(`⚡️ canvasInnerDims: width=${p.canvasInnerDims.width} `
-			+`height=${p.canvasInnerDims.height}  barWidth=${barWidth}`);
+		console.log(`⚡️ VoltArea.render, drawing left:${p.drawingLeft}
+			width=${p.drawingWidth}  height=${p.canvasInnerHeight}
+			barWidth=${barWidth}`);
 	}
 
-	v.setVoltScales(p.canvasInnerDims.width, p.canvasInnerDims.height, p.space.N);
+	v.setVoltScales(p.drawingLeft, p.drawingWidth, p.canvasInnerHeight);
 
 	// these elements show and hide
 	let vClass = p.showVoltage +'ShowVoltage';
 
 	let vArea = (
 		<svg className='VoltArea'
-			viewBox={`0 0 ${p.canvasInnerDims.width} ${p.canvasInnerDims.height}`}
-			width={p.canvasInnerDims.width} height={p.canvasInnerDims.height}
-			ref={cnDrag.refArena}
-			onWheel={wheelHandler}
+			viewBox={`${p.drawingLeft} 0 ${p.drawingWidth} ${p.canvasInnerHeight}`}
+			x={p.drawingLeft} width={p.drawingWidth} height={p.canvasInnerHeight}
+			ref={svgRef}
+			onWheel={wheelHandler} onPointerMove={pointerMove} onPointerUp={pointerUp}
 		>
 			<g className={'optionalVoltage ' + vClass}>
 				{/* for showVoltage on hover, need this to  hover over */}
 				<rect className='hoverBox' key='hoverBox'
-					x={0} y={0} width={p.canvasInnerDims.width} height={p.canvasInnerDims.height}
-					/>
+					x={p.drawingLeft} y={0}
+					width={p.drawingWidth} height={p.canvasInnerHeight}
+				/>
 
-				{renderVoltagePath()}
 				{renderAxes()}
+				{renderVoltagePath()}
 			</g>
 
 		</svg>

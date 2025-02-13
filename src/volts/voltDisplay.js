@@ -1,15 +1,16 @@
 /*
 ** volt display -- calculations for display of the voltage
-** Copyright (C) 2021-2024 Tactile Interactive, all rights reserved
+** Copyright (C) 2021-2025 Tactile Interactive, all rights reserved
 */
 
+import qeConsts from '../engine/qeConsts.js';
 import {scaleLinear} from 'd3-scale';
 import {EFFECTIVE_VOLTS, VALLEY_FACTOR, TOO_MANY_VOLTS} from './voltConstants.js';
 import {getAGroup, storeASetting} from '../utils/storeSettings.js';
 
 let traceFamiliar = false;
 let tracePathAttribute = false;
-let tracePathIndividualPoints = false
+let tracePathIndividualPoints = false;
 
 let traceVoltArithmetic = false;
 let traceVoltScales = false;
@@ -31,15 +32,17 @@ const isOK = (c) => {
 }
 
 // this contains the voltage scrolling and zooming numbers and what's visible.
-// Not a component; just an object
+// NOT A COMPONENT; just an object
 export class voltDisplay {
 	// make it from given settings obj. Note we don't get the buffer from the space,
 	// cuz the Voltage minigraph needs its own buffer
-	constructor(start, end, voltageBuffer, settings) {
+	constructor(label, start, end, continuum, voltageBuffer, settings) {
 		// point-by-point voltage values, + start and end of voltage buffer, aligned with waves
-		this.voltageBuffer = voltageBuffer;
+		this.label = label;
 		this.start = start;
 		this.end = end;
+		this.continuum = continuum;
+		this.voltageBuffer = voltageBuffer;
 
 		if (settings) {
 			// voltage from top of box to bottom
@@ -60,10 +63,10 @@ export class voltDisplay {
 		Object.assign(this, from);
 	}
 
-	// create a voltDisplay the way the app needs it
+	// create a voltDisplay the way the space needs it
 	static newForSpace(space) {
-		let vDisp = new voltDisplay(
-			space.start, space.end,
+		let vDisp = new voltDisplay('space',
+			space.start, space.end, space.dimensions[0].continuum,
 			space.voltageBuffer,
 			getAGroup('voltageSettings')
 		);
@@ -77,36 +80,36 @@ export class voltDisplay {
 			toArray[ix] = fromArray[ix];
 	}
 
-	// dumps voltageArray
-	dumpVoltage(title, voltageArray = this.voltageBuffer, nPerRow = 8, skipAllButEvery = 1) {
-		this.dumpVoltDisplay(title);
-		let N = this.end - this.start;
-		if (! skipAllButEvery)
-			skipAllButEvery = Math.ceil(N / 40);
-		if (! nPerRow)
-			nPerRow =  Math.ceil(N / 10);
-		let stride = nPerRow * skipAllButEvery;
-		let txt = `⚡️ dumpVoltage buffer: ${title}\n`;
-		for (let rowStart = this.start; rowStart < this.end; rowStart += stride) {
-			txt += `[${String(rowStart).padStart(4)}]  `;
-			for (let ix = rowStart; ix < rowStart + stride; ix += skipAllButEvery)
-				txt += voltageArray[ix].toFixed(0).padStart(10);
-			txt += '\n';
-		}
-		console.log(`${txt}\n`);
-	}
-
 	// all of our properties, but not the datapoints.  Optional: pass voltage params
 	dumpVoltDisplay(title, voltageParams) {
 		this.findVoltExtremes();
-		console.log(`⚡️ voltD: ${title},
-			bottomVolts: ${this.bottomVolts}   heightVolts: ${this.heightVolts}   (top volts: ${this.bottomVolts + this.heightVolts})
-			measured voltage range: ${this.measuredMinVolts} ... ${this.measuredMaxVolts}`);
+		console.log(`⚡️ voltD.${this.label}: ${title} @ ${this.voltageBuffer.byteOffset},
+			bottomVolts: ${this.bottomVolts}   heightVolts: ${this.heightVolts.toFixed(0)} `
+				+`  (top volts: ${(this.bottomVolts + this.heightVolts).toFixed(0)})
+			measured voltage range: ${this.measuredMinVolts.toFixed(0)} ... ${this.measuredMaxVolts.toFixed(0)}`);
 		if (voltageParams)
 			console.log(`    `, voltageParams);
 	}
 
-	/* ******************************************************************* height and bottom calculations */
+	// dumps this.voltageBuffer
+	dumpVoltage(title, nPerRow = 8, skipAllButEvery = 1) {
+		this.dumpVoltDisplay(title);
+		const voltageBuffer = this.voltageBuffer;
+		let N = this.end - this.start;
+		skipAllButEvery = Math.max(skipAllButEvery, 1);
+		nPerRow =  Math.max(nPerRow, 1);
+		let stride = nPerRow * skipAllButEvery;
+		let txt = new Array((this.end - this.start) * 2);
+		for (let rowStart = this.start; rowStart < this.end; rowStart += stride) {
+			txt.push(`[${String(rowStart).padStart(4)}]  `);
+			for (let ix = rowStart; ix < rowStart + stride; ix += skipAllButEvery)
+				txt.push(voltageBuffer[ix].toFixed(0).padStart(10));
+			txt.push('\n');
+		}
+		console.log(txt.join(''));
+	}
+
+	/* ******************************************************* height and bottom calculations */
 
 	// actually measure the current voltage signal, get min & max
 	findVoltExtremes() {
@@ -119,19 +122,6 @@ export class voltDisplay {
 		this.measuredMinVolts = mini;
 		this.measuredMaxVolts = maxi;
 	}
-
-	// given totally new minBottom and height, figure out the other maxes
-	// setMaxMax() {
-	// 	this.maxBottom = this.minBottom + this.heightVolts;
-	// 	this.maxTop = this.maxBottom + this.heightVolts;
-	// }
-
-	// given totally new minBottom and height, figure out all the rest, to set the scroll
-	// soo avg bottomVolts is 1/4 up from the bottom
-// 	setMaxMaxBottom() {
-// 		// this.setMaxMax();
-// 		// this.bottomVolts = this.minBottom + this.heightVolts / 4;
-// 	}
 
 	// Adjust bottomVolts and heightVolts to the existing potential numbers, so it looks nice.
 	// call this after loading these settings from somewhere, if you're not confident about them.
@@ -163,74 +153,189 @@ export class voltDisplay {
 		}
 	}
 
-	// set our xScale and yScale according to the numbers passed in, and our own settings
-	// used by VoltArea to plot potential
-	setVoltScales(canvasWidth, canvasHeight, nPoints) {
-		isOK(this.bottomVolts); isOK(this.heightVolts); isOK(canvasHeight); isOK(canvasWidth);
+	/* ***************************************************************** Rendering */
+
+ 	// set our xScale and yScale according to the numbers passed in, and our own settings
+	// used by VoltArea to plot potential.  X in units of dx, Y in units of volts
+	// I think I call this too many times (?)
+	setVoltScales(drawingLeft, drawingWidth, canvasHeight) {
+		isOK(this.bottomVolts); isOK(this.heightVolts);
+		isOK(drawingLeft); isOK(drawingWidth); isOK(canvasHeight);
 
 		// these are used to draw the voltage path line in VoltArea
-		this.yScale = scaleLinear([this.bottomVolts, this.bottomVolts + this.heightVolts], [0, canvasHeight]);
-		this.yUpsideDown = scaleLinear([this.bottomVolts, this.bottomVolts + this.heightVolts], [canvasHeight, 0]);
-		this.xScale = scaleLinear([0, nPoints-1], [0, canvasWidth]);
+		this.yScale = scaleLinear(
+			[this.bottomVolts, this.bottomVolts + this.heightVolts],
+			[0, canvasHeight]);
+		this.yUpsideDown = scaleLinear(
+			[this.bottomVolts, this.bottomVolts + this.heightVolts],
+			[canvasHeight, 0]);
+		this.canvasHeight = canvasHeight;
+
+		// the actual datapoints are on the edges between segments.
+		// So, 8 states means nPoints=10 means 9 or 10 segments.  Sortof.
+		// For contENDLESS, this means 9 segments drawn cuz it duplicates the
+		//     boundary bar on each end.  Resonant wavelength is 8.
+		// For contWELL, this means the data edges on each end are zero, with 8
+		//     actual datapoints for the state.  10 segments drawn, although the
+		//     outer 2 go off to infinity.  Resonant wavelength is 9.
+		// no that's not  right....
+		let most = this.end;
+		//let most = (qeConsts.contENDLESS == this.continuum) ? this.end :  this.start + this.end;
+		this.xScale = scaleLinear(
+			[0, most],
+			[drawingLeft, drawingLeft + drawingWidth]);
 
 		if (traceVoltScales) {
-			console.log(`⚡️ ⚡️   voltagearea.setVoltScales()  done\n X domain & range: `);
-			console.log(`    X domain & range: `, this.xScale.domain(), this.xScale.range());
-			console.log(`    Y domain & range: `, this.yScale.domain(),  this.yScale.range());
-			console.log(`    Y UpsideDown: `, this.yUpsideDown.domain(),  this.yUpsideDown.range());
-			console.log(`    Zero at: `, this.xScale(0),  this.yScale(0),  this.yUpsideDown(0));
+			console.log(`⚡️ ⚡️   voltagearea.setVoltScales()  done
+			    X domain & range: `, this.xScale.domain(), this.xScale.range(), `
+				Y domain & range: `, this.yScale.domain(),  this.yScale.range(), `
+			    Y UpsideDown: `, this.yUpsideDown.domain(),  this.yUpsideDown.range(), `
+			    Zero at: `, this.xScale(0),  this.yScale(0),  this.yUpsideDown(0));
 		}
 		return true;
 	}
 
+	// make the value for the 'd' attribute on an svg <path element
+	// from start to end, on your space, using std volts array from WaveView
+	// usedYScale is either yScale or yUpsideDown; your choice
+	makeVoltagePathAttribute(usedYScale) {
+		let start = this.start;
+		let end = this.end;
+		if (tracePathAttribute)
+			console.log(`⚡️voltDisplay.makePathAttribute(${start}, ${end})`);
+
+		// for tracing.  long decimal numbers are depresssing
+		const tpip = (x, y, title = '') => {if (tracePathIndividualPoints)
+			console.log(`    ⚡️${title} x=${x}  y=${y}`)};
+
+		// yawn too early?
+		if (! usedYScale) {
+			if (tracePathAttribute)
+				console.warn(`⚡️ 🧨  makePathAttribute(): no yScale so punting`);
+			return `M0,0`;
+		}
+
+		const voltageBuffer = this.voltageBuffer;
+
+		// array to collect small snippets of text like '371,226' or
+		// 'L371,226'.  Avoid recreating array.
+		this.points ??= new Array(this.end + this.start);
+		let points = this.points;
+		let x, y, pt;
+
+		if (tracePathIndividualPoints)
+			console.log(`⚡️ makeVoltagePathAttribute pts `);
+
+		// get ready to stop and start the path if needed
+		let didMove = false, didLine = false;
+		switch (this.continuum) {
+		case qeConsts.contDISCRETE:
+			throw new Error(`discrete continuum in makeVoltagePathAttribute`);
+
+		case qeConsts.contWELL:
+			// potential at the ends of the well are 'infinite'; therefore regular points run start ... end-1.
+			// just do a line going up on each end.  skyHigh isn't ∞ but should get slanted line
+			let skyHigh = usedYScale(this.bottomVolts + 5 * this.heightVolts).toFixed(1);
+
+			x = this.xScale(0).toFixed(1);
+			points[0] = `M${x},` + skyHigh;
+			didMove = true;
+			didLine = false;
+			tpip(x, skyHigh, '️left bumper');
+
+			// should I get rid of this if the point at end-1 is NAN?  probably.  unlikely, though
+			x = this.xScale(end).toFixed(1);
+			points[end] = `L${x},` + skyHigh;
+			tpip(x, skyHigh, '️right bumper');
+			break;
+
+		case qeConsts.contENDLESS:
+			// make the voltage buffer wraparound
+			voltageBuffer[0] = voltageBuffer[end-1];
+			voltageBuffer[end] = voltageBuffer[1];
+
+			// we're doing the whole thing nicluding the wraparound ends
+			start = 0;
+			end = this.start + this.end;
+			didMove = false;
+			didLine = false;
+			break;
+
+		default:
+			debugger;
+			throw new Error(`⚡️  bad continuum '${continuum}' in  makeVoltagePathAttribute()`);
+		}
+
+		for (let ix = start; ix < end; ix++) {
+			x = this.xScale(ix);
+			if ((x==null) || !isFinite(x))
+				debugger;
+			x = x.toFixed(1);
+
+			// ±∞ come out as NaN.
+			y = usedYScale(voltageBuffer[ix]);
+			if (isNaN(y) || y < -TOO_MANY_VOLTS || y > TOO_MANY_VOLTS) {
+				// Absent.  the line ends here, for this pt and maybe a few more; just omit it
+				didMove = didLine = false;
+				pt = '';
+			}
+			else {
+				y = y.toFixed(1);
+				tpip(x, y, ix);
+
+				// didLine is there because  you can say M3,4 L5,6 7,8 9,10
+				// you don't have to repeat the L every segment..
+				pt = `${x},${y}`;
+				if (!didMove) {
+					pt = 'M' + pt;
+					didMove = true;
+				}
+				else if (!didLine) {
+					pt = 'L' + pt;
+					didLine = true;
+				}
+			}
+			points[ix] = pt;
+		}
+
+		// spaces between xy pairs make them easier to read, and they repeat L
+		let final = points.join(' ');
+		if (tracePathAttribute)
+			console.log(`final path attribute`, final);
+		return final;
+	}
 
 	/* ******************************************************************* interaction */
 
-	// called after user changed bottom and/or  height (zoomed or scrolled).
-	saveScroll() {
-		storeASetting('voltageSettings', 'bottomVolts', +this.bottomVolts);
-		storeASetting('voltageSettings', 'heightVolts', +this.heightVolts);
-		//storeASetting('voltageSettings', 'minBottom', +this.minBottom);
-
-		// this function is set in the VoltArea constructor
-		//this.updateVoltageArea();
-	}
-
 	// called when user scrolls up or down.
-	// frac = 1=scrolled to top, one click.  -1=scrolled toward bottom, one click.
-	// Other schromll mechanisms pass other proprtional numbers
+	// frac = fraction of a height, 1=scrolled to top, one click.  -1=scrolled toward bottom, one click.
+	// Other scroll mechanisms pass other proportional numbers
 	scrollVoltHandler(frac) {
 		let distance = this.heightVolts * frac / 4;
 
-		this.bottomVolts += distance;
+		this.setBottomVolts(this.bottomVolts + distance);
 
-		//storeASetting('voltageSettings', 'bottomVolts', this.bottomVolts);
 		if (traceScrolling)
 			console.info(`userScroll(frac=${frac}) => bottomVolts=${this.bottomVolts}`);
-		this.saveScroll();
 	}
 
-	// called when human zooms in or out.  pass +1 or -1.  heightVolts expands or contracts a fixed  factor up and down.
+	// called when human zooms in or out.  pass +1 or -1.  heightVolts expands
+	// or contracts a fixed  factor up and down.
 	zoomVoltHandler(inOut) {
 		// keep looking at same place
 		let midView = this.bottomVolts + this.heightVolts/2;
 
 		if (traceZooming)
-			this.dumpVoltDisplay(`zoom START ${inOut}: old midView=${midView}  sFrac=${scrollFraction}`);
+			this.dumpVoltDisplay(`zoom START ${inOut}: old midView=${midView}`);
 
 		// zoom in/out to int powers of ZoomFactor.
-		// let newLogZoom = Math.log(this.heightVolts) / logZoomFactor;
-		// newLogZoom = Math.round(newLogZoom - inOut);  // round off to integer power of ZoomFactor
-		this.heightVolts *= zoomFactor ** inOut;
-
-		// the rests of this is exactly the same no matter which direction
-		this.bottomVolts = midView - this.heightVolts / 2;
-
-		this.saveScroll();
+		let h = this.heightVolts * zoomFactor ** inOut;
+		this.setHeightVolts(h);
+		this.setBottomVolts(midView - h / 2);
 	}
 
 
-	/* ******************************************************************* familiar potential filling */
+	/* ******************************************************************* familiar voltage filling */
 
 	// fill the buffer with a constant from A to B
 	fillVoltage(fillWith, start = this.start, end = this.end) {
@@ -275,10 +380,12 @@ export class voltDisplay {
 
 	// generate a canyon, flat etc voltage potential in the given array, according to params.
 	setFamiliarVoltage(voltageParams) {
-		let {voltageCenter, voltageBreed, canyonPower, canyonScale, slotScale, slotWidth} = voltageParams;
-		if (canyonPower == undefined || canyonScale == undefined || slotScale == undefined || voltageCenter == undefined)
-			throw `bad Voltage params: slotScale=${slotScale}, canyonPower=${canyonPower}, canyonScale=${canyonScale},
-				voltageCenter=${voltageCenter}`;
+		let {voltageCenter, voltageBreed, canyonPower, canyonScale,
+			slotScale, slotWidth} = voltageParams;
+		if (canyonPower == undefined || canyonScale == undefined || slotScale == undefined
+			|| voltageCenter == undefined)
+			throw `bad Voltage params: slotScale=${slotScale}, canyonPower=${canyonPower},
+				canyonScale=${canyonScale}, voltageCenter=${voltageCenter}`;
 
 		if (traceFamiliar)
 			console.log(`⚡️ starting setFamiliarVoltage(`, voltageParams);
@@ -315,6 +422,9 @@ export class voltDisplay {
 		default:
 			console.warn(`setFamiliarVoltage: no breed`, voltageParams);
 		}
+
+		// notice how we cheated  above?  tell react
+		this.setAPoint?.(1, this.voltageBuffer[1]);
 
 		if (traceFamiliar)
 			this.dumpVoltage(`done with setFamiliarVoltage()`);
@@ -369,70 +479,7 @@ export class voltDisplay {
 			this.dumpVoltDisplay(`setAppropriateRange(): `);
 	}
 
-	/* **************************************************************************** Rendering */
-	// make the value for the 'd' attribute on an svg <path element
-	// from start to end, on your space, using std volts array from WaveView
-	// usedYScale is either yScale or yUpsideDown; your choice
-	makeVoltagePathAttribute(usedYScale) {
-		let start = this.start;
-		let end = this.end;
-		if (tracePathAttribute)
-			console.log(`⚡️voltDisplay.makePathAttribute(${start}, ${end})`);
 
-		// yawn too early?
-		if (! usedYScale) {
-			if (tracePathAttribute)
-				console.warn(`⚡️ 🧨  makePathAttribute(): no yScale so punting`);
-			return `M0,0`;
-		}
-
-		const voltageBuffer = this.voltageBuffer;
-
-		// array to collect small snippets of text.  Try to avoid recreating it all the time.
-		this.points ??= new Array(this.end + this.start);
-		let points = this.points;
-		let x, y, pt;
-
-		//let y = usedYScale(voltageBuffer[start]);  //qeFuncs.get1DVoltage(dim.start);
-		//let x = this.xScale(start);
-		if (start) points[0] = points[end] = '';
-
-		// get ready to stop and start the path if needed
-		let didMove = false, didLine = false;
-		for (let ix = start; ix < end; ix++) {
-			x = this.xScale(ix);
-			if ((x==null) || !isFinite(x))
-				debugger;
-
-			// ±∞ come out as NaN.
-			y = usedYScale(voltageBuffer[ix]);
-			if (tracePathIndividualPoints)
-				console.log(`⚡️    x=${x}  y=${y}`);
-			if (isNaN(y) || y < -TOO_MANY_VOLTS || y > TOO_MANY_VOLTS) {
-				// Absent.  the line ends here, for this pt and maybe a few more; just omit it
-				didMove = didLine = false;
-				pt = '';
-			}
-			else {
-				pt = `${x.toFixed(1)},${y.toFixed(1)}`;
-				if (!didMove) {
-					pt = 'M' + pt;
-					didMove = true;
-				}
-				else if (!didLine) {
-					pt = 'L' + pt;
-					didLine = true;
-				}
-			}
-			points[ix] = pt;
-		}
-
-		// spaces between xy pairs make them easier to read, and they repeat L
-		let final = points.join(' ');
-		if (tracePathAttribute)
-			console.log(`final path attribute`, final);
-		return final;
-	}
 }
 
 export default voltDisplay;

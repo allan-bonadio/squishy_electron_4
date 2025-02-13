@@ -1,16 +1,16 @@
 /*
 ** Star View Def -- an old prototype used to develop the View Variable system
-** Copyright (C) 2021-2024 Tactile Interactive, all rights reserved
+** Copyright (C) 2021-2025 Tactile Interactive, all rights reserved
 */
 
 import {abstractScene} from '../abstractScene.js';
 import {abstractDrawing} from '../abstractDrawing.js';
-import {viewUniform, viewAttribute} from '../viewVariable.js';
+import {drawingUniform, drawingAttribute} from '../drawingVariable.js';
 
 
 let corners;
 
-// create this table the way viewAttribute likes it
+// create this table the way drawingAttribute likes it
 function createVertices() {
 	// create the data for the corners attribute
 	const sin = Math.sin;
@@ -88,7 +88,7 @@ export class starDrawing extends abstractDrawing {
 		//debugger;
 
 		this.cornerColorUni =
-			new viewUniform('cornerColorUni', this,
+			new drawingUniform('cornerColorUni', this,
 				() => {
 					return {value: [0, 1, .5, 1], type: '4fv'}
 				}
@@ -96,14 +96,16 @@ export class starDrawing extends abstractDrawing {
 
 		createVertices();
 
-		this.cornerAttr = new viewAttribute('corner', this, 2, () => corners);
+		this.cornerAttr = new drawingAttribute('corner', this, 2, () => corners);
 		//this.cornerAttr.attachArray(corners, 2);
 	}
 
-	draw() {
+	draw(width, height, specialInfo) {
 		const gl = this.gl;
 		this.setDrawing();
 		//debugger;
+
+		gl.viewport(0, 0, width, height);
 
 		// is this a good place to do this?
 		gl.lineWidth(1.0);  // it's the only option anyway
@@ -123,8 +125,8 @@ export class starDrawing extends abstractDrawing {
 
 
 export class starScene extends abstractScene {
-	constructor(viewName, ambiance, space, avatar) {
-		super(viewName, ambiance, space, avatar);
+	constructor(sceneName, ambiance, space, avatar) {
+		super(sceneName, ambiance, space, avatar);
 
 		if (! this.space || !this.avatar) {
 			throw  new Error(`starScene: being created without space or avatar`);
@@ -137,4 +139,4 @@ export class starScene extends abstractScene {
 
 export default starScene;
 
-starScene.viewClassName = 'starScene';
+starScene.sceneClassName = 'starScene';

@@ -1,6 +1,6 @@
 /*
 ** qGrinder -- the calculation of a simulation of a quantum mechanical wave
-** Copyright (C) 2022-2024 Tactile Interactive, all rights reserved
+** Copyright (C) 2022-2025 Tactile Interactive, all rights reserved
 */
 #include <string.h>
 #include <ctime>
@@ -38,6 +38,7 @@ static bool traceKinks = false;
 static bool traceAggregate = false;
 static bool traceSingleStep = false;
 static bool traceThreadsHaveFinished = false;
+static bool traceDivergence = false;
 
 // RK2
 #define MIDPOINT_METHOD
@@ -48,13 +49,13 @@ static std::runtime_error nullException("");
 // create new grinder, complete with its own stage buffers. make sure
 // these values are doable by the sliders' steps. Space is definitely
 // created by creation time here, although a few details left  to do.
-qGrinder::qGrinder(qSpace *sp, qAvatar *av, int nGrinderThreads, const char *lab)
+qGrinder::qGrinder(qSpace *sp, qAvatar *av, int nGrWorkers, const char *lab)
 	: space(sp), avatar(av), elapsedTime(0), frameSerial(0), stretchedDt(60),
 		integrationEx(nullException), exceptionCode(""), _zero(0), hadException(false),
-		shouldBeIntegrating(false), isIntegrating(false), justNFrames(0),
+		shouldBeIntegrating(false), isIntegrating(false),
 		stepsPerFrame(10),
 		pleaseFFT(false), videoFP(.05),
-		nGrinderThreads(nGrinderThreads) {
+		nGrWorkers(nGrWorkers) {
 
 	magic = 'Grnd';
 
@@ -75,7 +76,7 @@ qGrinder::qGrinder(qSpace *sp, qAvatar *av, int nGrinderThreads, const char *lab
 	atomic_init(&finishAtomic, 0);
 
 	// should this come earlier?
-	grWorker::createGrinderThreads(this);
+	grWorker::createGrWorkers(this);
 
 	samplePoint = space->dimensions[0].N / 3 + space->dimensions[0].start;
 
@@ -98,9 +99,11 @@ qGrinder::qGrinder(qSpace *sp, qAvatar *av, int nGrinderThreads, const char *lab
 			space->voltage, space->spectrumLength,
 			samplePoint);
 	}
-	sentinel = true;
+	sentinel = grSENTINEL_VALUE;
+	printf("qGrinder:103 sentinel should be equal: %d %d\n", (int) sentinel, (int) grSENTINEL_VALUE);
 
 	FORMAT_DIRECT_OFFSETS;
+	if (sentinel != grSENTINEL_VALUE) printf("106 should be equal: %d %d\n", (int) sentinel, (int) grSENTINEL_VALUE);
 };
 
 qGrinder::~qGrinder(void) {
@@ -129,25 +132,59 @@ void qGrinder::formatDirectOffsets(void) {
 	// don't need magic
 	printf("🪓 🪓 --------------- starting qGrinder direct access JS getters & setters--------------\n\n");
 	// these can come in any order; the .h file determines the memory layout
+	// but keep in same order as the .h file so I don't go crazy.  Commented ones don't have js accessors.
 
+	/* ************************* pointers  for large blocks */
 	makePointerGetter(space);
+	makePointerGetter(qflick);
+	// avatar
+	makePointerGetter(voltage);
+	makePointerGetter(qspect);
 	printf("\n");
 
-	/* *********************************************** scalars */
+	/* ************************* timing */
+	// stepsPerFrame
+	makeDoubleGetter(videoFP);
+	makeDoubleSetter(videoFP);
+	makeDoubleGetter(chosenFP);
+	makeDoubleSetter(chosenFP);
 
+	makeDoubleGetter(totalCalcTime);
+	makeDoubleGetter(maxCalcTime);
+	printf("\n");
+
+	/* ************************* grinding */
+
+	makeDoubleGetter(stretchedDt);
+	makeDoubleSetter(stretchedDt);
+	// d2Coeff
+	makeDoubleGetter(divergence);
 	makeDoubleGetter(elapsedTime);
 	makeDoubleSetter(elapsedTime);
 	makeIntGetter(frameSerial);
 	makeIntSetter(frameSerial);
-	printf("\n");
-	makeIntGetter(justNFrames);
-	makeIntSetter(justNFrames);
+	// samplePoint
+	// grWorkers
+	makeIntGetter(nGrWorkers);
 
-	makeDoubleGetter(totalCalcTime);
-	makeDoubleGetter(maxCalcTime);
-	makeDoubleGetter(divergence);
-
+	makeIntOffset(startAtomic);
+	makeIntGetter(startAtomic);
+	// finishAtomic
 	printf("\n");
+
+	/* ************************* exceptions */
+
+	// integrationEx
+	makeStringPointer(exceptionCode);
+
+	makeBoolGetter(hadException);
+	makeBoolSetter(hadException);
+	// _zero
+
+	makeStringPointer(label);
+	printf("\n");
+
+	/* ************************* booleans & bytes at end */
 
 	makeBoolGetter(shouldBeIntegrating);
 	makeBoolSetter(shouldBeIntegrating);
@@ -156,52 +193,12 @@ void qGrinder::formatDirectOffsets(void) {
 
 	makeBoolGetter(pleaseFFT);
 	makeBoolSetter(pleaseFFT);
-	printf("\n");
 
 	makeBoolGetter(needsRepaint);
 	makeBoolSetter(needsRepaint);
 
-	makeBoolGetter(hadException);
-	makeBoolSetter(hadException);
-	makeStringPointer(exceptionCode);
-
-	printf("\n");
-	makeDoubleGetter(stretchedDt);
-	makeDoubleSetter(stretchedDt);
-
-	makeIntGetter(nGrinderThreads);
-
-	makeDoubleGetter(videoFP);
-	makeDoubleSetter(videoFP);
-	makeDoubleGetter(chosenFP);
-	makeDoubleSetter(chosenFP);
-
-	makeIntOffset(startAtomic);
-	makeIntGetter(startAtomic);
-
-	/* *********************************************** waves & buffers */
-
-	printf("\n");
-	makePointerGetter(qflick);
-
-	printf("\n");
-	makePointerGetter(voltage);
-
-	makeDoubleGetter(divergence);
-
-//	printf("\n");
-//	makePointerGetter(scratchQWave);
-
-	printf("\n");
-	makePointerGetter(qspect);
-
-	makePointerGetter(stages);
-	makePointerGetter(threads);
-
-	makeStringPointer(label);
-
-	makeBoolGetter(sentinel);  // should always be value true; only for validation
-
+	makeByteGetter(sentinel);  // should always be value grSENTINEL_VALUE; only for validation
+	makeByteSetter(sentinel);  // only until we answer why it's doing that
 
 	printf("\n🪓 🪓 --------------- done with qGrinder direct access --------------\n");
 }
@@ -243,8 +240,9 @@ void qGrinder::copyToAvatar(qAvatar *avatar) {
 	qflick->copyBuffer(avatar->qwave, qflick);  // from buffer zero
 }
 
-/* ********************************************************** tally & measure divergence */
+/* **********************************************************   */
 
+// sloppy sloppy
 static int tally = 0;
 
 // if these two derivatives differ in sign, increment the tally.
@@ -258,10 +256,10 @@ static void difft(double p, double q, double r) {
 void qGrinder::tallyUpKinks(qWave *qwave) {
 	tally = 0;
 	qCx *wave = qwave->wave;
-	qCx a = wave[qwave->start - 1];
-	qCx b = wave[qwave->start];
+	qCx a = wave[qwave->start];
+	qCx b = wave[qwave->start + 1];
 	qCx c;
-	for (int ix = qwave->start + 1; ix <= qwave->end; ix++) {
+	for (int ix = qwave->start + 2; ix <= qwave->end; ix++) {
 		c = wave[ix];
 
 		difft(a.re, b.re, c.re);
@@ -278,6 +276,32 @@ void qGrinder::tallyUpKinks(qWave *qwave) {
 		speedyLog("🪓 tallyUpKinks result: tally/2= %d out of %d or %5.1f %%\n",
 			tally/2, N, 100.0 * tally / N / 2);
 	divergence = tally/2;
+}
+
+// see how many alternating derivatives we have.  Then convert to a user-visible
+// number and issue errors or warnings
+void qGrinder::measureDivergence() {
+	tallyUpKinks(qflick);
+	if (divergence > 20) {
+		int N = space->dimensions[0].N;
+
+		if (divergence > N * 15 / 16) {
+			char buf[64];
+			snprintf(buf, 64, "🪓 🪓 wave is DIVERGING, =%4.4g %% 🔥 🧨", divergence);
+			shouldBeIntegrating = isIntegrating = false;
+
+			// js code intercepts this exact spelling
+			reportException("Sorry, your wave integration diverged! Try a shorter "
+				"stretch factor for ∆t.  Click Start Over to try again.", "diverged");
+		}
+		else {
+			// not bad yet
+			if (traceDivergence) {
+				speedyLog("🪓 wave starting to Diverge, divergence=%4.4g / %d 🧨",
+					divergence, N);
+			}
+		}
+	}
 }
 
 /* ********************************************************** doing Integration */
@@ -358,8 +382,8 @@ void qGrinder::oneFrame() {
 void qGrinder::aggregateCalcTime(void) {
 	totalCalcTime = 0;
 	maxCalcTime = 0;
-	for (int ix = 0; ix < nGrinderThreads; ix++) {
-		grWorker *sl = gThreads[ix];
+	for (int ix = 0; ix < nGrWorkers; ix++) {
+		grWorker *sl = grWorkers[ix];
 		if (sl) {
 			totalCalcTime += sl->frameCalcTime;
 			maxCalcTime = fmax(maxCalcTime, sl->frameCalcTime);
@@ -380,25 +404,29 @@ void qGrinder::aggregateCalcTime(void) {
 
 // runs in the thread loop, only in the last thread to finish integration in an integration frame.
 void qGrinder::threadsHaveFinished() {
-	if (traceThreadsHaveFinished) speedyLog("🪓 qGrinder::threadsHaveFinished starts\n");
+	double thfTime;
+	if (traceThreadsHaveFinished) {
+		thfTime = getTimeDouble();
+		speedyLog("🪓 qGrinder::threadsHaveFinished starts\n");
+	}
 	aggregateCalcTime();
 
 	// single step (or a few steps): are we done yet? we shouldn't do
 	// single step this way; should just have shouldBeIntegrating off
 	// while triggering.  TODO
-	if (justNFrames) {
-		if (traceSingleStep) speedyLog("🪓 ss: justNFrames = %d\n", justNFrames);
-		--justNFrames;
-		if (0 >= justNFrames) {
-			shouldBeIntegrating = false;
-			if (traceSingleStep) speedyLog("🪓 ss turned off sbi: justNFrames = %d\n", justNFrames);
-		}
-	}
+// 	if (justNFrames) {
+// 		if (traceSingleStep) speedyLog("🪓 ss: justNFrames = %d\n", justNFrames);
+// 		--justNFrames;
+// 		if (0 >= justNFrames) {
+// 			shouldBeIntegrating = false;
+// 			if (traceSingleStep) speedyLog("🪓 ss turned off sbi: justNFrames = %d\n", justNFrames);
+// 		}
+// 	}
 
 	if (traceIntegration)  {
-		speedyLog("🪓                ...in threadsHaveFinished().  justNFrames=%d and "
+		speedyLog("🪓                ...in threadsHaveFinished().  "
 			"shouldBeIntegrating=%d   isIntegrating=%d\n",
-			justNFrames, shouldBeIntegrating, isIntegrating);
+			shouldBeIntegrating, isIntegrating);
 	}
 
 	// isIntegrating is on otherwise we wouldn't be here.
@@ -419,52 +447,43 @@ void qGrinder::threadsHaveFinished() {
 	// thing that'll happen is the image will be part one frame and part
 	// the next frame.
 	copyToAvatar(avatar);
-	needsRepaint = true;
-	if (traceThreadsHaveFinished) speedyLog("🪓 threadsHaveFinished()— copied latest wave"
-		" to avatar needsRepaint=%d  shouldBeIntegrating=%d   isIntegrating=%d\n",
-			needsRepaint, shouldBeIntegrating, isIntegrating);
 
-	if (this->pleaseFFT) analyzeWaveFFT(qflick, "before fourierFilter()");
+	needsRepaint = true;
+
+	if (traceThreadsHaveFinished)
+		speedyLog("🪓 threadsHaveFinished()— copyToAvatar() in %10.6lf ms - needsRepaint=%d"
+			" shouldBeIntegrating=%d   isIntegrating=%d\n",
+			getTimeDouble() - thfTime, needsRepaint, shouldBeIntegrating, isIntegrating);
+
+	if (this->pleaseFFT)
+		analyzeWaveFFT(qflick, "latest fft");
 	this->pleaseFFT = false;
 
-	// see how many alternating derivatives we have
-	tallyUpKinks(qflick);
-	if (divergence > 10) {
-		int N = space->dimensions[0].N;
-
-		if (divergence > N * 15 / 16) {
-			char buf[64];
-			snprintf(buf, 64, "🪓 🪓 wave is DIVERGING, divergence=%4.4g %% 🔥 🧨", divergence);
-			shouldBeIntegrating = isIntegrating = false;
-
-			// js code intercepts this exact spelling
-			reportException("Sorry, your wave integration diverged! Try a shorter "
-				"stretch factor for ∆t.  Click Start Over to try again.", "diverged");
-		}
-		else {
-			speedyLog("🪓 wave starting to Diverge, divergence=%4.4g / %d 🧨\n",
-				divergence, N);
-		}
-	}
+	measureDivergence();
 
 	// ready for new frame
 	// check whether we've stopped and leave it locked or unlocked for the next cycle.
 	// this retriggers every frametime, if the chosenFP is FASTEST.
-	if (isIntegrating && FASTEST == chosenFP)
-		emscripten_atomic_store_u32(&startAtomic, 0);  // start next iteration ASAP
-	else
-		emscripten_atomic_store_u32(&startAtomic, -1);  // stop integration, wait for JS to retrigger
+	// if (isIntegrating && FASTEST == chosenFP)
+	// 	emscripten_atomic_store_u32(&startAtomic, 0);  // start next iteration ASAP
+	// else
+	emscripten_atomic_store_u32(&startAtomic, -1);  // stop integration, wait for JS to retrigger
 	emscripten_atomic_store_u32(&finishAtomic, 0);
-	if (traceThreadsHaveFinished) speedyLog("🪓  so now startAtomic=%d   and finishAtomic=%d\n",
+
+	if (traceThreadsHaveFinished) {
+		speedyLog("🪓  threads have finished in %10.6lf ms; startAtomic=%d finishAtomic=%d\n",
+		getTimeDouble() - thfTime,
 		emscripten_atomic_load_u32(&startAtomic), emscripten_atomic_load_u32(&finishAtomic));
+	}
 
 }
 
 
 // start a new frame calculating by starting each/all gThread threads.
-// This is called from JS, therefore the UI thread.
-// Each frame will trigger the next to continue integration?
-// Actually we can do this from JS with Atomic.store and .notify
+// This can be called from JS, therefore the UI thread.
+// Each frame will trigger the next to continue integration
+// Now we do this from JS with Atomic.store and .notify instead
+// (but I want to be able to fall back on this if needed so don't remove it.)
 void qGrinder::triggerIteration() {
 	if (traceIntegration)  {
 		speedyLog("🪓 qGrinder::triggerIteration(): shouldBeIntegrating=%d   isIntegrating=%d\n",

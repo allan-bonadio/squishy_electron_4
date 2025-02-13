@@ -1,6 +1,6 @@
 /*
 ** qThread -- manage the thread(s) that are doing iteration
-** Copyright (C) 2022-2024 Tactile Interactive, all rights reserved
+** Copyright (C) 2022-2025 Tactile Interactive, all rights reserved
 */
 
 struct qSpace;
@@ -54,9 +54,6 @@ struct qThread {
 	static int nCreatedThreads;
 	static int nRunningThreads;
 	static qThread **threadsList;
-
-	//static std::atomic_flag changingActive;
-
 };
 
 

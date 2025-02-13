@@ -1,0 +1,26 @@
+#!/bin/bash
+
+# use this to set the current build to the one given in $1
+# run on the server in the /var/www/squish directory
+
+if [ -n "$1" ]
+then
+	echo "activate build $1"
+	if [ -d "$1" ]
+	then
+		rm -v active
+		ln -sfv $1 active
+		ls -l active
+	else
+		echo "no $1 around here"
+		ls -F
+		exit 9
+	fi
+else
+	echo "No build name.  Try again like this:"
+	echo "$0 2025-01-28,162821_PST_Tue"
+	echo "Here's what's available:"
+	echo
+	ls -l | grep -E --color=none  '^dr.xr'
+	exit 5
+fi

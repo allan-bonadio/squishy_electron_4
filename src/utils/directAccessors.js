@@ -1,6 +1,6 @@
 /*
 ** directAccessors -- helpers to generate direct accessor funcs for JS
-** Copyright (C) 2022-2024 Tactile Interactive, all rights reserved
+** Copyright (C) 2022-2025 Tactile Interactive, all rights reserved
 */
 
 // lookup table from qObject pointer in C++, to JS eObject or TypedArray
@@ -29,14 +29,14 @@ export function prepForDirectAccessors(_this, pointer) {
 	// (these are not used for arrays or buffers)
 	_this.doubles = new Float64Array(window.Module.HEAPF64.buffer, pointer, 40);
 	_this.ints = new Int32Array(window.Module.HEAP32.buffer, pointer, 80);
-	_this.bools = new Uint8Array(window.Module.HEAPU8.buffer, pointer, 320);
+	_this.bytes = new Uint8Array(window.Module.HEAPU8.buffer, pointer, 320);
 
 	cppObjectRegistry[pointer] = _this;
 }
 
 // call this after all your spaces and avatars and buffers have been freed
 // cuz you're recreating everything
-export function resetObjectRegistry() {
-	cppObjectRegistry = {};
-}
-resetObjectRegistry();
+//export function resetObjectRegistry() {
+//	cppObjectRegistry = {};
+//}
+//resetObjectRegistry();

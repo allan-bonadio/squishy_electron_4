@@ -1,7 +1,7 @@
 #!/bin/bash
 ##
 ## Build Development -- build script for quantum engine during development
-## Copyright (C) 2021-2024 Tactile Interactive, all rights reserved
+## Copyright (C) 2021-2025 Tactile Interactive, all rights reserved
 ##
 
 # script to compile emscripten/C++ sources into WebAssembly
@@ -13,11 +13,6 @@ cd ..
 # also maybe ? --cpuprofiler --memoryprofiler --threadprofiler
 # see 80% down in https://emscripten.org/docs/tools_reference/emcc.html
 # i think --threadprofiler is only for pthreads
-
-# keep MAX_LABEL_LEN+1 a multiple of 4 or 8 for alignment, eg 7, 15 or 31
-export MAX_LABEL_LEN=15
-
-
 
 # -sEMIT_PRODUCERS_SECTION = put info on which compiler/linker/language was
 # built.  Mostly irrelevant.  add it here if you want.

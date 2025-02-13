@@ -1,6 +1,6 @@
 /*
-** flatScene -- main viewDef for 2d image of 1d space
-** Copyright (C) 2021-2024 Tactile Interactive, all rights reserved
+** flatScene -- main scene for 2d image of 1d space
+** Copyright (C) 2021-2025 Tactile Interactive, all rights reserved
 */
 
 import {abstractScene} from './abstractScene.js';
@@ -10,8 +10,8 @@ import {ticDrawing} from './ticDrawing.js';
 
 class flatScene extends abstractScene {
 
-	constructor(viewName, ambiance, space, avatar) {
-		super(viewName, ambiance, space, avatar);
+	constructor(sceneName, ambiance, space, avatar) {
+		super(sceneName, ambiance, space, avatar);
 
 		if (! this.space || !this.avatar) {
 			debugger;

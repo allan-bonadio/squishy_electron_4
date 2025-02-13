@@ -1,10 +1,10 @@
 /*
 ** testRunner -- js for in-browser webgl tests  with testsRunner.html
-** Copyright (C) 2023-2024 Tactile Interactive, all rights reserved
+** Copyright (C) 2023-2025 Tactile Interactive, all rights reserved
 */
 
 import glAmbiance from '../glAmbiance.js';
-import {mockSpace, mockAvatar, mockGLView} from './mockGLView.js';
+import {mockSpace, mockAvatar, mockGLScene} from './mockGLScene.js';
 import {starScene} from './starScene.js';
 import {noiseScene} from './noiseScene.js';
 
@@ -37,8 +37,8 @@ function selectVersion(ev) {
 	location = location; // reload page
 }
 
-function selectViewClass(ev) {
-	localStorage.viewClass = ev.target.value;
+function selectSceneClass(ev) {
+	localStorage.completeScene = ev.target.value;
 }
 
 export let glView;
@@ -53,7 +53,7 @@ function startGLView() {
 	canvas.setAttribute('height', height);
 	canvas.style.height = height + 'px';
 
-	glView = new mockGLView(localStorage.viewClass ?? 'star', 'mockGLView Runner');
+	glView = new mockGLScene(localStorage.completeScene ?? 'star', 'mockGLScene Runner');
 
 	// really set as a ref by React when page renders first time
 	glView.setGLCanvas($('canvas'));
@@ -127,7 +127,7 @@ window.addEventListener('DOMContentLoaded', ev => {
 	$('status').innerHTML = `DOMContentLoaded, waiting for page to come to front...`;
 	try {
 		setHandlersOnAll(`version`, selectVersion, localStorage.version);
-		setHandlersOnAll(`viewClass`, selectViewClass, localStorage.viewClass ?? 'star');
+		setHandlersOnAll(`completeScene`, selectSceneClass, localStorage.completeScene ?? 'star');
 
 		setHandlersOnAll(`N`, selectN, localStorage.N ?? 16);
 		setHandlersOnAll(`continuum`, selectContinuum, localStorage.continuum ?? '1');

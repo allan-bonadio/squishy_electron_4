@@ -1,6 +1,6 @@
 /*
 ** store settings -- storing control panel settings in localStorage for the next session
-** Copyright (C) 2022-2024 Tactile Interactive, all rights reserved
+** Copyright (C) 2022-2025 Tactile Interactive, all rights reserved
 */
 
 import {isPowerOf2} from './powers.js';
@@ -229,7 +229,7 @@ export function createStoreSettings() {
 	// set in integration tab
 	makeParam('frameSettings', 'shouldBeIntegrating', true,  [false, true]);
 	makeParam('frameSettings', 'chosenFP', 50, {min: 16, max: 60_001});
-	makeParam('frameSettings', 'dtStretch', 1, {min: .001, max: 1, });
+	makeParam('frameSettings', 'dtStretch', .01, {min: .0001, max: 1, });
 	//makeParam('frameSettings', 'stepsPerFrame', 10, {min: 2, max: 50});
 	//makeParam('frameSettings', 'lowPassFilter', 50, {min: 0, max: 75});
 
@@ -238,7 +238,7 @@ export function createStoreSettings() {
 	makeParam('miscSettings', 'showingTab', 'wave', ['wave', 'voltage', 'space', 'integration']);
 
 	// set by size box on main view
-	makeParam('miscSettings', 'waveViewHeight', 400, {min: 50, max: 1e4});
+	makeParam('miscSettings', 'waveViewHeight', 402, {min: 50, max: 1e4});
 
 }
 

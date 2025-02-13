@@ -1,6 +1,6 @@
 /*
 ** Set Voltage tab -- user can set the voltage to something interesting
-** Copyright (C) 2021-2024 Tactile Interactive, all rights reserved
+** Copyright (C) 2021-2025 Tactile Interactive, all rights reserved
 */
 
 import {useState, useRef, useReducer} from 'react';
@@ -17,7 +17,7 @@ let MINI_WIDTH = 300;
 let MINI_HEIGHT = 150;
 
 
-// used in multiple places
+// used in multiple places?
 // can't figure out how to get hover working.  grrrr.
 export function ShowVoltageControl(props) {
 	return <label className='ShowVoltageControl' >
@@ -75,7 +75,8 @@ function SetVoltageTab(props) {
 			voltDisplay.copyVolts(This.miniGraphBuffer, space.voltageBuffer);
 
 			// each voltDisplay manages a voltage context; this one does the minigraph one
-			This.miniVolts = new voltDisplay(space.start, space.end,
+			This.miniVolts = new voltDisplay('miniVolts',
+				space.start, space.end, space.dimensions[0].continuum,
 				This.miniGraphBuffer, getAGroup('voltageSettings'));
 
 			setThis(This);
@@ -93,20 +94,16 @@ function SetVoltageTab(props) {
 			return;
 		const v = This.space.vDisp;
 		v.setFamiliarVoltage(vParams);
-		v.bottomVolts = This.miniVolts.bottomVolts;
-		v.heightVolts = This.miniVolts.heightVolts;
-
-
-		// only NOW do we set it in the localStorage
 		storeAGroup('voltageParams', vParams);
-		storeASetting('voltageSettings', 'bottomVolts', This.miniVolts.bottomVolts);
-		storeASetting('voltageSettings', 'heightVolts', This.miniVolts.heightVolts);
-		This.space.updateVoltageArea?.();
+
+		v.setBottomVolts(This.miniVolts.bottomVolts);
+		v.setHeightVolts(This.miniVolts.heightVolts);
 	};
 
 	/* *************************************************************** rendering for the Tab */
 
-	//  some slot and block chars if you need them: ⎍ ⊓ ⊔  also try box ddrawing symols ⨅ ⨆ vs ⊓ ⊔ they're different!
+	//  some slot and block chars if you need them: ⎍ ⊓ ⊔  also try box
+	// drawing symols ⨅ ⨆ vs ⊓ ⊔ they're different!
 	function renderBreedSelector() {
 		const breed = vParams.voltageBreed ?? 'flat';
 		return <div className='breedSelector'>
@@ -120,22 +117,24 @@ function SetVoltageTab(props) {
 				<input type='radio' className='slotBreed' name='breed'
 					checked={'slot' == breed}
 					onChange={ev => setVParams({voltageBreed: 'slot'})}/>
-				⨆ Slot
+				<big> ⨆</big> Slot
 			</label>
 			<label>
 				<input type='radio' className='blockBreed' name='breed'
 					checked={'block' == breed}
 					onChange={ev => setVParams({voltageBreed: 'block'})}/>
-				⨅ Block
+				<big> ⨅</big> Block
 			</label>
 			<label>
 				<input type='radio' className='canyonBreed' name='breed'
 					checked={'canyon' == breed}
 					onChange={ev => setVParams({voltageBreed: 'canyon'})}/>
-				|<var>x</var>|<sup><var>n</var></sup> Canyon
+				<big> ⋎</big> Canyon
 			</label>
 		</div>;
 	}
+	// 				|<var>x</var>|<sup><var>n</var></sup> Canyon
+
 
 	// the minigraph is all in svg; no gl
 	function renderMiniGraph() {
@@ -146,7 +145,7 @@ function SetVoltageTab(props) {
 		//debugger;
 
 		v.setAppropriateRange(vParams);
-		v.setVoltScales(MINI_WIDTH, MINI_HEIGHT, This.space.nPoints);
+		v.setVoltScales(0, MINI_WIDTH, MINI_HEIGHT);
 
 		// fill the voltage buffer
 		v.setFamiliarVoltage(vParams);
@@ -163,15 +162,6 @@ function SetVoltageTab(props) {
 
 	// start pointer capture on this drag
 	const capture = (ev) => ev.target.setPointerCapture(ev.pointerId);
-
-// 			<input type='range' className='canyonPower'
-// 				value={vParams.canyonPower ?? alternateStoreDefaults.voltageParams.canyonPower}
-// 				min={vMinsMaxes.canyonPower.min} max={vMinsMaxes.canyonPower.max}
-// 				step={.5}
-// 				onChange={ev => setVParams({canyonPower: ev.target.valueAsNumber})}
-// 				onPointerDown={capture}
-// 				style={{visibility: 'canyon' == breed ? 'visible' : 'hidden'}}
-// 			/>
 
 	// draw minigraph, and wrap it with sliders on 3 sides, depending on breed
 	function renderFirstRow(breed, vMinsMaxes) {

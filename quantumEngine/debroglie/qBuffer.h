@@ -1,6 +1,6 @@
 /*
 ** quantum buffer -- a buffer of qCx values that represents a qWave or a qSpectrum
-** Copyright (C) 2022-2024 Tactile Interactive, all rights reserved
+** Copyright (C) 2022-2025 Tactile Interactive, all rights reserved
 */
 
 // a 'wave' is a straight array of qCx, of length space->nPoints.
@@ -32,6 +32,7 @@ struct qBuffer {
 	uint32_t magic;
 
 	// calls solo allocateWave() but for this wave's count and stuff
+	// TODO: functions should be grouped at the beginning or end to easily see alignment
 	qCx *allocateWave(int nPoints = -1);
 
 	// constructor for qWave and qSpectrum calls this to finish up & alloc buffer
@@ -42,7 +43,7 @@ struct qBuffer {
 	qCx *wave;
 
 	// spectrums don't have wraparounds boundaries so spectrums calculate different numbers from waves.
-	// should be in accord with the space, sortof, depending on whether wave or spectrum.
+	// should be in accord with the space, sortof, depending on whether wave or spectrum, and continuum.
 	int nPoints, start, end, continuum;
 
 	// if it used the first constructor
@@ -50,6 +51,9 @@ struct qBuffer {
 	// but for just a bare qBuffer, this can be null, for freelance buffers.
 	qSpace *space;
 
+	// TODO: this is not aligned!  Or, maybe its the last?  Oh wait, see
+	// subclasses and their alignment.  Only qFlick so should pad this to 4
+	// bytes
 	bool dynamicallyAllocated;
 
 	// print one complex number, plus maybe some more calculated metrics for that point,

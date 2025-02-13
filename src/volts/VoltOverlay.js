@@ -1,7 +1,7 @@
 /*
 ** Volt Overlay -- the offwhite voltage line, and its tactile accessories
 **	      for Squishy Electron
-** Copyright (C) 2024-2024 Tactile Interactive, all rights reserved
+** Copyright (C) 2024-2025 Tactile Interactive, all rights reserved
 */
 
 import React, {useRef, useState, useReducer} from 'react';
@@ -21,10 +21,9 @@ function setPT() {
 		space: PropTypes.object,
 
 		// this can be null if stuff isn't ready.  these are now determined by css.
-		height: PropTypes.number,
-
-		width: PropTypes.number,
-		left: PropTypes.number,
+		canvasInnerWidth: PropTypes.number.isRequired,
+		canvasInnerHeight: PropTypes.number.isRequired,
+		bumperWidth: PropTypes.number.isRequired,
 
 		// includes scrollSetting, heightVolts, measuredMinVolts, measuredMaxVolts, xScale, yScale
 		vDisp: PropTypes.object,
@@ -32,8 +31,6 @@ function setPT() {
 		// this component is always rendered so it retains its state,
 		// but won't draw anything if the checkbox is off
 		showVoltage: PropTypes.string,
-
-		canvasInnerDims: PropTypes.object,
 	};
 }
 
@@ -58,37 +55,32 @@ function VoltOverlay(props) {
 
 	// the Hooks way
 	const [vState, voltDispatch] = useReducer(voltReducer, v.voltageBuffer);  // see reducer above
-	// vState === v.voltageBuffer now, so I don't have to set it or anything
 
 	// use this function to actually set a point in the voltage buffer, instead of just a regular assignment
 	const setAPoint =
 	(ix, volts) => voltDispatch({ix, volts});
 
 	// these are in our state, but ALSO in the vDisp, and settings, so keep them synched.
-	const [bottomVolts, setBottomVolts] = useState(v.bottomVolts);
+	const [bottomVolts, _setBottomVolts] = useState(v.bottomVolts);
 	v.bottomVolts = bottomVolts;
 	if (getASetting('voltageSettings', 'bottomVolts') != bottomVolts)
 			storeASetting('voltageSettings', 'bottomVolts', bottomVolts);
 
-	const [heightVolts, setHeightVolts] = useState(v.heightVolts);
+	const [heightVolts, _setHeightVolts] = useState(v.heightVolts);
 	v.heightVolts = heightVolts;
 	if (getASetting('voltageSettings', 'heightVolts') != heightVolts)
 			storeASetting('voltageSettings', 'heightVolts', heightVolts);
 
-	/* ************************************************************************ interaction */
-
-	// the actual bottomVolts is ignored; what's important is to tell us that it changed
-	const scrollVoltHandler =
-	bottomVolts => {
-		setBottomVolts(bottomVolts);
+	// practically speaking, use these functions whenever you set stuff.
+	// They set state, so  immediately after, changes will not be apparent.
+	v.setAPoint = setAPoint;
+	v.setBottomVolts = (bv) => {
+		_setBottomVolts(bv);
+		storeASetting('voltageSettings', 'bottomVolts', bv);
 	}
-
-	// handles zoom in/out buttons    They pass +1 or -1.
-	const zoomVoltHandler =
-	upDown => {
-		v.zoomVoltHandler(upDown);
-		setBottomVolts(v.bottomVolts);
-		setHeightVolts(v.heightVolts);
+	v.setHeightVolts = (hv) => {
+		_setHeightVolts(hv);
+		storeASetting('voltageSettings', 'heightVolts', hv);
 	}
 
 	/* ************************************************************************ rendering */
@@ -97,20 +89,27 @@ function VoltOverlay(props) {
 	// (but see another mechanism in the sidebar!)
 	return <section className={(p.showVoltage ?? 'hover') + 'ShowVoltage VoltOverlay'}
 			style={{width: p.width}} >
-		<VoltSidebar width={VOLTAGE_SIDEBAR_WIDTH} height={p.height}
+		<VoltSidebar width={VOLTAGE_SIDEBAR_WIDTH}
 			vDisp={p.vDisp}
+			drawingRight={p.canvasInnerWidth - p.bumperWidth}
+			canvasInnerHeight={p.canvasInnerHeight}
 			showVoltage={p.showVoltage}
-			scrollVoltHandler={scrollVoltHandler}
-			zoomVoltHandler={zoomVoltHandler}
+			scrollVoltHandler={v.setBottomVolts}
+			zoomVoltHandler={v.zoomVoltHandler}
 		/>
 		<VoltArea
 			vDisp={p.vDisp}
+			drawingLeft={p.bumperWidth}
+			drawingWidth={p.canvasInnerWidth - 2 * p.bumperWidth}
+			canvasInnerHeight={p.canvasInnerHeight}
 			showVoltage={p.showVoltage}
 			space={p.space}
-			height={p.height}
-			canvasInnerDims={p.canvasInnerDims}
+			setAPoint={setAPoint}
 		/>
-	</section>
+	</section>;
+	//			bumperWidth={p.bumperWidth}
+
+	// n=removed height={p.height} from VOltArea in favor of canvasInnerDims
 }
 //, left: p.left
 

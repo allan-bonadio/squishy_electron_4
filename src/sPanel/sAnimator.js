@@ -1,6 +1,6 @@
 /*
 ** squish panel animation -- real-time simulation and interactivity.
-** Copyright (C) 2023-2024 Tactile Interactive, all rights reserved
+** Copyright (C) 2023-2025 Tactile Interactive, all rights reserved
 */
 
 import ControlPanel from '../controlPanel/ControlPanel.js';
@@ -76,12 +76,12 @@ class sAnimator {
 		this.inteTimes.frameDrawPeriod = startDrawTime - this.inteTimes.prevDrawTime;
 		this.inteTimes.prevDrawTime = startDrawTime;
 
-			this.space.mainEAvatar.doRepaint?.();
-			this.showTimeNFrame();  // part of the draw time
+		this.space.mainEAvatar.doRepaint?.();
+		this.showTimeNFrame();  // part of the draw time
 
 
-			// update dom elements in integration tab to latest stats
-			this.space.sInteStats.displayAllStats(this.inteTimes, this.grinder);
+		// update dom elements in integration tab to latest stats
+		this.space.sInteStats.displayAllStats(this.inteTimes, this.grinder);
 
 		//this.inteTimes.endReloadVarsNBuffer =
 		let endDrawTime = performance.now();
@@ -146,9 +146,10 @@ class sAnimator {
 	// all the frame periods
 	// based on the detected screen frame rate, choose items on the Frame Rate menu
 	recalcFrameMenuRates(videoRate) {
-		console.log(`🎥 recalcFrameMenuRates(${videoRate}) `)
+		//console.log(`🎥 recalcFrameMenuRates(${videoRate}) `)
 		// start the list on the Frame Rate menu.
-		this.frameRateMenuFreqs = [qeConsts.FASTEST, videoRate];
+		this.frameRateMenuFreqs = [videoRate];  // can't figure out how to do FASTEST
+		//this.frameRateMenuFreqs = [qeConsts.FASTEST, videoRate];
 
 		let aRate = videoRate
 		while (round(aRate / 2) * 2 == aRate) {
@@ -274,7 +275,7 @@ class sAnimator {
 		return this.findNearestMenuFreq(getASetting('frameSettings', 'chosenFP'));
 	}
 
-	/* *************************************  runningDiagnosticCycle of circular wave*/
+	/* *************************************  the heartbeat */
 
 	rAFHandler =
 	now => {

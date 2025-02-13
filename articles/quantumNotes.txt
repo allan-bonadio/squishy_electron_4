@@ -15,21 +15,26 @@ in our case, α = - ℏ² / 2m_e =
 
 
 
-2024 May 2 ============================================= squishy_electron_4
+2024 May 2 ============================================= schrodinger's directory
 
 Finalizing the version using pthreads successfully with one thread.
-but now it's busted.  no integration.
+but now it's busted.  no integration.  OK fixed.
+Worker threads just don't work in Emscripten, or I can't get them to work.
 
-candidates for new dir name:
+candidates for new dir name spun out of schrodinger:
 Dorothy Jean Johnson Vaughan - first African-American woman to receive a promotion and supervise a group of staff at Langley.
 
 Creola Katherine Johnson - earned a reputation for mastering complex manual calculations and helped pioneer the use of computers to perform the tasks
 
 Mary Jackson, NASA's first black female engineer.
 
-choose 'vaughan' but now i can't decide how to split the schrodinger directory
+*  choose 'vaughan' but now i can't decide how to split the schrodinger directory
 
+vaughan:
+	Should be 'grinding' - grWorker.*  qGrinder.*  and maybe the abacus stuff
 
+schrodinger:
+	should be formulas, vischer.*, hamiltonian,
 
 2023 Feb 22 ============================================= proxy2worker branch
 

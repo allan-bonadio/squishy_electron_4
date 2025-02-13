@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 /*
 ** generate exports -- generate files for JS calling C++ code through emscripten
-** Copyright (C) 2021-2024 Tactile Interactive, all rights reserved
+** Copyright (C) 2021-2025 Tactile Interactive, all rights reserved
 */
 
 let traceOutput = false;
@@ -93,6 +93,9 @@ let commonConstants = [
 
 	// out-of-band value that means Fastest on frame speed menu
 	{name: 'FASTEST', cppType: 'double', value: 999_999},
+
+	// phony bool value that marks the end of a qGrinder object
+	{name: 'grSENTINEL_VALUE', cppType: 'byte', value: 123},
 ];
 
 
@@ -116,7 +119,8 @@ function generateExports() {
 
 // commonConstants.h , needed by C++ AND js
 function generateCommonConstants() {
-	const hConsts = commonConstants.map(co => `const ${co.cppType} ${co.name} = ${co.value};`);
+	const hConsts = commonConstants.map(co =>
+		`const ${co.cppType} ${co.name} = ${co.value};`);
 
 	let commonH = `/*
 	** commonConstants.h - shared constants between JS and C++
