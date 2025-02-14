@@ -7,6 +7,8 @@ import React from 'react';
 import PropTypes from 'prop-types';
 
 import voltDisplay from './voltDisplay.js';
+import {VOLT_SIDEBAR_WIDTH} from './voltConstants.js';
+
 
 let traceVoltageSidebar = false;
 let traceDragging = false;
@@ -21,8 +23,7 @@ export const spongeFactor = 100;
 
 function setPT() {
 	VoltSidebar.propTypes = {
-		width: PropTypes.number.isRequired,  // width of sidebar: fixed or zero
-
+		// x coordinate of the right edge or the bumper on the right side
 		drawingRight: PropTypes.number.isRequired,
 		canvasInnerHeight: PropTypes.number.isRequired,
 		bumperWidth: PropTypes.number,
@@ -67,35 +68,37 @@ function VoltSidebar(props) {
 
 
 	// render.  The buttons are almost square.  The + and – are emojis
-	return (<aside className='VoltSidebar'
-			onPointerEnter={pointerEnter} onPointerLeave={pointerLeave} >
-		<p/>
+	return (
+		<aside className='VoltSidebar' style={{width: VOLT_SIDEBAR_WIDTH + 'px'}}
+				onPointerEnter={pointerEnter} onPointerLeave={pointerLeave} >
+			<p/>
 
-		<button className='scrollUp'
-				onClick={ev => v.scrollVoltHandler(+1)}>
-			⬆︎
-		</button>
-		<p/>
+			<button className='scrollUp'
+					onClick={ev => v.scrollVoltHandler(+1)}>
+				⬆︎
+			</button>
+			<p/>
 
-		<button className='zoomIn'
-				onClick={ev => v.zoomVoltHandler(-1)}>
-			+
-		</button>
-		<p/>
+			<button className='zoomIn'
+					onClick={ev => v.zoomVoltHandler(-1)}>
+				+
+			</button>
+			<p/>
 
-		<button className='zoomOut'
-				onClick={ev => v.zoomVoltHandler(+1)}>
-			–
-		</button>
-		<p/>
+			<button className='zoomOut'
+					onClick={ev => v.zoomVoltHandler(+1)}>
+				–
+			</button>
+			<p/>
 
-		<button className='scrollDown'
-				onClick={ev => v.scrollVoltHandler(-1)}>
-			⬇︎
-		</button>
-		<p/>
+			<button className='scrollDown'
+					onClick={ev => v.scrollVoltHandler(-1)}>
+				⬇︎
+			</button>
+			<p/>
 
-	</aside>);
+		</aside>
+	);
 }
 setPT();
 

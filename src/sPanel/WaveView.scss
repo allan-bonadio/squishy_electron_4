@@ -24,13 +24,15 @@
 		z-index: 10;
 	}
 
-	// bumpers only show in Well continuum.
+	// bumpers only show in WELL continuum.
 	.bumper {
 		// width set by JS either zero or bumper width
 		height: 100%;
-		background-color: common.$voltageColor;
 		flex: 0 0;  // no growing/shrinking, but style attr sets flex-basis
 		z-index: 20;
+
+		background-color: common.$voltageColor;
+		//background-color: #0f06;  // for testing
 	}
 
 
@@ -41,10 +43,10 @@
 	// height set by WaveView height, and width set by flex depending on continuum.
 	// see also volts.scss for more widgetArea
 	.widgetArea {
-		height: 100%;
+		position: relative;
 		flex: 1 1;
+		height: 100%;
 		z-index: 20;
-		display: relative;
 
 		// dragging the voltage line right where an axis lable is, avoid text selection
 		.voltageAxis {
@@ -78,7 +80,7 @@
 		pointer-events: auto;
 		bottom: 1px;
 		right: 0;
-		width: common.$sizeBoxSize; height: common.$sizeBoxSize;
+		// width & height set in JS, search for SIZE_BOX_SIZE
 		z-index: 50;
 		cursor: ns-resize;
 		opacity: 0.5;

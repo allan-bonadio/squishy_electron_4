@@ -283,7 +283,7 @@ class eWave {
 		if (this.space.continuum == qeConsts.contWELL) {
 			end2 += start2;
 			start2 = 0;
-			dAngle = Math.PI / (N + 2) * (+n);
+			dAngle = Math.PI / (N + 1) * (+n);
 		}
 		else {
 			dAngle = Math.PI / N * (+n);

@@ -73,6 +73,12 @@
 			color: #fff;
 		}
 
+		// only while integration is running
+		button.startStopTool.running {
+			background: linear-gradient(#aab, #fef 20%, #eef 25%, #eff 30%, #445);
+		}
+
+		// only while user is mousedown
 		button.startStopTool:active {
 			background: linear-gradient(#223, #cdd 70%, #ccd 75%, #dcd 80%, #889);
 		}
@@ -165,19 +171,30 @@
 
 	/* **************************************** Set Wave tab */
 
-	/* a column in the SetWave band */
+	/* any column in the SetWave band */
 	.waveTabCol {
 		float: left;
 		text-align: right;
 		padding: 0 .5em;
 
-		&.middle  label {
-			display: block;
-			text-align: right;
+		// sliders for freq, etc
+		&.waveParamSliders {
+			width: 25em;
+
+			input {
+				display: inline;
+			}
+
+			h3 {
+				text-align: left;
+			}
 		}
 
-		input {
-			display: inline;
+		// the column with the radios for wave breed
+		&.breedSelector  label {
+			display: block;
+			text-align: right;
+			width: 9em;
 		}
 
 		.selected {
@@ -215,7 +232,7 @@
 			float: left;
 			height: 6em;
 			border-left: 1px #888 solid;
-			margin: 1em .5em;
+			margin: 1em 1.5em;
 		}
 
 		// the panel with the minigraph, and all the sliders
@@ -267,6 +284,7 @@
 			.ShowVoltageControl {
 				float: left;
 				padding: 1em;
+				margin-left: 1em;
 				.showVoltage {
 
 				}

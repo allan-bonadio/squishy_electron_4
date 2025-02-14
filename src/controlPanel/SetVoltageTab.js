@@ -26,7 +26,7 @@ export function ShowVoltageControl(props) {
 		<select name='showVoltage' value={props.showVoltage}
 					onChange={props.changeShowVoltage}>
 			<option value='always'>Always</option>
-// 			<option value='hover'>only while hovering</option>
+			<option value='hover'>only while hovering</option>
 			<option value='never'>Never</option>
 		</select>
 	</label>;
@@ -133,7 +133,6 @@ function SetVoltageTab(props) {
 			</label>
 		</div>;
 	}
-	// 				|<var>x</var>|<sup><var>n</var></sup> Canyon
 
 
 	// the minigraph is all in svg; no gl
@@ -286,6 +285,12 @@ function SetVoltageTab(props) {
 	}
 	//  <sup>{(vParams.canyonPower ?? 0).toFixed(1)}</sup>
 
+	function renderMisc() {
+		return <div className='misc'>
+			<ShowVoltageControl showVoltage={p.showVoltage} changeShowVoltage={p.changeShowVoltage} />
+			<button onClick={setVoltage} >Set Voltage</button>
+		</div>;
+	}
 
 
 	// remember that set*VoltageHandler is an event handler that gets the
@@ -294,7 +299,6 @@ function SetVoltageTab(props) {
 		<div className='voltageBreedPanel'>
 			<h3>Set Voltage</h3>
 			{renderBreedSelector()}
-			<button onClick={setVoltage} >Set Voltage</button>
 		</div>
 
 		<div className='divider' />
@@ -303,7 +307,7 @@ function SetVoltageTab(props) {
 
 		<div className='divider' />
 
-		<ShowVoltageControl showVoltage={p.showVoltage} changeShowVoltage={p.changeShowVoltage} />
+		{renderMisc()}
 	</div>;
 
 }

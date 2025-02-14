@@ -50,21 +50,19 @@ static std::runtime_error nullException("");
 // these values are doable by the sliders' steps. Space is definitely
 // created by creation time here, although a few details left  to do.
 qGrinder::qGrinder(qSpace *sp, qAvatar *av, int nGrWorkers, const char *lab)
-	: space(sp), avatar(av), elapsedTime(0), frameSerial(0), stretchedDt(60),
+	: magic('Grnd'), space(sp), avatar(av), qspect(NULL),
+		stepsPerFrame(10), videoFP(.05), stretchedDt(60),
+		elapsedTime(0), frameSerial(0), nGrWorkers(nGrWorkers),
 		integrationEx(nullException), exceptionCode(""), _zero(0), hadException(false),
 		shouldBeIntegrating(false), isIntegrating(false),
-		stepsPerFrame(10),
-		pleaseFFT(false), videoFP(.05),
-		nGrWorkers(nGrWorkers) {
+		pleaseFFT(false), sentinel(grSENTINEL_VALUE) {
 
-	magic = 'Grnd';
+	;
 
 	// number of waves; number of threads
 	qflick = new qFlick(space, 3, 0);
 
 	// so wave in the qflick points to the zero-th wave
-
-	qspect = NULL;  // until used
 
 	// use these for grinding
 	voltage = sp->voltage;
@@ -99,11 +97,9 @@ qGrinder::qGrinder(qSpace *sp, qAvatar *av, int nGrWorkers, const char *lab)
 			space->voltage, space->spectrumLength,
 			samplePoint);
 	}
-	sentinel = grSENTINEL_VALUE;
 	printf("qGrinder:103 sentinel should be equal: %d %d\n", (int) sentinel, (int) grSENTINEL_VALUE);
 
 	FORMAT_DIRECT_OFFSETS;
-	if (sentinel != grSENTINEL_VALUE) printf("106 should be equal: %d %d\n", (int) sentinel, (int) grSENTINEL_VALUE);
 };
 
 qGrinder::~qGrinder(void) {
@@ -198,7 +194,7 @@ void qGrinder::formatDirectOffsets(void) {
 	makeBoolSetter(needsRepaint);
 
 	makeByteGetter(sentinel);  // should always be value grSENTINEL_VALUE; only for validation
-	makeByteSetter(sentinel);  // only until we answer why it's doing that
+	makeByteSetter(sentinel);
 
 	printf("\n🪓 🪓 --------------- done with qGrinder direct access --------------\n");
 }

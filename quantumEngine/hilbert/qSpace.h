@@ -57,7 +57,8 @@ public:
 	// Not used if this is a discrete coordinate.
 	double dx;
 
-	// multiply this onto the second derivative while integrating
+	// multiply this onto the second derivative while integrating.  Depends on
+	// dx so different for each dimension.
 	double d2Coeff;
 
 	// size for Fourier transforms, or zero if not yet calculated.  ON

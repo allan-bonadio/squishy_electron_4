@@ -395,7 +395,7 @@ void qBuffer::setSquareWave(int wavelength, int first, qCx height) {
 	}
 
 	normalize();
-	fixBoundaries();
+	// done in normalize fixBoundaries();
 	dump("setSquareWave() done");
 }
 

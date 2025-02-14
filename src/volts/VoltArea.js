@@ -33,7 +33,6 @@ let traceScrollStretch = false;
 // to double the scroll or heightVolts
 let DOUBLING_TIME = 2000;
 
-
 function setPT() {
 	VoltArea.propTypes = {
 		// includes scrollSetting, heightVolts, measuredMinVolts, measuredMaxVolts, xScale, yScale
@@ -74,6 +73,7 @@ function VoltArea(props) {
 	let tactileEl = tactileRef.current;
 	const visibleRef = useRef();
 	let visibleEl = visibleRef.current;
+	//const dragCountRef = useRef(0);
 
 	// phony state variable that changes when buffer changes.  I tried using the whole buffer for this; no.
  	//let [changeCounter, setChangeCounter] = useState(0);
@@ -82,6 +82,7 @@ function VoltArea(props) {
 	let dragging = false;
 	let latestVoltage;
 	let latestIx;
+
 
 	/* ***************************************************  click & drag */
 
@@ -207,7 +208,8 @@ function VoltArea(props) {
 		// only react if the LEFT button is down
 		if (ev.buttons & 1) {
 			// bring me all the events, even outside the svg
-			svgEl.setPointerCapture(ev.pointerId);
+			// somehow this breaks drawing the voltage line  🤔
+			//svgEl.setPointerCapture(ev.pointerId);
 
 			dragging = true;
 			onePoint(ev);
@@ -227,7 +229,7 @@ function VoltArea(props) {
 		}
 	}
 
-	// called upon pointerup
+	// called upon pointerup or pointerleave
 	const pointerUp =
 	(ev) => {
 		// ev.buttons is zero here, this is called after button(s) released
@@ -328,7 +330,7 @@ function VoltArea(props) {
 		vAx.attr('class', 'voltageAxis');
 
 		// not sure how much to move axis in from right side
-		let txX = p.drawingLeft + p.drawingWidth - 32;
+		let txX = p.drawingLeft + p.drawingWidth;
 		let txY = p.canvasInnerHeight;
 		vAx.attr('transform', `translate(${txX}, ${txY})`);
 		vAx.call(axis);
@@ -357,10 +359,12 @@ function VoltArea(props) {
 			viewBox={`${p.drawingLeft} 0 ${p.drawingWidth} ${p.canvasInnerHeight}`}
 			x={p.drawingLeft} width={p.drawingWidth} height={p.canvasInnerHeight}
 			ref={svgRef}
-			onWheel={wheelHandler} onPointerMove={pointerMove} onPointerUp={pointerUp}
+			onWheel={wheelHandler} onPointerMove={pointerMove}
+			onPointerUp={pointerUp} onPointerLeave={pointerUp}
 		>
 			<g className={'optionalVoltage ' + vClass}>
-				{/* for showVoltage on hover, need this to  hover over */}
+				{/* for showVoltage on hover, need this to  hover over.  No ev handlers here,
+					but the .alwaysShowVoltage etc classes' :hover doesn't catch them othrwise */}
 				<rect className='hoverBox' key='hoverBox'
 					x={p.drawingLeft} y={0}
 					width={p.drawingWidth} height={p.canvasInnerHeight}
@@ -372,6 +376,8 @@ function VoltArea(props) {
 
 		</svg>
 	);
+
+
 
 	if (traceRendering)
 		console.log(`⚡️ VoltArea render done`);

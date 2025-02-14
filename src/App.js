@@ -149,7 +149,7 @@ class App extends React.Component {
 			//sqPanel = <SquishPanel id='theSquishPanel' width={s.bodyWidth} />;
 			//if (this.appEl?.bodyWidth != document.body.clientWidth)
 			console.log(`🍦 App renders SquishPanel when cppRunning, `
-					+`body.clientWidth=${document.body.clientWidth} body scrollWidth=${document.body.scrollWidth} `
+					+`body.clientWidth=${document.body.clientWidth}  `
 					+ `this.bodyWidth=${this.bodyWidth} this.appEl=`, this.appEl);
 		}
 		else {
