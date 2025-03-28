@@ -33,7 +33,7 @@ export function ShowVoltageControl(props) {
 }
 
 
-/* ***************************************************************** the tab itself */
+/* ******************************************************* the tab itself */
 
 function setPT() {
 	SetVoltageTab.propTypes = {
@@ -43,10 +43,11 @@ function setPT() {
 	};
 }
 
-// reducer is an object with just the components that change
-function reducer(vParams, action) {
+// action is an object with just the components that change
+function vParamsReducer(vParams, action) {
 	// gotta make a whole new object, with old values, overwritten by new values
-	const newParams = Object.assign({}, vParams, action);
+	// NO!  that's for useState.
+	const newParams = Object.assign(vParams, action);
 	// no!  wait for SetVoltage click!  storeAGroup('voltageParams', newParams);
 	return newParams;
 }
@@ -55,49 +56,49 @@ function reducer(vParams, action) {
 function SetVoltageTab(props) {
 	const p = props;
 
-	const [vParams, setVParams] = useReducer(reducer, getAGroup('voltageParams'));
+	const [vParams, setVParams] = useReducer(vParamsReducer, getAGroup('voltageParams'));
 
-	let [This, setThis] = useState(null);  // triggers rerender only when space created
-	// const ThisRef = useRef(null);
-	//let This = ThisRef.current;
-	if (!This) {
+	let [SVState, setSVState] = useState(null);  // triggers rerender only when space created
+	// const SVStateRef = useRef(null);
+	//let SVState = SVStateRef.current;
+	if (!SVState) {
 		// only the first time this is run
-		This = {};
+		SVState = {};
 
 		// think of this like a useEffect
 		eSpaceCreatedPromise.then(space => {
-			// This obj holds various big objects
+			// SVState obj holds various big objects
 
-			This.space = space;
+			SVState.space = space;
 
 			// used for depicting what the user's selected.  Copy from live one.
-			This.miniGraphBuffer = new Float64Array(space.nPoints);
-			voltDisplay.copyVolts(This.miniGraphBuffer, space.voltageBuffer);
+			SVState.miniGraphBuffer = new Float64Array(space.nPoints);
+			voltDisplay.copyVolts(SVState.miniGraphBuffer, space.voltageBuffer);
 
 			// each voltDisplay manages a voltage context; this one does the minigraph one
-			This.miniVolts = new voltDisplay('miniVolts',
+			SVState.miniVolts = new voltDisplay('miniVolts',
 				space.start, space.end, space.dimensions[0].continuum,
-				This.miniGraphBuffer, getAGroup('voltageSettings'));
+				SVState.miniGraphBuffer, getAGroup('voltageSettings'));
 
-			setThis(This);
+			setSVState(SVState);
 		});
 
 		return null;  // can't render this time
 	}
-	if (!This.space)
+	if (!SVState.space)
 		return null;  // can't render till space promise resolves, sorry
 
-	// Set Voltage button copies This panel's volts to the space's volts, and stores params
+	// Set Voltage button copies SVState panel's volts to the space's volts, and stores params
 	const setVoltage=
 	(ev) => {
-		if (!This.miniVolts)
+		if (!SVState.miniVolts)
 			return;
-		const v = This.space.vDisp;
+		const v = SVState.space.vDisp;
 		v.setFamiliarVoltage(vParams);
 		storeAGroup('voltageParams', vParams);
 
-		v.setBottomVolts(This.miniVolts.bottomVolts);
-		v.setHeightVolts(This.miniVolts.heightVolts);
+		v.setBottomVolts(SVState.miniVolts.bottomVolts);
+		v.setHeightVolts(SVState.miniVolts.heightVolts);
 	};
 
 	/* *************************************************************** rendering for the Tab */
@@ -138,9 +139,9 @@ function SetVoltageTab(props) {
 	// the minigraph is all in svg; no gl
 	function renderMiniGraph() {
 		// even if you can't draw it, at least reserve the space
-		if (!This.miniVolts)
+		if (!SVState.miniVolts)
 			return <svg width={MINI_WIDTH} height={MINI_HEIGHT} />;
-		const v = This.miniVolts;
+		const v = SVState.miniVolts;
 		//debugger;
 
 		v.setAppropriateRange(vParams);
