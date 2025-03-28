@@ -148,16 +148,20 @@ class App extends React.Component {
 			sqPanel = <SquishPanel id='theSquishPanel' bodyWidth={this.bodyWidth} />;
 			//sqPanel = <SquishPanel id='theSquishPanel' width={s.bodyWidth} />;
 			//if (this.appEl?.bodyWidth != document.body.clientWidth)
-			console.log(`🍦 App renders SquishPanel when cppRunning, `
+			if (traceResize) {
+				console.log(`🍦 App renders SquishPanel when cppRunning, `
 					+`body.clientWidth=${document.body.clientWidth}  `
 					+ `this.bodyWidth=${this.bodyWidth} this.appEl=`, this.appEl);
+			}
 		}
 		else {
 			// spinner tells ppl we're working on it
 			sqPanel= <div id='theSquishPanel' >
 				<img className='spinner' alt='spinner' src='/images/eclipseOnTransparent.gif' />
 			</div>;
-			console.log(`🍦 render when NOT cppRunning, body.clientWidth=${this.bodyWidth}`);
+			if (traceState) {
+				console.log(`🍦 render when NOT cppRunning, body.clientWidth=${this.bodyWidth}`);
+			}
 		}
 
 		return (

@@ -96,8 +96,8 @@ qGrinder::qGrinder(qSpace *sp, qAvatar *av, int nGrWorkers, const char *lab)
 			space->nDimensions, space->nStates, space->nPoints,
 			space->voltage, space->spectrumLength,
 			samplePoint);
+		printf("qGrinder:103 sentinel should be equal: %d %d\n", (int) sentinel, (int) grSENTINEL_VALUE);
 	}
-	printf("qGrinder:103 sentinel should be equal: %d %d\n", (int) sentinel, (int) grSENTINEL_VALUE);
 
 	FORMAT_DIRECT_OFFSETS;
 };

@@ -96,6 +96,14 @@ footer {
 	width: 60%;
 }
 
+/* **************************************** squish panel */
+
+.SquishPanel {
+	position: relative;
+	z-index: 10;
+	margin-bottom: 1em;
+}
+
 /* **************************************** controls in general */
 
 /* applies to text boxes, checkboxes, radios, sliders, ... */
@@ -313,6 +321,8 @@ dialog#CommonDialog {
 	background-color: transparent;
 }
 
+/* ***************************************************************** testing */
+
 // this strange experiment that I haven't touched in at least a year
 .runningOneCycle {
 	float: right;
@@ -320,10 +330,5 @@ dialog#CommonDialog {
 	border: outset 3px #ca8;
 	background-color: #468;
 	padding: .5em;
-}
-
-.SquishPanel {
-	position: relative;
-	z-index: 10;
 }
 
