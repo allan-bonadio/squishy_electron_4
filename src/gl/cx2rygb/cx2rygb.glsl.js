@@ -14,13 +14,13 @@ const sqrtTwo = Math.sqrt(2.);  // 1.4142...
 //const sqrtOneThird = Math.sqrt(1. / 3.);  // 0.57735..
 //const sqrtThree = Math.sqrt(3.);  // 1.7320..
 
-// slopes zero to this number will be directly used as gun gradient
+// ?? slopes zero to this number will be directly used as gun gradient
 const KINK = 0.5;
 const HALF = 0.5;
 
 const KINK_FACTOR = KINK / sqrtOneThird;
 
-// slope and offset for the 30-60 part, as a linear function of ySlope-xSlope
+//?? slope and offset for the 30-60 part, as a linear function of ySlope-xSlope
 const MEZZO_FACTOR = (1. - KINK) * sqrtThree / 4;
 const MEZZO_OFFSET = (1. + KINK) / 2;
 
@@ -108,10 +108,14 @@ vec3 cx2rygb(vec2 psi) {
 	vec3 scratch;
 
 	// have to normallize it!!
-//	vec2 temp;
-//	temp = psi;
+    //vec2 temp;
+    //temp = psi;
+    factor = sqrt(psi.x ** 2 + psi.y ** 2);
+    if (0 == factor) factor = 1e-5;
+    psi.x /= factor;
+    psi.y /= factor;
 
-
+    // decision tree cases: >0, =0, <0.  Then y (im) is outer, x (re) is inner
 	if (psi.y > 0) {
 		// red 0°over to green ±180°, and yellow 90° half way in between
 		if (psi.x > 0) {

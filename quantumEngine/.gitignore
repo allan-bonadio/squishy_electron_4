@@ -4,14 +4,14 @@ wasm/*
 commonConstants.h
 building/exports.json
 commonConstants.h
-# also in src is engine/qe.js, see that gitignore
+# also in src is engine/qe*.js, see that gitignore
 
 
-# cppu test objects, now in wasm?
+# cppu test objects, now in testing
 #cppuTestBin
 #cppuTestBin.dSYM
 
-# abacus lab
+# abacus lab - still under dev
 schrodinger/abacusLab
 schrodinger/abacusLab.dSYM
 

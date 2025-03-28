@@ -74,6 +74,7 @@ echo "                                     🎁  🔨  NPM Build Completed"
 echo "                                     🎁  🔨  starting final cleanup"
 # move these out of the way so they don't get confused with dev versions
 # but don't delete them in case I have to examine them later
+echo "Moving production binaries to /tmp in case needed for post mortem"
 mv -fv quantumEngine/wasm/* /tmp
 
 echo "                                     🎁  🔨  final cleanup Completed, here's all the files:"

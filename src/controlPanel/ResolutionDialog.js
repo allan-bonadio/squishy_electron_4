@@ -5,6 +5,8 @@
 
 import React from 'react';
 
+
+import qeFuncs from '../engine/qeFuncs.js';
 import qeConsts from '../engine/qeConsts.js';
 import CommonDialog from '../widgets/CommonDialog.js';
 import {powerToIndex} from '../utils/powers.js';

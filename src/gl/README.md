@@ -24,11 +24,24 @@ Roughly corresponds to an Avatar?  not really...
 * abstractScene.js  - abstract superclass of Scenes, although you can use them as-is for smoke testing
 * flatDrawingScene.js - view def for flat stereotypical bargraph of wave
 
-## misc drawing code
-* drawingVariable.js - helps drawing modules with the variables passed into GL
+## complex to RGB
 * cx2rgb - convert a complex number to a RGB color + translator to .js
 * cx2rgb/cx2rgb.glsl.js - GLSL code to calculate colors based on complex numbers
+
+## complex to RYGB
+* cx2rygb - convert a complex number to a RYGB color + translator to .js
+* cx2rygb/cx2rygb.glsl.js - GLSL code to calculate colors based on complex numbers
 
 # other
 * README.md - this file
 * curiosity.js - test code to explore WebGL; retrieves all settings and other stuff, interesting!
+* drawingVariable.js - helps drawing modules with the variables passed into GL
+
+
+# RYGB
+Alternate color map.  Expands red-yellow-green and shrinks green-blue-magenta-red.
+Cuz there's just more colors near yellow than near blue.
+red=0  orange=45°  yellow=90° chartreuce=135° green=180°
+cyan=225° blue=270° magenta=315°
+
+
