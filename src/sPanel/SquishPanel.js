@@ -63,20 +63,19 @@ export class SquishPanel extends React.Component {
 			space: null,
 
 			//  this will get filled in when the rAF mesurements get settled down in sAnimator
+			// TODO: this should be a global, cuz screen refresh rate is shared by all SPs
 			frameRateMenuFreqs: null,
 		};
 
 		// um, I think we want multiple things in the space context.  The space,
 		// the promise for the space, dunno what else.  Hmmm the hooks docs
 		// use one per variable.  I think you can't do that in class components.
-		this.spaceCtx = React.createContext(null);
-
-
+		//this.spaceCtx = React.createContext(null);
 
 		if (traceSquishPanel) console.log(`👑 SquishPanel constructor done`);
 	}
 
-	/* ******************************************************* space & wave creation */
+	/* ****************************************** space & wave creation */
 
 	componentDidMount() {
 		// upon startup, after C++ says it's ready.
@@ -185,28 +184,27 @@ export class SquishPanel extends React.Component {
 			+ ` body.clientWidth=${document.body.clientWidth}`);
 
 		return (
-			<this.spaceCtx.Provider value={s.space}>
+			<article id={this.props.id} className="SquishPanel">
+				<WaveView
+					outerWidth = {p.bodyWidth}
+					showVoltage={s.showVoltage}
+					sPanel={this}
+				/>
+				<ControlPanel
+					changeShowVoltage={this.changeShowVoltage}
+					showVoltage={s.showVoltage}
 
-				<article id={this.props.id} className="SquishPanel">
-					<WaveView
-						outerWidth = {p.bodyWidth}
-						showVoltage={s.showVoltage}
-						sPanel={this}
-					/>
-					<ControlPanel
-						changeShowVoltage={this.changeShowVoltage}
-						showVoltage={s.showVoltage}
+					redrawWholeMainWave={this.redrawWholeMainWave}
 
-						redrawWholeMainWave={this.redrawWholeMainWave}
-
-						iStats={this.iStats}
-						frameRateMenuFreqs={s.frameRateMenuFreqs}
-						animator={this.animator}
-						sPanel={this}
-					/>
-				</article>
-			</this.spaceCtx.Provider>
+					iStats={this.iStats}
+					frameRateMenuFreqs={s.frameRateMenuFreqs}
+					animator={this.animator}
+					sPanel={this}
+				/>
+			</article>
 		);
+		//<this.spaceCtx.Provider value={s.space}>
+		//</this.spaceCtx.Provider>
 	}
 }
 
