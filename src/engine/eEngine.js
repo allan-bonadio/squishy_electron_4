@@ -4,7 +4,7 @@
 */
 
 import {defineQEngineFuncs} from './qeFuncs.js';
-import App from '../App.js';
+//import App from '../App.js';
 import {interpretCppException, excRespond} from '../utils/errors.js';
 //import {resetObjectRegistry} from '../utils/directAccessors.js';
 import {getASetting, storeASetting, createStoreSettings} from '../utils/storeSettings.js';
@@ -23,8 +23,6 @@ export let MAX_DIMENSIONS, N_THREADS;
 
 // this promise resolves when the main space is created.
 // Create the promise tout de suite when app starts, so everybody can get at it.
-// Recreate it when you know you're about to recreate the space and everything.
-
 // TODO: I don't need this crap anymore, right?
 let eSpaceCreatedSucceed, eSpaceCreatedFail;
 function resetSpaceCreatedPromise() {
@@ -42,7 +40,7 @@ function resetSpaceCreatedPromise() {
 // for the first time when app starts up.  Because eSpaceCreatedPromise is an
 // exported variable, that means there can only be one of them.  Therefore, only
 // one space, and only one SquishPanel.  I was hoping to be able to have more
-// than one SquishPanel.  Maybe if they all share the same spact... or if I pass
+// than one SquishPanel.  Maybe if they all share the same space... or if I pass
 // down yet another variable down multiple layers of components...
 export let eSpaceCreatedPromise = resetSpaceCreatedPromise();
 
@@ -70,9 +68,9 @@ export function create1DMainSpace(spaceParams) {
 	} catch (ex) {
 		// this is called from eSpaceCreatedPromise so trigger its fail
 		// eslint-disable-next-line no-ex-assign
-		ex = interpretCppException(ex);
+		const iex = interpretCppException(ex);
 		debugger;
-		eSpaceCreatedFail(ex);
+		eSpaceCreatedFail(iex);
 	}
 }
 
@@ -102,47 +100,21 @@ function startUpEverything() {
 	if (traceStartup) console.log(`main space 🐣  created`);
 }
 
-// Called directly by main.cpp when C++ has
-// finally started up.  Once only, at page load. do NOT export this; it's global
-// cuz quantumEngine.js, the compiled C++ proxy, has to have access to it early
-// on, and it's CJS and can't reach JS module exports.
-function startUpFromCpp(maxDims, nThreads) {
-	MAX_DIMENSIONS = maxDims;
-	N_THREADS = nThreads;
-
-	window.cppRuntimeInitialized();
-
-	// startup threads need, like everything else, the space
-	// I guess we're starting up with threads anyway
-	eSpaceCreatedPromise
-	.then(space => {
-		if (traceStartup) console.log(`threads 🐣  created`);
-		if (tracePromises) console.log(
-			`🐥 startUpFromCpp:  space created and resolving eSpaceCreatedPromise`);
-
-	})
-	.catch(ex => {
-		excRespond(ex, `creating threads`);
-		debugger;
-	});
-
-};
-window.startUpFromCpp = startUpFromCpp;
-
 /* ********************************************************** Main Startup */
 // startup: both of these: domContentLoaded and cppInitialized must have
 // happened (and turned true) in order for us to start threads and space and C++
 // and everything. Don't care which came first, but the second one runs
-// startUpWithThreads() or startUpEverything().
+// startUpEverything().
 
 let cppInitialized = false, domContentLoaded = false;
 
-// trigger when all the dom stuff is loaded.  (React not totally up yet)
+// trigger when all the dom stuff is 'loaded'.  (really just the
+// public/index.html file.  With the empty element.  React not totally up yet)
 document.addEventListener('DOMContentLoaded', ev => {
 	if (traceStartup) console.log(`🐣 DOMContentLoaded`);
 	domContentLoaded = true;
 	if (cppInitialized)
-		window.startUpEverything();
+		startUpEverything();
 });
 
 
@@ -155,3 +127,35 @@ ev => {
 		startUpEverything();
 };
 
+
+/* ********************************************************** C++ Startup */
+
+// Called directly by main.cpp when C++ has
+// finally started up.  Once only, at page load. do NOT export this; it's global on window
+// cuz quantumEngine.js, the compiled C++ proxy, has to have access to it early
+// on, and it's CJS and can't reach JS module exports.
+function startUpFromCpp(maxDims, nThreads) {
+	MAX_DIMENSIONS = maxDims;
+	N_THREADS = nThreads;
+
+	window.cppRuntimeInitialized();
+	if (traceStartup) console.log(`threads 🐣  created`);
+
+	// startup threads need, like everything else, the space
+	// I guess we're starting up with threads anyway
+	eSpaceCreatedPromise
+	.then(space => {
+		if (traceStartup) console.log(`threads 🐣  created`);
+		if (tracePromises) {
+			console.log(
+				`🐥 startUpFromCpp:  space created and resolving eSpaceCreatedPromise`);
+		}
+
+	})
+	.catch(ex => {
+		excRespond(ex, `creating threads`);
+		debugger;
+	});
+
+};
+window.startUpFromCpp = startUpFromCpp;
