@@ -12,7 +12,7 @@ let traceConfirm = false;
 
 /* ********************************** testing the translated glsl code*/
 
-// given a complex number cx, |cx| == 1, passed in as just the complex angle
+// given a complex number cx, |cx| not necessarily = 1, passed in as just the complex angle
 // in degrees, run it through cx2rygb() and compare the rygb-vector it returns
 // with the expected return
 function testOne(angle, expected) {

@@ -84,7 +84,7 @@ function handleRealImag(cx) {
 
 
 // Take aQuarter() and reflect it for the 4 corners.
-export function cx2rgb(cx)  {
+export function cx2rygb(cx)  {
 		let color = vec3();
 		let scratch = vec3();
 		let temp = vec2();
@@ -211,4 +211,4 @@ function OLDcxToColor(psi) {
 }
 
 
-export default cx2rgb;
+export default cx2rygb;

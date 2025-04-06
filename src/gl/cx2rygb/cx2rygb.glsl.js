@@ -45,75 +45,81 @@ float sqrtHalf = ${sqrtHalf};
 // calculate any complex with both positive x and y, from northeast corner ONLY
 // return a 3-vector with gradient values for each color (which gets rearranged)
 // this returns an rgb but red=gradient over top (1->.5), and green = gradient over sides (0->1)
-vec3 aQuarter(vec2 psi) {
-	// we'll figure out a more efficient way to do this in the future
-	float ySlope = psi.y / psi.x;  // ySlope is the one you learned in calculus
-	float xSlope = psi.x / psi.y;
-	vec3 col;
-	col.r = col.g = col.b = 0.;  // no swizzling cuz of JS version
+//vec3 aQuarter(vec2 psi) {
+//	// we'll figure out a more efficient way to do this in the future
+//	float ySlope = psi.y / psi.x;  // ySlope is the one you learned in calculus
+//	float xSlope = psi.x / psi.y;
+//	vec3 col;
+//	col.r = col.g = col.b = 0.;  // no swizzling cuz of JS version
+//
+//	// sqrt 3 and sqrt 1/3 are the slopes at 30 and 60 degrees
+//	if (xSlope < sqrtOneThird) {
+//		// the part between 60° and 90°, horizontal along the top, red starts to lower, green stays 1
+//		col.r = .5 + xSlope * KINK_FACTOR;    // 1 at 60°, HALF at 90°,
+//		col.g = 1.;
+//		//traceQuarter('quarter6090 cx=', _(psi.x), _(psi.y), '  color=', _(col.r), _(col.g));
+//	}
+//	else if (ySlope < sqrtOneThird)  {
+//		// bottom 0° to 30°, far right near 0°,  to KINK slope
+//		col.r = 1.;
+//		col.g = ySlope * KINK_FACTOR;    // zero at 0°, KINK at 30°
+//		//traceQuarter('quarter0030 cx=', _(psi.x), _(psi.y), '  color=', _(col.r), _(col.g));
+//	}
+//	else {
+//		// middle part between 30° and 60°
+//		float mezzo = ySlope - xSlope;
+//		col.r = 1.;
+//		col.g = mezzo * MEZZO_FACTOR + MEZZO_OFFSET;  // 1/2? ... 1
+//		//traceQuarter('quarter3060 cx=', _(psi.x), _(psi.y), '  color=', _(col.r), _(col.g));
+//	}
+//	return col;
+//}
 
-	// sqrt 3 and sqrt 1/3 are the slopes at 30 and 60 degrees
-	if (xSlope < sqrtOneThird) {
-		// the part between 60° and 90°, horizontal along the top, red starts to lower, green stays 1
-		col.r = .5 + xSlope * KINK_FACTOR;    // 1 at 60°, HALF at 90°,
-		col.g = 1.;
-		//traceQuarter('quarter6090 cx=', _(psi.x), _(psi.y), '  color=', _(col.r), _(col.g));
-	}
-	else if (ySlope < sqrtOneThird)  {
-		// bottom 0° to 30°, far right near 0°,  to KINK slope
-		col.r = 1.;
-		col.g = ySlope * KINK_FACTOR;    // zero at 0°, KINK at 30°
-		//traceQuarter('quarter0030 cx=', _(psi.x), _(psi.y), '  color=', _(col.r), _(col.g));
-	}
-	else {
-		// middle part between 30° and 60°
-		float mezzo = ySlope - xSlope;
-		col.r = 1.;
-		col.g = mezzo * MEZZO_FACTOR + MEZZO_OFFSET;  // 1/2? ... 1
-		//traceQuarter('quarter3060 cx=', _(psi.x), _(psi.y), '  color=', _(col.r), _(col.g));
-	}
-	return col;
-}
-
-// real or imag numbers.  handle x=0 & y=0 cases  that screw up division
-vec3 handleRealImag(vec2 cx) {
-	if (0. == cx.y) {
-		// top half thru yellow
-		if (0. == cx.x) {
-			return vec3(0., 0., 0.);  // black
-		}
-		else if (cx.x > 0.) {
-			// east
-			return vec3(1., 0., 0.);  // red = +1
-		}
-		else {
-			return vec3(0., 1., 1.);  // green = -1
-		}
-	}
-	else {
-		if (cx.y > 0.) {
-			return vec3(1., 1., 0.);  // yellow = +i
-		}
-		else {
-			return vec3(.5, 0., 1.);  // blue = -i
-		}
-	}
-}
+//// real numbers.  handle im = y=0 cases  that screw up division
+//vec3 handleReal(vec2 cx) {
+//    // red thru zero to yellow
+//    if (0. == cx.x) {
+//        return vec3(0., 0., 0.);  // black
+//    }
+//    else if (cx.x > 0.) {
+//        // east
+//        return vec3(1., 0., 0.);  // red = +1
+//    }
+//   return vec3(0., 1., 0.);  // green = -1
+//}
+//
+//
+//// imag numbers.  handle re = x = 0 cases  that screw up division
+//vec3 handleImag(vec2 cx) {
+//    // yellow thru zero to blue
+//	if (cx.y > 0.) {
+//        return vec3(1., 1., 0.);  // yellow = +i
+//    }
+//    else if (cx.y < 0.) {
+//        return vec3(0., 0., 1.);  // blue = -i
+//	}
+//    return vec3(0., 0., 0.);  // black
+//}
 
 
 // take a complex and use the octogon alg to figure out the color
-// complex is normalized?   r**2 + i**2 == 1
+// complex is normalized?  ∑  r**2 + i**2 == 1
 vec3 cx2rygb(vec2 psi) {
-	vec3 color.rgba = 0;
+	vec3 color.rgb = 0;
 	vec3 scratch;
 
-	// have to normallize it!!
-    //vec2 temp;
-    //temp = psi;
+//	if (psi.x == 0.) return handleImag(psi);
+//	if (psi.y == 0.) return handleReal(psi);
+
+	// have to normallize it!!  this just calculates the color, not the mag
+    //have tro find a faster alg than this
     factor = sqrt(psi.x ** 2 + psi.y ** 2);
     if (0 == factor) factor = 1e-5;
     psi.x /= factor;
     psi.y /= factor;
+
+    // wait, I'm thinking that x and y should be -1...1 linearly and abs(x) + abs(y) = 1
+    // make it so!
 
     // decision tree cases: >0, =0, <0.  Then y (im) is outer, x (re) is inner
 	if (psi.y > 0) {
@@ -124,7 +130,7 @@ vec3 cx2rygb(vec2 psi) {
 			color.g = psi.y;
 		}
 		else if (0. == psi.x) {
-		    // yelllow ... avoid div by zero
+		    // yelllow
 			color.r = 1;
 			color.g = 1.;
 		}
