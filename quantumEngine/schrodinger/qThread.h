@@ -42,7 +42,7 @@ struct qThread {
 	 //void (*handler)(void *);
 	 void *arg;
 
-	 // set true when thread actually starts running after creation
+	 // set true when thread actually starts running after creation.  Only for page startup.
 	 bool confirmed;
 	 void confirmThread(void);
 
