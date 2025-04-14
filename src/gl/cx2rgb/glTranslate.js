@@ -65,7 +65,6 @@ const preface = `
 
 // set these after translation
 let traceQuarter = false;
-let traceMain = false;
 
 const vec2 = (x=0, y=0) => {{x, y}};
 const vec3 = (r=0, g=0, b=0) => ({r, g, b});
