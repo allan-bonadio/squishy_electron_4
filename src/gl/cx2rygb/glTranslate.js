@@ -7,15 +7,12 @@
 import fs from 'fs';
 import cxToColorGlsl from './cx2rygb.glsl.js';
 
-// You must manually run this!  no script or makefile will run it for you.
-// This is a nodejs, cmd-line program.
-// no args needed, just run this to recompile after changing cxToColorGlsl file.
-//            ./glTranslate.js
+// This is a nodejs library, imported and run from inside Jest
 
 // This does NOT translate all of glsl; just the stuff used in cx2rygb file.
 // Nor does it detect GLSL syntax errors.  All done by regex.
 // This ONLY translates cx2rygb.glsl.js!  it's a hack.
-// Also a few other details
+// Also a few other ad-hoc details
 
 //console.log(`input:`, cxToColorGlsl);
 
@@ -43,7 +40,7 @@ function convertFile(text) {
 	text = text.replace(/\((vec2|vec3|vec4|float|int|bool) /g, '(');
 
 	// variable declarations - always float
-	text = text.replace(/^(float|int|bool) /gm, 'let ');
+	text = text.replace(/\b(float|int|bool) /gm, 'let ');
 
 	// function declarations - always return vec3
 	text = text.replace(/^(vec2|vec3|vec4) /gm, 'function ');
@@ -54,6 +51,10 @@ function convertFile(text) {
 	// when you declare a vector, must use constructor in JS
 	text = text.replace(/\t(vec2|vec3|vec4) (\w+)/g, '\t\tlet $2 = $1()');
 
+	// this ONE special case.  A GL-ism
+	text = text.replace(/vec3\(\)\.rgb = 0/g, 'vec3(0., 0., 0.)');
+
+
 	return text;
 }
 
@@ -63,16 +64,18 @@ const preface = `
 // mostly for testing purposes.  do not edit!  instead edit cx2rygb.glsl.js & run unit tests
 // this file written ${new Date()}
 
-// set these after translation
-let traceQuarter = false;
-let traceMain = false;
+// TODO: use these someday?
+//let traceQuarter = false;
+//const  _  = (v) => v.toFixed(4);
 
-const vec2 = (x=0, y=0) => {{x, y}};
+// needed defs of vec2 (complex only) and vec3 (rgb only)
+const vec2 = (x=0, y=0) => ({x, y});
 const vec3 = (r=0, g=0, b=0) => ({r, g, b});
-const  _  = (v) => v.toFixed(4);
 `;
 
-const suffix = '\nexport default cx2rygb;\n';
+const suffix = `
+export default cx2rgb;
+`;
 
 function glTranslate() {
 	let text = cxToColorGlsl;
@@ -80,6 +83,8 @@ function glTranslate() {
 	let jsText = convertFile(text);
 	fs.writeFileSync(process.env.SQUISH_ROOT + '/src/gl/cx2rygb/cx2rygb.txlated.js',
 		preface + jsText + suffix);
+
+	return null;
 }
 
-glTranslate();
+export default glTranslate;

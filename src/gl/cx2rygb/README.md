@@ -2,14 +2,17 @@
 
 ### Color Octagon
 
+This is the scheme for the Octogon Algorithm, mapping from Re, Im to RYGB to RGB.
 the octagon:
-√ =  √.5
+√ =  √0.5 or 1/√2
 
+```
                 yellow 1,1,0
      chartreuce √,1,0    orange 1,√,0
 green 0,1,0                     red 1,0,0
       cyan 0,1,1            magenta 1,0,1
                 blue 0,0,1
+```
 
 Guns are constant 1 when angle is next to gun color.
 2 guns are always nonzero unless you're exactly on a rgb color, when only that one is.
@@ -24,6 +27,11 @@ I divide these to isolate just the phase.
 
 Color = r g b
 
-=x / (y + 1e-6)
+phase tangent =x / (y + 1e-6)
 
+
+### How to Test
+
+./glTranslate.js
+./cx2rygb.test.js
 
