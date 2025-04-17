@@ -17,11 +17,13 @@
 EM_JS(int, qeStarted, (int max_dimensions, int n_threads), {
 	// sometimes these things start in the wrong order
 	let inter = setInterval(() => {
-		console.log(`trying again, see if cpp set up yet`);
 		if (window.startUpFromCpp) {
 			// this function in src/engine/eEngine.js
 			window.startUpFromCpp(max_dimensions, n_threads);
 			clearInterval(inter);
+		}
+		else {
+			console.log(`try again later, see if cpp set up yet`);
 		}
 	}, 100);
 });
