@@ -57,6 +57,7 @@ struct qGrinder {
 
 	/* ************************* FFT to checkout momentum */
 
+  // call if/when you need the spectrum buffer.  Only one; kept forever
 	struct qSpectrum *getSpectrum(void);
 
 	// set pleaseFFt from JS (only if in the middle of frame)
@@ -117,7 +118,7 @@ struct qGrinder {
 	// pointer grabbed from the space.  Same buffer as in space.
 	double *voltage;
 
-	// for the fourier filter.  Call the function first time you need it.
+	// for the fourier filter.  Call the getSpectrum() first time you need it.
 	// owned if non-null
 	struct qSpectrum *qspect;
 

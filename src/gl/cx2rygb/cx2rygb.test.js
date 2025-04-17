@@ -1,24 +1,28 @@
 /*
-** complex to color testing -- all the widgets below the displayed canvas
+** complex to color testing -- for all psi GL drawing
 ** Copyright (C) 2021-2025 Tactile Interactive, all rights reserved
 */
 
 import {expect} from '@jest/globals';
-import {cx2rygb} from './cx2rygb.txlated.js';
+import glTranslate from './glTranslate.js';
+import cx2rgb from './cx2rygb.txlated.js';
 
 let traceConfirm = false;
 
 // THis is a Jest testfile.  Do 'npm test' and it'll run along with the rest.
 
+// must translate this after each change so might as well do this here
+//beforeAll(glTranslate);
+
 /* ********************************** testing the translated glsl code*/
 
-// given a complex number cx, |cx| == 1, passed in as just the complex angle
+// given a complex number cx, |cx| not necessarily = 1, passed in as just the complex angle
 // in degrees, run it through cx2rygb() and compare the rygb-vector it returns
 // with the expected return
 function testOne(angle, expected) {
 	let cx = {x: Math.cos(angle * Math.PI / 180), y: Math.sin(angle * Math.PI / 180)};
 
-	const actual = cx2rygb(cx);
+	const actual = cx2rgb(cx);
 	if (traceConfirm) console.info(`cx2rygb: ${angle}°`+
 		` = [${cx.x.toFixed(4)},${cx.y.toFixed(4)}]`+
 		` => (${actual.r.toFixed(6)}, ${actual.g.toFixed(6)}, ${actual.b.toFixed(6)})`);
