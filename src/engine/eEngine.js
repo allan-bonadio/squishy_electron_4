@@ -7,7 +7,7 @@ import {defineQEngineFuncs} from './qeFuncs.js';
 //import App from '../App.js';
 import {interpretCppException, excRespond} from '../utils/errors.js';
 //import {resetObjectRegistry} from '../utils/directAccessors.js';
-import {getASetting, storeASetting, createStoreSettings} from '../utils/storeSettings.js';
+import {getASetting, storeASetting, getAGroup, createStoreSettings} from '../utils/storeSettings.js';
 import eSpace from './eSpace.js';
 //import eThread from './eThread.js';
 
@@ -92,9 +92,10 @@ function startUpEverything() {
 	// Create The Space.  Asynchronous, then triggers the eSpaceCreatedPromise.
 	// This can't happen until we have the storeSettings and QEngine funcs, and...
 	create1DMainSpace({
-		N: getASetting('spaceParams', 'N'),
-		continuum: getASetting('spaceParams', 'continuum'),
-		spaceLength: getASetting('spaceParams', 'spaceLength'),
+		...getAGroup('spaceParams'),
+		//	N: getASetting('spaceParams', 'N'),
+		//	continuum: getASetting('spaceParams', 'continuum'),
+		//	spaceLength: getASetting('spaceParams', 'spaceLength'),
 		label: 'main'});
 
 	if (traceStartup) console.log(`main space 🐣  created`);
