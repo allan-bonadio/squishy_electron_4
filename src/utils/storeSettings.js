@@ -181,7 +181,7 @@ export function createStoreSettings() {
 
 	/* ************************************ spaceParams */
 
-	// see also resolution dialog to change these
+	// see also resolution dialog to change these.  Never changes after page loaded.
 	makeParam('spaceParams', 'N', 64,  N => isPowerOf2(N) );
 	makeParam('spaceParams', 'continuum', qeConsts.contENDLESS,
 		[qeConsts.contDISCRETE, qeConsts.contWELL, qeConsts.contENDLESS]);
@@ -261,31 +261,34 @@ window.dumpSettings = () => {
 
 // retrieve a whole group, with defaults filled in as needed
 export function getAGroup(groupName) {
-	let group;
+	let gr;
 	try {
 		let savedGroup = localStorage.getItem(groupName);
-		group = JSON.parse(savedGroup);
+		gr = JSON.parse(savedGroup);
 	} catch (ex) {
 		// in the event that some bogus value gets stored in the localStorage, revert to default.
-		group = alternateStoreDefaults[groupName];
+		gr = {};
+		//group = alternateStoreDefaults[groupName];
 	}
 
 	// if completely uninitialized, create.  (if user hacked on localStore)
-	if (!group)
-		group = {};
+	//if (!group)
+	//group = {};
 
 	// If some are missing, fill those in.
-	const asg = alternateStore[groupName];
-	for (let varName in asg)
-		group[varName] ??= asg[varName].default;
+	let group = {...alternateStore[groupName], ...gr}
+	//const asg = alternateStore[groupName];
+	//for (let varName in asg)
+	//	group[varName] ??= asg[varName].default;
 
 	return group;
 }
 
-// store a whole group.  Eliminates values that aren't official, defaults missing ones.
-// Returns clone of newGroup with defaults filled in, if any.
+// store a whole group.  Eliminates values that aren't official, or undefined
+// but official.  defaults missing ones. Returns clone of newGroup with defaults
+// filled in, if any.
 export function storeAGroup(groupName, newGroup) {
-	// only set those that are official
+	// only set those that are official!  don't overwrite zeroes or empty strings.
 	let toSet = {};
 	const asg = alternateStore[groupName];
 	for (let varName in asg) {
