@@ -41,6 +41,8 @@ I get it.  Standing wave freq 0 => nans.
 
 - frame number and elapsed ps don't display anywhere  near right
 
+😡- the Start and Stop icons are totally bozo on Firefox.  Time to overhaul them.
+
 
 ## Voltage
 
