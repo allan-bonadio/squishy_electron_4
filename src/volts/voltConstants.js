@@ -8,13 +8,13 @@
 // and slow it or stop it progressing across the space.  Adjust if voltages change.
 // this is NOT the maximum voltage; see storeSettings.js
 // Adjust this subjectively to fit.
-export let EFFECTIVE_VOLTS = 1000;
+export let EFFECTIVE_VOLTS = 4000;
 
 // used for default graphical limits
 export let AMPLE_VOLTS = 4 * EFFECTIVE_VOLTS;
 
-// any voltage above this is just too much for the code to handle so it may be
-// truncated or similar
+// any voltage above this is just too much for us to handle so it may be
+// limited
 export const TOO_MANY_VOLTS = 1e30;
 
 // Controls the overall height of Valley voltage in SetVolt panel
