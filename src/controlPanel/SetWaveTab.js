@@ -34,9 +34,7 @@ function setPT() {
 			pulseWidth: PropTypes.number,
 			pulseCenter: PropTypes.number,
 		}).isRequired,
-
-		// sets it only in the ControlPanel state for subsequent SetWave click
-		setCPState: PropTypes.func,
+		setWaveParams: PropTypes.func,
 
 		// no big deal if it's not constructed yet; we fake it
 		space: PropTypes.object,

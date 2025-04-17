@@ -31,17 +31,19 @@ const N_EXTRA_STEPS = 0.5;
 export class ControlPanel extends React.Component {
 	static propTypes = {
 		// the showVoltage bool is kept by the Squish Panel; probably should by the WaveView
+		// this is NOT the voltageParams!
 		changeShowVoltage: PropTypes.func.isRequired,
 		showVoltage: PropTypes.string.isRequired,
 
 		redrawWholeMainWave: PropTypes.func.isRequired,
 
-		// the integration statistics shown in the Integration tab
+		// the integration statistics shown in the Integration tab (there's several more fields)
 		iStats: PropTypes.shape({
 			startIntegrationTime: PropTypes.number.isRequired,
 			totalDrawTime: PropTypes.number.isRequired,
 		}),
 
+		// sAnimator
 		animator: PropTypes.object,
 
 		//sPanel: PropTypes.object.isRequired,
@@ -55,20 +57,13 @@ export class ControlPanel extends React.Component {
 
 		// most of the state is kept here.  But, also, in the store settings for the next page reload.
 		this.state = {
-			chosenFP: getASetting('frameSettings', 'chosenFP'),
-
-			// defaults for sliders
-			dtStretch: getASetting('frameSettings', 'dtStretch'),
-			//stepsPerFrame: getASetting('frameSettings', 'stepsPerFrame'),
-			//lowPassFilter: getASetting('frameSettings', 'lowPassFilter'),
+			// each of these params changes the state; here they are individually
+			...getAGroup('waveParams'),
+			...getAGroup('voltageParams'),
+			...getAGroup('frameSettings'),
 
 			showingTab: getASetting('miscSettings', 'showingTab'),
 
-			// a copy of shouldBeIntegrating, to update this panel when it's changed
-			shouldBeIntegrating: getASetting('frameSettings', 'shouldBeIntegrating'),
-
-			...getAGroup('waveParams'),
-			...getAGroup('voltageParams'),
 		}
 		this.chosenFP = this.state.chosenFP;
 
@@ -94,7 +89,8 @@ export class ControlPanel extends React.Component {
 		});
 	}
 
-	// we need a surprising amount of stuff from the space.  So this gets called when it comes up.
+	// we need a surprising amount of stuff from the space.  We can't draw much without it.
+	// So this gets called when it's ready.
 	initWithSpace(space) {
 		// not much happens without this info
 		this.space = space;
@@ -118,9 +114,7 @@ export class ControlPanel extends React.Component {
 		}
 	}
 
-	/* ******************************************************* start/stop */
-
-	// set it JUST for the animator and grinder
+	// set frame period chosen by the user: set it JUST for the animator and grinder
 	setChosenFP =
 	(period) => {
 		const an = this.props.animator;
@@ -174,29 +168,25 @@ export class ControlPanel extends React.Component {
 	startAnimating =
 	() => {
 		if (!this.space) return;  // too early.  mbbe should gray out the button?
-		//if (this.shouldBeIntegrating) return;  // already on.  how'd this happen?
 
 		if (traceStartStop) console.info(`startAnimating starts, triggering iteration`);
-		// set it true as you store it in store; then set state
 		this.shouldBeIntegrating = true;
-		//	= storeASetting('frameSettings', 'shouldBeIntegrating', true);
-		//this.setState({shouldBeIntegrating: true});
 
 		// must do this to start each iteration going in the thread(s)
 		this.grinder.triggerIteration();
 
-		//console.log(`startAnimating done: shouldBeIntegrating =${space.grinder.shouldBeIntegrating}   `);
-		if (traceStartStop) console.log(`🎛️ ControlPanel startAnimating, shouldBeIntegrating=${this.shouldBeIntegrating}, isIntegrating=${this.grinder.isIntegrating}   `);
+		if (traceStartStop) console.log(`🎛️ ControlPanel startAnimating,`
+			+` shouldBeIntegrating=${this.shouldBeIntegrating}, isIntegrating=${this.grinder.isIntegrating}   `);
 	}
 
 	stopAnimating =
 	() => {
 		if (!this.space) return;  // too early.  mbbe should gray out the button?
-		//if (!this.shouldBeIntegrating) return;  // already off.  how'd this happen?
 
 		// set it false as you store it in store; then set state
 		this.shouldBeIntegrating = false;
-		if (traceStartStop) console.log(`🎛️ ControlPanel STOP Animating, shouldBeIntegrating=${this.shouldBeIntegrating}, isIntegrating=${this.grinder.isIntegrating}   `);
+		if (traceStartStop) console.log(`🎛️ ControlPanel STOP Animating, `
+			+`shouldBeIntegrating=${this.shouldBeIntegrating}, isIntegrating=${this.grinder.isIntegrating}   `);
 	}
 
 	startStop =
@@ -223,42 +213,8 @@ export class ControlPanel extends React.Component {
 
 	}
 
-	/* ********************************************** wave */
-
-	// given these params, put it into effect and display it on the wave scene
-	// This is most of 'Reset Wave'  NOT for regular iteration
-	setAndPaintMainWave =
-	waveParams => {
-		const p = this.props;
-		if (!this.space)
-			return;
-
-		const mainEWave = this.space.mainEWave;
-		this.grinder.elapsedTime = 0;
-		this.grinder.frameSerial = 0;
-
-		mainEWave.setFamiliarWave(waveParams);  // eSpace does this initially
-		qeFuncs.grinder_copyFromAvatar(this.grinder.pointer, this.mainEAvatar.pointer);
-		p.redrawWholeMainWave();
-	}
-
-	// toolbar: Start Over button.  Display it from wave params
-	resetWave =
-	() => {
-		let waveParams = getAGroup('waveParams');
-		this.setAndPaintMainWave(waveParams);
-		this.grinder.hadException = false;
-		this.stopAnimating()
-	}
-
-	// SetWave button in SetWaveTab: set it from passed in params, and save it
-	saveMainWave =
-	waveParams => {
-		this.setAndPaintMainWave(waveParams);
-		storeAGroup('waveParams', waveParams);
-	}
-
-	// generate an FFT of the wave.  In the JS console.  TODO: make a real GLScene out of the spectrum!
+	// generate an FFT of the wave.  In the JS console.
+	// TODO: make a real GLScene out of the spectrum!
 	clickOnFFT(space)
 	{
 		wrapForExc(() => {
@@ -273,20 +229,120 @@ export class ControlPanel extends React.Component {
 		});
 	}
 
-	/* ********************************************** volts & tab */
+	/* ********************************************** wave tab */
 
-	// fills in the voltage buffer with values most recently set for voltageParams
-	// called when user clicks reset voltage on cptoolbar
-	resetVoltage =
-	() => this.space.vDisp.setFamiliarVoltage(getAGroup('voltageParams'));
-
-	setShowingTab =
-	tabCode => {
-		this.setState({showingTab: storeASetting('miscSettings', 'showingTab', tabCode)});
+	// these are kept individually in the state so any of them triggers a render.
+	//  Kindof inconvenient, so we have getters and setters.
+	getWaveParams = () => {
+		const s = this.state;
+		return {
+			waveBreed: s.waveBreed, waveFrequency: s.waveFrequency,
+			pulseWidth: s.pulseWidth, pulseCenter: s.pulseCenter
+		};
 	}
 
+	// pass an object with any or all of the params you want to change.
+	// non-wave params are ignored
+	setWaveParams = (wp) => {
+		const s = this.state;
+		this.setState({
+			waveBreed: wp.waveBreed ?? s.waveBreed,
+			waveFrequency: wp.waveFrequency ?? s.waveFrequency,
+			pulseWidth: wp.pulseWidth ?? s.pulseWidth,
+			pulseCenter: wp.pulseCenter ?? s.pulseCenter,
+		});
+	}
 
-	/* ********************************************** frame */
+	// toolbar: Start Over button.  Display it from wave params from store
+	// opposite of saveMainWave()
+	resetWave = () => {
+		let waveParams = getAGroup('waveParams');
+		this.setAndPaintFamiliarWave(waveParams);
+		this.grinder.hadException = false;
+		this.stopAnimating()
+	}
+
+	// given these params, put it into effect and display it on the wave scene
+	// This is most of 'Reset Wave'  NOT for regular iteration
+	setAndPaintFamiliarWave = waveParams => {
+		const p = this.props;
+		if (!this.space)
+			return;
+
+		this.waveParams = waveParams;
+
+		const mainEWave = this.space.mainEWave;
+		this.grinder.elapsedTime = 0;
+		this.grinder.frameSerial = 0;
+
+		mainEWave.setFamiliarWave(waveParams);  // eSpace does this initially
+
+		// is this the problem?  I make a copy of the wave ... voltage instead
+		// of the same buffer?
+		qeFuncs.grinder_copyFromAvatar(this.grinder.pointer, this.mainEAvatar.pointer);
+		p.redrawWholeMainWave();
+	}
+
+	// SetWave button in SetWaveTab: set it from passed in params, and save it
+	// in storage and state. opposite of resetWave()
+	saveMainWave = waveParams => {
+		this.setAndPaintFamiliarWave(waveParams);
+		storeAGroup('waveParams', waveParams);
+	}
+
+	// setMainWave() called when user clicks SetWave, fills the main wave
+	// waveParams handed in are the defaults as stored in storeSettings
+	makeWaveTab = () => <SetWaveTab
+			saveMainWave={this.saveMainWave}
+			waveParams={this.getWaveParams()}
+			setWaveParams={this.setWaveParams}
+			space={this.space}
+		/>;
+
+	/* ********************************************** volts */
+
+	// these are kept individually in the state so any of them triggers a render.
+	// Kindof inconvenient to grab the whole thing, so we have this.
+	getVoltageParams = () => {
+		const s = this.state;
+		return { voltageBreed: s.voltageBreed, voltageCenter: s.voltageCenter,
+			canyonPower: s.canyonPower, canyonScale: s.canyonScale,
+			slotWidth: s.slotWidth, slotScale: s.slotScale };
+	}
+
+	// change the state for the voltage params.  Just this.state
+	// pass an object with any or all of the params you want to change
+	setVoltageParams = (vp) => {
+		const s = this.state;
+		this.setState({ voltageBreed: vp.voltageBreed ?? s.voltageBreed,
+			voltageCenter: vp.voltageCenter ?? s.voltageCenter,
+			canyonPower: vp.canyonPower ?? s.canyonPower,
+			canyonScale: vp.canyonScale ?? s.canyonScale,
+			slotWidth: vp.slotWidth ?? s.slotWidth,
+			slotScale: vp.slotScale ?? s.slotScale }
+		);
+	}
+
+	// fills in the voltage buffer with familiar voltage most recently set for
+	// stored voltageParams called when user clicks reset voltage on cptoolbar
+	resetVoltage = () => {
+		const voltageParams = getAGroup('voltageParams');
+		this.setVoltageParams(voltageParams);
+		this.space.vDisp.setFamiliarVoltage(voltageParams);
+	}
+
+	makeVoltageTab = () => {
+		const p = this.props;
+		return <SetVoltageTab
+			voltageParams={this.getVoltageParams()}
+			setVoltageParams={this.setVoltageParams}
+			changeShowVoltage={p.changeShowVoltage}
+			showVoltage={p.showVoltage}
+			space={this.space}
+		/>
+	};
+
+	/* ********************************************** integration frame */
 
 	// dt is time per step, stretchedDt is stretched, ready to use
 	setDtStretch = dtStretch => {
@@ -296,47 +352,47 @@ export class ControlPanel extends React.Component {
 		console.log(`🎛️ setDtStretch: dt = ${this.space.dt}   dtStretch= ${dtStretch} stretchedDt=${this.grinder.stretchedDt}`)
 	}
 
+	makeIntegrationTab = () => {
+		const s = this.state;
+		const p = this.props;
+
+		return <SetIntegrationTab
+			dtStretch={s.dtStretch}
+			setDtStretch={this.setDtStretch}
+
+			N={this.N}
+			iStats={p.iStats}
+		/>;
+	}
+
 	/* ********************************************** tabs */
+
+	// called when user clicks on a left tab
+	setShowingTab =
+	tabCode => {
+		this.setState({showingTab: storeASetting('miscSettings', 'showingTab', tabCode)});
+	}
+
 
 	// whichever tab is showing right now
 	createShowingTab() {
 		const p = this.props;
 		const s = this.state;
-		const {waveBreed, waveFrequency, pulseWidth, pulseCenter} = s;
-		const {canyonPower, canyonScale, slotWidth, slotScale, voltageCenter} = s;
+//		const {waveBreed, waveFrequency, pulseWidth, pulseCenter} = s;
+//		const {canyonPower, canyonScale, slotWidth, slotScale, voltageCenter} = s;
 
 		switch (s.showingTab) {
 		case 'wave':
-			// setMainWave() called when user clicks SetWave, fills the main wave
-			// waveParams handed in are the defaults as stored in storeSettings
-			return <SetWaveTab
-				saveMainWave={this.saveMainWave}
-				waveParams={{waveBreed, waveFrequency, pulseWidth, pulseCenter,}}
-				setCPState={this.setCPState}
-				space={this.space}
-			/>;
+			return this.makeWaveTab();
 
 		case 'voltage':
-			// setVoltageHandler={this.setVoltageHandler}
-			//setVoltageAndUpdate={this.setVoltageAndUpdate}
-			return <SetVoltageTab
-				voltageParams={{ canyonPower, canyonScale, slotWidth, slotScale, voltageCenter,}}
-				changeShowVoltage={p.changeShowVoltage}
-				showVoltage={p.showVoltage}
-			/>;
+			return this.makeVoltageTab();
 
 		case 'space':
 			return <SetResolutionTab grinder={this.grinder}/>;
 
 		case 'integration':
-			return <SetIntegrationTab
-				space={this.space}
-				dtStretch={s.dtStretch}
-				setDtStretch={this.setDtStretch}
-
-				N={this.N}
-				iStats={p.iStats}
-			/>;
+			return this.makeIntegrationTab();
 
 			/*
 				lowPassFilter={s.lowPassFilter}
@@ -349,13 +405,15 @@ export class ControlPanel extends React.Component {
 		}
 	}
 
+
 	/* ********************************************** render */
 	render() {
 		const p = this.props;
 		const s = this.state;
 
-		// before the mount event on SquishPanel
-		// why?  this just shows panels and buttons if (!this.space) return '';
+		// before the space exists
+		// why?  this just shows panels and buttons
+		if (!this.space) return '';
 
 		let showingTabHtml = this.createShowingTab();
 

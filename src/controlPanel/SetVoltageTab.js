@@ -17,7 +17,7 @@ let MINI_WIDTH = 300;
 let MINI_HEIGHT = 150;
 
 
-// used in multiple places?
+// the setting, show/hide voltage on voltareaused in multiple places? not any more.
 // can't figure out how to get hover working.  grrrr.
 export function ShowVoltageControl(props) {
 	return <label className='ShowVoltageControl' >
@@ -38,70 +38,54 @@ export function ShowVoltageControl(props) {
 function setPT() {
 	SetVoltageTab.propTypes = {
 		// function that actually sets showVoltage
-		changeShowVoltage: PropTypes.func.isRequired,
+		voltageParams: PropTypes.shape({
+			canyonPower: PropTypes.number.isRequired,  // there's more but not now
+			slotWidth: PropTypes.number.isRequired}),
+		setVoltageParams: PropTypes.func.isRequired,
+
+		// showVoltage is a separate setting for showing/hiding voltage over canvas
 		showVoltage: PropTypes.string.isRequired,
+		changeShowVoltage: PropTypes.func.isRequired,
+
+		space: PropTypes.object,
 	};
 }
 
-// action is an object with just the components that change
-function vParamsReducer(vParams, action) {
-	// gotta make a whole new object, with old values, overwritten by new values
-	// NO!  that's for useState.
-	const newParams = Object.assign(vParams, action);
-	// no!  wait for SetVoltage click!  storeAGroup('voltageParams', newParams);
-	return newParams;
-}
+// the tab that user sets voltage buffer with
+function SetVoltageTab({voltageParams, setVoltageParams, showVoltage, changeShowVoltage, space}) {
+	const vParams = voltageParams;
+	const setVParams = setVoltageParams;
+	let stuff;
 
-// the tab that user sets voltage with
-function SetVoltageTab(props) {
-	const p = props;
-
-	const [vParams, setVParams] = useReducer(vParamsReducer, getAGroup('voltageParams'));
-
-	let [SVState, setSVState] = useState(null);  // triggers rerender only when space created
-	// const SVStateRef = useRef(null);
-	//let SVState = SVStateRef.current;
-	if (!SVState) {
+	// we'll hang on to these so I don't have to reallocate the buffer all the time
+	let stuffRef = useRef(null);
+	stuff = stuffRef.current;
+	if (!stuff) {
 		// only the first time this is run
-		SVState = {};
+		stuff = stuffRef.current = {};
+		stuff.miniGraphBuffer = new Float64Array(space.nPoints);
+		voltDisplay.copyVolts(stuff.miniGraphBuffer, space.voltageBuffer);
 
-		// think of this like a useEffect
-		eSpaceCreatedPromise.then(space => {
-			// SVState obj holds various big objects
-
-			SVState.space = space;
-
-			// used for depicting what the user's selected.  Copy from live one.
-			SVState.miniGraphBuffer = new Float64Array(space.nPoints);
-			voltDisplay.copyVolts(SVState.miniGraphBuffer, space.voltageBuffer);
-
-			// each voltDisplay manages a voltage context; this one does the minigraph one
-			SVState.miniVolts = new voltDisplay('miniVolts',
-				space.start, space.end, space.dimensions[0].continuum,
-				SVState.miniGraphBuffer, getAGroup('voltageSettings'));
-
-			setSVState(SVState);
-		});
-
-		return null;  // can't render this time
+		// each voltDisplay manages a voltage context; this one does the minigraph one
+		stuff.miniVolts = new voltDisplay('miniVolts',
+			space.start, space.end, space.dimensions[0].continuum,
+			stuff.miniGraphBuffer, getAGroup('voltageSettings'));
 	}
-	if (!SVState.space)
-		return null;  // can't render till space promise resolves, sorry
 
-	// Set Voltage button copies SVState panel's volts to the space's volts, and stores params
+	// Set Voltage button copies our working volts to the space's volts, and stores familiar params
 	const setVoltage=
 	(ev) => {
-		if (!SVState.miniVolts)
-			return;
-		const v = SVState.space.vDisp;
+		//if (!stuff.miniVolts)
+		//	return;
+		const v = space.vDisp;
 		v.setFamiliarVoltage(vParams);
 		storeAGroup('voltageParams', vParams);
 
-		v.setBottomVolts(SVState.miniVolts.bottomVolts);
-		v.setHeightVolts(SVState.miniVolts.heightVolts);
+		v.setBottomVolts(stuff.miniVolts.bottomVolts);
+		v.setHeightVolts(stuff.miniVolts.heightVolts);
 	};
 
-	/* *************************************************************** rendering for the Tab */
+	/* ***************************************************** rendering for the Tab */
 
 	//  some slot and block chars if you need them: ⎍ ⊓ ⊔  also try box
 	// drawing symols ⨅ ⨆ vs ⊓ ⊔ they're different!
@@ -139,9 +123,9 @@ function SetVoltageTab(props) {
 	// the minigraph is all in svg; no gl
 	function renderMiniGraph() {
 		// even if you can't draw it, at least reserve the space
-		if (!SVState.miniVolts)
-			return <svg width={MINI_WIDTH} height={MINI_HEIGHT} />;
-		const v = SVState.miniVolts;
+		//if (!stuff.miniVolts)
+		//	return <svg width={MINI_WIDTH} height={MINI_HEIGHT} />;
+		const v = stuff.miniVolts;
 		//debugger;
 
 		v.setAppropriateRange(vParams);
@@ -157,13 +141,12 @@ function SetVoltageTab(props) {
 			<rect x={0} y={0} width={MINI_WIDTH} height={MINI_HEIGHT} fill='#000' />
 			<path d={path} />
 		</svg>;
-
 	}
 
-	// start pointer capture on this drag
-	const capture = (ev) => ev.target.setPointerCapture(ev.pointerId);
+	// call this to start pointer capture on whichever range slider
+	const startCapture = (ev) => ev.target.setPointerCapture(ev.pointerId);
 
-	// draw minigraph, and wrap it with sliders on 3 sides, depending on breed
+	// draw minigraph, and wrap it with sliders on both sides, depending on breed
 	function renderFirstRow(breed, vMinsMaxes) {
 		return <>
 			{/* only shows for canyon, otherwise blank space */}
@@ -178,25 +161,25 @@ function SetVoltageTab(props) {
 
 			{renderMiniGraph()}
 
-			{/* only shows for canyon */}
+			{/* only shows for canyon - shouldn't this be logarithmic?  */}
 			<input type='range' className='canyonScale'
 				value={(vParams.canyonScale ?? alternateStoreDefaults.voltageParams.canyonScale)}
 				min={vMinsMaxes.canyonScale.min}
 				max={vMinsMaxes.canyonScale.max}
 				step='10'
 				onChange={ev => setVParams({canyonScale: ev.target.valueAsNumber})}
-				onPointerDown={capture}
+				onPointerDown={startCapture}
 				style={{display: 'canyon' == breed ? 'inline-block' : 'none'}}
 			/>
 
-			{/* only shows for slot and block */}
+			{/* only shows for slot and block - shouldn't this be logarithmic? */}
 			<input type='range' className='slotScale'
 				value={(vParams.slotScale ?? alternateStoreDefaults.voltageParams.slotScale)}
 				min={vMinsMaxes.slotScale.min}
 				max={vMinsMaxes.slotScale.max}
 				step='10'
 				onChange={ev => setVParams({slotScale: ev.target.valueAsNumber})}
-				onPointerDown={capture}
+				onPointerDown={startCapture}
 				style={{display: ('slot' == breed || 'block' == breed) ? 'inline-block' : 'none'}}
 			/>
 
@@ -226,7 +209,7 @@ function SetVoltageTab(props) {
 				max={vMinsMaxes.voltageCenter.max}
 				step={5}
 				onChange={ev => setVParams({voltageCenter: ev.target.valueAsNumber})}
-				onPointerDown={capture}
+				onPointerDown={startCapture}
 				style={{visibility: 'flat' == breed ? 'hidden' : 'visible'}}
 			/>
 
@@ -254,7 +237,7 @@ function SetVoltageTab(props) {
 				max={vMinsMaxes.voltageCenter.max}
 				step={.1}
 				onChange={ev => setVParams({slotWidth: ev.target.valueAsNumber})}
-				onPointerDown={capture}
+				onPointerDown={startCapture}
 				style={{visibility: ('slot' == breed || 'block' == breed) ? 'visible' : 'hidden',
 					width: '50%'}}
 			/>
@@ -288,7 +271,8 @@ function SetVoltageTab(props) {
 
 	function renderMisc() {
 		return <div className='misc'>
-			<ShowVoltageControl showVoltage={p.showVoltage} changeShowVoltage={p.changeShowVoltage} />
+			<ShowVoltageControl showVoltage={showVoltage}
+				changeShowVoltage={changeShowVoltage} />
 			<button onClick={setVoltage} >Set Voltage</button>
 		</div>;
 	}
