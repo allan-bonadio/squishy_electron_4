@@ -1,15 +1,15 @@
 
 // cx2rygb.txlated.js -- generated from cx2rygb.glsl.js into js
 // mostly for testing purposes.  do not edit!  instead edit cx2rygb.glsl.js & run unit tests
-// this file written Mon Apr 14 2025 10:27:27 GMT-0700 (Pacific Daylight Time)
+// this file written Thu Apr 17 2025 00:48:20 GMT-0700 (Pacific Daylight Time)
 
-// set these after translation
-let traceQuarter = false;
+// TODO: use these someday?
+//let traceQuarter = false;
+//const  _  = (v) => v.toFixed(4);
 
 // needed defs of vec2 (complex only) and vec3 (rgb only)
 const vec2 = (x=0, y=0) => ({x, y});
 const vec3 = (r=0, g=0, b=0) => ({r, g, b});
-const  _  = (v) => v.toFixed(4);
 
 
 
@@ -75,11 +75,11 @@ function cx2rgb(psi) {
 			if (psi.x > -psi.y) {
 				// red 0° to magenta -45°
 				color.r = 1;
-				color.b = -psi.y * sqrtTwo;
+				color.b = -psi.y * 1.414214;
 			}
 			else {
 				// magenta -45° to blue -90°
-				color.r = psi.x * sqrtTwo;
+				color.r = psi.x * 1.414214;
 				color.b = 1;
 			}
         }
@@ -92,11 +92,11 @@ function cx2rgb(psi) {
 			if (-psi.x < -psi.y) {
 				// blue -90° to cyan -135°
 				color.b = 1;
-				color.g = -psi.y * sqrtTwo;
+				color.g = -psi.y * 1.414214;
 			}
 			else {
 				// cyan -135° to green -180°
-				color.b = -psi.y * sqrtTwo;
+				color.b = -psi.y * 1.414214;
 				color.g = 1;
 			}
 		}

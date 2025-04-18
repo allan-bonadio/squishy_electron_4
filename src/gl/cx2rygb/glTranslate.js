@@ -7,6 +7,8 @@
 import fs from 'fs';
 import cxToColorGlsl from './cx2rygb.glsl.js';
 
+
+
 // This is a nodejs library, imported and run from inside Jest
 
 // This does NOT translate all of glsl; just the stuff used in cx2rygb file.
@@ -37,6 +39,7 @@ function convertFile(text) {
 	text = text.replace(/varying|highp|attribute|uniform/g, ' ');
 
 	// types in argument lists - get rid of em.  look for eg '(vec3 '
+	// oh this only does the first arg... duu...
 	text = text.replace(/\((vec2|vec3|vec4|float|int|bool) /g, '(');
 
 	// variable declarations - always float
@@ -87,4 +90,9 @@ function glTranslate() {
 	return null;
 }
 
+
+// for a library, use this:
 export default glTranslate;
+
+// for a standalone node app, use this:
+glTranslate();
