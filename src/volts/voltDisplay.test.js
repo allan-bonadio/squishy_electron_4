@@ -4,10 +4,9 @@
 */
 
 import {expect, test, jest} from '@jest/globals';
+
 import voltDisplay from './voltDisplay.js';
 import {dumpJsStack} from '../utils/errors.js';
-import qeConsts from './qeConsts.js';
-
 import qeConsts from '../engine/qeConsts.js';
 
 let traceObj = false;
