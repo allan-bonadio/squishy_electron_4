@@ -240,7 +240,7 @@ struct qGrinder {
 extern "C" {
 	//void grinder_initThreadIntegration(qGrinder *grinder, int threadSerial);
 	void grinder_oneFrame(qGrinder *grinder);
-	//void grinder_triggerIteration(qGrinder *grinder);
+	void grinder_triggerIteration(qGrinder *grinder);
 
 	void grinder_askForFFT(qGrinder *grinder);
 

@@ -503,10 +503,10 @@ void qGrinder::triggerIteration() {
 // start iterating, starting each/all gThread threads. Iteration will
 // trigger the next frame, and so on.  This starts it, and
 // shouldBeIntegrating should also be true.  Unless you want it to stop
-// after one frame. This is called from JS, therefore the UI thread.
-// void grinder_triggerIteration(qGrinder *grinder) {
-// 	grinder->triggerIteration();
-// }
+// after one frame. This is called from JS, therefore the UI thread.  (or alternate: via js atomics)
+void grinder_triggerIteration(qGrinder *grinder) {
+	grinder->triggerIteration();
+}
 
 /* ********************************************************** exceptions  */
 
