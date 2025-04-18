@@ -194,7 +194,7 @@ void qGrinder::hitImaginary(qCx *newW, qCx *oldW, qCx *hamiltW, double dt) {
 
 }
 
-// this is what will be replaced to make Midpoint.  except midpoint also uses this.
+// this is what will be replaced by stepMidpoint.
 // Cuz, you can't really do two Real steps in a row; must do an Imag step in between.  And vice versa.
 void qGrinder::hitRealImaginary(qCx *newW, qCx *oldW, qCx *hamiltW, double dt) {
 	qflick->fixThoseBoundaries(oldW);

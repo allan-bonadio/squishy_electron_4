@@ -1,6 +1,6 @@
 #  bugs and wishlist items for Squishy Electron
 
-😡 - needed before MVP
+😡 = needed before MVP
 
 ## Project
 
@@ -12,7 +12,7 @@
 	- Expo, has it’s own templating language
 	For squish, I don't need a server so I think Vite is best (say veet)
 
-😡- more unit tests!  for js side.
+😡- more unit tests!  for js side.  And should work on C++ ones too.
 
 ## Control Panel
 

@@ -14,7 +14,7 @@ static bool traceFinish = false;
 static bool traceSync = false;
 static bool traceCreation = false;
 
-static bool traceWorkOccasionally = false;
+static bool traceWorkOccasionally = true;
 static int occasionally = 0;
 
 /* *********************************************** grWorker */
@@ -28,7 +28,7 @@ grWorker **qGrinder::grWorkers = sla;
 void grWorker::gThreadWork(void) {
 	int nWas;
 
-	// this one generates a message every iteration.  GADS!  lots of output.
+	// this one generates a message every Frame.  GADS!  lots of output.
 	if (traceWork)  {
 		speedyLog("🔪        thread #%d: shouldBeIntegrating=%d  isIntegrating=%d.  "
 			"nFinishedThreads=%d\n",
@@ -39,9 +39,9 @@ void grWorker::gThreadWork(void) {
 
 	// this one, maybe every several seconds or less.  Feel free to adjust.
 	if (traceWorkOccasionally && occasionally-- < 0) {
-		speedyLog("🔪 grWorker working...shouldBeIntegrating=%d startAtomic=%d\n",
+		speedyLog("🔪 grWorker working (occasionallly)...shouldBeIntegrating=%d startAtomic=%d\n",
 			grinder->shouldBeIntegrating, grinder->startAtomic);
-		occasionally = 200;
+		occasionally = 100;
 	}
 
 	// Gonna do an integration frame.  set starting time, under lockf
@@ -97,9 +97,6 @@ void grWorker::gThreadLoop(void) {
 // 			while (atomic_load(&grinder->startAtomic) < 0) ;
 			if (traceSync) speedyLog("🔪 after atomic_add on startAtomic=%d (shdbe 0 or more)\n", nWas);
 			//emscripten_debugger();
-
-// 			nWas = atomic_fetch_add(&grinder->startAtomic, 1);  // returns number BEFORE incr
-// 			nWas++;
 
 			//speedyLog("after increment on startAtomic=%d (shdbe 1 or more)\n", nWas);
 			// I don't think we really need this counting for start....?
