@@ -203,7 +203,7 @@ export function createStoreSettings() {
 
 	/* ************************************ voltage */
 	// the voltage controls   volts ≈ canyonScale * x ** canyonPower sortof
-	// where x is centered at voltageCenter across
+	// where x is centered at voltageCenter% across
 	makeParam('voltageParams', 'voltageBreed', 'flat', ['flat', 'slot', 'block', 'canyon']);
 	makeParam('voltageParams', 'voltageCenter', 50, {min: 0, max: 100});
 
@@ -262,24 +262,26 @@ window.dumpSettings = () => {
 // retrieve a whole group, with defaults filled in as needed
 export function getAGroup(groupName) {
 	let gr;
+	if (!alternateStoreVerifiers[groupName])
+	  throw Error(`No such group ${groupName}`);
+
 	try {
 		let savedGroup = localStorage.getItem(groupName);
 		gr = JSON.parse(savedGroup);
 	} catch (ex) {
 		// in the event that some bogus value gets stored in the localStorage, revert to default.
 		gr = {};
-		//group = alternateStoreDefaults[groupName];
 	}
 
-	// if completely uninitialized, create.  (if user hacked on localStore)
-	//if (!group)
-	//group = {};
+	// If some are missing in the localStorage, from an old version, fill those in.
+	let group = {...alternateStoreDefaults[groupName], ...gr};
 
-	// If some are missing, fill those in.
-	let group = {...alternateStore[groupName], ...gr}
-	//const asg = alternateStore[groupName];
-	//for (let varName in asg)
-	//	group[varName] ??= asg[varName].default;
+	// if some old vars are left over from a previous version, remove them
+	const asg = alternateStoreVerifiers[groupName];  // true only for vars that are supported
+	for (let varName in group) {
+	  if (!asg[varName])
+	    delete group[varName];
+	}
 
 	return group;
 }
