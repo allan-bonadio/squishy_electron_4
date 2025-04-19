@@ -186,12 +186,13 @@ class SetWaveTab extends React.Component {
 		</div>;
 
 		return <div className='SetWaveTab'>
-			<div className='waveTabCol waveParamSliders'>
+			<div className='waveTabCol '>
 				<h3>Design a new Wave</h3>
-				{waveParamSliders}
+  			{breedSelector}
+				<button className='setWaveButton' onClick={ev => this.saveMainWave(this.state)}>
+						Set Wave
+				</button>
 			</div>
-
-			{breedSelector}
 
 			<div className='waveTabCol'>
 				&nbsp;
@@ -199,10 +200,10 @@ class SetWaveTab extends React.Component {
 					{glScene}
 				</div>
 
-				<button className='setWaveButton' onClick={ev => this.saveMainWave(this.state)}>
-						Set Wave
-				</button>
+			</div>
 
+			<div className='waveTabCol waveParamSliders'>
+				{waveParamSliders}
 			</div>
 		</div>;
 	}
