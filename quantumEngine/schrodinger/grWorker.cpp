@@ -14,7 +14,7 @@ static bool traceFinish = false;
 static bool traceSync = false;
 static bool traceCreation = false;
 
-static bool traceWorkOccasionally = true;
+static bool traceWorkOccasionally = false;
 static int occasionally = 0;
 
 /* *********************************************** grWorker */

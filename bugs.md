@@ -27,14 +27,16 @@ I get it.  Standing wave freq 0 => nans.
 
 - need a hamburger menu for things like the above.
 
-😡- StartOver displays a kinked wave - cick a second time and it's ok
+😡😡- StartOver sometimes displays a kinked wave - cick a second time and it's ok
 
+😡😡- now params work instantaneously - re-institute the SetVolt and SetWave mechanisms.
+😡😡-   And, stick the buttons at the lower left.
 
 ## GL & WaveView
 
 😡- left tic marks rarely draw.
 
-😡- WELL: last points on ends have no ink so there's this black acute triangle instead of color
+😡😡- WELL: last points on ends have no ink so there's this black acute triangle instead of color
 
 - display Garland Spiral in 3d could be easy.
 	Really should use Three.js
@@ -45,15 +47,13 @@ I get it.  Standing wave freq 0 => nans.
 
 - should have x axis on the bottom marked in nm
 
-😀- frame number and elapsed ps don't display anywhere  near right
-
 😡- the Start and Stop icons are totally bozo on Firefox.  Time to overhaul them.
 
-- Start Over should restart time & frame number
+😡😡- Start Over should restart time & frame number
 
 ## Voltage
 
-😡- voltage setting doesn't work anymore!?!?  There's something wrong - I think too many voltage buffers and the setting never gets to the grinder
+😡😡- voltage setting doesn't work anymore!?!?  There's something wrong - I think too many voltage buffers and the setting never gets to the grinder?  no I think voltages just need to be really high.  Switch to kilovolts.
 
 - voltage area: dragging beyond bounds should expand scale.  Actually,
 now, it just breaks stuff and gives you a really low or high boundary.
@@ -62,7 +62,8 @@ Needs fixing.
 - option to have voltage relax back to zero (or whatever's set in the
 tab)
 
-😡- reset voltage doesn't reset voltage range
+😡- reset voltage doesn't reset voltage range ?? do we want this?  no, cuz user wants to redo in hte same realm
+
 
 ## Space and Integration
 
@@ -76,9 +77,10 @@ certain it doesn't. But now I have FFTs to measure it at least.  If you think ab
 
 - RK4?  probably not.
 
-😀 - for Well contimuum, need start and end to be nailed to zero, and N-1 points between.
-
 - qGrinder really needs to be broken in two.  (or three?)  And whole schrodinger directory.  ONe needs to handle the threadsf and (?) grinding.  Or something.  Use the name of that black womaem from nasa for a new dir.
+
+😡- Should allow almost any number N, not just powers of 2
+
 
 ## Docs
 
@@ -92,12 +94,14 @@ certain it doesn't. But now I have FFTs to measure it at least.  If you think ab
 
 - the voltage
 
+😡😡- some button to get to some of the docs
+
 
 ## Wish List
 
 - iphone touch events,
 
-😡- iphone full screen, upon phone rotation event
+😡😡- iphone full screen, upon phone rotation event
 
 - make it a PWA.  Not hard!
 	Use Lighthouse in Chrome Debugger
@@ -105,7 +109,7 @@ certain it doesn't. But now I have FFTs to measure it at least.  If you think ab
 
 - tabs: add check boxes so you can have more than one open at a time
 
-- display of momentum spectrum with double fft display.  along with
+😡- display of momentum spectrum with double fft display.  along with
 energy?  Energy should be one number ... or maybe total potential and
 total kinetic
 
