@@ -43,7 +43,7 @@ function setPT() {
 			slotWidth: PropTypes.number.isRequired}),
 		setVoltageParams: PropTypes.func.isRequired,
 
-		// showVoltage is a separate setting for showing/hiding voltage over canvas
+		// showVoltage is a separate Setting (not param) for showing/hiding voltage over canvas
 		showVoltage: PropTypes.string.isRequired,
 		changeShowVoltage: PropTypes.func.isRequired,
 
@@ -53,7 +53,7 @@ function setPT() {
 
 // the tab that user sets voltage buffer with
 function SetVoltageTab({voltageParams, setVoltageParams, showVoltage, changeShowVoltage, space}) {
-	const vParams = voltageParams;
+	const vParams = voltageParams;  // our local version, before user clicks Set Voltage
 	const setVParams = setVoltageParams;
 	let stuff;
 
@@ -68,21 +68,22 @@ function SetVoltageTab({voltageParams, setVoltageParams, showVoltage, changeShow
 
 		// each voltDisplay manages a voltage context; this one does the minigraph one
 		stuff.miniVolts = new voltDisplay('miniVolts',
-			space.start, space.end, space.dimensions[0].continuum,
+			space.start, space.end, space.continuum,
 			stuff.miniGraphBuffer, getAGroup('voltageSettings'));
 	}
+	const vDisp = stuff.miniVolts;
 
 	// Set Voltage button copies our working volts to the space's volts, and stores familiar params
 	const setVoltage=
 	(ev) => {
-		//if (!stuff.miniVolts)
+		//if (!vDisp)
 		//	return;
-		const v = space.vDisp;
-		v.setFamiliarVoltage(vParams);
+		vDisp.setFamiliarVoltage(vParams);
 		storeAGroup('voltageParams', vParams);
 
-		v.setBottomVolts(stuff.miniVolts.bottomVolts);
-		v.setHeightVolts(stuff.miniVolts.heightVolts);
+    // huh?!?
+		vDisp.setBottomVolts(vDisp.bottomVolts);
+		vDisp.setHeightVolts(vDisp.heightVolts);
 	};
 
 	/* ***************************************************** rendering for the Tab */
@@ -123,18 +124,17 @@ function SetVoltageTab({voltageParams, setVoltageParams, showVoltage, changeShow
 	// the minigraph is all in svg; no gl
 	function renderMiniGraph() {
 		// even if you can't draw it, at least reserve the space
-		//if (!stuff.miniVolts)
+		//if (!vDisp)
 		//	return <svg width={MINI_WIDTH} height={MINI_HEIGHT} />;
-		const v = stuff.miniVolts;
 		//debugger;
 
-		v.setAppropriateRange(vParams);
-		v.setVoltScales(0, MINI_WIDTH, MINI_HEIGHT);
+		vDisp.setAppropriateRange(vParams);
+		vDisp.setVoltScales(0, MINI_WIDTH, MINI_HEIGHT);
 
 		// fill the voltage buffer
-		v.setFamiliarVoltage(vParams);
+		vDisp.setFamiliarVoltage(vParams);
 
-		let path = v.makeVoltagePathAttribute(v.yUpsideDown);
+		let path = vDisp.makeVoltagePathAttribute(vDisp.yUpsideDown);
 
 		// black background, path in cream white
 		return <svg className='miniGraph' width={MINI_WIDTH} height={MINI_HEIGHT}  >
@@ -269,11 +269,11 @@ function SetVoltageTab({voltageParams, setVoltageParams, showVoltage, changeShow
 	}
 	//  <sup>{(vParams.canyonPower ?? 0).toFixed(1)}</sup>
 
+  // soon to include: relaxation...
 	function renderMisc() {
 		return <div className='misc'>
 			<ShowVoltageControl showVoltage={showVoltage}
 				changeShowVoltage={changeShowVoltage} />
-			<button onClick={setVoltage} >Set Voltage</button>
 		</div>;
 	}
 
@@ -284,6 +284,8 @@ function SetVoltageTab({voltageParams, setVoltageParams, showVoltage, changeShow
 		<div className='voltageBreedPanel'>
 			<h3>Set Voltage</h3>
 			{renderBreedSelector()}
+
+      <button onClick={setVoltage} >Set Voltage</button>
 		</div>
 
 		<div className='divider' />
