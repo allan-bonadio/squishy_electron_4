@@ -4,7 +4,7 @@
 */
 
 import React from 'react';
-import PropTypes from 'prop-types';
+import PropTypes, {checkPropTypes} from 'prop-types';
 
 import './ControlPanel.scss';
 import CPToolbar from './CPToolbar.js';
@@ -54,6 +54,7 @@ export class ControlPanel extends React.Component {
 	constructor(props) {
 		super(props);
 		//debugger;
+		checkPropTypes(ControlPanel.propTypes, props, 'prop', 'ControlPanel');
 
 		// most of the state is kept here.  But, also, in the store settings for the next page reload.
 		this.state = {
@@ -67,12 +68,8 @@ export class ControlPanel extends React.Component {
 		}
 		this.chosenFP = this.state.chosenFP;
 
-		// pour these directly into the initial state.  The control panel saves
-		// these params in its state, but they're not saved in localStorage until a user clicks
-		// SetWave or SetVoltage.
-		// let waveParams = ;
-		// let voltageParams = ;
-		// Object.assign(this.state, waveParams, voltageParams);
+		// can't get this to work for now
+		this.state.shouldBeIntegrating = false;
 
 		// we can't init some stuff till we get the space.  But we also can't until this constructor runs.
 		eSpaceCreatedPromise.then(space => {
