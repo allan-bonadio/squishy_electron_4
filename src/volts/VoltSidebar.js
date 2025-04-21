@@ -17,10 +17,6 @@ let traceDragging = false;
 // So I reduced it by this factor, but still have to magnify it to make it visible.
 export const spongeFactor = 100;
 
-
-
-
-
 function setPT() {
 	VoltSidebar.propTypes = {
 		// x coordinate of the right edge or the bumper on the right side
@@ -28,7 +24,7 @@ function setPT() {
 		canvasInnerHeight: PropTypes.number.isRequired,
 		bumperWidth: PropTypes.number,
 
-		vDisp: PropTypes.instanceOf(voltDisplay),
+		mainVDisp: PropTypes.instanceOf(voltDisplay),
 
 		// Same as voltage area, this shows and hides along with it
 		// but won't draw anything if the checkbox is off
@@ -36,21 +32,22 @@ function setPT() {
 	}
 }
 
-
 function VoltSidebar(props) {
 	if (!props) return '';  // too early
 	let sidebarWidth = props.width;
 
-	let v = props.vDisp;
-	if (!v) return '';  // too early or first render
+	let mVD = props.mainVDisp;
+	if (!mVD) return '';  // too early or first render
 
-	if (!v.heightVolts  || v.heightVolts <= 0) throw `bad heightVolts ${v.heightVolts}`
+	if (!mVD.heightVolts  || mVD.heightVolts <= 0)
+	  throw `bad heightVolts ${mVD.heightVolts}`
 
 	// so how far down is the thumb from top of rail in pix?
-	//thumbY = thumbFreedom * (1 - (v.bottomVolts - v.minBottom) / v.heightVolts)
+	//thumbY = thumbFreedom * (1 - (mVD.bottomVolts - mVD.minBottom) / mVD.heightVolts)
 
 	if (traceVoltageSidebar) {
-		console.log(`🍟 V Sidebar rend: width=${sidebarWidth}  heightVolts=${v.heightVolts}  ${v.minBottom} `);
+		console.log(`🍟 V Sidebar rend: width=${sidebarWidth}  heightVolts=${mVD.heightVolts}  `
+		  +`${mVD.minBottom} `);
 	}
 
 	// Hovering  to show/hide voltage - hovering over the sidebar
@@ -74,25 +71,25 @@ function VoltSidebar(props) {
 			<p/>
 
 			<button className='scrollUp'
-					onClick={ev => v.scrollVoltHandler(+1)}>
+					onClick={ev => mVD.scrollVoltHandler(+1)}>
 				⬆︎
 			</button>
 			<p/>
 
 			<button className='zoomIn'
-					onClick={ev => v.zoomVoltHandler(-1)}>
+					onClick={ev => mVD.zoomVoltHandler(-1)}>
 				+
 			</button>
 			<p/>
 
 			<button className='zoomOut'
-					onClick={ev => v.zoomVoltHandler(+1)}>
+					onClick={ev => mVD.zoomVoltHandler(+1)}>
 				–
 			</button>
 			<p/>
 
 			<button className='scrollDown'
-					onClick={ev => v.scrollVoltHandler(-1)}>
+					onClick={ev => mVD.scrollVoltHandler(-1)}>
 				⬇︎
 			</button>
 			<p/>

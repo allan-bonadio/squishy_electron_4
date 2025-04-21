@@ -10,7 +10,7 @@
 // control panel tabs to display proposed settings before effecting them.
 
 import React from 'react';
-import PropTypes from 'prop-types';
+import PropTypes, {checkPropTypes} from 'prop-types';
 
 import eSpace from '../engine/eSpace.js';
 import {thousands, thousandsSpaces} from '../utils/formatNumber.js';
@@ -53,6 +53,7 @@ export class WaveView extends React.Component {
 
 	constructor(props) {
 		super(props);
+		checkPropTypes(this.constructor.propTypes, props, 'prop', this.constructor.name);
 		PropTypes.checkPropTypes(WaveView.propTypes, props, 'prop', 'GLScene');
 
 		// is this a bad idea?
@@ -76,7 +77,7 @@ export class WaveView extends React.Component {
 		this.formerShowVoltage = props.showVoltage;
 
 		// make the proptypes shuddup about it being undefined
-		this.vDisp = null;
+		this.mainVDisp = null;
 
 		eSpaceCreatedPromise
 		.then(space => {
@@ -94,7 +95,7 @@ export class WaveView extends React.Component {
 				? WELL_BUMPER_WIDTH
 				: 0;
 
-			this.vDisp = space.vDisp;
+			this.mainVDisp = space.vDisp;
 		})
 		.catch(ex => {
 			console.error(`eSpaceCreatedPromise failed`);
@@ -147,6 +148,8 @@ export class WaveView extends React.Component {
 			// the formers are OUTER sizes.  All these should be integers by now.
 			this.formerWidth = this.outerWidth;
 			this.formerHeight = s.outerHeight;
+
+			// for next time it's changed.  Do we need this?  Since it's a passed-in prop, maybe not.
 			this.formerShowVoltage = p.showVoltage;
 			if (traceWidth) {
 				console.log(`🏄 WaveView canvasInner width is ${this.canvasInnerWidth};  `
@@ -244,10 +247,10 @@ export class WaveView extends React.Component {
 		// if there's no vDisp yet (cuz no space yet), the voltOverlay gets all
 		// mucked up.  So just avoid it.
 		let voltOverlay = '';
-		if (this.vDisp){
+		if (this.mainVDisp){
 			voltOverlay = <VoltOverlay
 				space={this.space}
-				showVoltage={p.showVoltage} vDisp={this.vDisp}
+				showVoltage={p.showVoltage} mainVDisp={this.mainVDisp}
 				canvasInnerWidth={this.canvasInnerWidth} canvasInnerHeight={this.canvasInnerHeight}
 				bumperWidth={this.bumperWidth}
 			/>;

@@ -15,14 +15,13 @@ function setPT() {
 	VoltOverlay.propTypes = {
 		// for first couple of renders, space and idunno are null
 		space: PropTypes.object,
+		mainVDisp: PropTypes.object,
 
-		// this can be null if stuff isn't ready.  these are now determined by css.
+
+		// this can be null if stuff isn't ready.
 		canvasInnerWidth: PropTypes.number.isRequired,
 		canvasInnerHeight: PropTypes.number.isRequired,
 		bumperWidth: PropTypes.number.isRequired,
-
-		// includes scrollSetting, heightVolts, measuredMinVolts, measuredMaxVolts, xScale, yScale
-		vDisp: PropTypes.object,
 
 		// this component is always rendered so it retains its state,
 		// but won't draw anything if the checkbox is off
@@ -35,9 +34,9 @@ function setPT() {
 // Whole thing disappears/appears with mouse hover.
 function VoltOverlay(props) {
 	const p = props;
-	const v = p.vDisp;
-	if (!v)
-		throw `props.vDisp has no voltDisplay`;
+	const mVD = p.mainVDisp;
+	if (!mVD)
+		throw `props.mainVDisp has no voltDisplay`;
 
 	/* ************************************************************************ state */
 
@@ -50,31 +49,31 @@ function VoltOverlay(props) {
 	}
 
 	// the Hooks way
-	const [vState, voltDispatch] = useReducer(voltReducer, v.voltageBuffer);  // see reducer above
+	const [vState, voltDispatch] = useReducer(voltReducer, mVD.voltageBuffer);  // see reducer above
 
 	// use this function to actually set a point in the voltage buffer, instead of just a regular assignment
 	const setAPoint =
 	(ix, volts) => voltDispatch({ix, volts});
 
-	// these are in our state, but ALSO in the vDisp, and settings, so keep them synched.
-	const [bottomVolts, _setBottomVolts] = useState(v.bottomVolts);
-	v.bottomVolts = bottomVolts;
+	// these are in our state, but ALSO in the mainVDisp, and settings, so keep them synched.
+	const [bottomVolts, _setBottomVolts] = useState(mVD.bottomVolts);
+	mVD.bottomVolts = bottomVolts;
 	if (getASetting('voltageSettings', 'bottomVolts') != bottomVolts)
 			storeASetting('voltageSettings', 'bottomVolts', bottomVolts);
 
-	const [heightVolts, _setHeightVolts] = useState(v.heightVolts);
-	v.heightVolts = heightVolts;
+	const [heightVolts, _setHeightVolts] = useState(mVD.heightVolts);
+	mVD.heightVolts = heightVolts;
 	if (getASetting('voltageSettings', 'heightVolts') != heightVolts)
 			storeASetting('voltageSettings', 'heightVolts', heightVolts);
 
 	// practically speaking, use these functions whenever you set stuff.
 	// They set state, so  immediately after, changes will not be apparent.
-	v.setAPoint = setAPoint;
-	v.setBottomVolts = (bv) => {
+	mVD.setAPoint = setAPoint;
+	mVD.setBottomVolts = (bv) => {
 		_setBottomVolts(bv);
 		storeASetting('voltageSettings', 'bottomVolts', bv);
 	}
-	v.setHeightVolts = (hv) => {
+	mVD.setHeightVolts = (hv) => {
 		_setHeightVolts(hv);
 		storeASetting('voltageSettings', 'heightVolts', hv);
 	}
@@ -86,16 +85,15 @@ function VoltOverlay(props) {
 	return <section className={(p.showVoltage ?? 'hover') + 'ShowVoltage VoltOverlay'}
 			style={{width: p.width}} >
 		<VoltSidebar
-			vDisp={p.vDisp}
+			mainVDisp={p.mainVDisp}
 			drawingRight={p.canvasInnerWidth - p.bumperWidth}
 			bumperWidth={p.bumperWidth}
 			canvasInnerHeight={p.canvasInnerHeight}
-			showVoltage={p.showVoltage}
-			scrollVoltHandler={v.setBottomVolts}
-			zoomVoltHandler={v.zoomVoltHandler}
+			scrollVoltHandler={mVD.setBottomVolts}
+			zoomVoltHandler={mVD.zoomVoltHandler}
 		/>
 		<VoltArea
-			vDisp={p.vDisp}
+			mainVDisp={p.mainVDisp}
 			drawingLeft={p.bumperWidth}
 			drawingWidth={p.canvasInnerWidth - 2 * p.bumperWidth}
 			canvasInnerHeight={p.canvasInnerHeight}
@@ -104,11 +102,12 @@ function VoltOverlay(props) {
 			setAPoint={setAPoint}
 		/>
 	</section>;
-	//			bumperWidth={p.bumperWidth}
-
-	// n=removed height={p.height} from VOltArea in favor of canvasInnerDims
 }
+
 //, left: p.left
+	//			bumperWidth={p.bumperWidth}
+	// n=removed height={p.height} from VOltArea in favor of canvasInnerDims
+//removed from sidebar: 			showVoltage={p.showVoltage}
 
 
 export default VoltOverlay;

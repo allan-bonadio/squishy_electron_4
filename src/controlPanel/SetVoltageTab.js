@@ -25,19 +25,18 @@ export function ShowVoltageControl(props) {
 		&nbsp;
 		<select name='showVoltage' value={props.showVoltage}
 					onChange={props.changeShowVoltage}>
-			<option value='always'>Always</option>
-			<option value='hover'>only while hovering</option>
-			<option value='never'>Never</option>
+			<option value='always'>Show</option>
+			<option value='never'>Hide</option>
 		</select>
 	</label>;
 }
+//			<option value='hover'>only while hovering</option>
 
 
 /* ******************************************************* the tab itself */
 
 function setPT() {
 	SetVoltageTab.propTypes = {
-		// function that actually sets showVoltage
 		voltageParams: PropTypes.shape({
 			canyonPower: PropTypes.number.isRequired,  // there's more but not now
 			slotWidth: PropTypes.number.isRequired}),
@@ -78,12 +77,8 @@ function SetVoltageTab({voltageParams, setVoltageParams, showVoltage, changeShow
 	(ev) => {
 		//if (!vDisp)
 		//	return;
-		vDisp.setFamiliarVoltage(vParams);
+		space.vDisp.setFamiliarVoltage(vParams);
 		storeAGroup('voltageParams', vParams);
-
-    // huh?!?
-		vDisp.setBottomVolts(vDisp.bottomVolts);
-		vDisp.setHeightVolts(vDisp.heightVolts);
 	};
 
 	/* ***************************************************** rendering for the Tab */
