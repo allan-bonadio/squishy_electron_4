@@ -177,9 +177,20 @@
 		text-align: right;
 		padding: 0 .5em;
 
+		// the column with the radios for wave breed
+		.breedSelector  label {
+			display: block;
+			text-align: right;
+			width: 9em;
+		}
+		
+		.setWaveButton {
+		  margin-top: .8em;
+		}
+
 		// sliders for freq, etc
 		&.waveParamSliders {
-			width: 25em;
+			//width: 30em;
 
 			input {
 				display: inline;
@@ -188,13 +199,6 @@
 			h3 {
 				text-align: left;
 			}
-		}
-
-		// the column with the radios for wave breed
-		&.breedSelector  label {
-			display: block;
-			text-align: right;
-			width: 9em;
 		}
 
 		.selected {
