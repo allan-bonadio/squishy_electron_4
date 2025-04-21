@@ -8,7 +8,7 @@
 // the ResolutionDialog changes the initialParams and recreates the qSpace.
 
 import React from 'react';
-import PropTypes from 'prop-types';
+import PropTypes, {checkPropTypes} from 'prop-types';
 
 import ControlPanel from '../controlPanel/ControlPanel.js';
 
@@ -26,7 +26,7 @@ let tracePromises = false;
 let traceSquishPanel = false;
 let traceWidth = false;
 
-const DEFAULT_VIEW_CLASS_NAME = 'flatScene';
+const DEFAULT_SCENE_NAME = 'flatScene';
 
 
 
@@ -43,6 +43,7 @@ export class SquishPanel extends React.Component {
 
 	constructor(props) {
 		super(props);
+		checkPropTypes(this.constructor.propTypes, props, 'prop', this.constructor.name);
 
 		if (SquishPanel.squishPanelConstructed) {
 			// should not be called twice!
@@ -55,9 +56,9 @@ export class SquishPanel extends React.Component {
 
 
 		this.state = {
-			mainSceneClassName: DEFAULT_VIEW_CLASS_NAME,
+			mainSceneClassName: DEFAULT_SCENE_NAME,
 
-			showVoltage:  getASetting('voltageSettings', 'showVoltage'),
+			showVoltage: getASetting('voltageSettings', 'showVoltage'),
 
 			// the space for this SP.
 			space: null,
@@ -159,11 +160,11 @@ export class SquishPanel extends React.Component {
 	}
 
 	/* ******************************************************* rendering */
-	// Base function that draws the WebGL, whether during iteration, or during idle times if params change.
-	// call this when you change both the GL and iter and elapsed time
-	// we need it here in SquishPanel cuz it's often called in ControlPanel but affects WaveView
-	redrawWholeMainWave =
-	() => {
+	// Base function that draws the WebGL, whether during iteration, or during
+	// idle times if waveParams change. call this when you change both the GL and iter
+	// and elapsed time. We need it here in SquishPanel cuz it's often called in
+	// ControlPanel but affects WaveView
+	redrawWholeMainWave = () => {
 		let avatar = this.mainEAvatar;
 		let grinder = this.grinder;
 
@@ -174,6 +175,14 @@ export class SquishPanel extends React.Component {
 		// directly redraw the GL
 		avatar.smoothHighest = 0;
 		avatar.doRepaint();
+	}
+
+	// re-render the main SVG voltage, any time when
+	// voltageParams change. call this when you change voltageParams to a familiar one. We need it
+	// here in SquishPanel cuz it's often called in ControlPanel but affects
+	// WaveView
+	rerenderWholeMainVoltage = (voltageParams) => {
+
 	}
 
 	render() {
@@ -191,10 +200,11 @@ export class SquishPanel extends React.Component {
 					sPanel={this}
 				/>
 				<ControlPanel
-					changeShowVoltage={this.changeShowVoltage}
 					showVoltage={s.showVoltage}
+					changeShowVoltage={this.changeShowVoltage}
 
 					redrawWholeMainWave={this.redrawWholeMainWave}
+					rerenderWholeMainVoltage={this.rerenderWholeMainVoltage}
 
 					iStats={this.iStats}
 					frameRateMenuFreqs={s.frameRateMenuFreqs}

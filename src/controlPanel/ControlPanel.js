@@ -30,12 +30,13 @@ const N_EXTRA_STEPS = 0.5;
 
 export class ControlPanel extends React.Component {
 	static propTypes = {
-		// the showVoltage bool is kept by the Squish Panel; probably should by the WaveView
+		// the showVoltage setting is kept by the Squish Panel; cuz it also influences WaveView
 		// this is NOT the voltageParams!
 		changeShowVoltage: PropTypes.func.isRequired,
 		showVoltage: PropTypes.string.isRequired,
 
 		redrawWholeMainWave: PropTypes.func.isRequired,
+		rerenderWholeMainVoltage: PropTypes.func.isRequired,
 
 		// the integration statistics shown in the Integration tab (there's several more fields)
 		iStats: PropTypes.shape({
@@ -53,8 +54,8 @@ export class ControlPanel extends React.Component {
 
 	constructor(props) {
 		super(props);
-		//debugger;
-		checkPropTypes(ControlPanel.propTypes, props, 'prop', 'ControlPanel');
+		checkPropTypes(this.constructor.propTypes, props, 'prop', this.constructor.name);
+		//checkPropTypes(ControlPanel.propTypes, props, 'prop', 'ControlPanel');
 
 		// most of the state is kept here.  But, also, in the store settings for the next page reload.
 		this.state = {
@@ -142,7 +143,8 @@ export class ControlPanel extends React.Component {
 	// need to keep grinder's variable and our state in sync for sbi.
 	// maybe these help.  Oh yeah, the setting, too.
 	get shouldBeIntegrating() {
-		// before the space is created, this.grinder is undefined but the state should be set from storeSettings
+    // before the space is created, this.grinder is undefined but the state
+    // should be set from storeSettings
 		const sbi = this.grinder?.shouldBeIntegrating ?? this.state.shouldBeIntegrating;
 
 		// NO this could be in a render method
@@ -250,15 +252,6 @@ export class ControlPanel extends React.Component {
 		});
 	}
 
-	// toolbar: Start Over button.  Display it from wave params from store
-	// opposite of saveMainWave()
-	resetWave = () => {
-		let waveParams = getAGroup('waveParams');
-		this.setAndPaintFamiliarWave(waveParams);
-		this.grinder.hadException = false;
-		this.stopAnimating()
-	}
-
 	// given these params, put it into effect and display it on the wave scene
 	// This is most of 'Reset Wave'  NOT for regular iteration
 	setAndPaintFamiliarWave = waveParams => {
@@ -266,16 +259,12 @@ export class ControlPanel extends React.Component {
 		if (!this.space)
 			return;
 
-		this.waveParams = waveParams;
-
 		const mainEWave = this.space.mainEWave;
 		this.grinder.elapsedTime = 0;
 		this.grinder.frameSerial = 0;
 
 		mainEWave.setFamiliarWave(waveParams);  // eSpace does this initially
 
-		// is this the problem?  I make a copy of the wave ... voltage instead
-		// of the same buffer?
 		qeFuncs.grinder_copyFromAvatar(this.grinder.pointer, this.mainEAvatar.pointer);
 		p.redrawWholeMainWave();
 	}
@@ -285,6 +274,15 @@ export class ControlPanel extends React.Component {
 	saveMainWave = waveParams => {
 		this.setAndPaintFamiliarWave(waveParams);
 		storeAGroup('waveParams', waveParams);
+	}
+
+	// toolbar: Start Over button.  Display it from wave params from store
+	// opposite of saveMainWave()
+	resetWave = () => {
+		let waveParams = getAGroup('waveParams');
+		this.setAndPaintFamiliarWave(waveParams);
+		this.grinder.hadException = false;
+		this.stopAnimating()
 	}
 
 	// setMainWave() called when user clicks SetWave, fills the main wave
@@ -309,15 +307,29 @@ export class ControlPanel extends React.Component {
 
 	// change the state for the voltage params.  Just this.state
 	// pass an object with any or all of the params you want to change
-	setVoltageParams = (vp) => {
+	setVoltageParams = (vP) => {
 		const s = this.state;
-		this.setState({ voltageBreed: vp.voltageBreed ?? s.voltageBreed,
-			voltageCenter: vp.voltageCenter ?? s.voltageCenter,
-			canyonPower: vp.canyonPower ?? s.canyonPower,
-			canyonScale: vp.canyonScale ?? s.canyonScale,
-			slotWidth: vp.slotWidth ?? s.slotWidth,
-			slotScale: vp.slotScale ?? s.slotScale }
+		this.setState({ voltageBreed: vP.voltageBreed ?? s.voltageBreed,
+			voltageCenter: vP.voltageCenter ?? s.voltageCenter,
+			canyonPower: vP.canyonPower ?? s.canyonPower,
+			canyonScale: vP.canyonScale ?? s.canyonScale,
+			slotWidth: vP.slotWidth ?? s.slotWidth,
+			slotScale: vP.slotScale ?? s.slotScale }
 		);
+	}
+
+  setAndRenderFamiliarVoltage(vP) {
+		this.space.vDisp.setFamiliarVoltage(vP);
+		p.rerenderWholeMainVoltage(vP);
+  }
+
+	// the Set Voltage button on the Set Voltage tab - always a familiar voltage profile
+	saveMainVoltage(vP) {
+	  this.setVoltageParams(vP);
+
+	  setAndRenderFamiliarVoltage(vP);
+
+		storeAGroup('voltageParams', vP);
 	}
 
 	// fills in the voltage buffer with familiar voltage most recently set for
@@ -333,8 +345,8 @@ export class ControlPanel extends React.Component {
 		return <SetVoltageTab
 			voltageParams={this.getVoltageParams()}
 			setVoltageParams={this.setVoltageParams}
-			changeShowVoltage={p.changeShowVoltage}
 			showVoltage={p.showVoltage}
+			changeShowVoltage={p.changeShowVoltage}
 			space={this.space}
 		/>
 	};
@@ -425,8 +437,8 @@ export class ControlPanel extends React.Component {
 
 				resetWave={this.resetWave}
 				resetVoltage={this.resetVoltage}
-				changeShowVoltage={p.changeShowVoltage}
 				showVoltage={p.showVoltage}
+				changeShowVoltage={p.changeShowVoltage}
 
 				N={this.N}
 				space={this.space}
