@@ -4,7 +4,7 @@
 */
 
 import React from 'react';
-import PropTypes from 'prop-types';
+import PropTypes, {checkPropTypes} from 'prop-types';
 import {scaleLinear} from 'd3-scale';
 
 
@@ -45,6 +45,7 @@ function setPT() {
 class SetWaveTab extends React.Component {
 	constructor(props) {
 		super(props);
+		checkPropTypes(this.constructor.propTypes, props, 'prop', this.constructor.name);
 		this.state = {
 			space: null,
 			// also wave params
@@ -159,7 +160,7 @@ class SetWaveTab extends React.Component {
 					/>
 		}
 
-		const breedSelector = <div className='waveTabCol breedSelector'>
+		const breedSelector = <div className='breedSelector'>
 			<label>
 				circular
 				<input type='radio' checked={'circular' == breed} name='circular'
@@ -187,7 +188,7 @@ class SetWaveTab extends React.Component {
 
 		return <div className='SetWaveTab'>
 			<div className='waveTabCol '>
-				<h3>Design a new Wave</h3>
+				<h3>Design a<br/>new Wave</h3>
   			{breedSelector}
 				<button className='setWaveButton' onClick={ev => this.saveMainWave(this.state)}>
 						Set Wave
