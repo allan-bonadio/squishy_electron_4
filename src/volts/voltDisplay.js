@@ -219,7 +219,8 @@ export class voltDisplay {
 
 		// array to collect small snippets of text like '371,226' or
 		// 'L371,226'.  Avoid recreating array.
-		this.points ??= new Array(this.end + this.start);
+		if (!this.points)
+			this.points = new Array(this.end + this.start);
 		let points = this.points;
 		let x, y, pt;
 
@@ -254,9 +255,9 @@ export class voltDisplay {
 			voltageBuffer[0] = voltageBuffer[end-1];
 			voltageBuffer[end] = voltageBuffer[1];
 
-			// we're doing the whole thing nicluding the wraparound ends
-			start = 0;
-			end = this.start + this.end;
+			// we're doing the whole thing including the wraparound ends.  NO!  looks weird
+			//start = 0;
+			//end = this.start + this.end;
 			didMove = false;
 			didLine = false;
 			break;
@@ -355,16 +356,15 @@ export class voltDisplay {
 	}
 
 	// pre-calc variables needed for evaluating the voltage familiarly
+	// isn't this different for the well?
 	canyonVoltageSetup(voltageParams) {
-		const {voltageCenter, slotWidth} = voltageParams;
-
-		const toIx = (this.end - this.start) / 100;  // converts 0...100 across to  0...N
+		const toIx = (this.end - this.start) / 100;  // how big is 1% of domain
+		this.offset = voltageParams.voltageCenter * toIx;  // convert center to ix units
 		this.halfN = (this.end - this.start) / 2;
-		this.offset = voltageCenter * toIx;
 	}
 
 	canyonVoltage(ix, voltageParams) {
-		let xm1_1 = (ix - this.offset) / this.halfN;  // -1...+1
+		let xm1_1 = (ix - this.offset) / this.halfN;  // x value to raise to the power for this ix value
 		let y0_1 = Math.pow(abs(xm1_1), voltageParams.canyonPower);  // 0 ... +1
 
 		if (!isFinite(y0_1)) {
@@ -458,20 +458,29 @@ export class voltDisplay {
 			break;
 
 		case 'canyon':
-			// always, the max is one or the other end.
+			// always, the max is one or the other end, or the zero point.
 			this.canyonVoltageSetup(voltageParams);
 			let startVal = this.canyonVoltage(this.start, voltageParams);
 			let endVal = this.canyonVoltage(this.end-1, voltageParams);
-			let highest = max(startVal, endVal);
+			let zeroVal = this.canyonVoltage(this.offset, voltageParams);
+			let highest = max(startVal, endVal, zeroVal);
+			let lowest = min(startVal, endVal, zeroVal);
 
 			// But autoscaling hides changes in scale so do this
-			height =  sqrt(highest * EFFECTIVE_VOLTS) + MARGIN;
-			bottom = -MARGIN / 2;
+			height =  (highest - lowest);
+			bottom = lowest;
+			let aBitExtra = MARGIN - height;
+			//			if (aBitExtra > 0) {
+			//			  height = MARGIN
+			//			  bottom -= MARGIN / 2;
+			//			}
+			//height =  sqrt(abs(highest * EFFECTIVE_VOLTS)) + MARGIN;
+			//bottom = -MARGIN / 2;
 			break;
 
 		default:
 			console.warn(`setAppropriateRange: no breed`, voltageParams);
- 		}
+		}
 
 		this.bottomVolts = bottom;
 		this.heightVolts = height;
