@@ -9,6 +9,7 @@
 // Object constuctores generally do this automatically in prepForDirectAccessors()
 // but for typed array you have to do this by hand.
 // like this:     cppObjectRegistry[blah.pointer] = blah;
+// TODO: do we actually use this anywhere?!?
 export let cppObjectRegistry = {};
 
 // Use this to directly access C++ fields in a JS class that sortof mirrors the C++ class.
