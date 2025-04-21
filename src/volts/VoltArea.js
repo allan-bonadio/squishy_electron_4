@@ -316,14 +316,13 @@ function VoltArea(props) {
 	// axis for voltage.  Makes no sense if no axis there.
 	function renderAxes() {
 		let axis = d3_axisLeft(mVD.yUpsideDown);
-		axis.ticks(6);
+		axis.ticks(3, 's');
 
 		let voltageAxis = ReactFauxDOM.createElement('g');
 		//let voltageAxis = document.createElementNS('http://www.w3.org/2000/svg', 'g');
 		let vAx = d3_select(voltageAxis);
 		vAx.attr('class', 'voltageAxis');
 
-		// not sure how much to move axis in from right side
 		let txX = p.drawingLeft + p.drawingWidth;
 		let txY = p.canvasInnerHeight;
 		vAx.attr('transform', `translate(${txX}, ${txY})`);
