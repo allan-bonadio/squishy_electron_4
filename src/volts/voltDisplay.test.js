@@ -45,7 +45,7 @@ describe(`findVoltExtremes() method`, () => {
 		volts16 = new Float64Array(16);  // all zeroes, right?
 		// TODO: should also test well continuum!
 		vDisp = new voltDisplay('test findVoltExtremes', 0, 16, qeConsts.contENDLESS, volts16,
-			{showVoltage: true, heightVolts: 0, bottomVolts: 0,});
+			{showVoltage: 'always', heightVolts: 0, bottomVolts: 0,});
 
 	})
 
@@ -117,7 +117,7 @@ describe(`voltage creation & consistency`, () => {
 	])(`voltDisplay created w/%j  should yield %o`, (settings, mungeFunc, expected) => {
 		mungeFunc?.();
 		vDisp = new voltDisplay('test created', 0, 16, qeConsts.contENDLESS, volts16,
-			{showVoltage: true, ...settings});
+			{showVoltage: 'always', ...settings});
 		tryOutConsistency(vDisp);
 
 		// expect(vDisp.minBottom).toBeCloseTo(expected.minBottom);
