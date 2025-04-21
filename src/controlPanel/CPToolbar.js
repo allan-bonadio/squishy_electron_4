@@ -6,7 +6,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import eSpace from '../engine/eSpace.js';
-import {ShowVoltageControl} from './SetVoltageTab.js';
+//import {ShowVoltageControl} from './SetVoltageTab.js';
 import qeConsts from '../engine/qeConsts.js';
 
 let traceCPToolbar = false;
@@ -45,7 +45,7 @@ function setPT() {
 
 		resetWave: PropTypes.func.isRequired,
 		resetVoltage: PropTypes.func.isRequired,
-		showVoltage: PropTypes.string.isRequired,
+		//showVoltage: PropTypes.string.isRequired,
 	};
 }
 
