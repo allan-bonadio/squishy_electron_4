@@ -6,7 +6,7 @@
 // TODO this needs some cleanup and testing.  needs to use ErrorDialog
 
 import React from 'react';
-import PropTypes from 'prop-types';
+import PropTypes, {checkPropTypes} from 'prop-types';
 import './ErrorBoundary.scss';
 
 
@@ -64,6 +64,7 @@ class ErrorBoundary extends React.Component {
 
 	constructor(props) {
 		super(props);
+		checkPropTypes(this.constructor.propTypes, props, 'prop', this.constructor.name);
 		this.state = {
 			errorObj: null,
 			terminalErrorObj: null,

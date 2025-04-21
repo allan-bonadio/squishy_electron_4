@@ -4,7 +4,7 @@
 */
 
 import React from 'react';
-import PropTypes from 'prop-types';
+import PropTypes, {checkPropTypes} from 'prop-types';
 
 import './DocReader.scss';
 import CommonDialog from './CommonDialog.js';
@@ -23,6 +23,7 @@ class DocReader extends React.Component {
 	// i'll probably turn this to a function component
 	constructor(props) {
 		super(props);
+		checkPropTypes(this.constructor.propTypes, props, 'prop', this.constructor.name);
 		DocReader.me = this;
 
 		this.state = {

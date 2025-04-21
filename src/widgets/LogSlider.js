@@ -3,8 +3,8 @@
 ** Copyright (C) 2021-2025 Tactile Interactive, all rights reserved
 */
 
-import PropTypes from 'prop-types';
 import React from 'react';
+import PropTypes, {checkPropTypes} from 'prop-types';
 
 import {stepsPerDecadeStepFactors, indexToPower, powerToIndex} from '../utils/powers.js';
 import {thousands} from '../utils/formatNumber.js';
@@ -80,6 +80,7 @@ class LogSlider extends React.Component {
 
 	constructor(props) {
 		super(props);
+		checkPropTypes(this.constructor.propTypes, props, 'prop', this.constructor.name);
 		if (!props)
 			debugger;
 		const p = props;
