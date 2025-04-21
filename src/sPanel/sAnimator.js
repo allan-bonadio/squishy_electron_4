@@ -96,7 +96,7 @@ class sAnimator {
 
 	/* ************************************************ Frame timing */
 
-	// videoFP = measured frame period from requestAnimatioFrame().  Depends on
+	// videoFP = measured frame period from requestAnimationFrame().  Depends on
 	// video; often 60/sec => 16.666...  Can change as window moves to different
 	// monitor or monitor frame rate changes (settings).  See machine control panel.
 	// avgVideoFP = running avg, smoothed.  We use this as videoFP

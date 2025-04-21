@@ -15,7 +15,7 @@
 	.hoverShowVoltage {visibility: hidden}
 	.hoverShowVoltage:hover {visibility: visible}
 	.neverShowVoltage {visibility: hidden}
-
+	
 	// encloses the actual glview, the timeOverlay, and the VoltOverlay
 	// the VoltOverlay is what hides/shows with mouseover (see above)
 	// see also WaveView.scss for more widgetArea
