@@ -4,6 +4,7 @@
 */
 
 import React from 'react';
+import PropTypes, {checkPropTypes} from 'prop-types';
 
 
 import qeFuncs from '../engine/qeFuncs.js';
@@ -20,6 +21,7 @@ export default class ResolutionDialog extends React.Component {
 
 	constructor(props) {
 		super(props);
+		checkPropTypes(this.constructor.propTypes, props, 'prop', this.constructor.name);
 
 		// this is the state in the dialog; will be used to recreate space upon OK().
 		// Therefore, initial values set from storage = current settings.
