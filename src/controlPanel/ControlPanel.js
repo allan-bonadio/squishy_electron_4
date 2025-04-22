@@ -255,7 +255,6 @@ export class ControlPanel extends React.Component {
 	// given these params, put it into effect and display it on the wave scene
 	// This is most of 'Reset Wave'  NOT for regular iteration
 	setAndPaintFamiliarWave = waveParams => {
-		const p = this.props;
 		if (!this.space)
 			return;
 
@@ -266,7 +265,7 @@ export class ControlPanel extends React.Component {
 		mainEWave.setFamiliarWave(waveParams);  // eSpace does this initially
 
 		qeFuncs.grinder_copyFromAvatar(this.grinder.pointer, this.mainEAvatar.pointer);
-		p.redrawWholeMainWave();
+		this.props.redrawWholeMainWave();
 	}
 
 	// SetWave button in SetWaveTab: set it from passed in params, and save it
@@ -318,18 +317,16 @@ export class ControlPanel extends React.Component {
 		);
 	}
 
-  setAndRenderFamiliarVoltage(vP) {
+	setAndRenderFamiliarVoltage(vP) {
 		this.space.vDisp.setFamiliarVoltage(vP);
-		p.rerenderWholeMainVoltage(vP);
-  }
+		this.props.rerenderWholeMainVoltage(vP);
+	}
 
 	// the Set Voltage button on the Set Voltage tab - always a familiar voltage profile
-	saveMainVoltage(vP) {
-	  this.setVoltageParams(vP);
-
-	  setAndRenderFamiliarVoltage(vP);
-
-		storeAGroup('voltageParams', vP);
+	saveMainVoltage = (vP) => {
+		this.setVoltageParams(vP);  // here, and to display in volt tab
+		this.setAndRenderFamiliarVoltage(vP);  // for the space, and the WaveView
+		storeAGroup('voltageParams', vP);  // from now on
 	}
 
 	// fills in the voltage buffer with familiar voltage most recently set for
@@ -338,6 +335,7 @@ export class ControlPanel extends React.Component {
 		const voltageParams = getAGroup('voltageParams');
 		this.setVoltageParams(voltageParams);
 		this.space.vDisp.setFamiliarVoltage(voltageParams);
+		this.space.updateVoltagePath();
 	}
 
 	makeVoltageTab = () => {
@@ -347,6 +345,7 @@ export class ControlPanel extends React.Component {
 			setVoltageParams={this.setVoltageParams}
 			showVoltage={p.showVoltage}
 			changeShowVoltage={p.changeShowVoltage}
+			saveMainVoltage={this.saveMainVoltage}
 			space={this.space}
 		/>
 	};
@@ -362,15 +361,12 @@ export class ControlPanel extends React.Component {
 	}
 
 	makeIntegrationTab = () => {
-		const s = this.state;
-		const p = this.props;
-
 		return <SetIntegrationTab
-			dtStretch={s.dtStretch}
+			dtStretch={this.state.dtStretch}
 			setDtStretch={this.setDtStretch}
 
 			N={this.N}
-			iStats={p.iStats}
+			iStats={this.props.iStats}
 		/>;
 	}
 
@@ -385,7 +381,6 @@ export class ControlPanel extends React.Component {
 
 	// whichever tab is showing right now
 	createShowingTab() {
-		const p = this.props;
 		const s = this.state;
 //		const {waveBreed, waveFrequency, pulseWidth, pulseCenter} = s;
 //		const {canyonPower, canyonScale, slotWidth, slotScale, voltageCenter} = s;

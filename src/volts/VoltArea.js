@@ -155,7 +155,8 @@ function VoltArea(props) {
 
 		if (traceDragging) {
 			console.log(`⚡⚡️ ${phase} on point (${ev.clientX.toFixed(1)}, ${ev.clientY.toFixed(1)}) `
-				+` voltage @ ix=${ix} changing from ${mVD.voltageBuffer[ix].toFixed(0)} to ${newVoltage.toFixed(0)}`);
+				+` voltage @ ix=${ix} changing from ${mVD.voltageBuffer[ix].toFixed(0)} to `
+				+`${newVoltage.toFixed(0)}`);
 		}
 
 		if (phase == 'pointerdown') {
@@ -193,7 +194,8 @@ function VoltArea(props) {
 		visibleEl.setAttribute('d', dAttr);
 	}
 
-	// pointer down on the path.tactile element.  The VoltArea function is not called during dragging; only at the end.
+	// pointer down on the path.tactile element.  The VoltArea function is not
+	// called during dragging; only at the end.
 	const pointerDown =
 	(ev) => {
 		if (traceDragging)
@@ -246,7 +248,7 @@ function VoltArea(props) {
 		}
 	}
 
-// we only do vertical.  right now.  Moves the voltage line (but not its voltage)
+	// we only do vertical.  right now.  Moves the voltage line (but not its voltage)
 	const wheelHandler =
 	(ev) => {
 		let deltaPixels;
@@ -282,22 +284,7 @@ function VoltArea(props) {
 
 	/* *************************************************** rendering */
 
-	// tell the VoltArea (that;s us) that something in the (space or
-	// mainVDisp).voltageBuffer changed.  Or the bottom or height.  Sometimes called
-	// from above. This gets set into the space, when it's available.
-//	const updateVoltageArea =
-//	() => {
-//		if (traceRendering)
-//			console.log(`⚡️ VoltArea.updateVoltageArea`);
-//
-//		// so update everybody who keeps this
-//		//setChangeCounter(changeCounter++);  // so react rerenders
-//	}
-//	// these places need this function too
-//	mVD.updateVoltageArea = updateVoltageArea;
-//	p.space.updateVoltageArea = updateVoltageArea;
-
-	// this one actually draws the voltage line
+	// this one actually draws the voltage line, normally
 	function renderVoltagePath() {
 		// the lines themselves: exactly overlapping.  tactile wider than visible.
 		const pathAttribute = mVD.makeVoltagePathAttribute(mVD.yScale);
@@ -313,13 +300,24 @@ function VoltArea(props) {
 		</>;
 	}
 
+	// all over squish, need a way to update the voltage line on the main display
+	//if (!p.space.updateVoltagePath) {
+		// use this whenever the voltage buffer changed.  does Not use react;
+		// munges the attr directly
+		//p.space.updateVoltagePath = () => {
+		p.space.updateVoltagePath = function updateVoltagePath() {
+			const pathAttribute = mVD.makeVoltagePathAttribute(mVD.yScale);
+			visibleEl.setAttribute('d', pathAttribute);
+			tactileEl.setAttribute('d', pathAttribute);
+		}
+	//}
+
 	// axis for voltage.  Makes no sense if no axis there.
 	function renderAxes() {
 		let axis = d3_axisLeft(mVD.yUpsideDown);
 		axis.ticks(3, 's');
 
 		let voltageAxis = ReactFauxDOM.createElement('g');
-		//let voltageAxis = document.createElementNS('http://www.w3.org/2000/svg', 'g');
 		let vAx = d3_select(voltageAxis);
 		vAx.attr('class', 'voltageAxis');
 
