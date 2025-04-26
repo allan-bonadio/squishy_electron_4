@@ -1,0 +1,21 @@
+<!--
+title: Overview of Documentation
+description: what have I got, what do I need
+-->
+topics I need:
+
+- sci notation & powers of 10
+- dimensions
+- voltage
+- the wave
+- numbers and their domains, and complex numbers
+- equations - arghhhh!
+- classical mechanics - arghhhh!
+
+- tooltip help for the app
+
+<a href=electronAppearance.html> Electron Appearance </a>
+<a href=oneSecond.html> One Second </a>
+<a href=colophon.html> Colophon </a>
+
+should use react-spring https://www.npmjs.com/package/react-spring for demos
