@@ -164,7 +164,7 @@ export class SquishPanel extends React.Component {
 	// idle times if waveParams change. call this when you change both the GL and iter
 	// and elapsed time. We need it here in SquishPanel cuz it's often called in
 	// ControlPanel but affects WaveView
-	redrawWholeMainWave = () => {
+	repaintWholeMainWave = () => {
 		let avatar = this.mainEAvatar;
 		let grinder = this.grinder;
 
@@ -181,9 +181,9 @@ export class SquishPanel extends React.Component {
 	// voltageParams change. call this when you change voltageParams to a familiar one. We need it
 	// here in SquishPanel cuz it's often called in ControlPanel but affects
 	// WaveView
-	rerenderWholeMainVoltage = (voltageParams) => {
-
-	}
+	//rerenderWholeMainVoltage = (voltageParams) => {
+	//	debugger;
+	//}
 
 	render() {
 		const p = this.props;
@@ -203,8 +203,7 @@ export class SquishPanel extends React.Component {
 					showVoltage={s.showVoltage}
 					changeShowVoltage={this.changeShowVoltage}
 
-					redrawWholeMainWave={this.redrawWholeMainWave}
-					rerenderWholeMainVoltage={this.rerenderWholeMainVoltage}
+					repaintWholeMainWave={this.repaintWholeMainWave}
 
 					iStats={this.iStats}
 					frameRateMenuFreqs={s.frameRateMenuFreqs}
@@ -215,6 +214,7 @@ export class SquishPanel extends React.Component {
 		);
 		//<this.spaceCtx.Provider value={s.space}>
 		//</this.spaceCtx.Provider>
+		//			rerenderWholeMainVoltage={this.rerenderWholeMainVoltage}
 	}
 }
 

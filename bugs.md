@@ -27,16 +27,13 @@ I get it.  Standing wave freq 0 => nans.
 
 - need a hamburger menu for things like the above.
 
-😡😡- StartOver sometimes displays a kinked wave - cick a second time and it's ok
-
-😡😡- now params work instantaneously - re-institute the SetVolt and SetWave mechanisms.
-😡😡-   And, stick the buttons at the lower left.
+😡😡- startOverHandler sometimes displays a kinked wave - cick a second time and it's ok
 
 ## GL & WaveView
 
 😡- left tic marks rarely draw.
 
-😡😡- WELL: last points on ends have no ink so there's this black acute triangle instead of color
+- WELL: last points on ends have no ink so there's this black acute triangle instead of color.  No that's right - i's zero at the ends
 
 - display Garland Spiral in 3d could be easy.
 	Really should use Three.js
@@ -53,8 +50,6 @@ I get it.  Standing wave freq 0 => nans.
 
 ## Voltage
 
-😀- voltage setting doesn't work anymore!?!?  There's something wrong - I think too many voltage buffers and the setting never gets to the grinder?  no I think voltages just need to be really high.  Switch to kilovolts.
-
 - voltage area: dragging beyond bounds should expand scale.  Actually,
 now, it just breaks stuff and gives you a really low or high boundary.
 Needs fixing.
@@ -62,7 +57,6 @@ Needs fixing.
 - option to have voltage relax back to zero (or whatever's set in the
 tab)
 
-😡- reset voltage doesn't reset voltage range ?? do we want this?  no, cuz user wants to redo in the same realm
 
 
 ## Space and Integration

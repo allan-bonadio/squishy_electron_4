@@ -5,7 +5,7 @@ description: Overview and some results from Squishy Electron
 ## Squishy Electron project
 
 
-This is a project I've been working on since 2021, off and on in my free time.
+This is a project I've been working on for a few years, off and on in my free time.
 It's a work in progress, and this is the Alpha version here.
 Send feedback to
 [Send Feedback Here](mailto://squish@orgmgr.tactileint.org?subject=squishy_electron_feedback)
