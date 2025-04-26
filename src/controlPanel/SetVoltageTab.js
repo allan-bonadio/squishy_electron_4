@@ -26,8 +26,9 @@ export function ShowVoltageControl(props) {
 		&nbsp;
 		<select name='showVoltage' value={props.showVoltage}
 					onChange={props.changeShowVoltage}>
-			<option value='always'>Show</option>
-			<option value='never'>Hide</option>
+			<option value='always'>Always</option>
+			<option value='hover'>only while hovering</option>
+			<option value='never'>Never</option>
 		</select>
 	</label>;
 }
@@ -48,7 +49,7 @@ function setPT() {
 		changeShowVoltage: PropTypes.func.isRequired,
 
 		// the SetVoltage button
-		saveMainVoltage:  PropTypes.func.isRequired,
+		setVoltageHandler:  PropTypes.func.isRequired,
 
 		space: PropTypes.object,
 	};
@@ -57,7 +58,7 @@ function setPT() {
 // the tab that user sets voltage buffer with
 function SetVoltageTab(p) {
 	// these are all the local versions, for use and setting in this Voltage Tab
-	const {voltageParams, setVoltageParams, showVoltage, changeShowVoltage, saveMainVoltage, space} = p;
+	const {voltageParams, setVoltageParams, showVoltage, changeShowVoltage, setVoltageHandler, space} = p;
 	const vP = voltageParams;
 	const setVP = setVoltageParams;
 
@@ -77,19 +78,13 @@ function SetVoltageTab(p) {
 	}
 	const vDisp = stuff.miniVolts;
 
-	// Set Voltage button copies our working volts to the space's volts, and stores familiar params
-	const setVoltage=
-	(ev) => {
-		p.saveMainVoltage(vP);
-	};
-
 	/* ***************************************************** rendering for the Tab */
 
 	//  some slot and block chars if you need them: ⎍ ⊓ ⊔  also try box
 	// drawing symols ⨅ ⨆ vs ⊓ ⊔ they're different!
 	function renderBreedSelector() {
 		const breed = vP.voltageBreed;
-		return <div className='breedSelector'>
+		return <div className='breedSelector' title='Choose the shape of the voltage potential you want to try'>
 			<label>
 				<input type='radio' className='flatBreed' name='breed'
 					checked={'flat' == breed}
@@ -154,6 +149,7 @@ function SetVoltageTab(p) {
 				stepsPerDecade={10}
 				handleChange={power => setVoltageParams({canyonPower: power})}
 				wholeStyle={{visibility: 'canyon' == breed ? 'visible' : 'hidden'}}
+				title='choose the exponent'
 			/>
 
 			{renderMiniGraph()}
@@ -167,6 +163,7 @@ function SetVoltageTab(p) {
 				onChange={ev => setVoltageParams({canyonScale: ev.target.valueAsNumber})}
 				onPointerDown={startCapture}
 				style={{display: 'canyon' == breed ? 'inline-block' : 'none'}}
+				title="Voltage of multiplier.  The little graph autoranges so you can't see it so well."
 			/>
 
 			{/* only shows for slot and block - shouldn't this be logarithmic? */}
@@ -178,6 +175,7 @@ function SetVoltageTab(p) {
 				onChange={ev => setVoltageParams({slotScale: ev.target.valueAsNumber})}
 				onPointerDown={startCapture}
 				style={{display: ('slot' == breed || 'block' == breed) ? 'inline-block' : 'none'}}
+				title="Voltage between upper and lower levels"
 			/>
 
 			{/* only if neither of above */}
@@ -193,7 +191,7 @@ function SetVoltageTab(p) {
 		// shouldn't be neg if (scaleDisplayN < 0) scaleDisplay = `(${scaleDisplay})`;
 
 		return <>
-			{/* only shows for canyon, otherwise blank space */}
+			{/* xⁿ only shows for canyon, otherwise blank space */}
 			<div className='powerDisplay'
 					style={{visibility: 'canyon' == breed ? 'visible' : 'hidden'}}>
 				<var>x</var><sup> {(vP.canyonPower).toFixed(1)}</sup>
@@ -208,6 +206,7 @@ function SetVoltageTab(p) {
 				onChange={ev => setVoltageParams({voltageCenter: ev.target.valueAsNumber})}
 				onPointerDown={startCapture}
 				style={{visibility: 'flat' == breed ? 'hidden' : 'visible'}}
+				title="move the voltage profile left and right"
 			/>
 
 			{/* only one of these three is displayed */}
@@ -218,7 +217,7 @@ function SetVoltageTab(p) {
 			</div>
 			<div className='canyonScaleDisplay'
 					style={{display: 'canyon' == breed ? 'inline-block' : 'none'}}>
-				{canyonScaleDisplay} <var>x</var><sup>•</sup>
+				{canyonScaleDisplay} <var>x</var><sup>n</sup>
 			</div>
 			<div style={{display: 'flat' == breed ? 'inline-block' : 'none'}} />
 		</>;
@@ -237,6 +236,7 @@ function SetVoltageTab(p) {
 				onPointerDown={startCapture}
 				style={{visibility: ('slot' == breed || 'block' == breed) ? 'visible' : 'hidden',
 					width: '50%'}}
+				title="how wide the pulse is, in percent of whole wave"
 			/>
 			<div />
 		</>;
@@ -282,7 +282,7 @@ function SetVoltageTab(p) {
 			<h3>Set Voltage</h3>
 			{renderBreedSelector()}
 
-      <button onClick={setVoltage} >Set Voltage</button>
+      <button onClick={p.setVoltageHandler} >Set Voltage</button>
 		</div>
 
 		<div className='divider' />
