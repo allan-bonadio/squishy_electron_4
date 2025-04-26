@@ -35,8 +35,8 @@ export class ControlPanel extends React.Component {
 		changeShowVoltage: PropTypes.func.isRequired,
 		showVoltage: PropTypes.string.isRequired,
 
-		redrawWholeMainWave: PropTypes.func.isRequired,
-		rerenderWholeMainVoltage: PropTypes.func.isRequired,
+		repaintWholeMainWave: PropTypes.func.isRequired,
+		//rerenderWholeMainVoltage: PropTypes.func.isRequired,
 
 		// the integration statistics shown in the Integration tab (there's several more fields)
 		iStats: PropTypes.shape({
@@ -212,6 +212,15 @@ export class ControlPanel extends React.Component {
 
 	}
 
+	/* ********************************************** misc */
+
+	resetElapsedTime() {
+		this.grinder.elapsedTime = 0;
+		this.grinder.frameSerial = 0;
+
+		this.props.animator.showTimeNFrame();
+	}
+
 	// generate an FFT of the wave.  In the JS console.
 	// TODO: make a real GLScene out of the spectrum!
 	clickOnFFT(space)
@@ -259,25 +268,27 @@ export class ControlPanel extends React.Component {
 			return;
 
 		const mainEWave = this.space.mainEWave;
-		this.grinder.elapsedTime = 0;
-		this.grinder.frameSerial = 0;
 
 		mainEWave.setFamiliarWave(waveParams);  // eSpace does this initially
 
 		qeFuncs.grinder_copyFromAvatar(this.grinder.pointer, this.mainEAvatar.pointer);
-		this.props.redrawWholeMainWave();
+		this.props.repaintWholeMainWave();
 	}
 
 	// SetWave button in SetWaveTab: set it from passed in params, and save it
-	// in storage and state. opposite of resetWave()
+	// in storage and state. opposite of startOverHandler()
 	saveMainWave = waveParams => {
+		this.resetElapsedTime();
+
 		this.setAndPaintFamiliarWave(waveParams);
 		storeAGroup('waveParams', waveParams);
 	}
 
 	// toolbar: Start Over button.  Display it from wave params from store
 	// opposite of saveMainWave()
-	resetWave = () => {
+	startOverHandler = () => {
+		this.resetElapsedTime();
+
 		let waveParams = getAGroup('waveParams');
 		this.setAndPaintFamiliarWave(waveParams);
 		this.grinder.hadException = false;
@@ -319,23 +330,25 @@ export class ControlPanel extends React.Component {
 
 	setAndRenderFamiliarVoltage(vP) {
 		this.space.vDisp.setFamiliarVoltage(vP);
-		this.props.rerenderWholeMainVoltage(vP);
+		debugger;
+		this.space.updateDrawnVoltagePath();  // visible change on screen
 	}
 
 	// the Set Voltage button on the Set Voltage tab - always a familiar voltage profile
-	saveMainVoltage = (vP) => {
-		this.setVoltageParams(vP);  // here, and to display in volt tab
-		this.setAndRenderFamiliarVoltage(vP);  // for the space, and the WaveView
-		storeAGroup('voltageParams', vP);  // from now on
+	setVoltageHandler = (ev) => {
+		let voltageParams = this.getVoltageParams()
+		this.setVoltageParams(voltageParams);  // here, and to display in volt tab
+		this.setAndRenderFamiliarVoltage(voltageParams);  // for the space, and the WaveView
+		storeAGroup('voltageParams', voltageParams);  // remember from now on
 	}
 
 	// fills in the voltage buffer with familiar voltage most recently set for
 	// stored voltageParams called when user clicks reset voltage on cptoolbar
-	resetVoltage = () => {
+	resetVoltageHandler = (ev) => {
 		const voltageParams = getAGroup('voltageParams');
 		this.setVoltageParams(voltageParams);
 		this.space.vDisp.setFamiliarVoltage(voltageParams);
-		this.space.updateVoltagePath();
+		this.space.updateDrawnVoltagePath();
 	}
 
 	makeVoltageTab = () => {
@@ -345,10 +358,10 @@ export class ControlPanel extends React.Component {
 			setVoltageParams={this.setVoltageParams}
 			showVoltage={p.showVoltage}
 			changeShowVoltage={p.changeShowVoltage}
-			saveMainVoltage={this.saveMainVoltage}
+			setVoltageHandler={this.setVoltageHandler}
 			space={this.space}
-		/>
-	};
+		/>;
+	}
 
 	/* ********************************************** integration frame */
 
@@ -421,6 +434,8 @@ export class ControlPanel extends React.Component {
 
 		let showingTabHtml = this.createShowingTab();
 
+		//showVoltage={p.showVoltage}
+		//changeShowVoltage={p.changeShowVoltage}
 		//setVoltageHandler={this.setVoltageHandler}
 		return <div className='ControlPanel'>
 			<CPToolbar
@@ -430,10 +445,8 @@ export class ControlPanel extends React.Component {
 
 				shouldBeIntegrating={this.shouldBeIntegrating ?? false}
 
-				resetWave={this.resetWave}
-				resetVoltage={this.resetVoltage}
-				showVoltage={p.showVoltage}
-				changeShowVoltage={p.changeShowVoltage}
+				startOverHandler={this.startOverHandler}
+				resetVoltageHandler={this.resetVoltageHandler}
 
 				N={this.N}
 				space={this.space}

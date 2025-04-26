@@ -301,16 +301,13 @@ function VoltArea(props) {
 	}
 
 	// all over squish, need a way to update the voltage line on the main display
-	//if (!p.space.updateVoltagePath) {
-		// use this whenever the voltage buffer changed.  does Not use react;
-		// munges the attr directly
-		//p.space.updateVoltagePath = () => {
-		p.space.updateVoltagePath = function updateVoltagePath() {
-			const pathAttribute = mVD.makeVoltagePathAttribute(mVD.yScale);
-			visibleEl.setAttribute('d', pathAttribute);
-			tactileEl.setAttribute('d', pathAttribute);
-		}
-	//}
+	// Instead of handing the function around, just attach it to the space; everybody has a copy
+	p.space.updateDrawnVoltagePath = function updateDrawnVoltagePath() {
+		debugger;
+		const pathAttribute = mVD.makeVoltagePathAttribute(mVD.yScale);
+		visibleEl.setAttribute('d', pathAttribute);
+		tactileEl.setAttribute('d', pathAttribute);
+	}
 
 	// axis for voltage.  Makes no sense if no axis there.
 	function renderAxes() {

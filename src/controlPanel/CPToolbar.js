@@ -39,13 +39,14 @@ function setPT() {
 
 		shouldBeIntegrating: PropTypes.bool.isRequired,
 
+		startOverHandler: PropTypes.func.isRequired,
+		resetVoltageHandler: PropTypes.func.isRequired,
+		//showVoltage: PropTypes.string.isRequired,
+
 		// these two might be undefined during startup, so get ready to punt
 		N: PropTypes.number,
-		space: PropTypes.instanceOf(eSpace),
-
-		resetWave: PropTypes.func.isRequired,
-		resetVoltage: PropTypes.func.isRequired,
-		//showVoltage: PropTypes.string.isRequired,
+		space: PropTypes.instanceOf(eSpace).isRequired,
+		cPanel: PropTypes.object.isRequired,
 	};
 }
 
@@ -100,10 +101,10 @@ function CPToolbar(props) {
 					resolution {props.N ?? '...'} &nbsp;
 				</div>
 
-				<button onClick={props.resetWave}>Start Over</button>
+				<button onClick={props.startOverHandler}>Start Over</button>
 				&nbsp;
 
-				<button onClick={props.resetVoltage}>
+				<button onClick={props.resetVoltageHandler}>
 					Reset Voltage
 				</button>
 				&nbsp;
