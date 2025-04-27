@@ -39,16 +39,11 @@ struct qThread {
 	 // handler to call in loop; see grWorker.h/cpp
 	 // like this void *(*)(void *)
 	 void *(*handler)(void *);
-	 //void (*handler)(void *);
 	 void *arg;
 
 	 // set true when thread actually starts running after creation.  Only for page startup.
 	 bool confirmed;
 	 void confirmThread(void);
-
-	// the code that each thread runs.  and the thread dies when it returns.
-	// so it should never return.
-	//void threadStart(void);
 
 	// how many have actually been created
 	static int nCreatedThreads;
@@ -59,7 +54,6 @@ struct qThread {
 
 extern "C" {
 	int thread_setupThreads(void);
-	//qThread * thread_createAThread(int serial, qGrinder *grinder);
 }
 
 

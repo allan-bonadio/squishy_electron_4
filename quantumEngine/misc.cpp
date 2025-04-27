@@ -41,7 +41,6 @@ bool traceSpeedyLog = false;
 #define MAX_ONE_LOG_LEN  400
 static char speedyBuf[MAX_BUF_LEN];
 static int speedyCursor = 0;
-//static double startTime = getTimeDouble();
 
 
 void speedyLog(const char* format, ...) {

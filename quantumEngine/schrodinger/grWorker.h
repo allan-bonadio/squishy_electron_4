@@ -50,7 +50,6 @@ struct grWorker {
 	qThread *thread;  // points to corresponding thread
 	qGrinder *grinder;  // all point to the same grinder
 	int serial;  // same as thread serial
-	//bool isDone;  // false while still working
 
 	// makes its own qThread
 	grWorker(qGrinder *gr);

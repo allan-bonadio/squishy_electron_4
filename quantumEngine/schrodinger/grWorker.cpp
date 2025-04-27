@@ -48,7 +48,7 @@ void grWorker::gThreadWork(void) {
 	// wait this doesn't have to be under lock!  it's per-thread.
 	startCalc = getTimeDouble();
 
-	//actually, doing the calculation, single  thread
+	// actually, doing the calculation, single  thread
 	grinder->oneFrame();
 
 	// get endCalc and compare
@@ -94,11 +94,8 @@ void grWorker::gThreadLoop(void) {
 			nWas = emscripten_atomic_add_u32(&grinder->startAtomic, -1);
 			nWas++;
 
-// 			while (atomic_load(&grinder->startAtomic) < 0) ;
 			if (traceSync) speedyLog("🔪 after atomic_add on startAtomic=%d (shdbe 0 or more)\n", nWas);
-			//emscripten_debugger();
 
-			//speedyLog("after increment on startAtomic=%d (shdbe 1 or more)\n", nWas);
 			// I don't think we really need this counting for start....?
 			if (traceStart)
 				speedyLog("🔪 start of work, nStarted=%d\n", nWas);
@@ -128,8 +125,6 @@ void grWorker::gThreadLoop(void) {
 		} catch (std::runtime_error& ex) {
 			//  typically divergence.  JS handles it.  save whole exception
 			grinder->reportException(&ex, "thrown");
-			//integrationEx = ex;
-			//strncpy(exceptionCode, "thrown", sizeof(exceptionCode));
 			printf("🔪 Error (saved to grinder) during gThreadLoop: %s\n", ex.what());
 		}
 	}

@@ -13,11 +13,10 @@
 #include "../schrodinger/qGrinder.h"
 #include "../debroglie/qWave.h"
 #include "../fourier/qSpectrum.h"
-//#include "../greiman/qViewBuffer.h"
 #include "../fourier/fftMain.h"
 #include "../directAccessors.h"
 
-
+// TODO: merge ViewBuffer into this; I think avatar has almost everything, just gotta make sure
 
 static bool traceJustWave = false;
 static bool traceJustInnerProduct = false;
@@ -81,8 +80,6 @@ qAvatar::~qAvatar(void) {
 	delete[] vBuffer;
 	delete qwave;
 	qwave = NULL;
-	//delete qvBuffer;
-	//qvBuffer = NULL;
 };
 
 // need these numbers for the js interface to this object, to figure out the offsets.

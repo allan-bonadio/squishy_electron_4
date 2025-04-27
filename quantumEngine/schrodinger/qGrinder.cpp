@@ -109,8 +109,6 @@ qGrinder::~qGrinder(void) {
 	delete qflick;
 	qflick = NULL;
 
-	//pthread_rwlock_destroy(&masterLock);
-
 	// these may or may not have been allocated, depending on whether they were needed
 	if (qspect)
 		delete qspect;
@@ -489,7 +487,6 @@ void qGrinder::triggerIteration() {
 	// don't let it trigger if already running; might scrw up timing
 	//if (isIntegrating) return;
 
-	//emscripten_debugger();
 	isIntegrating = true;
 
 	// start next iteration
@@ -497,7 +494,6 @@ void qGrinder::triggerIteration() {
 
 	// this is like notify_all
 	emscripten_futex_wake(&startAtomic, 0x7fffffff);
-	// not for pthreads emscripten_atomic_notify(&startAtomic, EMSCRIPTEN_NOTIFY_ALL_WAITERS);
 }
 
 // start iterating, starting each/all gThread threads. Iteration will

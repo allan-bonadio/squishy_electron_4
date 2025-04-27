@@ -93,9 +93,6 @@ struct qGrinder {
 
 	void stepMidpoint(qCx *newW, qCx *oldW, qCx *scratch, double dt);
 
-	// kill high frequencies via FFTs
-	//void fourierFilter(int lowPassFilter);
-
 	// measuring divergence
 	void tallyUpKinks(struct qWave *qwave);
 	void measureDivergence(void);
@@ -133,11 +130,10 @@ struct qGrinder {
 	// In milliseconds, with fractions.  comes from sAnimator.
 	double videoFP;
 
-	// the frame speed most recently chosen by user, as number of
-	// milliseconds. should be a multiple of videoFP (?)  Actually
-	// we use this as an indicator as to whether rate is
-	// 'fastest' qeConsts.FASTEST  Otherwise, the JS triggers a new frame calc based on
-	// rAF.
+	// the frame speed most recently chosen by user, as number of milliseconds.
+	// Might not be a multiple of videoFP.  Actually we use this as an indicator
+	// as to whether rate is 'fastest' qeConsts.FASTEST  Otherwise, the JS
+	// triggers a new frame calc based on rAF.
 	double chosenFP;
 
 	// how long (thread time) it took to do the latest frame, all threads added together
