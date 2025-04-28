@@ -84,30 +84,31 @@ function SetVoltageTab(p) {
 	// drawing symols ⨅ ⨆ vs ⊓ ⊔ they're different!
 	function renderBreedSelector() {
 		const breed = vP.voltageBreed;
-		return <div className='breedSelector' title='Choose the shape of the voltage potential you want to try'>
-			<label>
+		return <div className='breedSelector'
+				title='Choose the shape of the voltage potential you want to try'>
+			<label title="zero everywhere">
+				Flat
 				<input type='radio' className='flatBreed' name='breed'
 					checked={'flat' == breed}
 					onChange={ev => setVoltageParams({voltageBreed: 'flat'}) }/>
-				Flat, zero everywhere
 			</label>
-			<label>
+			<label title="sides will look diagonal if you have low resolution">
+				<big> ⨆</big> Slot
 				<input type='radio' className='slotBreed' name='breed'
 					checked={'slot' == breed}
 					onChange={ev => setVoltageParams({voltageBreed: 'slot'})}/>
-				<big> ⨆</big> Slot
 			</label>
-			<label>
+			<label title="sides will look diagonal if you have low resolution">
+				<big> ⨅</big> Block
 				<input type='radio' className='blockBreed' name='breed'
 					checked={'block' == breed}
 					onChange={ev => setVoltageParams({voltageBreed: 'block'})}/>
-				<big> ⨅</big> Block
 			</label>
-			<label>
+			<label title="x² or √x or similar.  Use this with Well space continuum.">
+				V Canyon
 				<input type='radio' className='canyonBreed' name='breed'
 					checked={'canyon' == breed}
 					onChange={ev => setVoltageParams({voltageBreed: 'canyon'})}/>
-				<big> ⋎</big> Canyon
 			</label>
 		</div>;
 	}
@@ -138,7 +139,8 @@ function SetVoltageTab(p) {
 	// call this to start pointer capture on whichever range slider
 	const startCapture = (ev) => ev.target.setPointerCapture(ev.pointerId);
 
-	// draw minigraph, and wrap it with sliders on both sides, depending on breed
+	// draw minigraph, and wrap it with sliders on all sides, depending on
+	// breed.  All comes in three rows.
 	function renderFirstRow(breed, vMinsMaxes) {
 		return <>
 			{/* only shows for canyon, otherwise blank space */}
@@ -266,7 +268,7 @@ function SetVoltageTab(p) {
 	}
 	//  <sup>{(vP.canyonPower).toFixed(1)}</sup>
 
-  // soon to include: relaxation...
+  // right space.  soon to include: relaxation...
 	function renderMisc() {
 		return <div className='misc'>
 			<ShowVoltageControl showVoltage={showVoltage}
@@ -277,23 +279,25 @@ function SetVoltageTab(p) {
 
 	// remember that set*VoltageHandler is an event handler that gets the
 	// params from ControlPanel state
-	return <div className='setVoltageTab'>
+	return <div className='setVoltageTab controlPanelPanel'>
+		<h3>Design the Voltage Profile</h3>
 		<div className='voltageBreedPanel'>
-			<h3>Set Voltage</h3>
 			{renderBreedSelector()}
 
-      <button onClick={p.setVoltageHandler} >Set Voltage</button>
+			<button onClick={p.setVoltageHandler}
+					title="This will set the main voltage, and save it for next time.">
+				Set Voltage
+		 	</button>
 		</div>
 
-		<div className='divider' />
-
 		{renderMiniGraphPanel()}
-
-		<div className='divider' />
 
 		{renderMisc()}
 	</div>;
 
+	// removed
+	//<div className='divider' />
+	//<div className='divider' />
 }
 
 setPT();

@@ -14,7 +14,8 @@ function setPT() {
 }
 
 function SetResolutionTab(props) {
-	return (<div className='SetResolutionTab'>
+	return (<div className='SetResolutionTab controlPanelPanel'>
+		<h3>Reconfigure the Space</h3>
 		<button className='setResolutionButton'
 			onClick={ev => (props.grinder)
 					&& ResolutionDialog.openResolutionDialog(props.grinder)}>
@@ -22,7 +23,6 @@ function SetResolutionTab(props) {
 			<div style={{fontSize: '.8em'}}>
 				(will reset current wave)</div>
 		</button>
-		<h3>Reconfigure the Space</h3>
 		<p className='discussion'>
 			Squishy Electron's space is a one-dimensional region for an electron to travel in.
 			You can reconfigure this space here, if you want, with different settings.

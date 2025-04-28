@@ -141,23 +141,40 @@
 		}
 	}
 
-
+	// encloses all panels on the right
 	.tabFrame {
 		width: 90%;
 		border: inset #abc 2px;
-		padding: .2em .5em;
+		//padding: .2em .5em;
 		color: #222;
 		background-color: #eef;
 		margin-left: -.2em;
 
 		h3 {
-			margin: .2em;
+			margin-top: 0;
+			margin-bottom: .8em;
 		}
-		h4 {
-			margin: .2em;
-			display: inline-block;
 
-			width: 6em;
+		//none h4 {
+		//	margin: .2em;
+		//	display: inline-block;
+		//
+		//	width: 6em;
+		//	text-align: right;
+		//}
+	}
+
+	// each of the panels
+	.controlPanelPanel {
+		padding: .8em;
+	}
+
+	// the column with the radios for wave breed
+	.breedSelector  {
+		//padding: 1em 0;
+
+		label {
+			display: block;
 			text-align: right;
 		}
 	}
@@ -175,15 +192,9 @@
 	.waveTabCol {
 		float: left;
 		text-align: right;
-		padding: 0 .5em;
+		padding-right: .8em;
 
-		// the column with the radios for wave breed
-		.breedSelector  label {
-			display: block;
-			text-align: right;
-			width: 9em;
-		}
-		
+
 		.setWaveButton {
 		  margin-top: .8em;
 		}
@@ -222,10 +233,6 @@
 				display: block;
 				//line-height: 3em;
 			}
-		}
-
-		.breedSelector {
-			padding: 1em 0;
 		}
 
 		input[type=range]{
@@ -303,7 +310,7 @@
 		.sliderBlock, .iStats {
 			width: 40%;
 			float: left;
-			margin-left: 3em;
+			//margin-left: 3em;
 		}
 
 		.sliderBlock .middle {
@@ -338,7 +345,8 @@
 /* **************************************** Set Resolution tab & dialog */
 
 .setResolutionButton {
-	float: right;
+	float: left;
+	margin: 0 .8em 0 0;
 }
 
 .ResolutionDialog {

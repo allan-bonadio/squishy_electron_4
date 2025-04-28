@@ -50,7 +50,7 @@ function SetIntegrationTab(props) {
 	let mini = alternateMinMaxs.frameSettings.dtStretch.min;
 	let maxi = alternateMinMaxs.frameSettings.dtStretch.max;
 
-	return (<div className='SetIntegrationTab'>
+	return (<div className='SetIntegrationTab controlPanelPanel'>
 		<div className='sliderBlock'>
 			<h3>Integration Controls</h3>
 
