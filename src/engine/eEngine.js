@@ -48,7 +48,7 @@ export let eSpaceCreatedPromise = resetSpaceCreatedPromise();
 //let theSpace;
 
 // called during startup, to create the space.  (Change Resolution reloads app - easier)
-// spaceParams is {N, continuum, spaceLength, label: 'x'}
+// spaceParams is {N, continuum, dimLength, label: 'x'}
 // label=label for this dimension, not the whole space
 export function create1DMainSpace(spaceParams) {
 	try {
@@ -92,10 +92,9 @@ function startUpEverything() {
 	// Create The Space.  Asynchronous, then triggers the eSpaceCreatedPromise.
 	// This can't happen until we have the storeSettings and QEngine funcs, and...
 	create1DMainSpace({
-		...getAGroup('spaceParams'),
-		//	N: getASetting('spaceParams', 'N'),
-		//	continuum: getASetting('spaceParams', 'continuum'),
-		//	spaceLength: getASetting('spaceParams', 'spaceLength'),
+	  N: getASetting('spaceParams', 'N'),
+	  continuum: getASetting('spaceParams', 'continuum'),
+	  dimLength: getASetting('spaceParams', 'dimLength'),
 		label: 'main'});
 
 	if (traceStartup) console.log(`main space 🐣  created`);
