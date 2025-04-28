@@ -62,10 +62,6 @@ export class SquishPanel extends React.Component {
 
 			// the space for this SP.
 			space: null,
-
-			//  this will get filled in when the rAF mesurements get settled down in sAnimator
-			// TODO: this should be a global, cuz screen refresh rate is shared by all SPs
-			frameRateMenuFreqs: null,
 		};
 
 		// um, I think we want multiple things in the space context.  The space,
@@ -90,9 +86,7 @@ export class SquishPanel extends React.Component {
 			this.space = space;
 			this.setState({space});  // maybe i don't need this if it's in the context?
 
-			// CPToolbar needs frameRateMenuFreqs to draw the menu.  If it exists yet.
-			const pickupFreqs = (freqs) => this.setState({frameRateMenuFreqs: freqs});
-			this.animator = new sAnimator(this, space, pickupFreqs);
+			this.animator = new sAnimator(this, space);
 
 			this.mainEAvatar = space.mainEAvatar;
 			this.grinder = space.grinder;
@@ -206,7 +200,6 @@ export class SquishPanel extends React.Component {
 					repaintWholeMainWave={this.repaintWholeMainWave}
 
 					iStats={this.iStats}
-					frameRateMenuFreqs={s.frameRateMenuFreqs}
 					animator={this.animator}
 					sPanel={this}
 				/>

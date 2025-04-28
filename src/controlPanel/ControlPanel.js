@@ -19,7 +19,7 @@ import qeConsts from '../engine/qeConsts.js';
 import {interpretCppException, wrapForExc} from '../utils/errors.js';
 
 let traceSetPanels = false;
-let traceStartStop = false;
+let traceStartStop = true;
 
 
 
@@ -46,10 +46,6 @@ export class ControlPanel extends React.Component {
 
 		// sAnimator
 		animator: PropTypes.object,
-
-		//sPanel: PropTypes.object.isRequired,
-
-		frameRateMenuFreqs: PropTypes.array,
 	}
 
 	constructor(props) {
@@ -441,7 +437,6 @@ export class ControlPanel extends React.Component {
 			<CPToolbar
 				chosenRate={1000. / s.chosenFP}
 				setChosenRate={this.setChosenRate}
-				frameRateMenuFreqs={p.frameRateMenuFreqs}
 
 				shouldBeIntegrating={this.shouldBeIntegrating ?? false}
 

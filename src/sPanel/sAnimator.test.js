@@ -36,11 +36,11 @@ describe(`sAnimator recalcFrameMenuRates() `, () => {
 	])(`testing recalcFrameMenuRates videoFP=%f freq=%f`,
 	({videoFP, expFirst, list}) => {
 		//console.log(`the dummy SA is: `, dummySA);
-		//console.log(`the dummySA.frameRateMenuFreqs is: `, dummySA.frameRateMenuFreqs);
-		recalcFrameMenuRates(videoFP);
-		expect(dummySA.frameRateMenuFreqs[0]).toEqual(qeConsts.FASTEST);
-		expect(dummySA.frameRateMenuFreqs[1]).toEqual(expFirst);
-		expect(dummySA.frameRateMenuFreqs).toEqual(list);
+		// obsolete
+		//recalcFrameMenuRates(videoFP);
+		//expect(dummySA.frameRateMenuFreqs[0]).toEqual(qeConsts.FASTEST);
+		//expect(dummySA.frameRateMenuFreqs[1]).toEqual(expFirst);
+		//expect(dummySA.frameRateMenuFreqs).toEqual(list);
 	},
 	10_000);
 

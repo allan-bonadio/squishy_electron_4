@@ -9,7 +9,7 @@ import eSpace from '../engine/eSpace.js';
 //import {ShowVoltageControl} from './SetVoltageTab.js';
 import qeConsts from '../engine/qeConsts.js';
 
-let traceCPToolbar = false;
+let traceCPToolbar = true;
 
 window.dbLog = console.log;
 
@@ -35,7 +35,6 @@ function setPT() {
 	CPToolbar.propTypes = {
 		chosenRate: PropTypes.number.isRequired,
 		setChosenRate: PropTypes.func.isRequired,
-		frameRateMenuFreqs: PropTypes.array,
 
 		shouldBeIntegrating: PropTypes.bool.isRequired,
 
@@ -50,16 +49,18 @@ function setPT() {
 	};
 }
 
+// the frame rate menu
+const menuFreqs = [
+		qeConsts.FASTEST,
+		60, 30, 20, 10, 5, 2,
+		1, 1/2, 1/5, 1/10, 1/20, 1/30, 1/60];
+const rateOptions = menuFreqs.map(freq => optionForFreq(freq));
+
 function CPToolbar(props) {
 	if (traceCPToolbar)
 		dbLog(`🧰 CPToolbar(props=`, props, `) `);
-	let {chosenRate, setChosenRate, frameRateMenuFreqs} = props;
+	let {chosenRate, setChosenRate} = props;
 
-	// early on, the animator isn't there, nor this variable, so supply a lame but effective default
-	frameRateMenuFreqs ??= [60, 8, 1, 1/60];
-
-	// these are just startup defaults; see sAnimator.js for how it's actually set based on scan rate
-	const rateOptions = frameRateMenuFreqs.map(freq => optionForFreq(freq));
 
 	let runningClass = props.shouldBeIntegrating ? 'running' : '';
 	return <div className='CPToolbar'>
