@@ -39,7 +39,8 @@
 		}
 	}
 
-
+	/* **************************************** CPToolbar:  */
+// directly south of the canvas
 
 	.CPToolbar {
 		float: none;
@@ -95,6 +96,7 @@
 
 		/* **************************************** other */
 
+    // i don't think these are used anymore
 		.cpSlider {
 			display: inline-block;
 			width: 26em;
@@ -371,8 +373,8 @@
 		grid-area: continuum;
 	}
 	// the space quantum width text box, in nm
-	.spaceLength {
-		grid-area: spaceLength;
+	.dimLength {
+		grid-area: dimLength;
 		text-align: right;
 		input {
 			width: 6em;
@@ -403,7 +405,7 @@
 			div.note {
 				max-width: 12em;
 			}
-			.spaceLength { display: none; }
+			.dimLength { display: none; }
 			.continuum {
 				.continuumTitle { display: none};
 				display: flex;
@@ -422,7 +424,7 @@
 		grid-template-areas:
 			" header header"
 			"resolutionSlider resolutionSlider "
-			"  continuum  spaceLength "
+			"  continuum  dimLength "
 			"  . okCancel ";
 
 		.continuum label {
