@@ -393,7 +393,7 @@ export class ControlPanel extends React.Component {
 			return this.makeVoltageTab();
 
 		case 'space':
-			return <SetResolutionTab grinder={this.grinder}/>;
+			return <SetResolutionTab grinder={this.grinder}  space={this.space} />;
 
 		case 'integration':
 			return this.makeIntegrationTab();
