@@ -57,7 +57,7 @@ struct qGrinder {
 
 	/* ************************* FFT to checkout momentum */
 
-  // call if/when you need the spectrum buffer.  Only one; kept forever
+	// call if/when you need the spectrum buffer.  Only one; kept forever
 	struct qSpectrum *getSpectrum(void);
 
 	// set pleaseFFt from JS (only if in the middle of frame)

@@ -29,14 +29,12 @@ I get it.  Standing wave freq 0 => nans.
 
 😡😡- StartOver sometimes displays a kinked wave - cick a second time and it's ok
 
-😡😡- now params work instantaneously - re-institute the SetVolt and SetWave mechanisms.
-😡😡-   And, stick the buttons at the lower left.
-
 ## GL & WaveView
 
 😡- left tic marks rarely draw.
 
 😡😡- WELL: last points on ends have no ink so there's this black acute triangle instead of color
+	NO!  That's correct.  The well wave goes to zero on the ends.
 
 - display Garland Spiral in 3d could be easy.
 	Really should use Three.js
@@ -49,11 +47,8 @@ I get it.  Standing wave freq 0 => nans.
 
 😡- the Start and Stop icons are totally bozo on Firefox.  Time to overhaul them.
 
-😡😡- Start Over should restart time & frame number
 
 ## Voltage
-
-😀- voltage setting doesn't work anymore!?!?  There's something wrong - I think too many voltage buffers and the setting never gets to the grinder?  no I think voltages just need to be really high.  Switch to kilovolts.
 
 - voltage area: dragging beyond bounds should expand scale.  Actually,
 now, it just breaks stuff and gives you a really low or high boundary.
@@ -115,7 +110,7 @@ total kinetic
 
 
 - ability to create two wave functions and superimpose them, with varying complex ratio between.
-  In the wave panel.  maybe only with wave params at first
+	In the wave panel.  maybe only with wave params at first
 
 - ability to 'stick your finger in' and measure a state variable and thereby change the state.  You mean, like a dirac delta?!?!?!  naawwww
 

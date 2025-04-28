@@ -168,7 +168,7 @@ float qAvatar::loadViewBuffer(void) {
 	qCx *wave = qwave->wave;
 
 	int nPoints = space->nPoints;
-	double highest = 0;
+	double highest = 0;  // actually the highest squared; don't want to do sqrt in the loop
 	double tiny = 1;
 
 	if (traceInDetail) {

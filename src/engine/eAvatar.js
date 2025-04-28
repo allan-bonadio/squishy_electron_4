@@ -55,6 +55,7 @@ class eAvatar {
 	get _vBuffer() { return this.ints[4]; }
 	get _label() { return this.pointer + 20; }
 
+
 	/* **************************** end of direct accessors */
 
 	// this just gets the pointer to the view buffer...  the JS array

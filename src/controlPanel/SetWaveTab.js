@@ -189,7 +189,7 @@ class SetWaveTab extends React.Component {
 		return <div className='SetWaveTab'>
 			<div className='waveTabCol '>
 				<h3>Design a<br/>new Wave</h3>
-  			{breedSelector}
+				{breedSelector}
 				<button className='setWaveButton' onClick={ev => this.saveMainWave(this.state)}>
 						Set Wave
 				</button>
