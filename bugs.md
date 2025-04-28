@@ -27,7 +27,7 @@ I get it.  Standing wave freq 0 => nans.
 
 - need a hamburger menu for things like the above.
 
-😡😡- startOverHandler sometimes displays a kinked wave - cick a second time and it's ok
+😡😡- startOverHandler sometimes displays a kinked wave - click a second time and it's ok
 
 ## GL & WaveView
 
