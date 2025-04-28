@@ -162,11 +162,15 @@ void qSpace::formatDirectOffsets(void) {
 	makeNamedIntGetter(continuum, dimensions[0].continuum);  // until 2nd D
 	makeNamedIntGetter(start, dimensions[0].start);  // until 2nd D
 	makeNamedIntGetter(end, dimensions[0].end);  // until 2nd D
-	makeNamedIntGetter(nStates0, dimensions[0].nStates);
-	makeNamedIntGetter(nPoints0, dimensions[0].nPoints);
-	makeNamedIntGetter(spectrumLength0, dimensions[0].spectrumLength);
-	makeNamedDoubleGetter(dx0, dimensions[0].dx);  // until 2nd D
-	makeNamedStringPointer(label0, dimensions[0].label);
+	makeNamedDoubleGetter(dimLength, dimensions[0].dimLength);  // until 2nd D
+
+//	makeNamedIntGetter(nStates0, dimensions[0].nStates);
+//	makeNamedIntGetter(nPoints0, dimensions[0].nPoints);
+//	makeNamedIntGetter(spaceLength0, dimensions[0].dimLength);
+//
+//	makeNamedIntGetter(spectrumLength0, dimensions[0].spectrumLength);
+//	makeNamedDoubleGetter(dx0, dimensions[0].dx);  // until 2nd D
+//	makeNamedStringPointer(label0, dimensions[0].label);
 
 
 	/* *********************************************** scalars */
@@ -177,7 +181,6 @@ void qSpace::formatDirectOffsets(void) {
 	makeIntGetter(nDimensions);
 	makeIntGetter(nStates);
 	makeIntGetter(nPoints);
-	makeIntGetter(spectrumLength);
 
 	makePointerGetter(mainAvatar);
 	makePointerGetter(miniGraphAvatar);

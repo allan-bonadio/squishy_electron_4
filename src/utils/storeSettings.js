@@ -185,7 +185,7 @@ export function createStoreSettings() {
 	makeParam('spaceParams', 'N', 64,  N => isPowerOf2(N) );
 	makeParam('spaceParams', 'continuum', qeConsts.contENDLESS,
 		[qeConsts.contDISCRETE, qeConsts.contWELL, qeConsts.contENDLESS]);
-	makeParam('spaceParams', 'spaceLength', 16, {min: 1e-3, max: 1e7});
+	makeParam('spaceParams', 'dimLength', 16, {min: 1e-3, max: 1e7});
 
 	/* ************************************ waveParams */
 

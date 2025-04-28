@@ -53,6 +53,9 @@ public:
 	// includes boundaries.
 	int nPoints;
 
+	// actual distance, in nanometers, of the whole dimension
+	double dimLength;
+
 	// nanometers separating data points.  Named dx even if this coordinate is y or z.
 	// Not used if this is a discrete coordinate.
 	double dx;

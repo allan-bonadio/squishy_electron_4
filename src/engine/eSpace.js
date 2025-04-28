@@ -23,6 +23,7 @@ export class eDimension {
 	constructor(dim) {
 		this.N = dim.N;
 		this.continuum = dim.continuum;
+		this.dimLength = dim.dimLength;
 		this.label = dim.label;
 
 		this.start = this.continuum ? 1 : 0;
@@ -55,7 +56,7 @@ export class eSpace {
 		// make each dimension (someday there'll be more than 1)
 		//let nPoints = 1, nStates = 1;
 		this.dimensions = dims.map(d => {
-				qeFuncs.addSpaceDimension(this.pointer, d.N, d.continuum, d.spaceLength, d.label);  // c++
+				qeFuncs.addSpaceDimension(this.pointer, d.N, d.continuum, d.dimLength, d.label);  // c++
 
 				let dim = new eDimension(d)
 				return dim;
@@ -135,20 +136,15 @@ export class eSpace {
 	get continuum() { return this.ints[3]; }
 	get start() { return this.ints[4]; }
 	get end() { return this.ints[5]; }
-	get nStates0() { return this.ints[6]; }
-	get nPoints0() { return this.ints[7]; }
-	get spectrumLength0() { return this.ints[12]; }
-	get dx0() { return this.doubles[4]; }
-	get _label0() { return this.pointer + 52; }
-	get dt() { return this.doubles[18]; }
-	get nDimensions() { return this.ints[38]; }
-	get nStates() { return this.ints[39]; }
-	get nPoints() { return this.ints[40]; }
-	get spectrumLength() { return this.ints[41]; }
-	get _mainAvatar() { return this.ints[42]; }
-	get _miniGraphAvatar() { return this.ints[43]; }
-	get _qgrinder() { return this.ints[44]; }
-	get _label() { return this.pointer + 180; }
+	get dt() { return this.doubles[20]; }
+	get nDimensions() { return this.ints[42]; }
+	get nStates() { return this.ints[43]; }
+	get nPoints() { return this.ints[44]; }
+	get dimLength() { return this.doubles[4]; }
+	get _mainAvatar() { return this.ints[46]; }
+	get _miniGraphAvatar() { return this.ints[47]; }
+	get _qgrinder() { return this.ints[48]; }
+	get _label() { return this.pointer + 196; }
 
 	/* **************************** end of direct accessors */
 
@@ -157,7 +153,7 @@ export class eSpace {
 	get startEnd() {
 		const dim = this.dimensions[0];
 		return {start: dim.start, end: dim.end, N: dim.N, nPoints: this.nPoints,
-			continuum: dim.continuum};
+			continuum: dim.continuum, dimLength: dim.dimLength};
 	}
 
 	// this will return the DOUBLE of start and end so you can just loop thru += 2
@@ -167,7 +163,7 @@ export class eSpace {
 	get startEnd2() {
 		const dim = this.dimensions[0];
 		return {start2: dim.start*2, end2: dim.end*2, N: dim.N, nPoints2: this.nPoints * 2,
-			continuum: dim.continuum};
+			continuum: dim.continuum, dimLength: dim.dimLength};
 	}
 }
 

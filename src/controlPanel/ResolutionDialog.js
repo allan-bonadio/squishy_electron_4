@@ -31,7 +31,7 @@ export default class ResolutionDialog extends React.Component {
 			powerIndex: powerToIndex(16, N),
 			continuum: getASetting('spaceParams', 'continuum'),
 			origN: N,
-			spaceLength: getASetting('spaceParams', 'spaceLength'),
+			dimLength: getASetting('spaceParams', 'dimLength'),
 		};
 	}
 
@@ -80,8 +80,8 @@ export default class ResolutionDialog extends React.Component {
 				// this is the 0-th dimension of the space, the x axis
 				finalParams.label = 'x';
 
-				let {N, continuum, spaceLength} = finalParams;
-				storeAGroup('spaceParams',  {N, continuum, spaceLength});
+				let {N, continuum, dimLength} = finalParams;
+				storeAGroup('spaceParams',  {N, continuum, dimLength});
 				location = location;   // reload page
 			},  // end of OK callback
 
@@ -162,16 +162,16 @@ export default class ResolutionDialog extends React.Component {
 
 
 	renderSpaceLength() {
-		return <section className='spaceLength'>
+		return <section className='dimLength'>
 			<label className='spaceLengthLabel'>
 				Space Length: &nbsp;
-				<input value={this.state.spaceLength} placeholder='Fill in length'
-					onChange={ev => this.setState({spaceLength: ev.target.value}) }
+				<input value={this.state.dimLength} placeholder='Fill in length'
+					onChange={ev => this.setState({dimLength: ev.target.value}) }
 					size='4' />
 				&nbsp; nm
 				<div className='note'>
 					<small>Total length, in nanometers, of space, resulting in &nbsp;
-					{(this.state.spaceLength / this.state.N).toPrecision(4)}&nbsp;nm
+					{(this.state.dimLength / this.state.N).toPrecision(4)}&nbsp;nm
 					distance between points.</small>
 				</div>
 			</label>

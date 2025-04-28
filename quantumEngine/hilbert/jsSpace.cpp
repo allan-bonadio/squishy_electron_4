@@ -11,7 +11,7 @@
 #include "../debroglie/qWave.h"
 #include "../greiman/qViewBuffer.h"
 
-static bool traceSpaceCreation = false;
+static bool traceSpaceCreation = true;
 static bool traceAvatarDetail = false;
 
 /* ********************************************************** glue functions for js */
@@ -47,12 +47,15 @@ qSpace *startNewSpace(const char *label) {
 }
 
 // call this from JS to add one or more dimensions
-void addSpaceDimension(qSpace *space, int N, int continuum, double spaceLength, const char *label) {
+void addSpaceDimension(qSpace *space, int N, int continuum, double dimLength, const char *label) {
 	// each datapoint represents a piece of the length dx wide, with dx/2 before the center datapoint and dx/2 after.
-	double dx = spaceLength / N;
+	int nSegments = N;
+	if (contWELL == continuum)
+	  nSegments--;
+	double dx = dimLength / nSegments;
 
-	if (traceSpaceCreation) printf("🚀 addSpaceDimension(N=%d, cont=%d, spaceLength-%lf=>%lf=dx, %s)\n",
-		N, continuum, spaceLength, dx, label);
+	if (traceSpaceCreation) printf("🚀 addSpaceDimension(N=%d, cont=%d, dimLength-%lf=>%lf=dx, %s)\n",
+		N, continuum, dimLength, dx, label);
 	space->addDimension(N, continuum, dx, label);
 }
 
