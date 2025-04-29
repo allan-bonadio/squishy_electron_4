@@ -62,10 +62,6 @@ export class SquishPanel extends React.Component {
 
 			// the space for this SP.
 			space: null,
-
-			//  this will get filled in when the rAF mesurements get settled down in sAnimator
-			// TODO: this should be a global, cuz screen refresh rate is shared by all SPs
-			frameRateMenuFreqs: null,
 		};
 
 		// um, I think we want multiple things in the space context.  The space,
@@ -90,9 +86,7 @@ export class SquishPanel extends React.Component {
 			this.space = space;
 			this.setState({space});  // maybe i don't need this if it's in the context?
 
-			// CPToolbar needs frameRateMenuFreqs to draw the menu.  If it exists yet.
-			const pickupFreqs = (freqs) => this.setState({frameRateMenuFreqs: freqs});
-			this.animator = new sAnimator(this, space, pickupFreqs);
+			this.animator = new sAnimator(this, space);
 
 			this.mainEAvatar = space.mainEAvatar;
 			this.grinder = space.grinder;
@@ -164,7 +158,7 @@ export class SquishPanel extends React.Component {
 	// idle times if waveParams change. call this when you change both the GL and iter
 	// and elapsed time. We need it here in SquishPanel cuz it's often called in
 	// ControlPanel but affects WaveView
-	redrawWholeMainWave = () => {
+	repaintWholeMainWave = () => {
 		let avatar = this.mainEAvatar;
 		let grinder = this.grinder;
 
@@ -181,9 +175,9 @@ export class SquishPanel extends React.Component {
 	// voltageParams change. call this when you change voltageParams to a familiar one. We need it
 	// here in SquishPanel cuz it's often called in ControlPanel but affects
 	// WaveView
-	rerenderWholeMainVoltage = (voltageParams) => {
-
-	}
+	//rerenderWholeMainVoltage = (voltageParams) => {
+	//	debugger;
+	//}
 
 	render() {
 		const p = this.props;
@@ -203,11 +197,9 @@ export class SquishPanel extends React.Component {
 					showVoltage={s.showVoltage}
 					changeShowVoltage={this.changeShowVoltage}
 
-					redrawWholeMainWave={this.redrawWholeMainWave}
-					rerenderWholeMainVoltage={this.rerenderWholeMainVoltage}
+					repaintWholeMainWave={this.repaintWholeMainWave}
 
 					iStats={this.iStats}
-					frameRateMenuFreqs={s.frameRateMenuFreqs}
 					animator={this.animator}
 					sPanel={this}
 				/>
@@ -215,6 +207,7 @@ export class SquishPanel extends React.Component {
 		);
 		//<this.spaceCtx.Provider value={s.space}>
 		//</this.spaceCtx.Provider>
+		//			rerenderWholeMainVoltage={this.rerenderWholeMainVoltage}
 	}
 }
 

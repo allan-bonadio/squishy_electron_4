@@ -186,9 +186,10 @@ class SetWaveTab extends React.Component {
 			</label>*/}
 		</div>;
 
-		return <div className='SetWaveTab'>
+		return <div className='SetWaveTab  controlPanelPanel'
+		  		title="This will set the main wave, and save it for next time.">
+			<h3>Design a new Wave</h3>
 			<div className='waveTabCol '>
-				<h3>Design a<br/>new Wave</h3>
 				{breedSelector}
 				<button className='setWaveButton' onClick={ev => this.saveMainWave(this.state)}>
 						Set Wave
@@ -196,11 +197,9 @@ class SetWaveTab extends React.Component {
 			</div>
 
 			<div className='waveTabCol'>
-				&nbsp;
 				<div className='waveMiniGraph'>
 					{glScene}
 				</div>
-
 			</div>
 
 			<div className='waveTabCol waveParamSliders'>

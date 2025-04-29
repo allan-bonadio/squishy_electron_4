@@ -146,8 +146,6 @@ class App extends React.Component {
 		if (s.cppRunning) {
 			// real squishpanel
 			sqPanel = <SquishPanel id='theSquishPanel' bodyWidth={this.bodyWidth} />;
-			//sqPanel = <SquishPanel id='theSquishPanel' width={s.bodyWidth} />;
-			//if (this.appEl?.bodyWidth != document.body.clientWidth)
 			if (traceResize) {
 				console.log(`🍦 App renders SquishPanel when cppRunning, `
 					+`body.clientWidth=${document.body.clientWidth}  `

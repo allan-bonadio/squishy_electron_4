@@ -37,7 +37,8 @@ function SetResolutionTab(props) {
 	  segmentsBetweenEnds = spa.N;
 	}
 
-	return (<div className='SetResolutionTab'>
+	return (<div className='SetResolutionTab controlPanelPanel'>
+		<h3>Reconfigure the Space</h3>
 		<button className='setResolutionButton'
 			onClick={ev => (props.grinder)
 					&& ResolutionDialog.openResolutionDialog(props.grinder)}>

@@ -103,17 +103,29 @@ class eGrinder {
 	// call this to trigger all the threads to do the next iteration.  We COULD do this in C++
 	// but the Atomics api can do it, too.
 	triggerIteration() {
-		if (traceTriggerIteration) {
-			console.log(`🪚 eGrinder.triggerIteration, ${this.pointer.toString(16)} starting  `
-				+`shouldBeIntegrating=${this.shouldBeIntegrating}  isIntegrating=${this.isIntegrating} `
-				+`voltageFactor=${this.voltageFactor}`);
-		}
-		Atomics.store(this.ints, this.startAtomicOffset, 0);
-		let nWoke = Atomics.notify(this.ints, this.startAtomicOffset);
-		//console.log(`🎥 nWoke:`, nWoke);
 
-		// old way: doing it by C++
-		//qeFuncs.this_triggerIteration(this.pointer);
+		if (false) {
+			if (traceTriggerIteration) {
+				console.log(`🪚 eGrinder.triggerIteration, Atomics.notify() starting  `
+					+`shouldBeIntegrating=${this.shouldBeIntegrating}  isIntegrating=${this.isIntegrating} `
+					+`voltageFactor=${this.voltageFactor}`);
+			}
+
+			// the 'new' way: triggering it in JS with Atomics api
+			Atomics.store(this.ints, this.startAtomicOffset, 0);
+			let nWoke = Atomics.notify(this.ints, this.startAtomicOffset);
+			//console.log(`🎥 nWoke:`, nWoke);
+		}
+		else {
+			// old way: doing it by C++
+			if (traceTriggerIteration) {
+				console.log(`🪚 eGrinder.triggerIteration,  starting  qeFuncs.grinder_triggerIteration()`
+					+`shouldBeIntegrating=${this.shouldBeIntegrating}  isIntegrating=${this.isIntegrating} `
+					+`voltageFactor=${this.voltageFactor}`);
+			}
+
+			qeFuncs.grinder_triggerIteration(this.pointer);
+		}
 
 		if (qeConsts.grSENTINEL_VALUE !== this.sentinel)
 			throw "🔥 🔥 Grinder offsets aren't correct (119) 🔥 🔥";

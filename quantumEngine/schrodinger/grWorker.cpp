@@ -9,11 +9,11 @@
 #include "grWorker.h"
 
 static bool traceStart = false;
-static bool traceWork = false;
-static bool traceFinish = false;
-static bool traceSync = false;
+static bool traceFinish = true;
+static bool traceSync = true;
 static bool traceCreation = false;
 
+static bool traceWork = true;
 static bool traceWorkOccasionally = false;
 static int occasionally = 0;
 
@@ -48,7 +48,7 @@ void grWorker::gThreadWork(void) {
 	// wait this doesn't have to be under lock!  it's per-thread.
 	startCalc = getTimeDouble();
 
-	//actually, doing the calculation, single  thread
+	// actually, doing the calculation, single  thread
 	grinder->oneFrame();
 
 	// get endCalc and compare
@@ -68,9 +68,9 @@ void grWorker::gThreadLoop(void) {
 		try {
 			int nWas;
 
-			// this thread will freeze here until startMx is unlocked, at start of iteration.
-			// All other gThread threads will also be waiting for startMx.  When this one gets its chance,
-			// it'll lock and unlock, then start its integration work.
+			// this thread will freeze here until startAtomic is unlocked, at start of iteration.
+			// All other gThread threads will also be waiting for startAtomic.  When this one gets its chance,
+			// it'll be unlocked, then start its integration work.
 			// so they all start at roughly the same time.
 			if (traceSync) {
 				speedyLog("🏁 🔪 at Starting Gate in grWorker::gThreadLoop "
@@ -79,29 +79,22 @@ void grWorker::gThreadLoop(void) {
 			}
 			speedyFlush();
 
-			// wait forever to get notified, when startAtomic changes from -1 to zero
-			// emscripten_atomic_wait_u32() doesn't work here so use the futex call
-			int howEnded = emscripten_futex_wait(&grinder->startAtomic, -1, 1e12);
+			// this wait will stop when notify is sent to it.
+			// eGrinder.triggerIteration() or qeFuncs.grinder_triggerIteration
+			int waitCode = emscripten_atomic_wait_u32(&grinder->startAtomic, -1, 60000);
+			if (waitCode != ATOMICS_WAIT_OK)
+				printf("😵‍ emscripten_atomic_wait_u32 didn't return OK: %d\n", waitCode);
 
-			if (traceSync) {
-				speedyLog("🏁 🔪 after atomic wait on startAtomic=%d (shdbe 0) and wait "
-					"returned howEnded=%d ok=0, ≠1, timeout= ∞  🏁\n",
-					emscripten_atomic_load_u32(&grinder->startAtomic), howEnded);
-			}
-			speedyFlush();
+			// now we count each thread as it starts up (shoulda been at -1 = stopped)
 
-			// now we count each thread as it starts up
-			nWas = emscripten_atomic_add_u32(&grinder->startAtomic, -1);
-			nWas++;
+			nWas = emscripten_atomic_add_u32(&grinder->startAtomic, 1);
 
-// 			while (atomic_load(&grinder->startAtomic) < 0) ;
-			if (traceSync) speedyLog("🔪 after atomic_add on startAtomic=%d (shdbe 0 or more)\n", nWas);
-			//emscripten_debugger();
 
-			//speedyLog("after increment on startAtomic=%d (shdbe 1 or more)\n", nWas);
+			if (traceSync) speedyLog("🔪 after atomic_add on startAtomic nWas =%d (shdbe 0 or more)\n", nWas);
+
 			// I don't think we really need this counting for start....?
 			if (traceStart)
-				speedyLog("🔪 start of work, nStarted=%d\n", nWas);
+				speedyLog("🔪 start of work, nStarted=%d,  nWas=%d\n", grinder->startAtomic, nWas);
 			speedyFlush();
 
 			gThreadWork();
@@ -128,8 +121,6 @@ void grWorker::gThreadLoop(void) {
 		} catch (std::runtime_error& ex) {
 			//  typically divergence.  JS handles it.  save whole exception
 			grinder->reportException(&ex, "thrown");
-			//integrationEx = ex;
-			//strncpy(exceptionCode, "thrown", sizeof(exceptionCode));
 			printf("🔪 Error (saved to grinder) during gThreadLoop: %s\n", ex.what());
 		}
 	}

@@ -24,23 +24,11 @@ static void *tStart(void *qtx) {
 	// MY qThread object
 	qThread *qt = (qThread *) qtx;
 	qt->confirmThread();
-	//printf("🐴 qThread::ok confirmed in tStart #%d!\n", qt->serial);
 
 	// since this is the thread execcuting, it should show up in its log in the debugger?
 	if (traceThreads) qt->dumpAThread("thread starting up()");
 
 	(*qt->handler)(qt->arg);
-
-//	emscripten_set_main_loop_arg(
-//		&mainLooper,
-//		qt,  // argument
-//		-1,   // fps, or -1 to run off of Req Ani Frame
-//		false);
-//	// so does that ever return?  Tryna prevent the thread going away
-//
-//	// I guess we don't get here until ... I dunno
-//	printf("🦒  💥 🌪 emscripten_set_main_loop_arg() finished ️"
-//		"I guess we don't get here until ... I dunno\n");
 
 	// wait,np this ends the thread....
 	return NULL;
@@ -57,8 +45,6 @@ qThread::qThread(void *(*hand)(void *), void *ar)
 	if (traceThreads)
 		printf("🐴 qThread::qThread(%d) constructor...hand=%p   ar=%p\n",
 			serial, hand, ar);
-
-	//qThread();
 
 	//	dunno if we'll ever get any
 	if (errorCode) {
@@ -97,7 +83,6 @@ void qThread::dumpAThread(const char *title) {
 
 // js runs this in the beginning
 int thread_setupThreads(void) {
-
 	return MAX_THREADS;
 };
 

@@ -369,7 +369,8 @@ export class voltDisplay {
 
 		if (!isFinite(y0_1)) {
 			// needs correction
-			console.warn(`voltage ${y0_1 * EFFECTIVE_VOLTS} not finite at x=${ix} ${JSON.stringify(voltageParams)}
+			console.warn(`voltage ${y0_1 * EFFECTIVE_VOLTS} not finite at x=${ix} `
+			+`${JSON.stringify(voltageParams)}
 				ix - offset=${ix - offset}
 				x ** ${canyonPower}=${Math.pow(ix - offset, canyonPower)}
 				x ** ${canyonPower} * ${canyonScale}=
@@ -383,9 +384,10 @@ export class voltDisplay {
 		let {voltageCenter, voltageBreed, canyonPower, canyonScale,
 			slotScale, slotWidth} = voltageParams;
 		if (canyonPower == undefined || canyonScale == undefined || slotScale == undefined
-			|| voltageCenter == undefined)
-			throw `bad Voltage params: slotScale=${slotScale}, canyonPower=${canyonPower},
-				canyonScale=${canyonScale}, voltageCenter=${voltageCenter}`;
+			|| voltageCenter == undefined) {
+debugger;
+			throw `bad Voltage params: slotScale=${slotScale}, canyonPower=${canyonPower},`
+			+`canyonScale=${canyonScale}, voltageCenter=${voltageCenter}`;}
 
 		if (traceFamiliar)
 			console.log(`⚡️ starting setFamiliarVoltage(`, voltageParams);

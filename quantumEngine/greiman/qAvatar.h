@@ -38,9 +38,6 @@ struct qAvatar {
 	// the gl buffer, not the qWave buffer.  always dynamically allocated.
 	float *vBuffer;  // aligned by 4 for single floats, not 8
 
-	// rename to initThreadIntegration
-	//void initIntegrationLoop(int xxx, int nThreads, int nStages);
-
 	// for alignment: put the rest of these last
 
 	// mostly for debugging

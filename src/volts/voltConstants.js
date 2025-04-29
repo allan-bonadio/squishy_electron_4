@@ -8,7 +8,7 @@
 // and slow it or stop it progressing across the space.  Adjust if voltages change.
 // this is NOT the maximum voltage; see storeSettings.js
 // Adjust this subjectively to fit.
-export let EFFECTIVE_VOLTS = 4000;
+export let EFFECTIVE_VOLTS = 10000;
 
 // used for default graphical limits
 export let AMPLE_VOLTS = 4 * EFFECTIVE_VOLTS;

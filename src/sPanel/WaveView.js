@@ -27,7 +27,7 @@ let traceBumpers = false;
 
 let traceScaling = false;
 let traceDragCanvasHeight = false;
-let traceWidth = false;
+let traceWidth = true;
 
 const CANVAS_BORDER_THICKNESS = 1;
 const DOUBLE_THICKNESS = 2 * CANVAS_BORDER_THICKNESS;
@@ -54,7 +54,6 @@ export class WaveView extends React.Component {
 	constructor(props) {
 		super(props);
 		checkPropTypes(this.constructor.propTypes, props, 'prop', this.constructor.name);
-		PropTypes.checkPropTypes(WaveView.propTypes, props, 'prop', 'GLScene');
 
 		// is this a bad idea?
 		this.sPanel = props.sPanel;

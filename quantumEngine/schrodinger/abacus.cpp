@@ -71,7 +71,7 @@ C) average G+1 and G+2 into G+3.  Can't reuse G+2 cuz neighboring threads need o
 
 */
 
-
+2
 
 /* ************************************************************ edges */
 

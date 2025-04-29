@@ -27,14 +27,13 @@ I get it.  Standing wave freq 0 => nans.
 
 - need a hamburger menu for things like the above.
 
-😡😡- StartOver sometimes displays a kinked wave - cick a second time and it's ok
+😡😡- startOverHandler sometimes displays a kinked wave - click a second time and it's ok
 
 ## GL & WaveView
 
 😡- left tic marks rarely draw.
 
-😡😡- WELL: last points on ends have no ink so there's this black acute triangle instead of color
-	NO!  That's correct.  The well wave goes to zero on the ends.
+- WELL: last points on ends have no ink so there's this black acute triangle instead of color.  No that's right - i's zero at the ends
 
 - display Garland Spiral in 3d could be easy.
 	Really should use Three.js
@@ -57,7 +56,6 @@ Needs fixing.
 - option to have voltage relax back to zero (or whatever's set in the
 tab)
 
-😡- reset voltage doesn't reset voltage range ?? do we want this?  no, cuz user wants to redo in the same realm
 
 
 ## Space and Integration
