@@ -139,8 +139,6 @@ class App extends React.Component {
 	render() {
 		const s = this.state;
 
-		if (!this.bodyWidth) debugger;
-
 		// until things start up.  Must always have a className theSquishPanel for tooOldTerminate()
 		let sqPanel;
 		if (s.cppRunning) {
