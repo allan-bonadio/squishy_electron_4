@@ -78,15 +78,18 @@
 			right: 0;  // snug against right bumper or right edge
 			// width set in JS in VoltSidebar
 			height: 100%;  // percent of waveview which is relative pos
-			font-size: 32px;   // fixed; not proportional  to ambient font size
+			font-size: 18px;   // fixed; not proportional  to ambient font size
 			z-index: 35;
 
-			// but particpates in its parent's row flex box.  Width and display set by code in WaveView.render()
+			// but particpates in its parent's row flex box.  Width and display set by
+			// code in WaveView.render()
 			text-align: center;
 
 			//background-color: #f006;  // testing
 			background-color: transparent;
-			pointer-events: none;  // but subelements DO have pointer-events
+			
+			// but subelements DO have pointer-events
+			pointer-events: none;
 			user-select: none;
 
 
@@ -95,20 +98,30 @@
 				display: inline;
 				width: 1em;
 				line-height: 1em;
+				padding: .125em;
+				margin: 0 .125em 0 0;
+				border: .5px solid common.$voltageTransparentColor;
+				border-radius: .1em;
+
+				text-align: center;
 				font-weight: 700;
-				background-color: transparent;
+				background-color: common.$voltageTransparentColor ;
 				color: common.$voltageColor;
-				padding: 0;
-				margin: 0;
-				border: none;
 
 				pointer-events: auto;
+				
+				&.scrollDown, &.scrollUp {
+					padding-left: 0;
+					div {
+						margin-top: .125em;
+					}
+				}
 			}
-//			button:hover {
-//				border-color: common.$voltageColor;
-//			}
+			button:hover {
+				border-color: common.$voltageLighterColor ;
+			}
 			button:active {
-				color: common.$voltageDarkerColor;
+				background-color: common.$voltageLighterColor ;
 			}
 
 			// we use p as spacers between the buttons

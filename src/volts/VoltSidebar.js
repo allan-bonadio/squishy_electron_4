@@ -64,15 +64,17 @@ function VoltSidebar(props) {
 
 
 
-	// render.  The buttons are almost square.  The + and – are emojis
+	// render.  The buttons are almost square.  The + and – are emojis  The arrows need the div for alignment.
 	return (
 		<aside className='VoltSidebar' style={{width: VOLT_SIDEBAR_WIDTH + 'px'}}
 				onPointerEnter={pointerEnter} onPointerLeave={pointerLeave} >
 			<p/>
 
 			<button className='scrollUp'
-					onClick={ev => mVD.scrollVoltHandler(+1)}>
-				⬆︎
+						onClick={ev => mVD.scrollVoltHandler(+1)}>
+					<div>
+						⬆︎
+					</div>
 			</button>
 			<p/>
 
@@ -89,8 +91,10 @@ function VoltSidebar(props) {
 			<p/>
 
 			<button className='scrollDown'
-					onClick={ev => mVD.scrollVoltHandler(-1)}>
-				⬇︎
+						onClick={ev => mVD.scrollVoltHandler(-1)}>
+					<div>
+						⬇︎
+					</div>
 			</button>
 			<p/>
 
