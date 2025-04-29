@@ -176,11 +176,11 @@ void qSpace::formatDirectOffsets(void) {
 	/* *********************************************** scalars */
 
 	makeDoubleGetter(dt);
-	// should be NO setter.  Set when space created only in C++.
 
 	makeIntGetter(nDimensions);
 	makeIntGetter(nStates);
 	makeIntGetter(nPoints);
+	makeIntGetter(spectrumLength);
 
 	makePointerGetter(mainAvatar);
 	makePointerGetter(miniGraphAvatar);
