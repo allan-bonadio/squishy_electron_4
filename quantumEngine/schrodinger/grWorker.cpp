@@ -9,11 +9,11 @@
 #include "grWorker.h"
 
 static bool traceStart = false;
-static bool traceFinish = true;
-static bool traceSync = true;
+static bool traceFinish = false;
+static bool traceSync = false;
 static bool traceCreation = false;
 
-static bool traceWork = true;
+static bool traceWork = false;
 static bool traceWorkOccasionally = false;
 static int occasionally = 0;
 
@@ -26,21 +26,13 @@ grWorker **qGrinder::grWorkers = sla;
 
 // do the work: integration
 void grWorker::gThreadWork(void) {
-	int nWas;
-
-	// this one generates a message every Frame.  GADS!  lots of output.
-	if (traceWork)  {
-		speedyLog("🔪        thread #%d: shouldBeIntegrating=%d  isIntegrating=%d.  "
-			"nFinishedThreads=%d\n",
-			serial, grinder->shouldBeIntegrating, grinder->isIntegrating,
-			grinder->finishAtomic
-		);
-	}
-
-	// this one, maybe every several seconds or less.  Feel free to adjust.
-	if (traceWorkOccasionally && occasionally-- < 0) {
-		speedyLog("🔪 grWorker working (occasionallly)...shouldBeIntegrating=%d startAtomic=%d\n",
-			grinder->shouldBeIntegrating, grinder->startAtomic);
+	// traceWork generates a message every Frame.  GADS!
+	// traceWorkOccasionally, maybe every several seconds or less.  Feel free to adjust.
+	if (traceWork || (traceWorkOccasionally && occasionally-- < 0)) {
+		speedyLog("🦫 grWorker working ...shouldBeIntegrating=%d  isIntegrating=%d "
+				"startAtomic=%d  finishAtomic=%d\n",
+				grinder->shouldBeIntegrating, grinder->isIntegrating,
+				grinder->startAtomic, grinder->finishAtomic);
 		occasionally = 100;
 	}
 
@@ -55,10 +47,13 @@ void grWorker::gThreadWork(void) {
 	double endCalc = getTimeDouble();
 	frameCalcTime = endCalc - startCalc;
 
-	if (traceWork) speedyLog("🔪 end of gThreadWork; frame time=%8.4lf ms, "
-		"shouldBeIntegrating=%d  isIntegrating=%d\n",
- 			frameCalcTime, grinder->shouldBeIntegrating, grinder->isIntegrating);
+	if (traceWork) speedyLog("🦫 end of gThreadWork; frame time=%8.4lf ms, "
+				"shouldBeIntegrating=%d  isIntegrating=%d "
+				"startAtomic=%d  finishAtomic=%d\n",
+				frameCalcTime, grinder->shouldBeIntegrating, grinder->isIntegrating,
+				grinder->startAtomic, grinder->finishAtomic);
 }
+
 
 // do the atomics and synchronization, and call gThreadWork().  runs repeatedly.
 // Or blocked on startAtomic.
@@ -66,54 +61,61 @@ void grWorker::gThreadWork(void) {
 void grWorker::gThreadLoop(void) {
 	while (true) {
 		try {
-			int nWas;
 
-			// this thread will freeze here until startAtomic is unlocked, at start of iteration.
-			// All other gThread threads will also be waiting for startAtomic.  When this one gets its chance,
-			// it'll be unlocked, then start its integration work.
-			// so they all start at roughly the same time.
+			// this thread will freeze here until startAtomic is unlocked, at start of
+			// iteration. All other worker threads will also be waiting for
+			// startAtomic.  When it's time to do another iteration, it'll be
+			// unlocked, then all worker threads start integration work. so they all
+			// start at roughly the same time.
 			if (traceSync) {
-				speedyLog("🏁 🔪 at Starting Gate in grWorker::gThreadLoop "
-					"startAtomic=%d (stopped= -1, go=0) pointer: %p   size: %lu  🏁\n",
+				speedyLog("🏁 🦫 wait at startAtomic,  in grWorker::gThreadLoop "
+					"startAtomic=%d (stopped= -1, go>=0) pointer: %p   atomic size: %lu  🏁\n",
 					grinder->startAtomic, &grinder->startAtomic, sizeof(grinder->startAtomic));
+				speedyFlush();
 			}
-			speedyFlush();
 
-			// this wait will stop when notify is sent to it.
+			// this wait will end when notify is sent to it.
 			// eGrinder.triggerIteration() or qeFuncs.grinder_triggerIteration
-			int waitCode = emscripten_atomic_wait_u32(&grinder->startAtomic, -1, 60000);
-			if (waitCode != ATOMICS_WAIT_OK)
-				printf("😵‍ emscripten_atomic_wait_u32 didn't return OK: %d\n", waitCode);
+			// this is what I want but it's only in u32 form.
+			//int waitCode = emscripten_wasm_wait_i32(...
+			int waitCode = emscripten_atomic_wait_u32(&grinder->startAtomic, -1,
+					ATOMICS_WAIT_DURATION_INFINITE);
+			if (waitCode != ATOMICS_WAIT_OK) {
+				const char *msg = "unknown wait status";
+				if (ATOMICS_WAIT_NOT_EQUAL == waitCode)
+					msg = "ATOMICS_WAIT_NOT_EQUAL";
+				else if (ATOMICS_WAIT_TIMED_OUT == waitCode)
+					msg = "ATOMICS_WAIT_TIMED_OUT";
+				printf("😵‍ emscripten_atomic_wait_u32 didn't return OK: %d %s\n",
+						waitCode, msg);
+			}
 
-			// now we count each thread as it starts up (shoulda been at -1 = stopped)
+			// now we count each thread as it starts up
+			// nStarted=number of threads started before this one
+			int nStarted = emscripten_atomic_add_u32(&grinder->startAtomic, 1);
+			nStarted++;
+			if (traceSync) speedyLog("🦫 after atomic_add on startAtomic nStarted =%d "
+					" (shdbe 0 or more)  startAtomic=%d\n", nStarted, grinder->startAtomic);
+			if (nStarted >= grinder->nGrWorkers) {
+				// everybody's started, so now's a good time to set this back for next time.
+				emscripten_atomic_store_u32(&grinder->startAtomic, -1);
+			}
 
-			nWas = emscripten_atomic_add_u32(&grinder->startAtomic, 1);
 
-
-			if (traceSync) speedyLog("🔪 after atomic_add on startAtomic nWas =%d (shdbe 0 or more)\n", nWas);
-
-			// I don't think we really need this counting for start....?
-			if (traceStart)
-				speedyLog("🔪 start of work, nStarted=%d,  nWas=%d\n", grinder->startAtomic, nWas);
-			speedyFlush();
-
-			gThreadWork();
+			gThreadWork();  // actually DO SOME WORK
 			speedyFlush();
 
 			// tell the boss we're done
-			if (traceSync) speedyLog("🔪 before increment on finishAtomic=%d (shdbe 0)\n",
+			if (traceSync) speedyLog("🦫 done, before increment on finishAtomic=%d (shdbe 0)\n",
 				grinder->finishAtomic);
-			nWas = emscripten_atomic_add_u32(&grinder->finishAtomic, 1);  // returns number BEFORE incr
-			nWas++;
-			if (traceSync) speedyLog("🔪 after increment on finishAtomic=%d (shdbe 1 or more)\n",
-				grinder->finishAtomic);
-
-			if (traceFinish) {
-				speedyLog("🔪 finishing work on thread %d, nFinished=%d\n",
-					serial, nWas);
+			int nFinished = emscripten_atomic_add_u32(&grinder->finishAtomic, 1);
+			nFinished++;
+			if (traceSync || traceFinish) {
+					speedyLog("🦫 after increment on finishAtomic=%d (shdbe 1 or more) "
+					"thread %d, nFinished=%d \n",
+					grinder->finishAtomic, serial, nFinished);
 			}
-
-			if (nWas >= grinder->nGrWorkers) {
+			if (nFinished >= grinder->nGrWorkers) {
 				// this must be the last thread to finish in this integration frame!
 				grinder->threadsHaveFinished();
 			}
@@ -121,7 +123,7 @@ void grWorker::gThreadLoop(void) {
 		} catch (std::runtime_error& ex) {
 			//  typically divergence.  JS handles it.  save whole exception
 			grinder->reportException(&ex, "thrown");
-			printf("🔪 Error (saved to grinder) during gThreadLoop: %s\n", ex.what());
+			printf("🦫 Error (saved to grinder) during gThreadLoop: %s\n", ex.what());
 		}
 	}
 	throw std::runtime_error("grWorker::gThreadLoop()  ∞ loop actually ending and returning");
@@ -130,10 +132,10 @@ void grWorker::gThreadLoop(void) {
 
 /* *********************************************** creation and startup */
 
-// wrapper for pthread to start the thread.  arg is the grWorker ptr.  requestAnimationFrame.
+// wrapper for pthread to start the thread.  arg is the grWorker ptr.  .
 static void *sStarter(void *st) {
 	if (traceStart)
-		speedyLog("🔪 grWorker: starting\n");
+		speedyLog("🦫 grWorker: starting\n");
 
 	// runs forever. never returns.  catches its exceptions.
 	((grWorker *) st)->gThreadLoop();
@@ -143,7 +145,7 @@ static void *sStarter(void *st) {
 
 
 // initialize this as being idle, before starting an integration task.
-// All the grinders are the same object; all the threads are differrent.
+// All the grinders are the same object; all the threads are per-thread.
 grWorker::grWorker(qGrinder *gr)
 	: grinder(gr) {
 
@@ -158,12 +160,13 @@ void grWorker::createGrWorkers(qGrinder *grinder) {
 	for (int t = 0; t < grinder->nGrWorkers; t++) {
 		// actual pthread won't start till the next event loop i think
 		grWorker *gThread = new grWorker(grinder);
-		grinder->grWorkers[gThread->thread->serial] = gThread;
+		grinder->grWorkers[gThread->serial] = gThread;
 		if (traceCreation)
-			speedyLog("🔪  grWorker::createGrWorkers() created A grWorker #%d\n",
+			speedyLog("🦫  grWorker::createGrWorkers() created A grWorker #%d\n",
 				gThread->serial);
 	}
 
 	if (traceCreation)
-		speedyLog("🔪  grWorker created %d grWorkers \n", grinder->nGrWorkers);
+		speedyLog("🦫  grWorker::createGrWorkers() created %d grWorkers \n",
+				grinder->nGrWorkers);
 };

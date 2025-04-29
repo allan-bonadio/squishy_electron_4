@@ -396,12 +396,14 @@ void qGrinder::aggregateCalcTime(void) {
 }
 
 
-// runs in the thread loop, only in the last thread to finish integration in an integration frame.
+// runs in the thread loop, only in the last thread to finish integration in an
+// integration frame.  Eventually I'll have a 'tail' thread, that does this so
+// the worker threads can work.
 void qGrinder::threadsHaveFinished() {
 	double thfTime;
 	if (traceThreadsHaveFinished) {
 		thfTime = getTimeDouble();
-		speedyLog("🪓 qGrinder::threadsHaveFinished starts\n");
+		speedyLog("🪓 qGrinder::threadsHaveFinished() starts\n");
 	}
 	aggregateCalcTime();
 
@@ -430,7 +432,8 @@ void qGrinder::threadsHaveFinished() {
 		isIntegrating = false;
 
 	if (traceIntegration)  {
-		speedyLog("🪓 finished threadsHaveFinished() sortof. shouldBeIntegrating=%d   isIntegrating=%d\n",
+		speedyLog("🪓 finished threadsHaveFinished() sortof. "
+		    "shouldBeIntegrating=%d   isIntegrating=%d\n",
 				shouldBeIntegrating, isIntegrating);
 	}
 	speedyFlush();
@@ -440,15 +443,18 @@ void qGrinder::threadsHaveFinished() {
 	// this here runs in thread time.  webgl runs in UI time.  Worst
 	// thing that'll happen is the image will be part one frame and part
 	// the next frame.
+	// THis tail thread should also snarf off a copy of the raw wave, and do an FFT on it,
+	// for display on the frequency chart
 	copyToAvatar(avatar);
-
 	needsRepaint = true;
 
-	if (traceThreadsHaveFinished)
+	if (traceThreadsHaveFinished) {
 		speedyLog("🪓 threadsHaveFinished()— copyToAvatar() in %10.6lf ms - needsRepaint=%d"
 			" shouldBeIntegrating=%d   isIntegrating=%d\n",
 			getTimeDouble() - thfTime, needsRepaint, shouldBeIntegrating, isIntegrating);
+  }
 
+  // what is this doing here?  Prob should be another thread.
 	if (this->pleaseFFT)
 		analyzeWaveFFT(qflick, "latest fft");
 	this->pleaseFFT = false;
@@ -461,13 +467,14 @@ void qGrinder::threadsHaveFinished() {
 	// if (isIntegrating && FASTEST == chosenFP)
 	// 	emscripten_atomic_store_u32(&startAtomic, 0);  // start next iteration ASAP
 	// else
-	emscripten_atomic_store_u32(&startAtomic, -1);  // stop integration, wait for JS to retrigger
+
+	// now in grWorker emscripten_atomic_store_u32(&startAtomic, -1);
 	emscripten_atomic_store_u32(&finishAtomic, 0);
 
 	if (traceThreadsHaveFinished) {
 		speedyLog("🪓  threads have finished in %10.6lf ms; startAtomic=%d finishAtomic=%d\n",
-		getTimeDouble() - thfTime,
-		emscripten_atomic_load_u32(&startAtomic), emscripten_atomic_load_u32(&finishAtomic));
+      getTimeDouble() - thfTime,
+      emscripten_atomic_load_u32(&startAtomic), emscripten_atomic_load_u32(&finishAtomic));
 	}
 
 }
@@ -493,7 +500,7 @@ void qGrinder::triggerIteration() {
 	emscripten_atomic_store_u32(&startAtomic, 0);
 
 	// this is like notify_all
-	emscripten_futex_wake(&startAtomic, 0x7fffffff);
+	emscripten_futex_wake(&startAtomic, 999999);
 }
 
 // start iterating, starting each/all gThread threads. Iteration will
