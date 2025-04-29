@@ -15,7 +15,7 @@
 
 	To start integration, qGrinder::triggerIteration() is called
 	(however), or a Atomic.notify is called from JS.
-	Eithr way, .startAtomic is atomically set to zero, isIntegrating is
+	Either way, .startAtomic is atomically set to zero, isIntegrating is
 	set to true, and a notify is done on startAtomic.  All of the
 	grinderThreads launch all together (simultaneously?).  They all run
 	this algorithm that requires them to start simultaneously, and to

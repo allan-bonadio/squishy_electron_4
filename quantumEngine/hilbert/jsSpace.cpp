@@ -11,7 +11,7 @@
 #include "../debroglie/qWave.h"
 #include "../greiman/qViewBuffer.h"
 
-static bool traceSpaceCreation = true;
+static bool traceSpaceCreation = false;
 static bool traceAvatarDetail = false;
 
 /* ********************************************************** glue functions for js */
@@ -34,12 +34,12 @@ void wave_normalize(qWave *qwave) {
 // see eSpace constructor
 qSpace *startNewSpace(const char *label) {
 	if (traceSpaceCreation)
-		printf("\n🚀 🚀 🚀  startNewSpace(%s), \n", label);
+		printf("\n🚀  startNewSpace(%s), \n", label);
 
 	qSpace *space = new qSpace(label);
 
 	if (traceSpaceCreation) {
-		printf("🚀 🚀 🚀  JS startNewSpace   done (%s == %s)   \n",
+		printf("🚀  JS startNewSpace   done (%s == %s)   \n",
 			space->label, label);
 	}
 
@@ -62,7 +62,7 @@ void addSpaceDimension(qSpace *space, int N, int continuum, double dimLength, co
 // call this from JS to finish the process for the qSpace, create and add the avatars & voltage
 qSpace *completeNewSpace(qSpace *space, int nGrWorkers) {
 	if (traceSpaceCreation)
-		printf("🚀 🚀 🚀  JS completeNewSpace starts(%s)   space=%p\n",
+		printf("🚀  JS completeNewSpace starts(%s)   space=%p\n",
 			space->label, space);
 
 	// finish up all the dimensions now that we know them all
@@ -77,7 +77,7 @@ qSpace *completeNewSpace(qSpace *space, int nGrWorkers) {
 
 	space->miniGraphAvatar = new qAvatar(space, "miniGraph");
 
-	if (traceSpaceCreation) printf("   🚀 🚀 🚀 qSpace created: space=%p  mainAvatar=%p  grinder=%p\n",
+	if (traceSpaceCreation) printf("   🚀 qSpace created: space=%p  mainAvatar=%p  grinder=%p\n",
 		space, mainAvatar, qgrinder);
 	return space;
 }
@@ -88,7 +88,7 @@ void deleteFullSpace(qSpace *space) {
 	// deleting the avatars will delete their qWaves and qViewBuffers
 	// not there if completeNewSpace() never called, even if initSpace() called
 	if (space->mainAvatar) {
-		if (traceAvatarDetail) printf("   🚀 🚀 🚀 deleteFullSpace(): deleting avatars\n");
+		if (traceAvatarDetail) printf("   🚀 deleteFullSpace(): deleting avatars\n");
 		delete space->mainAvatar;
 		space->mainAvatar = NULL;
 

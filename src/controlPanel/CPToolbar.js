@@ -9,7 +9,7 @@ import eSpace from '../engine/eSpace.js';
 //import {ShowVoltageControl} from './SetVoltageTab.js';
 import qeConsts from '../engine/qeConsts.js';
 
-let traceCPToolbar = true;
+let traceCPToolbar = false;
 
 window.dbLog = console.log;
 
@@ -58,7 +58,7 @@ const rateOptions = menuFreqs.map(freq => optionForFreq(freq));
 
 function CPToolbar(props) {
 	if (traceCPToolbar)
-		dbLog(`🧰 CPToolbar(props=`, props, `) `);
+		dbLog(`🧰 CPToolbar starts.  props=`, props);
 	let {chosenRate, setChosenRate} = props;
 
 
@@ -77,7 +77,7 @@ function CPToolbar(props) {
 		<button className={`startStopToggle startStopTool ${runningClass}`}
 			onClick={ev => {
 				if (traceCPToolbar)
-					dbLog(`🧰 CPToolbar props.cPanel.startStop -> (props)  props=`, props);
+					dbLog(`🧰 CPToolbar startStop -> props=`, props);
 				props.cPanel.startStop(ev)
 			}}>
 			{ props.shouldBeIntegrating
@@ -88,7 +88,7 @@ function CPToolbar(props) {
 		<button className={`stepButton startStopTool`}
 			onClick={ev=>{
 				if (traceCPToolbar)
-					dbLog(`🧰 CPToolbar props.cPanel.singleFrame -> (props)  props=`, props);
+					dbLog(`🧰 CPToolbar singleFrame -> props=`, props);
 				props.cPanel.singleFrame(ev);
 			}}>
 			<big>►</big> ▌

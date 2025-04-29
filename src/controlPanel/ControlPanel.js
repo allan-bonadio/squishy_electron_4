@@ -19,7 +19,7 @@ import qeConsts from '../engine/qeConsts.js';
 import {interpretCppException, wrapForExc} from '../utils/errors.js';
 
 let traceSetPanels = false;
-let traceStartStop = true;
+let traceStartStop = false;
 
 
 
@@ -65,7 +65,7 @@ export class ControlPanel extends React.Component {
 		}
 		this.chosenFP = this.state.chosenFP;
 
-		// can't get this to work for now
+		// can't get this to work for now, startup is always stopped.
 		this.state.shouldBeIntegrating = false;
 
 		// we can't init some stuff till we get the space.  But we also can't until this constructor runs.
@@ -164,21 +164,22 @@ export class ControlPanel extends React.Component {
 	() => {
 		if (!this.space) return;  // too early.  mbbe should gray out the button?
 
-		if (traceStartStop) console.info(`startAnimating starts, triggering iteration`);
+		if (traceStartStop) console.info(`🎛️ startAnimating starts, triggering iteration`);
 		this.shouldBeIntegrating = true;
 
 		// must do this to start each iteration going in the thread(s)
 		this.grinder.triggerIteration();
 
 		if (traceStartStop) console.log(`🎛️ ControlPanel startAnimating,`
-			+` shouldBeIntegrating=${this.shouldBeIntegrating}, isIntegrating=${this.grinder.isIntegrating}   `);
+			+` shouldBeIntegrating=${this.shouldBeIntegrating}, `
+			+`isIntegrating=${this.grinder.isIntegrating}   `);
 	}
 
 	stopAnimating =
 	() => {
 		if (!this.space) return;  // too early.  mbbe should gray out the button?
 
-		// set it false as you store it in store; then set state
+		// set it false as you store it in store; then set state.  The threads will figure it out next iteration
 		this.shouldBeIntegrating = false;
 		if (traceStartStop) console.log(`🎛️ ControlPanel STOP Animating, `
 			+`shouldBeIntegrating=${this.shouldBeIntegrating}, isIntegrating=${this.grinder.isIntegrating}   `);
@@ -195,7 +196,7 @@ export class ControlPanel extends React.Component {
 	// needs work
 	singleFrame =
 	(ev) => {
-		//console.info(`singleFrame starts`);
+		//console.info(`🎛️ singleFrame starts`);
 		this.shouldBeIntegrating = true;
 
 		this.grinder.justNFrames = 1;

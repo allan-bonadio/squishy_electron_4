@@ -27,7 +27,7 @@ let traceBumpers = false;
 
 let traceScaling = false;
 let traceDragCanvasHeight = false;
-let traceWidth = true;
+let traceWidth = false;
 
 const CANVAS_BORDER_THICKNESS = 1;
 const DOUBLE_THICKNESS = 2 * CANVAS_BORDER_THICKNESS;

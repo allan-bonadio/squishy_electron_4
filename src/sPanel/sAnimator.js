@@ -14,9 +14,12 @@ import qeConsts from '../engine/qeConsts.js';
 
 let traceTheViewBuffer = false;
 let traceHeartbeats = false;
-let tracerAFPeriod = false;
 let tracerFrameProgress = false;
 let traceFrameMenuRates = false;
+
+let tracerAFPeriod = false;
+let traceTypicalVideoPeriod = false;
+let typical = 100;
 
 // rAF should certainly call more often than this many ms
 const MAX_rAF_PERIOD =  50;
@@ -41,6 +44,7 @@ class sAnimator {
 		// defaults - will work until set by real life
 		this.avgVideoFP = 1000 / 60;
 		this.unstableFP = true;
+		this.prevFrame = performance.now();
 
 		// Start the heartbeat.  on next tic
 		if (traceHeartbeats)
@@ -113,14 +117,25 @@ class sAnimator {
 		this.avgVideoFP  =
 			Math.min(MAX_rAF_PERIOD, (videoFP + 255 * this.avgVideoFP) / 256);
 
+		if (traceTypicalVideoPeriod && typical-- <= 0) {
+			console.log(`🎥  TypicalVideoPeriod at ${performance.now().toFixed(4)}ms `
+					+` videoFP=${videoFP.toFixed(4)}  `
+					+ ` this.avgVideoFP = ${this.avgVideoFP.toFixed(4)}  `
+					+ `abs diff = ${abs(videoFP - this.avgVideoFP).toFixed(4)} `);
+			typical = 100;
+		}
+
 		// IF the frame period changed from recent cycles,
 			// something's changing, let it settle down.  Some timing fumbles
 			// are tolerable while this is on.
 		if (abs(videoFP - this.avgVideoFP) > 4) {
 			this.unstableFP = true;
-			if (tracerAFPeriod) console.log(`🎥  aniFP change!  videoFP=${videoFP}  `
-				+ ` this.avgVideoFP = ${this.avgVideoFP}  `
-				+ `abs diff = ${abs(videoFP - this.avgVideoFP)} `);
+			if (tracerAFPeriod) {
+			  console.log(`🎥  aniFP change at ${performance.now().toFixed(4)}ms `
+						+` videoFP=${videoFP.toFixed(4)}  `
+						+ ` this.avgVideoFP = ${this.avgVideoFP.toFixed(4)}  `
+						+ `abs diff = ${abs(videoFP - this.avgVideoFP).toFixed(4)} `);
+			}
 		}
 		else {
 			// if the videoFP changed recently/last time, but is settling down
@@ -227,7 +242,7 @@ class sAnimator {
 			let da = new Date();
 			let time = da.getSeconds() + da.getMilliseconds() / 1e3;
 			console.log(`🎥 needsRepaint=${grinder.needsRepaint} latest frame `
-				+ `${grinder.frameSerial} at :${time.toFixed(3)} `);
+				+ `${grinder.frameSerial} at :${time.toFixed(3)} seconds`);
 		}
 
 		//console.log(`🎥 qeConsts.FASTEST=${qeConsts.FASTEST}  this.chosenFP=${this.chosenFP}`)
