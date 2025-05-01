@@ -49,7 +49,7 @@ function setPT() {
 		changeShowVoltage: PropTypes.func.isRequired,
 
 		// the SetVoltage button
-		setVoltageHandler:  PropTypes.func.isRequired,
+		saveMainVoltage:  PropTypes.func.isRequired,
 
 		space: PropTypes.object,
 	};
@@ -58,7 +58,7 @@ function setPT() {
 // the tab that user sets voltage buffer with
 function SetVoltageTab(p) {
 	// these are all the local versions, for use and setting in this Voltage Tab
-	const {voltageParams, setVoltageParams, showVoltage, changeShowVoltage, setVoltageHandler, space} = p;
+	const {voltageParams, setVoltageParams, showVoltage, changeShowVoltage, saveMainVoltage, space} = p;
 	const vP = voltageParams;
 	const setVP = setVoltageParams;
 
@@ -84,25 +84,26 @@ function SetVoltageTab(p) {
 	// drawing symols ⨅ ⨆ vs ⊓ ⊔ they're different!
 	function renderBreedSelector() {
 		const breed = vP.voltageBreed;
-		return <div className='breedSelector'
-				title='Choose the shape of the voltage potential you want to try'>
-			<label title="zero everywhere">
-				Flat
+		return <div className='breedSelector'>
+			<label>
 				<input type='radio' className='flatBreed' name='breed'
 					checked={'flat' == breed}
 					onChange={ev => setVoltageParams({voltageBreed: 'flat'}) }/>
+				Flat
 			</label>
 			<label title="sides will look diagonal if you have low resolution">
 				<big> ⨆</big> Slot
 				<input type='radio' className='slotBreed' name='breed'
 					checked={'slot' == breed}
 					onChange={ev => setVoltageParams({voltageBreed: 'slot'})}/>
+				<big> ⨆</big> Slot
 			</label>
 			<label title="sides will look diagonal if you have low resolution">
 				<big> ⨅</big> Block
 				<input type='radio' className='blockBreed' name='breed'
 					checked={'block' == breed}
 					onChange={ev => setVoltageParams({voltageBreed: 'block'})}/>
+				<big> ⨅</big> Block
 			</label>
 			<label title="x² or √x or similar.  Use this with Well space continuum.">
 				V Canyon
@@ -282,6 +283,7 @@ function SetVoltageTab(p) {
 	return <div className='setVoltageTab controlPanelPanel'>
 		<h3>Design the Voltage Profile</h3>
 		<div className='voltageBreedPanel'>
+			<h3>Set Voltage</h3>
 			{renderBreedSelector()}
 
 			<button onClick={p.setVoltageHandler}
