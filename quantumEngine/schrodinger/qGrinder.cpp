@@ -454,7 +454,7 @@ void qGrinder::threadsHaveFinished() {
 			getTimeDouble() - thfTime, needsRepaint, shouldBeIntegrating, isIntegrating);
   }
 
-  // what is this doing here?  Prob should be another thread.
+  // what is this doing here?  Prob should be done in another thread.
 	if (this->pleaseFFT)
 		analyzeWaveFFT(qflick, "latest fft");
 	this->pleaseFFT = false;
