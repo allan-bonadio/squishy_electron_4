@@ -7,8 +7,8 @@ description: Overview and some results from Squishy Electron
 
 This is a project I've been working on for a few years, off and on in my free time.
 It's a work in progress, and this is the Alpha version here.
-Send feedback to
-[Send Feedback Here](mailto://squish@orgmgr.tactileint.org?subject=squishy_electron_feedback)
+
+[Send Feedback Here](mailto:bojnac@tactileint.org?subject='Squishy Electron Feedback')
 
 When I was a physics major, I had trouble getting a 'feel' for quantum mechanics.
 I could do the math, I could visualize what was happening, but I kept on having a problem because things seemed so unintuitive.
