@@ -45,20 +45,19 @@ export class SquishPanel extends React.Component {
 		super(props);
 		checkPropTypes(this.constructor.propTypes, props, 'prop', this.constructor.name);
 
-		if (SquishPanel.squishPanelConstructed) {
-			// should not be called twice!
-			console.error(`👑 annoying hot reload...🙄  👿 🤢 😵 🤬 😭 😠`);
-			debugger;
-			location = location;  // eslint-disable-line no-restricted-globals
-		}
+//		if (SquishPanel.squishPanelConstructed) {
+//			// should not be called twice!
+//			console.error(`👑 annoying hot reload...🙄  👿 🤢 😵 🤬 😭 😠`);
+//			debugger;
+//			location = location;  // eslint-disable-line no-restricted-globals
+//		}
+// why does this continue to happen!?!?!?
 		SquishPanel.squishPanelConstructed++;
 
 
 
 		this.state = {
 			mainSceneClassName: DEFAULT_SCENE_NAME,
-
-			showVoltage: getASetting('voltageSettings', 'showVoltage'),
 
 			// the space for this SP.
 			space: null,
@@ -123,25 +122,6 @@ export class SquishPanel extends React.Component {
 	// others managed from ControlPanel
 	// can i move these to the control panel?
 
-	// as long as this alo apppears in the CPToolbar, has to be here
-	changeShowVoltage =
-	ev => {
-		let newSetting = ev.target.value;
-		this.setState({showVoltage: newSetting});
-		storeASetting('voltageSettings', 'showVoltage', newSetting);
-
-		// now make it effective.  This class and css do it.
-		// this stays until the next render, which will also generate the same className.
-		// this will have to get more specific if/when there's multiple squish panels
-		const setSV = voEl => {
-			if (!voEl) return;
-			voEl.classList.remove('alwaysShowVoltage', 'hoverShowVoltage',
-					'neverShowVoltage');
-			voEl.classList.add(newSetting + 'ShowVoltage');
-		}
-		setSV(document.querySelector('.SquishPanel .optionalVoltage'));
-	}
-
 	// dump the view buffer, from the JS side.  Why not use the C++ version?
 	dumpViewBuffer(title = '') {
 		const s = this.state;
@@ -183,18 +163,16 @@ export class SquishPanel extends React.Component {
 		const p = this.props;
 		const s = this.state;
 
-		if (traceWidth) console.log(`👑 SquishPanel render, p.bodyWidth=${p.bodyWidth} `
+		if (traceWidth) console.log(`👑 SquishPanel render, p.bodyWidth=${p.bodyWidth} = outerWidth `
 			+ ` body.clientWidth=${document.body.clientWidth}`);
 
 		return (
 			<article id={this.props.id} className="SquishPanel">
 				<WaveView
 					outerWidth = {p.bodyWidth}
-					showVoltage={s.showVoltage}
 					sPanel={this}
 				/>
 				<ControlPanel
-					showVoltage={s.showVoltage}
 					changeShowVoltage={this.changeShowVoltage}
 
 					repaintWholeMainWave={this.repaintWholeMainWave}

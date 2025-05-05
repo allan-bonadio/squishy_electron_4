@@ -24,10 +24,8 @@ import GLScene from '../gl/GLScene.js';
 import {eSpaceCreatedPromise} from '../engine/eEngine.js';
 
 let traceBumpers = false;
-
-let traceScaling = false;
+let traceDimensions = false;
 let traceDragCanvasHeight = false;
-let traceWidth = false;
 
 const CANVAS_BORDER_THICKNESS = 1;
 const DOUBLE_THICKNESS = 2 * CANVAS_BORDER_THICKNESS;
@@ -46,9 +44,8 @@ export class WaveView extends React.Component {
 		// all around for border.
 		outerWidth: PropTypes.number.isRequired,
 
-		showVoltage: PropTypes.string.isRequired,
-
 		sPanel: PropTypes.object.isRequired,
+		//showVoltage: PropTypes.string,  // need this!?!?
 	};
 
 	constructor(props) {
@@ -66,14 +63,11 @@ export class WaveView extends React.Component {
 			// no!  handed in by promise space: null,  // set when promise comes in
 		}
 
-		// on the off chance this is not yet an integer, keep our rounded version of the number
-		this.outerWidth = round(props.outerWidth);
 
 		this.updateInnerDims();  // after outerWidth done
 
 		this.formerWidth = this.outerWidth;
 		this.formerHeight = round(this.state.outerHeight);
-		this.formerShowVoltage = props.showVoltage;
 
 		// make the proptypes shuddup about it being undefined
 		this.mainVDisp = null;
@@ -102,9 +96,15 @@ export class WaveView extends React.Component {
 		});
 	}
 
+	// set this.canvasInnerDims from the right places
 	updateInnerDims() {
+		// on the off chance this is not yet an integer, keep our rounded version of the number
+		this.outerWidth = round(this.props.outerWidth);
+
 		this.canvasInnerWidth = round(this.outerWidth - DOUBLE_THICKNESS);
 		this.canvasInnerHeight = round(this.state.outerHeight - DOUBLE_THICKNESS);
+		if (traceDimensions)
+			console.log(`🏄 canvasInner: w=${this.canvasInnerWidth} h=${this.canvasInnerHeight}`);
 	}
 
 	// we finally have a canvas; give me a copy so I can save it
@@ -127,14 +127,12 @@ export class WaveView extends React.Component {
 		// only need this when the WaveView outer dims change, either a user
 		// change height or window change width.  On that occasion, we have to adjust
 		// a lot, including resizing the canvas.
-		if (this.mainEAvatar && (this.formerShowVoltage != p.showVoltage
-					|| this.formerWidth != this.outerWidth
+		if (this.mainEAvatar && (this.formerWidth != this.outerWidth
 					|| this.formerHeight != s.outerHeight) ) {
 
 			// Size of window & canvas changed!  (or, will change soon)
-			if (traceScaling) {
+			if (traceDimensions) {
 				console.log(`🏄 Resizing  👀 mainEAvatar=${this.mainEAvatar.label}
-				formerShowVoltage=${this.formerShowVoltage} ≟➔ showVoltage=${p.showVoltage}
 				formerWidth=${this.formerWidth} ≟➔ outerWidth=${this.outerWidth}
 				formerHeight=${this.formerHeight} ≟➔ outerHeight=${s.outerHeight}`);
 			}
@@ -147,10 +145,7 @@ export class WaveView extends React.Component {
 			// the formers are OUTER sizes.  All these should be integers by now.
 			this.formerWidth = this.outerWidth;
 			this.formerHeight = s.outerHeight;
-
-			// for next time it's changed.  Do we need this?  Since it's a passed-in prop, maybe not.
-			this.formerShowVoltage = p.showVoltage;
-			if (traceWidth) {
+			if (traceDimensions) {
 				console.log(`🏄 WaveView canvasInner width is ${this.canvasInnerWidth};  `
 					+ `now outer width = ${this.outerWidth}`);
 			}
@@ -213,7 +208,7 @@ export class WaveView extends React.Component {
 			frameSerial = thousands(this.grinder.frameSerial);
 		}
 
-		if (traceWidth) {
+		if (traceDimensions) {
 			console.log(`🏄 WaveView render, outerWidth=${this.outerWidth}`
 				+` bumperWidth=${this.bumperWidth}`);
 		}
@@ -249,8 +244,8 @@ export class WaveView extends React.Component {
 		if (this.mainVDisp){
 			voltOverlay = <VoltOverlay
 				space={this.space}
-				showVoltage={p.showVoltage} mainVDisp={this.mainVDisp}
 				canvasInnerWidth={this.canvasInnerWidth} canvasInnerHeight={this.canvasInnerHeight}
+				showVoltage={p.showVoltage} mainVDisp={this.mainVDisp}
 				bumperWidth={this.bumperWidth}
 			/>;
 		}
