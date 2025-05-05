@@ -3,12 +3,12 @@ title: Waves
 description: Explanation of Wave Physics & Mathematics
 -->
 
-Waves
-=======================
 
-Waves are vibrations that are moving in space.
+== Waves ==
 
-Vibrations are things that are moving in a cycle, over time.  Most people think of vibrations as things moving fast, like a tuning fork or a guitar string.  But, you can think of other things as vibrations: a child swinging back and forth on a swing is vibrating.  All vibrations have a cycle time; for a child on a swing, it's probably about one or two seconds.  For a tuning fork, it might be 1/100 or 1/1000 of a second.
+Waves are vibrations that are moving.
+
+Vibrations are things that are moving in a cycle, over time.  Most people think of vibrations as things moving fast, like a tuning fork or a guitar string.  But, you can think of other things as vibrations: a child swinging back and forth on a swing is vibrating.  All vibrations have a cycle time; for a child on a swing, it's a few seconds.  For a tuning fork, it might be 1/100 or 1/10000 of a second.
 
 https://youtu.be/pCLgmE5FEEc
 https://youtu.be/uBW5Kq6rBFY
