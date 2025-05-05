@@ -5,6 +5,8 @@ This project is at alpha quality.  (I like doing it all myself.)
 
 [You can see a running version here](https://squish.tactileint.org)
 
+To see it with the intro, https://127.0.0.1:6600?intro=1 in development mode or https://squish.tactileint.org?intro=1 for production
+
 
 Requirements for Running
 ========================

@@ -7,7 +7,9 @@ import subprocess
 SQUISH_ROOT = os.environ['SQUISH_ROOT']
 retCode = 0
 
-print("Scan sources for traces that I unintentionally left on... prints and returns failure if there's some")
+print('''Scan sources for trace flags that I unintentionally left on... prints
+and returns failure if there's some.  You just copy and paste 'false' over
+'true' Prints filenames and line numbers.''')
 
 print("🟦 🟦 🟦 🟦 🟦 🟦 🟦 🟦 🟦 🟦  C++")
 
@@ -21,7 +23,7 @@ if 0 == cpl.returncode:
 
 print()
 print("🟦 🟦 🟦 🟦 🟦 🟦 🟦 🟦 🟦 🟦  JavaScript")
-print("Sorry but searching in JavaScriippt might not work I think")
+#print("Sorry but searching in JavaScriippt might not work I think")
 os.chdir(SQUISH_ROOT + '/src')
 
 cpl = subprocess.run(['grep', '-ERnI', '^(let|const) trace.* = true;', '.'])

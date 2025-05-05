@@ -17,8 +17,8 @@ let traceFinalPromiseResult = false;
 let traceMetadata = false;
 
 /*
-** The documentation is served from the public/doc directory, which contains mostly .html files.
-** during writing, the docGen directory serves as a proxy.  Both have symlinks into the
+** The documentation is served from the public/doc directory, which contains mostly .html, image and video files.
+** during writing (development), the docGen directory serves as a proxy.  Both have symlinks into the
 ** katex directory for the katex.css file and its fonts.
 */
 

@@ -114,7 +114,7 @@ function GLScene(props) {
 
 	if (traceGeometry && 'mainWave' == p.sceneName) {
 		console.log(`🖼 GLScene rend '${p.sceneName}': canvas=${canvasNode?.nodeName}
-			draw reg: w=${p.canvasInnerWidth} h=${p.canvasInnerHeight} `);
+			draw dims: w=${p.canvasInnerWidth} h=${p.canvasInnerHeight} `);
 		//  x=${cdr.x} y=${cdr.y}
 	}
 

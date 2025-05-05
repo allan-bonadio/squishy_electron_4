@@ -11,6 +11,8 @@ import VoltArea from '../volts/VoltArea.js';
 import VoltSidebar from '../volts/VoltSidebar.js';
 import {getASetting, storeASetting} from '../utils/storeSettings.js';
 
+let traceGeometry = false;
+
 function setPT() {
 	VoltOverlay.propTypes = {
 		// for first couple of renders, space and idunno are null
@@ -79,6 +81,8 @@ function VoltOverlay(props) {
 	}
 
 	/* ************************************************************************ rendering */
+  if (traceGeometry)
+    console.log(`vOverlay: ciWidth=${p.canvasInnerWidth} ciHeight=${p.canvasInnerHeight}`);
 
 	// the class on the section here does the showing/hiding when user mouses over.
 	// (but see another mechanism in the sidebar!)

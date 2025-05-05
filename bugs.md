@@ -45,6 +45,7 @@ I get it.  Standing wave freq 0 => nans.
 - should have x axis on the bottom marked in nm
 
 😡- the Start and Stop icons are totally bozo on Firefox.  Time to overhaul them.
+not nowl..?
 
 
 ## Voltage
