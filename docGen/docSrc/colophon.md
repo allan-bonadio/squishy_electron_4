@@ -1,5 +1,5 @@
 <!--
-title: my Squishy Electron project
+title: How I Did this
 description: Overview and some results from Squishy Electron
 -->
 # How this was Built

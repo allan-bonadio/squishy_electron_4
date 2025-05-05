@@ -1,3 +1,7 @@
+<!--
+title: Electron Appearance
+description: What does an electron look like?
+-->
 
 
 In 1900,  Max Planck figured out a formula for Blackbody Radiation.

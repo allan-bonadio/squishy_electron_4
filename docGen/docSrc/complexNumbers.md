@@ -1,5 +1,5 @@
 <!--
-title: my Squishy Electron project
+title: Complex Numbers
 description: Overview and some results from Squishy Electron
 -->
 <title>Complex Numbers</title>
