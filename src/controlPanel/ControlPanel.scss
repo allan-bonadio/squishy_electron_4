@@ -173,7 +173,7 @@
 
 	// the column with the radios for wave breed
 	.breedSelector  {
-		//padding: 1em 0;
+		margin-bottom: 1em;
 
 		label {
 			display: block;
@@ -240,12 +240,12 @@
 			accent-color: common.$voltageDarkerColor;
 		}
 
-		.divider {
-			float: left;
-			height: 6em;
-			border-left: 1px #888 solid;
-			margin: 1em 1.5em;
-		}
+		//.divider {
+		//	float: left;
+		//	height: 6em;
+		//	border-left: 1px #888 solid;
+		//	margin: 1em 1.5em;
+		//}
 
 		// the panel with the minigraph, and all the sliders
 		.miniGraphPanel {

@@ -86,24 +86,22 @@ function SetVoltageTab(p) {
 		const breed = vP.voltageBreed;
 		return <div className='breedSelector'>
 			<label>
+				Flat
 				<input type='radio' className='flatBreed' name='breed'
 					checked={'flat' == breed}
 					onChange={ev => setVoltageParams({voltageBreed: 'flat'}) }/>
-				Flat
 			</label>
 			<label title="sides will look diagonal if you have low resolution">
 				<big> ⨆</big> Slot
 				<input type='radio' className='slotBreed' name='breed'
 					checked={'slot' == breed}
 					onChange={ev => setVoltageParams({voltageBreed: 'slot'})}/>
-				<big> ⨆</big> Slot
 			</label>
 			<label title="sides will look diagonal if you have low resolution">
 				<big> ⨅</big> Block
 				<input type='radio' className='blockBreed' name='breed'
 					checked={'block' == breed}
 					onChange={ev => setVoltageParams({voltageBreed: 'block'})}/>
-				<big> ⨅</big> Block
 			</label>
 			<label title="x² or √x or similar.  Use this with Well space continuum.">
 				V Canyon
@@ -283,7 +281,6 @@ function SetVoltageTab(p) {
 	return <div className='setVoltageTab controlPanelPanel'>
 		<h3>Design the Voltage Profile</h3>
 		<div className='voltageBreedPanel'>
-			<h3>Set Voltage</h3>
 			{renderBreedSelector()}
 
 			<button onClick={p.setVoltageHandler}
