@@ -66,7 +66,8 @@ export class voltDisplay {
 	// create a voltDisplay the way the space needs it
 	static newForSpace(space) {
 		let vDisp = new voltDisplay('space',
-			space.start, space.end, space.dimensions[0].continuum,
+			space.start, space.end, space.continuum,
+//			space.start, space.end, space.continuum,
 			space.voltageBuffer,
 			getAGroup('voltageSettings')
 		);

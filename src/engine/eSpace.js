@@ -12,24 +12,25 @@ import {getAGroup} from '../utils/storeSettings.js';
 import {interpretCppException} from '../utils/errors.js';
 import {MAX_DIMENSIONS, N_THREADS} from './eEngine.js';
 
-let traceSpace = false;
+let traceSpace = true;
 let traceFamiliarWave = false;
 
 /* **************************************************************** eDimension */
 
 // these days the espace is just one qDimension.
-// So, do it that way, if anybody needs it.  dim={N, continuum, label: 'x'}
-export class eDimension {
-	constructor(dim) {
-		this.N = dim.N;
-		this.continuum = dim.continuum;
-		this.dimLength = dim.dimLength;
-		this.label = dim.label;
-
-		this.start = this.continuum ? 1 : 0;
-		this.end = this.N + this.start;
-	}
-}
+// So, do it that way, if anybody needs it.  dim={N, continuum, dimLength, label: 'x'}
+// NO!  use the direct accessors on the eSpace
+//export class eDimension {
+//	constructor(dim) {
+//		this.N = dim.N;
+//		this.continuum = dim.continuum;
+//		this.dimLength = dim.dimLength;
+//		this.label = dim.label;
+//
+//		this.start = this.continuum ? 1 : 0;
+//		this.end = this.N + this.start;
+//	}
+//}
 
 /* **************************************************************** eSpace */
 // this is how you create a qSpace - start from JS and call this.
@@ -55,11 +56,12 @@ export class eSpace {
 
 		// make each dimension (someday there'll be more than 1)
 		//let nPoints = 1, nStates = 1;
-		this.dimensions = dims.map(d => {
+		dims.forEach(d => {
+		//this.dimensions = dims.map(d => {
 				qeFuncs.addSpaceDimension(this.pointer, d.N, d.continuum, d.dimLength, d.label);  // c++
 
-				let dim = new eDimension(d)
-				return dim;
+				//let dim = new eDimension(d)
+				//return dim;
 			}
 		);
 
@@ -151,9 +153,12 @@ export class eSpace {
 	// return me the start, end, etc of this 1d space
 	// call it like this: const {start, end, N, continuum} = space.startEnd;
 	get startEnd() {
-		const dim = this.dimensions[0];
-		return {start: dim.start, end: dim.end, N: dim.N, nPoints: this.nPoints,
-			continuum: dim.continuum, dimLength: dim.dimLength};
+		//const dim = this.dimensions[0];
+		return {start: this.start, end: this.end, N: this.N, nPoints: this.nPoints,
+			continuum: this.continuum, dimLength: this.dimLength};
+		//const dim = this.dimensions[0];
+		//return {start: dim.start, end: dim.end, N: dim.N, nPoints: this.nPoints,
+		//	continuum: dim.continuum, dimLength: dim.dimLength};
 	}
 
 	// this will return the DOUBLE of start and end so you can just loop thru += 2
@@ -161,9 +166,11 @@ export class eSpace {
 	// call like this:       const {start2, end2, N} = this.space.startEnd2;
 	// note start2, end2 NEED TO BE SPELLED exactly that way!
 	get startEnd2() {
-		const dim = this.dimensions[0];
-		return {start2: dim.start*2, end2: dim.end*2, N: dim.N, nPoints2: this.nPoints * 2,
-			continuum: dim.continuum, dimLength: dim.dimLength};
+		//const dim = this.dimensions[0];
+		return {start: this.start*2, end: this.end*2, N: this.N, nPoints: this.nPoints*2,
+			continuum: this.continuum, dimLength: this.dimLength};
+		//return {start2: dim.start*2, end2: dim.end*2, N: dim.N, nPoints2: this.nPoints * 2,
+		//	continuum: dim.continuum, dimLength: dim.dimLength};
 	}
 }
 

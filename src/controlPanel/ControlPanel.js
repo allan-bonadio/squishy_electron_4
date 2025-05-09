@@ -30,10 +30,6 @@ const N_EXTRA_STEPS = 0.5;
 
 export class ControlPanel extends React.Component {
 	static propTypes = {
-		// the showVoltage setting is kept by the Squish Panel; cuz it also influences WaveView
-		// this is NOT the voltageParams!
-		changeShowVoltage: PropTypes.func.isRequired,
-		showVoltage: PropTypes.string.isRequired,
 
 		repaintWholeMainWave: PropTypes.func.isRequired,
 		//rerenderWholeMainVoltage: PropTypes.func.isRequired,
@@ -58,7 +54,9 @@ export class ControlPanel extends React.Component {
 			// each of these params changes the state; here they are individually
 			...getAGroup('waveParams'),
 			...getAGroup('voltageParams'),
+			...getAGroup('voltageSettings'),
 			...getAGroup('frameSettings'),
+
 
 			showingTab: getASetting('miscSettings', 'showingTab'),
 
@@ -88,7 +86,7 @@ export class ControlPanel extends React.Component {
 	initWithSpace(space) {
 		// not much happens without this info
 		this.space = space;
-		this.N = space.dimensions[0].N;
+		this.N = space.N;
 		this.mainEAvatar = space.mainEAvatar;
 		this.mainEWave = space.mainEWave;
 
@@ -350,17 +348,22 @@ export class ControlPanel extends React.Component {
 
 	makeVoltageTab = () => {
 		const p = this.props;
+		const s = this.state;
 		return <SetVoltageTab
 			voltageParams={this.getVoltageParams()}
 			setVoltageParams={this.setVoltageParams}
-			showVoltage={p.showVoltage}
-			changeShowVoltage={p.changeShowVoltage}
+			showVoltage={s.showVoltage}
+			changeShowVoltage={this.changeShowVoltage}
 			setVoltageHandler={this.setVoltageHandler}
 			space={this.space}
 		/>;
 	}
 
-	/* ********************************************** integration frame */
+	setShowVoltage(sv) {
+		this.setState({showVoltage: sv});
+	}
+
+	/* ********************************************** integration tab */
 
 	// dt is time per step, stretchedDt is stretched, ready to use
 	setDtStretch = dtStretch => {
@@ -431,8 +434,6 @@ export class ControlPanel extends React.Component {
 
 		let showingTabHtml = this.createShowingTab();
 
-		//showVoltage={p.showVoltage}
-		//changeShowVoltage={p.changeShowVoltage}
 		//setVoltageHandler={this.setVoltageHandler}
 		return <div className='ControlPanel'>
 			<CPToolbar

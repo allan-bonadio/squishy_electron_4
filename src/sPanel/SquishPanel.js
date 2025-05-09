@@ -173,8 +173,6 @@ export class SquishPanel extends React.Component {
 					sPanel={this}
 				/>
 				<ControlPanel
-					changeShowVoltage={this.changeShowVoltage}
-
 					repaintWholeMainWave={this.repaintWholeMainWave}
 
 					iStats={this.iStats}

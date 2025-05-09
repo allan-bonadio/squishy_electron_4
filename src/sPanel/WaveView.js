@@ -84,14 +84,14 @@ export class WaveView extends React.Component {
 
 			// make room for the bumpers for WELL continuum (both sides).  Note that
 			// continuum can change only when page reloads.
-			this.bumperWidth = (qeConsts.contWELL == space.dimensions[0].continuum)
+			this.bumperWidth = (qeConsts.contWELL == space.continuum)
 				? WELL_BUMPER_WIDTH
 				: 0;
 
 			this.mainVDisp = space.vDisp;
 		})
 		.catch(ex => {
-			console.error(`eSpaceCreatedPromise failed`);
+			console.error(`eSpaceCreatedPromise failed:`, ex.stack ?? ex.message ?? ex);
 			debugger;
 		});
 	}
