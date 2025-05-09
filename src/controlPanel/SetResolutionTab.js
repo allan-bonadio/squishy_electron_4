@@ -20,25 +20,33 @@ function SetResolutionTab(props) {
 
 	let continuumBlurb, segmentsBetweenEnds;
 	if (qeConsts.contWELL == spa.continuum) {
-	  continuumBlurb = <div>
+	  segmentsBetweenEnds = spa.N - 1;
+	  continuumBlurb = <span>
 	    Your space is a <b>Well</b>, just a box with impenetrable walls on the ends.
       So, your wave will bounce back and forth off the ends.  Exactly at the ends,
       your wave will be zero — the voltage is infinite there, so the walls repell the wave.
-      So you actually have {spa.N - 2} datapoints in play.
-    </div>;
-	  segmentsBetweenEnds = spa.N - 1;
+      So you have {segmentsBetweenEnds} datapoints in use.
+    </span>;
 	}
-	if (qeConsts.contENDLESS == spa.continuum) {
-	  continuumBlurb = <div>
-      Your space is <b>Endless</b>, infinite space that cycles around on the ends.
-      So, your wave will crawl along until it gets to the end.
-      So you actually have {spa.N - 2} datapoints in play.
-    </div>;
+	else if (qeConsts.contENDLESS == spa.continuum) {
 	  segmentsBetweenEnds = spa.N;
+	  continuumBlurb = <span>
+      Your space is <b>Endless</b>, infinite space that cycles around on the ends.
+      So, your wave will crawl along until it gets to the right, and then show up on the left.
+      You have {segmentsBetweenEnds} datapoints in use.
+    </span>;
 	}
+	else
+		throw `bad space continuum ${spa.continuum}`;
 
 	return (<div className='SetResolutionTab controlPanelPanel'>
-		<h3>Reconfigure the Space</h3>
+		<h3>
+			Design the Space
+			<span className='statusBar'>
+				<b>{spa.N}</b> datapoints in
+				<b>{spa.continuum ? ' an Endless' : ' a Well'}</b> space.
+			</span>
+		</h3>
 		<button className='setResolutionButton'
 			onClick={ev => (props.grinder)
 					&& ResolutionDialog.openResolutionDialog(props.grinder)}>
@@ -46,23 +54,17 @@ function SetResolutionTab(props) {
 			<div style={{fontSize: '.8em'}}>
 			(will reset current wave)</div>
 		</button>
-		<h3 style={{display: 'inline-block', }}>Reconfigure the Space</h3>
-		<span style={{marginLeft: '3em', backgroundColor: '#ace', padding: '.5em',
-		      }}>
-		  <b>{spa.N}</b> datapoints in
-      <b>{spa.continuum ? ' an Endless' : ' a Well'}</b> space.
-    </span>
 
 		<p className='discussion'>
 			Squishy Electron's space is a one-dimensional place for an electron to travel in.
 			You can reconfigure this space here, if you want, with different settings.
 			(Your current wave will be reset.)
 		</p>
-		<div className='discussion'>
+		<p className='discussion'>
       Your space is {spa.dimLength.toFixed(2)}nm long, with&nbsp;
       {(spa.dimLength / segmentsBetweenEnds).toFixed(4)}nm between data points.
 		  {continuumBlurb}
-		</div>
+		</p>
 
 	</div>);
 }
