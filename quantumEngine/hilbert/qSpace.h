@@ -73,6 +73,8 @@ public:
 
 	// called by qSpace::tallyDimensions() to count/sum/multiply up stuff
 	void tally(qSpace *space);
+
+	void dumpThisDimension(int serial);
 };
 
 /* ************************************************************ the space */
@@ -120,6 +122,8 @@ public:
 	struct qGrinder *qgrinder;
 
 	char label[MAX_LABEL_LEN+1];
+
+	void dumpAllDimensions(void);
 
 	void formatDirectOffsets(void);
 };

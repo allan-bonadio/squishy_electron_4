@@ -11,7 +11,7 @@
 #include "../debroglie/qWave.h"
 #include "../greiman/qViewBuffer.h"
 
-static bool traceSpaceCreation = false;
+static bool traceSpaceCreation = true;
 static bool traceAvatarDetail = false;
 
 /* ********************************************************** glue functions for js */
@@ -77,8 +77,9 @@ qSpace *completeNewSpace(qSpace *space, int nGrWorkers) {
 
 	space->miniGraphAvatar = new qAvatar(space, "miniGraph");
 
-	if (traceSpaceCreation) printf("   🚀 qSpace created: space=%p  mainAvatar=%p  grinder=%p\n",
-		space, mainAvatar, qgrinder);
+	space->dumpAllDimensions();
+//	if (traceSpaceCreation) printf("   🚀 qSpace created: space=%p  mainAvatar=%p  grinder=%p\n",
+//		space, mainAvatar, qgrinder);
 	return space;
 }
 

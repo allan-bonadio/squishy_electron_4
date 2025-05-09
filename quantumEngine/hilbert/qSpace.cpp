@@ -71,7 +71,7 @@ void qSpace::addDimension(int N, int continuum, double dx, const char *label) {
 	nDimensions++;
 }
 
-// do the tally for this dimension
+// do the tally for JUST THIS dimension
 void qDimension::tally(qSpace *space) {
 	space->nStates *= N;
 	nStates = space->nStates;  // accumulates states of prev dims
@@ -85,7 +85,8 @@ void qDimension::tally(qSpace *space) {
 	space->alpha += d2Coeff;
 }
 
-// after all the addDimension calls, what have we got?  calculate, not alloc.
+// do the tally for ALL DIMENSIONS, COMBINED.  after all the addDimension calls,
+// what have we got?  calculate, not alloc.  This kindof assumes one dimensions; i'll figure it out later.
 void qSpace::tallyDimensions(void) {
 	nPoints = 1;
 	nStates = 1;
@@ -100,6 +101,18 @@ void qSpace::tallyDimensions(void) {
 	// finish up all the dimensions now that we know them all - inside out
 	for (int dd = nDimensions-1; dd >= 0; dd--) {
 		dimensions[dd].tally(this);
+	}
+	dt = 1 / (2 * alpha);
+
+	spectrumLength = dimensions[0].spectrumLength;
+
+	if (traceQSpace) {
+		printf("🚀  got past tallyDimensions; nStates=%d  nPoints=%d\n", nStates, nPoints);
+		printf("   d2Coeff=%lf  alpha=%lf /ps  dt=%lf ps\n",
+			dimensions[0].d2Coeff, alpha, dt);
+	}
+}
+
 
 		// qDimension *dim = dimensions + dd;
 		//
@@ -113,17 +126,7 @@ void qSpace::tallyDimensions(void) {
 		// double dx2 = dim->dx * dim->dx;
 		// dim->d2Coeff = ℏOver2m_e / dx2;
 		// alpha += dim->d2Coeff;
-	}
-	dt = 1 / (2 * alpha);
 
-	spectrumLength = dimensions[0].spectrumLength;
-
-	if (traceQSpace) {
-		printf("🚀  got past tallyDimensions; nStates=%d  nPoints=%d\n", nStates, nPoints);
-		printf("   d2Coeff=%lf  alpha=%lf /ps  dt=%lf ps\n",
-			dimensions[0].d2Coeff, alpha, dt);
-	}
-}
 
 // call this After addDIMENSION calls to get it ready to go.
 // If nPoints is still zero, initSpace hasn't been called yet; failure
@@ -162,6 +165,9 @@ void qSpace::formatDirectOffsets(void) {
 	makeNamedIntGetter(continuum, dimensions[0].continuum);  // until 2nd D
 	makeNamedIntGetter(start, dimensions[0].start);  // until 2nd D
 	makeNamedIntGetter(end, dimensions[0].end);  // until 2nd D
+	makeIntGetter(nStates);
+	makeIntGetter(nPoints);
+
 	makeNamedDoubleGetter(dimLength, dimensions[0].dimLength);  // until 2nd D
 
 //	makeNamedIntGetter(nStates0, dimensions[0].nStates);
@@ -178,8 +184,6 @@ void qSpace::formatDirectOffsets(void) {
 	makeDoubleGetter(dt);
 
 	makeIntGetter(nDimensions);
-	makeIntGetter(nStates);
-	makeIntGetter(nPoints);
 	makeIntGetter(spectrumLength);
 
 	makePointerGetter(mainAvatar);
@@ -191,7 +195,7 @@ void qSpace::formatDirectOffsets(void) {
 	printf("\n🖼 🖼 --------------- done with qSpace direct access --------------\n");
 }
 
-/* ********************************************************** voltage */
+/* ********************************************************** dumping */
 
 // is this obsolete?  no, need it for C++ testing
 void qSpace::dumpVoltage(const char *title) {
@@ -212,3 +216,25 @@ void qSpace::dumpVoltage(const char *title) {
 	printf("🚀 == Voltage %s, %d...%d\n", title, dims->start, dims->end);
 }
 
+void qDimension::dumpThisDimension(int serial) {
+	printf("dimension %d %s:\n", serial, label);
+
+
+
+	printf("    N=%d   continuum=%d   start=%d   end=%d   nStates=%d   nPoints=%d   \ndimLength=%lg.4      dx=%lg.4      d2Coeff=%lg.4 \n     spectrumLength=%d\n",
+			N, continuum, start, end, nStates, nPoints, dimLength, dx, d2Coeff, spectrumLength);
+}
+
+void qSpace::dumpAllDimensions(void) {
+	printf("All %d dimensions of this space %s:\n", nDimensions, label);
+
+	for (int d = 0; d < nDimensions; d++) {
+		dimensions[d].dumpThisDimension(d);
+	}
+
+	printf("magic=%4c, alpha=%lg.4, dt=%lg.4, nStates=%d, nPoints=%d, spectrumLength=%d",
+			magic, 	alpha, 	dt, 	nStates, 	nPoints, 	spectrumLength);
+
+	printf("qDimension length: %lul   qSpace length: %lul\n", sizeof(qDimension), sizeof(qSpace));
+
+}
