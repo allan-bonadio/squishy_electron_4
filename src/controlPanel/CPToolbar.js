@@ -119,15 +119,6 @@ function CPToolbar(props) {
 	</div>;
 }
 
-// stuff that I removed and I'm too chicken to delete
-// 				<ShowVoltageControl showVoltage={props.showVoltage}
-// 					changeShowVoltage={props.changeShowVoltage} />
-
-// 				<button onClick={ev => this.cPanel.clickOnFFT(props.space)}>
-// 					FFT
-// 				</button>
-
-
 setPT();
 
 export default CPToolbar;
