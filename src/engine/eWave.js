@@ -10,8 +10,9 @@ import cx2rgb from '../gl/cx2rgb/cx2rgb.txlated.js';
 import {cppObjectRegistry, prepForDirectAccessors} from '../utils/directAccessors.js';
 import eSpace from './eSpace.js';
 
-let traceSetFamiliarWave = false;
-let traceSetFamiliarWaveResult = false;
+let traceSetFamiliarWave = true;
+let traceGaussian = false;
+let traceFamiliarResult = false;
 
 const _ = num => num.toFixed(4).padStart(9);
 const atan2 = Math.atan2;
@@ -259,7 +260,7 @@ class eWave {
 	// the first point here is like x=0 as far as the trig functions, and the last like x=-1
 	setCircularWave(n) {
 		const {start2, end2, N} = this.space.startEnd2;
-		const dAngle = Math.PI / N * (+n) * 2;
+		const dAngle = 2 * Math.PI / N * (+n);
 		const wave = this.wave;
 
 		for (let ix2 = start2; ix2 < end2; ix2 += 2) {
@@ -309,7 +310,7 @@ class eWave {
 		// must be half-odd-integer cuz the peak is between two integers..
 		// EXCEPT make it point to the right side of the peak to keep it an int.
 		let offset = Math.round(offsetUi * N / 100 + .5);  // now in units of X
-		if (traceSetFamiliarWave) console.log(`🌊  setGaussianWave freq=${freqUi} => ${freq} `+
+		if (traceGaussian) console.log(`🌊  setGaussianWave freq=${freqUi} => ${freq} `+
 			`  offset=${offsetUi}% => ${offset}   pulseWidth=${pulseWidthUi}% => ${pulseWidth.toFixed(4)}`)
 
 		// first, make the gaussian.  For Endless, need to wrap it around.
@@ -329,9 +330,9 @@ class eWave {
 		let first = (4 * gaussian[1] - gaussian[2]) / 3;
 		gaussian[0] = first;
 
-		if (traceSetFamiliarWave) {
+		if (traceGaussian) {
 			// Float64Array.map() results in another Float64Array; we want Array
-			console.log(`bare gaussian, before wraparound: `
+			console.log(`🌊 bare gaussian, before wraparound: `
 				+ (Array.from(gaussian)).map(
 					(val, ix) => `[${ix}]:${val.toFixed(4)}`
 				).join('  '));
@@ -341,8 +342,8 @@ class eWave {
 		for (let ix = 0; ix < N; ix++)
 			gaussian[ix] += gaussian[ix + N];
 
-		if (traceSetFamiliarWave) {
-			console.log(`bare gaussian, after wraparound: `
+		if (traceGaussian) {
+			console.log(`🌊 bare gaussian, after wraparound: `
 				+ (Array.from(gaussian))
 					.filter((val, ix) => (ix < N/2))
 					.map((val, ix) => `[${ix}]:${val.toFixed(4)}`).join('  '));
@@ -376,7 +377,7 @@ class eWave {
 		let nSideFreqs = Math.round(100 / pulseWidthUi * N / 2);
 		nSideFreqs = Math.min(nSideFreqs, Math.abs(freq) - 1)
 
-		if (traceSetFamiliarWave)
+		if (traceGaussian)
 			console.log(`🌊  setChordWave freq=${freqUi} => ${freq}  nSideFreqs=${nSideFreqs}`+
 			`  offset=${offsetUi}% => ${offset2}`);
 
@@ -405,8 +406,8 @@ class eWave {
 	setFamiliarWave(waveParams) {
 		waveParams = {...waveParams};
 		waveParams.pulseWidth = Math.max(1, waveParams.pulseWidth);  // emergency!!  this gets really slow
-		if (traceSetFamiliarWaveResult) {
-			console.log(`setFamiliarWave() starts, wave params: `+
+		if (traceFamiliarResult) {
+			console.log(`🌊 setFamiliarWave() starts, wave params: `+
 			`waveBreed=${waveParams.waveBreed}   `+
 			`waveFrequency UI=${waveParams.waveFrequency.toFixed(2)}/N   `+
 			`pulseWidth UI=${waveParams.pulseWidth.toFixed(2)}%   `+
@@ -438,7 +439,7 @@ class eWave {
 		this.normalize();
 		this.fixBoundaries();
 
-		if (traceSetFamiliarWaveResult)
+		if (traceFamiliarResult)
 			this.rainbowDump(`eWave.setFamiliarWave(${waveParams.waveBreed}) done`);
 	}
 }
