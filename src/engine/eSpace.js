@@ -161,16 +161,14 @@ export class eSpace {
 		//	continuum: dim.continuum, dimLength: dim.dimLength};
 	}
 
-	// this will return the DOUBLE of start and end so you can just loop thru += 2
+	// this will return the DOUBLE of start and end, for indexing into complex tables.
+	// so you can just loop thru += 2
 	// skipping over reals/imags.  but NOT N, that's honest
 	// call like this:       const {start2, end2, N} = this.space.startEnd2;
 	// note start2, end2 NEED TO BE SPELLED exactly that way!
 	get startEnd2() {
-		//const dim = this.dimensions[0];
-		return {start: this.start*2, end: this.end*2, N: this.N, nPoints: this.nPoints*2,
+		return {start2: this.start*2, end2: this.end*2, N: this.N, nPoints2: this.nPoints*2,
 			continuum: this.continuum, dimLength: this.dimLength};
-		//return {start2: dim.start*2, end2: dim.end*2, N: dim.N, nPoints2: this.nPoints * 2,
-		//	continuum: dim.continuum, dimLength: dim.dimLength};
 	}
 }
 
