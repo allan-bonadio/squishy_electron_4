@@ -21,10 +21,13 @@ const MINI_WIDTH = 300;
 const MINI_HEIGHT = 150;
 
 
+let traceRegenerate = true;
+
+
 function setPT() {
 	// variables from on high, and the funcs needed to change them
 	SetWaveTab.propTypes = {
-		// actually sets the one in use by the algorithm
+		// actually sets the one in use by the main wave
 		saveMainWave: PropTypes.func.isRequired,
 
 		waveParams: PropTypes.shape({
@@ -42,171 +45,143 @@ function setPT() {
 }
 
 // a component that renders the Wave tab, to set a new wave
-class SetWaveTab extends React.Component {
-	constructor(props) {
-		super(props);
-		checkPropTypes(this.constructor.propTypes, props, 'prop', this.constructor.name);
-		this.state = {
-			space: null,
-			// also wave params
-		};
-
-		// pour these directly into the initial state
-		let waveParams = getAGroup('waveParams');
-		Object.assign(this.state, waveParams);
-
-		// nobody will set the wave before the space is created!!
-		eSpaceCreatedPromise
-		.then(space => {
-			// if the space has been created, so has all the stuff hanging off it
-			this.miniGraphAvatar = space.miniGraphAvatar;
-			this.miniGraphEWave = this.miniGraphAvatar.ewave;
-
-			// space in the state will allow the GLScene to start showing, therefore initializing
-			this.setState({space});
-		})
-		.catch(rex => {
-			let ex = interpretCppException(rex);
-			console.error(ex.stack ?? ex.message ?? ex);
-			debugger;
-		});
-	}
-	yScale = scaleLinear().range([0, MINI_HEIGHT]);
+function SetWaveTab(props) {
+	checkPropTypes(SetWaveTab.propTypes, props, 'prop', 'SetWaveTab');
+	let {saveMainWave, waveParams, setWaveParams, space} = props;
 
 	// set the captive minGraph wave to the new settings, after user changed one.
-	// Since the state was also changed, we'll do a render.  but this will do a GL draw.
-	regenerateMiniGraphWave() {
-		if (!this.state.space) return;  // too soon
-		this.miniGraphEWave.setFamiliarWave(this.state);
-		this.miniGraphAvatar.smoothHighest = 0;
-		this.miniGraphAvatar.doRepaint?.();
+	// this will do a GL draw.
+	function regenerateMiniGraphWave() {
+		if (traceRegenerate)
+			console.log(`Regenerating WaveTab minigraph.  params: `, waveParams);
+		space.miniGraphAvatar.ewave.setFamiliarWave(waveParams);
+		space.miniGraphAvatar.smoothHighest = 0;
+		space.miniGraphAvatar.doRepaint?.();
+	}
+
+	// set any combination of the wave params, in the Control Panel state.
+	function setAndRegenerate(wp) {
+		setWaveParams(wp);
+
+		// set it in our local copy so it draws the latest
+		waveParams = {...waveParams, ...wp};
+		regenerateMiniGraphWave()
 	}
 
 	// the local state is just the temporary settings before user clicks Set Wave
-	setBreed = waveBreed => {
-		this.setState({waveBreed}, () => this.regenerateMiniGraphWave());
+	const setBreed = waveBreed => {
+		setAndRegenerate({waveBreed});
 	}
-	setWaveFrequency = waveFrequency => {
-		this.setState({waveFrequency}, () => this.regenerateMiniGraphWave());
+	const setWaveFrequency = waveFrequency => {
+		setAndRegenerate({waveFrequency});
 	}
-	setPulseWidth = pulseWidth => {
-		this.setState({pulseWidth}, () => this.regenerateMiniGraphWave());
+	const setPulseWidth = pulseWidth => {
+		setAndRegenerate({pulseWidth});
 	}
-	setPulseCenter = pulseCenter => {
-		this.setState({pulseCenter}, () => this.regenerateMiniGraphWave());
-	}
-
-	saveMainWave =
-	() => {
-		const s = this.state;
-
-		// take other stuff out of the state.  just want the wave params.
-		const {waveBreed, waveFrequency, pulseWidth, pulseCenter} = s;
-		this.props.saveMainWave({waveBreed, waveFrequency, pulseWidth, pulseCenter});
+	const setPulseCenter = pulseCenter => {
+		setAndRegenerate({pulseCenter});
 	}
 
-	render() {
-		const p = this.props;
-		const s = this.state;
+	// some sliders disappear for some breeds
+	const breed = waveParams.waveBreed;
+	const needPulseWidth = breed == 'gaussian' || breed == 'chord';
+	const needOffset = (breed == 'gaussian' || breed == 'chord');
 
-		// some sliders disappear for some breeds
-		const breed = s.waveBreed;
-		const needPulseWidth = breed == 'gaussian' || breed == 'chord';
-		const needOffset = (breed == 'gaussian' || breed == 'chord');
+	// don't let them set a freq to Nyquist or beyond
+	let highestFrequency = space.nStates / 2 - 1;
+	highestFrequency = Math.min(
+		alternateMinMaxs.waveParams.waveFrequency.max, highestFrequency);
 
-		// don't let them set a freq to Nyquist or beyond
-		let highestFrequency = p.space ? p.space.nStates / 2 - 1 : Infinity;
-		highestFrequency = Math.min(
-			alternateMinMaxs.waveParams.waveFrequency.max, highestFrequency);
+	// sliders for each param besides breed
+	const waveParamSliders = <>
+		<TextNSlider className='waveFrequency' label='frequency'
+			value={+waveParams.waveFrequency}
+			min={-highestFrequency}
+			max={highestFrequency}
+			step={'standing' == breed ? .5 : 1}
+			handleChange={setWaveFrequency}
+			title="how many times your wave wraps around the rainbow"
+		/>
 
-		const waveParamSliders = <>
-			<TextNSlider className='waveFrequency' label='frequency'
-				value={+s.waveFrequency}
-				min={-highestFrequency}
-				max={highestFrequency}
-				step={'standing' == breed ? .5 : 1}
-				handleChange={this.setWaveFrequency}
-			/>
+		<TextNSlider className='pulseWidth' label='pulse width, %'
+			style={{display: needPulseWidth ? 'block' :  'none'}}
+			value={+waveParams.pulseWidth}
+			min={alternateMinMaxs.waveParams.pulseWidth.min}
+			max={alternateMinMaxs.waveParams.pulseWidth.max}
+			step={.1}
+			handleChange={setPulseWidth}
+			title="how fat your  wave packet is"
+		/>
 
-			<TextNSlider className='pulseWidth' label='pulse width, %'
-				style={{display: needPulseWidth ? 'block' :  'none'}}
-				value={+s.pulseWidth}
-				min={alternateMinMaxs.waveParams.pulseWidth.min}
-				max={alternateMinMaxs.waveParams.pulseWidth.max}
-				step={.1}
-				handleChange={this.setPulseWidth}
-			/>
+		<TextNSlider className='offset' label='offset, %'
+			style={{display: needOffset ? 'block' :  'none'}}
+			value={+waveParams.pulseCenter}
+			min={alternateMinMaxs.waveParams.pulseCenter.min}
+			max={alternateMinMaxs.waveParams.pulseCenter.max}
+			step={2}
+			handleChange={setPulseCenter}
+			title="where do you want the hump to be"
+		/>
+	</>;
 
-			<TextNSlider className='offset' label='offset, %'
-				style={{display: needOffset ? 'block' :  'none'}}
-				value={+s.pulseCenter}
-				min={alternateMinMaxs.waveParams.pulseCenter.min}
-				max={alternateMinMaxs.waveParams.pulseCenter.max}
-				step={2}
-				handleChange={this.setPulseCenter}
-			/>
+	// the minigraph
+	const glScene = <GLScene
+		space={space} avatar={space.miniGraphAvatar}
+		sceneClassName='flatScene' sceneName='setWaveMiniGraph'
+		canvasInnerWidth={MINI_WIDTH}
+		canvasInnerHeight={MINI_HEIGHT}
+		specialInfo={{bumperWidth: 0}}
+		title="preview of what your wave will look like after clicking Set Wave"
+	/>;
 
-		</>;
+	// radio buttons
+	const breedSelector = <div className='breedSelector'>
+		<label title='a spiral wave, same magnitude everywhere'>
+			circular
+			<input type='radio' checked={'circular' == breed} name='circular'
+				onChange={ev => setBreed('circular')} />
+		</label>
 
-		let glScene = '';
-		if (s.space) {
-			// warning: this +2 is a defined constant in WaveView
-			glScene = <GLScene
-						space={s.space} avatar={this.miniGraphAvatar}
-						sceneClassName='flatScene' sceneName='setWaveMiniGraph'
-						canvasInnerWidth={MINI_WIDTH}
-						canvasInnerHeight={MINI_HEIGHT}
-						specialInfo={{bumperWidth: 0}}
-					/>
-		}
+		<label title='two identical waves traveling in opposite directions'>
+			standing
+			<input type='radio'  checked={'standing' == breed} name='standing'
+				onChange={ev => setBreed('standing')} />
+		</label>
 
-		const breedSelector = <div className='breedSelector'>
-			<label>
-				circular
-				<input type='radio' checked={'circular' == breed} name='circular'
-					onChange={ev => this.setBreed('circular')} />
-			</label>
+		<label title='a typical wave packet'>
+			gauss pulse
+			<input type='radio'  checked={'gaussian' == breed} name='gaussian'
+				onChange={ev => setBreed('gaussian')} />
+		</label>
 
-			<label>
-				standing
-				<input type='radio'  checked={'standing' == breed} name='standing'
-					onChange={ev => this.setBreed('standing')} />
-			</label>
+		{/* sorry don't have time to fix this now     <label>
+			chord pulse
+			<input type='radio'  checked={'chord' == breed}
+				onChange={ev => setBreed('chord')} />
+		</label>*/}
+	</div>;
 
-			<label>
-				gauss pulse
-				<input type='radio'  checked={'gaussian' == breed} name='gaussian'
-					onChange={ev => this.setBreed('gaussian')} />
-			</label>
+	return <div className='SetWaveTab  controlPanelPanel'
+			title="This tab will set the main wave, and save it for next time.">
+		<h3>Design a new Wave</h3>
+		<div className='waveTabCol '>
+			{breedSelector}
+			<button className='setWaveButton' onClick={ev => saveMainWave(waveParams)}
+					title='start using it' >
+				Set Wave
+			</button>
+		</div>
 
-			{/* sorry don't have time to fix this now     <label>
-				chord pulse
-				<input type='radio'  checked={'chord' == breed}
-					onChange={ev => this.setBreed('chord')} />
-			</label>*/}
-		</div>;
-
-		return <div className='SetWaveTab  controlPanelPanel'
-		  		title="This will set the main wave, and save it for next time.">
-			<h3>Design a new Wave</h3>
-			<div className='waveTabCol '>
-				{breedSelector}
-				<button className='setWaveButton' onClick={ev => this.saveMainWave(this.state)}>
-						Set Wave
-				</button>
+		<div className='waveTabCol'>
+			<div className='waveMiniGraph'>
+				{glScene}
 			</div>
+		</div>
 
-			<div className='waveTabCol'>
-				<div className='waveMiniGraph'>
-					{glScene}
-				</div>
-			</div>
-
-			<div className='waveTabCol waveParamSliders'>
-				{waveParamSliders}
-			</div>
-		</div>;
-	}
+		<div className='waveTabCol waveParamSliders'>
+			{waveParamSliders}
+		</div>
+	</div>;
 }
 setPT();
 
