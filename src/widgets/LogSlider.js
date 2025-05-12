@@ -62,6 +62,8 @@ class LogSlider extends React.Component {
 		wholeStyle: PropTypes.object,   // whole  component, like to make it invisible
 		inputStyle: PropTypes.object,  // just the input.range slider
 
+		// a help msg, optional
+		title: PropTypes.string,
 	}
 
 	static defaultProps = {
@@ -141,7 +143,8 @@ class LogSlider extends React.Component {
 			: undefined;
 
 		try {
-			return <div className={`${p.className} LogSlider`} style={p.wholeStyle ?? {}}>
+			return <div className={`${p.className} LogSlider`} style={p.wholeStyle ?? {}}
+				title={p.title}>
 
 				{annotation}
 

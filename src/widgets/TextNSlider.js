@@ -22,6 +22,9 @@ function setPT() {
 
 		// dom ID of <datalist> element
 		list: PropTypes.string,
+
+		// a help msg, optional
+		title: PropTypes.string,
 	};
 
 	TextNSlider.defaultProps = {
@@ -82,12 +85,13 @@ function TextNSlider(props) {
 			<input type='range'
 					value={value} min={p.min} max={p.max} name={p.label}
 					step={p.step}
-					onChange={handleSlider} />
+					onChange={handleSlider}/>
 		</>;
 	}
 
 	const label = p.label ? <span>{p.label}</span> : '';
-	return <div className={`TextNSlider ${p.className}`} style={p.style}>
+	return <div className={`TextNSlider ${p.className}`} style={p.style}
+					title={p.title} >
 		{label}
 		{controls}
 	</div>;

@@ -45,6 +45,9 @@ function setPT() {
 
 		// if our caller needs the canvas and gl ctx itself, otherwise undef
 		setGlCanvas: PropTypes.func,
+
+		// a help msg, optional
+		title: PropTypes.string,
 	};
 }
 
@@ -175,6 +178,7 @@ function GLScene(props) {
 			height={cHeight}
 			style={{width: cWidth + 'px', height: cHeight + 'px'}}
 			ref={canvasRef}
+			title={p.title}
 		/>
 	);
 }
