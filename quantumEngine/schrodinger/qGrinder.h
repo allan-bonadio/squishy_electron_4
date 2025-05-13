@@ -146,7 +146,7 @@ struct qGrinder {
 	double stretchedDt;
 
 	// this is ℏ / 2 m_e dx², the coefficient on Schrodinger's for the second
-	// derivative. dx is the linear spacing between datapoints.  Actually,  this
+	// derivative. DX is the linear spacing between datapoints.  Actually,  this
 	// should be specific to the dimension that we're integrating along.  So it
 	// only applies to the 0-ith dimension, the only one we have now.  I'll
 	// figure out a better way when we get to more dimensions.

@@ -56,10 +56,10 @@ qAvatar::qAvatar(qSpace *sp, const char *lab)
 		vBuffer);
 
 	if (traceSpace) {
-		printf("the qSpace for avatar %s:   magic=%c%c%c%c label=%s nDimesions=%d  "
+		printf("the qSpace for avatar %s:   magic=" MAGIC_FORMAT " label=%s nDimesions=%d  "
 			"nStates=%d nPoints=%d voltage=%p  spectrumLength=%d  \n",
 			label,
-			space->magic >> 24,  space->magic >> 16, space->magic >> 8, space->magic,
+			MAGIC_ARGS,
 			space->label, space->nDimensions, space->nStates, space->nPoints,
 			space->voltage, space->spectrumLength);
 		qDimension *dims = space->dimensions;
@@ -108,9 +108,10 @@ void qAvatar::formatDirectOffsets(void) {
 /* ********************************************************** dump  */
 
 // dump all the fields of an avatar other than the actual datapoints
+// I don't think anybody uses this
 void qAvatar::dumpObj(const char *title) {
 	printf("\n🌊🌊 ==== qAvatar | %s ", title);
-	printf("        magic: %c%c%c%c   qSpace=%p   '%s'   \n",
+	printf("        magic: " MAGIC_FORMAT "   qSpace=%p   '%s'   \n",
 		magic>>3, magic>>2, magic>>1, magic, space, label);
 
 	printf("        qwave %p     vBuffer %p\n", qwave, vBuffer);

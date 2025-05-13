@@ -181,8 +181,8 @@ void qBuffer::dumpThat(qCx *wave, bool withExtras) {
 
 // works on any buffer, shows which kind
 void qBuffer::dump(const char *title, bool withExtras) {
-	printf(" \n🌊🌊 a %c%c%c%c buffer, o%p w%p | %s \n",
-		magic >> 24, magic >> 16, magic >> 8, magic, this, wave, title);
+	printf(" \n🌊🌊 a " MAGIC_FORMAT " buffer, o%p w%p | %s \n",
+		MAGIC_ARGS, this, wave, title);
 	qBuffer::dumpHeadings();
 	qBuffer::dumpSegment(wave, withExtras, start, end, continuum);
 	printf("        ==== end of qBuffer ====\n\n");

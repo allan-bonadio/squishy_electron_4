@@ -88,16 +88,15 @@ qGrinder::qGrinder(qSpace *sp, qAvatar *av, int nGrWorkers, const char *lab)
 		printf("        its continuum=%d spectrumLength=%d label=%s\n",
 			dims[0].continuum, dims[0].spectrumLength, dims[0].label);
 
-		printf("      the qSpace for 🪓 grinder %s:   magic=%c%c%c%c spacelabel=%s\n",
-			label,
-			space->magic >> 24,  space->magic >> 16, space->magic >> 8, space->magic,
-			space->label);
+		printf("      the qSpace for 🪓 grinder %s:   magic=" MAGIC_FORMAT " spacelabel=%s\n",
+			label, MAGIC_ARGS,space->label);
 		printf("         nDimesions=%d   nStates=%d nPoints=%d voltage=%p spectrumLength=%d  samplePoint=%d\n",
 			space->nDimensions, space->nStates, space->nPoints,
 			space->voltage, space->spectrumLength,
 			samplePoint);
-		printf("qGrinder:103 sentinel should be equal: %d %d\n", (int) sentinel, (int) grSENTINEL_VALUE);
 	}
+	if (sentinel != grSENTINEL_VALUE)
+		printf("qGrinder: sentinel should be equal: %d %d\n", (int) sentinel, (int) grSENTINEL_VALUE);
 
 	FORMAT_DIRECT_OFFSETS;
 };
@@ -202,8 +201,8 @@ void qGrinder::formatDirectOffsets(void) {
 // dump all the fields of a grinder
 void qGrinder::dumpObj(const char *title) {
 	speedyLog("\n🪓🪓 ==== qGrinder | %s ", title);
-	speedyLog("        magic: %c%c%c%c   qSpace=%p '%s'   \n",
-		magic>>24, magic>>16, magic>>8, magic, space, label);
+	speedyLog("        magic: " MAGIC_FORMAT "   qSpace=%p '%s'   \n",
+		MAGIC_ARGS, space, label);
 
 	speedyLog("        elapsedTime=%lf, frameSerial=%d, dt=%lf, \n",
 		elapsedTime, frameSerial, space->dt);
