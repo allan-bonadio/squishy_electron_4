@@ -22,7 +22,7 @@ extern const double ℏ;  //  = 105.4571817 pfg nm^2 / ps, Plank's reduced
 extern const double m_e;  //  = .91093837015 pico femto grams, mass of electron
 
 // these two are used directly in Schrodinger's - the equ we integrate is all / ℏ
-extern const double ℏOver2m_e;  // = ℏ / (2 * m_e);  // units nm^2 / ps
+extern const double ℏOver2m_e;  // = ℏ / (2 * m_e)  units nm^2 / ps
 extern const double inverseℏ;  //  = 1 / ℏ;  // units ps / pfg nm^2
 
 extern const double NaN;
@@ -42,6 +42,8 @@ extern const double NaN;
 extern void speedyLog(const char* format, ...);
 extern void speedyFlush(void);
 
+#define MAGIC_FORMAT "%c%c%c%c"
+#define MAGIC_ARGS magic >> 24, magic >> 16, magic >> 8, magic
 
 #endif
 

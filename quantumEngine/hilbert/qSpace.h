@@ -56,9 +56,9 @@ public:
 	// actual distance, in nanometers, of the whole dimension
 	double dimLength;
 
-	// nanometers separating data points.  Named dx even if this coordinate is y or z.
+	// nanometers separating data points.
 	// Not used if this is a discrete coordinate.
-	double dx;
+	double DX;
 
 	// multiply this onto the second derivative while integrating.  Depends on
 	// dx so different for each dimension.
@@ -74,7 +74,7 @@ public:
 	// called by qSpace::tallyDimensions() to count/sum/multiply up stuff
 	void tally(qSpace *space);
 
-	void dumpThisDimension(int serial);
+	void dumpDimension(void);
 };
 
 /* ************************************************************ the space */
@@ -85,7 +85,7 @@ public:
 	~qSpace(void);
 
 	// additional for space creation
-	void addDimension(int N, int continuum, double dx, const char *label);
+	void addDimension(int N, int continuum, double dimLength, const char *label);
 	private:
 		void tallyDimensions(void);
 	public:
@@ -123,7 +123,7 @@ public:
 
 	char label[MAX_LABEL_LEN+1];
 
-	void dumpAllDimensions(void);
+	void dumpSpace(void);
 
 	void formatDirectOffsets(void);
 };
@@ -134,7 +134,7 @@ public:
 extern "C" {
 	// create
 	qSpace *startNewSpace(const char *name = "a space");
-	void addSpaceDimension(qSpace *space, int N, int continuum, double dx, const char *label);
+	void addSpaceDimension(qSpace *space, int N, int continuum, double dimLength, const char *label);
 	qSpace *completeNewSpace(qSpace *space, int nThreads);
 
 	// destroy

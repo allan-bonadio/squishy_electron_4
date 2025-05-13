@@ -73,7 +73,7 @@ TEST(qSpace, qSpace_1DConstructorGauntlet)
 	LONGS_EQUAL(1, dims[0].start);
 	LONGS_EQUAL(65, dims[0].end);
 	LONGS_EQUAL(contENDLESS, dims[0].continuum);
-	DOUBLES_EQUAL(2.2, dims[0].dx, ERROR_RADIUS)
+	DOUBLES_EQUAL(2.2, dims[0].DX, ERROR_RADIUS)
 	STRCMP_EQUAL("x", dims[0].label);
 
 	delete space;

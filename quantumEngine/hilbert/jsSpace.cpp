@@ -48,15 +48,7 @@ qSpace *startNewSpace(const char *label) {
 
 // call this from JS to add one or more dimensions
 void addSpaceDimension(qSpace *space, int N, int continuum, double dimLength, const char *label) {
-	// each datapoint represents a piece of the length dx wide, with dx/2 before the center datapoint and dx/2 after.
-	int nSegments = N;
-	if (contWELL == continuum)
-	  nSegments--;
-	double dx = dimLength / nSegments;
-
-	if (traceSpaceCreation) printf("🚀 addSpaceDimension(N=%d, cont=%d, dimLength-%lf=>%lf=dx, %s)\n",
-		N, continuum, dimLength, dx, label);
-	space->addDimension(N, continuum, dx, label);
+	space->addDimension(N, continuum, dimLength, label);
 }
 
 // call this from JS to finish the process for the qSpace, create and add the avatars & voltage
@@ -77,7 +69,7 @@ qSpace *completeNewSpace(qSpace *space, int nGrWorkers) {
 
 	space->miniGraphAvatar = new qAvatar(space, "miniGraph");
 
-	space->dumpAllDimensions();
+	space->dumpSpace();
 //	if (traceSpaceCreation) printf("   🚀 qSpace created: space=%p  mainAvatar=%p  grinder=%p\n",
 //		space, mainAvatar, qgrinder);
 	return space;

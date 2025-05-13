@@ -18,9 +18,7 @@
 
 
 static bool traceQSpace = false;
-
-
-
+static bool traceSpaceCreation = true;
 
 /* ********************************************************** qSpace construction */
 
@@ -50,25 +48,42 @@ qSpace::qSpace(const char *lab)
 }
 
 // after the contructor, call this to add each dimension up to MAX_DIMENSIONS
-void qSpace::addDimension(int N, int continuum, double dx, const char *label) {
+void qSpace::addDimension(int N, int continuum, double dimLength, const char *label) {
 	if (nDimensions >= MAX_DIMENSIONS) {
 		printf("🚀 Error dimensions: %d\n", nDimensions);
 		throw std::runtime_error("🚀 too many dimensions");
 	}
 
 	// start of the next dim
-	qDimension *dims = dimensions + nDimensions;
-	dims->N = N;
-	dims->continuum = continuum;
-	dims->dx = dx;
+	qDimension *dim = dimensions + nDimensions;
+	dim->N = N;
+	dim->continuum = continuum;
 
-	dims->start = continuum ? 1 : 0;
-	dims->end = N + dims->start;
+	// each datapoint represents a segment of the length DX wide.  How wide is each?
+	int nSegments = N;
+	if (contWELL == continuum)
+	  nSegments--;
 
-	strncpy(dims->label, label, MAX_LABEL_LEN);
-	dims->label[MAX_LABEL_LEN] = 0;
+	dim->dimLength = dimLength;
+	dim->DX = dimLength / nSegments;
 
+	dim->start = continuum ? 1 : 0;
+	dim->end = N + dim->start;
+
+	strncpy(dim->label, label, MAX_LABEL_LEN);
+	dim->label[MAX_LABEL_LEN] = 0;
+
+	if (traceSpaceCreation)
+		dim->dumpDimension();
 	nDimensions++;
+}
+
+// do the tally for JUST THIS dimension
+void qDimension::dumpDimension(void) {
+	printf("dimension %s: 🚀\n", label);
+	printf("    N=%d   continuum=%d   start=%d   end=%d   nStates=%d   nPoints=%d  🚀"
+			" dimLength=%lg.4      DX=%lg.4      d2Coeff=%lg.4     spectrumLength=%d\n",
+			N, continuum, start, end, nStates, nPoints, dimLength, DX, d2Coeff, spectrumLength);
 }
 
 // do the tally for JUST THIS dimension
@@ -80,7 +95,7 @@ void qDimension::tally(qSpace *space) {
 
 	chooseSpectrumLength();
 
-	double dx2 = dx * dx;
+	double dx2 = DX * DX;
 	d2Coeff = ℏOver2m_e / dx2;
 	space->alpha += d2Coeff;
 }
@@ -113,22 +128,7 @@ void qSpace::tallyDimensions(void) {
 	}
 }
 
-
-		// qDimension *dim = dimensions + dd;
-		//
-		// nStates *= dim->N;
-		// dim->nStates = nStates;  // accumulates states of prev dims
-		// nPoints *= dim->start + dim->end;
-		// dim->nPoints = nPoints;  // accumulates
-		//
-		// dim->chooseSpectrumLength();
-		//
-		// double dx2 = dim->dx * dim->dx;
-		// dim->d2Coeff = ℏOver2m_e / dx2;
-		// alpha += dim->d2Coeff;
-
-
-// call this After addDIMENSION calls to get it ready to go.
+// call this After addDimension calls to get it ready to go.
 // If nPoints is still zero, initSpace hasn't been called yet; failure
 void qSpace::initSpace() {
 	tallyDimensions();
@@ -175,7 +175,7 @@ void qSpace::formatDirectOffsets(void) {
 //	makeNamedIntGetter(spaceLength0, dimensions[0].dimLength);
 //
 //	makeNamedIntGetter(spectrumLength0, dimensions[0].spectrumLength);
-//	makeNamedDoubleGetter(dx0, dimensions[0].dx);  // until 2nd D
+//	makeNamedDoubleGetter(dLength0, dimensions[0].DX);  // until 2nd D
 //	makeNamedStringPointer(label0, dimensions[0].label);
 
 
@@ -202,38 +202,29 @@ void qSpace::dumpVoltage(const char *title) {
 	int ix;
 	qDimension *dims = dimensions;
 
-	printf("🚀 == Voltage %s, %d...%d\n", title, dims->start, dims->end);
+	printf("🚀 == Voltage %s, %d...%d\n", title, dims[0].start, dims[0].end);
 
-	int half = dims->N / 2;
-	int quarter = dims->N / 4;
-	int quarterEnd = dims->start + quarter;
-	for (ix = dims->start; ix < quarterEnd; ix++) {
+	int half = dims[0].N / 2;
+	int quarter = dims[0].N / 4;
+	int quarterEnd = dims[0].start + quarter;
+	for (ix = dims[0].start; ix < quarterEnd; ix++) {
 
 		printf("[%3d] %8.4lg   [%3d] %8.4lg   [%3d] %8.4lg   [%3d] %8.4lg\n",
 			ix, voltage[ix], ix+quarter, voltage[ix+quarter],
 			ix+half, voltage[ix+half], ix+half+quarter, voltage[ix+half+quarter]);
 	}
-	printf("🚀 == Voltage %s, %d...%d\n", title, dims->start, dims->end);
+	printf("🚀 == Voltage %s, %d...%d\n", title, dims[0].start, dims[0].end);
 }
 
-void qDimension::dumpThisDimension(int serial) {
-	printf("dimension %d %s:\n", serial, label);
-
-
-
-	printf("    N=%d   continuum=%d   start=%d   end=%d   nStates=%d   nPoints=%d   \ndimLength=%lg.4      dx=%lg.4      d2Coeff=%lg.4 \n     spectrumLength=%d\n",
-			N, continuum, start, end, nStates, nPoints, dimLength, dx, d2Coeff, spectrumLength);
-}
-
-void qSpace::dumpAllDimensions(void) {
+void qSpace::dumpSpace(void) {
 	printf("All %d dimensions of this space %s:\n", nDimensions, label);
 
 	for (int d = 0; d < nDimensions; d++) {
-		dimensions[d].dumpThisDimension(d);
+		dimensions[d].dumpDimension();
 	}
 
-	printf("magic=%4c, alpha=%lg.4, dt=%lg.4, nStates=%d, nPoints=%d, spectrumLength=%d",
-			magic, 	alpha, 	dt, 	nStates, 	nPoints, 	spectrumLength);
+	printf("magic=" MAGIC_FORMAT ", alpha=%lg.4, dt=%lg.4, nStates=%d, nPoints=%d, spectrumLength=%d",
+			MAGIC_ARGS, 	alpha, 	dt, 	nStates, 	nPoints, 	spectrumLength);
 
 	printf("qDimension length: %lul   qSpace length: %lul\n", sizeof(qDimension), sizeof(qSpace));
 
