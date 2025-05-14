@@ -18,7 +18,7 @@ os.chdir(SQUISH_ROOT + '/quantumEngine')
 
 cpl = subprocess.run(['grep', '-ERnI', 'bool trace.* = true;', '.'])
 if 0 == cpl.returncode:
-	print("🔧 🔧 Try global regex search     bool trace.* = true;  ")
+	print("🔧 🔧 if needed, try global regex search     bool trace.* = true;  ")
 	retCode = 57
 
 print()
@@ -28,7 +28,7 @@ os.chdir(SQUISH_ROOT + '/src')
 
 cpl = subprocess.run(['grep', '-ERnI', '^(let|const) trace.* = true;', '.'])
 if 0 == cpl.returncode:
-	print("     ... 🔧 🔧 Try global regex search     let trace.* = true;  ")
+	print("     ... 🔧 🔧 if needed, try global regex search     let trace.* = true;  ")
 	retCode = 33
 
 print()
