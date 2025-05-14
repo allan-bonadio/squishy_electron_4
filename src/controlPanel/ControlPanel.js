@@ -330,15 +330,16 @@ export class ControlPanel extends React.Component {
 	}
 
 	// the Set Voltage button on the Set Voltage tab - always a familiar voltage profile
-	setVoltageHandler = (ev) => {
+	// TODO: move this to the end of this section
+	saveMainVoltage = (ev) => {
 		let voltageParams = this.getVoltageParams()
-		this.setVoltageParams(voltageParams);  // here, and to display in volt tab
+		this.setVoltageParams(voltageParams);  // to display in volt tab
 		this.setAndRenderFamiliarVoltage(voltageParams);  // for the space, and the WaveView
 		storeAGroup('voltageParams', voltageParams);  // remember from now on
 	}
 
 	// fills in the voltage buffer with familiar voltage most recently set for
-	// stored voltageParams called when user clicks reset voltage on cptoolbar
+	// stored voltageParams. called when user clicks reset voltage on cptoolbar
 	resetVoltageHandler = (ev) => {
 		const voltageParams = getAGroup('voltageParams');
 		this.setVoltageParams(voltageParams);
@@ -354,13 +355,15 @@ export class ControlPanel extends React.Component {
 			setVoltageParams={this.setVoltageParams}
 			showVoltage={s.showVoltage}
 			changeShowVoltage={this.changeShowVoltage}
-			setVoltageHandler={this.setVoltageHandler}
+			saveMainVoltage={this.saveMainVoltage}
 			space={this.space}
 		/>;
 	}
 
-	setShowVoltage(sv) {
+	changeShowVoltage = (ev) => {
+		const sv = ev.target.value;
 		this.setState({showVoltage: sv});
+		this.space.updateShowVoltage(sv);  // on the screen
 	}
 
 	/* ********************************************** integration tab */
@@ -434,7 +437,6 @@ export class ControlPanel extends React.Component {
 
 		let showingTabHtml = this.createShowingTab();
 
-		//setVoltageHandler={this.setVoltageHandler}
 		return <div className='ControlPanel'>
 			<CPToolbar
 				chosenRate={1000. / s.chosenFP}
