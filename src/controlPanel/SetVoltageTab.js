@@ -20,18 +20,18 @@ let MINI_HEIGHT = 150;
 // the setting, show/hide voltage on voltareaused in multiple places? not any more.
 // can't figure out how to get hover working.  grrrr.
 // TODO: this isn't special anymore; embed it into the tab.
-export function ShowVoltageControl(props) {
-	return <label className='ShowVoltageControl' >
-		Show Voltage
-		&nbsp;
-		<select name='showVoltage' value={props.showVoltage}
-					onChange={props.changeShowVoltage}>
-			<option value='always'>Always</option>
-			<option value='hover'>only while hovering</option>
-			<option value='never'>Never</option>
-		</select>
-	</label>;
-}
+//export function ShowVoltageControl(props) {
+//	return <label className='ShowVoltageControl' >
+//		Show Voltage
+//		&nbsp;
+//		<select name='showVoltage' value={props.showVoltage}
+//sd e4t					onChange={props.changeShowVoltage}>
+//			<option value='always'>Always</option>
+//			<option value='hover'>only while hovering</option>
+//			<option value='never'>Never</option>
+//		</select>
+//	</label>;
+//}
 //			<option value='hover'>only while hovering</option>
 
 
@@ -58,7 +58,8 @@ function setPT() {
 // the tab that user sets voltage buffer with
 function SetVoltageTab(p) {
 	// these are all the local versions, for use and setting in this Voltage Tab
-	const {voltageParams, setVoltageParams, showVoltage, changeShowVoltage, saveMainVoltage, space} = p;
+	const {voltageParams, setVoltageParams, showVoltage, changeShowVoltage,
+		saveMainVoltage, space} = p;
 	const vP = voltageParams;
 	const setVP = setVoltageParams;
 
@@ -268,11 +269,17 @@ function SetVoltageTab(p) {
 	//  <sup>{(vP.canyonPower).toFixed(1)}</sup>
 
   // right space.  soon to include: relaxation...
-	function renderMisc() {
-		return <div className='misc'>
-			<ShowVoltageControl showVoltage={showVoltage}
-				changeShowVoltage={changeShowVoltage} />
-		</div>;
+	function renderShowVoltage() {
+		return <label className='ShowVoltageControl' >
+			Show Voltage
+			&nbsp;
+			<select name='showVoltage' value={p.showVoltage}
+						onChange={p.changeShowVoltage}>
+				<option value='always'>Always</option>
+				<option value='hover'>only while hovering</option>
+				<option value='never'>Never</option>
+			</select>
+		</label>;
 	}
 
 
@@ -283,15 +290,16 @@ function SetVoltageTab(p) {
 		<div className='voltageBreedPanel'>
 			{renderBreedSelector()}
 
-			<button onClick={p.setVoltageHandler}
-					title="This will set the main voltage, and save it for next time.">
+			<button onClick={p.saveMainVoltage}
+					title={"This will set the voltage on the main display above, "
+						+" from what you've created on this panel, and save it for next time."}>
 				Set Voltage
 		 	</button>
 		</div>
 
 		{renderMiniGraphPanel()}
 
-		{renderMisc()}
+		{renderShowVoltage()}
 	</div>;
 
 	// removed
