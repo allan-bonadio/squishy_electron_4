@@ -19,9 +19,9 @@ import './volts.scss';
 let traceVoltageArea = false;
 
 let traceRendering = false;
-let traceDragging = false;
+let traceProfileDragging = true;
 let traceTweening = false;
-let traceWheel = false;
+let traceWheel = true;
 
 let traceScrollStretch = false;
 
@@ -34,7 +34,7 @@ function setPT() {
 		// includes scrollSetting, heightVolts, measuredMinVolts, measuredMaxVolts, xScale, yScale
 		mainVDisp: PropTypes.object,
 
-		showVoltage: PropTypes.string.isRequired,
+		//NOT NEEDED.  VoltOverlay shows and hides.  showVoltage: PropTypes.string.isRequired,
 
 		// for first couple of renders, space and idunno are null
 		space: PropTypes.object,
@@ -59,10 +59,12 @@ function VoltArea(props) {
 	if (traceVoltageArea)
 		console.log(`⚡️ starting VoltArea`);
 
-	// element refs
+	// svg element ref.
 	const svgRef = useRef();
 	let svgEl = svgRef.current;
 	let svgRect = svgEl?.getBoundingClientRect();
+
+	// <path refs
 	const tactileRef = useRef();
 	let tactileEl = tactileRef.current;
 	const visibleRef = useRef();
@@ -153,7 +155,7 @@ function VoltArea(props) {
 		if (ix == latestIx && Math.abs(newVoltage - latestVoltage) < mVD.heightVolts * .01)
 			return;  // same old same old; these events come too fast
 
-		if (traceDragging) {
+		if (traceProfileDragging) {
 			console.log(`⚡⚡️ ${phase} on point (${ev.clientX.toFixed(1)}, ${ev.clientY.toFixed(1)}) `
 				+` voltage @ ix=${ix} changing from ${mVD.voltageBuffer[ix].toFixed(0)} to `
 				+`${newVoltage.toFixed(0)}`);
@@ -198,7 +200,7 @@ function VoltArea(props) {
 	// called during dragging; only at the end.
 	const pointerDown =
 	(ev) => {
-		if (traceDragging)
+		if (traceProfileDragging)
 			console.log(`👈 👆  pointerDown on tactile Line`, this, ev);
 
 		// only react if the LEFT button is down
@@ -230,7 +232,7 @@ function VoltArea(props) {
 	(ev) => {
 		// ev.buttons is zero here, this is called after button(s) released
 		if (dragging) {
-			if (traceDragging) {
+			if (traceProfileDragging) {
 				console.log(`⚡⚡️ pointer UP on point (${ev.clientX.toFixed(1)}, ${ev.clientY.toFixed(1)}) `
 					+` voltage @ ix=${latestIx} changing from ${mVD.voltageBuffer[latestIx].toFixed(0)}`
 					+` to ${latestVoltage.toFixed(0)}`);
@@ -241,7 +243,7 @@ function VoltArea(props) {
 			latestIx = latestVoltage = undefined;
 			//setChangeCounter(changeCounter++);
 
-			if (traceDragging)
+			if (traceProfileDragging)
 				mVD.dumpVoltage('pointer up', 8);
 			ev.preventDefault();
 			ev.stopPropagation();
@@ -249,6 +251,7 @@ function VoltArea(props) {
 	}
 
 	// we only do vertical.  right now.  Moves the voltage line (but not its voltage)
+	// By default this is handled as a passive event, but we need active so we have to do it outselves.
 	const wheelHandler =
 	(ev) => {
 		let deltaPixels;
@@ -277,10 +280,32 @@ function VoltArea(props) {
 				ev);
 		}
 
-		// can't cuz it's passive ev.preventDefault();
+		// we can't do the preventDefault() if this handler is passive.  Hence all the kicking and screaming.
+		ev.preventDefault();
 		ev.stopPropagation();
 	}
 
+	// set the wheel event handler, with passive OFF and with capture so we can
+	// avoid passing it to anybody else.
+	const wheelHandlerOptions = {passive: false, capture: true};
+
+	// intercepted with a ref callback, we set the wheel event handler and
+	// remove it when done, as we should.  React 19+ apparently wants you to
+	// RETURN a cleanup function instead of calling svgRefCallback() with null.
+	const svgRefCallback = (se) => {
+		if (!se)  {
+			// element went away.  (or this is the first render... in which case the remove is harmless.)
+			// must be exactly same args as the add call
+			svgEl.removeEventListener('wheel', wheelHandler, wheelHandlerOptions)
+		}
+
+		svgRef.current = svgEl = se;
+
+		if (svgEl) {
+			// all of this is to set passive here to false.   React gives us no way to do that.
+			svgEl.addEventListener('wheel', wheelHandler, wheelHandlerOptions);
+		}
+	}
 
 	/* *************************************************** rendering */
 
@@ -340,20 +365,21 @@ function VoltArea(props) {
 	mVD.setVoltScales(p.drawingLeft, p.drawingWidth, p.canvasInnerHeight);
 
 	// these elements show and hide
-	let vClass = p.showVoltage +'ShowVoltage';
+	// NO!  this is done in VoltOverlay  let vClass = p.showVoltage +'ShowVoltage';
+	// so the whole assembly shows and hides incl sidebar
 
 	let vArea = (
 		<svg className='VoltArea'
 			viewBox={`${p.drawingLeft} 0 ${p.drawingWidth} ${p.canvasInnerHeight}`}
 			x={p.drawingLeft} width={p.drawingWidth} height={p.canvasInnerHeight}
-			ref={svgRef}
-			onWheel={wheelHandler} onPointerMove={pointerMove}
+			ref={svgRefCallback}
+			onPointerMove={pointerMove}
 			onPointerUp={pointerUp} onPointerLeave={pointerUp}
 		>
-			<g className={'optionalVoltage ' + vClass}>
+			<g>
 				{/* for showVoltage on hover, need this to  hover over.  No ev handlers here,
 					but the .alwaysShowVoltage etc classes' :hover doesn't catch them othrwise
-					TODO: I need the hover mode to work!  */}
+					TODO: I need the hover mode to work!  ??? unneeded? */}
 				<rect className='hoverBox' key='hoverBox'
 					x={p.drawingLeft} y={0}
 					width={p.drawingWidth} height={p.canvasInnerHeight}
@@ -365,8 +391,6 @@ function VoltArea(props) {
 
 		</svg>
 	);
-
-
 
 	if (traceRendering)
 		console.log(`⚡️ VoltArea render done`);

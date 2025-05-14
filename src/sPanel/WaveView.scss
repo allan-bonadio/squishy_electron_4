@@ -56,7 +56,7 @@
 		// overlay with frame count, virtual time and other stuff, on top of canvas
 		.timeOverlay {
 			position: absolute;
-			pointer-events: none;  // need to click through for voltage
+			//pointer-events: none;  // need to click through for voltage
 			z-index: 30;
 			width: 100%;
 			height: 100%;

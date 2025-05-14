@@ -26,6 +26,7 @@ import {eSpaceCreatedPromise} from '../engine/eEngine.js';
 let traceBumpers = false;
 let traceDimensions = false;
 let traceDragCanvasHeight = false;
+let traceHover = false;
 
 const CANVAS_BORDER_THICKNESS = 1;
 const DOUBLE_THICKNESS = 2 * CANVAS_BORDER_THICKNESS;
@@ -45,7 +46,6 @@ export class WaveView extends React.Component {
 		outerWidth: PropTypes.number.isRequired,
 
 		sPanel: PropTypes.object.isRequired,
-		//showVoltage: PropTypes.string,  // need this!?!?
 	};
 
 	constructor(props) {
@@ -193,6 +193,26 @@ export class WaveView extends React.Component {
 		ev.stopPropagation();
 	}
 
+	/* ********************************************************* hover */
+	// I'm done trying to get the css :hover to do this right.  Enter and Leave events
+	// now turn on/off the voltage display.
+
+	hoverEnter = ev => {
+		if (traceHover)
+			console.log(`waveview hover enter`);
+		if (this.waveViewEl)
+			this.waveViewEl.classList.add('wvHovering')
+	}
+
+	hoverLeave = ev => {
+		if (traceHover)
+			console.log(`waveview hover Leave`);
+		if (this.waveViewEl)
+			this.waveViewEl.classList.remove('wvHovering')
+	}
+
+	grabWaveViewEl = el => this.waveViewEl = el;
+
 	/* ********************************************************* render */
 
 	render() {
@@ -245,16 +265,19 @@ export class WaveView extends React.Component {
 			voltOverlay = <VoltOverlay
 				space={this.space}
 				canvasInnerWidth={this.canvasInnerWidth} canvasInnerHeight={this.canvasInnerHeight}
-				showVoltage={p.showVoltage} mainVDisp={this.mainVDisp}
+				mainVDisp={this.mainVDisp}
 				bumperWidth={this.bumperWidth}
 			/>;
 		}
+		// now kept in VoltOverlay and Control Panel showVoltage={p.showVoltage}
 
 		let betweenBumpers = this.canvasInnerWidth - 2 * this.bumperWidth;
 
 		// the glScene is one layer.  Over that is the bumpers and widget area betweeen them.
 		return (
-		<div className='WaveView' style={{height: `${s.outerHeight}px`}}>
+		<div className='WaveView' style={{height: `${s.outerHeight}px`}}
+			onPointerEnter={this.hoverEnter} onPointerLeave={this.hoverLeave}
+			ref={this.grabWaveViewEl}>
 
 			{glScene}
 

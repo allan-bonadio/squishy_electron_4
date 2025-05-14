@@ -27,7 +27,7 @@ function setPT() {
 
 		// this component is always rendered so it retains its state,
 		// but won't draw anything if the checkbox is off
-		showVoltage: PropTypes.string,
+		////showVoltage: PropTypes.string,
 	};
 }
 
@@ -50,8 +50,11 @@ function VoltOverlay(props) {
 		return voltageBuffer;
 	}
 
-	// the Hooks way
-	const [vState, voltDispatch] = useReducer(voltReducer, mVD.voltageBuffer);  // see reducer above
+	// showVoltage state kept in Control Panel but duplicated here cuz here's where it's drawn
+	let [showVoltage, setShowVoltage] = useState(getASetting('voltageSettings', 'showVoltage'));
+
+	// see reducer above
+	const [vState, voltDispatch] = useReducer(voltReducer, mVD.voltageBuffer);
 
 	// use this function to actually set a point in the voltage buffer, instead of just a regular assignment
 	const setAPoint =
@@ -80,13 +83,30 @@ function VoltOverlay(props) {
 		storeASetting('voltageSettings', 'heightVolts', hv);
 	}
 
-	/* ************************************************************************ rendering */
-  if (traceGeometry)
-    console.log(`vOverlay: ciWidth=${p.canvasInnerWidth} ciHeight=${p.canvasInnerHeight}`);
+	// used by control panel when user changes ShowVoltage menu
+	p.space.updateShowVoltage = (sv) => {
+		setShowVoltage(sv);
+	}
+//
+//	const enterOverlay = ev => {
+////		const vo = document.querySelector('.VoltOverlay');
+////		vo.style.visibility = 'visible';
+////		console.log(`ptrEnter vo`);
+//	}
+//
+//	const leaveOverlay = ev => {
+////		const vo = document.querySelector('.VoltOverlay');
+////		vo.style.visibility = 'hidden';
+////		console.log(`ptrLeave vo`);
+//	}
+
+	/* ********************************************************** rendering */
+	if (traceGeometry)
+		console.log(`vOverlay: ciWidth=${p.canvasInnerWidth} ciHeight=${p.canvasInnerHeight}`);
 
 	// the class on the section here does the showing/hiding when user mouses over.
 	// (but see another mechanism in the sidebar!)
-	return <section className={(p.showVoltage ?? 'hover') + 'ShowVoltage VoltOverlay'}
+	return <section className={(showVoltage ?? 'hover') + 'ShowVoltage VoltOverlay'}
 			style={{width: p.width}} >
 		<VoltSidebar
 			mainVDisp={p.mainVDisp}
@@ -101,7 +121,6 @@ function VoltOverlay(props) {
 			drawingLeft={p.bumperWidth}
 			drawingWidth={p.canvasInnerWidth - 2 * p.bumperWidth}
 			canvasInnerHeight={p.canvasInnerHeight}
-			showVoltage={p.showVoltage}
 			space={p.space}
 			setAPoint={setAPoint}
 		/>

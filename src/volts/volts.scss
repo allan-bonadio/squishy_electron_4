@@ -9,13 +9,13 @@
 // user last dragged the resize box in the corner, in WaveView state.  Width
 // comes from the window width.  hmmm...
 .WaveView {
-	// the setting for showVoltage chooses one of these classes for different things...
+	// the setting for showVoltage chooses one of these classes for VoltOverlay
 	// display:none gets no events.  so change visibilty instead.
 	.alwaysShowVoltage {visibility: visible}
 	.hoverShowVoltage {visibility: hidden}
-	.hoverShowVoltage:hover {visibility: visible}
+	&.wvHovering .hoverShowVoltage {visibility: visible}
 	.neverShowVoltage {visibility: hidden}
-	
+
 	// encloses the actual glview, the timeOverlay, and the VoltOverlay
 	// the VoltOverlay is what hides/shows with mouseover (see above)
 	// see also WaveView.scss for more widgetArea
@@ -24,7 +24,6 @@
 		display: block;
 		width: 100%;
 		height: 100%;
-
 
 		.VoltArea {
 			position: absolute;
@@ -87,7 +86,7 @@
 
 			//background-color: #f006;  // testing
 			background-color: transparent;
-			
+
 			// but subelements DO have pointer-events
 			pointer-events: none;
 			user-select: none;
@@ -109,7 +108,7 @@
 				color: common.$voltageColor;
 
 				pointer-events: auto;
-				
+
 				&.scrollDown, &.scrollUp {
 					padding-left: 0;
 					div {
