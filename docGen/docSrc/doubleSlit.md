@@ -19,3 +19,20 @@ You cannot tell which slit a particular electron went through, cuz it's still a 
 At the back wall, the waves' 𝜓 arrives, and the amount of each electron's 𝜓 will vary at different locations on the wall.  As you move along the wall, the distance to each of the two slits change gradually.  If the two distances are the same, the sub-beams' wave crests and troughs line up, so the 𝜓 will be full-strength there.  This is also true if the distances are off by a full wavelength, two full wavelengths, or any integer number of wavelengths.
 
 If the distances are 1/2 wavelength off, or 3/2 or 5/2 or similar, then crests and troughs line up with each other and cancel out.  So, no 𝜓.  Distances in between will result in shades of gray (sortof).
+
+
+
+================================
+
+
+When the light comes out of the laser, it's monochromatic, and coherent.  In other words, the photons exist in a momentum eigenstate.  Waves.  This (these) eigenstates are superpositions of all of the location eigenstates.  Wave function of the light is like cos(x) + i sin(x) for all x.  (circularly polarized.... freq and magnitude set to 1 for simplicity.)  So, they seem to us as waves.
+
+When they hit the back wall, they have to have definite location - you're 'measuring' the location, it's the location of the back wall.  Or, specifically, they have to exist in a location eigenstate, a superposition of momentum eigenstates, each with a phase that makes all the wave functions peak exactly at the location of the backwall.  Everywhere else they cancel out, so the photon is now at that location.
+
+And, the probability of the photon as a wave, being in the location at the backwall, depends on the dotproduct of the eigenstates before and after.  That's the Copenhagen interpretation.  Neils Bohr.
+
+So, Huygen's principle says that the wave travels as though every location it comes from, broadcasts in all directions.  When it's the single laser beam with thickness,  it goes straight ahead, because that's the only way the wave's peaks and troughs, from the left side of the beam and the right, and all places in between, can line up.  At any other angle, the light from across the width, will be traveling at different phases.  Kindof a smear, and they'll all cancel out.
+
+But if they go through a slit, there (theoretically) is no width, so the waves can come out in a circular pattern.  For each photon, some of it goes through the one slit, some through the other slit, and most of it is absorbed (or whatever) on the back of your two-slit mask thing.
+
+Quantum waves can only interfere with themselves (from the same particle), so if you lit the two slits with different lights, it wouldn't work.  The small fraction of the photon that makes it through the two slits, can now form semicircular waves and interfere on the back wall.  But, all randomly and probabilistically, depending on the magnitude of the wave function (after all the additions and subtractions because of phase and interfererence.
