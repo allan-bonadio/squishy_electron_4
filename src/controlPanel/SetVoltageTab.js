@@ -249,9 +249,9 @@ function SetVoltageTab(p) {
 		let vMinsMaxes = alternateMinMaxs.voltageParams;
 		let breed = vP.voltageBreed;
 
-        // for vertical sliders, firefox wanted orient=vertical as element attr;
-        // chrome/safari wanted appearance:slider-vertical in css.
-        // chrome/safari  won
+				// for vertical sliders, firefox wanted orient=vertical as element attr;
+				// chrome/safari wanted appearance:slider-vertical in css.
+				// chrome/safari  won
 
 
 		return <div className='miniGraphPanel'>
@@ -268,7 +268,7 @@ function SetVoltageTab(p) {
 	}
 	//  <sup>{(vP.canyonPower).toFixed(1)}</sup>
 
-  // right space.  soon to include: relaxation...
+	// right space.  soon to include: relaxation...
 	function renderShowVoltage() {
 		return <label className='ShowVoltageControl' >
 			Show Voltage

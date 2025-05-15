@@ -134,7 +134,7 @@ const keywords = [
 			desc2: 'see also /en-US/docs/Web/API/WebGLRenderingContext/cullFace',},
 	{code: 'CURRENT_PROGRAM',
 		url: '/en-US/docs/Web/API/WebGLProgram', type: 'WebGLProgram',
-		  desc3: 'See /en-US/docs/Web/API/WebGLRenderingContext/useProgram' },
+			desc3: 'See /en-US/docs/Web/API/WebGLRenderingContext/useProgram' },
 	{code: 'DEPTH_BITS',
 		url: '/en-US/docs/Web/API/WebGL_API/Types', type: 'GLint',},
 	{code: 'DEPTH_CLEAR_VALUE',
@@ -153,8 +153,8 @@ const keywords = [
 		url: '/en-US/docs/Web/API/WebGLBuffer', type: 'WebGLBuffer',},
 	{code: 'FRAMEBUFFER_BINDING',
 		url: '/en-US/docs/Web/API/WebGLFramebuffer', type: 'WebGLFramebuffer or null',
-		  desc: ' corresponds to a binding to the default framebuffer. See also '+
-		  	'/en-US/docs/Web/API/WebGLRenderingContext/bindFramebuffer'},
+			desc: ' corresponds to a binding to the default framebuffer. See also '+
+				'/en-US/docs/Web/API/WebGLRenderingContext/bindFramebuffer'},
 	{code: 'FRONT_FACE',
 		url: '/en-US/docs/Web/API/WebGL_API/Types', type: 'GLenum',
 		desc: 'gl.CW or gl.CCW. See also /en-US/docs/Web/API/WebGLRenderingContext/frontFace'},
@@ -464,12 +464,12 @@ export function curioAUB(gl, vShader, fShader, program, ) {
 
 /*
 "getBufferParameter",
-    "getFramebufferAttachmentParameter",
-    "getParameter",
-    "getProgramParameter",
-    "getRenderbufferParameter",
-    "getShaderParameter",
-    "getTexParameter",
+		"getFramebufferAttachmentParameter",
+		"getParameter",
+		"getProgramParameter",
+		"getRenderbufferParameter",
+		"getShaderParameter",
+		"getTexParameter",
 
 any gl.getActiveUniformBlockParameter(program, uniformBlockIndex, pname);
 Copy to Clipboard

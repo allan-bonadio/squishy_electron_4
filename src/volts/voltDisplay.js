@@ -188,10 +188,10 @@ export class voltDisplay {
 
 		if (traceVoltScales) {
 			console.log(`⚡️ ⚡️   voltagearea.setVoltScales()  done
-			    X domain & range: `, this.xScale.domain(), this.xScale.range(), `
+					X domain & range: `, this.xScale.domain(), this.xScale.range(), `
 				Y domain & range: `, this.yScale.domain(),  this.yScale.range(), `
-			    Y UpsideDown: `, this.yUpsideDown.domain(),  this.yUpsideDown.range(), `
-			    Zero at: `, this.xScale(0),  this.yScale(0),  this.yUpsideDown(0));
+					Y UpsideDown: `, this.yUpsideDown.domain(),  this.yUpsideDown.range(), `
+					Zero at: `, this.xScale(0),  this.yScale(0),  this.yUpsideDown(0));
 		}
 		return true;
 	}
@@ -474,8 +474,8 @@ debugger;
 			bottom = lowest;
 			let aBitExtra = MARGIN - height;
 			//			if (aBitExtra > 0) {
-			//			  height = MARGIN
-			//			  bottom -= MARGIN / 2;
+			//				height = MARGIN
+			//				bottom -= MARGIN / 2;
 			//			}
 			//height =  sqrt(abs(highest * EFFECTIVE_VOLTS)) + MARGIN;
 			//bottom = -MARGIN / 2;

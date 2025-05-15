@@ -7,11 +7,11 @@ the octagon:
 √ =  √0.5 or 1/√2
 
 ```
-	              yellow 1,1,0
-	   chartreuce √,1,0    orange 1,√,0
+								yellow 1,1,0
+		 chartreuce √,1,0    orange 1,√,0
 green 0,1,0                     red 1,0,0
-	    cyan 0,1,1            magenta 1,0,1
-	              blue 0,0,1
+			cyan 0,1,1            magenta 1,0,1
+								blue 0,0,1
 ```
 
 Guns are constant 1 when angle is next to gun color.

@@ -263,7 +263,7 @@ window.dumpSettings = () => {
 export function getAGroup(groupName) {
 	let gr;
 	if (!alternateStoreVerifiers[groupName])
-	  throw Error(`No such group ${groupName}`);
+		throw Error(`No such group ${groupName}`);
 
 	try {
 		let savedGroup = localStorage.getItem(groupName);
@@ -279,8 +279,8 @@ export function getAGroup(groupName) {
 	// if some old vars are left over from a previous version, remove them
 	const asg = alternateStoreVerifiers[groupName];  // true only for vars that are supported
 	for (let varName in group) {
-	  if (!asg[varName])
-	    delete group[varName];
+		if (!asg[varName])
+		  delete group[varName];
 	}
 
 	return group;

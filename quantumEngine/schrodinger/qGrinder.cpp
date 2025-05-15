@@ -432,7 +432,7 @@ void qGrinder::threadsHaveFinished() {
 
 	if (traceIntegration)  {
 		speedyLog("🪓 finished threadsHaveFinished() sortof. "
-		    "shouldBeIntegrating=%d   isIntegrating=%d\n",
+				"shouldBeIntegrating=%d   isIntegrating=%d\n",
 				shouldBeIntegrating, isIntegrating);
 	}
 	speedyFlush();
@@ -451,9 +451,9 @@ void qGrinder::threadsHaveFinished() {
 		speedyLog("🪓 threadsHaveFinished()— copyToAvatar() in %10.6lf ms - needsRepaint=%d"
 			" shouldBeIntegrating=%d   isIntegrating=%d\n",
 			getTimeDouble() - thfTime, needsRepaint, shouldBeIntegrating, isIntegrating);
-  }
+	}
 
-  // what is this doing here?  Prob should be done in another thread.
+	// what is this doing here?  Prob should be done in another thread.
 	if (this->pleaseFFT)
 		analyzeWaveFFT(qflick, "latest fft");
 	this->pleaseFFT = false;
@@ -472,8 +472,8 @@ void qGrinder::threadsHaveFinished() {
 
 	if (traceThreadsHaveFinished) {
 		speedyLog("🪓  threads have finished in %10.6lf ms; startAtomic=%d finishAtomic=%d\n",
-      getTimeDouble() - thfTime,
-      emscripten_atomic_load_u32(&startAtomic), emscripten_atomic_load_u32(&finishAtomic));
+			getTimeDouble() - thfTime,
+			emscripten_atomic_load_u32(&startAtomic), emscripten_atomic_load_u32(&finishAtomic));
 	}
 
 }

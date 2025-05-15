@@ -20,21 +20,21 @@ function SetResolutionTab(props) {
 
 	let continuumBlurb, segmentsBetweenEnds;
 	if (qeConsts.contWELL == spa.continuum) {
-	  segmentsBetweenEnds = spa.N - 1;
-	  continuumBlurb = <span>
-	    Your space is a <b>Well</b>, just a box with impenetrable walls on the ends.
-      So, your wave will bounce back and forth off the ends.  Exactly at the ends,
-      your wave will be zero — the voltage is infinite there, so the walls repell the wave.
-      So you have {segmentsBetweenEnds} datapoints in use.
-    </span>;
+		segmentsBetweenEnds = spa.N - 1;
+		continuumBlurb = <span>
+			Your space is a <b>Well</b>, just a box with impenetrable walls on the ends.
+			So, your wave will bounce back and forth off the ends.  Exactly at the ends,
+			your wave will be zero — the voltage is infinite there, so the walls repell the wave.
+			So you have {segmentsBetweenEnds} datapoints in use.
+		</span>;
 	}
 	else if (qeConsts.contENDLESS == spa.continuum) {
-	  segmentsBetweenEnds = spa.N;
-	  continuumBlurb = <span>
-      Your space is <b>Endless</b>, infinite space that cycles around on the ends.
-      So, your wave will crawl along until it gets to the right, and then show up on the left.
-      You have {segmentsBetweenEnds} datapoints in use.
-    </span>;
+		segmentsBetweenEnds = spa.N;
+		continuumBlurb = <span>
+			Your space is <b>Endless</b>, infinite space that cycles around on the ends.
+			So, your wave will crawl along until it gets to the right, and then show up on the left.
+			You have {segmentsBetweenEnds} datapoints in use.
+		</span>;
 	}
 	else
 		throw `bad space continuum ${spa.continuum}`;
@@ -61,9 +61,9 @@ function SetResolutionTab(props) {
 			(Your current wave will be reset.)
 		</p>
 		<p className='discussion'>
-      Your space is {spa.dimLength.toFixed(2)}nm long, with&nbsp;
-      {(spa.dimLength / segmentsBetweenEnds).toFixed(4)}nm between data points.
-		  {continuumBlurb}
+			Your space is {spa.dimLength.toFixed(2)}nm long, with&nbsp;
+			{(spa.dimLength / segmentsBetweenEnds).toFixed(4)}nm between data points.
+			{continuumBlurb}
 		</p>
 
 	</div>);

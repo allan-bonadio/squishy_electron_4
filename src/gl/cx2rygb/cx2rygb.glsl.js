@@ -119,19 +119,19 @@ vec3 cx2rgb(vec2 psi) {
 	vec3 color.rgb = 0;
 
 	// have to normallize it!!  this just calculates the color, not the mag
-    // have to find a faster alg than this
-    float factor = sqrt(psi.x ** 2 + psi.y ** 2);
-    if (0. == factor)
-        return vec3(0., 0., 0.);
-    psi.x /= factor;
-    psi.y /= factor;
+		// have to find a faster alg than this
+		float factor = sqrt(psi.x ** 2 + psi.y ** 2);
+		if (0. == factor)
+				return vec3(0., 0., 0.);
+		psi.x /= factor;
+		psi.y /= factor;
 
-    // wait, I'm thinking that x and y should be -1...1 linearly and abs(x) + abs(y) = 1
-    // make it so!
+		// wait, I'm thinking that x and y should be -1...1 linearly and abs(x) + abs(y) = 1
+		// make it so!
 
-    // in all cases, we start from red and move around, up or down, to green
+		// in all cases, we start from red and move around, up or down, to green
 
-    // decision tree cases: >0, =0, <0.  Then y (im) is outer, x (re) is inner
+		// decision tree cases: >0, =0, <0.  Then y (im) is outer, x (re) is inner
 	if (psi.y > 0) {
 		// red 0°over to green +180°, and yellow 90° half way in between
 		if (psi.x > 0) {
@@ -141,12 +141,12 @@ vec3 cx2rgb(vec2 psi) {
 			color.g = psi.y;
 		}
 		else if (0. == psi.x) {
-		    // yelllow
+				// yelllow
 			color.r = 1;
 			color.g = 1.;
 		}
 		else {
-		    // psi.x  negative
+				// psi.x  negative
 			// yellow 90°to green 180°, and chartreuce 135° half way in between
 			// c'mon, use the sqrt 2!
 			color.r = psi.y;
@@ -154,7 +154,7 @@ vec3 cx2rgb(vec2 psi) {
 		}
 	}
 	else if (0. == psi.y) {
-        // red 0° OR green 180°
+				// red 0° OR green 180°
 		if (psi.x > 0) {
 			color.r = 1;
 			color.g = 0.;
@@ -165,7 +165,7 @@ vec3 cx2rgb(vec2 psi) {
 		}
 	}
 	else {
-	    // psi.y < 0
+			// psi.y < 0
 		// red 0° under to green ±180°, with blue halfway in between.
 		// here we go all the way to the corners, and the x and y are sqrtHalf there
 		if (psi.x > 0) {
@@ -181,13 +181,13 @@ vec3 cx2rgb(vec2 psi) {
 				color.r = psi.x * ${sqrtTwo};
 				color.b = 1;
 			}
-        }
-        else if (0. == psi.x) {
-            // straight down blue
-            color.b = 1;
-        }
-        else {
-            // psi x and y both negative, blue -90°  to green -180°
+				}
+				else if (0. == psi.x) {
+						// straight down blue
+						color.b = 1;
+				}
+				else {
+						// psi x and y both negative, blue -90°  to green -180°
 			if (-psi.x < -psi.y) {
 				// blue -90° to cyan -135°
 				color.b = 1;
@@ -199,7 +199,7 @@ vec3 cx2rgb(vec2 psi) {
 				color.g = 1;
 			}
 		}
-    }
+		}
 	return color;
 }
 `;
@@ -222,7 +222,7 @@ vec3 cx2rgb(vec2 psi) {
 
 		no not these
 		else {
-            // green ±180° under to red 0°, with blue halfway in between.
+						// green ±180° under to red 0°, with blue halfway in between.
 			if (psi.x > 0) {
 				// blue -90° to red 0°, with magenta halfway in between
 				if (psi.x > 0) {
@@ -262,11 +262,11 @@ vec3 cx2rgb(vec2 psi) {
 the octagon:
 √ =  √.5
 
-                yellow 1,1,0
-     chartreuce √,1,0    orange 1,√,0
+								yellow 1,1,0
+		 chartreuce √,1,0    orange 1,√,0
 green 0,1,0                     red 1,0,0
-      cyan 0,1,1            magenta 1,0,1
-                blue 0,0,1
+			cyan 0,1,1            magenta 1,0,1
+								blue 0,0,1
 */
 
 // actual glsl string exported so all webgl code can reuse it

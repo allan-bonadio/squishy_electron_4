@@ -20,19 +20,19 @@ function cx2rgb(psi) {
 		let color = vec3(0., 0., 0.);
 
 	// have to normallize it!!  this just calculates the color, not the mag
-    // have to find a faster alg than this
-    let factor = Math.sqrt(psi.x ** 2 + psi.y ** 2);
-    if (0. == factor)
-        return vec3(0., 0., 0.);
-    psi.x /= factor;
-    psi.y /= factor;
+		// have to find a faster alg than this
+		let factor = Math.sqrt(psi.x ** 2 + psi.y ** 2);
+		if (0. == factor)
+				return vec3(0., 0., 0.);
+		psi.x /= factor;
+		psi.y /= factor;
 
-    // wait, I'm thinking that x and y should be -1...1 linearly and abs(x) + abs(y) = 1
-    // make it so!
+		// wait, I'm thinking that x and y should be -1...1 linearly and abs(x) + abs(y) = 1
+		// make it so!
 
-    // in all cases, we start from red and move around, up or down, to green
+		// in all cases, we start from red and move around, up or down, to green
 
-    // decision tree cases: >0, =0, <0.  Then y (im) is outer, x (re) is inner
+		// decision tree cases: >0, =0, <0.  Then y (im) is outer, x (re) is inner
 	if (psi.y > 0) {
 		// red 0°over to green +180°, and yellow 90° half way in between
 		if (psi.x > 0) {
@@ -42,12 +42,12 @@ function cx2rgb(psi) {
 			color.g = psi.y;
 		}
 		else if (0. == psi.x) {
-		    // yelllow
+				// yelllow
 			color.r = 1;
 			color.g = 1.;
 		}
 		else {
-		    // psi.x  negative
+				// psi.x  negative
 			// yellow 90°to green 180°, and chartreuce 135° half way in between
 			// c'mon, use the sqrt 2!
 			color.r = psi.y;
@@ -55,7 +55,7 @@ function cx2rgb(psi) {
 		}
 	}
 	else if (0. == psi.y) {
-        // red 0° OR green 180°
+				// red 0° OR green 180°
 		if (psi.x > 0) {
 			color.r = 1;
 			color.g = 0.;
@@ -66,7 +66,7 @@ function cx2rgb(psi) {
 		}
 	}
 	else {
-	    // psi.y < 0
+			// psi.y < 0
 		// red 0° under to green ±180°, with blue halfway in between.
 		// here we go all the way to the corners, and the x and y are sqrtHalf there
 		if (psi.x > 0) {
@@ -82,13 +82,13 @@ function cx2rgb(psi) {
 				color.r = psi.x * 1.414214;
 				color.b = 1;
 			}
-        }
-        else if (0. == psi.x) {
-            // straight down blue
-            color.b = 1;
-        }
-        else {
-            // psi x and y both negative, blue -90°  to green -180°
+				}
+				else if (0. == psi.x) {
+						// straight down blue
+						color.b = 1;
+				}
+				else {
+						// psi x and y both negative, blue -90°  to green -180°
 			if (-psi.x < -psi.y) {
 				// blue -90° to cyan -135°
 				color.b = 1;
@@ -100,7 +100,7 @@ function cx2rgb(psi) {
 				color.g = 1;
 			}
 		}
-    }
+		}
 	return color;
 }
 

@@ -137,8 +137,8 @@ export class ControlPanel extends React.Component {
 	// need to keep grinder's variable and our state in sync for sbi.
 	// maybe these help.  Oh yeah, the setting, too.
 	get shouldBeIntegrating() {
-    // before the space is created, this.grinder is undefined but the state
-    // should be set from storeSettings
+		// before the space is created, this.grinder is undefined but the state
+		// should be set from storeSettings
 		const sbi = this.grinder?.shouldBeIntegrating ?? this.state.shouldBeIntegrating;
 
 		// NO this could be in a render method

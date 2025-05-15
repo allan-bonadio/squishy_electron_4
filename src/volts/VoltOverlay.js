@@ -1,6 +1,6 @@
 /*
 ** Volt Overlay -- the offwhite voltage line, and its tactile accessories
-**	      for Squishy Electron
+**		    for Squishy Electron
 ** Copyright (C) 2024-2025 Tactile Interactive, all rights reserved
 */
 

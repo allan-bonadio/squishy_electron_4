@@ -62,7 +62,7 @@ void qSpace::addDimension(int N, int continuum, double dimLength, const char *la
 	// each datapoint represents a segment of the length DX wide.  How wide is each?
 	int nSegments = N;
 	if (contWELL == continuum)
-	  nSegments--;
+		nSegments--;
 
 	dim->dimLength = dimLength;
 	dim->DX = dimLength / nSegments;
