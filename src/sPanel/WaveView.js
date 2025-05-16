@@ -127,6 +127,7 @@ export class WaveView extends React.Component {
 		// only need this when the WaveView outer dims change, either a user
 		// change height or window change width.  On that occasion, we have to adjust
 		// a lot, including resizing the canvas.
+		this.updateInnerDims();
 		if (this.mainEAvatar && (this.formerWidth != this.outerWidth
 					|| this.formerHeight != s.outerHeight) ) {
 
@@ -136,8 +137,6 @@ export class WaveView extends React.Component {
 				formerWidth=${this.formerWidth} ≟➔ outerWidth=${this.outerWidth}
 				formerHeight=${this.formerHeight} ≟➔ outerHeight=${s.outerHeight}`);
 			}
-
-			this.updateInnerDims();
 
 			// trigger a render
 			this.setState({outerHeight: s.outerHeight});
