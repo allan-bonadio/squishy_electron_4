@@ -131,7 +131,7 @@ class sAnimator {
 		if (abs(videoFP - this.avgVideoFP) > 4) {
 			this.unstableFP = true;
 			if (tracerAFPeriod) {
-			  console.log(`🎥  aniFP change at ${performance.now().toFixed(4)}ms `
+				console.log(`🎥  aniFP change at ${performance.now().toFixed(4)}ms `
 						+` videoFP=${videoFP.toFixed(4)}  `
 						+ ` this.avgVideoFP = ${this.avgVideoFP.toFixed(4)}  `
 						+ `abs diff = ${abs(videoFP - this.avgVideoFP).toFixed(4)} `);

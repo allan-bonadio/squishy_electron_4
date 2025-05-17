@@ -1,6 +1,6 @@
 <!--
 title: Complex Numbers
-description: Overview and some results from Squishy Electron
+description: Complex Numbers
 -->
 <title>Complex Numbers</title>
 <link rel=stylesheet href=docs.css />

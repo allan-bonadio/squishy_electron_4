@@ -1,6 +1,6 @@
 <!--
 title: What is Physics
-description: Overview and some results from Squishy Electron
+description: What is Physics
 -->
 What is Science?  Science just means Knowledge.
 

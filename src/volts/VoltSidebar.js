@@ -40,14 +40,14 @@ function VoltSidebar(props) {
 	if (!mVD) return '';  // too early or first render
 
 	if (!mVD.heightVolts  || mVD.heightVolts <= 0)
-	  throw `bad heightVolts ${mVD.heightVolts}`
+		throw `bad heightVolts ${mVD.heightVolts}`
 
 	// so how far down is the thumb from top of rail in pix?
 	//thumbY = thumbFreedom * (1 - (mVD.bottomVolts - mVD.minBottom) / mVD.heightVolts)
 
 	if (traceVoltageSidebar) {
 		console.log(`🍟 V Sidebar rend: width=${sidebarWidth}  heightVolts=${mVD.heightVolts}  `
-		  +`${mVD.minBottom} `);
+			+`${mVD.minBottom} `);
 	}
 
 	// Hovering  to show/hide voltage - hovering over the sidebar

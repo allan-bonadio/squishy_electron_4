@@ -1,6 +1,6 @@
 /*
 ** Voltage Area -- the off-white voltage line, and its tactile
-**	      interactions when the user moves it.  for Squishy Electron
+**		    interactions when the user moves it.  for Squishy Electron
 ** Copyright (C) 2021-2025 Tactile Interactive, all rights reserved
 */
 

@@ -82,7 +82,7 @@ class eWave {
 	// • a C++ wave/spectrum buffer ptr, ask any qBuffer to pass back its wave and it comes out as an integer
 	// • a Float64Array[2*nPoints], with pairs being the real and im parts of psi.
 	//       From any source, C++ or JS.
-	// 	   (I bet you could pass it a JS array and some stuff would work)
+	// 		 (I bet you could pass it a JS array and some stuff would work)
 	// • Or absent/null, in which case it's dynamially allocated to space.nPoints; JS only
 	// pointer should be pointer to qWave in C++, otherwise leave it falsy.
 	// If you use pointer, leave the waveArg null; it's ignpored

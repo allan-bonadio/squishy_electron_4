@@ -1,6 +1,6 @@
 <!--
 title: How I Did this
-description: Overview and some results from Squishy Electron
+description: How I Did this
 -->
 # How this was Built
 

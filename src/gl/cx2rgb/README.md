@@ -4,11 +4,11 @@ Colors for Complex Numbers
 
 the 'color circle' hexagon:
 
-	       green    yellow
-	       
+				 green    yellow
+
 	cyan                        red
-	
-	       blue    magenta
+
+				 blue    magenta
 
 Guns are constant 1 when angle is next to gun color.
 2 guns are always nonzero unless you're exactly on a rgb color, when only that one is.

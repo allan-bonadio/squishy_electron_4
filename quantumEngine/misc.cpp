@@ -15,9 +15,9 @@ static bool traceExceptions = false;
 // seems like accuracy down to miliseconds or even a bit smaller
 double getTimeDouble(void)
 {
-    struct timespec ts;
-    clock_gettime(CLOCK_MONOTONIC, &ts);
-    return ts.tv_sec * 1000 + ts.tv_nsec / 1e6;
+	struct timespec ts;
+	clock_gettime(CLOCK_MONOTONIC, &ts);
+	return ts.tv_sec * 1000 + ts.tv_nsec / 1e6;
 }
 
 /* ****************** constants */
@@ -44,8 +44,8 @@ static int speedyCursor = 0;
 
 
 void speedyLog(const char* format, ...) {
-    va_list args;
-    va_start(args, format);
+	va_list args;
+	va_start(args, format);
 
 	if (speedyCursor >= MAX_BUF_LEN - MAX_ONE_LOG_LEN)
 		speedyFlush();
@@ -57,10 +57,10 @@ void speedyLog(const char* format, ...) {
  	// first the time, then the message
 	speedyCursor += snprintf(speedyBuf+speedyCursor, 20, "🌪️ %02d:%02d:%02d ",
 		nowPieces.tm_hour, nowPieces.tm_min, nowPieces.tm_sec);
-	speedyCursor +=  vsnprintf(speedyBuf+speedyCursor, MAX_ONE_LOG_LEN, format, args);
+	speedyCursor +=	vsnprintf(speedyBuf+speedyCursor, MAX_ONE_LOG_LEN, format, args);
 	speedyBuf[speedyCursor] = 0;
 
-    va_end(args);
+		va_end(args);
 	if (traceSpeedyLog)
 		printf("🌪 🌪 🌪 speedyLog fmt='%s' speedyCursor=%d  log so far:\n‹%s›\n",
 			format, speedyCursor, speedyBuf);

@@ -92,9 +92,9 @@ function startUpEverything() {
 	// Create The Space.  Asynchronous, then triggers the eSpaceCreatedPromise.
 	// This can't happen until we have the storeSettings and QEngine funcs, and...
 	create1DMainSpace({
-	  N: getASetting('spaceParams', 'N'),
-	  continuum: getASetting('spaceParams', 'continuum'),
-	  dimLength: getASetting('spaceParams', 'dimLength'),
+		N: getASetting('spaceParams', 'N'),
+		continuum: getASetting('spaceParams', 'continuum'),
+		dimLength: getASetting('spaceParams', 'dimLength'),
 		label: 'main'});
 
 	if (traceStartup) console.log(`main space 🐣  created`);

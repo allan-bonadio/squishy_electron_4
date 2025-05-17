@@ -9,10 +9,9 @@
 		<meta name=description content='〖description〗' />
 		<style src=../katex.min.css></style>
 		<style>
-		body {box-sizing: border-box}
 		body {
+			box-sizing: border-box;
 			font-family: trebuchet, helvetica, sans-serif;
-			font-size: 16px;
 		}
 		video {
 			display: block;
@@ -26,9 +25,11 @@
 		</style>
 		<!--link rel=apple-touch-icon href=logo192.png / -->
 		<title>〖title〗</title>
-
 	</head>
 	<body>
 〖body〗
+		<script>
+				setTimeout(() =>document.body.style.fontSize = (localStorage.fontSize || '16px'), 100);
+		</script>
 	</body>
 </html>

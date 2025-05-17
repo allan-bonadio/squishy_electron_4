@@ -35,7 +35,7 @@ function testOne(angle, expected) {
 describe('cx2rygb tests', () => {
 	// run some tests ... go around the circle, testing all crucial points
 
-  // near RED
+	// near RED
 	test(`Red 1 0 0 == +1`, () => {
 		testOne(0, [1, 0, 0]);
 	});
@@ -43,7 +43,7 @@ describe('cx2rygb tests', () => {
 		testOne(1, [1, .015117, 0]);
 	});
 
-  // near ORANGE
+	// near ORANGE
 	test(`Red > Yellow`, () => {
 		testOne(44, [1, 0.4800457, 0]);
 	});
@@ -54,7 +54,7 @@ describe('cx2rygb tests', () => {
 		testOne(46, [1, .5197630, 0]);
 	});
 
-  // near YELLOW
+	// near YELLOW
 	test(`Red << Yellow`, () => {
 		testOne(89, [1, .9802369, 0]);
 	});
@@ -65,7 +65,7 @@ describe('cx2rygb tests', () => {
 		testOne(91, [.9800457, 1, 0]);
 	});
 
-  // near CHARTREUCE
+	// near CHARTREUCE
 	test(`Yellow > Green == i`, () => {
 		testOne(134, [0.5151165296525431, 1, 0]);
 	});
@@ -116,7 +116,7 @@ describe('cx2rygb tests', () => {
 //		testOne(316, [0, 0.4802369376253134, 1]);
 //	});
 
-  // near GREEN
+	// near GREEN
 	test(`Cyan << Blue`, () => {
 		testOne(179, [0, 0.019763062374687168, 1]);
 	});
