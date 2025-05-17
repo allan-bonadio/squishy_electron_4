@@ -1,6 +1,6 @@
 <!--
 title: My Squishy Electron project
-description: Overview and some results from Squishy Electron
+description: Getting Started
 -->
 ## Squishy Electron project
 
@@ -8,7 +8,22 @@ description: Overview and some results from Squishy Electron
 This is a project I've been working on for a few years, off and on in my free time.
 It's a work in progress, and this is the Alpha version here.
 
-[Send Feedback Here](mailto:bojnac@tactileint.org?subject='Squishy Electron Feedback')
+<a href='mailto:bojnac@tactileint.org"  >
+Send Feedback Here sorry messed up!!!  😡 🥺 😢 😒
+</a>
+<mailBack>
+</mailBack>
+
+?subject="Squishy Electron Feedback'
+
+'''Quantum Mechanics''' is an alternate set of rules for very tiny things,
+like the size of atoms and molecules.
+Squishy Electron is a simulator that lets you see how it works, without getting into a lot of math.
+(Well, sortof.)
+
+One of the creepiest things about Quantum is that objects can be in multiple places at once.
+And, they can travel at multiple speeds, all at once.
+It's like the particle is split into lots of little pieces, and spread out.
 
 When I was a physics major, I had trouble getting a 'feel' for quantum mechanics.
 I could do the math, I could visualize what was happening, but I kept on having a problem because things seemed so unintuitive.
@@ -24,18 +39,19 @@ I had toys made of metal, plastic, fabric, wood.
 That's because I grew up with solid objects, with definite surfaces, like anybody else.
 Wood and metal and plastic all have surfaces; they have different textures,
 but their surface layers all seem infinitesimally thin, and mostly inflexible.
-![](biteStuffedAnimal.jpg)
+Things made of fabric did hae fuzy surfaces, sometimes, but the amount of fuzz rarely changed.
+![](biteRemote.jpg)
 I'd finger them, follow the surfaces and edges with my fingers or toes,
 and put them in my mouth and feel them with my lips and tongue.
 (I'm talking about, like, before kindergarten,
 when fundamentals of the world crystalize in one's mind.)
 
-
-The thing that we think of as a **particle** is really a wave in space.
-The wave is actually a superposition of lots of locations, and lots of velocities, all at once.
-The magnitude of the wave is the probability that the particle is at that location.
+The thing that we think of as a **particle** is really a **wave** in space.
+The wave is actually a superposition (mix) of lots of locations, and lots of speeds, all at once.
+The magnitude (size) of the wave, at some place,
+is the probability that the particle is at that location.
 The phase of the wave (peaks, troughs, or in-between) tell the motion of the particle.
-This is why microscopic mechanisms are so weird - they follow quantum mechanics rules of waves.
+This is why microscopic mechanisms are so weird - they follow quantum mechanical rules of waves.
 We use rainbow colors to represent the phase of the wave.
 
 
@@ -43,7 +59,7 @@ We use rainbow colors to represent the phase of the wave.
 
 The closest thing to a particle is a **wave packet**.
 Here's one.
-(It looks upside down, but there's a reason behind it.)
+(Squishy Electron shows it upside down, but there's a reason behind it.)
 Click the arrow to see the brief video.
 <video src=wideGaussian.mp4 controls ></video>
 
@@ -53,11 +69,11 @@ This illustrates [Heisenberg's uncertainty principle](https://en.wikipedia.org/w
 $$\sigma_x \sigma_p ≥ ½ ℏ$$
 
 ![Three wave packets, showing the influence the width has on the momentum.](waveSizes.png)
-That is, the uncertainty of the position, $\sigma_x$ , has an inverse relationship
+That is, the fuzz (uncertainty) of the location, $\sigma_x$ , has an inverse relationship
 with the uncertainty of the momentum, $\sigma_p$ , and therefore, speed.
 If one is big, the other has to be small, and vice versa.
 	<ul>
-	<li>The uncertainty of the position is the width of the wave packet;
+	<li>The uncertainty of the position is the width of the hump (wave packet);
 	if we pretend that the electron is a tiny, tiny marble, all we know
 	is that it is somewhere in that wave packet.
 	<li>The height (thickness) of the wave tells you the probability of
@@ -69,13 +85,19 @@ If one is big, the other has to be small, and vice versa.
 	(We auto-range, so it might not look thinner.)
 	</ul>
 
-ℏ is [Plank's reduced constant](https://en.wikipedia.org/wiki/Planck_constant).
+If you look up Paris with an online map, it might give you just one point, somewhere in the middle of the city.
+Actually, Paris is pretty large, many kilometers from west to east and north to south.
+This is kindof similar.
+You can cut out a square kilometer near that point, and that's Paris, but not all of Paris.
+Unlike Paris, the wave packet fades away at the edges instead of stopping at the city limits.
+
+ℏ is [Plank's constant](https://en.wikipedia.org/wiki/Planck_constant).
 It's a really tiny number, $1.05×10^{-34} {{kg m^2} \over s}$, so in normal life,
 it seems like zero, and you can have an object at an exact location, going an exact speed.
 (Give or take a nanometer or so.)
 So, in order for an electron to have a more specific location, with a
-very narrow wave packet, it must also have a more uncertain velocity (speed) -
-it must be a superposition of many different velocities.
+very narrow wave packet, it must also have a more uncertain speed -
+it must be a superposition of many different speeds.
 It instantly starts spreading out because different parts of the
 electron are going at different speeds, including backwards.
 (This is a wrap-around universe, so the leading edge of the wave starts interfering
@@ -106,7 +128,9 @@ therefore, finite, so we can model it here.
 <video controls src=typicalCircular.mp4></video>
 
 ![an electron circling its nucleus](orbitingElectron.png)
-So, how does an atom work?
+<aside style='float: right;'>
+####So, how does an atom work?
+
 The electrons have the same basic properties,
 but they're all attracted to the protons in the nucleus.
 They have a fuzzy wave packet; but the packet is circling the nucleus endlessly.
@@ -117,7 +141,7 @@ the circumference of the orbit; zero cycles for ground-state hydrogen,
 2 cycles for the second orbit, and on up.
 This is where the word **quantum** comes from;
 the electron wavelength has to be quantized - a whole number of waves, with no fractions.
-
+</aside>
 
 
 ### pushing
@@ -164,20 +188,13 @@ so they line up at slightly different places for different colors.
 
 
 ### Under the Hood
-The simulation runs real-time in a browser, with no contact with the server after loading.
+In Squishy Electron, the simulation runs real-time in a browser, with no contact with the server after loading.
 Much of the code is JavaScript, running in the browser, just like any other website.
 That part is done with React.
 
 The numerical  integration, and most other time-critical numerical calculations, are done in C++,
 in the browser, using Emscripten and WebAssembly.
 It integrates a version of Schrodinger's equation.
-
-This was far more difficult than I'd envisioned.
-It turns out that Schrodinger's is divergent - that is, if you just integrate it normally,
-it only runs for a short time before it explodes into high frequency noise.
-The equation amplifies high frequencies,
-so roundoff error in the double floats eventually overwhelms everything else.
-I found a better algorithm, extended it, and added some settings, so the user can manage it.
 
 The graphics are done in WebGL, a blindingly fast graphics rendering system,
 using the computer's GPU chip(s).
