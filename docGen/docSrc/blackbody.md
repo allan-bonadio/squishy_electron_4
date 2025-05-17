@@ -1,6 +1,6 @@
 <!--
-title: Electron Appearance
-description: What does an electron look like?
+title: Blackbody Radiation
+description: What color is something that's red hot?
 -->
 
 
