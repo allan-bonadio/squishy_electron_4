@@ -1,5 +1,5 @@
 /*
-**   App -- top level JS for Squishy Electron
+** App -- top level JS for Squishy Electron
 ** Copyright (C) 2021-2025 Tactile Interactive, all rights reserved
 */
 
@@ -95,12 +95,28 @@ class App extends React.Component {
 		//	//debugger;
 		//}
 
-		// if they got the URL with ?intro=1 on the end, open the introduction doc reader
-		if ('?intro=1' == location.search) {    // eslint-disable-line no-restricted-globals
-			setTimeout(() => {
-				DocReader.openWithUri('/intro/intro1.html');
-			}, 500);
+		// parse URL args
+		let locArgs = {};
+		if (location.search) {
+			let arArgs = location.search.substr(1).split('&');    // eslint-disable-line no-restricted-globals
+			arArgs.map(txt => txt.split('=')).forEach(pair => locArgs[pair[0]] = pair[1] ?? 'noSquishArg');
+
+			// if they got the URL with ?intro=anything on the end, open the introduction doc reader
+			if (locArgs.intro) {
+				setTimeout(() => {
+					DocReader.openWithUri('/intro/intro1.html');
+				}, 500);
+			}
 		}
+
+
+
+			//if ('?intro=1' == location.search) {    // eslint-disable-line no-restricted-globals
+			//	setTimeout(() => {
+			//		DocReader.openWithUri('/intro/intro1.html');
+			//	}, 500);
+			//}
+		//}
 
 		// see font sizer, below
 		document.body.style.fontSize = localStorage.fontSize || '16px';
@@ -172,7 +188,7 @@ class App extends React.Component {
 
 				{sqPanel}
 
-				<CommonDialog  dialogContent={s.dialogContent} setDialog={this.setDialog} />
+				<CommonDialog	dialogContent={s.dialogContent} setDialog={this.setDialog} />
 				<footer>
 					<aside id='traceOnScreen'>
 						<p className='A' />
