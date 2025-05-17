@@ -16,6 +16,10 @@ let traceFinalDocDir = false;
 let traceFinalPromiseResult = false;
 let traceMetadata = false;
 
+// turn this to true to halt before going forward, waiting for you to hit
+// return, before erasing the old files.
+let DO_PROMPT = false;
+
 /*
 ** The documentation is served from the public/doc directory, which contains mostly .html, image and video files.
 ** during writing (development), the docGen directory serves as a proxy.  Both have symlinks into the
@@ -314,6 +318,10 @@ function compileFileOrDir(path) {
 // prompt so I don't delete a bunch of files by accident.
 // these things don't do promises so we have to make our own.
 function promptAndDelete() {
+	if (!DO_PROMPT) {
+		return Promise.resolve();
+	}
+
 	return new Promise((succeed, fail) => {
 		exec('ls -mFA .',
 			{cwd: `${process.env.SQUISH_ROOT}/public/doc`, encoding: 'utf8'},
