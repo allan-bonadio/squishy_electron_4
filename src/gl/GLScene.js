@@ -15,6 +15,10 @@ import glAmbiance from './glAmbiance.js';
 let traceSetup = false;
 let traceGeometry = false;
 
+// this one dumps large buffers
+let traceViewBuffer = false;
+
+
 function traceOnScreen(msg) {
 	const traceOnScreen = document.querySelector('#traceOnScreen .A');
 	if (traceOnScreen)
@@ -22,8 +26,6 @@ function traceOnScreen(msg) {
 }
 
 
-// this one dumps large buffers
-let tracePainting = false;
 
 function setPT() {
 	GLScene.propTypes = {
@@ -95,30 +97,32 @@ function GLScene(props) {
 	const doRepaint =
 	() => {
 		if (! effectiveScene) {
-			if (tracePainting)
+			if (traceViewBuffer)
 				console.log(`🖼 GLScene ${p.avatar.label}: too early for doRepaint  effectiveScene=${effectiveScene}`);
 			return null;  // too early
 		}
-		if (tracePainting)
+		if (traceViewBuffer)
 			p.avatar.ewave.dump(`🖼 GLScene ${p.sceneName}: got the ewave right here`);
 
 		// copy from latest wave to view buffer (c++) & pick up highest
 		p.avatar.loadViewBuffer();
-		if (tracePainting)
+		if (traceViewBuffer)
 			p.avatar.dumpViewBuffer(`🖼 GLScene ${p.sceneName}: loaded ViewBuffer`);
 
-		// draw
-		effectiveScene.drawAllDrawings(p.canvasInnerWidth, p.canvasInnerHeight, p.specialInfo);
-		if (tracePainting)
-			console.log(`🖼 GLScene ${p.sceneName} ${p.avatar.label}: doRepaint done drawing`);
-
-		return; //{endReloadVarsNBuffer, endDrawTime};
+		// draw.  This won't set up an ∞ loop, right?
+		effectiveScene.drawAllDrawings(canvasNode.width, canvasNode.height, p.specialInfo);
+		//effectiveScene.drawAllDrawings(p.canvasInnerWidth, p.canvasInnerHeight, p.specialInfo);
+		if (traceGeometry) {
+			console.log(`🖼 GLScene done doRepaint ${p.sceneName} av=${p.avatar.label}:   \n`
+					+`canvasInnerWidth=${p.canvasInnerWidth}, canvasInnerHeight=${p.canvasInnerHeight}, `
+					+`specialInfo=${p.specialInfo}`);
+		}
+		return;
 	}
 
 	if (traceGeometry && 'mainWave' == p.sceneName) {
-		console.log(`🖼 GLScene rend '${p.sceneName}': canvas=${canvasNode?.nodeName}
-			draw dims: w=${p.canvasInnerWidth} h=${p.canvasInnerHeight} `);
-		//  x=${cdr.x} y=${cdr.y}
+		console.log(`🖼 GLScene rend '${p.sceneName}': canvas=${canvasNode?.nodeName} `
+			+`canv inner dims: w=${p.canvasInnerWidth} h=${p.canvasInnerHeight} `);
 	}
 
 	const setupGLContext = () => {
@@ -138,8 +142,9 @@ function GLScene(props) {
 	}
 
 	// can't do much first rendering; no canvasNode yet.  Second time, no gl
-	// yet.  but otherwise, after each render
-	const canvasFollowup = () => {
+	// yet.  but otherwise, after each render.  Renders should be infrequent,
+	// only when dimensions of the canvas change or other big change.
+	const renderRepaint = () => {
 		if (!canvasNode || canvasRef.current !== canvasNode) {
 			if (!canvasRef.current)
 				return;  // no canvas yet, nothing to draw on
@@ -151,14 +156,15 @@ function GLScene(props) {
 			setupGLContext();
 		}
 
+		// but when it happens, make sure to repaint again
 		doRepaint();
 
 		if (traceSetup) {
-			console.log(`🖼 GLScene ${p.sceneName}: canvasFollowup(): completed, canvasNode=`,
+			console.log(`🖼 GLScene ${p.sceneName}: renderRepaint(): completed, canvasNode=`,
 				canvasNode);
 		}
 	}
-	useEffect(canvasFollowup);
+	useEffect(renderRepaint);
 
 	// the canvas w&h attributes define its inner coord system (not element's
 	// size) We want them to reflect actual pixels on the screen; should be same
