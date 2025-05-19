@@ -21,7 +21,7 @@ const MINI_WIDTH = 300;
 const MINI_HEIGHT = 150;
 
 
-let traceRegenerate = true;
+let traceRegenerate = false;
 
 
 function setPT() {

@@ -8,6 +8,7 @@
 // But keep this so we can go back and forth.
 let perDrawingVAO = true;   // false;
 
+let tracePaint = false;
 
 // Each abstractScene subclass is a definition of a kind of picture or scene;
 // one per each kind of scene. Each drawing is a definition of a part of a scene
@@ -61,7 +62,9 @@ export class abstractScene {
 		// No!  difft for each drawing
 		// this.gl.viewport(0, 0, this.canvas.width, this.canvas.height);
 
-		// kick it off by drawing it once
+		if (tracePaint)
+			console.log(`🦊 abs completeScene() width=${this.canvas.width}, height=${this.canvas.height},`);
+
 		this.drawAllDrawings(this.canvas.width, this.canvas.height, specialInfo);
 
 		// and set up interactivity
@@ -108,6 +111,7 @@ export class abstractScene {
 	}
 
 	drawAllDrawings(width, height, specialInfo) {
+		if (tracePaint) console.log(`🦊 abs drawAllDr width=${width}, height=${height},`);
 		if (!width || !height) debugger;
 
 		// not specific to any drawing; I guess it's kindof a drawing itself

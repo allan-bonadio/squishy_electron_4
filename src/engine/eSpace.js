@@ -12,7 +12,7 @@ import {getAGroup} from '../utils/storeSettings.js';
 import {interpretCppException} from '../utils/errors.js';
 import {MAX_DIMENSIONS, N_THREADS} from './eEngine.js';
 
-let traceSpace = true;
+let traceSpace = false;
 let traceFamiliarWave = false;
 
 /* **************************************************************** eDimension */

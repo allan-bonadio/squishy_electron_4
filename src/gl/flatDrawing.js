@@ -10,6 +10,7 @@ import {drawingUniform, drawingAttribute} from './drawingVariable.js';
 let traceViewBufAfterDrawing = false;
 let traceHighest = false;
 let traceFlatDrawing = false;
+let traceViewport = false;
 
 // diagnostic purposes
 let traceDrawPoints = false;
@@ -88,7 +89,7 @@ export class flatDrawing extends abstractDrawing {
 		this.setDrawing();
 
 		if (traceFlatDrawing)
-			console.log(`🫓 flatDrawing ${this.outerDims}: creatingVariables`);
+			console.log(`♭♭♭ flatDrawing: creatingVariables`);
 
 		// loads view buffer from corresponding wave, calculates highest norm.
 		// Need this for starting values for highest & smoothHighest
@@ -99,7 +100,7 @@ export class flatDrawing extends abstractDrawing {
 		this.maxHeightUniform = new drawingUniform('maxHeight', this,
 			() => {
 				if (traceHighest)
-					console.log(`🫓 flatDrawing reloading outer: ${this.outerDims}: `
+					console.log(`♭♭♭ flatDrawing reloading outer:  `
 						+` highest=${this.avatar.highest.toFixed(5)} `
 						+` smoothHighest=${this.avatar.smoothHighest.toFixed(5)}`);
 
@@ -120,13 +121,13 @@ export class flatDrawing extends abstractDrawing {
 		// barWidth: width of each bargraph bar
 		let nPoints = this.nPoints = this.space.nPoints;
 		let barWidth;
-		if (traceFlatDrawing) console.log(`🫓 barWidth= ${barWidth}`);
 		this.barWidthUniform = new drawingUniform('barWidth', this,
 			() => {
 				barWidth = 1 / (nPoints - 1)
 				return { value: barWidth, type: '1f' };
 			}
 		);
+		if (traceFlatDrawing) console.log(`♭♭♭ barWidth= ${barWidth}`);
 
 		this.vertexCount = nPoints * 2;  // nPoints * vertsPerBar
 		this.rowFloats = 4;
@@ -141,14 +142,18 @@ export class flatDrawing extends abstractDrawing {
 	// called for each image frame on th canvas
 	draw(width, height, specialInfo) {
 		if (traceFlatDrawing) {
-			console.log(`🫓 flatDrawing ${this.outerDims}, ${this.avatarLabel}: `
-				+` drawing ${this.vertexCount/2} points`);
+			console.log(`♭♭♭ flatDrawing  ${this.avatarLabel}: `
+				+` width=${width}, height=${height}  drawing ${this.vertexCount/2} points`);
 		}
 		const gl = this.gl;
 		this.setDrawing();
 
 		let bw = specialInfo.bumperWidth;
 		gl.viewport(bw, 0, width - 2 * bw, height);
+		if (traceViewport)
+			console.log(`♭♭♭ flatDrawing set viewport on ${this.avatarLabel}: `
+				+` width-2bw=${width - 2 * bw}, height=${height}  drawing ${this.vertexCount/2} points`);
+
 
 		this.viewVariables.forEach(v => v.reloadVariable());
 		gl.drawArrays(gl.TRIANGLE_STRIP, 0, this.vertexCount);
@@ -164,8 +169,8 @@ export class flatDrawing extends abstractDrawing {
 
 		// i think this is problematic
 		if (traceViewBufAfterDrawing) {
-			this.avatar.dumpViewBuffer(`finished drawing ${this.outerDims} in flatDrawing.js; drew buf:`);
-			console.log(`barWidthUniform=${this.barWidthUniform.getFunc()}    `
+			this.avatar.dumpViewBuffer(`♭♭♭ finished drawing in flatDrawing.js; drew buf:`);
+			console.log(`♭♭♭ barWidthUniform=${this.barWidthUniform.getFunc()}    `
 				+`maxHeightUniform=${this.maxHeightUniform.getFunc()}`);
 		}
 		// ?? this.gl.bindVertexArray(null);

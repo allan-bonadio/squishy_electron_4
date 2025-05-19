@@ -18,7 +18,7 @@
 
 
 static bool traceQSpace = false;
-static bool traceSpaceCreation = true;
+static bool traceSpaceCreation = false;
 
 /* ********************************************************** qSpace construction */
 

@@ -19,9 +19,9 @@ import './volts.scss';
 let traceVoltageArea = false;
 
 let traceRendering = false;
-let traceProfileDragging = true;
+let traceProfileDragging = false;
 let traceTweening = false;
-let traceWheel = true;
+let traceWheel = false;
 
 let traceScrollStretch = false;
 

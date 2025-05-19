@@ -11,7 +11,7 @@
 #include "../debroglie/qWave.h"
 #include "../greiman/qViewBuffer.h"
 
-static bool traceSpaceCreation = true;
+static bool traceSpaceCreation = false;
 static bool traceAvatarDetail = false;
 
 /* ********************************************************** glue functions for js */

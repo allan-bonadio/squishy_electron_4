@@ -77,7 +77,7 @@ void grWorker::gThreadLoop(void) {
 			// this wait will end when notify is sent to it.
 			// eGrinder.triggerIteration() or qeFuncs.grinder_triggerIteration
 			// this is what I want but it's only in u32 form.
-			//int waitCode = emscripten_wasm_wait_i32(...
+			int formerStartAtomic = grinder->startAtomic;
 			int waitCode = emscripten_atomic_wait_u32(&grinder->startAtomic, -1,
 					ATOMICS_WAIT_DURATION_INFINITE);
 			if (waitCode != ATOMICS_WAIT_OK) {
@@ -86,8 +86,9 @@ void grWorker::gThreadLoop(void) {
 					msg = "ATOMICS_WAIT_NOT_EQUAL";
 				else if (ATOMICS_WAIT_TIMED_OUT == waitCode)
 					msg = "ATOMICS_WAIT_TIMED_OUT";
-				printf("😵‍ emscripten_atomic_wait_u32 didn't return OK: %d %s\n",
-						waitCode, msg);
+				printf("😵‍ emscripten_atomic_wait_u32() didn't return OK: "
+						" waitCode=%d msg=%s formerStartAtomic=%d\n",
+						waitCode, msg, formerStartAtomic);
 			}
 
 			// now we count each thread as it starts up

@@ -10,7 +10,7 @@ import cx2rgb from '../gl/cx2rgb/cx2rgb.txlated.js';
 import {cppObjectRegistry, prepForDirectAccessors} from '../utils/directAccessors.js';
 import eSpace from './eSpace.js';
 
-let traceSetFamiliarWave = true;
+let traceSetFamiliarWave = false;
 let traceGaussian = false;
 let traceFamiliarResult = false;
 
