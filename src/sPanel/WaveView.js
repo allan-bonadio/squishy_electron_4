@@ -104,10 +104,10 @@ export class WaveView extends React.Component {
 		this.canvasInnerWidth = round(this.outerWidth - DOUBLE_THICKNESS);
 		this.canvasInnerHeight = round(this.state.outerHeight - DOUBLE_THICKNESS);
 		if (traceDimensions)
-			console.log(`🏄 canvasInner: w=${this.canvasInnerWidth} h=${this.canvasInnerHeight}`);
+			console.log(`🏄 canvas updateInner: w=${this.canvasInnerWidth} h=${this.canvasInnerHeight}`);
 	}
 
-	// we finally have a canvas; give me a copy so I can save it
+	// we finally have a canvas; give me a reference so I can save it
 	setGlCanvas =
 	gl => {
 		if (!gl)
@@ -123,19 +123,23 @@ export class WaveView extends React.Component {
 	componentDidUpdate() {
 		const p = this.props;
 		const s = this.state;
+		this.updateInnerDims();
 
 		// only need this when the WaveView outer dims change, either a user
 		// change height or window change width.  On that occasion, we have to adjust
 		// a lot, including resizing the canvas.
-		this.updateInnerDims();
 		if (this.mainEAvatar && (this.formerWidth != this.outerWidth
 					|| this.formerHeight != s.outerHeight) ) {
 
+			//this.updateInnerDims();
+
 			// Size of window & canvas changed!  (or, will change soon)
 			if (traceDimensions) {
-				console.log(`🏄 Resizing  👀 mainEAvatar=${this.mainEAvatar.label}
-				formerWidth=${this.formerWidth} ≟➔ outerWidth=${this.outerWidth}
-				formerHeight=${this.formerHeight} ≟➔ outerHeight=${s.outerHeight}`);
+				console.log(`🏄 wv Resizing  👀 mainEAvatar=${this.mainEAvatar.label}
+					formerWidth=${this.formerWidth} ≟➔ outerWidth=${this.outerWidth}
+					formerHeight=${this.formerHeight} ≟➔ outerHeight=${s.outerHeight}
+					btw props.outerWidth=${this.props.outerWidth}
+					canvas: ${this.canvasNode.width}, ${this.canvasNode.height}`);
 			}
 
 			// trigger a render
@@ -229,7 +233,8 @@ export class WaveView extends React.Component {
 
 		if (traceDimensions) {
 			console.log(`🏄 WaveView render, outerWidth=${this.outerWidth}`
-				+` bumperWidth=${this.bumperWidth}`);
+				+` bumperWidth=${this.bumperWidth}, canvasInnerWidth=${this.canvasInnerWidth} `
+				+`canvasInnerHeight=${this.canvasInnerHeight}`);
 		}
 
 		// can't make a real GLScene until we have the space!
@@ -263,7 +268,8 @@ export class WaveView extends React.Component {
 		if (this.mainVDisp){
 			voltOverlay = <VoltOverlay
 				space={this.space}
-				canvasInnerWidth={this.canvasInnerWidth} canvasInnerHeight={this.canvasInnerHeight}
+				canvasInnerWidth={this.canvasInnerWidth}
+				canvasInnerHeight={this.canvasInnerHeight}
 				mainVDisp={this.mainVDisp}
 				bumperWidth={this.bumperWidth}
 			/>;
