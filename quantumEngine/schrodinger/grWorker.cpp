@@ -78,15 +78,16 @@ void grWorker::gThreadLoop(void) {
 			// eGrinder.triggerIteration() or qeFuncs.grinder_triggerIteration
 			// this is what I want but it's only in u32 form.
 			int formerStartAtomic = grinder->startAtomic;
+			printf("🦫 ‍ emscripten_atomic_wait_u32() startAtomic=%d  \n ", formerStartAtomic);
+
 			int waitCode = emscripten_atomic_wait_u32(&grinder->startAtomic, -1,
 					ATOMICS_WAIT_DURATION_INFINITE);
-			if (waitCode != ATOMICS_WAIT_OK) {
+			if (ATOMICS_WAIT_OK != waitCode && ATOMICS_WAIT_NOT_EQUAL != waitCode) {
+				// for some reason it keeps returning NOT_EQUAL, when they are, but otherwise everythingis ok
 				const char *msg = "unknown wait status";
-				if (ATOMICS_WAIT_NOT_EQUAL == waitCode)
-					msg = "ATOMICS_WAIT_NOT_EQUAL";
-				else if (ATOMICS_WAIT_TIMED_OUT == waitCode)
+				if (ATOMICS_WAIT_TIMED_OUT == waitCode)
 					msg = "ATOMICS_WAIT_TIMED_OUT";
-				printf("😵‍ emscripten_atomic_wait_u32() didn't return OK: "
+				printf("🦫 😵‍ emscripten_atomic_wait_u32() didn't return OK: "
 						" waitCode=%d msg=%s formerStartAtomic=%d\n",
 						waitCode, msg, formerStartAtomic);
 			}
