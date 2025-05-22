@@ -15,9 +15,13 @@ let traceGaussian = false;
 let traceFamiliarResult = false;
 
 const _ = num => num.toFixed(4).padStart(9);
-const atan2 = Math.atan2;
 const abs = Math.abs;
+const sqrt = Math.sqrt;
+const exp = Math.exp;
 const π = Math.PI;
+const sin = Math.sin;
+const cos = Math.cos;
+const atan2 = Math.atan2;
 
 // generate string for this one cx value, w, at location ix
 // rewritten from the c++ version in qBuffer::dumpRow()
@@ -260,39 +264,45 @@ class eWave {
 	// the first point here is like x=0 as far as the trig functions, and the last like x=-1
 	setCircularWave(n) {
 		const {start2, end2, N} = this.space.startEnd2;
-		const dAngle = 2 * Math.PI / N * (+n);
+		const dAngle = 2 * π / N * (+n);
 		const wave = this.wave;
 
 		for (let ix2 = start2; ix2 < end2; ix2 += 2) {
 			const angle = dAngle * (ix2 - start2) / 2;
-			wave[ix2] = Math.cos(angle);
-			wave[ix2 + 1] = Math.sin(angle);
+			wave[ix2] = cos(angle);
+			wave[ix2 + 1] = sin(angle);
 		}
 	}
 
 
 	// make a superposition of two waves in opposite directions.
-	// n 'should' be an integer to make it meet up on ends if wraparound
-	// oh yeah, the walls on the sides are nodes in this case so we'll split by N+2 in that case.
-	// pass negative to make it backwardsd.
+	// frequency n 'should' be an integer to make it meet up on ends if wraparound
+	// WELL: the walls on the sides are nodes so we'll split by N+1 in that case.
+	// pass negative to make it backwards.
 	setStandingWave(n) {
 		let {start2, end2, N} = this.space.startEnd2;
 		const wave = this.wave;
+		let bias = 0;  // for when freq=0
 
 		// For a well, the boundary points ARE part of the wave, so do the whole thing
 		let dAngle;
 		if (this.space.continuum == qeConsts.contWELL) {
 			end2 += start2;
 			start2 = 0;
-			dAngle = Math.PI / (N + 1) * (+n);
+			dAngle = π / (N + 1) * (+n);
+
+			if (0 == n)
+				bias = 1 / sqrt(N + 1)
 		}
 		else {
-			dAngle = Math.PI / N * (+n);
+			dAngle = π / N * (+n);
+			if (0 == n)
+				bias = 1 / sqrt(N)
 		}
 
 		for (let ix2 = start2; ix2 < end2; ix2 += 2) {
 			const angle = dAngle * (ix2 - start2);
-			wave[ix2] = Math.sin(angle);
+			wave[ix2] = sin(angle) + bias;
 			wave[ix2 + 1] = 0;
 		}
 	}
@@ -320,7 +330,7 @@ class eWave {
 		const s2 = pulseWidth ** -2;  // 1/stddev**2 sortof
 		for (let ix = 0; ix < 2 * N; ix++) {
 			const delta = ix - N;
-			gaussian[ix] = Math.exp(-delta * delta * s2);
+			gaussian[ix] = exp(-delta * delta * s2);
 		}
 
 		// there's a problem when you chop it off at the ends for Endless.  You
@@ -381,8 +391,8 @@ class eWave {
 			console.log(`🌊  setChordWave freq=${freqUi} => ${freq}  nSideFreqs=${nSideFreqs}`+
 			`  offset=${offsetUi}% => ${offset2}`);
 
-		//const dAngle = 4 * Math.PI / N;
-		const dAngle = 1.0 * Math.PI / N;
+		//const dAngle = 4 * π / N;
+		const dAngle = 1.0 * π / N;
 // 		let freqLow = freq - 1.;  // could be zero!  but still works.
 // 		let freqLowLow = freqLow - 1.;  // could be zero!  but still works.
 // 		let freqHigh = freq + 1.;
@@ -396,8 +406,8 @@ class eWave {
 			wave[ix2] = wave[ix2+1] = 0;
 
 			for (let f = startFreq; f <= lastFreq; f++) {
-				wave[ix2] += Math.cos(f * angle);  // r
-				wave[ix2+1] += Math.sin(f * angle);  // im
+				wave[ix2] += cos(f * angle);  // r
+				wave[ix2+1] += sin(f * angle);  // im
 			}
 		}
 	}

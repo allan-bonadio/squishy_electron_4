@@ -21,7 +21,10 @@
 😡 *- SetWave: Sliding the frequency slider really fast screws something up.  The
 events come  too fast.  maybe need 'passive' mode?  Or capture mode?
 Now the offset slider.  JUST the offset slider.  Doing it slowly is OK.
-I get it.  Standing wave freq 0 => nans.
+
+√ 😡😡 - Standing wave freq 0 => nans.
+
+😡😡 - Single frame really doesn'twork.(?)
 
 - need a button to reset ALL params and settings
 
@@ -33,7 +36,7 @@ I get it.  Standing wave freq 0 => nans.
 
 😡- left tic marks rarely draw.
 
-- WELL: last points on ends have no ink so there's this black acute triangle instead of color.  No that's right - i's zero at the ends
+√ - WELL: last points on ends have no ink so there's this black acute triangle instead of color.  No that's right - i's zero at the ends
 
 - display Garland Spiral in 3d could be easy.
 	Really should use Three.js
