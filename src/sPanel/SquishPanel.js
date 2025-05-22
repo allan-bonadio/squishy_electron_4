@@ -150,9 +150,10 @@ export class SquishPanel extends React.Component {
 
 		if (traceWidth) console.log(`👑 SquishPanel render, p.bodyWidth=${p.bodyWidth} = outerWidth `
 			+ ` body.clientWidth=${document.body.clientWidth}`);
+		const space = s.space;
 
 		return (
-			<SquishContext.Provider value={{controlPanel:{}, waveView:{}}}>
+			<SquishContext.Provider value={{controlPanel:{space}, waveView:{space}}}>
 				<article id={this.props.id} className="SquishPanel">
 					<WaveView
 						outerWidth = {p.bodyWidth}

@@ -437,12 +437,15 @@ export class ControlPanel extends React.Component {
 
 	setUpContext() {
 		// react never sets our context.  dunno why.  remove this if/when you fix that.
+		// boy it doesn't even remember it when you set it.  Pfft.
 		if (!this.context?.controlPanel)
-			this.context = props.context;
+			this.context = this.props.context;
 		//debugger;
 
 		let cp = this.context?.controlPanel;
-		if (!cp || cp.space)
+		// if there's no context yet, or no space promise yet, don't do this yet.
+		// or, if it's already done, we don't have to do it again.
+		if (!cp || !this.space || cp.N)
 			return;
 
 
@@ -453,17 +456,17 @@ export class ControlPanel extends React.Component {
 		cp.singleFrame = this.singleFrame;
 
 		// stuff available after space promise
-		cp.space = space;
-		cp.N = space.N;
-		cp.mainEAvatar = space.mainEAvatar;
-		cp.mainEWave = space.mainEWave;
+		cp.space = this.space;
+		cp.N = this.space.N;
+		cp.mainEAvatar = this.space.mainEAvatar;
+		cp.mainEWave = this.space.mainEWave;
 
-		cp.grinder = space.grinder;
-		cp.grinder.stretchedDt = cp.state.dtStretch * cp.space.dt;
+		cp.grinder = this.space.grinder;
+		cp.grinder.stretchedDt = this.state.dtStretch * this.space.dt;
 
 		// if somebody tried to set this before the space and grinder
 		// were here, it's saved in the state.
-		cp.grinder.shouldBeIntegrating = cp.state.shouldBeIntegrating;
+		cp.grinder.shouldBeIntegrating = this.state.shouldBeIntegrating;
 		if (cp.grinder.shouldBeIntegrating)
 			cp.startAnimating();
 
