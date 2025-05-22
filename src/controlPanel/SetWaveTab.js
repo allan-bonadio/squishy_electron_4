@@ -3,7 +3,7 @@
 ** Copyright (C) 2021-2025 Tactile Interactive, all rights reserved
 */
 
-import React from 'react';
+import React, {useContext} from 'react';
 import PropTypes, {checkPropTypes} from 'prop-types';
 import {scaleLinear} from 'd3-scale';
 
