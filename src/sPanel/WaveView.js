@@ -9,7 +9,7 @@
 // One is the main view, displaying current simulation.  Others are used in the
 // control panel tabs to display proposed settings before effecting them.
 
-import React from 'react';
+import React, {useContext} from 'react';
 import PropTypes, {checkPropTypes} from 'prop-types';
 
 import eSpace from '../engine/eSpace.js';
@@ -22,6 +22,7 @@ import VoltOverlay from '../volts/VoltOverlay.js';
 import {WELL_BUMPER_WIDTH, SIZE_BOX_SIZE} from '../volts/voltConstants.js';
 import GLScene from '../gl/GLScene.js';
 import {eSpaceCreatedPromise} from '../engine/eEngine.js';
+import SquishContext from './SquishContext.js';
 
 let traceBumpers = false;
 let traceDimensions = false;
@@ -63,7 +64,6 @@ export class WaveView extends React.Component {
 			// no!  handed in by promise space: null,  // set when promise comes in
 		}
 
-
 		this.updateInnerDims();  // after outerWidth done
 
 		this.formerWidth = this.outerWidth;
@@ -89,12 +89,29 @@ export class WaveView extends React.Component {
 				: 0;
 
 			this.mainVDisp = space.vDisp;
+
+			// context.  Somehow this context is around by space promise.  Not so for control panel.
+			let wv = this.context.waveView;
+			debugger;
+			wv.space = space;
+			wv.grinder = space.grinder;
+			wv.mainEAvatar = space.mainEAvatar;
+
+			// make room for the bumpers for WELL continuum (both sides).  Note that
+			// continuum can change only when page reloads.
+			wv.bumperWidth = (qeConsts.contWELL == space.continuum)
+				? WELL_BUMPER_WIDTH
+				: 0;
+
+			wv.mainVDisp = space.vDisp;
 		})
 		.catch(ex => {
 			console.error(`eSpaceCreatedPromise failed:`, ex.stack ?? ex.message ?? ex);
 			debugger;
 		});
 	}
+
+	static contextType = SquishContext;
 
 	// set this.canvasInnerDims from the right places
 	updateInnerDims() {
@@ -158,18 +175,18 @@ export class WaveView extends React.Component {
 	/* ************************************************************************ resizing */
 
 	// these are for resizing the WaveView ONLY with the size box
-	pointerDown =
+	resizePointerDown =
 	ev => {
 		this.resizing = true;
 		this.yOffset = round(this.state.outerHeight - ev.pageY);
 		if (traceDragCanvasHeight)
-			console.info(`🏄 pointer down ${ev.pageX} ${ev.pageY} offset=${this.yOffset}`);
+			console.info(`🏄 resizePointer down ${ev.pageX} ${ev.pageY} offset=${this.yOffset}`);
 		ev.target.setPointerCapture(ev.pointerId);
 		ev.preventDefault();
 		ev.stopPropagation();
 	}
 
-	pointerMove =
+	resizePointerMove =
 	ev => {
 		if (!this.resizing)
 			return;
@@ -179,7 +196,7 @@ export class WaveView extends React.Component {
 			this.setState({outerHeight: vHeight});
 		storeASetting('miscSettings', 'waveViewHeight', vHeight);
 		if (traceDragCanvasHeight)
-			console.info(`🏄 pointer drag ${ev.pageX} ${ev.pageY}  newheight=${ev.pageY + this.yOffset}`);
+			console.info(`🏄 resizePointer drag ${ev.pageX} ${ev.pageY}  newheight=${ev.pageY + this.yOffset}`);
 
 		ev.preventDefault();
 		ev.stopPropagation();
@@ -187,10 +204,10 @@ export class WaveView extends React.Component {
 
 	// usually I send pointerLeave events here, but now with pointerCapture, maybe it doesn't matter.
 	// I do get pointerLeave events, but only after pointerUp, if the pointer is out of the size box.
-	pointerUp =
+	resizePointerUp =
 	ev => {
 		if (traceDragCanvasHeight)
-			console.info(`🏄 pointer up ${ev.pageX} ${ev.pageY}`);
+			console.info(`🏄 resizePointer up ${ev.pageX} ${ev.pageY}`);
 		this.resizing = false;
 		ev.preventDefault();
 		ev.stopPropagation();
@@ -216,11 +233,28 @@ export class WaveView extends React.Component {
 
 	grabWaveViewEl = el => this.waveViewEl = el;
 
+	stopIntegration = ev => {
+
+	};
+
 	/* ********************************************************* render */
+	setUpContext() {
+		let wv = this.context?.waveView;
+		if (!wv || wv.space)
+			return;
+
+		//debugger;
+		wv.space = {};
+		console.log(`🏄  WaveView set context context: `, this.context);
+	}
+
 
 	render() {
 		const p = this.props;
 		const s = this.state;
+
+		// this is the earliest place the context shows up
+		this.setUpContext();
 
 		// if c++ isn't initialized yet, we can assume the time and frame serial
 		let elapsedTime = '0';
@@ -278,10 +312,11 @@ export class WaveView extends React.Component {
 
 		let betweenBumpers = this.canvasInnerWidth - 2 * this.bumperWidth;
 
-		// the glScene is one layer.  Over that is the bumpers and widget area betweeen them.
+		// the glScene is one layer.  Over that is the widget area  Bumpers are outside.
 		return (
 		<div className='WaveView' style={{height: `${s.outerHeight}px`}}
 			onPointerEnter={this.hoverEnter} onPointerLeave={this.hoverLeave}
+			onPointerUp={this.stopIntegration}
 			ref={this.grabWaveViewEl}>
 
 			{glScene}
@@ -306,8 +341,8 @@ export class WaveView extends React.Component {
 				{voltOverlay}
 
 				<img className='sizeBox' src='/images/sizeBox4.png' alt='size box'
-					onPointerDown={this.pointerDown} onPointerUp={this.pointerUp}
-					onPointerMove={this.pointerMove} onPointerLeave={this.pointerUp}
+					onPointerDown={this.resizePointerDown} onPointerUp={this.resizePointerUp}
+					onPointerMove={this.resizePointerMove} onPointerLeave={this.resizePointerUp}
 					style={{width: `${SIZE_BOX_SIZE}px`, height: `${SIZE_BOX_SIZE}px`}} />
 			</div>
 			<div className='bumper right' key='right'

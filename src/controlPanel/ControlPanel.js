@@ -3,7 +3,7 @@
 ** Copyright (C) 2021-2025 Tactile Interactive, all rights reserved
 */
 
-import React from 'react';
+import React, {useContext} from 'react';
 import PropTypes, {checkPropTypes} from 'prop-types';
 
 import './ControlPanel.scss';
@@ -17,6 +17,8 @@ import {eSpaceCreatedPromise} from '../engine/eEngine.js';
 import qeFuncs from '../engine/qeFuncs.js';
 import qeConsts from '../engine/qeConsts.js';
 import {interpretCppException, wrapForExc} from '../utils/errors.js';
+import SquishContext from '../sPanel/SquishContext.js';
+
 
 let traceSetPanels = false;
 let traceStartStop = false;
@@ -42,12 +44,15 @@ export class ControlPanel extends React.Component {
 
 		// sAnimator
 		animator: PropTypes.object,
+
+		// WHy isn't React handing me the context?  Not ever.  Just an empty
+		// object that's frozen.  do it myself.
+		context: PropTypes.object,
 	}
 
 	constructor(props) {
 		super(props);
 		checkPropTypes(this.constructor.propTypes, props, 'prop', this.constructor.name);
-		//checkPropTypes(ControlPanel.propTypes, props, 'prop', 'ControlPanel');
 
 		// most of the state is kept here.  But, also, in the store settings for the next page reload.
 		this.state = {
@@ -57,16 +62,15 @@ export class ControlPanel extends React.Component {
 			...getAGroup('voltageSettings'),
 			...getAGroup('frameSettings'),
 
-
 			showingTab: getASetting('miscSettings', 'showingTab'),
-
 		}
 		this.chosenFP = this.state.chosenFP;
 
 		// can't get this to work for now, startup is always stopped.
 		this.state.shouldBeIntegrating = false;
 
-		// we can't init some stuff till we get the space.  But we also can't until this constructor runs.
+		// we can't init some stuff till we get the space.  But we also can't until
+		// this constructor runs.
 		eSpaceCreatedPromise.then(space => {
 			this.initWithSpace(space);
 
@@ -99,9 +103,11 @@ export class ControlPanel extends React.Component {
 		if (this.grinder.shouldBeIntegrating)
 			this.startAnimating();
 
+
+
 		if (traceStartStop) {
 			console.log(`🎛️ ControlPanel constructor initialized with space, ${this.grinder.pointer.toString(16)} `
-				+` shouldBeIntegrating=${this.grinder.shouldBeIntegrating}  `
+				+` shouldBeIntegrating=${this.grinder.shouldBeIntegrating} `
 				+` isIntegrating=${this.grinder.isIntegrating}`);
 		}
 	}
@@ -120,8 +126,9 @@ export class ControlPanel extends React.Component {
 			this.grinder.chosenFP = period;
 	}
 
-	// set freq of frame, which is 1, 2, 4, 8, ... some float number of times per second you want frames.
-	// freq is how the CPToolbar UI, handles it, but we keep the period in the ControlPanel state,
+	// set freq of frame, which is 1, 2, 4, 8, ... some float number of times per
+	// second you want frames. freq is how the CPToolbar UI, handles it, but we
+	// keep the period in the ControlPanel state,
 	setChosenRate =
 	freq =>{
 		// set it in the settings, controlpanel state, and SquishPanel's state, too.
@@ -427,9 +434,48 @@ export class ControlPanel extends React.Component {
 
 
 	/* ********************************************** render */
+
+	setUpContext() {
+		// react never sets our context.  dunno why.  remove this if/when you fix that.
+		if (!this.context?.controlPanel)
+			this.context = props.context;
+		//debugger;
+
+		let cp = this.context?.controlPanel;
+		if (!cp || cp.space)
+			return;
+
+
+		// stuff available immediately
+		cp.startAnimating = this.startAnimating;
+		cp.stopAnimating = this.stopAnimating;
+		cp.startStop = this.startStop;
+		cp.singleFrame = this.singleFrame;
+
+		// stuff available after space promise
+		cp.space = space;
+		cp.N = space.N;
+		cp.mainEAvatar = space.mainEAvatar;
+		cp.mainEWave = space.mainEWave;
+
+		cp.grinder = space.grinder;
+		cp.grinder.stretchedDt = cp.state.dtStretch * cp.space.dt;
+
+		// if somebody tried to set this before the space and grinder
+		// were here, it's saved in the state.
+		cp.grinder.shouldBeIntegrating = cp.state.shouldBeIntegrating;
+		if (cp.grinder.shouldBeIntegrating)
+			cp.startAnimating();
+
+		console.log(`🎛️  ControlPanel setUpContext context: `, this.context);
+	}
+
 	render() {
 		const p = this.props;
 		const s = this.state;
+
+		// this is the earliest place the context shows up (if ever)
+		this.setUpContext();
 
 		// before the space exists
 		// why?  this just shows panels and buttons

@@ -21,15 +21,15 @@ import sAnimator from './sAnimator.js';
 import {getASetting, storeASetting} from '../utils/storeSettings.js';
 import {tooOldTerminate} from '../utils/errors.js';
 
+import SquishContext from '../sPanel/SquishContext.js';
+
+
 // runtime debugging flags - you can change in the debugger or here
 let tracePromises = false;
 let traceSquishPanel = false;
 let traceWidth = false;
 
 const DEFAULT_SCENE_NAME = 'flatScene';
-
-
-
 
 /* ************************************************ construction & reconstruction */
 
@@ -54,8 +54,6 @@ export class SquishPanel extends React.Component {
 // why does this continue to happen!?!?!?
 		SquishPanel.squishPanelConstructed++;
 
-
-
 		this.state = {
 			mainSceneClassName: DEFAULT_SCENE_NAME,
 
@@ -63,13 +61,10 @@ export class SquishPanel extends React.Component {
 			space: null,
 		};
 
-		// um, I think we want multiple things in the space context.  The space,
-		// the promise for the space, dunno what else.  Hmmm the hooks docs
-		// use one per variable.  I think you can't do that in class components.
-		//this.spaceCtx = React.createContext(null);
-
 		if (traceSquishPanel) console.log(`👑 SquishPanel constructor done`);
 	}
+
+	static contextType = SquishContext;
 
 	/* ****************************************** space & wave creation */
 
@@ -115,9 +110,6 @@ export class SquishPanel extends React.Component {
 			tooOldTerminate('WebWorkers');
 	}
 
-
-
-
 	/* ******************************************************* user settings */
 	// others managed from ControlPanel
 	// can i move these to the control panel?
@@ -137,8 +129,9 @@ export class SquishPanel extends React.Component {
 	// Base function that draws the WebGL, whether during iteration, or during
 	// idle times if waveParams change. call this when you change both the GL and iter
 	// and elapsed time. We need it here in SquishPanel cuz it's often called in
-	// ControlPanel but affects WaveView
+	// ControlPanel but affects WaveView.  Should be implemented thru context TODO
 	repaintWholeMainWave = () => {
+		debugger;
 		let avatar = this.mainEAvatar;
 		let grinder = this.grinder;
 
@@ -151,14 +144,6 @@ export class SquishPanel extends React.Component {
 		avatar.doRepaint();
 	}
 
-	// re-render the main SVG voltage, any time when
-	// voltageParams change. call this when you change voltageParams to a familiar one. We need it
-	// here in SquishPanel cuz it's often called in ControlPanel but affects
-	// WaveView
-	//rerenderWholeMainVoltage = (voltageParams) => {
-	//	debugger;
-	//}
-
 	render() {
 		const p = this.props;
 		const s = this.state;
@@ -167,23 +152,24 @@ export class SquishPanel extends React.Component {
 			+ ` body.clientWidth=${document.body.clientWidth}`);
 
 		return (
-			<article id={this.props.id} className="SquishPanel">
-				<WaveView
-					outerWidth = {p.bodyWidth}
-					sPanel={this}
-				/>
-				<ControlPanel
-					repaintWholeMainWave={this.repaintWholeMainWave}
+			<SquishContext.Provider value={{controlPanel:{}, waveView:{}}}>
+				<article id={this.props.id} className="SquishPanel">
+					<WaveView
+						outerWidth = {p.bodyWidth}
+						sPanel={this}
+					/>
+					<ControlPanel
+						repaintWholeMainWave={this.repaintWholeMainWave}
 
-					iStats={this.iStats}
-					animator={this.animator}
-					sPanel={this}
-				/>
-			</article>
+						iStats={this.iStats}
+						animator={this.animator}
+						sPanel={this}
+
+						context={this.context}
+					/>
+				</article>
+			</SquishContext.Provider>
 		);
-		//<this.spaceCtx.Provider value={s.space}>
-		//</this.spaceCtx.Provider>
-		//			rerenderWholeMainVoltage={this.rerenderWholeMainVoltage}
 	}
 }
 
