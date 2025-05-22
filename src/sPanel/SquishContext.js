@@ -12,7 +12,7 @@ export const SquishContext = createContext({
 	controlPanel: {
 		singleFrame: null,
 	},
-	space: {
+	waveView: {
 		space: null,
 	}
 
