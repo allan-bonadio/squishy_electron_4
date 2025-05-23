@@ -153,7 +153,7 @@ export class SquishPanel extends React.Component {
 		const space = s.space;
 
 		return (
-			<SquishContext.Provider value={{controlPanel:{space}, waveView:{space}}}>
+			<SquishContext.Provider value={{controlPanel:{}, waveView:{}, engine:{}}}>
 				<article id={this.props.id} className="SquishPanel">
 					<WaveView
 						outerWidth = {p.bodyWidth}
@@ -165,8 +165,6 @@ export class SquishPanel extends React.Component {
 						iStats={this.iStats}
 						animator={this.animator}
 						sPanel={this}
-
-						context={this.context}
 					/>
 				</article>
 			</SquishContext.Provider>

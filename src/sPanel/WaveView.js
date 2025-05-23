@@ -54,8 +54,8 @@ export class WaveView extends React.Component {
 		checkPropTypes(this.constructor.propTypes, props, 'prop', this.constructor.name);
 
 		// is this a bad idea?
-		this.sPanel = props.sPanel;
-		this.sPanel.wView = this;
+		//this.sPanel = props.sPanel;  // not used anywhere
+		//this.sPanel.wView = this;
 
 		this.state = {
 			// height of just the canvas + DOUBLE_THICKNESSpx, as set by user with size box
@@ -72,46 +72,64 @@ export class WaveView extends React.Component {
 		// make the proptypes shuddup about it being undefined
 		this.mainVDisp = null;
 
-		eSpaceCreatedPromise
-		.then(space => {
-			// this will kick off a render, now that the avatar is in place
-			this.setState({space});
-
-			// easy access
-			this.space = space;
-			this.grinder = space.grinder;
-			this.mainEAvatar = space.mainEAvatar;
-
-			// make room for the bumpers for WELL continuum (both sides).  Note that
-			// continuum can change only when page reloads.
-			this.bumperWidth = (qeConsts.contWELL == space.continuum)
-				? WELL_BUMPER_WIDTH
-				: 0;
-
-			this.mainVDisp = space.vDisp;
-
-			// context.  Somehow this context is around by space promise.  Not so for control panel.
-			let wv = this.context.waveView;
-			debugger;
-			wv.space = space;
-			wv.grinder = space.grinder;
-			wv.mainEAvatar = space.mainEAvatar;
-
-			// make room for the bumpers for WELL continuum (both sides).  Note that
-			// continuum can change only when page reloads.
-			wv.bumperWidth = (qeConsts.contWELL == space.continuum)
-				? WELL_BUMPER_WIDTH
-				: 0;
-
-			wv.mainVDisp = space.vDisp;
-		})
-		.catch(ex => {
-			console.error(`eSpaceCreatedPromise failed:`, ex.stack ?? ex.message ?? ex);
-			debugger;
-		});
+		eSpaceCreatedPromise.then(this.handleSpacePromise,
+			// catch
+			ex => {
+				console.error(`eSpaceCreatedPromise failed:`, ex.stack ?? ex.message ?? ex);
+				debugger;
+			}
+		);
 	}
 
 	static contextType = SquishContext;
+
+	// set up 2/3 of the context: waveView and engine
+	setUpContext() {
+		// need BOTH context  and the space.  So this is called twice.
+		let wv = this.context?.waveView;
+		let eng = this.context?.engine;
+		if (!this.space || !wv)
+			return;  // not ready yet
+		if (wv.mainEAvatar)
+			return;  // already done
+
+		// context.  Somehow this context is around by space promise.  Not so for control panel.
+		debugger;
+		const space = eng.space = this.space;
+		eng.grinder = space.grinder;
+
+		wv.mainEAvatar = space.mainEAvatar;
+
+		// make room for the bumpers for WELL continuum (both sides).  Note that
+		// continuum can change only when page reloads.
+		wv.bumperWidth = (qeConsts.contWELL == space.continuum)
+			? WELL_BUMPER_WIDTH
+			: 0;
+
+		wv.mainVDisp = space.vDisp;
+	}
+
+	// set up 2/3 of the context: waveView and engine
+	handleSpacePromise = (space) => {
+		// this will kick off a render, now that the avatar is in place
+		this.setState({space});
+		debugger;
+
+		// easy access
+		this.space = space;
+		this.grinder = space.grinder;
+		this.mainEAvatar = space.mainEAvatar;
+
+		// make room for the bumpers for WELL continuum (both sides).  Note that
+		// continuum can change only when page reloads.
+		this.bumperWidth = (qeConsts.contWELL == space.continuum)
+			? WELL_BUMPER_WIDTH
+			: 0;
+
+		this.mainVDisp = space.vDisp;
+
+		this.setUpContext();
+	}
 
 	// set this.canvasInnerDims from the right places
 	updateInnerDims() {
@@ -135,6 +153,17 @@ export class WaveView extends React.Component {
 		}
 		else if (this.gl !== gl)
 			throw `this.gl ≠ gl !`;
+	}
+
+	componentDidMount() {
+		let wv = this.context?.waveView;
+		if (!wv || wv.space)
+			return;
+
+		debugger;
+		this.setUpContext();
+		//wv.space = {};
+		console.log(`🏄  WaveView componentDidMount context: `, this.context);
 	}
 
 	componentDidUpdate() {
@@ -233,28 +262,12 @@ export class WaveView extends React.Component {
 
 	grabWaveViewEl = el => this.waveViewEl = el;
 
-	stopIntegration = ev => {
-
-	};
-
 	/* ********************************************************* render */
-	setUpContext() {
-		let wv = this.context?.waveView;
-		if (!wv || wv.space)
-			return;
-
-		//debugger;
-		wv.space = {};
-		console.log(`🏄  WaveView set context context: `, this.context);
-	}
 
 
 	render() {
 		const p = this.props;
 		const s = this.state;
-
-		// this is the earliest place the context shows up
-		this.setUpContext();
 
 		// if c++ isn't initialized yet, we can assume the time and frame serial
 		let elapsedTime = '0';

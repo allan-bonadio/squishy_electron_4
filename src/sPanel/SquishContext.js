@@ -5,17 +5,14 @@
 
 import { createContext } from 'react';
 
-// all of these start as null so we don't need to import everything.  So no circular references.
-// As the squishPanel inits up, these will be filled in.  mostly funcs i guess
+// all of these start as empty so we don't need to import anything into this
+// file.  So no import circular references. As the waveView and controlPanel init up, these
+// will be filled in.  funcs & objects mostly
 export const SquishContext = createContext({
-	// the context object will be frozen, but not its subobjects.
-	controlPanel: {
-		singleFrame: null,
-	},
-	waveView: {
-		space: null,
-	}
-
+	// the context object will be frozen, but not its subobjects.  Each for a major subsystem.
+	controlPanel: {},
+	waveView: {},
+	engine: {},
 });
 SquishContext.displayName = 'SquishContext';
 

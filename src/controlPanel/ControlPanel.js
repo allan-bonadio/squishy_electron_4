@@ -3,7 +3,7 @@
 ** Copyright (C) 2021-2025 Tactile Interactive, all rights reserved
 */
 
-import React, {useContext} from 'react';
+import React from 'react';
 import PropTypes, {checkPropTypes} from 'prop-types';
 
 import './ControlPanel.scss';
@@ -44,10 +44,6 @@ export class ControlPanel extends React.Component {
 
 		// sAnimator
 		animator: PropTypes.object,
-
-		// WHy isn't React handing me the context?  Not ever.  Just an empty
-		// object that's frozen.  do it myself.
-		context: PropTypes.object,
 	}
 
 	constructor(props) {
@@ -103,7 +99,7 @@ export class ControlPanel extends React.Component {
 		if (this.grinder.shouldBeIntegrating)
 			this.startAnimating();
 
-
+		this.setUpContext();
 
 		if (traceStartStop) {
 			console.log(`🎛️ ControlPanel constructor initialized with space, ${this.grinder.pointer.toString(16)} `
@@ -111,6 +107,8 @@ export class ControlPanel extends React.Component {
 				+` isIntegrating=${this.grinder.isIntegrating}`);
 		}
 	}
+
+	static contextType = SquishContext;
 
 	// set frame period chosen by the user: set it JUST for the animator and grinder
 	setChosenFP =
@@ -332,7 +330,6 @@ export class ControlPanel extends React.Component {
 
 	setAndRenderFamiliarVoltage(vP) {
 		this.space.vDisp.setFamiliarVoltage(vP);
-		debugger;
 		this.space.updateDrawnVoltagePath();  // visible change on screen
 	}
 
@@ -436,18 +433,11 @@ export class ControlPanel extends React.Component {
 	/* ********************************************** render */
 
 	setUpContext() {
-		// react never sets our context.  dunno why.  remove this if/when you fix that.
-		// boy it doesn't even remember it when you set it.  Pfft.
-		if (!this.context?.controlPanel)
-			this.context = this.props.context;
-		//debugger;
-
-		let cp = this.context?.controlPanel;
-		// if there's no context yet, or no space promise yet, don't do this yet.
-		// or, if it's already done, we don't have to do it again.
-		if (!cp || !this.space || cp.N)
-			return;
-
+		const cp = this.context?.controlPanel;
+		if (!cp)
+			return;  // not ready yet
+		if (cp.singleFrame)
+			return;  // already done
 
 		// stuff available immediately
 		cp.startAnimating = this.startAnimating;
@@ -456,19 +446,19 @@ export class ControlPanel extends React.Component {
 		cp.singleFrame = this.singleFrame;
 
 		// stuff available after space promise
-		cp.space = this.space;
-		cp.N = this.space.N;
-		cp.mainEAvatar = this.space.mainEAvatar;
-		cp.mainEWave = this.space.mainEWave;
-
-		cp.grinder = this.space.grinder;
-		cp.grinder.stretchedDt = this.state.dtStretch * this.space.dt;
-
-		// if somebody tried to set this before the space and grinder
-		// were here, it's saved in the state.
-		cp.grinder.shouldBeIntegrating = this.state.shouldBeIntegrating;
-		if (cp.grinder.shouldBeIntegrating)
-			cp.startAnimating();
+//		cp.space = this.space;
+//		cp.N = this.space.N;
+//		cp.mainEAvatar = this.space.mainEAvatar;
+//		cp.mainEWave = this.space.mainEWave;
+//
+//		cp.grinder = this.space.grinder;
+//		cp.grinder.stretchedDt = this.state.dtStretch * this.space.dt;
+//
+//		// if somebody tried to set this before the space and grinder
+//		// were here, it's saved in the state.
+//		cp.grinder.shouldBeIntegrating = this.state.shouldBeIntegrating;
+//		if (cp.grinder.shouldBeIntegrating)
+//			cp.startAnimating();
 
 		console.log(`🎛️  ControlPanel setUpContext context: `, this.context);
 	}
@@ -477,7 +467,7 @@ export class ControlPanel extends React.Component {
 		const p = this.props;
 		const s = this.state;
 
-		// this is the earliest place the context shows up (if ever)
+		// this is the earliest place the context shows up
 		this.setUpContext();
 
 		// before the space exists
