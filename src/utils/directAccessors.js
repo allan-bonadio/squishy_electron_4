@@ -34,10 +34,3 @@ export function prepForDirectAccessors(_this, pointer) {
 
 	cppObjectRegistry[pointer] = _this;
 }
-
-// call this after all your spaces and avatars and buffers have been freed
-// cuz you're recreating everything
-//export function resetObjectRegistry() {
-//	cppObjectRegistry = {};
-//}
-//resetObjectRegistry();

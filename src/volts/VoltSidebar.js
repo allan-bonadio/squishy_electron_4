@@ -25,10 +25,6 @@ function setPT() {
 		bumperWidth: PropTypes.number,
 
 		mainVDisp: PropTypes.instanceOf(voltDisplay),
-
-		// Same as voltage area, this shows and hides along with it
-		// but won't draw anything if the checkbox is off
-		//showVoltage: PropTypes.string,
 	}
 }
 

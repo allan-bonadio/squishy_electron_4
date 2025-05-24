@@ -3,8 +3,6 @@
 // mostly for testing purposes.  do not edit!  instead edit cx2rygb.glsl.js & run unit tests
 // this file written Thu Apr 17 2025 00:48:20 GMT-0700 (Pacific Daylight Time)
 
-// TODO: use these someday?
-//let traceQuarter = false;
 //const  _  = (v) => v.toFixed(4);
 
 // needed defs of vec2 (complex only) and vec3 (rgb only)

@@ -94,7 +94,6 @@ export class WaveView extends React.Component {
 			return;  // already done
 
 		// context.  Somehow this context is around by space promise.  Not so for control panel.
-		debugger;
 		const space = eng.space = this.space;
 		eng.grinder = space.grinder;
 
@@ -113,9 +112,7 @@ export class WaveView extends React.Component {
 	handleSpacePromise = (space) => {
 		// this will kick off a render, now that the avatar is in place
 		this.setState({space});
-		debugger;
 
-		// easy access
 		this.space = space;
 		this.grinder = space.grinder;
 		this.mainEAvatar = space.mainEAvatar;
@@ -160,7 +157,6 @@ export class WaveView extends React.Component {
 		if (!wv || wv.space)
 			return;
 
-		debugger;
 		this.setUpContext();
 		//wv.space = {};
 		console.log(`🏄  WaveView componentDidMount context: `, this.context);

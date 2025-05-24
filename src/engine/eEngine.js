@@ -23,7 +23,6 @@ export let MAX_DIMENSIONS, N_THREADS;
 
 // this promise resolves when the main space is created.
 // Create the promise tout de suite when app starts, so everybody can get at it.
-// TODO: I don't need this crap anymore, right?
 let eSpaceCreatedSucceed, eSpaceCreatedFail;
 function resetSpaceCreatedPromise() {
 	let prom = new Promise((succeed, fail) => {

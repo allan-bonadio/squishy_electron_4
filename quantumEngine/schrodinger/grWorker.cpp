@@ -78,7 +78,7 @@ void grWorker::gThreadLoop(void) {
 			// eGrinder.triggerIteration() or qeFuncs.grinder_triggerIteration
 			// this is what I want but it's only in u32 form.
 			int formerStartAtomic = grinder->startAtomic;
-			printf("🦫 ‍ emscripten_atomic_wait_u32() startAtomic=%d  \n ", formerStartAtomic);
+			//printf("🦫 ‍ emscripten_atomic_wait_u32() startAtomic=%d  \n ", formerStartAtomic);
 
 			int waitCode = emscripten_atomic_wait_u32(&grinder->startAtomic, -1,
 					ATOMICS_WAIT_DURATION_INFINITE);

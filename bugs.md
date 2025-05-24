@@ -14,6 +14,8 @@
 
 😡- more unit tests!  for js side.  And should work on C++ ones too.
 
+😡- common scss is included multio,e times
+
 ## Control Panel
 
 - chord pulse should be harmonics of the full width.  Needs an overhaul, and re-enabling.
@@ -60,7 +62,7 @@ Needs fixing.
 - option to have voltage relax back to zero (or whatever's set in the
 tab)
 
-
+😡- Hi and Lo voltage both attract!!
 
 ## Space and Integration
 
