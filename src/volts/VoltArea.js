@@ -377,14 +377,6 @@ function VoltArea(props) {
 			onPointerUp={pointerUp} onPointerLeave={pointerUp}
 		>
 			<g>
-				{/* for showVoltage on hover, need this to  hover over.  No ev handlers here,
-					but the .alwaysShowVoltage etc classes' :hover doesn't catch them othrwise
-					TODO: I need the hover mode to work!  ??? unneeded? */}
-				<rect className='hoverBox' key='hoverBox'
-					x={p.drawingLeft} y={0}
-					width={p.drawingWidth} height={p.canvasInnerHeight}
-				/>
-
 				{renderAxes()}
 				{renderVoltagePath()}
 			</g>
