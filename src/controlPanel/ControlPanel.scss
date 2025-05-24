@@ -38,135 +38,129 @@
 			width: 3em;
 		}
 	}
+}
+
 
 	/* **************************************** CPToolbar:  */
 	// directly south of the canvas
+.ControlPanel .CPToolbar {
+	float: none;
+	user-select: none;
 
-	.CPToolbar {
-		float: none;
-		user-select: none;
-
-		.frameRateBox {
-			display: inline-block;
-			margin-left: .5em;
-		}
-
-		.rateSelector {
-			background-color: #222;
-			color: #eee;
-		}
-
-		.toolbarThing {
-			display: inline-block;
-		}
-
-		/* **************************************** toolbar buttons */
-
-		.startStopTool {
-			display: inline-block;
-			font-size: 2em;
-			padding: .1em .5em .2em;
-			margin: .1em .05em;
-
-			background: linear-gradient(#889, #dcd 20%, #ccd 25%, #cdd 30%, #223);
-			border: none;
-			border-radius: 0;
-			color: #fff;
-		}
-
-		// only while integration is running
-		button.startStopTool.running {
-			background: linear-gradient(#aab, #fef 20%, #eef 25%, #eff 30%, #445);
-		}
-
-		// only while user is mousedown
-		button.startStopTool:active {
-			background: linear-gradient(#223, #cdd 70%, #ccd 75%, #dcd 80%, #889);
-		}
-
-		.startStopToggle {
-			width: 8em;
-		}
-
-		.stepButton {
-			width: 4em;
-		}
-
-
-
-		/* **************************************** other */
-
-		// i don't think these are used anymore
-		.cpSlider {
-			display: inline-block;
-			width: 26em;
-			padding: 0 .5em 0 .5em;
-		}
-
-		// set the width inline
-		.toolSpacer {
-			display: inline-block;
-		}
+	.frameRateBox {
+		display: inline-block;
+		margin-left: .5em;
 	}
+
+	.rateSelector {
+		background-color: #222;
+		color: #eee;
+	}
+
+	.toolbarThing {
+		display: inline-block;
+	}
+
+	/* **************************************** toolbar buttons */
+
+	.startStopTool {
+		display: inline-block;
+		font-size: 2em;
+		padding: .1em .5em .2em;
+		margin: .1em .05em;
+
+		background: linear-gradient(#889, #dcd 20%, #ccd 25%, #cdd 30%, #223);
+		border: none;
+		border-radius: 0;
+		color: #fff;
+	}
+
+	// only while integration is running
+	button.startStopTool.running {
+		background: linear-gradient(#aab, #fef 20%, #eef 25%, #eff 30%, #445);
+	}
+
+	// only while user is mousedown
+	button.startStopTool:active {
+		background: linear-gradient(#223, #cdd 70%, #ccd 75%, #dcd 80%, #889);
+	}
+
+	.startStopToggle {
+		width: 8em;
+	}
+
+	.stepButton {
+		width: 4em;
+	}
+
+
+
+	/* **************************************** cp slider other */
+
+	// i don't think these are used anymore
+	.cpSlider {
+		display: inline-block;
+		width: 26em;
+		padding: 0 .5em 0 .5em;
+	}
+
+	// set the width inline
+	.toolSpacer {
+		display: inline-block;
+	}
+}
 
 
 	/* **************************************** Tab bar & Tabs */
 
 	/* the vertical bar on the left */
-	ul.TabBar {
-		margin: 0;
-		padding: 0;
-		position: absolute;
-		z-index: 10;
-		position: relative;
-		cursor: pointer;
+.ControlPanel ul.TabBar {
+	margin: 0;
+	padding: 0;
+	position: absolute;
+	z-index: 10;
+	position: relative;
+	cursor: pointer;
 
-		/* a tab button */
-		li {
-			list-style: none;
-			display: block;
-			border: outset #abc 2px;
-			border-radius: .5em 0 0 .5em;
-			padding: .2em .5em .2em 1em;
-			width: calc(7em + 2px);
-			margin: 0 0 .2em .5em;
-			text-align: right;
-		}
-
-		li.selected {
-			background-color: #eef;
-			color: #222;
-			border-style: inset;
-			border-color: #abc;
-			border-right: solid #eef 2px;
-			width: 7.2em;
-		}
+	/* a tab button */
+	li {
+		list-style: none;
+		display: block;
+		border: outset #abc 2px;
+		border-radius: .5em 0 0 .5em;
+		padding: .2em .5em .2em 1em;
+		width: calc(7em + 2px);
+		margin: 0 0 .2em .5em;
+		text-align: right;
 	}
+
+	li.selected {
+		background-color: #eef;
+		color: #222;
+		border-style: inset;
+		border-color: #abc;
+		border-right: solid #eef 2px;
+		width: 7.2em;
+	}
+}
 
 	// encloses all panels on the right
-	.tabFrame {
-		width: 90%;
-		border: inset #abc 2px;
-		//padding: .2em .5em;
-		color: #222;
-		background-color: #eef;
-		margin-left: -.2em;
+.ControlPanel .tabFrame {
+	width: 90%;
+	border: inset #abc 2px;
+	//padding: .2em .5em;
+	color: #222;
+	background-color: #eef;
+	margin-left: -.2em;
 
-		h3 {
-			margin-top: 0;
-			margin-bottom: .8em;
-		}
-
-		//none h4 {
-		//	margin: .2em;
-		//	display: inline-block;
-		//
-		//	width: 6em;
-		//	text-align: right;
-		//}
+	h3 {
+		margin-top: 0;
+		margin-bottom: .8em;
 	}
+}
 
 	// each of the panels
+.ControlPanel {
 	.controlPanelPanel {
 		padding: .8em;
 	}
@@ -180,6 +174,7 @@
 			text-align: right;
 		}
 	}
+}
 
 
 	//.MiniGraph {
@@ -191,162 +186,173 @@
 	/* **************************************** Set Wave tab */
 
 	/* any column in the SetWave band */
-	.waveTabCol {
-		float: left;
-		text-align: right;
-		padding-right: .8em;
+.ControlPanel .waveTabCol {
+	float: left;
+	text-align: right;
+	padding-right: .8em;
 
-		.setWaveButton {
-			margin-top: .8em;
+	.setWaveButton {
+		margin-top: .8em;
+	}
+
+	// sliders for freq, etc
+	&.waveParamSliders {
+		//width: 30em;
+
+		input {
+			display: inline;
 		}
 
-		// sliders for freq, etc
-		&.waveParamSliders {
-			//width: 30em;
+		h3 {
+			text-align: left;
+		}
+	}
 
-			input {
-				display: inline;
+	.selected {
+		background: #ccf;
+	}
+}
+
+
+/* **************************************** Set Voltage tab */
+
+.ControlPanel .setVoltageTab {
+	width: calc( 50em + 200px);
+	height: auto;
+
+	// this is the whole left panel, the title and the breed selector, etc
+	.voltageBreedPanel {
+		float: left;
+		label {
+			display: block;
+			//line-height: 3em;
+		}
+	}
+
+	input[type=range] {
+		accent-color: common.$voltageDarkerColor;
+	}
+
+	//.divider {
+	//	float: left;
+	//	height: 6em;
+	//	border-left: 1px #888 solid;
+	//	margin: 1em 1.5em;
+	//}
+
+	// the panel with the minigraph, and all the sliders
+	.miniGraphPanel {
+		//--miniGraphWidth: 200px;
+		//--miniGraphHeight: 150px;
+
+		display: grid;
+		grid-template-columns: auto auto auto;
+		grid-template-rows: auto auto auto;
+		gap: .5em;
+		width: 450px;
+		float: left;
+
+		// "The keyword 'slider-vertical' ... is not standardized..."
+		.slotScale, .canyonScale, .canyonPower {
+			//appearance: slider-vertical;
+			writing-mode: vertical-lr;  // new standard? feb 2024  use direction: rtl; to invert
+			direction: rtl;
+			width: 2.5em;
+
+		}
+
+		// left-right offset of voltage pattern
+		.voltageCenter {
+			height: 20px;
+		}
+	}
+
+	.miniGraphPanel {
+		// thing that looks like x^2.5 only for canyon
+		.powerDisplay {
+			width: 2.5em;
+			text-align: center;
+		}
+
+		// for block, slot or canyon.  looks like 2.50 • x...
+		.scaleDisplay {
+			width: 7em;
+			text-align: center;
+			font-size: .7em;
+		}
+
+		.miniGraph {
+			// width and height passed in from JS
+			border: #aaa 1px outset;
+			stroke: common.$voltageColor;
+			stroke-width: 1;
+			pointer-events: none;
+			background-color: #444;
+		}
+
+	}
+
+	.miniGraphPanel {
+		// menu showing in some places: always, hover, never
+		.ShowVoltageControl {
+			display: block;
+			float: left;
+			padding: 1em;
+			margin-left: 1em;
+		}
+	}
+
+	.canyonScaleDisplay {
+		width: 9em;
+	}
+	.slotScaleDisplay {
+		width: 9em;
+		textAlign: 'right';
+	}
+}
+
+
+/* **************************************** Set Integration tab */
+
+.ControlPanel .SetIntegrationTab {
+	.sliderBlock, .iStats {
+		width: 40%;
+		float: left;
+		//margin-left: 3em;
+	}
+
+	.sliderBlock .middle {
+		width: 10em;
+	}
+
+	.iStats table {
+		float: left;
+		margin-left: 3em;
+
+		td {
+			text-align: right;
+
+			&:first-child {
+				font-size: .8em;
 			}
-
-			h3 {
+			&:nth-child(2) {
+				width: 4em;
+				font-weight: bold;
+			}
+			&:last-child {
+				width: 4em;
+				font-weight: normal;
 				text-align: left;
 			}
 		}
-
-		.selected {
-			background: #ccf;
-		}
 	}
-
-
-	/* **************************************** Set Voltage tab */
-	--miniGraphWidth: 200px;
-	--miniGraphHeight: 150px;
-
-	.setVoltageTab {
-		width: calc( 50em + 200px);
-		height: auto;
-
-		// this is the whole left panel, the title and the breed selector, etc
-		.voltageBreedPanel {
-			float: left;
-			label {
-				display: block;
-				//line-height: 3em;
-			}
-		}
-
-		input[type=range]{
-			accent-color: common.$voltageDarkerColor;
-		}
-
-		//.divider {
-		//	float: left;
-		//	height: 6em;
-		//	border-left: 1px #888 solid;
-		//	margin: 1em 1.5em;
-		//}
-
-		// the panel with the minigraph, and all the sliders
-		.miniGraphPanel {
-			display: grid;
-			grid-template-columns: auto auto auto;
-			grid-template-rows: auto auto auto;
-			gap: .5em;
-			width: 450px;
-			float: left;
-
-			// "The keyword 'slider-vertical' ... is not standardized..."
-			.slotScale, .canyonScale, .canyonPower {
-				//appearance: slider-vertical;
-				writing-mode: vertical-lr;  // new standard? feb 2024  use direction: rtl; to invert
-				direction: rtl;
-				width: 2.5em;
-
-			}
-
-			// left-right offset of voltage pattern
-			.voltageCenter {
-				height: 20px;
-			}
-
-			// thing that looks like x^2.5 only for canyon
-			.powerDisplay {
-				width: 2.5em;
-				text-align: center;
-			}
-
-			// for block, slot or canyon.  looks like 2.50 • x...
-			.scaleDisplay {
-				width: 7em;
-				text-align: center;
-				font-size: .7em;
-			}
-
-			.miniGraph {
-				// width and height passed in from JS
-				border: #aaa 1px outset;
-				stroke: common.$voltageColor;
-				stroke-width: 1;
-				pointer-events: none;
-				background-color: #444;
-			}
-
-			// menu showing in some places: always, hover, never
-			.ShowVoltageControl {
-				display: block;
-				float: left;
-				padding: 1em;
-				margin-left: 1em;
-				.showVoltage {
-
-				}
-			}
-		}
-	}
-
-
-	/* **************************************** Set Integration tab */
-
-	.SetIntegrationTab {
-		.sliderBlock, .iStats {
-			width: 40%;
-			float: left;
-			//margin-left: 3em;
-		}
-
-		.sliderBlock .middle {
-			width: 10em;
-		}
-
-		.iStats table {
-			float: left;
-			margin-left: 3em;
-
-			td {
-				text-align: right;
-
-				&:first-child {
-					font-size: .8em;
-				}
-				&:nth-child(2) {
-					width: 4em;
-					font-weight: bold;
-				}
-				&:last-child {
-					width: 4em;
-					font-weight: normal;
-					text-align: left;
-				}
-			}
-		}
-	}
-
 }
+
+
 
 /* **************************************** Set Resolution tab & dialog */
 
-.SetResolutionTab {
+.ControlPanel .SetResolutionTab {
 	.statusBar {
 		margin-left: 3em;
 		font-size: .64em;
