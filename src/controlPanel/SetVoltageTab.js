@@ -17,24 +17,6 @@ let MINI_WIDTH = 300;
 let MINI_HEIGHT = 150;
 
 
-// the setting, show/hide voltage on voltareaused in multiple places? not any more.
-// can't figure out how to get hover working.  grrrr.
-// TODO: this isn't special anymore; embed it into the tab.
-//export function ShowVoltageControl(props) {
-//	return <label className='ShowVoltageControl' >
-//		Show Voltage
-//		&nbsp;
-//		<select name='showVoltage' value={props.showVoltage}
-//sd e4t					onChange={props.changeShowVoltage}>
-//			<option value='always'>Always</option>
-//			<option value='hover'>only while hovering</option>
-//			<option value='never'>Never</option>
-//		</select>
-//	</label>;
-//}
-//			<option value='hover'>only while hovering</option>
-
-
 /* ******************************************************* the tab itself */
 
 function setPT() {
@@ -213,13 +195,12 @@ function SetVoltageTab(p) {
 
 			{/* only one of these three is displayed */}
 			<div className='slotScaleDisplay'
-					style={{display: ('slot' == breed || 'block' == breed) ? 'inline-block' : 'none',
-					width: '4em', textAlign: 'right'}}>
+					style={{display: ('slot' == breed || 'block' == breed) ? 'inline-block' : 'none'}} >
 				{(slotScaleDisplay / 1000).toFixed(2)} kV
 			</div>
 			<div className='canyonScaleDisplay'
 					style={{display: 'canyon' == breed ? 'inline-block' : 'none'}}>
-				{canyonScaleDisplay} <var>x</var><sup>n</sup>
+				{(canyonScaleDisplay/1000).toFixed(2)} kV ∙ <var>x</var><sup>n</sup>
 			</div>
 			<div style={{display: 'flat' == breed ? 'inline-block' : 'none'}} />
 		</>;
