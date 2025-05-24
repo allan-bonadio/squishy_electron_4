@@ -81,6 +81,37 @@ export class ControlPanel extends React.Component {
 		});
 	}
 
+	setUpContext() {
+		const cp = this.context?.controlPanel;
+		if (!cp)
+			return;  // not ready yet
+		if (cp.singleFrame)
+			return;  // already done
+
+		// stuff available immediately
+		cp.startAnimating = this.startAnimating;
+		cp.stopAnimating = this.stopAnimating;
+		cp.startStop = this.startStop;
+		cp.singleFrame = this.singleFrame;
+
+		// stuff available after space promise
+//		cp.space = this.space;
+//		cp.N = this.space.N;
+//		cp.mainEAvatar = this.space.mainEAvatar;
+//		cp.mainEWave = this.space.mainEWave;
+//
+//		cp.grinder = this.space.grinder;
+//		cp.grinder.stretchedDt = this.state.dtStretch * this.space.dt;
+//
+//		// if somebody tried to set this before the space and grinder
+//		// were here, it's saved in the state.
+//		cp.grinder.shouldBeIntegrating = this.state.shouldBeIntegrating;
+//		if (cp.grinder.shouldBeIntegrating)
+//			cp.startAnimating();
+
+		console.log(`🎛️  ControlPanel setUpContext context: `, this.context);
+	}
+
 	// we need a surprising amount of stuff from the space.  We can't draw much without it.
 	// So this gets called when it's ready.
 	initWithSpace(space) {
@@ -110,6 +141,12 @@ export class ControlPanel extends React.Component {
 
 	static contextType = SquishContext;
 
+	componentDidMount() {
+		this.setUpContext();
+	}
+
+
+	/* *********************************************************** frame period/ frequencyu */
 	// set frame period chosen by the user: set it JUST for the animator and grinder
 	setChosenFP =
 	(period) => {
@@ -432,43 +469,11 @@ export class ControlPanel extends React.Component {
 
 	/* ********************************************** render */
 
-	setUpContext() {
-		const cp = this.context?.controlPanel;
-		if (!cp)
-			return;  // not ready yet
-		if (cp.singleFrame)
-			return;  // already done
-
-		// stuff available immediately
-		cp.startAnimating = this.startAnimating;
-		cp.stopAnimating = this.stopAnimating;
-		cp.startStop = this.startStop;
-		cp.singleFrame = this.singleFrame;
-
-		// stuff available after space promise
-//		cp.space = this.space;
-//		cp.N = this.space.N;
-//		cp.mainEAvatar = this.space.mainEAvatar;
-//		cp.mainEWave = this.space.mainEWave;
-//
-//		cp.grinder = this.space.grinder;
-//		cp.grinder.stretchedDt = this.state.dtStretch * this.space.dt;
-//
-//		// if somebody tried to set this before the space and grinder
-//		// were here, it's saved in the state.
-//		cp.grinder.shouldBeIntegrating = this.state.shouldBeIntegrating;
-//		if (cp.grinder.shouldBeIntegrating)
-//			cp.startAnimating();
-
-		console.log(`🎛️  ControlPanel setUpContext context: `, this.context);
-	}
 
 	render() {
 		const p = this.props;
 		const s = this.state;
 
-		// this is the earliest place the context shows up
-		this.setUpContext();
 
 		// before the space exists
 		// why?  this just shows panels and buttons
