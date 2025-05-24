@@ -5,8 +5,6 @@
 
 import qeFuncs from '../engine/qeFuncs.js';
 
-// TODO: do we actually use any of these?
-
 /* ****************************************************** diagnostics */
 
 // this is global so we can use it anywhere in JS
@@ -21,12 +19,6 @@ export function dumpJsStack(where = 'somewhere') {
 	console.info(`\n${where} traceback: ${tb}`);
 }
 window.dumpJsStack = dumpJsStack;
-
-export function dAssert(condition, msg) {
-	if (window.isDevel && !condition)
-		throw `Assertion failed: ${msg}`;
-}
-window.dAssert = dAssert;
 
 /* ****************************************************** error/exception handling from C++ */
 
