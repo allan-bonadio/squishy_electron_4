@@ -7,15 +7,16 @@ import React from 'react';
 import PropTypes from 'prop-types';
 
 import voltDisplay from './voltDisplay.js';
-import {VOLT_SIDEBAR_WIDTH} from './voltConstants.js';
+//import {VOLT_SIDEBAR_WIDTH} from './voltConstants.js';
+//new URL("./image.png", import.meta.url);
 
+import downIcon from './voltIcons/downIcon2.png';
+import upIcon   from './voltIcons/upIcon2.png';
+import minusIcon from './voltIcons/minusIcon2.png';
+import plusIcon from './voltIcons/plusIcon2.png';
 
 let traceVoltageSidebar = false;
 let traceDragging = false;
-
-// I dunno but the voltages I'm generating are too strong.
-// So I reduced it by this factor, but still have to magnify it to make it visible.
-export const spongeFactor = 100;
 
 function setPT() {
 	VoltSidebar.propTypes = {
@@ -58,38 +59,27 @@ function VoltSidebar(props) {
 		if (vo) vo.style.visibility = '';
 	};
 
-
-
 	// render.  The buttons are almost square.  The + and – are emojis
 	// The arrows need the div for alignment.
 	return (
-		<aside className='VoltSidebar' style={{width: VOLT_SIDEBAR_WIDTH + 'px'}}
+		<aside className='VoltSidebar waveButtonPanel'
 				onPointerEnter={pointerEnter} onPointerLeave={pointerLeave} >
-			<p/>
 
 			<button className='scrollUp' onClick={ev => mVD.scrollVoltHandler(+1)}>
-					<div>
-						⬆︎
-					</div>
+				<img src={upIcon} height='1em' />
 			</button>
-			<p/>
 
 			<button className='zoomIn' onClick={ev => mVD.zoomVoltHandler(-1)}>
-				+
+				<img src={plusIcon} height='1em' />
 			</button>
-			<p/>
 
 			<button className='zoomOut' onClick={ev => mVD.zoomVoltHandler(+1)}>
-				–
+				<img src={minusIcon} height='1em' />
 			</button>
-			<p/>
 
 			<button className='scrollDown' onClick={ev => mVD.scrollVoltHandler(-1)}>
-					<div>
-						⬇︎
-					</div>
+				<img src={downIcon} height='1em' />
 			</button>
-			<p/>
 
 		</aside>
 	);
@@ -97,12 +87,3 @@ function VoltSidebar(props) {
 setPT();
 
 export default VoltSidebar;
-
-
-
-// 		<div className='voltRail' ref={el => railEl = el}>
-// 			<div className='voltThumb' onMouseDown={mouseDown}
-// 				style={{top: 0}}  ref={el => thumbEl = el}>
-// 			⚡️
-// 			</div>
-// 		</div>

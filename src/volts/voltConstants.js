@@ -36,4 +36,4 @@ export const SIZE_BOX_SIZE = 24;
 export const WELL_BUMPER_WIDTH = 16;
 
 // width of the voltage sidebar
-export const VOLT_SIDEBAR_WIDTH = 32;
+//export const VOLT_SIDEBAR_WIDTH = 32;

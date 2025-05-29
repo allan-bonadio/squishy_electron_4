@@ -68,66 +68,29 @@
 
 		}  // end of VoltArea
 
-		// buttons on right to scroll and zoom the voltage
+
+
+		// buttons on right to scroll and zoom the voltage.  mixes in .waveButtonPanel
 		.VoltSidebar {
-			// this is a column flex box
-			position: absolute;
-			display: flex;
-			flex-direction: column;
-			right: 0;  // snug against right bumper or right edge
-			// width set in JS in VoltSidebar
-			height: 100%;  // percent of waveview which is relative pos
-			font-size: 18px;   // fixed; not proportional  to ambient font size
+			right: 2em;
+			bottom: .5em;
+			width: 7em;
 			z-index: 35;
-
-			// but particpates in its parent's row flex box.  Width and display set by
-			// code in WaveView.render()
 			text-align: center;
-
-			//background-color: #f006;  // testing
-			background-color: transparent;
-
-			// but subelements DO have pointer-events
-			pointer-events: none;
-			user-select: none;
 
 
 			// scroll & zoom in/out buttons
 			button {
-				display: inline;
 				width: 1em;
-				line-height: 1em;
-				padding: .125em;
-				margin: 0 .125em 0 0;
-				border: .5px solid common.$voltageTransparentColor;
-				border-radius: .1em;
-
-				text-align: center;
-				font-weight: 700;
-				background-color: common.$voltageTransparentColor ;
-				color: common.$voltageColor;
-
-				pointer-events: auto;
-
-				&.scrollDown, &.scrollUp {
-					padding-left: 0;
-					div {
-						margin-top: .125em;
-					}
+				flex: 1em;
+				height: 1em;
+				pointer-events: auto
+				img {
+					width:1em;
+					height: 1em;
+					opacity: 50%;
 				}
 			}
-			button:hover {
-				border-color: common.$voltageLighterColor ;
-			}
-			button:active {
-				background-color: common.$voltageLighterColor ;
-			}
-
-			// we use p as spacers between the buttons
-			p {
-				flex: 1 1 0em;
-			}
-
 		}
 	}  // end of widgetArea VoltOverlay
 
