@@ -36,11 +36,10 @@
 	}
 
 
-	// widget area, overlaying
-	// most of the widgets
+	// widget area, containing most of the widgets that float above (in front of) the canvas
 	// overlaying the wave drawing are here, like the voltage line, voltage axis, buttons, grow box....
 	// Fitting between the bumpers cuz if they go over the bumpers you can't see them.
-	// height set by WaveView height, and width set by flex depending on continuum.
+	// automatically moves widgets if/when dimensions change.
 	// see also volts.scss for more widgetArea
 	.widgetArea {
 		position: relative;
@@ -72,7 +71,53 @@
 			.northEastWrapper { right: 2em; }
 		}
 
+		// a loose association of buttons to appear on top of the canvas, with similar behaviors
+		// .startStopOverlay and .VoltSidebar both include this class
+		.waveButtonPanel {
+			position: absolute;
+			display: flex;
+			flex-direction: row;
 
+			background-color: transparent;
+
+			// but subelements DO have pointer-events
+			pointer-events: none;
+			user-select: none;
+
+			button {
+				display: inline-block;
+				font-size: 1em;
+				padding: 0;
+				margin: 0;
+				border: none;
+				background-color: transparent ;
+				pointer-events: auto;
+				cursor: pointer
+			}
+			//button:hover {
+			//	border-color: common.$voltageColor ;
+			//}
+			//button:active {
+			//	border-color: common.$voltageDarkerColor ;
+			//}
+		}
+
+		// object that encloses start/stop/singlestep buttons
+		.StartStopOverlay {
+			left: 2em;
+			bottom: 1em;
+			height: 1em;
+			width: 10em;
+			img {
+				height: 1em;
+				width: 1em;
+				pointer-events: auto;
+			}
+			img.singleStepWidget {
+				width: 1.1667em;
+				margin: 0 0 0 2em;
+			}
+		}
 	}  // end of widgetArea
 
 	.sizeBox {

@@ -23,11 +23,13 @@ import {WELL_BUMPER_WIDTH, SIZE_BOX_SIZE} from '../volts/voltConstants.js';
 import GLScene from '../gl/GLScene.js';
 import {eSpaceCreatedPromise} from '../engine/eEngine.js';
 import SquishContext from './SquishContext.js';
+import StartStopOverlay from './StartStopOverlay.js';
 
 let traceBumpers = false;
 let traceDimensions = false;
 let traceDragCanvasHeight = false;
 let traceHover = false;
+let traceContext = true;
 
 const CANVAS_BORDER_THICKNESS = 1;
 const DOUBLE_THICKNESS = 2 * CANVAS_BORDER_THICKNESS;
@@ -106,6 +108,8 @@ export class WaveView extends React.Component {
 			: 0;
 
 		wv.mainVDisp = space.vDisp;
+		if (traceContext)
+			console.log(`🏄 WaveView setUpContext context: %o`, this.context);
 	}
 
 	// set up 2/3 of the context: waveView and engine
@@ -296,8 +300,7 @@ export class WaveView extends React.Component {
 			// until then, show spinner, not actually a GLScene
 			const spinner = this.space
 				? ''
-				: <img className='spinner' alt='spinner' src='/images/eclipseOnTransparent.gif' />;
-
+				: <img className='spinner' alt='spinner' src='/images/eclipseOnTransparent.gif' />
 			let glScene = <div className='spinnerBox'
 						style={{width: this.outerWidth - CANVAS_BORDER_THICKNESS ,
 							height: s.outerHeight - DOUBLE_THICKNESS}} >
@@ -336,7 +339,7 @@ export class WaveView extends React.Component {
 						style={{flexBasis: betweenBumpers +'px', height: this.canvasInnerHeight}}>
 
 				<section className='timeOverlay'
-						style={{maxWidth: this.canvasInnerWidth +'px'}}>
+					style={{maxWidth: this.canvasInnerWidth +'px'}}>
 					<div className='northWestWrapper'>
 						<span className='voNorthWest'>{elapsedTime}</span> ps
 					</div>
@@ -346,6 +349,7 @@ export class WaveView extends React.Component {
 
 				</section>
 
+				<StartStopOverlay />
 
 				{voltOverlay}
 
