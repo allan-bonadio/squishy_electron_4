@@ -20,8 +20,8 @@ import {interpretCppException, wrapForExc} from '../utils/errors.js';
 import SquishContext from '../sPanel/SquishContext.js';
 
 let traceSetPanels = false;
-let traceStartStop = false;
-let traceContext = false;
+let traceStartStop = true;
+let traceContext = true;
 
 // integrations always need specific numbers of steps.  But there's always one
 // more. maybe this should be defined in the grinder.  Hey, isn't this really
@@ -99,7 +99,7 @@ export class ControlPanel extends React.Component {
 
 		// we're trying to avoid re-rendering everything by not changing the context
 		// itelf.  So if this changes your component, pass the value in as a prop
-		cp.getShouldBeIntegrating = () => this.shouldBeIntegrating;
+		cp.getShouldBeIntegrating = () => this.context.shouldBeIntegrating;
 
 		// a bit tricky.  This is used to turn on/off integration outside of this component
 		// maybe this won't work as every time we change teh value we have to call setCPContext()
@@ -185,20 +185,23 @@ export class ControlPanel extends React.Component {
 	}
 
 	/* ************************************************* shouldBeIntegrating */
-	// sbi is kept in the squishPanel's state, AND in the grinder.  Not in this component's state.
+	// sbi is kept in the context, AND in the grinder.  Not in this component's state.
 
+	// obsolete
 	// need to keep grinder's variable and our state in sync for sbi.
 	// maybe these help.  Oh yeah, the setting, too.
 	get shouldBeIntegrating() {
+		debugger;
 		return this.context.shouldBeIntegrating;
 
 //		// before the space is created, this.grinder is undefined but the state
 //		// should be set from storeSettings
 //		const sbi = this.grinder?.shouldBeIntegrating ?? this.state.shouldBeIntegrating;
-
-		return sbi;
+//		return sbi;
 	}
+	// obsolete
 	set shouldBeIntegrating(sbi) {
+		debugger;
 		this.props.setShouldBeIntegrating(sbi);
 		//if (this.grinder)
 		//	this.grinder.shouldBeIntegrating = sbi;
@@ -216,14 +219,15 @@ export class ControlPanel extends React.Component {
 		if (!this.space) return;  // too early.  mbbe should gray out the button?
 
 		if (traceStartStop) console.info(`🎛️ startAnimating starts, triggering iteration`);
-		this.shouldBeIntegrating = true;
-		this.props.setCPContext({...this.context.controlpanel, shouldBeIntegrating: true});
+		this.props.setShouldBeIntegrating(true);
+		//this.shouldBeIntegrating = true;
+		//this.props.setCPContext({...this.context.controlpanel, shouldBeIntegrating: true});
 
 		// must do this to start each iteration going in the thread(s)
 		this.grinder.triggerIteration();
 
 		if (traceStartStop) console.log(`🎛️ ControlPanel startAnimating,`
-			+` shouldBeIntegrating=${this.shouldBeIntegrating}, `
+			+` shouldBeIntegrating=${this.context.shouldBeIntegrating}, `
 			+`isIntegrating=${this.grinder.isIntegrating}   `);
 	}
 
@@ -232,14 +236,15 @@ export class ControlPanel extends React.Component {
 		if (!this.space) return;  // too early.  mbbe should gray out the button?
 
 		// set it false as you store it in store; then set state.  The threads will figure it out next iteration
-		this.shouldBeIntegrating = false;
+		this.props.setShouldBeIntegrating(false);
 		if (traceStartStop) console.log(`🎛️ ControlPanel STOP Animating, `
-			+`shouldBeIntegrating=${this.shouldBeIntegrating}, isIntegrating=${this.grinder.isIntegrating}   `);
+			+`shouldBeIntegrating=${this.context.shouldBeIntegrating}, `
+			+`grinder.isIntegrating=${this.grinder.isIntegrating}   `);
 	}
 
 	startStop =
 	ev => {
-		if (this.shouldBeIntegrating)
+		if (this.context.shouldBeIntegrating)
 			this.stopAnimating();
 		else
 			this.startAnimating();
@@ -248,15 +253,15 @@ export class ControlPanel extends React.Component {
 	// needs work
 	singleFrame =
 	(ev) => {
-		//console.info(`🎛️ singleFrame starts`);
-		this.shouldBeIntegrating = true;
-
+		console.log(`🎛️ singleFrame starts`);
+		this.props.setShouldBeIntegrating(true);
 		this.grinder.justNFrames = 1;
 
 		this.grinder.triggerIteration();
 
 		// wait ... need to do this one tic later.  Well, close enough.
-		setTimeout(() => this.shouldBeIntegrating = false, 100);
+		// TODO: find a more graceful way to do this
+		setTimeout(() => this.props.setShouldBeIntegrating(false), 100);
 		//setTimeout(() => this.sPanel.animator.drawLatestFrame(), 100);
 
 	}
@@ -498,7 +503,7 @@ export class ControlPanel extends React.Component {
 				chosenRate={1000. / s.chosenFP}
 				setChosenRate={this.setChosenRate}
 
-				shouldBeIntegrating={this.shouldBeIntegrating ?? false}
+				shouldBeIntegrating={this.context.shouldBeIntegrating ?? false}
 
 				startOverHandler={this.startOverHandler}
 				resetVoltageHandler={this.resetVoltageHandler}
