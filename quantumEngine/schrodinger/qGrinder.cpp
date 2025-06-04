@@ -271,6 +271,10 @@ void qGrinder::tallyUpKinks(qWave *qwave) {
 	divergence = tally/2;
 }
 
+EM_JS(int, stopAnimation, (qGrinder *pointer), {
+	globalThis.pointerContextMap[pointer].controlPanel.stopAnimation();
+});
+
 // see how many alternating derivatives we have.  Then convert to a user-visible
 // number and issue errors or warnings
 void qGrinder::measureDivergence() {
@@ -281,7 +285,8 @@ void qGrinder::measureDivergence() {
 		if (divergence > N * 15 / 16) {
 			char buf[64];
 			snprintf(buf, 64, "🪓 🪓 wave is DIVERGING, =%4.4g %% 🔥 🧨", divergence);
-			shouldBeIntegrating = isIntegrating = false;
+			isIntegrating = false;
+			stopAnimation(this);  // sets shouldBeIntegrating and tells UI to stop it
 
 			// js code intercepts this exact spelling
 			reportException("Sorry, your wave integration diverged! Try a shorter "
@@ -489,9 +494,6 @@ void qGrinder::triggerIteration() {
 		speedyLog("🪓 qGrinder::triggerIteration(): shouldBeIntegrating=%d   isIntegrating=%d\n",
 				shouldBeIntegrating, isIntegrating);
 	}
-
-	// don't let it trigger if already running; might scrw up timing
-	//if (isIntegrating) return;
 
 	isIntegrating = true;
 

@@ -213,7 +213,7 @@ struct qGrinder {
 
 	// same as shouldBeIntegrating, except this is synchronized with the
 	// integration threads. Does not change while integration frame being
-	// calculated.  So all threads are on the same page.
+	// calculated.  So all threads are 'on the same page'.
 	bool isIntegrating;
 
 	// true = please do an FFT at some time... waiting for something fourier
