@@ -8,45 +8,40 @@ import PropTypes from 'prop-types';
 
 import SquishContext from './SquishContext.js';
 
-import singleStepIcon from './waveViewIcons/singleStep2.png';
-import pauseIcon from './waveViewIcons/pause2.png';
 import startIcon from './waveViewIcons/start2.png';
-import upDownIcon from './waveViewIcons/upDown2.png';
+import stopIcon from './waveViewIcons/stop2.png';
+import singleStepIcon from './waveViewIcons/singleStep2.png';
 
 
-//let traceGeometry = false;
-
-//function setPT() {
-//	VoltOverlay.propTypes = {
-//		// for first couple of renders, space and idunno are null
-//
-//		// this component is always rendered so it retains its state,
-//		// but won't draw anything if the checkbox is off
-//		////showVoltage: PropTypes.string,
-//	};
-//}
-//singleStep2.png
-//pause2.png
-//start2.png
-//upDown2.png
+let traceContext = false;
 
 function StartStopOverlay(props) {
-	const context = useContext(SquishContext);
-
-	function startHandler(ev) {
-		context.controlPanel.start_BlahBlahBlah;
+	// no this doesn't work  const context = useContext(SquishContext);
+	const context = props.context;
+	if (traceContext) {
+		console.log(`StartStopOverlay starting context:`,
+				context.setShouldBeIntegrating,
+				context.controlPanel,
+				context.waveView);
+	}
+	const cp = context.controlPanel;
+	function startStopHandler(ev) {
+		cp.startStop?.();
 	}
 	function singleStepHandler(ev) {
-		context.controlPanel.singleStep_BlahBlahBlah
+		cp.singleFrame?.();
 	}
 
+	// the start/stop icon toggles depending on state
 	return <section className='StartStopOverlay waveButtonPanel' >
-		<img className='startStopWidget' src={startIcon} alt='start button'
-			onClick={startHandler} />
+		<img className='startStopWidget'
+			alt={cp.shouldBeIntegrating ? 'start integrating' : 'stop integrating'}
+			src={cp.shouldBeIntegrating ? startIcon : stopIcon}
+			onClick={startStopHandler} />
 
-		<img className='singleStepWidget' src={singleStepIcon} alt='singleStep button'
+		<img className='singleStepWidget' alt='singleStep button'
+			src={singleStepIcon}
 			onClick={singleStepHandler} />
-
 
 	</section>;
 

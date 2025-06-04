@@ -77,6 +77,7 @@
 			position: absolute;
 			display: flex;
 			flex-direction: row;
+			z-index: 30;
 
 			background-color: transparent;
 
@@ -92,7 +93,7 @@
 				border: none;
 				background-color: transparent ;
 				pointer-events: auto;
-				cursor: pointer
+				cursor: pointer;
 			}
 			//button:hover {
 			//	border-color: common.$voltageColor ;
