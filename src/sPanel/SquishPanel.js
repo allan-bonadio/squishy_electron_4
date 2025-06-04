@@ -21,8 +21,8 @@ import sAnimator from './sAnimator.js';
 import {getASetting, storeASetting} from '../utils/storeSettings.js';
 import {tooOldTerminate} from '../utils/errors.js';
 
-import SquishContext from '../sPanel/SquishContext.js';
-
+import SquishContext from './SquishContext.js';
+import pointerContextMap from '../engine/pointerContextMap.js';
 
 // runtime debugging flags - you can change in the debugger or here
 let tracePromises = false;
@@ -102,11 +102,14 @@ export class SquishPanel extends React.Component {
 			// space will end up in the state but meanwhile we need it now
 			this.space = space;
 			this.setState({space});  // maybe i don't need this if it's in the context?
+			pointerContextMap.register(space.pointer, this.context);
 
 			this.animator = new sAnimator(this, space);
 
 			this.mainEAvatar = space.mainEAvatar;
 			this.grinder = space.grinder;
+			pointerContextMap.register(space.grinder.pointer, this.context);
+			pointerContextMap.dump();
 
 			if (tracePromises) console.log(`👑 SquishPanel.compDidMount done`);
 		})
@@ -177,6 +180,7 @@ export class SquishPanel extends React.Component {
 
 		return (
 			<SquishContext.Provider value={{
+							name: 'main',
 							shouldBeIntegrating: s.shouldBeIntegrating,
 							controlPanel: s.controlPanel,
 							waveView: s.waveView,
@@ -194,7 +198,7 @@ export class SquishPanel extends React.Component {
 						iStats={this.iStats}
 						animator={this.animator}
 						setCPContext={this.setCPContext}
-						setShouldBeIntegrating={s.setShouldBeIntegrating}
+						setShouldBeIntegrating={this.setShouldBeIntegrating}
 						sPanel={this}
 					/>
 				</article>
