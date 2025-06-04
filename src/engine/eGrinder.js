@@ -1,5 +1,5 @@
 /*
-** eGrinder - the JS interface to c++ numbercrunching the Schrodinger's equation
+** eGrinder - the JS interface to c++ numbercrunching Schrodinger's equation
 ** Copyright (C) 2023-2025 Tactile Interactive, all rights reserved
 */
 
@@ -14,7 +14,7 @@ let traceCreation = false;
 let traceIntegration = false;
 let traceTriggerIteration = false;
 
-// a qGrinder manages frame of a wave
+// a qGrinder manages integration frames of a wave
 class eGrinder {
 	// eSpace we're in , creates its eGrinder
 	constructor(space, avatar, pointer) {
@@ -114,10 +114,11 @@ class eGrinder {
 			// the 'new' way: triggering it in JS with Atomics api
 			Atomics.store(this.ints, this.startAtomicOffset, 0);
 			let nWoke = Atomics.notify(this.ints, this.startAtomicOffset);
-			//console.log(`🎥 nWoke:`, nWoke);
+			if (traceTriggerIteration)
+				console.log(`triggerIteration 🎥 nWoke:`, nWoke);
 		}
 		else {
-			// old way: doing it by C++
+			// old, but still viable, way: doing it by C++
 			if (traceTriggerIteration) {
 				console.log(`🪚 eGrinder.triggerIteration,  starting  qeFuncs.grinder_triggerIteration()`
 					+`shouldBeIntegrating=${this.shouldBeIntegrating}  isIntegrating=${this.isIntegrating} `

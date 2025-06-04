@@ -365,7 +365,7 @@ export class WaveView extends React.Component {
 
 				{voltOverlay}
 
-				<StartStopOverlay/>
+				<StartStopOverlay />
 
 				<img className='sizeBox' src='/images/sizeBox4.png' alt='size box'
 					onPointerDown={this.resizePointerDown} onPointerUp={this.resizePointerUp}
