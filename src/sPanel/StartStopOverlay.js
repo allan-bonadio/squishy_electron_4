@@ -15,9 +15,10 @@ import singleStepIcon from './waveViewIcons/singleStep2.png';
 
 let traceContext = false;
 
+// no props!  does everything thru context.
 function StartStopOverlay(props) {
-	// no this doesn't work  const context = useContext(SquishContext);
-	const context = props.context;
+	const context = useContext(SquishContext);
+	//const context = props.context;
 	if (traceContext) {
 		console.log(`StartStopOverlay starting context:`,
 				context.setShouldBeIntegrating,
