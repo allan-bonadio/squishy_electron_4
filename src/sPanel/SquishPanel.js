@@ -59,12 +59,35 @@ export class SquishPanel extends React.Component {
 
 			// the space for this SP.
 			space: null,
+
+			// the context sub-objects
+			shouldBeIntegrating: getASetting('frameSettings', 'shouldBeIntegrating'),
+			controlPanel: {},
+			waveView: {},
 		};
 
 		if (traceSquishPanel) console.log(`👑 SquishPanel constructor done`);
 	}
 
+	/* ****************************************** context */
 	static contextType = SquishContext;
+
+	// these functions are passed in props to lower levels mostly for initialization.
+	// sbi, the state is kept here (and in the grinder) and passed down.
+	setShouldBeIntegrating = (sbi) => {
+		this.setState({shouldBeIntegrating: sbi})
+		if (this.grinder)
+			this.grinder.shouldBeIntegrating = sbi;
+		storeASetting('frameSettings', 'shouldBeIntegrating', sbi);
+	};
+
+	setCPContext = (cp) => {
+		this.setState({controlPanel: cp});
+	}
+
+	setWVContext = (wv) => {
+		this.setState({waveView: wv});
+	}
 
 	/* ****************************************** space & wave creation */
 
@@ -115,15 +138,15 @@ export class SquishPanel extends React.Component {
 	// can i move these to the control panel?
 
 	// dump the view buffer, from the JS side.  Why not use the C++ version?
-	dumpViewBuffer(title = '') {
-		const s = this.state;
-		let nRows = s.space.nPoints * 2;
-		let vb = s.space.mainVBuffer;
-		const _ = (f) => f.toFixed(3).padStart(6);
-		console.log(`👑 dump of view buffer '${title}' for ${s.space.nPoints} points in ${nRows} rows`);
-		for (let i = 0; i < nRows; i++)
-			console.log(_(vb[i*4]), _(vb[i*4+1]), _(vb[i*4+2]), _(vb[i*4+3]));
-	}
+//	dumpViewBuffer(title = '') {
+//		const s = this.state;
+//		let nRows = s.space.nPoints * 2;
+//		let vb = s.space.mainVBuffer;
+//		const _ = (f) => f.toFixed(3).padStart(6);
+//		console.log(`👑 dump of view buffer '${title}' for ${s.space.nPoints} points in ${nRows} rows`);
+//		for (let i = 0; i < nRows; i++)
+//			console.log(_(vb[i*4]), _(vb[i*4+1]), _(vb[i*4+2]), _(vb[i*4+3]));
+//	}
 
 	/* ******************************************************* rendering */
 	// Base function that draws the WebGL, whether during iteration, or during
@@ -153,10 +176,16 @@ export class SquishPanel extends React.Component {
 		const space = s.space;
 
 		return (
-			<SquishContext.Provider value={{controlPanel:{}, waveView:{}, engine:{}}}>
+			<SquishContext.Provider value={{
+							shouldBeIntegrating: s.shouldBeIntegrating,
+							controlPanel: s.controlPanel,
+							waveView: s.waveView,
+						}}>
 				<article id={this.props.id} className="SquishPanel">
 					<WaveView
 						outerWidth = {p.bodyWidth}
+						setWVContext={this.setWVContext}
+						setShouldBeIntegrating={this.setShouldBeIntegrating}
 						sPanel={this}
 					/>
 					<ControlPanel
@@ -164,6 +193,8 @@ export class SquishPanel extends React.Component {
 
 						iStats={this.iStats}
 						animator={this.animator}
+						setCPContext={this.setCPContext}
+						setShouldBeIntegrating={s.setShouldBeIntegrating}
 						sPanel={this}
 					/>
 				</article>

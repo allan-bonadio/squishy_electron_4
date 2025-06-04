@@ -10,9 +10,9 @@ import { createContext } from 'react';
 // will be filled in.  funcs & objects mostly
 export const SquishContext = createContext({
 	// the context object will be frozen, but not its subobjects.  Each for a major subsystem.
+	shouldBeIntegrating: false,
 	controlPanel: {},
 	waveView: {},
-	engine: {},
 });
 SquishContext.displayName = 'SquishContext';
 

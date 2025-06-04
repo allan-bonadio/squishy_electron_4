@@ -29,7 +29,7 @@ let traceBumpers = false;
 let traceDimensions = false;
 let traceDragCanvasHeight = false;
 let traceHover = false;
-let traceContext = true;
+let traceContext = false;
 
 const CANVAS_BORDER_THICKNESS = 1;
 const DOUBLE_THICKNESS = 2 * CANVAS_BORDER_THICKNESS;
@@ -48,16 +48,13 @@ export class WaveView extends React.Component {
 		// all around for border.
 		outerWidth: PropTypes.number.isRequired,
 
+		setShouldBeIntegrating: PropTypes.func.isRequired,
 		sPanel: PropTypes.object.isRequired,
 	};
 
 	constructor(props) {
 		super(props);
 		checkPropTypes(this.constructor.propTypes, props, 'prop', this.constructor.name);
-
-		// is this a bad idea?
-		//this.sPanel = props.sPanel;  // not used anywhere
-		//this.sPanel.wView = this;
 
 		this.state = {
 			// height of just the canvas + DOUBLE_THICKNESSpx, as set by user with size box
@@ -88,16 +85,18 @@ export class WaveView extends React.Component {
 	// set up 2/3 of the context: waveView and engine
 	setUpContext() {
 		// need BOTH context  and the space.  So this is called twice.
-		let wv = this.context?.waveView;
-		let eng = this.context?.engine;
-		if (!this.space || !wv)
-			return;  // not ready yet
+		const ctx = this.context;
+		let wv = ctx?.waveView;
+		if (!this.space || !wv) {
+			// not ready yet so try again
+			setTimeout(this.setUpContext, 100);
+			return;
+		}
 		if (wv.mainEAvatar)
 			return;  // already done
 
-		// context.  Somehow this context is around by space promise.  Not so for control panel.
-		const space = eng.space = this.space;
-		eng.grinder = space.grinder;
+		const space = wv.space = this.space;
+		wv.grinder = space.grinder;
 
 		wv.mainEAvatar = space.mainEAvatar;
 
@@ -108,8 +107,15 @@ export class WaveView extends React.Component {
 			: 0;
 
 		wv.mainVDisp = space.vDisp;
-		if (traceContext)
-			console.log(`🏄 WaveView setUpContext context: %o`, this.context);
+		if (traceContext) {
+			console.log(`🏄 WaveView setUpContext context:`,
+				context.setShouldBeIntegrating,
+				context.controlPanel,
+				context.waveView,
+			);
+		}
+		this.props.setWVContext(wv);
+		return;  // done
 	}
 
 	// set up 2/3 of the context: waveView and engine
@@ -269,6 +275,12 @@ export class WaveView extends React.Component {
 		const p = this.props;
 		const s = this.state;
 
+		if (traceContext) {
+			console.log(`🏄 WaveView Render context:`, context.setShouldBeIntegrating,
+				context.controlPanel,
+				context.waveView
+);
+		}
 		// if c++ isn't initialized yet, we can assume the time and frame serial
 		let elapsedTime = '0';
 		let frameSerial = '0';
@@ -300,7 +312,8 @@ export class WaveView extends React.Component {
 			// until then, show spinner, not actually a GLScene
 			const spinner = this.space
 				? ''
-				: <img className='spinner' alt='spinner' src='/images/eclipseOnTransparent.gif' />
+				: <img className='spinner' alt='spinner'
+					src='/images/eclipseOnTransparent.gif' />
 			let glScene = <div className='spinnerBox'
 						style={{width: this.outerWidth - CANVAS_BORDER_THICKNESS ,
 							height: s.outerHeight - DOUBLE_THICKNESS}} >
@@ -344,14 +357,15 @@ export class WaveView extends React.Component {
 						<span className='voNorthWest'>{elapsedTime}</span> ps
 					</div>
 					<div className='northEastWrapper'>
-						frame <span className='voNorthEast'>{thousandsSpaces(frameSerial)}</span>
+						frame <span className='voNorthEast'>
+							{thousandsSpaces(frameSerial)}</span>
 					</div>
 
 				</section>
 
-				<StartStopOverlay />
-
 				{voltOverlay}
+
+				<StartStopOverlay/>
 
 				<img className='sizeBox' src='/images/sizeBox4.png' alt='size box'
 					onPointerDown={this.resizePointerDown} onPointerUp={this.resizePointerUp}
