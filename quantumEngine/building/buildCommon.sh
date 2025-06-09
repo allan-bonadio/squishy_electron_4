@@ -72,6 +72,7 @@ DISABLE_FS="-sFILESYSTEM=0 -sFETCH_SUPPORT_INDEXEDDB=0  "
 # omit those, so testing can also use this and compile & run itself (see testing/cppu*).
 allCpp=`cat building/allCpp.list`
 
+echo "starting at"  `date +%a%d,%H:%M:%S`
 rm -rf wasm/*
 
 # show options while compiling and linking

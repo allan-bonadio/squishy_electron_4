@@ -17,8 +17,8 @@ These files are the top display of the wave, but above the webgl code itself (se
 
 ## youtube assuming 1em=16px
 * left edge to pause icon right edge: 44px = 2.75em  width: 16=1em
-* left edge to singlestep icon right edge: 90px = 5 5/8 em    width:16=1em
+* left edge to singleframe icon right edge: 90px = 5 5/8 em    width:16=1em
 * bottom edge to bottom of pause icon: 14=7/8em  height: 20=1.25em
-* bottom edge to bottom of single step icon: 20 =1.25em  height: 16=1em
+* bottom edge to bottom of single frame icon: 20 =1.25em  height: 16=1em
 
 

@@ -29,7 +29,8 @@ describe(`test thousands() and `, () => {
 // 		[16e20, 7, '1.6', '1.6'],
 // 		[16e24, 7, '1.6', '1.6'],
 // 		[16e30, 7, '1.6', '1.6'],
-	])(`blah blah blah`, (input, expectedThous, expectedSI) => {
+this isnt right whats that secondargument?
+	])(`test thousands()`, (input, dunnoNumber, expectedThous, expectedSI) => {
 
 		expect(thousandsSpaces(input), expectedThous);
 		expect(toSiSuffix(input), expectedSI);

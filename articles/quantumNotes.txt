@@ -69,7 +69,7 @@ prep:
 - maybe even running.
 
 check:
-- start/stop works.  Single step works.
+- start/stop works.  Single frame works.
 - Reset Wave
 - frame rate
 - resolution display

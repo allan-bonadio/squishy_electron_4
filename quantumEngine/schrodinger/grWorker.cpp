@@ -9,11 +9,11 @@
 #include "grWorker.h"
 
 static bool traceStart = false;
-static bool traceFinish = false;
+static bool traceFinish = true;
 static bool traceSync = false;
 static bool traceCreation = false;
 
-static bool traceWork = false;
+static bool traceWork = true;
 static bool traceWorkOccasionally = false;
 static int occasionally = 0;
 
@@ -24,12 +24,12 @@ static int occasionally = 0;
 static grWorker *sla[MAX_THREADS];
 grWorker **qGrinder::grWorkers = sla;
 
-// do the work: integration
+// do the work: integration.  One frame, on one thread.
 void grWorker::gThreadWork(void) {
 	// traceWork generates a message every Frame.  GADS!
 	// traceWorkOccasionally, maybe every several seconds or less.  Feel free to adjust.
 	if (traceWork || (traceWorkOccasionally && occasionally-- < 0)) {
-		speedyLog("🦫 grWorker working ...shouldBeIntegrating=%d  isIntegrating=%d "
+		speedyLog("🦫 grWorker working ...shouldBeIntegrating=%hhu  isIntegrating=%hhu "
 				"startAtomic=%d  finishAtomic=%d\n",
 				grinder->shouldBeIntegrating, grinder->isIntegrating,
 				grinder->startAtomic, grinder->finishAtomic);
@@ -47,11 +47,13 @@ void grWorker::gThreadWork(void) {
 	double endCalc = getTimeDouble();
 	frameCalcTime = endCalc - startCalc;
 
-	if (traceWork) speedyLog("🦫 end of gThreadWork; frame time=%8.4lf ms, "
-				"shouldBeIntegrating=%d  isIntegrating=%d "
+	if (traceWork) {
+		speedyLog("🦫 end of gThreadWork; frame time=%8.4lf ms, "
+				"shouldBeIntegrating=%hhu  isIntegrating=%hhu "
 				"startAtomic=%d  finishAtomic=%d\n",
 				frameCalcTime, grinder->shouldBeIntegrating, grinder->isIntegrating,
 				grinder->startAtomic, grinder->finishAtomic);
+		}
 }
 
 
@@ -99,7 +101,7 @@ void grWorker::gThreadLoop(void) {
 			if (traceSync) speedyLog("🦫 after atomic_add on startAtomic nStarted =%d "
 					" (shdbe 0 or more)  startAtomic=%d\n", nStarted, grinder->startAtomic);
 			if (nStarted >= grinder->nGrWorkers) {
-				// everybody's started, so now's a good time to set this back for next time.
+				// everybody's started, so now's a good time to lock this back for next time.
 				emscripten_atomic_store_u32(&grinder->startAtomic, -1);
 			}
 
@@ -128,7 +130,8 @@ void grWorker::gThreadLoop(void) {
 			printf("🦫 Error (saved to grinder) during gThreadLoop: %s\n", ex.what());
 		}
 	}
-	throw std::runtime_error("grWorker::gThreadLoop()  ∞ loop actually ending and returning");
+	throw std::runtime_error("grWorker::gThreadLoop()  ∞ loop actually ending and returning - "
+		" should not happen!!");
 }
 
 

@@ -7,7 +7,7 @@
 #define __QSPACE_H__
 
 // not even used these days
-extern qCx hamiltonian(struct qSpace *space, qCx *wave, int x);
+extern qCx hamiltonian(struct qSpace *space, qCx *wave, int ix);
 
 // currently we support only one dimension.  But we're envisioning...
 //
@@ -21,8 +21,9 @@ extern qCx hamiltonian(struct qSpace *space, qCx *wave, int x);
 
 /* *************************************** one for each DIMENSION of the wave array */
 
-// nStates are available 𝜓 datapoints, each representing a state.  Complex number, where 𝜓*𝜓 is probability of being in that state.
-// nPoints is nStates or nStates+1, depending on continuum.
+// nStates are available 𝜓 datapoints, each representing a state.  Complex
+// number, where 𝜓*𝜓 is probability of being in that state. nPoints is nStates
+// or nStates+1, depending on continuum.
 
 
 // for more than one dimension, the labels:
@@ -105,7 +106,7 @@ public:
 	// alpha for convergence https://en.wikipedia.org/wiki/FTCS_scheme#Stability
 	double alpha;
 
-	// picoseconds per step (re, im, re, im cycle of steps recommended for convergence)
+	// picoseconds per step (re, im, re, im cycle of steps recommended for convergence
 	double dt;
 
 	// number of  dimensions actually used, always <= MAX_DIMENSIONS
