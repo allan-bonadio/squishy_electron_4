@@ -27,10 +27,10 @@ function StartStopOverlay(props) {
 	}
 	const cp = context.controlPanel;
 	function startStopHandler(ev) {
-		cp.startStop?.();
+		cp.startStop?.(ev);
 	}
 	function singleStepHandler(ev) {
-		cp.singleFrame?.();
+		cp.singleFrame?.(ev);
 	}
 
 	// the start/stop icon toggles depending on state
@@ -40,7 +40,7 @@ function StartStopOverlay(props) {
 			src={cp.shouldBeIntegrating ? startIcon : stopIcon}
 			onClick={startStopHandler} />
 
-		<img className='singleStepWidget' alt='singleStep button'
+		<img className='singleFrameWidget' alt='singleframe button'
 			src={singleStepIcon}
 			onClick={singleStepHandler} />
 
