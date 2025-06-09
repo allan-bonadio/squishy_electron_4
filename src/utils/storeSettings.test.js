@@ -130,7 +130,7 @@ describe('cx2rgb tests', () => {
 	testParam('frameSettings', 'shouldBeIntegrating', false,  [false, true]);
 	testParam('frameSettings', 'chosenFP', 50, {min: 16, max: 60_001});
 	testParam('frameSettings', 'dtStretch', 1, {min: .1, max: 10.0, });
-	//testParam('frameSettings', 'stepsPerFrame', 100, {min: 10, max: 1e5});
+	//testParam('frameSettings', 'stepsPerFrame', 128, {min: 10, max: 1e5});
 	//testParam('frameSettings', 'lowPassFilter', 50, {min: 0, max: 75});
 
 	/* ************************************miscSettings */
