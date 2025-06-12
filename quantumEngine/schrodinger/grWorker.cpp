@@ -9,11 +9,11 @@
 #include "grWorker.h"
 
 static bool traceStart = false;
-static bool traceFinish = true;
+static bool traceFinish = false;
 static bool traceSync = false;
 static bool traceCreation = false;
 
-static bool traceWork = true;
+static bool traceWork = false;
 static bool traceWorkOccasionally = false;
 static int occasionally = 0;
 
