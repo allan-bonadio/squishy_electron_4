@@ -63,35 +63,35 @@
 
 	/* **************************************** toolbar buttons */
 
-	.startStopTool {
-		display: inline-block;
-		font-size: 2em;
-		padding: .1em .5em .2em;
-		margin: .1em .05em;
-
-		background: linear-gradient(#889, #dcd 20%, #ccd 25%, #cdd 30%, #223);
-		border: none;
-		border-radius: 0;
-		color: #fff;
-	}
-
-	// only while integration is running
-	button.startStopTool.running {
-		background: linear-gradient(#aab, #fef 20%, #eef 25%, #eff 30%, #445);
-	}
-
-	// only while user is mousedown
-	button.startStopTool:active {
-		background: linear-gradient(#223, #cdd 70%, #ccd 75%, #dcd 80%, #889);
-	}
-
-	.startStopToggle {
-		width: 8em;
-	}
-
-	.stepButton {
-		width: 4em;
-	}
+//	.startStopTool {
+//		display: inline-block;
+//		font-size: 2em;
+//		padding: .1em .5em .2em;
+//		margin: .1em .05em;
+//
+//		background: linear-gradient(#889, #dcd 20%, #ccd 25%, #cdd 30%, #223);
+//		border: none;
+//		border-radius: 0;
+//		color: #fff;
+//	}
+//
+//	// only while integration is running
+//	button.startStopTool.running {
+//		background: linear-gradient(#aab, #fef 20%, #eef 25%, #eff 30%, #445);
+//	}
+//
+//	// only while user is mousedown
+//	button.startStopTool:active {
+//		background: linear-gradient(#223, #cdd 70%, #ccd 75%, #dcd 80%, #889);
+//	}
+//
+//	.startStopToggle {
+//		width: 8em;
+//	}
+//
+//	.stepButton {
+//		width: 4em;
+//	}
 
 
 
