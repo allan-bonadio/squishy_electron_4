@@ -33,11 +33,18 @@ function StartStopOverlay(props) {
 		cp.singleFrame?.();
 	}
 
+	let label = 'start integrating';
+	let icon = startIcon;
+	if (context.shouldBeIntegrating) {
+		label = 'stop integrating';
+		icon = stopIcon
+	}
+
 	// the start/stop icon toggles depending on state
 	return <section className='StartStopOverlay waveButtonPanel' >
 		<img className='startStopWidget'
-			alt={cp.shouldBeIntegrating ? 'start integrating' : 'stop integrating'}
-			src={cp.shouldBeIntegrating ? startIcon : stopIcon}
+			alt={label} title={label}
+			src={icon}
 			onClick={startStopHandler} />
 
 		<img className='singleStepWidget' alt='singleStep button'
