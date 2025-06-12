@@ -45,14 +45,14 @@ export class SquishPanel extends React.Component {
 		super(props);
 		checkPropTypes(this.constructor.propTypes, props, 'prop', this.constructor.name);
 
-//		if (SquishPanel.squishPanelConstructed) {
-//			// should not be called twice!
-//			console.error(`👑 annoying hot reload...🙄  👿 🤢 😵 🤬 😭 😠`);
-//			debugger;
-//			location = location;  // eslint-disable-line no-restricted-globals
-//		}
-// why does this continue to happen!?!?!?
+		// during dev, this gets called TWICE
 		SquishPanel.squishPanelConstructed++;
+
+		// make sure the context object doesn't keep getting replaced - it's this one
+		this.contextObj = {
+			name: 'main',
+			shouldBeIntegrating: getASetting('frameSettings', 'shouldBeIntegrating'),
+		};
 
 		this.state = {
 			mainSceneClassName: DEFAULT_SCENE_NAME,
@@ -61,7 +61,7 @@ export class SquishPanel extends React.Component {
 			space: null,
 
 			// the context sub-objects
-			shouldBeIntegrating: getASetting('frameSettings', 'shouldBeIntegrating'),
+			shouldBeIntegrating: this.contextObj.shouldBeIntegrating,
 			controlPanel: {},
 			waveView: {},
 		};
@@ -72,21 +72,31 @@ export class SquishPanel extends React.Component {
 	/* ****************************************** context */
 	static contextType = SquishContext;
 
-	// these functions are passed in props to lower levels mostly for initialization.
-	// sbi, the state is kept here (and in the grinder) and passed down.
+	// sbi, the state is kept in this state, the context, and in the grinder
+	// this should be the only way to set sbi.  Note does NOT trigger!
 	setShouldBeIntegrating = (sbi) => {
-		this.setState({shouldBeIntegrating: sbi})
-		if (this.grinder)
+		this.setState({shouldBeIntegrating: sbi});
+		if (this.grinder) {
 			this.grinder.shouldBeIntegrating = sbi;
+			if (sbi)
+				this.grinder.triggerIteration();
+		}
+
 		storeASetting('frameSettings', 'shouldBeIntegrating', sbi);
+		console.trace(`👑 called setShouldBeIntegrating(${sbi})`);
 	};
 
+	// these functions are passed in props to lower levels mostly for initialization.
+	// called once ONLY in control panel during setup
 	setCPContext = (cp) => {
 		this.setState({controlPanel: cp});
+		this.contextObj.controlPanel = cp;
 	}
 
+	// called once ONLY in waveView during setup
 	setWVContext = (wv) => {
 		this.setState({waveView: wv});
+		this.contextObj.waveView = wv;
 	}
 
 	/* ****************************************** space & wave creation */
@@ -104,12 +114,19 @@ export class SquishPanel extends React.Component {
 			this.setState({space});  // maybe i don't need this if it's in the context?
 			pointerContextMap.register(space.pointer, this.context);
 
-			this.animator = new sAnimator(this, space);
+			this.animator = new sAnimator(this, space, this.setShouldBeIntegrating);
 
 			this.mainEAvatar = space.mainEAvatar;
 			this.grinder = space.grinder;
 			pointerContextMap.register(space.grinder.pointer, this.context);
-			pointerContextMap.dump();
+			//pointerContextMap.dump();
+
+			// somebody needs to start this going if it was already on last time
+			// but wait till everything is ready.  TODO: should do this in a sync
+			// way; time is hokey
+			if (getASetting('frameSettings', 'shouldBeIntegrating')) {
+				setTimeout(() => props.setShouldBeIntegrating(true), 500)	;
+			}
 
 			if (tracePromises) console.log(`👑 SquishPanel.compDidMount done`);
 		})
@@ -118,12 +135,12 @@ export class SquishPanel extends React.Component {
 			ex = interpretCppException(ex);
 			if (typeof ex == 'string')
 				ex = new Error(ex);
-			if ('creating second space' == ex.message) {
-				// obnoxious hot reloading; let me reload the right way
-				debugger;
-				location = location;  // eslint-disable-line no-restricted-globals
-				// never gets here
-			}
+			//if ('creating second space' == ex.message) {
+			//	// obnoxious hot reloading; let me reload the right way
+			//	debugger;
+			//	location = location;  // eslint-disable-line no-restricted-globals
+			//	// never gets here
+			//}
 			console.error(`eSpaceCreatedPromise threw: `, ex.stack ?? ex.message ?? ex);
 			debugger;
 			throw ex;
@@ -136,20 +153,6 @@ export class SquishPanel extends React.Component {
 			tooOldTerminate('WebWorkers');
 	}
 
-	/* ******************************************************* user settings */
-	// others managed from ControlPanel
-	// can i move these to the control panel?
-
-	// dump the view buffer, from the JS side.  Why not use the C++ version?
-//	dumpViewBuffer(title = '') {
-//		const s = this.state;
-//		let nRows = s.space.nPoints * 2;
-//		let vb = s.space.mainVBuffer;
-//		const _ = (f) => f.toFixed(3).padStart(6);
-//		console.log(`👑 dump of view buffer '${title}' for ${s.space.nPoints} points in ${nRows} rows`);
-//		for (let i = 0; i < nRows; i++)
-//			console.log(_(vb[i*4]), _(vb[i*4+1]), _(vb[i*4+2]), _(vb[i*4+3]));
-//	}
 
 	/* ******************************************************* rendering */
 	// Base function that draws the WebGL, whether during iteration, or during
@@ -178,16 +181,15 @@ export class SquishPanel extends React.Component {
 			+ ` body.clientWidth=${document.body.clientWidth}`);
 		const space = s.space;
 
+		// make sure the context object doesn't keep getting replaced by using the same one every time
+		this.contextObj.shouldBeIntegrating = s.shouldBeIntegrating;
+
 		return (
-			<SquishContext.Provider value={{
-							name: 'main',
-							shouldBeIntegrating: s.shouldBeIntegrating,
-							controlPanel: s.controlPanel,
-							waveView: s.waveView,
-						}}>
+			<SquishContext.Provider value={this.contextObj}>
 				<article id={this.props.id} className="SquishPanel">
 					<WaveView
 						outerWidth = {p.bodyWidth}
+						animator={this.animator}
 						setWVContext={this.setWVContext}
 						setShouldBeIntegrating={this.setShouldBeIntegrating}
 						sPanel={this}

@@ -20,8 +20,8 @@ import {interpretCppException, wrapForExc} from '../utils/errors.js';
 import SquishContext from '../sPanel/SquishContext.js';
 
 let traceSetPanels = false;
-let traceStartStop = true;
-let traceContext = true;
+let traceStartStop = false;
+let traceContext = false;
 
 // integrations always need specific numbers of steps.  But there's always one
 // more. maybe this should be defined in the grinder.  Hey, isn't this really
@@ -49,6 +49,7 @@ export class ControlPanel extends React.Component {
 	constructor(props) {
 		super(props);
 		checkPropTypes(this.constructor.propTypes, props, 'prop', this.constructor.name);
+		//this.nFramesToGo = -1;
 
 		// most of the state is kept here.  But, also, in the store settings for the next page reload.
 		this.state = {
@@ -62,17 +63,10 @@ export class ControlPanel extends React.Component {
 		}
 		this.chosenFP = this.state.chosenFP;
 
-		// can't get this to work for now, startup is always stopped.
-		this.state.shouldBeIntegrating = false;
-
 		// we can't init some stuff till we get the space.  But we also can't until
 		// this constructor runs.
 		eSpaceCreatedPromise.then(space => {
 			this.initWithSpace(space);
-
-			if (this.state.shouldBeIntegrating) {
-				space.grinder.triggerIteration();
-			}
 		})
 		.catch(rex => {
 			let ex = interpretCppException(rex);
@@ -82,41 +76,32 @@ export class ControlPanel extends React.Component {
 	}
 
 	setUpContext() {
-		const cp = this.context?.controlPanel;
-		if (!cp) {
+		if (!this.context) {
 			// not ready yet so try again
 			setTimeout(this.setUpContext, 100);
+			debugger;
 			return;
 		}
-		if (cp.startStop)
+		let cp = this.context.controlPanel;
+		if (cp)
 			return;  // already done
 
-		// stuff available immediately
-		cp.startAnimating = this.startAnimating;
-		cp.stopAnimating = this.stopAnimating;
-		cp.startStop = this.startStop;
-		cp.singleFrame = this.singleFrame;
-
-		// we're trying to avoid re-rendering everything by not changing the context
-		// itelf.  So if this changes your component, pass the value in as a prop
-		cp.getShouldBeIntegrating = () => this.context.shouldBeIntegrating;
-
-		// a bit tricky.  This is used to turn on/off integration outside of this component
-		// maybe this won't work as every time we change teh value we have to call setCPContext()
-		//Object.defineProperties(cp, {
-		//	shouldBeIntegrating: {
-		//		get: () => this.shouldBeIntegrating,
-		//		//set: (sbi) => this.shouldBeIntegrating = sbi,
-		//	}
-		//});
+		// new cp object
+		cp = {
+			startAnimating: this.startAnimating,
+			stopAnimating: this.stopAnimating,
+			startStop: this.startStop,
+			singleFrame: this.singleFrame,
+		}
 
 		this.props.setCPContext(cp);
+
 		if (traceContext) {
 			const ctx = this.context;
-			console.log(`🎛️  ControlPanel setUpContext context: `,
-				ctx.setShouldBeIntegrating,
-				ctx.controlPanel,
-				ctx.waveView);
+			console.log(`🎛️  ControlPanel setUpContext context: sbi, ctx.cp, ctx.wv:`,
+				ctx?.shouldBeIntegrating,
+				ctx?.controlPanel,
+				ctx?.waveView);
 		}
 	}
 
@@ -132,26 +117,27 @@ export class ControlPanel extends React.Component {
 		this.grinder = space.grinder;
 		this.grinder.stretchedDt = this.state.dtStretch * this.space.dt;
 
-		// if somebody tried to set this before the space and grinder
-		// were here, it's saved in the state.
-		this.grinder.shouldBeIntegrating = this.state.shouldBeIntegrating;
-		if (this.grinder.shouldBeIntegrating)
-			this.startAnimating();
-
 		this.setUpContext();
 
+		// context is the RIGHT way to do it, but sometimes the context changes
+		// take until the next cycle (?)
+		if (this.context.shouldBeIntegrating)
+			this.startAnimating();
+
 		if (traceStartStop) {
-			console.log(`🎛️ ControlPanel constructor initialized with space, grinder=${this.grinder.pointer.toString(16)} `
-				+` shouldBeIntegrating=${this.grinder.shouldBeIntegrating} `
-				+` isIntegrating=${this.grinder.isIntegrating}`);
+			console.log(`🎛️ ControlPanel constructor & context initialized with space, `
+			+` ctx.shouldBeIntegrating=${this.context.shouldBeIntegrating}, `
+			+` gr.shouldBeIntegrating=${this.grinder.shouldBeIntegrating}, `
+			+` isIntegrating=${this.grinder.isIntegrating}   ctx.cp:`,
+			this.context.controlPanel);
 		}
 	}
 
 	static contextType = SquishContext;
 
-	componentDidMount() {
-		this.setUpContext();
-	}
+//	componentDidMount() {
+//		this.setUpContext();
+//	}
 
 
 	/* *********************************************************** frame period/ frequencyu */
@@ -187,32 +173,9 @@ export class ControlPanel extends React.Component {
 	/* ************************************************* shouldBeIntegrating */
 	// sbi is kept in the context, AND in the grinder.  Not in this component's state.
 
-	// obsolete
-	// need to keep grinder's variable and our state in sync for sbi.
-	// maybe these help.  Oh yeah, the setting, too.
-	get shouldBeIntegrating() {
-		debugger;
-		return this.context.shouldBeIntegrating;
-
-//		// before the space is created, this.grinder is undefined but the state
-//		// should be set from storeSettings
-//		const sbi = this.grinder?.shouldBeIntegrating ?? this.state.shouldBeIntegrating;
-//		return sbi;
-	}
-	// obsolete
-	set shouldBeIntegrating(sbi) {
-		debugger;
-		this.props.setShouldBeIntegrating(sbi);
-		//if (this.grinder)
-		//	this.grinder.shouldBeIntegrating = sbi;
-		//this.setState({shouldBeIntegrating: sbi});
-		////??this.context?.controlPanel?.setShouldBeIntegrating(sbi);
-		//storeASetting('frameSettings', 'shouldBeIntegrating', sbi);
-	}
-
 	// the central authority as to whether we're animating/integrating
-	// or not is grinder.shouldBeIntegrating Change the status by
-	// calling start/stop animating functions here the C++ will copy it
+	// or not is SquishPanel.state.shouldBeIntegrating Change the status by
+	// calling start/stop animating functions here. the C++ will copy it
 	// to isIntegrating at the right  time
 	startAnimating =
 	() => {
@@ -220,15 +183,19 @@ export class ControlPanel extends React.Component {
 
 		if (traceStartStop) console.info(`🎛️ startAnimating starts, triggering iteration`);
 		this.props.setShouldBeIntegrating(true);
-		//this.shouldBeIntegrating = true;
-		//this.props.setCPContext({...this.context.controlpanel, shouldBeIntegrating: true});
 
 		// must do this to start each iteration going in the thread(s)
 		this.grinder.triggerIteration();
 
-		if (traceStartStop) console.log(`🎛️ ControlPanel startAnimating,`
-			+` shouldBeIntegrating=${this.context.shouldBeIntegrating}, `
+		if (traceStartStop) {
+			console.log(`🎛️ ControlPanel startAnimating,`
+			+` ctx.shouldBeIntegrating=${this.context.shouldBeIntegrating}, `
+			+` gr.shouldBeIntegrating=${this.grinder.shouldBeIntegrating}, `
 			+`isIntegrating=${this.grinder.isIntegrating}   `);
+
+			console.log(`🎛️  this.context == props.context? `, this.context == this.props.context);
+		}
+
 	}
 
 	stopAnimating =
@@ -250,20 +217,23 @@ export class ControlPanel extends React.Component {
 			this.startAnimating();
 	}
 
-	// needs work
+	// the |> button
 	singleFrame =
 	(ev) => {
 		console.log(`🎛️ singleFrame starts`);
-		this.props.setShouldBeIntegrating(true);
-		this.grinder.justNFrames = 1;
 
-		this.grinder.triggerIteration();
+		let nFrames = 1;
+		// multipleby holding down modifiers.  Alt=bad on Windows, ctrl=bad on Mac
+		if (ev.ctrlKey || ev.altKey) nFrames *= 10;
+		if (ev.shiftKey) nFrames *= 100;
 
-		// wait ... need to do this one tic later.  Well, close enough.
-		// TODO: find a more graceful way to do this
-		setTimeout(() => this.props.setShouldBeIntegrating(false), 100);
-		//setTimeout(() => this.sPanel.animator.drawLatestFrame(), 100);
+		this.props.animator.singleFrame(nFrames);
 
+		if (traceStartStop) console.log(`🎛️ ControlPanel singleFrame,`
+			+` nFrames=${nFrames}, `
+			+` ctx.shouldBeIntegrating=${this.context.shouldBeIntegrating}, `
+			+` gr.shouldBeIntegrating=${this.grinder.shouldBeIntegrating}, `
+			+`isIntegrating=${this.grinder.isIntegrating}   `);
 	}
 
 	/* ********************************************** misc */
@@ -472,12 +442,6 @@ export class ControlPanel extends React.Component {
 		case 'integration':
 			return this.makeIntegrationTab();
 
-			/*
-				lowPassFilter={s.lowPassFilter}
-				setLowPassFilter={this.setLowPassFilter}
-							stepsPerFrame={s.stepsPerFrame}
-				setStepsPerFrame={this.setStepsPerFrame}
-			*/
 		default:
 			return `Do not understand showingTab='${s.showingTab}'`;
 		}
@@ -512,7 +476,7 @@ export class ControlPanel extends React.Component {
 				space={this.space}
 				cPanel={this}
 			/>
-			<div className='cpSecondRow'>
+			<div className='tabsArea'>
 				<ul className='TabBar' >
 					<li className={s.showingTab == 'wave' ? 'selected' : ''} key='wave'
 						onClick={ev => this.setShowingTab('wave')}>Wave</li>
@@ -530,12 +494,12 @@ export class ControlPanel extends React.Component {
 		</div>;
 	}
 
-	componentDidUpdate() {
-		// these should be EQUAL!  but single step turns it off without
-		// updating our state.  Make sure it's ok here.
-		if (this.grinder && (this.state.shouldBeIntegrating != this.grinder.shouldBeIntegrating))
-			this.setState({shouldBeIntegrating: this.grinder.shouldBeIntegrating});
-	}
+	//componentDidUpdate() {
+	//	// these should be EQUAL!  but single frame turns it off without
+	//	// updating our state.  Make sure it's ok here.
+	//	if (this.grinder && (this.state.shouldBeIntegrating != this.grinder.shouldBeIntegrating))
+	//		this.setState({shouldBeIntegrating: this.grinder.shouldBeIntegrating});
+	//}
 }
 
 export default ControlPanel;

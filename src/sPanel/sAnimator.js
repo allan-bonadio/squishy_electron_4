@@ -1,5 +1,5 @@
 /*
-** squish panel animation -- real-time simulation and interactivity.
+** squish panel animator -- real-time simulation and interactivity.
 ** Copyright (C) 2023-2025 Tactile Interactive, all rights reserved
 */
 
@@ -14,10 +14,11 @@ import qeConsts from '../engine/qeConsts.js';
 
 let traceTheViewBuffer = false;
 let traceHeartbeats = false;
-let tracerFrameProgress = false;
+let traceFrameProgress = false;
 let traceFrameMenuRates = false;
 
 let tracerAFPeriod = false;
+let traceSingleFrame = false;
 let traceTypicalVideoPeriod = false;
 let typical = 100;
 
@@ -32,13 +33,13 @@ const abs = Math.abs;
 class sAnimator {
 
 	// spanel is SquishPanel
-	constructor(spanel, space) {
+	constructor(spanel, space, setShouldBeIntegrating) {
 		this.sPanel = spanel;
-		this.cPanel = spanel.cPanel;
 		this.space = space;
 		this.grinder = space.grinder;
+		this.setShouldBeIntegrating = setShouldBeIntegrating;
 
-		this.frameProgress = 0;
+		this.frameProgress = 0;  // part of the FP stabilization
 		this.chosenFP = getASetting('frameSettings', 'chosenFP')
 
 		// defaults - will work until set by real life
@@ -46,12 +47,13 @@ class sAnimator {
 		this.unstableFP = true;
 		this.prevFrame = performance.now();
 
+		this.nFramesToGo = -1;
+		this.inteTimes = {totalDrawTime: 0};
+
 		// Start the heartbeat.  on next tic
 		if (traceHeartbeats)
 			console.log(`🎥 sAnimator: about to kick off rAFHandler`);
 		requestAnimationFrame(this.rAFHandler);
-
-		this.inteTimes = {totalDrawTime: 0};
 
 		/* ***************************** runningCycle tests */
 		// stick ?allowRunningDiagnosticCycle at the end of URL to show runningDiagnosticCycle panel
@@ -68,12 +70,13 @@ class sAnimator {
 	// the SVG in the HTML.  Faster than react. should move this to like
 	// WaveView
 	showTimeNFrame() {
+		let tnf = this.grinder.formatTimeNFrame();
 		let nw = document.querySelector('.voNorthWest')
 		if (nw)
-			nw.innerHTML = this.grinder.elapsedTime.toFixed(3);
+			nw.innerHTML = tnf.elapsedTimeText;
 		let ne = document.querySelector('.voNorthEast')
 		if (ne)
-			ne.innerHTML =  thousandsSpaces(this.grinder.frameSerial);
+			ne.innerHTML =  tnf.frameSerialText;
 	}
 
 	// Repaint, with webgl, the waveview.  (not render!)
@@ -160,6 +163,21 @@ class sAnimator {
 		}
 	}
 
+	/* ********************************************************* single frame */
+
+	// call when human clicks on Single Frame button, with n of frames they asked for
+	singleFrame = (nFrames) => {
+		console.log(`🎥 sAnimator singleFrame starts with '${nFrames}'`);
+		this.setShouldBeIntegrating(true);
+		this.nFramesToGo = nFrames - 1;
+
+		if (traceSingleFrame) console.log(`🎥  sAnimator singleFrame,`
+			+` nFramesToGo=${this.nFramesToGo}, `
+			+` ctx.shouldBeIntegrating=${this.context.shouldBeIntegrating}, `
+			+` gr.shouldBeIntegrating=${this.grinder.shouldBeIntegrating}, `
+			+`isIntegrating=${this.grinder.isIntegrating}   `);
+	}
+
 	/* *************************************  retrieving chosen frequency setting */
 
 	// given an FP that may be from a different set of frameRateMenuFreqs, find
@@ -224,7 +242,7 @@ class sAnimator {
 		// an error (eg divergence) will halt integration.  Start Over will put it back.
 		if (grinder.hadException) {
 			console.log(`🎥 sAnimator: hadException   will dialog`);
-			this.cPanel.shouldBeIntegrating = false;
+			this.context?.controlPanel?.stopAnimation();
 			this.errorMessage = qeFuncs.grinder_getExceptionMessage(grinder.pointer);
 			if (!this.errorMessage) this.errorMessage = 'sorry, no message.  🫦 🥺';
 			console.error(`had Exception!  '${this.errorMessage}'  ex=${this.grinder.hadException} `);
@@ -238,29 +256,43 @@ class sAnimator {
 			grinder.hadException = false;
 		}
 
-		if (tracerFrameProgress) {
+		if (traceFrameProgress) {
 			let da = new Date();
 			let time = da.getSeconds() + da.getMilliseconds() / 1e3;
-			console.log(`🎥 needsRepaint=${grinder.needsRepaint} latest frame `
-				+ `${grinder.frameSerial} at :${time.toFixed(3)} seconds`);
+			if (da.getMilliseconds() < 14) {
+				console.log(`🎥 b4 needsRepaint=${grinder.needsRepaint} latest frame `
+					+ `nFramesToGo=${this.nFramesToGo} `
+					+ `frameSerial=${this.frameSerial} at :${time.toFixed(3)} seconds (wall)`,
+					this.context, this.context?.controlPanel);
+			}
 		}
 
-		//console.log(`🎥 qeConsts.FASTEST=${qeConsts.FASTEST}  this.chosenFP=${this.chosenFP}`)
-		if (grinder.shouldBeIntegrating) {    // && qeConsts.FASTEST != this.chosenFP
+		if (this.context?.shouldBeIntegrating) {    // && qeConsts.FASTEST != this.chosenFP
 			// do the integration, if on a numerical frame rate.
 			// NOT fastest, so integration is only triggered according to the chosen rate
 			this.frameProgress += this.avgVideoFP;
+
 			if (this.frameProgress >= this.chosenFP) {
-				// time for another grind.  Trigger the threads.
-				this.grinder.triggerIteration();
+				// singleFrame - are we at the end?
+				if (0 == this.nFramesToGo--) {
+					// nFramesToGo next time will become -1 and then more negative
+					this.context.controlPanel?.stopAnimating?.();
+				}
+				else {
+					// time for another grind.  Trigger the threads.
+					this.grinder.triggerIteration();
+				}
 
 				// even if the chosenFP doesn't evenly divide by videoFP,
 				// this'll do it (approximately) right.  Leftovers goes into next period.
 				// you might get like chosen/video = 6 6 5 6 6 6 5 6 6 5 but user won't notice
 				this.frameProgress -= this.chosenFP
-				if (tracerFrameProgress) {
-					console.log(`🎥 frameProgress=${this.frameProgress}  `
-						+ `chosenFP=${this.chosenFP} at :${time.toFixed(3)} `);
+				if (traceFrameProgress) {
+					let da = new Date();
+					let time = da.getSeconds() + da.getMilliseconds() / 1e3;
+					console.log(`🎥 after grind frameProgress=${this.frameProgress}  `
+						+ `chosenFP=${this.chosenFP} at :${time.toFixed(3)} `
+						+ `nFramesToGo=${this.nFramesToGo}`);
 				}
 			}
 		}
@@ -288,7 +320,7 @@ class sAnimator {
 		if (!this.allowRunningDiagnosticCycle) return;
 		this.runningDiagnosticCycle = true;
 		this.runningCycleStartingTime = this.grinder.elapsedTime;
-		this.runningCycleStartingSerial = this.grinder.frameSerial;
+		this.runningCycleStartingSerial = this.frameSerial;
 		this.cPanel.startAnimating();
 	};
 
