@@ -440,7 +440,6 @@ export class ControlPanel extends React.Component {
 			setDtStretch={this.setDtStretch}
 
 			N={this.N}
-			iStats={this.props.iStats}
 		/>;
 	}
 
