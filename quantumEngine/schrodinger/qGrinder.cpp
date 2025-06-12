@@ -23,7 +23,7 @@
 
 
 
-static bool traceTrigger = true;
+static bool traceTrigger = false;
 
 static bool traceIntegration = false;
 static bool traceIntegrationDetailed = false;
@@ -39,8 +39,8 @@ static bool traceDivergence = false;
 static bool traceKinks = false;
 
 static bool traceAggregate = false;
-static bool traceCountedFrames = true;
-static bool traceThreadsHaveFinished = true;
+static bool traceThreadsHaveFinished = false;
+static bool traceTHFBenchmarks = false;
 
 // RK2
 #define MIDPOINT_METHOD
@@ -140,8 +140,7 @@ void qGrinder::formatDirectOffsets(void) {
 	printf("\n");
 
 	/* ************************* timing */
-	//makeIntGetter(nFramesToGo);
-	//makeIntSetter(nFramesToGo);
+
 	makeIntGetter(stepsPerFrame);
 	makeIntSetter(stepsPerFrame);
 
@@ -381,11 +380,12 @@ void qGrinder::oneFrame() {
 	if (traceJustWave)
 		qflick->dump("     🪓 qGrinder traceJustWave at end of frame", true);
 
-	if (traceIntegration)
+	if (traceIntegration) {
 		speedyLog("🪓 qGrinder::oneFrame() done; shouldBeIntegrating: %hhu   isIntegrating: %hhu \n"
 			"  dt in use=%lf  stretchedDt=%8.6lf stepsPerFrame=%d  wave0[5]=%lf\n",
 			shouldBeIntegrating, isIntegrating, dt, stretchedDt, stepsPerFrame,
 			wave0[5]);
+	}
 
 	//frameSerial++;
 	qCheckReset();
@@ -408,9 +408,8 @@ void qGrinder::aggregateCalcTime(void) {
 		}
 	}
 
-	// now compare it to the screen and adjust so it's just about the frame
-	// time.  Always a multiple of 4 so truncate down
-	stepsPerFrame += (int) (stepsPerFrame * (videoFP - maxCalcTime)  / maxCalcTime) & -4;
+	// now compare it to the screen and adjust so it's just about the frame time.
+	stepsPerFrame += (int) (stepsPerFrame * (videoFP - maxCalcTime)  / maxCalcTime);
 
 	if (traceAggregate) {
 		speedyLog(" qGrinder 🪓 aggregate time summed: %5.6lf ms, maxed: %5.6lf ms\n",
@@ -426,16 +425,16 @@ void qGrinder::aggregateCalcTime(void) {
 // the worker threads can quickly get back to work.
 void qGrinder::threadsHaveFinished() {
 	double thfTime;
-	if (traceThreadsHaveFinished) {
+	if (traceThreadsHaveFinished || (traceTHFBenchmarks && 0 == (frameSerial & 63))) {
 		thfTime = getTimeDouble();
 		speedyLog("🪓 qGrinder::threadsHaveFinished() starts\n");
 	}
 	aggregateCalcTime();
 
-	if (traceIntegration)  {
-		speedyLog("🪓                ...in threadsHaveFinished().  "
-			"shouldBeIntegrating=%hhu   isIntegrating=%hhu\n",
-			shouldBeIntegrating, isIntegrating);
+	if (traceTHFBenchmarks && 0 == (frameSerial & 63)) {
+		speedyLog("🪓 threadsHaveFinished()— aggregateCalcTime()÷64 at %10.6lf ms - needsRepaint=%hhu"
+			" shouldBeIntegrating=%hhu   isIntegrating=%hhu\n",
+			getTimeDouble() - thfTime, needsRepaint, shouldBeIntegrating, isIntegrating);
 	}
 
 	// isIntegrating is on otherwise we wouldn't be here.
@@ -449,7 +448,6 @@ void qGrinder::threadsHaveFinished() {
 				"shouldBeIntegrating=%hhu   isIntegrating=%hhu\n",
 				shouldBeIntegrating, isIntegrating);
 	}
-	speedyFlush();
 
 	// now, copy it to the Avatar's wave buffer, so it can copy it to
 	// its ViewBuffer, so webgl can pick it up.  quick!  No mutexes or anything;
@@ -461,8 +459,8 @@ void qGrinder::threadsHaveFinished() {
 	copyToAvatar(avatar);
 	needsRepaint = true;
 
-	if (traceThreadsHaveFinished) {
-		speedyLog("🪓 threadsHaveFinished()— copyToAvatar() in %10.6lf ms - needsRepaint=%hhu"
+	if (traceTHFBenchmarks && 0 == (frameSerial & 63)) {
+		speedyLog("🪓 threadsHaveFinished()— copyToAvatar()÷64 at %10.6lf ms - needsRepaint=%hhu"
 			" shouldBeIntegrating=%hhu   isIntegrating=%hhu\n",
 			getTimeDouble() - thfTime, needsRepaint, shouldBeIntegrating, isIntegrating);
 	}
@@ -484,13 +482,16 @@ void qGrinder::threadsHaveFinished() {
 	// now in grWorker emscripten_atomic_store_u32(&startAtomic, -1);
 	emscripten_atomic_store_u32(&finishAtomic, 0);
 
-	if (traceThreadsHaveFinished) {
-		speedyLog("🪓  threadsHaveFinished() finished in %10.6lf ms; startAtomic=%d finishAtomic=%d "
-			"needsRepaint=%hhu  shouldBeIntegrating=%hhu   isIntegrating=%hhu\n",
+	if (traceTHFBenchmarks && 0 == (frameSerial & 63)) {
+		speedyLog("🪓  threadsHaveFinished() finished÷64 at %10.6lf ms; startAtomic=%d finishAtomic=%d "
+			"needsRepaint=%hhu  shouldBeIntegrating=%hhu   isIntegrating=%hhu frSerial=%d\n",
 			getTimeDouble() - thfTime,
 			emscripten_atomic_load_u32(&startAtomic), emscripten_atomic_load_u32(&finishAtomic),
-			needsRepaint, shouldBeIntegrating, isIntegrating);
+			needsRepaint, shouldBeIntegrating, isIntegrating, frameSerial);
 	}
+
+	// only print now after benchmarks have been measured
+	speedyFlush();
 }
 
 
