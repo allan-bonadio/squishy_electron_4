@@ -3,71 +3,43 @@
 ** Copyright (C) 2024-2025 Tactile Interactive, all rights reserved
 */
 
+import SquishContext from '../sPanel/SquishContext.js';
+
 // holds all statistics shown on the Integration tab
-// must create and attach to space.  One per space and SquishPanel.
-class inteStats {
-	constructor(space) {
-		this.space = space;
+// One per space and SquishPanel.  No props but uses context.
+function InteStats(props) {
+	const context = useContext(SquishContext);
+	const statsInfoRef = useRef();
+	let info = statsInfoRef.current;
 
-		this.statsMap = {};  // by name
-		this.statsList = [];  // by serial
-
-		this.addStat('Divergence'         , 'divergence', 'points');
-		this.addStat('Frame Calc Time'    , 'frameCalcTime', 'ms');
-		this.addStat('Draw Time'                  , 'totalDrawTime', 'ms');
-		//this.addStat('Total For Frame'   , 'totalForFrame', 'ms');
-//		this.addStat('Frame Period'      , 'chosenFP', 'ms');
-//		this.addStat('Frames Per Sec'   , 'framesPerSec', '/sec');
-		this.addStat('rAF Period'   , 'rAFPeriod', 'ms');
-
-	}
-
-	// creates a stat object for a statistic.
-	addStat(label, name, unit) {
+	// creates a stat object for one statistic.
+	function addStat(label, name, unit) {
 		let stat = {label, name, unit};
-		this.statsMap[name] = stat;
-		this.statsList.push(stat);
+		info.statsMap[name] = stat;
+		info.statsList.push(stat);
 	}
 
-	/* ********************************************************* render table */
-
-	// render the row for this integration statistic (1 num), collecting nodes for the spans.
-	// values inserted right now are dummies to be replaced - real numbers inserted in display()
-	renderStat(stat) {
-		// this'll run when the dom nodes are in place.  eventually.
-		const init = el => {
-			if (!el)
-				return;
-			stat.el = el;
-			stat.statAvg = 1e-10;  // like zero but you can divide by it
+	// create the info object once
+	if (!statsInfoRef.current) {
+		 info = statsInfoRef.current = {
+			space: context.waveView.space,
+			statsMap: {},  // by name
+			statsList: [],  // by serial
 		}
 
-		return <tr key={stat.name + '-row'}>
-			<td>{stat.label}:</td>
-			<td>
-				<span  className={stat.name}  ref={init}>-</span> {stat.units}
-			</td>
-			<td>{stat.unit}</td>
-		</tr>;
-	}
-
-	// render all the rows - with dummy values.  Just creates the nodes and elements, not numbers.
-	// display() will actually stick the text into the elements.
-	renderAllStats() {
-		return (
-			<div className='iStats'>
-				<h3 style={{textAlign: 'left'}}>Integration Statistics</h3>
-				<table><tbody>
-					{this.statsList.map(stat => this.renderStat(stat))}
-				</tbody></table>
-			</div>
-		);
+		addStat('Divergence'         , 'divergence', '%');
+		addStat('Frame Calc Time'    , 'frameCalcTime', 'ms');
+		addStat('Draw Time'                  , 'totalDrawTime', 'ms');
+		//addStat('Total For Frame'   , 'totalForFrame', 'ms');
+//		addStat('Frame Period'      , 'chosenFP', 'ms');
+//		addStat('Frames Per Sec'   , 'framesPerSec', '/sec');
+		addStat('rAF Period'   , 'rAFPeriod', 'ms');
 	}
 
 	/* ********************************************************* display numbers */
 
 	/* given the fluctuation over time, try to smooth it out if it's near a
-	round number smoothing is done by a weighted avg of this value and
+	round number. smoothing is done by a weighted avg of this value and
 	the last several (or more). You keep a running average.  Then, every
 	cycle, say for the new display, you mix ¼ the new number and ¾ the
 	running average.
@@ -89,7 +61,7 @@ class inteStats {
 
 	// given new value, assimilate it into the running avg, attached on the node itself
 	// and remember this is called every frame so ¼ influence, repeated 10/sec, go quickly
-	smoothNumber(stat, value) {
+	function smoothNumber(stat, value) {
 		// but smooth according to how violently it's changing
 		let smooth = value;  // if the previous wasn't there, start here
 		if (stat.statAvg) {
@@ -121,11 +93,11 @@ class inteStats {
 		stat.statAvg = smooth;
 	}
 
-	// stick text into span to display number, smoothed
-	display(stat, value, nDigits = 1, mangleFunction) {
+	// stick text into <span to display number, smoothed
+	// value is raw latest calculated value.  mangleFunction() cuz divergence is special
+	function display(stat, value, nDigits = 1, mangleFunction) {
 		if (stat.el) {
-			// hard to see if it's jumping around a lot, so average over many frames
-			this.smoothNumber(stat, value);
+			smoothNumber(stat, value);
 			if (stat.statAvg != undefined) {
 				stat.el.innerHTML = stat.statAvg.toFixed(nDigits);
 				if (mangleFunction)
@@ -137,13 +109,13 @@ class inteStats {
 	// hand in inteTimes, where the actual numbers are, we'll them on the int tab
 	// inteTimes is raw numbers collected by sAnimator
 	// grinder is eGrinder instance doing integration and its numbers
-	displayAllStats(inteTimes, grinder) {
+	function displayAllStats(inteTimes, grinder) {
 		// the map of stat management objects, by name
-		const sm = this.statsMap;
+		const sm = info.statsMap;
 
 		// some of these aren't here when we need them.  Grinder numbers come from c++
 		if (grinder) {
-			this.display(sm.divergence, grinder.divergence, 0, (value, element) => {
+			display(sm.divergence, grinder.divergence, 0, (value, element) => {
 				let dv = grinder.divergence;
 				if (dv <= 50 ) {
 					// color will go black -> dark red -> full red
@@ -162,22 +134,53 @@ class inteStats {
 				}
 			});
 
-			this.display(sm.frameCalcTime, grinder.maxCalcTime );
+			display(sm.frameCalcTime, grinder.maxCalcTime );
 		}
 
 
 		// these are mostly from sAnimator
 		if (inteTimes) {
-			this.display(sm.totalDrawTime, inteTimes.totalDrawTime);
-			this.display(sm.rAFPeriod, inteTimes.rAFPeriod);
-
+			display(sm.totalDrawTime, inteTimes.totalDrawTime);
+			display(sm.rAFPeriod, inteTimes.rAFPeriod);
 		}
 	}
 
+	/* ********************************************************* render table */
+
+	// render the row for this integration statistic (1 num), collecting nodes for the spans.
+	// values inserted right now are dummies to be replaced - real numbers inserted in display()
+	function renderStat(stat) {
+		// this'll run when the dom nodes are in place.  eventually.
+		const init = el => {
+			if (!el)
+				return;
+			stat.el = el;
+			stat.statAvg = 1e-10;  // like zero but you can divide by it
+		}
+
+		// value - will be filled in by raw DOM setting each frame
+		return <tr key={stat.name + '-row'}>
+			<td>{stat.label}:</td>
+			<td>
+				<span  className={stat.name}  ref={init}>-</span> {stat.units}
+			</td>
+			<td>{stat.unit}</td>
+		</tr>;
+	}
+
+	// render all the rows - with dummy values.  Just creates the nodes and elements, not numbers.
+	// display() will actually stick the text into the elements.
+	return (
+		<div className='iStats'>
+			<h3 style={{textAlign: 'left'}}>Integration Statistics</h3>
+			<table><tbody>
+				{info.statsList.map(stat => renderStat(stat))}
+			</tbody></table>
+		</div>
+	);
 }
 
-
-export default inteStats;
+export default InteStats;
 
 
 

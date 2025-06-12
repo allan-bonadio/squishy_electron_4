@@ -51,6 +51,7 @@ class sAnimator {
 			console.log(`🎥 sAnimator: about to kick off rAFHandler`);
 		requestAnimationFrame(this.rAFHandler);
 
+		// this collects integration times
 		this.inteTimes = {totalDrawTime: 0};
 
 		/* ***************************** runningCycle tests */
@@ -95,7 +96,7 @@ class sAnimator {
 		let endDrawTime = performance.now();
 		this.inteTimes.totalDrawTime = endDrawTime - startDrawTime;
 
-		//this.inteTimes.prevStartIntegrationTime = this.inteTimes.startIntegrationTime;
+		this.inteTimes.prevStartIntegrationTime = this.inteTimes.startIntegrationTime;
 
 		this.continueRunningDiagnosticCycle();
 	}
