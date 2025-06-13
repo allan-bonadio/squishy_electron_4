@@ -9,8 +9,9 @@ import { createContext } from 'react';
 // file.  So no import circular references. As the waveView and controlPanel init up, these
 // will be filled in.  funcs & objects mostly
 export const SquishContext = createContext({
-	// the context object will be frozen, except in SquishPanel, the root
-	name: 'default untitled',
+	// the context object will be frozen, except in SquishPanel, the root.
+	// the actual value comes from state of SquishPanel; this is just a lame default.
+	name: 'main',
 	shouldBeIntegrating: false,
 	controlPanel: {},
 	waveView: {},

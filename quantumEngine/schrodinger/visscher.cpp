@@ -208,6 +208,7 @@ void qGrinder::hitRealImaginary(qCx *newW, qCx *oldW, qCx *hamiltW, double dt) {
 /* ********************************************************** midpoint method */
 
 // this will go forward calculating dPsi based on derivatives at the front AND back of dx
+// each of these is 4 hits = 2 steps of dt
 void qGrinder::stepMidpoint(qCx *newW, qCx *oldW, qCx *scratch, double dt) {
 	// first calculate the normal step taking derivatives at the beginning of dt
 	// already done in hit func qflick->fixThoseBoundaries(oldW);

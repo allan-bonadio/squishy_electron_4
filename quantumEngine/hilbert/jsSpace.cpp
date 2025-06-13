@@ -69,7 +69,7 @@ qSpace *completeNewSpace(qSpace *space, int nGrWorkers) {
 
 	space->miniGraphAvatar = new qAvatar(space, "miniGraph");
 
-	space->dumpSpace();
+	//space->dumpSpace();
 //	if (traceSpaceCreation) printf("   🚀 qSpace created: space=%p  mainAvatar=%p  grinder=%p\n",
 //		space, mainAvatar, qgrinder);
 	return space;

@@ -14,11 +14,11 @@
 	as that indicates not active.
 
 	To start integration, qGrinder::triggerIteration() is called
-	(however), or a Atomic.notify is called from JS.
+	(however), which calls Atomic.notify is called from JS.
 	Either way, .startAtomic is atomically set to zero, isIntegrating is
 	set to true, and a notify is done on startAtomic.  All of the
-	grinderThreads launch all together (simultaneously?).  They all run
-	this algorithm that requires them to start simultaneously, and to
+	grinderThreads launch all together (hopefully simultaneously).  They all run
+	this algorithm that prefers them to start simultaneously, and to
 	pause upon ending so the latest version of the wave can be copied
 	out.
 
@@ -31,18 +31,14 @@
 	tail thread to run threadsHaveFinished().]
 
 
-	Threads, when they finish, count up, atomically incrementing with grinder.finishAtomic.
+	Threads, when they finish, count up, atomically incrementing with grinder.finishAtomic, one per thread.
 	When it gets to nGrWorkers, that means that all threads have finished,
 	so that last thread calls grinder.threadsHaveFinished(), which cleans up.
-	[OR starts in the finishing thread]
+	[OR starts in the tail thread by notifying its atomic]
 
 	As part of finishing, grinder.shouldBeIntegrating is copied to
 	grinder.isIntegrating.  If true, the startAtomic is unlocked again
 	to trigger the next cycle.
-
-	[Single step should be done this way — start integrating with
-	trigger, but never set shouldBeIntegrating on, so  that at the end
-	of the cycle, integration will turn off.]
 */
 
 

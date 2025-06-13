@@ -36,7 +36,8 @@ function setPT() {
 		chosenRate: PropTypes.number.isRequired,
 		setChosenRate: PropTypes.func.isRequired,
 
-		shouldBeIntegrating: PropTypes.bool.isRequired,
+		// should get rid of this at some point TODO
+		//shouldBeIntegrating: PropTypes.bool.isRequired,
 
 		startOverHandler: PropTypes.func.isRequired,
 		resetVoltageHandler: PropTypes.func.isRequired,
@@ -61,8 +62,9 @@ function CPToolbar(props) {
 		dbLog(`🧰 CPToolbar starts.  props=`, props);
 	let {chosenRate, setChosenRate} = props;
 
-
+	// for the old buttons - obsolete
 	let runningClass = props.shouldBeIntegrating ? 'running' : '';
+
 	return <div className='CPToolbar'>
 		<div className='frameRateBox'>
 			frame rate:<br />

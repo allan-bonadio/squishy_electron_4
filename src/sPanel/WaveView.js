@@ -13,17 +13,17 @@ import React, {useContext} from 'react';
 import PropTypes, {checkPropTypes} from 'prop-types';
 
 import eSpace from '../engine/eSpace.js';
-import {thousands, thousandsSpaces} from '../utils/formatNumber.js';
 import qeConsts from '../engine/qeConsts.js';
 import './WaveView.scss';
 import {getASetting, storeASetting} from '../utils/storeSettings.js';
 
 import VoltOverlay from '../volts/VoltOverlay.js';
-import {WELL_BUMPER_WIDTH, SIZE_BOX_SIZE} from '../volts/voltConstants.js';
+import {WELL_BUMPER_WIDTH} from '../volts/voltConstants.js';
 import GLScene from '../gl/GLScene.js';
 import {eSpaceCreatedPromise} from '../engine/eEngine.js';
 import SquishContext from './SquishContext.js';
 import StartStopOverlay from './StartStopOverlay.js';
+import resizeIcon from './waveViewIcons/resize.png';
 
 let traceBumpers = false;
 let traceDimensions = false;
@@ -47,6 +47,9 @@ export class WaveView extends React.Component {
 		// bumpers and border.  Canvas is CANVAS_BORDER_THICKNESS pixel smaller
 		// all around for border.
 		outerWidth: PropTypes.number.isRequired,
+
+		// sAnimator
+		animator: PropTypes.object,
 
 		setShouldBeIntegrating: PropTypes.func.isRequired,
 		sPanel: PropTypes.object.isRequired,
@@ -85,28 +88,40 @@ export class WaveView extends React.Component {
 	// set up 2/3 of the context: waveView and engine
 	setUpContext() {
 		// need BOTH context  and the space.  So this is called twice.
-		const ctx = this.context;
-		let wv = ctx?.waveView;
-		if (!this.space || !wv) {
+		const context = this.context;
+		if (!context) {
 			// not ready yet so try again
 			setTimeout(this.setUpContext, 100);
 			return;
 		}
-		if (wv.mainEAvatar)
+
+		let wv = context.waveView;
+		if (wv)
 			return;  // already done
 
-		const space = wv.space = this.space;
-		wv.grinder = space.grinder;
+		const space = this.space;
+		wv = {
+			space: space,
+			grinder: space.grinder,
+			mainEAvatar: space.mainEAvatar,
 
-		wv.mainEAvatar = space.mainEAvatar;
+			// make room for the bumpers for WELL continuum (both sides).  Note that
+			// continuum can change only when page reloads.
+			bumperWidth: (qeConsts.contWELL == space.continuum)
+					? WELL_BUMPER_WIDTH
+					: 0,
 
-		// make room for the bumpers for WELL continuum (both sides).  Note that
-		// continuum can change only when page reloads.
-		wv.bumperWidth = (qeConsts.contWELL == space.continuum)
-			? WELL_BUMPER_WIDTH
-			: 0;
+			mainVDisp: space.vDisp,
+		};
 
-		wv.mainVDisp = space.vDisp;
+			// make room for the bumpers for WELL continuum (both sides).  Note that
+			// continuum can change only when page reloads.
+		//wv.bumperWidth = (qeConsts.contWELL == space.continuum)
+		//	? WELL_BUMPER_WIDTH
+		//	: 0;
+
+		//wv.mainVDisp = space.vDisp;
+
 		if (traceContext) {
 			console.log(`🏄 WaveView setUpContext context:`,
 				context.setShouldBeIntegrating,
@@ -122,8 +137,8 @@ export class WaveView extends React.Component {
 	handleSpacePromise = (space) => {
 		// this will kick off a render, now that the avatar is in place
 		this.setState({space});
+		this.space = space;  // for immediate access
 
-		this.space = space;
 		this.grinder = space.grinder;
 		this.mainEAvatar = space.mainEAvatar;
 
@@ -167,7 +182,7 @@ export class WaveView extends React.Component {
 		if (!wv || wv.space)
 			return;
 
-		this.setUpContext();
+		//this.setUpContext();
 		//wv.space = {};
 		console.log(`🏄  WaveView componentDidMount context: `, this.context);
 	}
@@ -207,7 +222,7 @@ export class WaveView extends React.Component {
 		}
 	}
 
-	/* ************************************************************************ resizing */
+	/* ******************************************************** resizing */
 
 	// these are for resizing the WaveView ONLY with the size box
 	resizePointerDown =
@@ -275,20 +290,21 @@ export class WaveView extends React.Component {
 		const p = this.props;
 		const s = this.state;
 
-		if (traceContext) {
-			console.log(`🏄 WaveView Render context:`, context.setShouldBeIntegrating,
-				context.controlPanel,
-				context.waveView
-);
+		// can't figure out when else to do it
+		if (this.props.animator)
+			this.props.animator.context ??= this.context;
+
+		if (traceContext && this.context) {
+			console.log(`🏄 WaveView Render context:`,
+				this.context.setShouldBeIntegrating,
+				this.context.controlPanel,
+				this.context.waveView);
 		}
+
 		// if c++ isn't initialized yet, we can assume the time and frame serial
-		let elapsedTime = '0';
-		let frameSerial = '0';
-		if (this.grinder) {
-			// after qeConsts has been initialized
-			elapsedTime = thousands(this.grinder.elapsedTime.toFixed(4));
-			frameSerial = thousands(this.grinder.frameSerial);
-		}
+		let tnf = {elapsedTimeText: '0', frameSerialText: '0'};
+		if (this.grinder)
+			tnf = this.grinder.formatTimeNFrame();
 
 		if (traceDimensions) {
 			console.log(`🏄 WaveView render, outerWidth=${this.outerWidth}`
@@ -354,11 +370,10 @@ export class WaveView extends React.Component {
 				<section className='timeOverlay'
 					style={{maxWidth: this.canvasInnerWidth +'px'}}>
 					<div className='northWestWrapper'>
-						<span className='voNorthWest'>{elapsedTime}</span> ps
+						<span className='voNorthWest'>{tnf.elapsedTimeText}</span> ps
 					</div>
 					<div className='northEastWrapper'>
-						frame <span className='voNorthEast'>
-							{thousandsSpaces(frameSerial)}</span>
+						frame <span className='voNorthEast'>{tnf.frameSerialText}</span>
 					</div>
 
 				</section>
@@ -367,10 +382,11 @@ export class WaveView extends React.Component {
 
 				<StartStopOverlay />
 
-				<img className='sizeBox' src='/images/sizeBox4.png' alt='size box'
+				<img className='sizeBox' src={resizeIcon} alt='size box'
 					onPointerDown={this.resizePointerDown} onPointerUp={this.resizePointerUp}
 					onPointerMove={this.resizePointerMove} onPointerLeave={this.resizePointerUp}
-					style={{width: `${SIZE_BOX_SIZE}px`, height: `${SIZE_BOX_SIZE}px`}} />
+					title="To adjust the height, drag this up or down"
+					style={{width: `2em`, height: `2em`}} />
 			</div>
 			<div className='bumper right' key='right'
 				style={{flexBasis: this.bumperWidth +'px', height: this.canvasInnerHeight}} />

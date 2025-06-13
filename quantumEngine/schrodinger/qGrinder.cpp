@@ -23,6 +23,8 @@
 
 
 
+static bool traceTrigger = false;
+
 static bool traceIntegration = false;
 static bool traceIntegrationDetailed = false;
 
@@ -33,17 +35,21 @@ static bool traceIProd = false;
 
 static bool traceConstructor = false;
 
+static bool traceDivergence = false;
 static bool traceKinks = false;
 
 static bool traceAggregate = false;
-static bool traceSingleStep = false;
 static bool traceThreadsHaveFinished = false;
-static bool traceDivergence = false;
+static bool traceTHFBenchmarks = false;
 
 // RK2
 #define MIDPOINT_METHOD
 
 static std::runtime_error nullException("");
+
+//EM_JS(int, stopAnimation, (qGrinder *pointer), {
+//	globalThis.pointerContextMap[pointer].controlPanel.stopAnimation();
+//});
 
 
 // create new grinder, complete with its own stage buffers. make sure
@@ -51,13 +57,11 @@ static std::runtime_error nullException("");
 // created by creation time here, although a few details left  to do.
 qGrinder::qGrinder(qSpace *sp, qAvatar *av, int nGrWorkers, const char *lab)
 	: magic('Grnd'), space(sp), avatar(av), qspect(NULL),
-		stepsPerFrame(10), videoFP(.05), stretchedDt(60),
+		stepsPerFrame(48), videoFP(.05), stretchedDt(60),
 		elapsedTime(0), frameSerial(0), nGrWorkers(nGrWorkers),
 		integrationEx(nullException), exceptionCode(""), _zero(0), hadException(false),
 		shouldBeIntegrating(false), isIntegrating(false),
 		pleaseFFT(false), sentinel(grSENTINEL_VALUE) {
-
-	;
 
 	// number of waves; number of threads
 	qflick = new qFlick(space, 3, 0);
@@ -136,7 +140,10 @@ void qGrinder::formatDirectOffsets(void) {
 	printf("\n");
 
 	/* ************************* timing */
-	// stepsPerFrame
+
+	makeIntGetter(stepsPerFrame);
+	makeIntSetter(stepsPerFrame);
+
 	makeDoubleGetter(videoFP);
 	makeDoubleSetter(videoFP);
 	makeDoubleGetter(chosenFP);
@@ -229,11 +236,21 @@ void qGrinder::copyFromAvatar(qAvatar *avatar) {
 	qflick->copyBuffer(qflick, avatar->qwave);  // to buffer zero
 }
 
+// JS interface
+void grinder_copyFromAvatar(qGrinder *qgrinder, qAvatar *avatar) {
+	qgrinder->copyFromAvatar(avatar);
+}
+
 void qGrinder::copyToAvatar(qAvatar *avatar) {
 	qflick->copyBuffer(avatar->qwave, qflick);  // from buffer zero
 }
 
-/* **********************************************************   */
+// JS interface
+void grinder_copyToAvatar(qGrinder *qgrinder, qAvatar *avatar) {
+	qgrinder->copyToAvatar(avatar);
+}
+
+/* *********************************************** divergence & tallying  */
 
 // sloppy sloppy
 static int tally = 0;
@@ -245,7 +262,8 @@ static void difft(double p, double q, double r) {
 	if (p < q && q > r) tally++;
 }
 
-// count up how many sign reversals, for the derivative, in consecutive cells we have
+// count up how many sign reversals, for the derivative, in consecutive cells we
+// have
 void qGrinder::tallyUpKinks(qWave *qwave) {
 	tally = 0;
 	qCx *wave = qwave->wave;
@@ -265,15 +283,13 @@ void qGrinder::tallyUpKinks(qWave *qwave) {
 	//double percent = 100.0 * tally / N / 2.;
 	// figure rate.  ÷2 for real, imag
 	int N = qwave->end - qwave->start;
-	if (traceKinks)
-		speedyLog("🪓 tallyUpKinks result: tally/2= %d out of %d or %5.1f %%\n",
-			tally/2, N, 100.0 * tally / N / 2);
 	divergence = tally/2;
-}
 
-EM_JS(int, stopAnimation, (qGrinder *pointer), {
-	globalThis.pointerContextMap[pointer].controlPanel.stopAnimation();
-});
+	if (traceKinks) {
+		speedyLog("🪓 tallyUpKinks result: tally/2= %d out of %d or %5.1f %%\n",
+			divergence, N, 100.0 * divergence / N);
+	}
+}
 
 // see how many alternating derivatives we have.  Then convert to a user-visible
 // number and issue errors or warnings
@@ -286,9 +302,8 @@ void qGrinder::measureDivergence() {
 			char buf[64];
 			snprintf(buf, 64, "🪓 🪓 wave is DIVERGING, =%4.4g %% 🔥 🧨", divergence);
 			isIntegrating = false;
-			stopAnimation(this);  // sets shouldBeIntegrating and tells UI to stop it
 
-			// js code intercepts this exact spelling
+			// js code intercepts this exact spelling, in sAnimate
 			reportException("Sorry, your wave integration diverged! Try a shorter "
 				"stretch factor for ∆t.  Click Start Over to try again.", "diverged");
 		}
@@ -325,16 +340,16 @@ void qGrinder::oneFrame() {
 	double dtHalf = dt / 2;
 
 	// half step in beginning to move Im forward dt/2
-	// cuz outside of here, re and im are interlaced.
+	// cuz outside of here, re and im are synchronized.
 	qflick->fixThoseBoundaries(wave0);
 	hitReal(wave1, wave0, wave0, 0);
 	hitImaginary(wave1, wave0, wave0, dt/2);
 
+	// do stepsPerFrame steps of  integration.
 	// Note here the latest is in [1]; frame continues this,
 	// and the halfwave at the end moves it back to [0]].
 	// midpoint uses [2] in between.
-	int doubleSteps = stepsPerFrame / 2;
-	for (int step = 0; step < doubleSteps; step++) {
+	for (int step = 0; step < stepsPerFrame; step++) {
 
 		#ifdef MIDPOINT_METHOD
 		stepMidpoint(wave0, wave1, wave2, dt);
@@ -344,7 +359,9 @@ void qGrinder::oneFrame() {
 		hitRealImaginary(wave1, wave0, wave0, dt);
 		#endif
 	}
-	elapsedTime += dt * (doubleSteps * 2 + .5);
+
+	// we
+	elapsedTime += dt * (stepsPerFrame + .5);  // is this right?
 	frameSerial++;
 
 	// half hit at completion to move Re forward dt / 2
@@ -356,22 +373,25 @@ void qGrinder::oneFrame() {
 	// normalize it and return the old inner product, see how close to 1.000 it is
 	double iProd = qflick->normalize();
 	if (dumpFFHiResSpectums) qflick->dumpHiRes("wave END fourierFilter() after normalize");
-	if (traceIProd && ((int) frameSerial & 0x7) == 0)
+	if (traceIProd && ((int) frameSerial & 31) == 0)
 		speedyLog("      🪓 qGrinder frame %d elapsed %4.6lf  iProd= %lf \n",
 			frameSerial, elapsedTime, iProd);
 
 	if (traceJustWave)
 		qflick->dump("     🪓 qGrinder traceJustWave at end of frame", true);
 
-	if (traceIntegration)
+	if (traceIntegration) {
 		speedyLog("🪓 qGrinder::oneFrame() done; shouldBeIntegrating: %hhu   isIntegrating: %hhu \n"
 			"  dt in use=%lf  stretchedDt=%8.6lf stepsPerFrame=%d  wave0[5]=%lf\n",
 			shouldBeIntegrating, isIntegrating, dt, stretchedDt, stepsPerFrame,
 			wave0[5]);
+	}
 
-	frameSerial++;
+	//frameSerial++;
 	qCheckReset();
 }
+
+void grinder_oneFrame(qGrinder *pointer) { pointer->oneFrame(); }
 
 
 /* ********************************************************** threaded integration  */
@@ -388,8 +408,8 @@ void qGrinder::aggregateCalcTime(void) {
 		}
 	}
 
-	// now compare it to the screen and adjust so it's just about the frame  time
-	stepsPerFrame += (stepsPerFrame / maxCalcTime) * (videoFP - maxCalcTime);
+	// now compare it to the screen and adjust so it's just about the frame time.
+	stepsPerFrame += (int) (stepsPerFrame * (videoFP - maxCalcTime)  / maxCalcTime);
 
 	if (traceAggregate) {
 		speedyLog(" qGrinder 🪓 aggregate time summed: %5.6lf ms, maxed: %5.6lf ms\n",
@@ -402,31 +422,19 @@ void qGrinder::aggregateCalcTime(void) {
 
 // runs in the thread loop, only in the last thread to finish integration in an
 // integration frame.  Eventually I'll have a 'tail' thread, that does this so
-// the worker threads can work.
+// the worker threads can quickly get back to work.
 void qGrinder::threadsHaveFinished() {
 	double thfTime;
-	if (traceThreadsHaveFinished) {
+	if (traceThreadsHaveFinished || (traceTHFBenchmarks && 0 == (frameSerial & 63))) {
 		thfTime = getTimeDouble();
 		speedyLog("🪓 qGrinder::threadsHaveFinished() starts\n");
 	}
 	aggregateCalcTime();
 
-	// single step (or a few steps): are we done yet? we shouldn't do
-	// single step this way; should just have shouldBeIntegrating off
-	// while triggering.  TODO
-// 	if (justNFrames) {
-// 		if (traceSingleStep) speedyLog("🪓 ss: justNFrames = %d\n", justNFrames);
-// 		--justNFrames;
-// 		if (0 >= justNFrames) {
-// 			shouldBeIntegrating = false;
-// 			if (traceSingleStep) speedyLog("🪓 ss turned off sbi: justNFrames = %d\n", justNFrames);
-// 		}
-// 	}
-
-	if (traceIntegration)  {
-		speedyLog("🪓                ...in threadsHaveFinished().  "
-			"shouldBeIntegrating=%d   isIntegrating=%d\n",
-			shouldBeIntegrating, isIntegrating);
+	if (traceTHFBenchmarks && 0 == (frameSerial & 63)) {
+		speedyLog("🪓 threadsHaveFinished()— aggregateCalcTime()÷64 at %10.6lf ms - needsRepaint=%hhu"
+			" shouldBeIntegrating=%hhu   isIntegrating=%hhu\n",
+			getTimeDouble() - thfTime, needsRepaint, shouldBeIntegrating, isIntegrating);
 	}
 
 	// isIntegrating is on otherwise we wouldn't be here.
@@ -436,11 +444,10 @@ void qGrinder::threadsHaveFinished() {
 		isIntegrating = false;
 
 	if (traceIntegration)  {
-		speedyLog("🪓 finished threadsHaveFinished() sortof. "
-				"shouldBeIntegrating=%d   isIntegrating=%d\n",
+		speedyLog("🪓 synch up isIntegrating with shouldBeIntegrating sortof. "
+				"shouldBeIntegrating=%hhu   isIntegrating=%hhu\n",
 				shouldBeIntegrating, isIntegrating);
 	}
-	speedyFlush();
 
 	// now, copy it to the Avatar's wave buffer, so it can copy it to
 	// its ViewBuffer, so webgl can pick it up.  quick!  No mutexes or anything;
@@ -452,9 +459,9 @@ void qGrinder::threadsHaveFinished() {
 	copyToAvatar(avatar);
 	needsRepaint = true;
 
-	if (traceThreadsHaveFinished) {
-		speedyLog("🪓 threadsHaveFinished()— copyToAvatar() in %10.6lf ms - needsRepaint=%d"
-			" shouldBeIntegrating=%d   isIntegrating=%d\n",
+	if (traceTHFBenchmarks && 0 == (frameSerial & 63)) {
+		speedyLog("🪓 threadsHaveFinished()— copyToAvatar()÷64 at %10.6lf ms - needsRepaint=%hhu"
+			" shouldBeIntegrating=%hhu   isIntegrating=%hhu\n",
 			getTimeDouble() - thfTime, needsRepaint, shouldBeIntegrating, isIntegrating);
 	}
 
@@ -475,23 +482,26 @@ void qGrinder::threadsHaveFinished() {
 	// now in grWorker emscripten_atomic_store_u32(&startAtomic, -1);
 	emscripten_atomic_store_u32(&finishAtomic, 0);
 
-	if (traceThreadsHaveFinished) {
-		speedyLog("🪓  threads have finished in %10.6lf ms; startAtomic=%d finishAtomic=%d\n",
+	if (traceTHFBenchmarks && 0 == (frameSerial & 63)) {
+		speedyLog("🪓  threadsHaveFinished() finished÷64 at %10.6lf ms; startAtomic=%d finishAtomic=%d "
+			"needsRepaint=%hhu  shouldBeIntegrating=%hhu   isIntegrating=%hhu frSerial=%d\n",
 			getTimeDouble() - thfTime,
-			emscripten_atomic_load_u32(&startAtomic), emscripten_atomic_load_u32(&finishAtomic));
+			emscripten_atomic_load_u32(&startAtomic), emscripten_atomic_load_u32(&finishAtomic),
+			needsRepaint, shouldBeIntegrating, isIntegrating, frameSerial);
 	}
 
+	// only print now after benchmarks have been measured
+	speedyFlush();
 }
 
 
 // start a new frame calculating by starting each/all gThread threads.
 // This can be called from JS, therefore the UI thread.
 // Each frame will trigger the next to continue integration
-// Now we do this from JS with Atomic.store and .notify instead
-// (but I want to be able to fall back on this if needed so don't remove it.)
+// We can do this also from JS with Atomic.store and .notify instead
 void qGrinder::triggerIteration() {
-	if (traceIntegration)  {
-		speedyLog("🪓 qGrinder::triggerIteration(): shouldBeIntegrating=%d   isIntegrating=%d\n",
+	if (traceTrigger)  {
+		speedyLog("🪓 qGrinder::triggerIteration(): shouldBeIntegrating=%hhu   isIntegrating=%hhu\n",
 				shouldBeIntegrating, isIntegrating);
 	}
 
@@ -506,8 +516,8 @@ void qGrinder::triggerIteration() {
 
 // start iterating, starting each/all gThread threads. Iteration will
 // trigger the next frame, and so on.  This starts it, and
-// shouldBeIntegrating should also be true.  Unless you want it to stop
-// after one frame. This is called from JS, therefore the UI thread.  (or alternate: via js atomics)
+// shouldBeIntegrating should also be true.
+// This is called from JS, therefore the UI thread.  (or alternate: via js atomics)
 void grinder_triggerIteration(qGrinder *grinder) {
 	grinder->triggerIteration();
 }
@@ -549,13 +559,4 @@ void qGrinder::askForFFT(void) {
 // if integrating, FFT as the current frame finishes, before and after fourierFilter().
 // If stopped, fft current wave. now.
 void grinder_askForFFT(qGrinder *pointer) { pointer->askForFFT(); }
-
-void grinder_oneFrame(qGrinder *pointer) { pointer->oneFrame(); }
-
-void grinder_copyFromAvatar(qGrinder *qgrinder, qAvatar *avatar) {qgrinder->copyFromAvatar(avatar);}
-
-void grinder_copyToAvatar(qGrinder *qgrinder, qAvatar *avatar) {qgrinder->copyToAvatar(avatar);}
-
-
-
 

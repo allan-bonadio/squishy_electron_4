@@ -9,7 +9,7 @@ import PropTypes from 'prop-types';
 import SquishContext from './SquishContext.js';
 
 import startIcon from './waveViewIcons/start2.png';
-import stopIcon from './waveViewIcons/stop2.png';
+import stopIcon from './waveViewIcons/stop3.png';
 import singleStepIcon from './waveViewIcons/singleStep2.png';
 
 
@@ -26,30 +26,32 @@ function StartStopOverlay(props) {
 				context.waveView);
 	}
 	const cp = context.controlPanel;
+	if (!cp)
+		return null;
+
 	function startStopHandler(ev) {
-		cp.startStop?.();
+		cp.startStop?.(ev);
 	}
-	function singleStepHandler(ev) {
-		cp.singleFrame?.();
+	function singleFrameHandler(ev) {
+		cp.singleFrame?.(ev);
 	}
 
-	let label = 'start integrating';
-	let icon = startIcon;
-	if (context.shouldBeIntegrating) {
-		label = 'stop integrating';
-		icon = stopIcon
-	}
+	const helpSS = context.shouldBeIntegrating ? 'stop integrating' : 'start integrating'
+	const helpSF = 'only do 1 frame.  Use opt or ctrl=10, shift=100) ';
 
 	// the start/stop icon toggles depending on state
 	return <section className='StartStopOverlay waveButtonPanel' >
-		<img className='startStopWidget'
-			alt={label} title={label}
-			src={icon}
-			onClick={startStopHandler} />
+		<button className='startStopWidget' onClick={startStopHandler}
+				alt={helpSS} title={helpSS}>
+			<img src={context.shouldBeIntegrating ? stopIcon : startIcon} />
+		</button>
 
-		<img className='singleStepWidget' alt='singleStep button'
-			src={singleStepIcon}
-			onClick={singleStepHandler} />
+		<span style={{width: '2em', display: 'inline-block'}} />
+
+		<button className='singleFrameWidget' onClick={singleFrameHandler}
+				alt={helpSF} title={helpSF}>
+			<img src={singleStepIcon} />
+		</button>
 
 	</section>;
 

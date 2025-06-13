@@ -6,29 +6,38 @@
 #include <pthread.h>
 #include <emscripten/threading.h>
 
-/* Some Calculation/Grinder terms:
+/*
+Some Calculation/Grinder terms:
+
+note: ∆t is the user-visible time per frame period, larger.
+dt is actually the individual time increment each time through Schrodinger
+FP means frame period.
 
 a Frame: is an amount of calculation correspoinding to one refresh of
-the video display. Doesn't have to be synchronized with the screen
-refreshes; just the amount of calculation done for it.  Typically
-hundreds of steps.
+the video display (or analogous). Doesn't have to be synchronized with the screen
+refreshes, although it often is.  Just the amount of calculation done for it.  Typically
+hundreds of steps, grinder.stepsPerFrame * 4?  Dynamically adjusted.
 
-a Step: is a calculation to advance the model ∆t or dt time.
+a Step: is a calculation to advance the model dt time.  Like, running
+Schrodinger's eq once (although it's more complicated).
 
-a Hit: advancement by dt of one of many parts of the calculation.  As of
-this writing, there are four hits to a step: two Vischer real+imag, and
-two Midpoint first+last.  (May be for whole buffer, or for just one pt)
+a Hit: advancement by dt of one of many parts of the calculation.  As of this
+writing, there are four hits to a step: two Vischer real+imag, times two
+Midpoint first+last.  All together, they advance one dt.  (May be for whole
+buffer, or for just one segment)
 
 a Point is one number in a buffer, one state of the qm system, and/or any
 associated numbers in parallel buffers like voltage.
 
+A step on a point is a step on a point.  A hit on a point is a hit on a point.
+
 Some sortof overlapping terms on timing:
 
 videoFP: video frame period is the period it takes the screen to do one
-scan.  rAF calls you that many times.  Often 16⅔ or 20 ms.
+scan.  rAF calls you that often.  Often 16⅔ or 20 ms.  Determined by the screen hardware and maybe some user settings.
 
 chosenFP: period chosen from the 'frame rate' menu, which shows rates
-not periods.  So user chooses 20 fps and the chosenFP would be 50ms.
+as FP periods.  So user chooses 20 fps and the chosenFP would be 50ms.
 chosenFP should be an even multiple of videoFP but isn't always.
 
 */
@@ -102,6 +111,8 @@ struct qGrinder {
 	// please keep alignment stable and correct!  See also eGrinder.js Keep
 	// arranged from larger to smaller - often doubles (or pairs of ints), then
 	// ints, then bools.  Give or take.
+
+	// should say 'Grin' in ascii
 	int magic;
 
 	/* ************************* pointers  for large blocks */
@@ -120,6 +131,9 @@ struct qGrinder {
 	struct qSpectrum *qspect;
 
 	/* ************************* timing */
+
+	// total number of times (frames) thru the number cruncher.
+	int frameSerial;
 
 	// number of integration steps executed for each frame
 	// dynamically adjusted so integration calculation of a frame takes
@@ -158,18 +172,13 @@ struct qGrinder {
 	// time.  Resets to zero every so often.
 	double elapsedTime;
 
-	// total number of times (frames) thru the number cruncher.  Somehow it's
-	// always even cuz two halves are done to get all the variables to the
-	// beginning again.
-	int frameSerial;
-
 	// when trace msgs display just one point (to avoid overwhelming output),
 	// this is the one.  (last i checked, 1/3 of the way)
 	int samplePoint;
 
 	// for the abacus or multithreaded integration which isn't even designed yet.
-//	struct qStage *stages;
-//	struct qThread *threads;
+	//	struct qStage *stages;
+	//	struct qThread *threads;
 
 	static grWorker **grWorkers;
 
@@ -208,7 +217,8 @@ struct qGrinder {
 	// for alignment: put the rest of these last
 
 	// true if thread(s) should start a new integration upon next event cycle, false if not
-	// Synchronized with the interactive simulation switch, visible and changeable in JS.
+	// Synchronized with context.shouldBeIntegrating in JS.
+	// Please only set it through startAnimation and stopAnimation in ControlPanel.
 	bool shouldBeIntegrating;
 
 	// same as shouldBeIntegrating, except this is synchronized with the

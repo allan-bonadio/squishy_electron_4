@@ -57,7 +57,7 @@ let exportsSrc  = [
 	// maybe done with js Atomics? but alternative for debugging
 	{name: 'grinder_triggerIteration', args: ['number'], retType: null},
 
-	// only needed if UI thread does a frame's worth of integration
+	// only needed if UI thread does a frame's worth of integration (siingle thread)
 	{name: 'grinder_oneFrame', args: ['number'], retType: null},
 
 	{name: 'grinder_askForFFT', args: ['number'], retType: null},

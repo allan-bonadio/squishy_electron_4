@@ -9,6 +9,7 @@ import {prepForDirectAccessors} from '../utils/directAccessors.js';
 import qeFuncs from './qeFuncs.js';
 import qeConsts from './qeConsts.js';
 import {getASetting} from '../utils/storeSettings.js';
+import {thousandsSpaces} from '../utils/formatNumber.js';
 
 let traceCreation = false;
 let traceIntegration = false;
@@ -52,47 +53,49 @@ class eGrinder {
 	// are passed by pointer and you need to allocate them in JS (eg see
 	// eGrinder.constructor)
 
+	get _space() { return this.ints[1]; }
+	get _qflick() { return this.ints[3]; }
+	get _voltage() { return this.ints[4]; }
+	get _qspect() { return this.ints[5]; }
 
- 	get _space() { return this.ints[1]; }
- 	get _qflick() { return this.ints[3]; }
- 	get _voltage() { return this.ints[4]; }
- 	get _qspect() { return this.ints[5]; }
+	get stepsPerFrame() { return this.ints[7]; }
+	set stepsPerFrame(a) { this.ints[7] = a; }
+	get videoFP() { return this.doubles[4]; }
+	set videoFP(a) { this.doubles[4] = a; }
+	get chosenFP() { return this.doubles[5]; }
+	set chosenFP(a) { this.doubles[5] = a; }
+	get totalCalcTime() { return this.doubles[6]; }
+	get maxCalcTime() { return this.doubles[7]; }
 
- 	get videoFP() { return this.doubles[4]; }
- 	set videoFP(a) { this.doubles[4] = a; }
- 	get chosenFP() { return this.doubles[5]; }
- 	set chosenFP(a) { this.doubles[5] = a; }
- 	get totalCalcTime() { return this.doubles[6]; }
- 	get maxCalcTime() { return this.doubles[7]; }
+	get stretchedDt() { return this.doubles[8]; }
+	set stretchedDt(a) { this.doubles[8] = a; }
+	get divergence() { return this.doubles[10]; }
+	get elapsedTime() { return this.doubles[11]; }
+	set elapsedTime(a) { this.doubles[11] = a; }
+	get frameSerial() { return this.ints[6]; }
+	set frameSerial(a) { this.ints[6] = a; }
+	get nGrWorkers() { return this.ints[25]; }
+	startAtomicOffset = 26;
+	get startAtomic() { return this.ints[26]; }
 
- 	get stretchedDt() { return this.doubles[8]; }
- 	set stretchedDt(a) { this.doubles[8] = a; }
- 	get divergence() { return this.doubles[10]; }
- 	get elapsedTime() { return this.doubles[11]; }
- 	set elapsedTime(a) { this.doubles[11] = a; }
- 	get frameSerial() { return this.ints[24]; }
- 	set frameSerial(a) { this.ints[24] = a; }
- 	get nGrWorkers() { return this.ints[26]; }
- 	startAtomicOffset = 27;
- 	get startAtomic() { return this.ints[27]; }
+	get _exceptionCode() { return this.pointer + 120; }
+	get hadException() { return Boolean(this.bytes[135]); }
+	set hadException(a) { this.bytes[135] = Boolean(a); }
+	get _label() { return this.pointer + 136; }
 
- 	get _exceptionCode() { return this.pointer + 124; }
- 	get hadException() { return Boolean(this.bytes[139]); }
- 	set hadException(a) { this.bytes[139] = Boolean(a); }
- 	get _label() { return this.pointer + 140; }
+	get shouldBeIntegrating() { return Boolean(this.bytes[152]); }
+	set shouldBeIntegrating(a) { this.bytes[152] = Boolean(a); }
+	get isIntegrating() { return Boolean(this.bytes[153]); }
+	set isIntegrating(a) { this.bytes[153] = Boolean(a); }
+	get pleaseFFT() { return Boolean(this.bytes[154]); }
+	set pleaseFFT(a) { this.bytes[154] = Boolean(a); }
+	get needsRepaint() { return Boolean(this.bytes[155]); }
+	set needsRepaint(a) { this.bytes[155] = Boolean(a); }
+	get sentinel() { return this.bytes[156]; }
 
- 	get shouldBeIntegrating() { return Boolean(this.bytes[156]); }
- 	set shouldBeIntegrating(a) { this.bytes[156] = Boolean(a); }
- 	get isIntegrating() { return Boolean(this.bytes[157]); }
- 	set isIntegrating(a) { this.bytes[157] = Boolean(a); }
- 	get pleaseFFT() { return Boolean(this.bytes[158]); }
- 	set pleaseFFT(a) { this.bytes[158] = Boolean(a); }
- 	get needsRepaint() { return Boolean(this.bytes[159]); }
- 	set needsRepaint(a) { this.bytes[159] = Boolean(a); }
- 	get sentinel() { return this.bytes[160]; }
- 	set sentinel(a) { this.bytes[160] = a; }
 
- 	/* ******************* end of direct accessors */
+
+	/* ******************* end of direct accessors */
 
 	/* ************************************************  */
 //	static divergedBlurb = `Sorry, but your quantum wave diverged!  This isn't your fault; `
@@ -104,7 +107,7 @@ class eGrinder {
 	// but the Atomics api can do it, too.
 	triggerIteration() {
 
-		if (false) {
+		if (true) {
 			if (traceTriggerIteration) {
 				console.log(`🪚 eGrinder.triggerIteration, Atomics.notify() starting  `
 					+`shouldBeIntegrating=${this.shouldBeIntegrating}  isIntegrating=${this.isIntegrating} `
@@ -130,6 +133,14 @@ class eGrinder {
 
 		if (qeConsts.grSENTINEL_VALUE !== this.sentinel)
 			throw "🔥 🔥 Grinder offsets aren't correct (119) 🔥 🔥";
+	}
+
+	// a consistent way to format these numbers, used in two places
+	formatTimeNFrame() {
+		return {
+			elapsedTimeText: this.elapsedTime.toFixed(3),
+			frameSerialText: thousandsSpaces(this.frameSerial),
+		}
 	}
 
 	// Grind one frame - Single Threaded - deprecated sortof
