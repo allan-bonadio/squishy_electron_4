@@ -20,7 +20,7 @@ import {interpretCppException, wrapForExc} from '../utils/errors.js';
 import SquishContext from '../sPanel/SquishContext.js';
 
 let traceSetPanels = false;
-let traceStartStop = false;
+let traceStartStop = true;
 let traceContext = false;
 
 // integrations always need specific numbers of steps.  But there's always one
@@ -177,11 +177,12 @@ export class ControlPanel extends React.Component {
 	// or not is SquishPanel.state.shouldBeIntegrating Change the status by
 	// calling start/stop animating functions here. the C++ will copy it
 	// to isIntegrating at the right  time
+	// ev is optional and only for the trace msg
 	startAnimating =
-	() => {
+	(ev) => {
 		if (!this.space) return;  // too early.  mbbe should gray out the button?
 
-		if (traceStartStop) console.info(`🎛️ startAnimating starts, triggering iteration`);
+		if (traceStartStop) console.info(`🎛️ startAnimating starts, triggering iteration, `, ev);
 		this.props.setShouldBeIntegrating(true);
 
 		// must do this to start each iteration going in the thread(s)
@@ -198,15 +199,16 @@ export class ControlPanel extends React.Component {
 
 	}
 
+	// ev is optional and only for the trace msg
 	stopAnimating =
-	() => {
+	(ev) => {
 		if (!this.space) return;  // too early.  mbbe should gray out the button?
 
 		// set it false as you store it in store; then set state.  The threads will figure it out next iteration
 		this.props.setShouldBeIntegrating(false);
 		if (traceStartStop) console.log(`🎛️ ControlPanel STOP Animating, `
 			+`shouldBeIntegrating=${this.context.shouldBeIntegrating}, `
-			+`grinder.isIntegrating=${this.grinder.isIntegrating}   `);
+			+`grinder.isIntegrating=${this.grinder.isIntegrating}   , `, ev);
 	}
 
 	startStop =
@@ -217,10 +219,10 @@ export class ControlPanel extends React.Component {
 			this.startAnimating();
 	}
 
-	// the |> button
+	// the |> button. ev is optional and only for the trace msg
 	singleFrame =
 	(ev) => {
-		console.log(`🎛️ singleFrame starts`);
+		console.log(`🎛️ singleFrame starts, `, ev);
 
 		let nFrames = 1;
 		// multipleby holding down modifiers.  Alt=bad on Windows, ctrl=bad on Mac
