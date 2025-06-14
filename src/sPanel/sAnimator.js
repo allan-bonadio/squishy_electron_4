@@ -243,7 +243,7 @@ class sAnimator {
 		// an error (eg divergence) will halt integration.  Start Over will put it back.
 		if (grinder.hadException) {
 			console.log(`🎥 sAnimator: hadException   will dialog`);
-			this.context?.controlPanel?.stopAnimation();
+			this.context.controlPanel.stopAnimating();
 			this.errorMessage = qeFuncs.grinder_getExceptionMessage(grinder.pointer);
 			if (!this.errorMessage) this.errorMessage = 'sorry, no message.  🫦 🥺';
 			console.error(`had Exception!  '${this.errorMessage}'  ex=${this.grinder.hadException} `);
