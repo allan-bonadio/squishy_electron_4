@@ -1,9 +1,10 @@
 /*
-** Integration Statistics -- nodes for display of integration stats
+** Integration Statistics -- component for display of integration stats
 ** Copyright (C) 2024-2025 Tactile Interactive, all rights reserved
 */
 
 import SquishContext from '../sPanel/SquishContext.js';
+import {useContext, useRef} from 'react';
 
 // holds all statistics shown on the Integration tab
 // One per space and SquishPanel.  No props but uses context.
@@ -12,9 +13,9 @@ function InteStats(props) {
 	const statsInfoRef = useRef();
 	let info = statsInfoRef.current;
 
-	// creates a stat object for one statistic.
-	function addStat(label, name, unit) {
-		let stat = {label, name, unit};
+	// creates a stat object for one statistic.  everything but the actual number
+	function addStat(label, name, unit, getterFunc, help) {
+		let stat = {label, name, unit, help};
 		info.statsMap[name] = stat;
 		info.statsList.push(stat);
 	}
@@ -22,18 +23,23 @@ function InteStats(props) {
 	// create the info object once
 	if (!statsInfoRef.current) {
 		 info = statsInfoRef.current = {
-			space: context.waveView.space,
-			statsMap: {},  // by name
-			statsList: [],  // by serial
+			statsMap: {},  // each, by name
+			statsList: [],  // each, by serial
 		}
 
-		addStat('Divergence'         , 'divergence', '%');
-		addStat('Frame Calc Time'    , 'frameCalcTime', 'ms');
-		addStat('Draw Time'                  , 'totalDrawTime', 'ms');
+
+		// the stats.  This is also the order they're displayed in.
+		addStat('Divergence'         , 'divergence', '%',
+				"How close the integration is to exploding");
+		addStat('Frame Calc Time'    , 'frameCalcTime', 'ms',
+				"How much CPU time it took to calculate a frame");
+		addStat('Draw Time'                  , 'totalDrawTime', 'ms',
+				"How much time it took to draw wave on screen");
 		//addStat('Total For Frame'   , 'totalForFrame', 'ms');
 //		addStat('Frame Period'      , 'chosenFP', 'ms');
 //		addStat('Frames Per Sec'   , 'framesPerSec', '/sec');
-		addStat('rAF Period'   , 'rAFPeriod', 'ms');
+		addStat('rAF Period'   , 'rAFPeriod', 'ms',
+				"How long a frame takes on your screen");
 	}
 
 	/* ********************************************************* display numbers */
@@ -45,7 +51,7 @@ function InteStats(props) {
 	running average.
 
 	After many cycles, the latest number will be: ¼
-	the new number + ³⁄₁₆=19% the previous number + ⁹⁄₆₄=14% of the
+	the new number + ³⁄₁₆ ≅ 19% the previous number + ⁹⁄₆₄ ≅ 14% of the
 	penultimate number, and so on, fading as you go backwards.  sortof
 	to infinity, but practically, a nice average of recent
 	history.
@@ -93,12 +99,12 @@ function InteStats(props) {
 		stat.statAvg = smooth;
 	}
 
-	// stick text into <span to display number, smoothed
-	// value is raw latest calculated value.  mangleFunction() cuz divergence is special
+	// stick text into existing <span to display number, smoothed.
+	// value is raw latest measured value.  mangleFunction() cuz divergence is special
 	function display(stat, value, nDigits = 1, mangleFunction) {
 		if (stat.el) {
 			smoothNumber(stat, value);
-			if (stat.statAvg != undefined) {
+			if (stat.statAvg != undefined && !isNaN(stat.statAvg)) {
 				stat.el.innerHTML = stat.statAvg.toFixed(nDigits);
 				if (mangleFunction)
 					mangleFunction(value, stat.el);
@@ -106,10 +112,10 @@ function InteStats(props) {
 		}
 	}
 
-	// hand in inteTimes, where the actual numbers are, we'll them on the int tab
-	// inteTimes is raw numbers collected by sAnimator
+	// stick correct values into the html for the InteStats
+	// inteTimes is key-value obj of raw numbers collected by sAnimator
 	// grinder is eGrinder instance doing integration and its numbers
-	function displayAllStats(inteTimes, grinder) {
+	const displayAllStats = (inteTimes, grinder) => {
 		// the map of stat management objects, by name
 		const sm = info.statsMap;
 
@@ -130,7 +136,6 @@ function InteStats(props) {
 					element.style.color = `rgb(255, ${green}, 0)`;
 					element.style.fontSize = (dv / 50) + 'em';
 					element.style.textShadow = '0 0 3px #0008';
-
 				}
 			});
 
@@ -144,6 +149,10 @@ function InteStats(props) {
 			display(sm.rAFPeriod, inteTimes.rAFPeriod);
 		}
 	}
+
+	// it will be called once an anaimation frame to update stats
+	const grinder = context.waveView.space.grinder;
+	grinder.displayAllStats = displayAllStats;
 
 	/* ********************************************************* render table */
 
@@ -159,7 +168,7 @@ function InteStats(props) {
 		}
 
 		// value - will be filled in by raw DOM setting each frame
-		return <tr key={stat.name + '-row'}>
+		return <tr key={stat.name + '-row'} title={stat.help} >
 			<td>{stat.label}:</td>
 			<td>
 				<span  className={stat.name}  ref={init}>-</span> {stat.units}

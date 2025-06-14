@@ -16,9 +16,9 @@ let traceTheViewBuffer = false;
 let traceHeartbeats = false;
 let traceFrameProgress = false;
 let traceFrameMenuRates = false;
+let traceSingleFrame = true;
 
 let tracerAFPeriod = false;
-let traceSingleFrame = false;
 let traceTypicalVideoPeriod = false;
 let typical = 100;
 
@@ -41,13 +41,14 @@ class sAnimator {
 
 		this.frameProgress = 0;  // part of the FP stabilization
 		this.chosenFP = getASetting('frameSettings', 'chosenFP')
+		this.nFramesToGo = -1;
 
 		// defaults - will work until set by real life
 		this.avgVideoFP = 1000 / 60;
 		this.unstableFP = true;
 		this.prevFrame = performance.now();
 
-		this.nFramesToGo = -1;
+		// inteTimes holds the stats calculated in sAnimator
 		this.inteTimes = {totalDrawTime: 0};
 
 		// Start the heartbeat.  on next tic
@@ -56,7 +57,7 @@ class sAnimator {
 		requestAnimationFrame(this.rAFHandler);
 
 		/* ***************************** runningCycle tests */
-		// stick ?allowRunningDiagnosticCycle at the end of URL to show runningDiagnosticCycle panel
+		// stick '?allowRunningDiagnosticCycle' at the end of URL to show runningDiagnosticCycle panel
 		// advance forward with each iter.  NOT SAME as shown on WaveView!
 		this.runningCycleElapsedTime = 0;
 		this.runningCycleIntegrateSerial = 0;
@@ -79,7 +80,7 @@ class sAnimator {
 			ne.innerHTML =  tnf.frameSerialText;
 	}
 
-	// Repaint, with webgl, the waveview.  (not render!)
+	// Repaint, with webgl, the waveview.  (not render!)  Also,, update integration statistics.
 	drawLatestFrame() {
 		//if (traceStats) console.log(`🎥 time since last tic: ${performance.now()
 		//		- this.inteTimes.startIntegrationTime}ms`);
@@ -87,12 +88,12 @@ class sAnimator {
 		this.inteTimes.frameDrawPeriod = startDrawTime - this.inteTimes.prevDrawTime;
 		this.inteTimes.prevDrawTime = startDrawTime;
 
-		this.space.mainEAvatar.doRepaint?.();
-		this.showTimeNFrame();  // part of the draw time
+		this.space.mainEAvatar.doRepaint?.();  // actual webgl drawing
 
+		this.showTimeNFrame();  // part of the draw time - the picoseconds and frame serial
 
-		// update dom elements in integration tab to latest stats
-		this.space.sInteStats.displayAllStats(this.inteTimes, this.grinder);
+		// update dom elements in integration tab to latest stats (if it's been shown at least once)
+		this.grinder.displayAllStats?.(this.inteTimes, this.grinder);
 
 		//this.inteTimes.endReloadVarsNBuffer =
 		let endDrawTime = performance.now();
@@ -277,10 +278,12 @@ class sAnimator {
 				if (0 == this.nFramesToGo--) {
 					// nFramesToGo next time will become -1 and then more negative
 					this.context.controlPanel?.stopAnimating?.();
+					if (traceSingleFrame) console.log(`🎥 stop single frame 🟥`);
 				}
 				else {
 					// time for another grind.  Trigger the threads.
 					this.grinder.triggerIteration();
+					if (traceSingleFrame) console.log(`🎥 another frame ${this.nFramesToGo >= 0 ? this.nFramesToGo : ''}`);
 				}
 
 				// even if the chosenFP doesn't evenly divide by videoFP,
@@ -310,6 +313,7 @@ class sAnimator {
 	/* *************************************  runningDiagnosticCycle of circular wave*/
 
 	// special test code.  probably broken
+
 	// use for benchmarking with a circular wave.  Will start frame, and stop after
 	// the leftmost state is at its peak.  Then display stats.
 	// not used for a year or more, so probably broken.
