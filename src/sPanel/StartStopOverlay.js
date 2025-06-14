@@ -35,6 +35,9 @@ function StartStopOverlay(props) {
 	function singleFrameHandler(ev) {
 		cp.singleFrame?.(ev);
 	}
+	function preventDragAway(ev) {
+		ev.preventDefault();
+	}
 
 	const helpSS = context.shouldBeIntegrating ? 'stop integrating' : 'start integrating'
 	const helpSF = 'only do 1 frame.  Use opt or ctrl=10, shift=100) ';
@@ -42,15 +45,17 @@ function StartStopOverlay(props) {
 	// the start/stop icon toggles depending on state
 	return <section className='StartStopOverlay waveButtonPanel' >
 		<button className='startStopWidget' onClick={startStopHandler}
-				alt={helpSS} title={helpSS}>
-			<img src={context.shouldBeIntegrating ? stopIcon : startIcon} />
+				alt={helpSS} title={helpSS} >
+			<img onMouseDown={preventDragAway}
+					src={context.shouldBeIntegrating ? stopIcon : startIcon} />
 		</button>
 
 		<span style={{width: '2em', display: 'inline-block'}} />
 
 		<button className='singleFrameWidget' onClick={singleFrameHandler}
-				alt={helpSF} title={helpSF}>
-			<img src={singleStepIcon} />
+				alt={helpSF} title={helpSF} onMouseMove={preventDragAway} >
+			<img onMouseDown={preventDragAway}
+					src={singleStepIcon} />
 		</button>
 
 	</section>;
