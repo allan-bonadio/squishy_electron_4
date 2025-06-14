@@ -125,7 +125,7 @@ export class SquishPanel extends React.Component {
 			// but wait till everything is ready.  TODO: should do this in a sync
 			// way; time is hokey
 			if (getASetting('frameSettings', 'shouldBeIntegrating')) {
-				setTimeout(() => props.setShouldBeIntegrating(true), 500)	;
+				setTimeout(() => this.setShouldBeIntegrating(true), 500)	;
 			}
 
 			if (tracePromises) console.log(`👑 SquishPanel.compDidMount done`);
@@ -160,7 +160,7 @@ export class SquishPanel extends React.Component {
 	// and elapsed time. We need it here in SquishPanel cuz it's often called in
 	// ControlPanel but affects WaveView.  Should be implemented thru context TODO
 	repaintWholeMainWave = () => {
-		debugger;
+		//debugger;
 		let avatar = this.mainEAvatar;
 		let grinder = this.grinder;
 
