@@ -3,10 +3,13 @@
 ** Copyright (C) 2021-2025 Tactile Interactive, all rights reserved
 */
 
+import React, {useContext} from 'react';
 import PropTypes from 'prop-types';
 
 import ResolutionDialog from './ResolutionDialog.js';
 import qeConsts from '../engine/qeConsts.js';
+import SquishContext from '../sPanel/SquishContext.js';
+
 
 function setPT() {
 	SetResolutionTab.propTypes = {
@@ -17,6 +20,23 @@ function setPT() {
 
 function SetResolutionTab(props) {
 	const spa = props.space;
+	const context = useContext(SquishContext);
+
+	// the resolution dialog is OUTSIDE of the SquishPanel so can't access the context
+	function runResolutionDialog() {
+
+		if (context) {
+			// freeze the frame while this is going on ... without disturbing the
+			// context or SP state, we'll probably reload the page soon anyway
+			const timeWasAdvancing = context.shouldBeIntegrating;
+			context.controlPanel.stopAnimating();
+
+			ResolutionDialog.openResolutionDialog(props.grinder);  // reloads the page on OK!
+
+			if (timeWasAdvancing)
+				context.controlPanel.startAnimating();
+		}
+	}
 
 	let continuumBlurb, segmentsBetweenEnds;
 	if (qeConsts.contWELL == spa.continuum) {
@@ -48,8 +68,7 @@ function SetResolutionTab(props) {
 			</span>
 		</h3>
 		<button className='setResolutionButton'
-			onClick={ev => (props.grinder)
-					&& ResolutionDialog.openResolutionDialog(props.grinder)}>
+					onClick={runResolutionDialog}>
 				Change Space
 			<div style={{fontSize: '.8em'}}>
 			(will reset current wave)</div>

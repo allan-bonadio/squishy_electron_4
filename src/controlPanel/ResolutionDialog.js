@@ -69,11 +69,6 @@ export default class ResolutionDialog extends React.Component {
 
 	// puts up the resolution dialog, starting with the values from the state
 	static openResolutionDialog(grinder) {
-		// freeze the frame while this is going on ... without disturbing the
-		// context or SP state, we'll probably reload the page soon anyway
-		const timeWasAdvancing = this.context.shouldBeIntegrating;
-		grinder.shouldBeIntegrating = false;
-
 		// pass our state upward to load into the dialog
 		ResolutionDialog.openResDialog(
 			// OK callback
@@ -89,7 +84,7 @@ export default class ResolutionDialog extends React.Component {
 
 			// cancel callback
 			() => {
-				grinder.shouldBeIntegrating = timeWasAdvancing;
+				//grinder.shouldBeIntegrating = timeWasAdvancing;
 			}
 		);
 	}
