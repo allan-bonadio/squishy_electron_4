@@ -209,6 +209,8 @@ export class ControlPanel extends React.Component {
 			+`grinder.isIntegrating=${this.grinder.isIntegrating}   `);
 	}
 
+	// if shouldBeIntegrating is true (is integrating), turn it off
+	// if false, turn it on.  Therefore, toggle it.  Note no argument.
 	startStop =
 	ev => {
 		if (this.context.shouldBeIntegrating)
