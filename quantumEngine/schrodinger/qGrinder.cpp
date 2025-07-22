@@ -47,10 +47,6 @@ static bool traceTHFBenchmarks = false;
 
 static std::runtime_error nullException("");
 
-//EM_JS(int, stopAnimation, (qGrinder *pointer), {
-//	globalThis.pointerContextMap[pointer].controlPanel.stopAnimation();
-//});
-
 
 // create new grinder, complete with its own stage buffers. make sure
 // these values are doable by the sliders' steps. Space is definitely

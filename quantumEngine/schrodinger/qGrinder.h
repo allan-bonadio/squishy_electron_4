@@ -216,9 +216,10 @@ struct qGrinder {
 	/* ************************* booleans & bytes at end */
 	// for alignment: put the rest of these last
 
-	// true if thread(s) should start a new integration upon next event cycle, false if not
-	// Synchronized with context.shouldBeIntegrating in JS.
-	// Please only set it through startAnimation and stopAnimation in ControlPanel.
+	// true if thread(s) should start a new integration upon next event cycle,
+	// false if not Synchronized with context.shouldBeIntegrating in JS. Please
+	// only set it through setShouldBeIntegrating() in SquishPanel or sub
+	// components.
 	bool shouldBeIntegrating;
 
 	// same as shouldBeIntegrating, except this is synchronized with the

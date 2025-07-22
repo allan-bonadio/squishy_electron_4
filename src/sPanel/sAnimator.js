@@ -16,7 +16,7 @@ let traceTheViewBuffer = false;
 let traceHeartbeats = false;
 let traceFrameProgress = false;
 let traceFrameMenuRates = false;
-let traceSingleFrame = true;
+let traceSingleFrame = false;
 
 let tracerAFPeriod = false;
 let traceTypicalVideoPeriod = false;
@@ -179,52 +179,23 @@ class sAnimator {
 			+`isIntegrating=${this.grinder.isIntegrating}   `);
 	}
 
-	/* *************************************  retrieving chosen frequency setting */
-
-	// given an FP that may be from a different set of frameRateMenuFreqs, find
-	// the closest frequency that's listed in the menus.  Note this takes in a
-	// PERIOD but returns a FREQUENCY (rate)
-//	findNearestMenuFreq(anFP) {
-//		const frmf = this.frameRateMenuFreqs;
-//		const aRate = 1000 / anFP;
-//
-//		// first some special values that won't work with the loop
-//		if (qeConsts.FASTEST == anFP)
-//			return qeConsts.FASTEST;
-//
-//		//console.log(`here it iz: aRate=${aRate}, frmf.length=${frmf.length}   frmf=`, frmf);
-//		if (aRate < frmf[frmf.length - 1])
-//			return frmf[frmf.length - 1];
-//
-//		if (aRate > frmf[1])
-//			return frmf[1];
-//
-//		// now find space between two rates
-//		debugger;
-//		let f;
-//		for (f = 1; aRate <= frmf[f]; f++) {
-//			if (aRate == frmf[f])
-//				return aRate;  // most typical
-//		}
-//
-//		// ok now we're between; which is closer?
-//		if (abs(aRate - frmf[f]) > abs(aRate - frmf[f - 1]))
-//			return frmf[f - 1];
-//		else
-//			return frmf[f];
-//	}
-
-	// nobody uses this
-	// Get chosen frame rate from storage, but make sure it's listed in the menu.
-	// Rounding to a menu freq usually not needed, but from the store, it may have been
-	// a different videoFP, different set of freqs.  Need this to clear up ambiguities.
-	// Then you can set the <select to the returned value and it'll set to one of the given items.
-	//getChosenRateFromStorage() {
-	//	return getASetting('frameSettings', 'chosenFP');
-	//	//return this.findNearestMenuFreq(getASetting('frameSettings', 'chosenFP'));
-	//}
-
 	/* *************************************  the heartbeat */
+	// start to jiggle whole screen if starting to diverge.  Directly, not thru React
+	divergenceJiggle(divergence)  {
+		let sps = this.sPanel.squishPanelEl.style;
+		if (divergence == 0) {
+			sps.marginLeft = sps.marginRight = sps.marginTop = sps.marginBottom = '0';
+			return;
+		}
+
+		let divergenceJiggle = divergence / 10;
+		let jLeft = (Math.random() * 2 - 1) * divergenceJiggle + 'px';
+		let jTop = (Math.random() * 2 - 1) * divergenceJiggle + 'px';
+		sps.marginLeft = jLeft;
+		sps.marginRight = '-'+  jLeft;
+		sps.marginTop = jTop;
+		sps.marginBottom = '-'+ jTop;
+	}
 
 	rAFHandler =
 	now => {
@@ -240,6 +211,14 @@ class sAnimator {
 
 		const grinder = this.grinder;
 
+		if (grinder.divergence > 10) {
+			// normally we don't go thru this overhead, but it's diverging
+			if (this.context?.shouldBeIntegrating)
+				this.divergenceJiggle(grinder.divergence);
+			else
+				this.divergenceJiggle(0);  // make sure it's off
+		}
+
 		// an error (eg divergence) will halt integration.  Start Over will put it back.
 		if (grinder.hadException) {
 			console.log(`🎥 sAnimator: hadException   will dialog`);
@@ -250,6 +229,8 @@ class sAnimator {
 			debugger;  // won't stop if we're not in the debugger
 			const ex = new Error(this.errorMessage);
 			ex.code  = UTF8ToString(grinder._exceptionCode);
+
+			this.divergenceJiggle(0);
 
 			// throwing in the rAF handler is problematic, but a dialog isn't.
 			CommonDialog.openErrorDialog({message: this.errorMessage},
