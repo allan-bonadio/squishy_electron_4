@@ -66,8 +66,11 @@ function CPToolbar(props) {
 	let runningClass = props.shouldBeIntegrating ? 'running' : '';
 
 	return <div className='CPToolbar'>
-		<div className='frameRateBox'>
-			frame rate:<br />
+		<div className='toolbarWidget'>
+			frame rate:
+		</div>
+
+		<div className='toolbarWidget'>
 			<select className='rateSelector' name='rateSelector' value={chosenRate}
 					onChange={ev => setChosenRate(ev.currentTarget.value)} >
 				{rateOptions}
@@ -76,25 +79,18 @@ function CPToolbar(props) {
 
 		<span className='toolSpacer' style={{width: '.3em'}}></span>
 
-		<div className='toolbarThing'>
-			<div className='toolbarRow'>
-				<div className='toolbarThing'>
-					resolution {props.N ?? '...'} &nbsp;
-				</div>
+		<div className='toolbarWidget'>
+			resolution {props.N ?? '...'} &nbsp;
+		</div>
 
+		<div className='toolbarWidget'>
 				<button onClick={props.startOverHandler}>Start Over</button>
-				&nbsp;
+		</div>
 
+		<div className='toolbarWidget'>
 				<button onClick={props.resetVoltageHandler}>
 					Reset Voltage
 				</button>
-				&nbsp;
-			</div>
-
-			<div className='toolbarRow'>
-				&nbsp;
-
-			</div>
 		</div>
 	</div>;
 }

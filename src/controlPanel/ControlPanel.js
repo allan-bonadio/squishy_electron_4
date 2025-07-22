@@ -20,7 +20,7 @@ import {interpretCppException, wrapForExc} from '../utils/errors.js';
 import SquishContext from '../sPanel/SquishContext.js';
 
 let traceSetPanels = false;
-let traceStartStop = true;
+let traceStartStop = false;
 let traceContext = false;
 
 // integrations always need specific numbers of steps.  But there's always one
@@ -67,6 +67,7 @@ export class ControlPanel extends React.Component {
 		// this constructor runs.
 		eSpaceCreatedPromise.then(space => {
 			this.initWithSpace(space);
+			this.grinder.chosenFP = this.chosenFP;
 		})
 		.catch(rex => {
 			let ex = interpretCppException(rex);
@@ -98,10 +99,10 @@ export class ControlPanel extends React.Component {
 
 		if (traceContext) {
 			const ctx = this.context;
-			console.log(`🎛️  ControlPanel setUpContext context: sbi, ctx.cp, ctx.wv:`,
-				ctx?.shouldBeIntegrating,
-				ctx?.controlPanel,
-				ctx?.waveView);
+			console.log(`🎛️  ControlPanel setUpContext context: `,
+				`  shouldBeIntegrating={ctx?.shouldBeIntegrating}  `,
+				`  controlPanel=`, ctx?.controlPanel,
+				`  waveView=`, ctx?.waveView);
 		}
 	}
 
@@ -144,6 +145,8 @@ export class ControlPanel extends React.Component {
 	// set frame period chosen by the user: set it JUST for the animator and grinder
 	setChosenFP =
 	(period) => {
+		this.setState({chosenFP: storeASetting('frameSettings', 'chosenFP', this.chosenFP)});
+
 		const an = this.props.animator;
 		if (an) {
 			an.chosenFP = period;
@@ -155,7 +158,7 @@ export class ControlPanel extends React.Component {
 			this.grinder.chosenFP = period;
 	}
 
-	// set freq of frame, which is 1, 2, 4, 8, ... some float number of times per
+	// set freq of frame, which is 1, 2, 15, 60, ... some float number of times per
 	// second you want frames. freq is how the CPToolbar UI, handles it, but we
 	// keep the period in the ControlPanel state,
 	setChosenRate =
@@ -165,8 +168,6 @@ export class ControlPanel extends React.Component {
 		if (qeConsts.FASTEST == freq)
 			this.chosenFP = qeConsts.FASTEST;
 
-		// now set it in all 4 places this variable is duplicated... (sorry)
-		this.setState({chosenFP: storeASetting('frameSettings', 'chosenFP', this.chosenFP)});
 		this.setChosenFP(this.chosenFP);  // so squish panel can adjust the heartbeat
 	}
 
