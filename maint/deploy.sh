@@ -3,17 +3,19 @@
 # Runs on local side (panama/dnipro)
 
 echo "                                     🎁 🎁 🛫 Deploy Production Squishy Electron" `date +%c`
+echo "                                               run this only After npm run build"
 cd $SQUISH_ROOT
 if [ ! -d 'quantumEngine' ]
 then
 	echo "Error: SQUISH_ROOT isn't defined right, '$SQUISH_ROOT'"
+	echo "   ... or you need to cd there."
 	exit 41
 fi
 
 echo you can do either make deploy or npm deploy, same
 
 # make sure it's there & compiled
-echo "                                     🎁 🎁 🛫 make sure at least most of the build is there"
+echo "                                     🎁 🎁 🛫 make sure the build is there"
 WASMFILES="qEng/quantumEngine.js qEng/quantumEngine.wasm "
 IMAGES="images/eclipseOnTransparent.gif images/splat.png logos/logoKetE.png"
 DOCFILES="doc/index.html doc/intro/intro1.html"
@@ -24,6 +26,7 @@ do
 	then
 		echo "build/$fn not there"
 		ls -lF build/$fn
+		echo "try    npm run build"
 		exit 77
 	fi
 done
@@ -34,9 +37,10 @@ xattr -cr build
 rm -f build/.DS_Store build/*/.DS_Store build/*/*/.DS_Store
 
 echo "                                     🎁 🎁 🛫 Contents of build dir:"
-ls -lF build/
+ls -lFa build/
 echo
 du -sh build
+du -sh build/*
 echo
 
 echo "                                     🎁 🎁 🛫 starting zip compression"
@@ -49,9 +53,10 @@ echo
 
 # u must be Allan for this to work
 # https://man.openbsd.org/sftp
+# dest url must always be last
 echo "                                     🎁 🎁 🛫 About to upload zip"
 # "-b - -N" is batch mode; any failure ends session
-sftp -p $NAKODA_SKEY  allan@nakoda -b - -N <<PETULANT_OLIGARCHS
+sftp -p $NAKODA_SKEY  -b - -N  allan@nakoda <<PETULANT_OLIGARCHS
 	cd /var/www/squish
 	ls
 
@@ -65,6 +70,11 @@ sftp -p $NAKODA_SKEY  allan@nakoda -b - -N <<PETULANT_OLIGARCHS
 
 	bye
 PETULANT_OLIGARCHS
+if [ "$?" != "0" ]
+then
+	echo "error in sftp, see above"
+	exit 71
+fi
 
 
 # now decompress and activate
@@ -84,6 +94,6 @@ curl https://squish.tactileint.org > /tmp/squish.html
 if diff build/index.html /tmp/squish.html
 then echo "                                       🎁 😅 🛫  Deploy Completed, looks good!"  `date +%c`
 	exit 0
-else echo "the diff didn't compare 🧐😒🙄😲🤕🫣  still probably works..."
+else echo "the diff didn't compare - hashes are different and that's ok"
 	exit 61
 fi
