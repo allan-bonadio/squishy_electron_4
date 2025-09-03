@@ -1,6 +1,5 @@
 /*
 ** quantum Wave -- an organized wave and space pointer &tc that represents a QM state
-**            This file also has qFlick  in it
 ** Copyright (C) 2021-2025 Tactile Interactive, all rights reserved
 */
 
@@ -17,13 +16,14 @@ struct qWave : public virtual qBuffer {
 
 	virtual ~qWave();
 
+
+	void formatDirectOffsets(void);
+
 	// never even tried any of these
 	void forEachPoint(void (*callback)(qCx, int));
 	void forEachState(void (*callback)(qCx, int));
 
 	void prune(void);
-
-	void formatDirectOffsets(void);
 };
 
 
@@ -36,6 +36,9 @@ extern "C" {
 	// js thinks it's a qWave but we know it's really a qBuf cuz that's where
 	// the method is.  JS isn't using this, some problem..?
 	void wave_normalize(qWave *qw);
+
+	// create the qWave, without the rest of eWave.  Depends on if you already have a qWave.
+	qWave *qwave_create(qSpace *space, qCx *useThisBuffer);
 }
 
 #endif
