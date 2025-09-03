@@ -50,7 +50,7 @@ extern void loaderRainbow(qAvatar *avatar) {
 		poses[p] = qPos2(RADIUS * (co + 1), RADIUS * (si + 1));
 
 		qCx cx = qCx(co, si);
-		complexToRYGB(&cx, colors[p]);
+		complexToRYGB(&cx, &colors[p]);
 	}
 
 //	printf("\n");

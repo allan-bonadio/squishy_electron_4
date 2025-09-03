@@ -5,7 +5,8 @@
 
 #include "qAvatar.h"
 
-void complexToRYGB(qCx *ps, qColor3 &color) {
+void complexToRYGB(qCx *ps, qColor3 *colorP) {
+	qColor3 &color = *colorP;
 	qCx psi = *ps;
 	color.red = color.green = color.blue = 0;
 

@@ -72,7 +72,7 @@ DISABLE_FS="-sFILESYSTEM=0 -sFETCH_SUPPORT_INDEXEDDB=0  "
 # omit those, so testing can also use this and compile & run itself (see testing/cppu*).
 allCpp=`cat building/allCpp.list`
 
-echo "starting at"  `date +%a%d,%H:%M:%S`
+echo "starting at"  `date '+%a %d, %H:%M:%S'`
 rm -rf wasm/*
 
 # show options while compiling and linking
@@ -86,7 +86,7 @@ $EMSDK/upstream/emscripten/emcc -o wasm/quantumEngine.js \
 set +x
 
 ls -lt wasm
-echo "done at"  `date +%a%d,%H:%M:%S`
+echo "done at"  `date '+%a %d, %H:%M:%S'`
 # should have produced, eg:
 # -rw-r--r--  1 allan  staff    99805 Jan 28 23:29 quantumEngine.js
 # -rw-r--r--  1 allan  staff     5825 Jan 28 23:29 quantumEngine.worker.js

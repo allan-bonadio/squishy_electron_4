@@ -135,7 +135,7 @@ public:
 	qColor3(void) {red = green = blue = 0;}
 };
 
-void complexToRYGB(qCx *cx, qColor3 &color);
+void complexToRYGB(qCx *cx, qColor3 *color);
 
 /* ************************************************************** C */
 
