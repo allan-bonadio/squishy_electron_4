@@ -10,8 +10,9 @@ import qeFuncs from './qeFuncs.js';
 import qeConsts from './qeConsts.js';
 import {getASetting} from '../utils/storeSettings.js';
 import {thousandsSpaces} from '../utils/formatNumber.js';
+import eFlick from './eFlick.js';
 
-let traceCreation = false;
+let traceCreation = true;
 let traceIntegration = false;
 let traceTriggerIteration = false;
 
@@ -20,23 +21,21 @@ class eGrinder {
 	// eSpace we're in , creates its eGrinder
 	constructor(space, avatar, pointer) {
 		prepForDirectAccessors(this, pointer);
-		this.label = window.Module.AsciiToString(this._label);
+		// ?? this.label = window.Module.AsciiToString(this._label);
 
 		this.space = space;
-		this.avatar = avatar;
+		this.avatar = avatar;  // the avatar it loads into
 		avatar.grinder = this;
 
-		//console.log(`matching sentinel:
-		//qeConsts.grSENTINEL_VALUE=${qeConsts.grSENTINEL_VALUE} !==
-		//this.sentinel=${this.sentinel}`)
-//
-//		console.log(`sentinels: ${qeConsts.grSENTINEL_VALUE}  ${this.sentinel}`);
-//this.sentinel = qeConsts.grSENTINEL_VALUE;  // try this
+		// for the flick we only have the pointer.  Similar to a eWave and cross fingers.
+		this.flick = new eFlick(space, this._flick);
+
+		//console.log(`sentinels: ${qeConsts.grSENTINEL_VALUE} ≟ ${this.sentinel}`);
 
 		if (qeConsts.grSENTINEL_VALUE !== this.sentinel)
-			throw "🔥 🔥 Grinder offsets not correct (36) 🔥 🔥";
+			throw Error("🔥 🔥 Grinder offsets not correct (36) 🔥 🔥");
 		if (traceCreation)
-			console.log(`🪚 eGrinder constructed:`, this);
+			console.log(`🪚 eGrinder constructed: %o`, this);
 	}
 
 	// delete, except 'delete' is a reserved word.  Turn everything off.
@@ -48,7 +47,7 @@ class eGrinder {
 		//qeFuncs.grinder_delete(this.pointer);
 	}
 
-	/* *************************************************************** Direct Accessors */
+	/* ***************************** 🥽 Direct Accessors */
 	// see qGrinder.cpp to regenerate this. Note these are all scalars; buffers
 	// are passed by pointer and you need to allocate them in JS (eg see
 	// eGrinder.constructor)
@@ -92,8 +91,6 @@ class eGrinder {
 	get needsRepaint() { return Boolean(this.bytes[155]); }
 	set needsRepaint(a) { this.bytes[155] = Boolean(a); }
 	get sentinel() { return this.bytes[156]; }
-
-
 
 	/* ******************* end of direct accessors */
 

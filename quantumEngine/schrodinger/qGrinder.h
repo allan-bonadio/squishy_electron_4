@@ -49,13 +49,13 @@ struct grWorker;
 // TODO: I should break up qGrinder: spin off qIterator with the down and dirty
 // stuff that has to be fast.
 struct qGrinder {
-	qGrinder(qSpace *, struct qAvatar *av, int nGrWorkers, const char *label);
+	qGrinder(qSpace *, int nGrWorkers, const char *label);
 	~qGrinder(void);
 	void formatDirectOffsets(void);
 	void dumpObj(const char *title);
 
-	void copyFromAvatar(qAvatar *avatar);
-	void copyToAvatar(qAvatar *avatar);
+	void copyFromStage(void);
+	void copyToStage(void);
 
 	/* ************************* error handling */
 
@@ -117,18 +117,22 @@ struct qGrinder {
 
 	/* ************************* pointers  for large blocks */
 	qSpace *space;
-	qAvatar *avatar;
 
-	// a subclass of  qWave, it has multiple waves to do grinding with
-	// this grinder OWNS the qFlick & is responsible for deleting it
-	struct qFlick *qflick;
+	// at the end of each frame calculation, quickly copy the latest wave off to
+	// here, and get back to grinding.  Then, a different thread will pick up
+	// this and transcribe it into avatar buffers.
+	qWave *stage;
+
+	// a subclass of  qWave, it has multiple waves to do grinding with.
+	// this grinder OWNS the qFlick & is responsible for deleting it.
+	struct qFlick *flick;
 
 	// pointer grabbed from the space.  Same buffer as in space.
 	double *voltage;
 
 	// for the fourier filter.  Call the getSpectrum() first time you need it.
 	// owned if non-null
-	struct qSpectrum *qspect;
+	struct qSpectrum *spect;
 
 	/* ************************* timing */
 
@@ -250,8 +254,8 @@ extern "C" {
 
 	void grinder_askForFFT(qGrinder *grinder);
 
-	void grinder_copyFromAvatar(qGrinder *grinder, qAvatar *avatar);
-	void grinder_copyToAvatar(qGrinder *grinder, qAvatar *avatar);
+	//void grinder_copyFromAvatar(qGrinder *grinder, qAvatar *avatar);
+	//void grinder_copyToStage(qGrinder *grinder, qAvatar *avatar);
 
 	const char *grinder_getExceptionMessage(qGrinder *grinder);
 }
