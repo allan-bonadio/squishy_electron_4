@@ -59,7 +59,7 @@ export function interpretCppException(ex) {
 //	result: 2152923161
 //	stack: "makeAWorker@http://localhost:6600/qEng/quantumEngine.main.js:2795:9\neThread@http://localhost:6600/static/js/bundle.js:53639:39\ncreateThreads@http://localhost:6600/static/js/bundle.js:53672:32\n./src/engine/eEngine.js/startUpWithThreads/<@http://localhost:6600/static/js/bundle.js:53046:57\npromise callback*startUpWithThreads@http://localhost:6600/static/js/bundle.js:53045:24\n@http://localhost:6600/qEng/quantumEngine.main.js:2866:10\nEventListener.handleEvent*@http://localhost:6600/qEng/quantumEngine.main.js:2861:10\n"
 
-
+// TODO: use this all over
 // general purpose exception reporter, use like this:
 //  try/catch:      ...} catch (ex) {excRespond(ex, `reindexing of alligator`)}
 //	promise:          .catch(ex => excRespond(ex, `reindexing of alligator`));
@@ -69,6 +69,7 @@ export function excRespond(exc, where, andDebug) {
 	if (andDebug)
 		debugger;
 }
+window.excRespond = excRespond;  // make it global
 
 // easier than writing out a try-catch all the time, this'll just guard a single function call
 // use this for event handlers and React lifecycle methods where react swallows the exception
@@ -79,7 +80,7 @@ export function wrapForExc(func, where, andDebug) {
 }
 
 
-/* ****************************************************** browser Too Old */
+/* *********************************************** browser Too Old */
 
 // call this if the browser/machine are just way too old to support the stuff we use:
 // what = 'WebGL' at least v1, 'WebAssembly', dedicated 'WebWorkers', ...

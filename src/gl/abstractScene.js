@@ -1,5 +1,5 @@
 /*
-** abstract View Def -- superclass for all the views, which live inside the WaveView
+** abstract Scene -- superclass for all the squish scenes, which live inside the WaveView
 ** Copyright (C) 2021-2025 Tactile Interactive, all rights reserved
 */
 

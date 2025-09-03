@@ -9,7 +9,6 @@
 #include "../debroglie/qWave.h"
 #include "../fourier/qSpectrum.h"
 #include "../greiman/qAvatar.h"
-#include "../greiman/qViewBuffer.h"
 #include "../schrodinger/qGrinder.h"
 #include "../hilbert/qSpace.h"
 #include "testingHelpers.h"
