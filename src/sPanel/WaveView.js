@@ -19,7 +19,8 @@ import {getASetting, storeASetting} from '../utils/storeSettings.js';
 
 import VoltOverlay from '../volts/VoltOverlay.js';
 import {WELL_BUMPER_WIDTH} from '../volts/voltConstants.js';
-import GLScene from '../gl/GLScene.js';
+import GLCanvas from '../gl/GLCanvas.js';  // ??
+import GLScene from '../gl/GLScene.js';  // ??
 import {eSpaceCreatedPromise} from '../engine/eEngine.js';
 import SquishContext from './SquishContext.js';
 import StartStopOverlay from './StartStopOverlay.js';
@@ -140,7 +141,7 @@ export class WaveView extends React.Component {
 		this.space = space;  // for immediate access
 
 		this.grinder = space.grinder;
-		this.mainEAvatar = space.mainEAvatar;
+		this.mainAvatar = space.mainAvatar;
 
 		// make room for the bumpers for WELL continuum (both sides).  Note that
 		// continuum can change only when page reloads.
@@ -195,14 +196,14 @@ export class WaveView extends React.Component {
 		// only need this when the WaveView outer dims change, either a user
 		// change height or window change width.  On that occasion, we have to adjust
 		// a lot, including resizing the canvas.
-		if (this.mainEAvatar && (this.formerWidth != this.outerWidth
+		if (this.mainAvatar && (this.formerWidth != this.outerWidth
 					|| this.formerHeight != s.outerHeight) ) {
 
 			//this.updateInnerDims();
 
 			// Size of window & canvas changed!  (or, will change soon)
 			if (traceDimensions) {
-				console.log(`🏄 wv Resizing  👀 mainEAvatar=${this.mainEAvatar.label}
+				console.log(`🏄 wv Resizing  👀 mainAvatar=${this.mainAvatar.label}
 					formerWidth=${this.formerWidth} ≟➔ outerWidth=${this.outerWidth}
 					formerHeight=${this.formerHeight} ≟➔ outerHeight=${s.outerHeight}
 					btw props.outerWidth=${this.props.outerWidth}

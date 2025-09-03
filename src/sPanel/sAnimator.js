@@ -87,7 +87,7 @@ class sAnimator {
 		this.inteTimes.frameDrawPeriod = startDrawTime - this.inteTimes.prevDrawTime;
 		this.inteTimes.prevDrawTime = startDrawTime;
 
-		this.space.mainEAvatar.doRepaint?.();
+		this.space.mainAvatar.doRepaint?.();
 		this.showTimeNFrame();  // part of the draw time
 
 
@@ -340,8 +340,8 @@ class sAnimator {
 					ControlPanel.stopAnimating();
 
 					this.setState({
-						runningCycleElapsedTime: this.mainEAvatar.elapsedTime - this.runningCycleStartingTime,
-						runningCycleIntegrateSerial: this.mainEAvatar.frameSerial - this.runningCycleStartingSerial,
+						runningCycleElapsedTime: this.mainAvatar.elapsedTime - this.runningCycleStartingTime,
+						runningCycleIntegrateSerial: this.mainAvatar.frameSerial - this.runningCycleStartingSerial,
 					});
 
 					this.goingDown = false;

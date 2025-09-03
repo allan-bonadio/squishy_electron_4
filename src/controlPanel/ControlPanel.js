@@ -111,8 +111,8 @@ export class ControlPanel extends React.Component {
 		// not much happens without this info
 		this.space = space;
 		this.N = space.N;
-		this.mainEAvatar = space.mainEAvatar;
-		this.mainEWave = space.mainEWave;
+		this.mainAvatar = space.mainAvatar;
+		this.mainWave = space.mainWave;
 
 		this.grinder = space.grinder;
 		this.grinder.stretchedDt = this.state.dtStretch * this.space.dt;
@@ -248,7 +248,7 @@ export class ControlPanel extends React.Component {
 	}
 
 	// generate an FFT of the wave.  In the JS console.
-	// TODO: make a real GLScene out of the spectrum!
+	// TODO: make a real GLCanvas out of the spectrum!
 	clickOnFFT(space)
 	{
 		wrapForExc(() => {
@@ -293,11 +293,11 @@ export class ControlPanel extends React.Component {
 		if (!this.space)
 			return;
 
-		const mainEWave = this.space.mainEWave;
+		const mainWave = this.space.mainWave;
 
-		mainEWave.setFamiliarWave(waveParams);  // eSpace does this initially
+		mainWave.setFamiliarWave(waveParams);  // eSpace does this initially
 
-		qeFuncs.grinder_copyFromAvatar(this.grinder.pointer, this.mainEAvatar.pointer);
+		qeFuncs.grinder_copyFromAvatar(this.grinder.pointer, this.mainAvatar.pointer);
 		this.props.repaintWholeMainWave();
 	}
 

@@ -37,10 +37,12 @@ class App extends React.Component {
 			console.log(`init App state to:`, this.state);
 
 		eSpaceCreatedPromise.then(space =>{
-			// there's lots of thens on this promise, so cppRunning won't be on for many of them
+			// there's lots of thens on this promise, so cppRunning
+			// won't be on for many of them
 			this.setState({cppRunning: true})
 
-			// everything squishes around upon startup, especially after the space is created, so do this a bit later
+			// everything squishes around upon startup, especially
+			// after the space is created, so do this a bit later
 			setTimeout(this.widthDidChange, 300);
 		});
 	}
@@ -108,15 +110,6 @@ class App extends React.Component {
 				}, 500);
 			}
 		}
-
-
-
-			//if ('?intro=1' == location.search) {    // eslint-disable-line no-restricted-globals
-			//	setTimeout(() => {
-			//		DocReader.openWithUri('/intro/intro1.html');
-			//	}, 500);
-			//}
-		//}
 
 		// see font sizer, below
 		document.body.style.fontSize = localStorage.fontSize || '16px';
