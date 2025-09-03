@@ -19,8 +19,8 @@ Not currently in use
 
 
 static qSpace *space;
-static qGrinder *qgrinder;
-static qFlick *qflick;
+static qGrinder *grinder;
+static qFlick *flick;
 
 static abacus *aba;
 
@@ -31,8 +31,8 @@ TEST_GROUP(abacus_creation)
 	void setup()
 	{
 		space = makeFullSpace(8);
-		qgrinder = space->qgrinder;
-		qflick = qgrinder->qflick;
+		grinder = space->grinder;
+		flick = grinder->flick;
 	}
 
 	void teardown()
@@ -42,12 +42,12 @@ TEST_GROUP(abacus_creation)
 };
 
 TEST(abacus_creation, simple) {
-	aba = new abacus(space, qgrinder, 3, 3);
+	aba = new abacus(space, grinder, 3, 3);
 
 	POINTERS_EQUAL(space, aba->space);
-	POINTERS_EQUAL(qgrinder, aba->qgrinder);
-	POINTERS_EQUAL(qflick, aba->qflick);
-	POINTERS_EQUAL(qflick->waves, aba->waves);
+	POINTERS_EQUAL(grinder, aba->grinder);
+	POINTERS_EQUAL(flick, aba->flick);
+	POINTERS_EQUAL(flick->waves, aba->waves);
 
 	LONGS_EQUAL(3, aba->nThreads);
 	LONGS_EQUAL(3, aba->nWaves);
@@ -81,7 +81,7 @@ void setProgsEdges(void) {
 }
 
 TEST(abacus_creation, progressFresh) {
-	aba = new abacus(space, qgrinder, 3, 3);
+	aba = new abacus(space, grinder, 3, 3);
 
 		//aba->dumpProgress();
 
@@ -98,7 +98,7 @@ TEST(abacus_creation, progressFresh) {
 }
 
 TEST(abacus_creation, progressReset) {
-	aba = new abacus(space, qgrinder, 3, 3);
+	aba = new abacus(space, grinder, 3, 3);
 	aba->reset();
 
 	//printf("---------------------------- thread progresses after reset\n");
@@ -122,7 +122,7 @@ TEST(abacus_creation, progressReset) {
 
 
 TEST(abacus_creation, edgesFresh) {
-	aba = new abacus(space, qgrinder, 3, 3);
+	aba = new abacus(space, grinder, 3, 3);
 	//printf("---------------------------- edges fresh\n");
 	//aba->dumpEdges();
 
@@ -156,7 +156,7 @@ TEST(abacus_creation, edgesFresh) {
 }
 
 TEST(abacus_creation, edgesReset) {
-	aba = new abacus(space, qgrinder, 3, 3);
+	aba = new abacus(space, grinder, 3, 3);
 
 	aba->reset();
 

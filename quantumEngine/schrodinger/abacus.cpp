@@ -216,7 +216,7 @@ void progress::next(void) {
 
 // each buffer is initialized to zero bytes therefore 0.0 everywhere
 abacus::abacus(qSpace *sp, qGrinder *gr, int nW, int nThr)
-	: space(sp), qgrinder(gr), nWaves(nW), nThreads(nThr) {
+	: space(sp), grinder(gr), nWaves(nW), nThreads(nThr) {
 	if (! space)
 		throw std::runtime_error("abacus::abacus null space");
 	if (nWaves < 2) throw std::runtime_error("nWaves must be at least 2");
@@ -225,9 +225,9 @@ abacus::abacus(qSpace *sp, qGrinder *gr, int nW, int nThr)
 
 	magic = 'Abac';
 
-	qflick = qgrinder->qflick;
-	waves = qflick->waves;
-	qflick->setNWaves(nWaves);
+	flick = grinder->flick;
+	waves = flick->waves;
+	flick->setNWaves(nWaves);
 
 	// all the edges, in big arrays
 	nEdges = nThreads * nWaves;
@@ -269,7 +269,7 @@ abacus::~abacus() {
 	//	printf("    freed waves array..done with abacus destructor..\n");
 }
 
-/* ************************************************************ integration on the qflick */
+/* ************************************************************ integration on the flick */
 
 // set up our edges and progresses to get ready for a new integration
 void abacus::reset(void) {

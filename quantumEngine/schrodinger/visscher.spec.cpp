@@ -105,8 +105,8 @@ TEST(visscher, VisscherOneFrame32)
 	// simulate the app starting up
 	qSpace *space = makeFullSpace(32);
 	qAvatar *av = space->mainAvatar;
-	qGrinder *qgrinder = space->qgrinder;
-	qFlick *fl = qgrinder->qflick;
+	qGrinder *grinder = space->grinder;
+	qFlick *fl = grinder->flick;
 	fl->setCircularWave(1.);
 	for (int ix = fl->start; ix < fl->end; ix++) space->voltage[ix] = 0;
 
@@ -114,12 +114,12 @@ TEST(visscher, VisscherOneFrame32)
 		fl->dump("VisscherOneFrame, before", true);
 
 	// simulate the app taking one iter = 100 steps
-	// qgrinder->stepsPerFrame = 100;
-	// qgrinder->dt = .01;
-	// qgrinder->lowPassFilter = 10;  // num freqs to eliminate on each side
+	// grinder->stepsPerFrame = 100;
+	// grinder->dt = .01;
+	// grinder->lowPassFilter = 10;  // num freqs to eliminate on each side
 
 	// one frame
-	qgrinder->oneFrame();
+	grinder->oneFrame();
 
 	if (traceOneFrame)
 		fl->dump("VisscherOneFrame, after", true);

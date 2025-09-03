@@ -49,8 +49,8 @@ static void doOneFrameMaybe(void) {
 
 int main(int argc, char **argv) {
 	space = makeFullSpace(8);
-	qgrinder = space->qgrinder;
-	qflick = qgrinder->qflick;
+	grinder = space->grinder;
+	flick = grinder->flick;
 
 	//printf("argc=%d argv0=%s\n", argc, argv[0]);
 	//printf("argv: 1=%p 2=%p 3=%p 4=%p\n", argv[1], argv[2], argv[3], argv[4]);
@@ -58,7 +58,7 @@ int main(int argc, char **argv) {
 	//	printf("arg %d is %s\n", i, argv[i]);
 	//}
 
-	aba = new abacus(space, qgrinder, nWAVES, N_THREADS);
+	aba = new abacus(space, grinder, nWAVES, N_THREADS);
 
 	//printf("---------------------------- edges fresh\n");
 	//aba->dumpEdges();
