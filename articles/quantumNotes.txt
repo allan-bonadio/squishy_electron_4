@@ -1,4 +1,68 @@
 
+2025 Aug 28  =============================================
+
+Ii give up on three.js.  No reference documentation.  It's just as cryptic and unpredictable as raw WebGL, and I already know WebGL.
+Fortunately I did it all on a branch.  Unfortunately, I made lots of other changes I want to drag along.  Like the Avatar data structure is good for WebGL buffers.  This'll take some work to get it all back to normal.
+
+2025 Aug 4  =============================================
+
+While showing it to a friend (Vaughn) I realized I really needed the 3d version.  So I wennt on a hack attack to learn three.js.  Then, I realized I really should have been using three.js all along - its a good way to cut thru the BS of webgl, even for 2D stuff.
+
+The previous approach I had sent the complex values directly to the GPU, and it figured out the vertices and colors.  Included was a glsl function to calculate colors from a complex number.  Worked pretty well for what it was.  I had plans also to do 3D; the same buffers sent to the GPU would have worked, given lots of work for the 3d navigator and stuff.
+
+But three.js needs the actual coordinates in xyz and also the actual color gun values.  And their 3d viewer and navigator is already written and debugged.  So it's a natural solution.  Just requires me rewriting way too much code.  All of the coordinates and colors are now calculated in the non-gpu code (although webassy and in soon in a thread).
+
+Now I'm starting to like the name Creola — Creola Katherine Johnson - earned a reputation for mastering complex manual calculations and helped pioneer the use of computers to perform the tasks.  This is more in keeping with the real mover-shaker in an area.
+
+Names for new split of Grinder.
+boss
+captain *
+chief
+commander
+director
+foreman *
+governor *
+king
+kingpin
+lord
+orchestrator
+overseer
+pacemaker *
+president
+principal
+producer
+skipper
+superintendent
+taskmaster
+
+
+names to replace qWave as it gets confused with buffer->wave:
+caddy
+carton
+cavity *
+chest
+cranny
+crate
+crib
+cubicle
+hollow
+locker
+niche
+nook
+packet *
+parcel
+stall
+tray
+trunk
+vibe
+
+
+quiver
+swap
+cadence
+
+
+
 2024 Jul 26 ============================================= squishy_electron_4
 
 Convergence:von Neumann criteria
