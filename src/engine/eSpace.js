@@ -8,34 +8,22 @@ import {prepForDirectAccessors} from '../utils/directAccessors.js';
 import voltDisplay from '../volts/voltDisplay.js';
 import eAvatar from './eAvatar.js';
 import eGrinder from './eGrinder.js';
+import eWave from './eWave.js';
+import eFlick from './eFlick.js';
 import {getAGroup} from '../utils/storeSettings.js';
 import {interpretCppException} from '../utils/errors.js';
 import {MAX_DIMENSIONS, N_THREADS} from './eEngine.js';
 
-let traceSpace = false;
-let traceFamiliarWave = false;
+let traceSpace = true;
+let traceFamiliarWave = true;
+let traceGlobalSpace = true;
 
-/* **************************************************************** eDimension */
-
-// these days the espace is just one qDimension.
-// So, do it that way, if anybody needs it.  dim={N, continuum, dimLength, label: 'x'}
-// NO!  use the direct accessors on the eSpace
-//export class eDimension {
-//	constructor(dim) {
-//		this.N = dim.N;
-//		this.continuum = dim.continuum;
-//		this.dimLength = dim.dimLength;
-//		this.label = dim.label;
-//
-//		this.start = this.continuum ? 1 : 0;
-//		this.end = this.N + this.start;
-//	}
-//}
 
 /* **************************************************************** eSpace */
 // this is how you create a qSpace - start from JS and call this.
 // call like this:
-// new eSpace([{N: 128, continuum: qeConsts.contENDLESS,coord: 'x'}], spaceLabelString)
+// new eSpace([{N: 128, continuum: qeConsts.contENDLESS,coord: 'x', etc}], spaceLabelString)
+//
 // labels must be unique.  Modeled after qSpace in C++,
 // does all dimensions in constructor, at least.
 // Coords are the same if two dims are parallel, eg two particles with x coords.
@@ -45,23 +33,20 @@ export class eSpace {
 	static theSpace = null;
 
 	constructor(dims, spaceLabel) {
-		if (traceSpace) console.log(`eSpace constructor just starting`, dims, spaceLabel);
+		if (traceSpace)
+			console.log(`eSpace constructor just starting`, dims, spaceLabel);
 		if (dims.length > MAX_DIMENSIONS)
 			throw new Error(`Too many dimensions for space: ${dims.length} given but max is ${MAX_DIMENSIONS}`);
 		if (eSpace.theSpace)
 			throw new Error('creating second space')
-		// this actually does it over on the C++ side
 		this.pointer = qeFuncs.startNewSpace(spaceLabel);
 		prepForDirectAccessors(this, this.pointer);
 
 		// make each dimension (someday there'll be more than 1)
 		//let nPoints = 1, nStates = 1;
 		dims.forEach(d => {
-		//this.dimensions = dims.map(d => {
-				qeFuncs.addSpaceDimension(this.pointer, d.N, d.continuum, d.dimLength, d.label);  // c++
-
-				//let dim = new eDimension(d)
-				//return dim;
+			qeFuncs.addSpaceDimension(this.pointer, d.N, d.continuum,
+				d.dimLength, d.label);
 			}
 		);
 
@@ -75,27 +60,30 @@ export class eSpace {
 		this.vDisp.setFamiliarVoltage(voltageParams);
 
 		// the avatars create their vbufs and waves, and we make a copy for ourselves
-		this.mainEAvatar = new eAvatar(this, this._mainAvatar);
-		this.mainVBuffer = this.mainEAvatar.vBuffer;
-		this.mainEWave = this.mainEAvatar.ewave;
+		this.mainAvatar = new eAvatar(this._mainAvatar);
+		this.miniGraphAvatar = new eAvatar(this._miniGraphAvatar);
 
-		this.grinder = new eGrinder(this, this.mainEAvatar, this._qgrinder);
 
-		this.miniGraphAvatar = new eAvatar(this, this._miniGraphAvatar);
-		this.miniGraphVBuffer = this.miniGraphAvatar.vBuffer;
-		this.miniGraphEWave = this.miniGraphAvatar.mainEWave;
+		this.grinder = new eGrinder(this, this.mainAvatar, this._grinder);
+		this.mainWave = this.grinder.flick;
+		this.miniGraphWave = new eWave(this);
 
-		// by default it's set to 1s, or zeroes?  but we want something good.
+		// SetWave most recent settings.
 		let waveParams = getAGroup('waveParams');
-		this.mainEWave.setFamiliarWave(waveParams);  //  SquishPanel re-does this for SetWave
-		qeFuncs.grinder_copyFromAvatar(this.grinder.pointer, this.mainEAvatar.pointer);
-
-		this.miniGraphAvatar.ewave.setFamiliarWave(waveParams);  //  SquishPanel re-does this for SetWave
+		this.mainWave.setFamiliarWave(waveParams);
+		this.miniGraphWave.setFamiliarWave(waveParams);
 		if (traceFamiliarWave) console.log(`🚀  done with setFamiliarWave():`,
-			JSON.stringify(this.mainEWave.wave));
+			JSON.stringify(this.mainWave.wave));
+
+		//qeFuncs.grinder_copyFromAvatar(this.grinder.pointer, this.mainAvatar.pointer);
+
+		//this.miniGraphAvatar.ewave.setFamiliarWave(waveParams);  //  SquishPanel re-does this for SetWave
 
 		this.sInteStats = new inteStats(this);
 		if (traceSpace) console.log(`🚀  done creating eSpace:`, this);
+
+		if (traceGlobalSpace)
+			window.squishSpace = this;
 	}
 
 	// delete, except 'delete' is a reserved word.  Turn everything off.
@@ -106,22 +94,24 @@ export class eSpace {
 			if (traceSpace) {
 				// trace msgs in C++ should agree with these
 				let mgAv =  '0x'+ this.miniGraphAvatar.pointer.toString(16);
-				let mainAv = '0x'+  this.mainEAvatar.pointer.toString(16);
+				let mainAv = '0x'+  this.mainAvatar.pointer.toString(16);
 				let spP = '0x'+ this.pointer.toString(16);
-				console.log(`🚀  liquidating mg avatar=${mgAv}  main avatar=${mainAv}  space=${spP} `,
+				console.log(`🚀  liquidating main avatar=${mainAv}  mini avatar=${mgAv} `
+					+`  space=${spP} `,
 					this);
 			}
 			this.miniGraphAvatar.liquidate();
-			this.miniGraphAvatar = this.miniGraphVBuffer = this.miniGraphEWave = null;
+			this.miniGraphAvatar = null;
 
-			this.mainEAvatar.liquidate();
-			this.mainEAvatar = this.mainVBuffer = this.mainEWave = null;
+			this.mainAvatar.liquidate();
+			this.mainAvatar = null;
 
+			// ?? aren't we freeing the voltage buffer?!?!
 			this.voltageBuffer = this.dimensions = null;
 
 			// finally, get rid of the C++ object
-			if (traceSpace) console.log(`🚀  done  eSpace:`, this);
 			qeFuncs.deleteFullSpace(this.pointer);
+			if (traceSpace) console.log(`🚀  done  liquidating eSpace:`, this);
 		} catch (ex) {
 			// eslint-disable-next-line no-ex-assign
 			ex = interpretCppException(ex);
@@ -129,7 +119,7 @@ export class eSpace {
 		}
 	}
 
-	/* *************************************************************** Direct Accessors */
+	/* ****************************************** 🥽 Direct Accessors */
 	// see qSpace.cpp and directAccessors.h to regenerate this.
 
 	get _voltage() { return this.ints[1]; }
@@ -138,17 +128,18 @@ export class eSpace {
 	get continuum() { return this.ints[3]; }
 	get start() { return this.ints[4]; }
 	get end() { return this.ints[5]; }
-	get dt() { return this.doubles[20]; }
-	get nDimensions() { return this.ints[42]; }
 	get nStates() { return this.ints[43]; }
 	get nPoints() { return this.ints[44]; }
 	get dimLength() { return this.doubles[4]; }
+ 	get dt() { return this.doubles[20]; }
+ 	get nDimensions() { return this.ints[42]; }
+ 	get spectrumLength() { return this.ints[45]; }
 	get _mainAvatar() { return this.ints[46]; }
 	get _miniGraphAvatar() { return this.ints[47]; }
-	get _qgrinder() { return this.ints[48]; }
-	get _label() { return this.pointer + 196; }
+ 	get _grinder() { return this.ints[49]; }
+ 	get _label() { return this.pointer + 200; }
 
-	/* **************************** end of direct accessors */
+	/* **************************** 🥽 end of direct accessors */
 
 	// return me the start, end, etc of this 1d space
 	// call it like this: const {start, end, N, continuum} = space.startEnd;

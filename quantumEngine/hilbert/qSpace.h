@@ -120,7 +120,8 @@ public:
 
 	struct qAvatar *mainAvatar;
 	struct qAvatar *miniGraphAvatar;
-	struct qGrinder *qgrinder;
+	struct qWave *miniGraphWave;
+	struct qGrinder *grinder;
 
 	char label[MAX_LABEL_LEN+1];
 

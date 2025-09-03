@@ -8,7 +8,6 @@
 #include "../greiman/qAvatar.h"
 #include "../schrodinger/qGrinder.h"
 #include "../debroglie/qWave.h"
-#include "../greiman/qViewBuffer.h"
 
 #include "../testing/testingHelpers.h"
 #include "../testing/cppuMain.h"
