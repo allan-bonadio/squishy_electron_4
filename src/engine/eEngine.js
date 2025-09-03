@@ -13,8 +13,8 @@ import eSpace from './eSpace.js';
 
 // all of these must be attached to window to  get called by c++
 
-let traceStartup = false;
-let tracePromises = false;
+let traceStartup = true;
+let tracePromises = true;
 
 /* ****************************************************** app startup */
 
@@ -133,9 +133,10 @@ ev => {
 // finally started up.  Once only, at page load. do NOT export this; it's global on window
 // cuz quantumEngine.js, the compiled C++ proxy, has to have access to it early
 // on, and it's CJS and can't reach JS module exports.
-function startUpFromCpp(maxDims, nThreads) {
+function startUpFromCpp(maxDims, nThreads, labBuffer) {
 	MAX_DIMENSIONS = maxDims;
 	N_THREADS = nThreads;
+	window.cppLabelText = labBuffer;
 
 	window.cppRuntimeInitialized();
 	if (traceStartup) console.log(`threads 🐣  created`);
@@ -144,6 +145,7 @@ function startUpFromCpp(maxDims, nThreads) {
 	// I guess we're starting up with threads anyway
 	eSpaceCreatedPromise
 	.then(space => {
+		// what this doesn't do anything?  I guess all the other thens do stuff.
 		if (traceStartup) console.log(`threads 🐣  created`);
 		if (tracePromises) {
 			console.log(
@@ -152,7 +154,7 @@ function startUpFromCpp(maxDims, nThreads) {
 
 	})
 	.catch(ex => {
-		excRespond(ex, `creating threads`);
+		excRespond(ex, `eSpaceCreatedPromise catch`);
 		debugger;
 	});
 
