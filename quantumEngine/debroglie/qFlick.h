@@ -17,6 +17,8 @@ struct qFlick : public qWave {
 	qFlick(qSpace *space, int nWaves, int nTProgresses);
 	~qFlick();
 
+	void formatDirectOffsets(void);
+
 	// dump
 	double dumpRow(char *buf, int doubleSerial, int ix, double *pPrevPhase, bool withExtras);
 	void dumpOneSerial(const char *title, int doubleSerial, bool withExtras);
