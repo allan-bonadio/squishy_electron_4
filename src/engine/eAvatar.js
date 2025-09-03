@@ -4,87 +4,200 @@
 */
 
 import {cppObjectRegistry, prepForDirectAccessors} from '../utils/directAccessors.js';
-import eWave from './eWave.js';
+//import eWave from './eWave.js';
 import qeFuncs from './qeFuncs.js';
+import qeConsts from './qeConsts.js';
 
 let traceCreation = false;
 let traceHighest = false;
 let traceVBuffer = false;
 
+// HOW TO USE     use avatars this way:
+// create one with eAvatar.createAvatar()
+// use attachViewBuffer() to attach each of your buffers (max 4)
+
+// OR adapt a qAvatar (eg one on qSpace) with eAvatar.adaptAvatar()
+// usually 2 buffers, position and color
+// the integration engine should usually populate the buffers as part
+// of its cycle, at the end of an integration frame.
+
+
 class eAvatar {
-	// space is the eSpace we're in (note eSpace constructor constructs 2 Avatars
-	// and they're the only ones who know nPoints etc)
-	// pointer is an integer pointing into the C++ address space, to the qAvatar object.
-	// We can then set and sample each of the member variables if we know the offset
-	// Give us the pointer, we'll reach in and make an eWave from qwave.
-	// the q objects must be in place.
-	// this way we can't get the wrong wave in the wrong avatar.
-	constructor(space, pointer) {
+	// create An eAvatar complete with its inner qAvatar.  (zero buffers)
+	// use this if you're doing something other than the original two space's avatars
+	static createAvatar(avatarBreed, label) {
+		console.log(`creatAvatar: avatarBreed=${avatarBreed} lab='${label}'`);
+		let qA = qeFuncs.avatar_create(avatarBreed, label);
+		return new eAvatar(qA);
+	}
+
+	// given a pointer to a qAvatar, return  an eAvatar that wraps it.
+	// Also creates the typed arrays for existing buvers.
+	static adaptAvatar(pointer) {
+		let av = new eAvatar(pointer);
+		av.wrapViewBuffers();
+		return av;
+	}
+
+	// DO NOT USE THIS to create an eAvatar in JS!  use adaptAvatar() or
+	// createAvatar() above.  To create an eAvatar, you must already have an existing
+	// qAvatar and pointer to it. pointer is an integer pointing into the C++
+	// address space, to the qAvatar object. The space comes with 2 qAvatars
+	// already. Or, call createAvatar() above.
+	constructor(pointer) {
+		if (!pointer) throw Error("Need pointer to create eAvatar")
 		prepForDirectAccessors(this, pointer);
-		this.label = window.Module.AsciiToString(this._label);
 
-		this.space = space;
-		this.ewave = new eWave(space, null, this._qwave);
-		this.vBuffer = new Float32Array(
-			window.Module.HEAPF32.buffer, this._vBuffer,
-				space.nPoints * 8); // two vec4 s per point
-
-		// label everything for better traces
-		this.ewave.avatarLabel = this.label;
-		this.vBuffer.avatarLabel = this.label;  // yes this works on typedarraybuffers
+		// for the Float32Arrays for each C++ float arrays
+		this.typedArrays = new Array(4);
+		this.bufferNames = new Array(4);
 
 		if (traceCreation)
-			console.log(`eAvatar constructed:`, this);
+			console.log(`cti eAvatar constructed:`, this);
 	}
 
-	// delete, except 'delete' is a reserved word.  Turn everything off.
-	// null out all other JS objects and buffers it points to, so ref counting can recycle it all
+	// delete, except 'delete' is a reserved word.  Turn everything off. null out
+	// all other JS objects and buffers it points to, so ref counting can recycle
+	// it all
 	liquidate() {
-		this.ewave.liquidate();
-		this.space = this.ewave = this.vBuffer = null;
+		throw Error("eAvatar liquidate not yet implemented")
+		//this.ewave.liquidate();
+		//this.space = this.ewave = this.vBuffer = null;
 	}
 
-	/* *************************************************************** Direct Accessors */
+	// set an element in the typedArray bloc
+	reserveTypedArray(whichBuffer, array) {
+		if (this.typedArrays[whichBuffer])
+			throw Error(`typed array ${whichBuffer} already reserved`);
+		return this.typedArrays[whichBuffer] = array;
+	}
+
+	// adds another view buffer onto the avatar.  You choose which one, need not
+	// be consecutive. But cannot do duplicates.  Will ultimately hold
+	// (nCoordsPerVertex * nVertices) single floats. useThisMemory is a float *
+	// pointer for the array in C++ memory.  Just an integer, in C++ global
+	// space. pass it if you have one, or else it'll allocate its own in C++ space.
+	// allocate the index buf bloc in C++, then wrap it in a typed array in JS
+	attachViewBuffer(whichBuffer, useThisMemory,
+		nCoordsPerVertex, nVertices, name) {
+		if (this.typedArrays[whichBuffer])
+			throw `Second allocate of typed array ${this.label} buffer ${whichBuffer}`;
+		this.bufferNames[whichBuffer] = name;
+
+		// buffer of floats, 4 by apiece
+		const nFloats = nCoordsPerVertex * nVertices;
+		if (!useThisMemory)
+			useThisMemory = qeFuncs.buffer_allocateBuffer(4 * nFloats);
+
+		let pointer = qeFuncs.avatar_attachViewBuffer(this.pointer, whichBuffer,
+				useThisMemory, nCoordsPerVertex, nVertices);
+		const tArray = new Float32Array(window.Module.HEAPF32.buffer, pointer, nFloats);
+		return this.reserveTypedArray(whichBuffer, tArray);
+	}
+
+	// allocate the index buf bloc in C++, then wrap it in a typed array in JS
+	attachIndexBuffer(useThisMemory, nItems) {
+
+		if (this.indexBuffer)
+			throw `Second allocate of typed array ${this.label} buffer ${whichBuffer}`;
+
+		if (!useThisMemory)
+			useThisMemory = qeFuncs.buffer_allocateBuffer(2 * nItems);
+
+		// buffer of short ints, 16 bits apiece
+		const pointer = qeFuncs.avatar_attachIndexBuffer(this.pointer, useThisMemory, nItems);
+		this.indexBuffer = new Uint16Array(window.Module.HEAPU16.buffer, pointer, nItems);
+
+		return this.indexBuffer;
+	}
+
+	// our pre-allocated qAvatar has view buffers in C++ space that we don't have
+	// typed arrays for yet.  Set those up.  Called by adaptAvatar()
+	wrapViewBuffers() {
+		// crawl the viewBuffers array; 3 words apiece
+		let nBuffers = this.nBuffers;
+		const vbb = this.viewBufferBlock = new Uint32Array(
+			window.Module.HEAP32.buffer, this._viewBuffers, nBuffers * 3);
+			// three ints for each viewBufInfo
+
+		for (let b = 0; b < nBuffers; b++) {
+			let wordLength = vbb[b * 3 + 1] * vbb[b * 3 + 2];
+			this.typedArrays[b] = new Float32Array(window.Module.HEAPF32.buffer,
+				vbb[b * 3], wordLength);
+		}
+	}
+
+	// populate whatever buffers in this avatar, written in C++.
+	// Go ahead and write your own in JS if you want and use that instead.
+	loadViewBuffers(breed) {
+		qeFuncs.avatar_loadViewBuffers(this.pointer, breed);
+	}
+
+	/* ***************************************** 🥽 Direct Accessors */
 	// see qAvatar.cpp to regenerate this. Note these are all scalars; buffers
-	// are passed by pointer and you need to allocate them in JS (eg see
-	// eAvatar.constructor)
-
-	get _space() { return this.ints[1]; }
-	get _qwave() { return this.ints[2]; }
-	get _voltage() { return this.ints[3]; }
-	get _vBuffer() { return this.ints[4]; }
-	get _label() { return this.pointer + 20; }
+	// are passed by pointer ... long story, see code and directAccessors.h
 
 
-	/* **************************** end of direct accessors */
+	get avatarBreed() { return this.ints[1]; }
+	set avatarBreed(a) { this.ints[1] = a; }
+	get _space() { return this.ints[3]; }
+	get _qwave() { return this.ints[4]; }
+	get i0() { return this.ints[5]; }
+	set i0(a) { this.ints[5] = a; }
+	get i1() { return this.ints[6]; }
+	set i1(a) { this.ints[6] = a; }
+	get d0() { return this.doubles[4]; }
+	set d0(a) { this.doubles[4] = a; }
+	get d1() { return this.doubles[5]; }
+	set d1(a) { this.doubles[5] = a; }
+	get _label() { return this.pointer + 48; }
+	get _indexBuffer() { return this.ints[16]; }
+	set _indexBuffer(a) { this.ints[16] = a; }
+	get _nIndices() { return this.ints[17]; }
+	get _viewBuffers() { return this.pointer + 72; }
 
-	// this just gets the pointer to the view buffer...  the JS array
-	getViewBuffer() {
-		return cppObjectRegistry[qeFuncs.avatar_getViewBuffer(this.pointer)];
+	/* **************************** 🥽 end of direct accessors */
+
+	// this just gets the pointer to the view buffer...  the JS typed array
+	getViewBuffer(bufferIx) {
+		return this.typedArrays[bufferIx];
+		//avatar_getViewBuffer(this.pointer, bufferIx);
 	}
 
-	// qAvatar functions run from here
-	dumpViewBuffer(title) {
-		qeFuncs.avatar_dumpViewBuffer(this.pointer, title)
+	dumpMeta(title) {
+		qeFuncs.avatar_dumpMeta(this.pointer, title);
 	}
 
-	loadViewBuffer() {
-		// flatDrawing will use this for tweaking the highest uniform
-		this.highest = qeFuncs.avatar_loadViewBuffer(this.pointer);
-		if (!this.smoothHighest)
-			this.smoothHighest = this.highest;
-		else
-			this.smoothHighest = (this.highest + 3*this.smoothHighest) / 4;
-		if (traceHighest) console.log(`🚦 eAvatar ${this.label}: highest=${this.highest}  `+
-			`smoothHighest=${this.smoothHighest}`);
-		if (traceVBuffer)
-			this.dumpViewBuffer(`afterLoadViewBuffer`);
+	// 0-15 for vertex bufs, any combo; 128 for index buf
+	dumpViewBuffers(whichBuffers, title) {
+		// if (whichBuffers & -16)
+		// 	throw Error(`dumpViewBuffers with bad whichBuffers ${whichBuffers}`);
+		console.group(title);
+		qeFuncs.avatar_dumpViewBuffers(this.pointer, whichBuffers, title);
+		console.groupEnd();
 	}
+
+	dumpIndex(title) {
+		console.group(title);
+		qeFuncs.avatar_dumpIndex(this.pointer, title);
+		console.groupEnd();
+	}
+
+		// TODO: make this owrk  flatDrawing will use this for tweaking the highest uniform
+//		this.highest = qeFuncs.avatar_loadViewBuffer(this.pointer);
+//		if (!this.smoothHighest)
+//			this.smoothHighest = this.highest;
+//		else
+//			this.smoothHighest = (this.highest + 3*this.smoothHighest) / 4;
+//		if (traceHighest) console.log(`cti eAvatar ${this.label}: highest=${this.highest}  `+
+//			`smoothHighest=${this.smoothHighest}`);
+//		if (traceVBuffer)
+//			this.dumpViewBuffer(`afterLoadViewBuffer`);
 
 	// delete the eAvatar and qAvatar and its owned buffers
-	deleteAvatar() {
-		qeFuncs.avatar_delete(this.pointer);
-	}
+//	deleteAvatar() {
+//		qeFuncs.avatar_delete(this.pointer);
+//	}
 }
 
 export default eAvatar;

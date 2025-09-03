@@ -7,8 +7,8 @@
 a long array of qCx complex numbers, plus some other meta info
 
 Data structures used for these buffers:
-qCx *wave  # wave: just an array of complex nums that's nPoints long
-	In JS, it turns into a Float64Array with 2*nPoints numbers
+qCx *wave  # wave: just an array of complex nums that's nPoints = nPoints/2 long
+	In JS, it turns into a Float64Array with nPoints complex numbers
 qBuffer - object, superclass of qWave and qSpectrum
 qWave - object that owns a single wave, and points to its space
 qSpectrum - object that owns a single qSpectrum, and points to its space
@@ -23,14 +23,31 @@ qFlick - object that owns a list of waves, and points to its space
 
 static bool traceInnerProduct = false;
 static bool traceNormalize = false;
-static bool traceAllocate = false;
+static bool traceAllocate = true;
+static bool traceInit = true;
+
+// make one, any size.  For single floats, ints, whatever.  Mostly for use from JS.
+void *allocateBuffer(int byteSize) {
+	if (traceAllocate) printf(" 🍕allocateBuffer(int nBytes=%d)\n", byteSize);
+	if (byteSize <= 0)
+		throw std::runtime_error("allocateBuffer() - no byteSize");
+
+	void *mem =  (void *) malloc(byteSize);
+	if (traceAllocate) {
+		printf(" 🍕 allocateWave byteSize: %d  buffer: %p, filled with  -0x55\n",
+			byteSize, mem);
+		for (int j = 0; j < byteSize; j++)
+			((byte *) mem)[j] = -0x55;
+	}
+	return mem;
+}
 
 // just allocate a wave of whatever length
 // buffer is unreliably initialized to zero bytes only first time it's allocated; hence calloc
 qCx *allocateZeroedWave(int nPoints) {
 	qCx *buf = (qCx *) calloc(nPoints, sizeof(qCx));
 	if (traceAllocate) {
-		printf("🍕 allocateZeroedWave()  buf=%p  nPoints: %d bytelength=x%lx\n",
+		printf(" 🍕 allocateZeroedWave()  buf=%p  nPoints: %d bytelength=x%lx\n",
 			buf, nPoints, nPoints * sizeof(qCx));
 	}
 	// each cell has zeroes
@@ -40,22 +57,22 @@ qCx *allocateZeroedWave(int nPoints) {
 void freeWave(qCx *wave) {
 	if (traceAllocate) {
 		// we don't know the length here, but you can search for the pointer value
-		printf("🍕 freeWave()  wave=%p \n", wave);
+		printf(" 🍕 freeWave()  wave=%p \n", wave);
 	}
 	free(wave);
 }
 
 // make one, the right size for this buffer's space, or nPoints long if no space
-qCx *qBuffer::allocateWave(int nPoints) {
-	if (traceAllocate) printf("🍕qBuffer::allocateWave(int nPoints=%d)\n", nPoints);
+// each value is a qCx complex double value
+qCx *allocateWave(int nPoints) {
+	if (traceAllocate) printf(" 🍕allocateWave(int nPoints=%d)\n", nPoints);
 	if (nPoints <= 0)
-		throw std::runtime_error("qBuffer::allocateWave() - no nPoints");
+		throw std::runtime_error("allocateWave() - no nPoints");
 
-	// ?? this is weird  this->nPoints = nPoints;
 	qCx *wa =  (qCx *) malloc(nPoints * sizeof(qCx));
 	if (traceAllocate) {
-		printf("🍕 qBuffer::allocateWave this=%p  nPoints: %d  buffer: %p, filled with -77\n",
-			this, nPoints, wa);
+		printf(" 🍕 allocateWave nPoints: %d  buffer: %p, filled with -77\n",
+			nPoints, wa);
 		for (int j = 0; j < nPoints; j++)
 			wa[j] = -77.;  // sets both Re and Im
 	}
@@ -72,27 +89,31 @@ qBuffer::qBuffer(void)
 // actually create the buffer that we need
 // dynamically allocated or Bring Your Own Buffer to use
 // usually called by subclass constructors when they figure out how long a buffer is needed
-// length is in units of qComplex (16 bytes)
-void qBuffer::initBuffer(int length, qCx *useThisBuffer) {
-	if (useThisBuffer) {
-		wave = useThisBuffer;
+// length is in units of qCx (complex double 16 bytes)
+void qBuffer::initBuffer(int nCxes, qCx *useThisMemory) {
+	if (useThisMemory) {
+		wave = useThisMemory;
 		dynamicallyAllocated = false;
 	}
 	else {
-		wave = allocateWave(length);
+		wave = allocateWave(nCxes);
 		dynamicallyAllocated = true;
 	}
 
-	nPoints = length;
+	nPoints = nCxes;
 	if (traceAllocate) {
-		printf("🍕 qBuffer::initBuffer this=%p  wave=%p  nPoints: %d\n",
+		printf(" 🍕 qBuffer::initBuffer this=%p  wave=%p  nPoints: %d\n",
 			this, wave, nPoints);
+	}
+	if (traceInit) {
+		printf(" 🍕 qBuffer vars: this=%p, &magic=%p, &wave=%p   &nPoints=%p  &start=%p   &end=%p   &continuum=%p\n",
+			this, &magic, &wave, &nPoints, &start, &end, &continuum);
 	}
 }
 
 qBuffer::~qBuffer() {
 	if (traceAllocate)
-		printf("🍕  start the qBuffer instance destructor...space=%p\n", space);
+		printf(" 🍕  start the qBuffer instance destructor...space=%p\n", space);
 	if (dynamicallyAllocated) {
 		freeWave(wave);
 	}
@@ -190,14 +211,14 @@ void qBuffer::dump(const char *title, bool withExtras) {
 
 // use this if roundoff is a problem
 void qBuffer::dumpHiRes(const char *title) {
-	printf("🍕 🍕  HIRES %s: s=%d e=%d continuum:%d nPoints:%d\n", title, start, end, continuum, nPoints);
+	printf(" 🍕 🍕  HIRES %s: s=%d e=%d continuum:%d nPoints:%d\n", title, start, end, continuum, nPoints);
 	double iProd = 0;
 	for (int ix = 0; ix < nPoints; ix++) {
-		printf("🍕 [%3d]  %22.16lg, %22.16lg\n", ix, wave[ix].re, wave[ix].im);
+		printf(" 🍕 [%3d]  %22.16lg, %22.16lg\n", ix, wave[ix].re, wave[ix].im);
 		if (ix >= start && ix < end)
 			iProd += wave[ix].norm();
 	}
-	printf("🍕 🍕  HIRES innerProduct: %22.16lg\n", iProd);
+	printf(" 🍕 🍕  HIRES innerProduct: %22.16lg\n", iProd);
 }
 
 // calls the JS dumpRainbow method of eWave.  Note we can't compile this for
@@ -265,7 +286,7 @@ double qBuffer::innerProduct(void) {
 		sum += norm;
 		if (traceNormalize) {
 			if (traceInnerProduct)
-				printf("🍕 innerProduct point %d (%lf,%lf) norm--> %lf\n",
+				printf(" 🍕 innerProduct point %d (%lf,%lf) norm--> %lf\n",
 					ix, wave[ix].re, wave[ix].im, norm);
 		}
 	}
@@ -284,7 +305,7 @@ double qBuffer::normalize(void) {
 
 	double iProd = innerProduct();
 	if (traceNormalize) {
-		printf("🍕 normalizing qBuffer.  innerProduct=%lf\n", iProd);
+		printf(" 🍕 normalizing qBuffer.  innerProduct=%lf\n", iProd);
 	}
 	if (iProd == 0.) {
 		// ALL ZEROES!??! this is bogus, shouldn't be happening.
@@ -297,7 +318,7 @@ double qBuffer::normalize(void) {
 	// normal functioning
 	const double factor = pow(iProd, -0.5);
 	if (traceNormalize) {
-		printf("🍕 normalizing qBuffer.  factor=%lf, start=%d, end=%d, N=%d\n",
+		printf(" 🍕 normalizing qBuffer.  factor=%lf, start=%d, end=%d, N=%d\n",
 			factor, start, end, end - start);
 	}
 
@@ -312,13 +333,13 @@ double qBuffer::normalize(void) {
 /* **********************************************************************  setting wave */
 
 // a little bit dangerous if your waves don't have the same continuum
-void qBuffer::copyThatWave(qCx *dest, qCx *src, int length) {
-//	printf("🍕 qWave::copyThatWave(%d <== %d)\n", (int) dest, (int) src);
+void qBuffer::copyThatWave(qCx *dest, qCx *src, int nCxes) {
+//	printf(" 🍕 qWave::copyThatWave(%d <== %d)\n", (int) dest, (int) src);
 	if (!dest) dest = wave;
 	if (!src) src = wave;
-	if (length < 0)
-		length = nPoints;
-	memcpy(dest, src, length * sizeof(qCx));
+	if (nCxes < 0)
+		nCxes = nPoints;
+	memcpy(dest, src, nCxes * sizeof(qCx));
 }
 
 // qBuffers know their length - must be same length and same continuum
@@ -418,3 +439,20 @@ void qBuffer::add(double coeff1, qBuffer *qwave1, double coeff2, qBuffer *qwave2
 	add(coeff1, qwave1->wave + qwave1->start, coeff2, qwave2->wave + qwave2->start);
 }
 
+
+/* **********************************************************************  javascript */
+
+// allocate a buffer full of floats for JS
+qCx *buffer_allocateZeroedWave(int nPairs) {
+	return allocateZeroedWave(nPairs);
+}
+
+qCx *buffer_allocateWave(int nPairs) {
+	return allocateWave(nPairs);
+}
+
+
+// allocate a C++ buffer full of whatever size data
+void *buffer_allocateBuffer(int nBytes) {
+	return (void *) calloc(nBytes, 1);
+}

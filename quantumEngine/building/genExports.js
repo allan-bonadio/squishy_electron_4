@@ -41,14 +41,46 @@ let exportsSrc  = [
 	// the voltage
 	{name: 'qSpace_dumpVoltage', args: ['number', 'string'], retType: 'number'},
 
+	/* ***************************************** waves, buffers */
+
+	{name: 'buffer_allocateZeroedWave', args: ['number'], retType: 'number'},
+
+	{name: 'buffer_allocateWave', args: ['number'], retType: 'number'},
+
+	// any size data
+	{name: 'buffer_allocateBuffer', args: ['number'], retType: 'number'},
+
 	// accept an integer pointer to the qWave as first arg
 	{name: 'wave_normalize', args: ['number'], retType: null},
 
-	// avatars - all accept an integer pointer to the avatar as first argument
-	// views, visual stuff not grind stuff
-	{name: 'avatar_getViewBuffer', args: ['number'], retType: 'number'},
-	{name: 'avatar_loadViewBuffer', args: ['number'], retType:  'number'},
-	{name: 'avatar_dumpViewBuffer', args: ['number', 'string'], retType: null},
+	// create a new one, allocating the space dynamically, that conforms to the space passed in
+	{name: 'qwave_create', args: ['number', 'number'], retType: 'number'},
+
+	/* ***************************************** avatars */
+	// most accept an integer pointer to the avatar as first argument
+	// except this that creates a new one.  When a space is created,
+	// it also makes its own avatars.
+	{name: 'avatar_create', args: ['number', 'number', 'string'], retType: 'number'},
+
+	{name: 'avatar_setWaveSpace',
+		args: ['number', 'number', 'number'], retType: null},
+
+	// create one buffer in the set
+	{name: 'avatar_attachViewBuffer',
+		args: ['number', 'number', 'number', 'number'], retType: 'number'},
+
+	{name: 'avatar_attachIndexBuffer',
+		args: ['number', 'number', 'number'], retType: 'number'},
+
+	{name: 'avatar_dumpMeta', args: ['string'], retType: null},
+
+	{name: 'avatar_dumpViewBuffers', args: ['number', 'number', 'string'], retType: null},
+
+	{name: 'avatar_dumpIndex', args: ['number', 'string'], retType: null},
+
+	{name: 'avatar_getViewBuffer', args: ['number', 'number'], retType: 'number'},
+
+	{name: 'avatar_loadViewBuffers', args: ['number', 'number'], retType: null},
 
 
 	// ************************* grinder
@@ -63,10 +95,10 @@ let exportsSrc  = [
 	{name: 'grinder_askForFFT', args: ['number'], retType: null},
 
 	// this one is called from JS
-	{name: 'grinder_copyFromAvatar', args: ['number', 'number'], retType: null},
-
-	// i think this one is actually only called from C++
-	{name: 'grinder_copyToAvatar', args: ['number', 'number'], retType: null},
+//	{name: 'grinder_copyFromAvatar', args: ['number', 'number'], retType: null},
+//
+//	// i think this one is actually only called from C++
+//	{name: 'grinder_copyToStage', args: ['number', 'number'], retType: null},
 
 	// return the  message stored in grinder->integrationEx
 	{name: 'grinder_getExceptionMessage', args: [], retType: 'string'},
@@ -97,6 +129,19 @@ let commonConstants = [
 
 	// phony bool value that marks the end of a qGrinder object
 	{name: 'grSENTINEL_VALUE', cppType: 'byte', value: 123},
+
+	// view buffer generators - all of these fill (one or more) typed arrays,
+	// usually/always floats.  each in its own file.
+	{name: 'avNULL', cppType: 'int', value: 0},
+	{name: 'avOldFLAT', cppType: 'int', value: 1},
+	{name: 'avFLAT', cppType: 'int', value: 2},
+	{name: 'avFLAT_TICS', cppType: 'int', value: 3},
+	{name: 'avRAINBOW', cppType: 'int', value: 4},
+
+	// labels, mostly for debugging, on dumps and objects
+	{name: 'MAX_LABEL_LEN', cppType: 'int', value: 15},
+
+
 ];
 
 
@@ -110,6 +155,7 @@ let commonConstants = [
 function generateExports() {
 	let exportsFile = exportsSrc.map(funcDesc => '_' + funcDesc.name);
 	exportsFile = JSON.stringify(exportsFile) + '\n';
+	exportsFile = exportsFile.replace(',', ', ');
 	if (traceOutput)
 		console.log('exports:\n' + exportsFile);
 

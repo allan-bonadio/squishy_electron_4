@@ -8,8 +8,7 @@
 // a 'qBuffer' is a wrapped wave that knows how to traverse itself
 // a 'qWave' is an object with cool methods for the wave it encloses,
 //    plus a qSpace pointer.  Subclass of qBuffer.
-// a 'qFlick' (see below) is a sequence of waves (defunct maybe)
-// a 'qViewBuffer' is specifically to send coordinates to WebGL for display; very different
+// a 'qFlick' (see below) is a sequence of waves
 // a 'qSpectrum' is like a qWave designed for FFT results - momentums not locations.  Subclass of qBuffer.
 
 #ifndef __QBUFFER_H__
@@ -19,7 +18,10 @@
 struct qSpace;
 struct qWave;
 
-extern qCx *allocateZeroedWave(int nPoints = -1);
+extern void *allocateBuffer(int byteSize);
+
+extern qCx *allocateWave(int nReals);
+extern qCx *allocateZeroedWave(int nReals);
 extern void freeWave(struct qCx *wave);
 
 // a long array of qCx complex numbers, plus some other info
@@ -29,32 +31,9 @@ struct qBuffer {
 	qBuffer(void);
 	virtual ~qBuffer();
 
-	uint32_t magic;
-
-	// calls solo allocateWave() but for this wave's count and stuff
-	// TODO: functions should be grouped at the beginning or end to easily see alignment
-	qCx *allocateWave(int nPoints = -1);
-
 	// constructor for qWave and qSpectrum calls this to finish up & alloc buffer
 	// length is length in qCxs
 	void initBuffer(int length, qCx *useThisBuffer = NULL);
-
-	// the actual data, must be in the right size allocated block
-	qCx *wave;
-
-	// spectrums don't have wraparounds boundaries so spectrums calculate different numbers from waves.
-	// should be in accord with the space, sortof, depending on whether wave or spectrum, and continuum.
-	int nPoints, start, end, continuum;
-
-	// if it used the first constructor
-	// this has, among other things, the count of points and states in all qWave buffers
-	// but for just a bare qBuffer, this can be null, for freelance buffers.
-	qSpace *space;
-
-	// TODO: this is not aligned!  Or, maybe its the last?  Oh wait, see
-	// subclasses and their alignment.  Only qFlick so should pad this to 4
-	// bytes
-	bool dynamicallyAllocated;
 
 	// print one complex number, plus maybe some more calculated metrics for that point,
 	// on a line in the dump on stdout.
@@ -96,6 +75,39 @@ struct qBuffer {
 	// like the JS version but in C++ and used only for testing
 	void setCircularWave(double freq = 1., int first = 0);
 	void setSquareWave(int wavelength = 1, int first = 0, qCx height = 1.);
+
+	/* ************************************************************ variables */
+	uint32_t magic;
+
+	// the actual data, must be in the right size allocated block
+	qCx *wave;
+
+	// spectrums don't have wraparounds boundaries so spectrums calculate different numbers from waves.
+	// should be in accord with the space, sortof, depending on whether wave or spectrum, and continuum.
+	int nPoints, start, end, continuum;
+
+	// if it used the first constructor
+	// this has, among other things, the count of points and states in all qWave buffers
+	// but for just a bare qBuffer, this can be null, for freelance buffers.
+	qSpace *space;
+
+	// TODO: this is not aligned!  Or, maybe its the last?  Oh wait, see
+	// subclasses and their alignment.  Only qFlick so should pad this to 4
+	// bytes
+	bool dynamicallyAllocated;
+
+	byte xxx[3];
 };
+
+/* ************************************************************** C */
+
+// for the JS side.  Note if the word Buffer is plural
+extern "C" {
+	qCx *buffer_allocateZeroedWave(int nPairs);
+
+	qCx *buffer_allocateWave(int nPairs);
+
+	void *buffer_allocateBuffer(int byteSize);
+}
 
 #endif

@@ -8,7 +8,6 @@
 #include "qAvatar.h"
 #include "../schrodinger/qGrinder.h"
 #include "../debroglie/qWave.h"
-#include "qViewBuffer.h"
 #include "../fourier/qSpectrum.h"
 
 #include "../testing/testingHelpers.h"
