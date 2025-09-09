@@ -35,7 +35,7 @@ export class abstractDrawing {
 		this.tagObject = scene.tagObject;
 		this.space = scene.space;
 		this.avatar = scene.avatar;
-		this.avatarLabel = scene.avatar.label;
+		this.avatarLabel = scene.avatar?.label ?? 'no avatar';
 		this.shaderTypes = {
 			[this.gl.VERTEX_SHADER]: 'vertex',
 			[this.gl.FRAGMENT_SHADER]: 'fragment'};

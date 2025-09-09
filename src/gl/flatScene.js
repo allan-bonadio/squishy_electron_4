@@ -13,9 +13,9 @@ class flatScene extends abstractScene {
 	constructor(sceneName, ambiance, space, avatar) {
 		super(sceneName, ambiance, space, avatar);
 
-		if (! this.space || !this.avatar) {
+		if (! this.space) {
 			debugger;
-			throw  `flatScene: being created without space or avatar`;
+			throw  `flatScene: being created without space`;
 		}
 
 		// normally autoranging would put the highest peak at the exact bottom.

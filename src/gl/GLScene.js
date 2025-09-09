@@ -36,8 +36,8 @@ function setPT() {
 
 		// Our caller gets these from eSpaceCreatedPromise; so it must be resolved by now.
 		// We can't just use the promise ourselves; we have to know which avatar
-		avatar: PropTypes.object.isRequired,
-		space: PropTypes.object.isRequired,
+		avatar: PropTypes.object,
+		space: PropTypes.object,
 
  		// inner width & height of canvas
 		// keep these separate  so any change will trigger render
@@ -60,7 +60,8 @@ function setPT() {
 // - one viewdef that encloses one or more drawings
 // Can NOT instantiate this until after the space promise has resolved
 function GLScene(props) {
-	PropTypes.checkPropTypes(GLScene.propTypes, props, 'prop', 'GLScene');
+	cfpt(GLScene, props);
+	//PropTypes.checkPropTypes(GLScene.propTypes, props, 'prop', 'GLScene');
 	const p = props;
 
 	// we have to keep the canvas node, to get a gl context.  Then we need to render again.
@@ -91,7 +92,7 @@ function GLScene(props) {
 
 		// intrinsic to avatar p.avatar.reStartDrawing = reStartDrawing;
 		//p.avatar.setGlViewport = setGlViewport;
-		if (traceSetup) console.log(`🖼 GLScene ${p.sceneName} ${p.avatar.label}: `
+		if (traceSetup) console.log(`🖼 GLScene ${p.sceneName} ${p.avatar?.label ?? ''}: `
 			+` done with initSceneClass`);
 	};
 
@@ -102,7 +103,7 @@ function GLScene(props) {
 	() => {
 		if (! effectiveScene) {
 			if (traceViewBuffer)
-				console.log(`🖼 GLScene ${p.avatar.label}: too early for doRepaint  effectiveScene=${effectiveScene}`);
+				console.log(`🖼 GLScene ${p.avatar?.label}: too early for doRepaint  effectiveScene=${effectiveScene}`);
 			return null;  // too early
 		}
       // if (traceViewBuffer)
@@ -117,7 +118,7 @@ function GLScene(props) {
 		effectiveScene.drawAllDrawings(canvasNode.width, canvasNode.height, p.specialInfo);
 		//effectiveScene.drawAllDrawings(p.canvasInnerWidth, p.canvasInnerHeight, p.specialInfo);
 		if (traceGeometry) {
-			console.log(`🖼 GLScene done doRepaint ${p.sceneName} av=${p.avatar.label}:   \n`
+			console.log(`🖼 GLScene done doRepaint ${p.sceneName} av=${p.avatar?.label}:   \n`
 					+`canvasInnerWidth=${p.canvasInnerWidth}, canvasInnerHeight=${p.canvasInnerHeight}, `
 					+`specialInfo=${p.specialInfo}`);
 		}
@@ -193,5 +194,7 @@ function GLScene(props) {
 		/>
 	);
 }
+
+setPT();
 
 export default GLScene;
