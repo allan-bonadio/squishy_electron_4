@@ -26,19 +26,16 @@ struct qWave : public virtual qBuffer {
 	void prune(void);
 };
 
-
-
-
-// (maybe obsolete...  might use this for MP)
-
 // for JS to call
 extern "C" {
-	// js thinks it's a qWave but we know it's really a qBuf cuz that's where
-	// the method is.  JS isn't using this, some problem..?
+	// create the qWave, without the rest of eWave.  Depends on if you already have a qWave.
+	qWave *wave_create(qSpace *space, qCx *useThisBuffer);
+
+	void wave_delete(qWave *qwave);
+
+	//   JS isn't using this, some problem..?
 	void wave_normalize(qWave *qw);
 
-	// create the qWave, without the rest of eWave.  Depends on if you already have a qWave.
-	qWave *qwave_create(qSpace *space, qCx *useThisBuffer);
 }
 
 #endif

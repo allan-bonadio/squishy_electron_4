@@ -60,14 +60,13 @@ qWave::~qWave(void) {
 	}
 }
 
-
 	/* *********************************************** direct access */
 
 // Insert this into the constructor and run this once.  Copy text output.
 // Paste the output into class eWave, the class itself, to replace the existing ones
 void qWave::formatDirectOffsets(void) {
 	// don't need magic
-	printf("🚦 🚦 --------------- starting 🥽 eWave direct access 🥽 JS getters & setters --------------\n\n");
+	printf("🚦 🚦 ----------- starting 🥽 eWave direct access 🥽 JS getters & setters ----------\n\n");
 
 	makePointerGetter(wave);
 
@@ -130,13 +129,17 @@ void qWave::prune() {
 
 /* ******************************************************* C for JS */
 
+qWave *wave_create(qSpace *space, qCx *useThisBuffer) {
+	// useThisBuffer, usually null, haven't tested lately
+	return new qWave(space, useThisBuffer);
+}
+
+void wave_delete(qWave *qwave) {
+	delete qwave;
+}
+
 // this will normalize with the C++ normalize
 void wave_normalize(qWave *qwave) {
 	qwave->normalize();
-}
-
-qWave *qwave_create(qSpace *space, qCx *useThisBuffer) {
-	// useThisBuffer, usually null, haven't tested lately
-	return new qWave(space, useThisBuffer);
 }
 

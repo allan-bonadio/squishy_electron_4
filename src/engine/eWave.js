@@ -100,17 +100,20 @@ class eWave {
 
 		if (pointer) {
 			this.pointer = pointer;  // a qWave
-			waveArg = this._wave;
+			//?? waveArg = this._wave;
 		}
 		else {
-			// a home brew wave, not from C++.  make a phony qWave for those ints to be
-			this.pointer = new Int32Array(20);
+			// a home brew wave, not from C++.  make a phony qWave for those ints
+			// a hack to get it running so you can run the direct accessor code to get the getters..
+			// not for 'real' use
+			//debugger;
+			this.pointer = qeFuncs.wave_create(space.pointer, null);
 		}
 		prepForDirectAccessors(this, this.pointer);
 
 		// now for the buffer
 		this.completeWave(useThis32F);
-		}
+	}
 
 			// console.assert(pointer, `eWave being constructed with no pointer `
 			// 	+` (${pointer}) and no buffer useThis32F (${useThis32F})`)
@@ -120,8 +123,14 @@ class eWave {
 	completeWave(useThis32F) {
 		if (!useThis32F) {
 			// _wave must be a pointer to the existing qWave's buffer
-			console.assert(this._wave > 256, `this._wave is too small ${this._wave}`);
-			this.wave = new Float64Array(HEAPF64 + this._wave, 2 * this.space.nPoints);
+			if (this._wave < 256) {
+				console.error(`this._wave pointer is too small ${this._wave}, but ok if just generating direct accessors`);
+				let temp_wave = qeFuncs.buffer_allocateWave(this.space.nPoints * 2);
+				this.wave = new Float64Array(Module.HEAPF64.buffer, temp_wave, 2 * this.space.nPoints );
+			}
+			else {
+				this.wave = new Float64Array(window.Module.HEAPF64.buffer, this._wave, 2 * this.space.nPoints );
+			}
 		}
 		else if (Array.isArray(useThis32F) & 'Float64Array' == useThis32F.constructor.name) {
 			// an existing Float64Array, should be
@@ -136,11 +145,11 @@ class eWave {
 
 			// smoke test - the values a raw, freshly created qWave gets
 			if (traceAllocate) {
-			for (let j = 0; j < this.nPoints*2; j++)
-				wave[j] = -99.;
-				// qBuffer::allocateWave() also fills to -77 (if trace turned on);
-				//allocateZeroedWave() leaves all zeroes
-		}
+				for (let j = 0; j < this.nPoints*2; j++)
+					wave[j] = -99.;
+					// qBuffer::allocateWave() also fills to -77 (if trace turned on);
+					//allocateZeroedWave() leaves all zeroes
+			}
 		}
 		else {
 			debugger;
@@ -152,11 +161,12 @@ class eWave {
 	// null out all other JS objects and buffers it points to, so ref counting
 	// can recycle it all
 	liquidate() {
+		wave_delete(this.pointer);
 		this.space = this.wave = null;
-		// qAvatar frees its own qBuffer(s)
 	}
 
 	/* **************************************************** 🥽 direct access */
+
 
 	get _wave() { return this.ints[3]; }
 
@@ -164,6 +174,7 @@ class eWave {
 	get start() { return this.ints[5]; }
 	get end() { return this.ints[6]; }
 	get continuum() { return this.ints[7]; }
+
 
 	/* **************************** 🥽 end of direct accessors */
 

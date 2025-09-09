@@ -74,7 +74,7 @@ qCx *allocateWave(int nPoints) {
 		printf(" 🍕 allocateWave nPoints: %d  buffer: %p, filled with -77\n",
 			nPoints, wa);
 		for (int j = 0; j < nPoints; j++)
-			wa[j] = -77.;  // sets both Re and Im
+			wa[j] = qCx(-77, -55);  // sets both Re and Im
 	}
 	return wa;
 }

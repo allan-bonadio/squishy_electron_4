@@ -29,7 +29,7 @@ void qFlick::reset(void) {
 /* ************************************************************ birth & death & basics */
 
 // each buffer is initialized to zero bytes therefore 0.0 everywhere
-qFlick::qFlick(qSpace *space, int nW, int nTProgresses)
+qFlick::qFlick(qSpace *space, int nW)
 	: qWave(space), nWaves(nW),  allocWaves(nW), currentWave(0)
 {
 	if (! space)
@@ -317,3 +317,13 @@ void qFlick::setCurrent(int newSerial) {
 //	fixBoundaries();
 //	dump("qFlick::normalize done", true);
 //}
+
+qFlick *flick_create(qSpace *space, int nWaves) {
+	// useThisBuffer, usually null, haven't tested lately
+	return new qFlick(space, nWaves);
+}
+
+void flick_delete(qFlick *flick) {
+	delete flick;
+}
+
