@@ -98,10 +98,10 @@ struct qAvatar {
 /* *************************************************** loaders in nearby files */
 
 // see qAvatar::getBreedLoader()
-extern void loaderFlat(qAvatar *avatar);
-extern void loaderFlatTics(qAvatar *avatar);
-extern void loaderRainbow(qAvatar *avatar);
-extern void loaderRainbow(qAvatar *avatar);
+//extern void loaderFlat(qAvatar *avatar);
+//extern void loaderFlatTics(qAvatar *avatar);
+//extern void loaderRainbow(qAvatar *avatar);
+//extern void loaderRainbow(qAvatar *avatar);
 
 
 

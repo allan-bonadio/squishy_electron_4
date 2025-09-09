@@ -44,31 +44,31 @@ static const bool traceInDetail = false;
 // for C++ calling, just set avatar->avatarBreed or pass it in the constructor directly.  avatarBreed optional.
 // For JS calling C++, need an avatarBreed in commonConstants.h, and must be listed here.
 // You can also load it in JS; write your on function and call it when you can
-void (*(getBreedLoader(int avatarBreed) ))(qAvatar *) {
-	printf("getBreedLoader(avatarBreed=%d)\n", avatarBreed);
-	printf("    loaders: %p   %p   %p\n", loaderFlat, loaderFlatTics, loaderRainbow);
-	switch (avatarBreed) {
-	case avNULL:
-		throw std::runtime_error("Cannot load avNULL");
-
-	case avOldFLAT:
-		throw std::runtime_error("Cannot load oldFlat");  // actual code doesn't relly work
-
-	case avFLAT:
-		return loaderFlat;
-
-	case avFLAT_TICS:
-		return loaderFlatTics;
-
-	case avRAINBOW:
-		return loaderRainbow ;
-
-	default:
-		printf("Cannot load strange avatarBreed=%d\n", avatarBreed);
-		throw std::runtime_error("Cannot load strange avatarBreed");
-
-	}
-}
+//void (*(getBreedLoader(int avatarBreed) ))(qAvatar *) {
+//	printf("getBreedLoader(avatarBreed=%d)\n", avatarBreed);
+//	printf("    loaders: %p   %p   %p\n", loaderFlat, loaderFlatTics, loaderRainbow);
+//	switch (avatarBreed) {
+//	case avNULL:
+//		throw std::runtime_error("Cannot load avNULL");
+//
+//	case avOldFLAT:
+//		throw std::runtime_error("Cannot load oldFlat");  // actual code doesn't relly work
+//
+//	case avFLAT:
+//		return loaderFlat;
+//
+//	case avFLAT_TICS:
+//		return loaderFlatTics;
+//
+//	case avRAINBOW:
+//		return loaderRainbow ;
+//
+//	default:
+//		printf("Cannot load strange avatarBreed=%d\n", avatarBreed);
+//		throw std::runtime_error("Cannot load strange avatarBreed");
+//
+//	}
+//}
 
 
 
@@ -212,7 +212,7 @@ void qAvatar::dumpViewBuffers(int whichBuffers, const char *title) {
 	txt[TXTLEN - 1] = 101;
 	if (!title) title = "no title 🧨 🧨";
 
-	printf(" 🚥 '%s' avatar ✈️ %d vertices (which viewBuffers: 0x%x)\n",
+	printf(" 🚥 %s avatar ✈️ %d vertices (which viewBuffers: 0x%x)\n",
 		title, viewBuffers[0].nVertices, whichBuffers);    // WRONG only for buf zero
 
 	// HEADING row.  Pay careful attention to chars across so rows line up,
@@ -363,39 +363,40 @@ void qAvatar::dumpIndex(const char *title) {
 // Actually, this is getting less official - you can write your loader in JS or C++.
 // just call it at the right time.
 void qAvatar::loadViewBuffers(int breed) {
-
-//fuck it
-		loaderRainbow(this);
-		return;
-
-	printf(" 🚥 avatar_loadViewBuffers: avatar  ptr=%p  breed=%d\n", this, avatarBreed);
-
-	breed = breed ? breed : avatarBreed;
-	switch (breed) {
-	case avNULL:
-		throw std::runtime_error("Cannot load avNULL");
-
-	case avOldFLAT:
-		throw std::runtime_error("Cannot load oldFlat");  // actual code doesn't relly work
-
-	case avFLAT:
-		loaderFlat(this);
-		break;
-
-	case avFLAT_TICS:
-		loaderFlatTics(this);
-		break;
-
-	case avRAINBOW:
-		loaderRainbow(this);
-		break;
-
-	default:
-		printf("Cannot load avatarBreed=%d\n", avatarBreed);
-		throw std::runtime_error("Cannot load avatarBreed");
-		break;
-
-	}
+	printf("qAvatar::loadViewBuffers: um... not implemented right now\n");
+//
+////fuck it
+//		loaderRainbow(this);
+//		return;
+//
+//	printf(" 🚥 avatar_loadViewBuffers: avatar  ptr=%p  breed=%d\n", this, avatarBreed);
+//
+//	breed = breed ? breed : avatarBreed;
+//	switch (breed) {
+//	case avNULL:
+//		throw std::runtime_error("Cannot load avNULL");
+//
+//	case avOldFLAT:
+//		throw std::runtime_error("Cannot load oldFlat");  // actual code doesn't relly work
+//
+//	case avFLAT:
+//		loaderFlat(this);
+//		break;
+//
+//	case avFLAT_TICS:
+//		loaderFlatTics(this);
+//		break;
+//
+//	case avRAINBOW:
+//		loaderRainbow(this);
+//		break;
+//
+//	default:
+//		printf("Cannot load avatarBreed=%d\n", avatarBreed);
+//		throw std::runtime_error("Cannot load avatarBreed");
+//		break;
+//
+//	}
 
 }
 
