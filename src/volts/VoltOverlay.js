@@ -35,6 +35,7 @@ function setPT() {
 // this has all the interactive state for the voltage stuff as displayed over the wave.
 // Whole thing disappears/appears with mouse hover.
 function VoltOverlay(props) {
+	cfpt(VoltOverlay, props);
 	const p = props;
 	const mVD = p.mainVDisp;
 	if (!mVD)
@@ -126,11 +127,6 @@ function VoltOverlay(props) {
 		/>
 	</section>;
 }
-
-//, left: p.left
-	//			bumperWidth={p.bumperWidth}
-	// n=removed height={p.height} from VOltArea in favor of canvasInnerDims
-//removed from sidebar: 			showVoltage={p.showVoltage}
-
+setPT();
 
 export default VoltOverlay;

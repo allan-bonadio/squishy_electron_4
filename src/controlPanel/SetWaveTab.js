@@ -46,7 +46,8 @@ function setPT() {
 
 // a component that renders the Wave tab, to set a new wave
 function SetWaveTab(props) {
-	checkPropTypes(SetWaveTab.propTypes, props, 'prop', 'SetWaveTab');
+	cfpt(SetWaveTab, props);
+	//checkPropTypes(SetWaveTab.propTypes, props, 'prop', 'SetWaveTab');
 	let {saveMainWave, waveParams, setWaveParams, space} = props;
 
 	// set the captive minGraph wave to the new settings, after user changed one.

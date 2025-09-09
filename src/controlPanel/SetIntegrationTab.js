@@ -32,6 +32,7 @@ function setPT() {
 
 
 function SetIntegrationTab(props) {
+	cfpt(SetIntegrationTab, props);
 	// lowPassFilter, the number setting.  On the JS side, it's a percentage of N/2:
 	// and can range from 200/N (nyquist only) to 75
 	// so when N=16, user can set lowPass to 12.5 ... 75 percents = 1 to 6 freqs

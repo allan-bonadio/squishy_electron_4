@@ -19,6 +19,7 @@ function setPT() {
 }
 
 function SetResolutionTab(props) {
+	cfpt(SetResolutionTab, props);
 	const spa = props.space;
 	const context = useContext(SquishContext);
 

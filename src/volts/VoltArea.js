@@ -54,6 +54,7 @@ function setPT() {
 
 // ultimately, this is a <svg node with a <path inside it
 function VoltArea(props) {
+	cfpt(VoltArea, props);
 	const p = props;
 	const mVD = p.mainVDisp;
 	if (traceVoltageArea)
@@ -389,5 +390,6 @@ function VoltArea(props) {
 
 	return vArea;
 }
+setPT();
 
 export default VoltArea;

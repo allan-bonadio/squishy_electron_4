@@ -84,6 +84,7 @@ const setDialogElement =
 }
 
 function CommonDialog(props) {
+	cfpt(CommonDialog, props);
 	CommonDialog.setDialog = props.setDialog;  // method on App
 
 	// I want to use this someday, nonmodal... CommonDialog.dialogElement.show();
@@ -95,7 +96,7 @@ function CommonDialog(props) {
 		</dialog>
 	);
 }
-setPT();
+CommonDialog.propTypes = {dialogStyles: PropTypes.object, dialogContent: PropTypes.string};
 
 
 CommonDialog.openDialog =
@@ -129,6 +130,7 @@ CommonDialog.closeDialog =
 
 // this does the Simple case, just a simple dialog with an OK button
 function SimpleDialog(props) {
+	cfpt(SimpleDialog, props);
 	// There is one and only one CommonDialog, so I can use IDs in it
 	return (
 		<article id='SimpleDialog' onKeyDown={CommonDialog.returnEscapeKeyDown} >
@@ -139,6 +141,7 @@ function SimpleDialog(props) {
 		</article>
 	);
 }
+SimpleDialog.propTypes = {text: PropTypes.string};
 
 CommonDialog.openSimpleDialog =
 (text) => {
@@ -192,6 +195,7 @@ function prepError(ex) {
 
 // similar but for an error, comes out in Red
 function ErrorDialog(props) {
+	cfpt(ErrorDialog, props);
 	let ex = props.error;
 
 	console.error('Error Dialog: ', ex);
@@ -206,6 +210,7 @@ function ErrorDialog(props) {
 		</article>
 	);
 }
+ErrorDialog.propTypes = {where: PropTypes.string};
 
 CommonDialog.openErrorDialog =
 (ex, where) => {

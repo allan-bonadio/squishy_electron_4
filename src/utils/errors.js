@@ -3,6 +3,8 @@
 ** Copyright (C) 2022-2025 Tactile Interactive, all rights reserved
 */
 
+import PropTypes, {checkPropTypes} from 'prop-types';
+
 import qeFuncs from '../engine/qeFuncs.js';
 
 /* ****************************************************** diagnostics */
@@ -20,7 +22,7 @@ export function dumpJsStack(where = 'somewhere') {
 }
 window.dumpJsStack = dumpJsStack;
 
-/* ****************************************************** error/exception handling from C++ */
+/* ************************************** error/exception handling from C++ */
 
 // c++ will set this in exceptions.cpp someday
 window.cppErrorStack = '';
@@ -82,6 +84,7 @@ export function wrapForExc(func, where, andDebug) {
 
 /* *********************************************** browser Too Old */
 
+// TODO: isn't this a duplicate ofwhats in glAmbiance?
 // call this if the browser/machine are just way too old to support the stuff we use:
 // what = 'WebGL' at least v1, 'WebAssembly', dedicated 'WebWorkers', ...
 export function tooOldTerminate(what) {
@@ -106,3 +109,31 @@ export function tooOldTerminate(what) {
 	inHere.style.fontSize = '1.5em' ;
 	throw `So long, and thanks for all the fish!`;
 }
+
+
+/* *********************************************** check prop types */
+
+// React used to include PropTypes that had a function checkPropTypes().
+// Then,they converted to TS.  I'm not.  And I want traditional PropTypes.
+// check-prop-types package ressurrects this.  It's only 8 years old!
+// but it depends on an old version of PropTypes which I can't run.
+// original was PropTypes.checkPropTypes(GLScene.propTypes, props, 'prop', 'GLScene');
+//  ccpt(this, props);  // class component
+//  cfpt(func, props);  // func component
+// fully featured, this will print out a detailed msg and how to get to the code
+
+// a class component
+function ccpt(_this, props) {
+	const con = _this.constructor;
+	checkPropTypes(con.propTypes, props, 'prop', con.name);
+}
+
+// a function component.  Crashes if propType isn't installed.
+function cfpt(func, props) {
+	if (func.propTypes)
+		checkPropTypes(func.propTypes, props, 'prop', func.name);
+}
+
+// so I can get at them anywhere
+window.ccpt = ccpt;
+window.cfpt = cfpt;

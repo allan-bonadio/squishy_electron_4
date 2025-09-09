@@ -31,6 +31,7 @@ function setPT() {
 
 function VoltSidebar(props) {
 	if (!props) return '';  // too early
+	cfpt(VoltSidebar, props);
 	let sidebarWidth = props.width;
 
 	let mVD = props.mainVDisp;
