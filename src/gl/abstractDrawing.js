@@ -5,8 +5,9 @@
 
 /* superclass of all drawings.  A drawing is a piece of code that draws one thing on
 a GL canvas.  It's got v&f shaders, a source of data, and a Draw function.
-But it does NOT own the canvas or gl object - that's shared among all drawings on a effSceneRef.
+But it does NOT own the canvas or gl object - that's shared among all drawings on a scene.
 THat's why drawings are not the same thing as Scenes: a scene has zero or more drawings.
+Also, a canvas may alternate between scenes.
 
 drawings must include:
 - vertex and frag shaders, probably backtic strings
@@ -35,30 +36,28 @@ export class abstractDrawing {
 		this.space = scene.space;
 		this.avatar = scene.avatar;
 		this.avatarLabel = scene.avatar.label;
+		this.shaderTypes = {
+			[this.gl.VERTEX_SHADER]: 'vertex',
+			[this.gl.FRAGMENT_SHADER]: 'fragment'};
 
 		this.drawingName = drawingName;
 
-		this.perDrawingVAO = scene.perDrawingVAO
-		if (this.perDrawingVAO) {
-			this.vao = this.gl.createVertexArray();
-			this.tagObject(this.vao, `${this.avatarLabel}-${this.drawingName}-vao`);
-		}
-		else {
-			this.vao = scene.vao;
-		}
+		// vao for this drawing only
+		this.vao = this.gl.createVertexArray();
+		this.tagObject(this.vao, `${this.avatarLabel}-${this.drawingName}-vao`);
 
 		this.viewVariables = [];  // vars for this drawing ONLY
-
-		// the specific scene will put the drawing instances  into the array in its creator
 	}
 
-	/* ************************************************** Shader Creation/Compile */
+	/* *********************************** Shader Creation/Compile */
 
-	// tell GL that this is the vao and program to use
+	// tell GL that this is the vao and program to use.  On this gl context, till another setDrawing.
 	setDrawing() {
 		const gl = this.gl;
-		if (!this.program || !this.vao)
-			throw `in drawing: bad program=${this.program} or vao=${this.vao}`;
+		if (!this.program)
+			throw `in drawing: bad program=${this.program}`;
+		if (!this.vao)
+			throw `in drawing: bad vao=${this.vao}`;
 
 		gl.useProgram(this.program);
 		gl.bindVertexArray(this.vao);
@@ -67,15 +66,11 @@ export class abstractDrawing {
 	// compile one or the other shader; used only by compileProgram()
 	compileShader(type, srcString) {
 		const {gl} = this;
-
-		let shType = (gl.VERTEX_SHADER == type)
-			? 'vertex'
-			: gl.FRAGMENT_SHADER == type
-				? 'fragment'
-				: 'unknown type ';
+		const shType = this.shaderTypes[type];
 
 		let shader = gl.createShader(type);
-		this.tagObject(shader, `${this.avatarLabel}-${this.drawingName}-${shType}-sh`);
+		this.tagObject(shader,
+			`${this.avatarLabel}-${this.drawingName}-${shType}-sh`);
 
 		gl.shaderSource(shader, srcString);
 		gl.compileShader(shader);
@@ -84,8 +79,9 @@ export class abstractDrawing {
 
 		// error in compilation
 		const msg = gl.getShaderInfoLog(shader);
-		gl.deleteShader(shader);
-		throw new Error(`Error compiling ${shType} shader for ${this.sceneName}: ${msg}`);
+		//gl.deleteShader(shader);
+		throw new Error(`Error compiling ${shType} `
+			+` shader for ${this.sceneName}: ${msg}`);
 	}
 
 	// call this with your sources in setShaders().
@@ -111,9 +107,7 @@ export class abstractDrawing {
 		this.fragmentShader = fragmentShader;
 
 		gl.linkProgram(program);
-		var success = gl.getProgramParameter(program, gl.LINK_STATUS);
-
-		if (success) {
+		if (gl.getProgramParameter(program, gl.LINK_STATUS)) {
 			this.program = program;
 			this.setDrawing();  // is this needed?!
 
@@ -125,13 +119,13 @@ export class abstractDrawing {
 
 		// somehow failed compile.  So, no program
 		const msg = gl.getProgramInfoLog(program);
-		gl.deleteProgram(program);
+		//gl.deleteProgram(program);
 		throw new Error(`Error linking program for
 			${this.scene.sceneName} ${this.drawingName}: ${msg}`);
 	}
 
 	draw(width, height, specialInfo) {
-		console.error(`abstract drawing draw(${width, height})`);
+		throw new Error(`abstract drawing draw(${width, height})`);
 	}
 
 }

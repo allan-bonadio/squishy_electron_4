@@ -3,11 +3,6 @@
 ** Copyright (C) 2021-2025 Tactile Interactive, all rights reserved
 */
 
-// should have one VAO per viewdef, or per drawing?
-// per drawing seems to be the winner.
-// But keep this so we can go back and forth.
-let perDrawingVAO = true;   // false;
-
 let tracePaint = false;
 
 // Each abstractScene subclass is a definition of a kind of picture or scene;
@@ -38,15 +33,6 @@ export class abstractScene {
 		this.space = space;
 		this.avatar = avatar;
 
-		// boolean cuz I can't find any docs telling me how to use vao, in detail
-		this.perDrawingVAO = perDrawingVAO;
-
-		if (!this.perDrawingVAO) {
-			// vao for all drawings in this viewdef
-			this.vao = this.gl.createVertexArray();
-			this.tagObject(this.vao, `${this.constructor.name}-${avatar.label}-vao`);
-		}
-
 		// all of the drawings in this scene
 		// they get prepared, and drawn, in this same order
 		this.drawings = [];
@@ -66,10 +52,6 @@ export class abstractScene {
 			console.log(`🦊 abs completeScene() width=${this.canvas.width}, height=${this.canvas.height},`);
 
 		this.drawAllDrawings(this.canvas.width, this.canvas.height, specialInfo);
-
-		// and set up interactivity
-		// maybe i should get rid of this
-		//this.domSetupForAllDrawings(this.canvas);
 	}
 
 	/* ****************************************** Shader s */
