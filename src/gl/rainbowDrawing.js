@@ -11,7 +11,7 @@ import {drawingUniform, drawingAttribute} from './drawingVariable.js';
 import qeConsts from '../engine/qeConsts.js';
 import qeFuncs from '../engine/qeFuncs.js';
 
-let traceViewBufAfterDrawing = true;
+let traceViewBufAfterDrawing = false;
 let traceRainbowDrawing = true;
 
 
@@ -102,9 +102,9 @@ export class rainbowDrawing extends abstractDrawing {
 			let angle = s * RADIANS_PER_SEG;
 			let si0 = Math.sin(angle);
 			let co0 = Math.cos(angle);
-			console.log(`seg: ${s}  angle: ${angle.toFixed(4)} `
-				+` degrees: ${(angle * 180 / 3.1415926535898).toFixed(4)} `
-				+` sine ${si0.toFixed(4)}   cosine ${co0.toFixed(4)}`);
+			// console.log(`seg: ${s}  angle: ${angle.toFixed(4)} `
+			// 	+` degrees: ${(angle * 180 / 3.1415926535898).toFixed(4)} `
+			// 	+` sine ${si0.toFixed(4)}   cosine ${co0.toFixed(4)}`);
 
 			pos[p + 0] = RADIUS * co0 + originX;
 			pos[p + 1] = RADIUS * si0 + originY;
@@ -126,7 +126,7 @@ export class rainbowDrawing extends abstractDrawing {
 
 		if (traceRainbowDrawing) {
 			console.log(`🌈 🌈 rainbowDrawing  ${this.avatarLabel}: `
-				+` width=${width}, height=${height}  drawing ${this.vertexCount/2} points`);
+				+` width=${width}, height=${height}  drawing ${nVERTS} points`);
 		}
 		const gl = this.gl;
 		this.setDrawing();
