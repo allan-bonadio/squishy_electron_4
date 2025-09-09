@@ -85,8 +85,10 @@ $EMSDK/upstream/emscripten/emcc -o wasm/quantumEngine.js \
 	main.cpp $allCpp || exit $?
 set +x
 
-ls -lt wasm
+ls -lth wasm
 echo "done at"  `date '+%a %d, %H:%M:%S'`
+exit 0
+
 # should have produced, eg:
 # -rw-r--r--  1 allan  staff    99805 Jan 28 23:29 quantumEngine.js
 # -rw-r--r--  1 allan  staff     5825 Jan 28 23:29 quantumEngine.worker.js

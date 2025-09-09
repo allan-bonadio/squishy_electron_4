@@ -17,22 +17,21 @@ let traceVBuffer = false;
 // use attachViewBuffer() to attach each of your buffers (max 4)
 
 // OR adapt a qAvatar (eg one on qSpace) with eAvatar.adaptAvatar()
-// usually 2 buffers, position and color
 // the integration engine should usually populate the buffers as part
 // of its cycle, at the end of an integration frame.
 
 
 class eAvatar {
 	// create An eAvatar complete with its inner qAvatar.  (zero buffers)
-	// use this if you're doing something other than the original two space's avatars
+	// use this if you're doing something other than the original  space's avatars
 	static createAvatar(avatarBreed, label) {
-		console.log(`creatAvatar: avatarBreed=${avatarBreed} lab='${label}'`);
+		console.log(`🚦 createAvatar: avatarBreed=${avatarBreed} lab='${label}'`);
 		let qA = qeFuncs.avatar_create(avatarBreed, label);
 		return new eAvatar(qA);
 	}
 
 	// given a pointer to a qAvatar, return  an eAvatar that wraps it.
-	// Also creates the typed arrays for existing buvers.
+	// Including existing buffers.
 	static adaptAvatar(pointer) {
 		let av = new eAvatar(pointer);
 		av.wrapViewBuffers();
@@ -40,20 +39,24 @@ class eAvatar {
 	}
 
 	// DO NOT USE THIS to create an eAvatar in JS!  use adaptAvatar() or
-	// createAvatar() above.  To create an eAvatar, you must already have an existing
-	// qAvatar and pointer to it. pointer is an integer pointing into the C++
-	// address space, to the qAvatar object. The space comes with 2 qAvatars
-	// already. Or, call createAvatar() above.
+	// createAvatar() above.  To create an eAvatar, you must already have an
+	// existing qAvatar and pointer to it. pointer is an integer pointing into
+	// the C++ address space, to the qAvatar object. The space comes with 2
+	// qAvatars already. Or, call createAvatar() above.
 	constructor(pointer) {
 		if (!pointer) throw Error("Need pointer to create eAvatar")
 		prepForDirectAccessors(this, pointer);
+		if (!pointer || pointer < 10)
+			throw "cannot construct eAvatar without qAvatar pointer: ${pointer}";
 
 		// for the Float32Arrays for each C++ float arrays
 		this.typedArrays = new Array(4);
 		this.bufferNames = new Array(4);
 
+		this.label = UTF8ToString(this._label, MAX_LABEL_LEN);
+
 		if (traceCreation)
-			console.log(`cti eAvatar constructed:`, this);
+			console.log(`🚦 cti eAvatar constructed:`, this);
 	}
 
 	// delete, except 'delete' is a reserved word.  Turn everything off. null out
@@ -68,12 +71,13 @@ class eAvatar {
 	// set an element in the typedArray bloc
 	reserveTypedArray(whichBuffer, array) {
 		if (this.typedArrays[whichBuffer])
-			throw Error(`typed array ${whichBuffer} already reserved`);
+			throw Error(`🚦 typed array ${whichBuffer} already reserved`);
 		return this.typedArrays[whichBuffer] = array;
 	}
 
 	// adds another view buffer onto the avatar.  You choose which one, need not
-	// be consecutive. But cannot do duplicates.  Will ultimately hold
+	// be consecutive. But cannot do duplicates.  Returns the typed array itself.
+	// Will ultimately hold
 	// (nCoordsPerVertex * nVertices) single floats. useThisMemory is a float *
 	// pointer for the array in C++ memory.  Just an integer, in C++ global
 	// space. pass it if you have one, or else it'll allocate its own in C++ space.
@@ -81,7 +85,7 @@ class eAvatar {
 	attachViewBuffer(whichBuffer, useThisMemory,
 		nCoordsPerVertex, nVertices, name) {
 		if (this.typedArrays[whichBuffer])
-			throw `Second allocate of typed array ${this.label} buffer ${whichBuffer}`;
+			throw `🚦 Second allocate of typed array ${this.label} buffer ${whichBuffer}`;
 		this.bufferNames[whichBuffer] = name;
 
 		// buffer of floats, 4 by apiece
@@ -99,7 +103,7 @@ class eAvatar {
 	attachIndexBuffer(useThisMemory, nItems) {
 
 		if (this.indexBuffer)
-			throw `Second allocate of typed array ${this.label} buffer ${whichBuffer}`;
+			throw `🚦 Second allocate of typed array ${this.label} buffer ${whichBuffer}`;
 
 		if (!useThisMemory)
 			useThisMemory = qeFuncs.buffer_allocateBuffer(2 * nItems);
@@ -138,6 +142,7 @@ class eAvatar {
 	// are passed by pointer ... long story, see code and directAccessors.h
 
 
+
 	get avatarBreed() { return this.ints[1]; }
 	set avatarBreed(a) { this.ints[1] = a; }
 	get _space() { return this.ints[3]; }
@@ -158,7 +163,7 @@ class eAvatar {
 
 	/* **************************** 🥽 end of direct accessors */
 
-	// this just gets the pointer to the view buffer...  the JS typed array
+	// this just gets the TypedArray, ready to use.  attachViewBuffer() also returns it.
 	getViewBuffer(bufferIx) {
 		return this.typedArrays[bufferIx];
 		//avatar_getViewBuffer(this.pointer, bufferIx);
@@ -171,9 +176,9 @@ class eAvatar {
 	// 0-15 for vertex bufs, any combo; 128 for index buf
 	dumpViewBuffers(whichBuffers, title) {
 		// if (whichBuffers & -16)
-		// 	throw Error(`dumpViewBuffers with bad whichBuffers ${whichBuffers}`);
+		// 	throw Error(`🚦 dumpViewBuffers with bad whichBuffers ${whichBuffers}`);
 		console.group(title);
-		qeFuncs.avatar_dumpViewBuffers(this.pointer, whichBuffers, title);
+		qeFuncs.avatar_dumpViewBuffers(this.pointer, whichBuffers, ' ');
 		console.groupEnd();
 	}
 
@@ -189,10 +194,10 @@ class eAvatar {
 //			this.smoothHighest = this.highest;
 //		else
 //			this.smoothHighest = (this.highest + 3*this.smoothHighest) / 4;
-//		if (traceHighest) console.log(`cti eAvatar ${this.label}: highest=${this.highest}  `+
+//		if (traceHighest) console.log(`🚦 cti eAvatar ${this.label}: highest=${this.highest}  `+
 //			`smoothHighest=${this.smoothHighest}`);
 //		if (traceVBuffer)
-//			this.dumpViewBuffer(`afterLoadViewBuffer`);
+//			this.dumpViewBuffer(`🚦 afterLoadViewBuffer`);
 
 	// delete the eAvatar and qAvatar and its owned buffers
 //	deleteAvatar() {

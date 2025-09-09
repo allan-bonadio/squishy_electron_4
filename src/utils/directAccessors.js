@@ -17,10 +17,10 @@ export let cppObjectRegistry = {};
 // In your JS constructor, call prepForDirectAccessors(this, pointer).
 // pointer is the C++ pointer to the start of the obj in C++ heap memory.
 // Then, see directAccessors.h and qAvatar.cpp and  eAvatar.js
+// or qWave or qSpace or qGrinder
 export function prepForDirectAccessors(_this, pointer) {
 	// we directly access fields in this C++ object,
 	// cuz the overhead from each js-C++ call is kindof large
-	if (!_this.pointer)
 	_this.pointer = pointer;
 	if (!_this.pointer)
 		console.error(`Error in Direct Accessors: pointer is falsy`, pointer);

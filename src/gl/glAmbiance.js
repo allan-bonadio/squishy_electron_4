@@ -7,7 +7,7 @@
 // of details; choosing between webgl1 or 2, attaches shims for features in 2
 // that are absent in 1, a few other things.  includes gl, canvas node, and some squirrelly code.
 
-// webgl-lint: sigh.
+// webgl-lint: sigh.  TODO: get this working.  if ever.
 // the gl Tests aren't tuned in to node_modules; use the https form for those.
 // the app is fine with it, so use the regular form.
 let webglLintProm;
@@ -19,10 +19,10 @@ else {
 
 let traceVersion = false;
 
-/* ********************************************************** browser-too-old error */
+/* *********************************************** browser-too-old error */
 
 // call this if the browser/machine are just way too old to support webgl
-export function tooOldTerminate(what) {
+export function tooOldTerminate() {
 	let tooOldMessage = `Sorry, your browser is too old for WebGL.
 		That's really really old!!
 		Probably the best solution is to get a more recent browser.`;
@@ -34,7 +34,7 @@ export function tooOldTerminate(what) {
 	throw `So long, and thanks for all the fish!`;
 }
 
-/* ********************************************************** actual glAmbiance class */
+/* ***************************************** actual glAmbiance class */
 
 // create one of these for each canvas, to get the gl context, and other prep.
 // Returns a promise because webgl-lint must load asynchronously.
@@ -54,7 +54,7 @@ class glAmbiance {
 		if (!glAmbiance.preferWebGL2 && !this.gl)
 			this.setupGL2(canvas);
 		if (!this.gl)
-			tooOldTerminate(`Sorry, your browser's WebGL is kindof old.`);
+			tooOldTerminate();
 
 		// caller must wait for this before it's ready to go
 		if (webglLintProm) {

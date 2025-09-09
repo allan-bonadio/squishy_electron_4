@@ -31,7 +31,5 @@ phase tangent =x / (y + 1e-6)
 
 
 ### How to Test
-
-./glTranslate.js
-./cx2rygb.test.js
+  glTranslate.js  cx2rygb.test.js
 

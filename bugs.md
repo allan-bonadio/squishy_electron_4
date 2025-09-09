@@ -41,7 +41,7 @@ Now the offset slider.  JUST the offset slider.  Doing it slowly is OK.
 √ - WELL: last points on ends have no ink so there's this black acute triangle instead of color.  No that's right - i's zero at the ends
 
 - display Garland Spiral in 3d could be easy.
-	Really should use Three.js
+- Really should use Three.js    NO  !! tried it; totally wrong for what I need.
 
 😡- use gl.getError() (I already do in some places)
 
