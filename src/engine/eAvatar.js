@@ -53,7 +53,7 @@ class eAvatar {
 		this.typedArrays = new Array(4);
 		this.bufferNames = new Array(4);
 
-		this.label = UTF8ToString(this._label, MAX_LABEL_LEN);
+		this.label = UTF8ToString(this._label, qeConsts.MAX_LABEL_LEN);
 
 		if (traceCreation)
 			console.log(`🚦 cti eAvatar constructed:`, this);
