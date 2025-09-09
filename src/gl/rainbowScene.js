@@ -4,28 +4,33 @@
 */
 
 import {abstractScene} from './abstractScene.js';
-import * as THREE from 'three';
 import {rainbowDrawing} from './rainbowDrawing.js';
 // eslint-disable-next-line no-unused-vars
 import {ticDrawing} from './ticDrawing.js';
 import qeConsts from '../engine/qeConsts.js';
 import eAvatar from '../engine/eAvatar.js';
 
+	const nSegs = 36;
+	const nVerts = nSegs + 1;
+
 class rainbowScene extends abstractScene {
 
-	constructor(sceneName, canvas, space, av) {
-		super(sceneName, canvas, space, av);
+	constructor(sceneName,ambiance, space, avatar) {
+		super(sceneName,ambiance, space, avatar);
 
-		// Repurpose the avatar for our stuff.  Close enough as long as you have
-		// enough datapoints.
-		this.canvas = canvas;
-		this.avatar = av;
-		//av.ints[2] = qeConsts.avRAINBOW;
+		// We don't use that avatar, we make our own.
+		this.canvas = ambiance.canvas;
+		this.gl = ambiance.gl;
+
+		// blow off the passed-in avatar.
+		// create avatar but don't stick buffers; the drawing does that
+		this.avatar = eAvatar.createAvatar(qeConsts.avRAINBOW, sceneName);
 
 		// create relevant drawings.
 		this.drawings = [ new rainbowDrawing(this) ];
 	}
 }
+
 
 export default rainbowScene;
 

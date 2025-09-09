@@ -5,6 +5,7 @@
 
 import {abstractScene} from './abstractScene.js';
 import flatScene from './flatScene.js';
+import rainbowScene from './rainbowScene.js';
 
 let traceSceneClasses = true;
 
