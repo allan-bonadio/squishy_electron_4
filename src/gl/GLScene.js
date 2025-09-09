@@ -3,6 +3,8 @@
 ** Copyright (C) 2021-2025 Tactile Interactive, all rights reserved
 */
 
+// TODO: rename this GLScene => GLCanvas after the dust settles
+
 // GLScene  wraps a canvas for display.  Via webgl.
 // And the Drawing and Scene machinery mgmt.  General for all gl canvases.
 
@@ -70,21 +72,23 @@ function GLScene(props) {
 	let glRef = useRef(null);
 	let gl = glRef.current;
 
-	// set up the view class - what kind of drawings it has.  Base classes
+	// set up the Scene - collection of drawings to draw in one rectangle.  Base classes
 	// abstractDrawing and abstractScene must do this after the canvas AND the
 	// space exist.
 	const initSceneClass =
 	(ambiance) => {
 		let sClass = listOfSceneClasses[p.sceneClassName];
 
-		// MUST use the props.avatar!  we can't get it from the space, cuz which one?
+		// use the props.avatar?  we can't get it from the space, cuz which one?
 		effectiveScene = new sClass(p.sceneName, ambiance, p.space, p.avatar);
 		effSceneRef.current = effectiveScene;
 
 		effectiveScene.completeScene(p.specialInfo);
 
 		// now that there's an avatar, we can set these functions so everybody can use them.
-		p.avatar.doRepaint = doRepaint;
+		// NO!  p.avatar.doRepaint = doRepaint;
+		effectiveScene.doRepaint = doRepaint;
+
 		// intrinsic to avatar p.avatar.reStartDrawing = reStartDrawing;
 		//p.avatar.setGlViewport = setGlViewport;
 		if (traceSetup) console.log(`🖼 GLScene ${p.sceneName} ${p.avatar.label}: `
@@ -101,13 +105,13 @@ function GLScene(props) {
 				console.log(`🖼 GLScene ${p.avatar.label}: too early for doRepaint  effectiveScene=${effectiveScene}`);
 			return null;  // too early
 		}
-		if (traceViewBuffer)
-			p.avatar.ewave.dump(`🖼 GLScene ${p.sceneName}: got the ewave right here`);
+      // if (traceViewBuffer)
+      //    p.avatar.ewave.dump(`🖼 GLScene ${p.sceneName}: got the ewave right here`);
 
 		// copy from latest wave to view buffer (c++) & pick up highest
-		p.avatar.loadViewBuffer();
-		if (traceViewBuffer)
-			p.avatar.dumpViewBuffer(`🖼 GLScene ${p.sceneName}: loaded ViewBuffer`);
+		//p.avatar.loadViewBuffer();
+      // if (traceViewBuffer)
+      //    p.avatar.dumpViewBuffer(`🖼 GLScene ${p.sceneName}: loaded ViewBuffer`);
 
 		// draw.  This won't set up an ∞ loop, right?
 		effectiveScene.drawAllDrawings(canvasNode.width, canvasNode.height, p.specialInfo);
@@ -133,7 +137,7 @@ function GLScene(props) {
 			glRef.current = gl;
 			p.setGlCanvas?.(gl);
 
-			canvasNode.squishViewName = p.sceneName;
+			canvasNode.squishSceneName = p.sceneName;
 			initSceneClass(ambiance);
 
 			if (traceSetup)
@@ -141,6 +145,7 @@ function GLScene(props) {
 		});
 	}
 
+   // repaint after each React render of the canvas.  This is an Effect.
 	// can't do much first rendering; no canvasNode yet.  Second time, no gl
 	// yet.  but otherwise, after each render.  Renders should be infrequent,
 	// only when dimensions of the canvas change or other big change.
