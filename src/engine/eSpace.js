@@ -19,7 +19,7 @@ let traceFamiliarWave = true;
 let traceGlobalSpace = true;
 
 
-/* **************************************************************** eSpace */
+/* ************************************************ eSpace */
 // this is how you create a qSpace - start from JS and call this.
 // call like this:
 // new eSpace([{N: 128, continuum: qeConsts.contENDLESS,coord: 'x', etc}], spaceLabelString)
@@ -60,24 +60,19 @@ export class eSpace {
 		this.vDisp.setFamiliarVoltage(voltageParams);
 
 		// the avatars create their vbufs and waves, and we make a copy for ourselves
-		this.mainAvatar = new eAvatar(this._mainAvatar);
-		this.miniGraphAvatar = new eAvatar(this._miniGraphAvatar);
-
+		// no, done by scene this.mainAvatar = eAvatar.adaptAvatar(this._mainAvatar);
+		// no, done by scene this.miniGraphAvatar = eAvatar.adaptAvatar(this._miniGraphAvatar);
 
 		this.grinder = new eGrinder(this, this.mainAvatar, this._grinder);
-		this.mainWave = this.grinder.flick;
-		this.miniGraphWave = new eWave(this);
+		this.mainWave = this.grinder.flick;  // i know its a flick not a wave
+		this.miniGraphWave = new eWave(this, null, this._miniGraphWave);
 
 		// SetWave most recent settings.
 		let waveParams = getAGroup('waveParams');
 		this.mainWave.setFamiliarWave(waveParams);
 		this.miniGraphWave.setFamiliarWave(waveParams);
-		if (traceFamiliarWave) console.log(`🚀  done with setFamiliarWave():`,
-			JSON.stringify(this.mainWave.wave));
-
-		//qeFuncs.grinder_copyFromAvatar(this.grinder.pointer, this.mainAvatar.pointer);
-
-		//this.miniGraphAvatar.ewave.setFamiliarWave(waveParams);  //  SquishPanel re-does this for SetWave
+		if (traceFamiliarWave)
+			console.log(`🚀  done with setFamiliarWave():`, this.mainWave.wave);
 
 		this.sInteStats = new inteStats(this);
 		if (traceSpace) console.log(`🚀  done creating eSpace:`, this);
@@ -119,8 +114,9 @@ export class eSpace {
 		}
 	}
 
-	/* ****************************************** 🥽 Direct Accessors */
+	/* ********************************* 🥽 Direct Accessors */
 	// see qSpace.cpp and directAccessors.h to regenerate this.
+
 
 	get _voltage() { return this.ints[1]; }
 
@@ -131,13 +127,16 @@ export class eSpace {
 	get nStates() { return this.ints[43]; }
 	get nPoints() { return this.ints[44]; }
 	get dimLength() { return this.doubles[4]; }
- 	get dt() { return this.doubles[20]; }
- 	get nDimensions() { return this.ints[42]; }
- 	get spectrumLength() { return this.ints[45]; }
+	get dt() { return this.doubles[20]; }
+	get nDimensions() { return this.ints[42]; }
+	get spectrumLength() { return this.ints[45]; }
 	get _mainAvatar() { return this.ints[46]; }
 	get _miniGraphAvatar() { return this.ints[47]; }
- 	get _grinder() { return this.ints[49]; }
- 	get _label() { return this.pointer + 200; }
+	get _miniGraphWave() { return this.ints[48]; }
+	get _grinder() { return this.ints[49]; }
+	get _label() { return this.pointer + 200; }
+
+
 
 	/* **************************** 🥽 end of direct accessors */
 

@@ -53,8 +53,14 @@ let exportsSrc  = [
 	// accept an integer pointer to the qWave as first arg
 	{name: 'wave_normalize', args: ['number'], retType: null},
 
-	// create a new one, allocating the space dynamically, that conforms to the space passed in
-	{name: 'qwave_create', args: ['number', 'number'], retType: 'number'},
+	// create a new qWave, allocating the space dynamically, that conforms to the space passed in
+	{name: 'wave_create', args: ['number', 'number'], retType: 'number'},
+	{name: 'wave_delete', args: ['number'], retType: null},
+
+	{name: 'flick_create', args: ['number', 'number'], retType: 'number'},
+	{name: 'flick_delete', args: ['number'], retType: null},
+
+	//? can't get to work {name: 'flick_delete', args: ['number'], retType: null},
 
 	/* ***************************************** avatars */
 	// most accept an integer pointer to the avatar as first argument
@@ -85,8 +91,10 @@ let exportsSrc  = [
 
 	// ************************* grinder
 
-	// for the older, same-thread integration, or to be run in a/the thread
-	// maybe done with js Atomics? but alternative for debugging
+	{name: 'grinder_create', args: ['number', 'number', 'string'], retType: 'number'},
+	{name: 'grinder_delete', args: ['number'], retType: null},
+
+	// alternative to the JS atomic triggering
 	{name: 'grinder_triggerIteration', args: ['number'], retType: null},
 
 	// only needed if UI thread does a frame's worth of integration (siingle thread)

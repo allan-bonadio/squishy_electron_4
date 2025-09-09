@@ -19,13 +19,18 @@ let traceTriggerIteration = false;
 // a qGrinder manages integration frames of a wave
 class eGrinder {
 	// eSpace we're in , creates its eGrinder
-	constructor(space, avatar, pointer) {
+	constructor(space) {
+	//constructor(space, avatar, pointer) {
+		let pointer = qeFuncs.grinder_create(space.pointer, 1, 'main');
+		/// ummm...
+
+
 		prepForDirectAccessors(this, pointer);
 		// ?? this.label = window.Module.AsciiToString(this._label);
 
 		this.space = space;
-		this.avatar = avatar;  // the avatar it loads into
-		avatar.grinder = this;
+// 		this.avatar = avatar;  // the avatar it loads into
+// 		avatar.grinder = this;
 
 		// for the flick we only have the pointer.  Similar to a eWave and cross fingers.
 		this.flick = new eFlick(space, this._flick);
@@ -44,7 +49,7 @@ class eGrinder {
 		this.ewave.liquidate();
 		this.space = this.ewave = this.vBuffer = null;
 
-		//qeFuncs.grinder_delete(this.pointer);
+		qeFuncs.grinder_delete(this.pointer);
 	}
 
 	/* ***************************** 🥽 Direct Accessors */
@@ -52,10 +57,12 @@ class eGrinder {
 	// are passed by pointer and you need to allocate them in JS (eg see
 	// eGrinder.constructor)
 
+
 	get _space() { return this.ints[1]; }
-	get _qflick() { return this.ints[3]; }
+	get _flick() { return this.ints[3]; }
 	get _voltage() { return this.ints[4]; }
-	get _qspect() { return this.ints[5]; }
+	get _spect() { return this.ints[5]; }
+	get _stage() { return this.ints[2]; }
 
 	get stepsPerFrame() { return this.ints[7]; }
 	set stepsPerFrame(a) { this.ints[7] = a; }
@@ -91,6 +98,7 @@ class eGrinder {
 	get needsRepaint() { return Boolean(this.bytes[155]); }
 	set needsRepaint(a) { this.bytes[155] = Boolean(a); }
 	get sentinel() { return this.bytes[156]; }
+	set sentinel(a) { this.bytes[156] = a; }
 
 	/* ******************* end of direct accessors */
 

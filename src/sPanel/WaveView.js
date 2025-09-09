@@ -19,8 +19,7 @@ import {getASetting, storeASetting} from '../utils/storeSettings.js';
 
 import VoltOverlay from '../volts/VoltOverlay.js';
 import {WELL_BUMPER_WIDTH} from '../volts/voltConstants.js';
-import GLCanvas from '../gl/GLCanvas.js';  // ??
-import GLScene from '../gl/GLScene.js';  // ??
+import GLScene from '../gl/GLScene.js';
 import {eSpaceCreatedPromise} from '../engine/eEngine.js';
 import SquishContext from './SquishContext.js';
 import StartStopOverlay from './StartStopOverlay.js';
@@ -58,13 +57,13 @@ export class WaveView extends React.Component {
 
 	constructor(props) {
 		super(props);
-		checkPropTypes(this.constructor.propTypes, props, 'prop', this.constructor.name);
+		checkPropTypes(this.constructor.propTypes, props, 'prop',
+				this.constructor.name);
 
 		this.state = {
 			// height of just the canvas + DOUBLE_THICKNESSpx, as set by user with size box
-			outerHeight: round(getASetting('miscSettings', 'waveViewHeight')),  // integer pixels
-
-			// no!  handed in by promise space: null,  // set when promise comes in
+			// integer pixels
+			outerHeight: round(getASetting('miscSettings', 'waveViewHeight')),
 		}
 
 		this.updateInnerDims();  // after outerWidth done
@@ -104,7 +103,7 @@ export class WaveView extends React.Component {
 		wv = {
 			space: space,
 			grinder: space.grinder,
-			mainEAvatar: space.mainEAvatar,
+			mainAvatar: space.mainAvatar,
 
 			// make room for the bumpers for WELL continuum (both sides).  Note that
 			// continuum can change only when page reloads.
@@ -316,9 +315,13 @@ export class WaveView extends React.Component {
 		// can't make a real GLScene until we have the space!
 		let glScene;
 		if (this.space) {
+			let rbow = true;  // for testing only
+			let sceneClassName = rbow ? 'rainbowScene' : 'flatScene';
+			let sceneName = rbow ? 'rainbow' : 'mainWave';
+
 			glScene = <GLScene
 				space={s.space} avatar={s.space.mainEAvatar}
-				sceneClassName='flatScene' sceneName='mainWave'
+				sceneClassName={sceneClassName} sceneName={sceneName}
 				canvasInnerWidth={this.canvasInnerWidth}
 				canvasInnerHeight={this.canvasInnerHeight}
 				setGlCanvas={this.setGlCanvas}

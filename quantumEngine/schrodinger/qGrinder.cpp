@@ -64,7 +64,7 @@ qGrinder::qGrinder(qSpace *sp, int nGrWorkers, const char *lab)
 		pleaseFFT(false), sentinel(grSENTINEL_VALUE) {
 
 	// number of waves
-	flick = new qFlick(space, 3, 0);
+	flick = new qFlick(space, 3);
 
 	// recieves wave after a frame is done; then vbufs generated from that
 	stage = new qWave(space, NULL);
@@ -345,11 +345,11 @@ void qGrinder::oneFrame() {
 	double dt = stretchedDt;
 	double dtHalf = dt / 2;
 
-	// half step in beginning to move Im forward dt/2
+	// half step in beginning to move Im forward dt/2 = dtHalf
 	// cuz outside of here, re and im are synchronized.
 	flick->fixThoseBoundaries(wave0);
 	hitReal(wave1, wave0, wave0, 0);
-	hitImaginary(wave1, wave0, wave0, dt/2);
+	hitImaginary(wave1, wave0, wave0, dtHalf);
 
 	// do stepsPerFrame steps of  integration.
 	// Note here the latest is in [1]; frame continues this,
@@ -373,7 +373,7 @@ void qGrinder::oneFrame() {
 	// half hit at completion to move Re forward dt / 2
 	// and copy back to Main
 	flick->fixThoseBoundaries(wave1);
-	hitReal(wave0, wave1, wave1, dt/2);
+	hitReal(wave0, wave1, wave1, dtHalf);
 	hitImaginary(wave0, wave1, wave1, 0);
 
 	// normalize it and return the old inner product, see how close to 1.000 it is
@@ -527,6 +527,17 @@ void qGrinder::triggerIteration() {
 void grinder_triggerIteration(qGrinder *grinder) {
 	grinder->triggerIteration();
 }
+
+/* ********************************************************** birth and death  */
+
+qGrinder *grinder_create(qSpace *space, int nGrWorkers, const char *label) {
+	return new	qGrinder(space, nGrWorkers, label);
+}
+
+void grinder_delete(qGrinder *grinder) {
+	delete grinder;
+}
+
 
 /* ********************************************************** exceptions  */
 

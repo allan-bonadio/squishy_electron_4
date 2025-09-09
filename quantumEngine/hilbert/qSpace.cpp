@@ -186,8 +186,17 @@ void qSpace::formatDirectOffsets(void) {
 	makeIntGetter(spectrumLength);
 
 	makePointerGetter(mainAvatar);
+	makePointerSetter(mainAvatar);
 	makePointerGetter(miniGraphAvatar);
+	makePointerSetter(miniGraphAvatar);
+
+	makePointerGetter(mainFlick);
+	makePointerSetter(mainFlick);
+	makePointerGetter(miniGraphWave);
+	makePointerSetter(miniGraphWave);
+
 	makePointerGetter(grinder);
+	makePointerSetter(grinder);
 
 	makeStringPointer(label);
 

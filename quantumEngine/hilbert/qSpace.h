@@ -35,6 +35,11 @@ extern qCx hamiltonian(struct qSpace *space, qCx *wave, int ix);
 
 struct qDimension {
 public:
+	// called by qSpace::tallyDimensions() to count/sum/multiply up stuff
+	void tally(qSpace *space);
+
+	void dumpDimension(void);
+
 	// possible  states, just for this  dimension.  end + start == datapoints=nPoints
 	// end - start == N.  always loop for (j=start; j < end; j++) for actual state 𝜓
 	int N;
@@ -71,11 +76,6 @@ public:
 	int spectrumLength;
 
 	char label[MAX_LABEL_LEN+1];
-
-	// called by qSpace::tallyDimensions() to count/sum/multiply up stuff
-	void tally(qSpace *space);
-
-	void dumpDimension(void);
 };
 
 /* ************************************************************ the space */
@@ -118,10 +118,15 @@ public:
 	int nPoints;  // allocated size
 	int spectrumLength;  // should == nStates
 
+	// each of these objects is created and linked into the space  in js, when ready
 	struct qAvatar *mainAvatar;
 	struct qAvatar *miniGraphAvatar;
+
+	struct qWave *mainFlick;
 	struct qWave *miniGraphWave;
+
 	struct qGrinder *grinder;
+
 
 	char label[MAX_LABEL_LEN+1];
 
@@ -138,6 +143,10 @@ extern "C" {
 	qSpace *startNewSpace(const char *name = "a space");
 	void addSpaceDimension(qSpace *space, int N, int continuum, double dimLength, const char *label);
 	qSpace *completeNewSpace(qSpace *space, int nThreads);
+
+	// do i need this?  maybe not.
+	void linkUp(qSpace *space,
+		qAvatar *mainAvatar, qAvatar *miniGraphAvatar, qWave *mainFlickWave, qWave *miniGraphWave );
 
 	// destroy
 	void deleteFullSpace(qSpace *space);

@@ -248,6 +248,11 @@ struct qGrinder {
 
 // for JS to call.  Defined in jsSpace, qGrinder and elsewhere.
 extern "C" {
+
+	qGrinder *grinder_create(qSpace *space, int nGrWorkers, const char *label);
+
+	void grinder_delete(qGrinder *qgrinder);
+
 	//void grinder_initThreadIntegration(qGrinder *grinder, int threadSerial);
 	void grinder_oneFrame(qGrinder *grinder);
 	void grinder_triggerIteration(qGrinder *grinder);
