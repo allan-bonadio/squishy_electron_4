@@ -57,8 +57,9 @@ export class WaveView extends React.Component {
 
 	constructor(props) {
 		super(props);
-		checkPropTypes(this.constructor.propTypes, props, 'prop',
-				this.constructor.name);
+		ccpt(this, props);
+		// checkPropTypes(this.constructor.propTypes, props, 'prop',
+		// 		this.constructor.name);
 
 		this.state = {
 			// height of just the canvas + DOUBLE_THICKNESSpx, as set by user with size box
@@ -320,7 +321,7 @@ export class WaveView extends React.Component {
 			let sceneName = rbow ? 'rainbow' : 'mainWave';
 
 			glScene = <GLScene
-				space={s.space} avatar={s.space.mainEAvatar}
+				space={s.space} avatar={s.space.mainAvatar}
 				sceneClassName={sceneClassName} sceneName={sceneName}
 				canvasInnerWidth={this.canvasInnerWidth}
 				canvasInnerHeight={this.canvasInnerHeight}

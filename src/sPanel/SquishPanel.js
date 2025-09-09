@@ -116,7 +116,7 @@ export class SquishPanel extends React.Component {
 
 			this.animator = new sAnimator(this, space, this.setShouldBeIntegrating);
 
-			this.mainEAvatar = space.mainEAvatar;
+			this.mainAvatar = space.mainAvatar;
 			this.grinder = space.grinder;
 			pointerContextMap.register(space.grinder.pointer, this.context);
 			//pointerContextMap.dump();
@@ -161,7 +161,7 @@ export class SquishPanel extends React.Component {
 	// ControlPanel but affects WaveView.  Should be implemented thru context TODO
 	repaintWholeMainWave = () => {
 		debugger;
-		let avatar = this.mainEAvatar;
+		let avatar = this.mainAvatar;
 		let grinder = this.grinder;
 
 		// trigger redrawing of WaveView cuz they're passed in via props
