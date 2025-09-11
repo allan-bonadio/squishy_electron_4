@@ -4,7 +4,7 @@
 
 This is the scheme for the Octogon Algorithm, mapping from Re, Im to RYGB to RGB.
 the octagon:
-√ =  √0.5 or 1/√2
+√ =  √0.5 or 1/√2 or maybe 1, keep changing my mind
 
 ```
 								yellow 1,1,0
