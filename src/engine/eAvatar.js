@@ -83,7 +83,7 @@ class eAvatar {
 	// space. pass it if you have one, or else it'll allocate its own in C++ space.
 	// allocate the index buf bloc in C++, then wrap it in a typed array in JS
 	attachViewBuffer(whichBuffer, useThisMemory,
-		nCoordsPerVertex, nVertices, name) {
+				nCoordsPerVertex, nVertices, name) {
 		if (this.typedArrays[whichBuffer])
 			throw `🚦 Second allocate of typed array ${this.label} buffer ${whichBuffer}`;
 		this.bufferNames[whichBuffer] = name;
@@ -96,6 +96,9 @@ class eAvatar {
 		let pointer = qeFuncs.avatar_attachViewBuffer(this.pointer, whichBuffer,
 				useThisMemory, nCoordsPerVertex, nVertices);
 		const tArray = new Float32Array(window.Module.HEAPF32.buffer, pointer, nFloats);
+		tArray.nTuples = nVertices;  // hack so you can pass around the array and its size,
+					//  and change the size from one draw to the next.  someday.
+
 		return this.reserveTypedArray(whichBuffer, tArray);
 	}
 
