@@ -8,6 +8,8 @@
 // that are absent in 1, a few other things.  includes gl, canvas node, and some squirrelly code.
 
 // webgl-lint: sigh.  TODO: get this working.  if ever.
+// webgl-debug: can wrap a gl in checking code.  TODO: do this too.
+
 // the gl Tests aren't tuned in to node_modules; use the https form for those.
 // the app is fine with it, so use the regular form.
 let webglLintProm;
@@ -20,7 +22,7 @@ else {
 let traceVersion = false;
 
 /* *********************************************** browser-too-old error */
-
+// TODO: there's another copy of this, I think in errors.js
 // call this if the browser/machine are just way too old to support webgl
 export function tooOldTerminate() {
 	let tooOldMessage = `Sorry, your browser is too old for WebGL.
