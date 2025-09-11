@@ -168,7 +168,7 @@ function makeParam(groupName, varName, defaultValue, criterion) {
 //	});
 }
 
-/* ********************************************************************** Params & Settings */
+/* **************************************************** Params & Settings */
 // settings are immediately effective
 // params are effective after user clicks some button to effect or commit changes
 // when referring to both, I use them interchangeably.
@@ -235,7 +235,8 @@ export function createStoreSettings() {
 
 	/* ************************************miscSettings */
 	// set by clicking on tab
-	makeParam('miscSettings', 'showingTab', 'wave', ['wave', 'voltage', 'space', 'integration']);
+	makeParam('miscSettings', 'showingTab', 'wave',
+		['wave', 'voltage', 'space', 'integration', 'rainbow']);
 
 	// set by size box on main view
 	makeParam('miscSettings', 'waveViewHeight', 402, {min: 50, max: 1e4});
