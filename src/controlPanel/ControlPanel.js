@@ -498,7 +498,7 @@ export class ControlPanel extends React.Component {
 					<li  className={s.showingTab == 'integration' ? 'selected' : ''} key='integration'
 						onClick={ev => this.setShowingTab('integration')}>Integration</li>
 					<li  className={s.showingTab == 'rainbow' ? 'selected' : ''} key='rainbow'
-						onClick={ev => this.setShowingTab('rainbow')}>Complex Rainbow</li>
+						onClick={ev => this.setShowingTab('rainbow')}>Complex</li>
 				</ul>
 				<div className='tabFrame'>
 					{showingTabHtml}
