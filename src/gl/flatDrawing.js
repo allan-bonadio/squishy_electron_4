@@ -4,8 +4,8 @@
 */
 
 import {abstractDrawing} from './abstractDrawing.js';
-import cx2rgb from './cx2rgb/cx2rgb.glsl.js';
 import {drawingUniform, drawingAttribute} from './drawingVariable.js';
+import cx2rygb from './cx2rygb/cx2rygb.glsl.js';
 
 let traceViewBufAfterDrawing = false;
 let traceHighest = false;
@@ -28,7 +28,7 @@ let pointSize = traceDrawPoints ? `gl_PointSize = 10.;` : '';
 */
 
 // make the line number for the start correspond to this JS file line number - the NEXT line
-const vertexSrc = `${cx2rgb}
+const vertexSrc = `${cx2rygb}
 #line 32
 varying highp vec4 vColor;
 attribute vec4 row;
@@ -55,7 +55,9 @@ void main() {
 	gl_Position = vec4(x, y, 0., 1.);
 
 	//  for the color, convert the complex values via this algorithm
-	vColor = vec4(cx2rgb(vec2(row.x, row.y)), 1.);
+	vColor = vec4(cx2rygb(vec2(row.x, row.y)), 1.);
+
+	// make the colors darker toward zero (top)
 	if (!odd)
 		vColor = vec4(vColor.r/2., vColor.g/2., vColor.b/2., vColor.a);
 	//vColor = vec4(.9, .9, .1, 1.);
@@ -94,7 +96,7 @@ export class flatDrawing extends abstractDrawing {
 		// loads view buffer from corresponding wave, calculates highest norm.
 		// Need this for starting values for highest & smoothHighest
 		// this is NOT where it gets called after each iter; see GLScene for that
-		this.avatar.loadViewBuffer();
+//this.avatar.loadViewBuffer();
 
 
 		this.maxHeightUniform = new drawingUniform('maxHeight', this,
