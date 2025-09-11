@@ -6,7 +6,7 @@
 // There is no eBuffer or eSpectrum; C++ deals with those exclusively
 
 import qeConsts from './qeConsts.js';
-import cx2rgb from '../gl/cx2rgb/cx2rgb.txlated.js';
+//import cx2rgb from '../gl/cx2rgb/cx2rgb.txlated.js';
 import {cppObjectRegistry, prepForDirectAccessors} from '../utils/directAccessors.js';
 import eSpace from './eSpace.js';
 import eWave from './eWave.js';

@@ -6,7 +6,6 @@
 // There is no eBuffer or eSpectrum; C++ deals with those exclusively
 
 import qeConsts from './qeConsts.js';
-import cx2rgb from '../gl/cx2rgb/cx2rgb.txlated.js';
 import {cppObjectRegistry, prepForDirectAccessors} from '../utils/directAccessors.js';
 import eSpace from './eSpace.js';
 
@@ -48,36 +47,6 @@ function dumpRow(ix, re, im, prev, isBorder) {
 	return`[${ix}] (${_(re)} , ${_(im)}) | `+
 		`${_(phase)} ${_(dPhase)}} ${_(mag * 1000)} m𝜓/nm\n` ;
 }
-
-
-// Dump a wave buffer as a colored bargraph in the JS console
-// this is also called by C++ so it's easier as a standalone function
-// see also eWave method by same name (but different args)
-export function rainbowDump(wave, start, end, nPoints, title) {
-	let start2 = 2 * start;
-	let end2 = 2 * end;
-	if (isNaN(start2) || isNaN(end2))
-		debugger;
-
-	// maybe doesn't work when called from c++?
-	console.log(`%c rainbowDump  🌊 |  ${title} `,
-		`color: #222; background-color: #fff; font: 14px Palatino;`);
-
-	// autorange
-	let maxi = 0;
-	for (let ix2 = start2; ix2 < end2; ix2 += 2)
-		maxi = Math.max(maxi, wave[ix2] ** 2 + wave[ix2 + 1] ** 2);
-	let correction = 1000 / maxi;  // intended max width in console
-
-	for (let ix2 = start2; ix2 < end2; ix2 += 2) {
-		let mag = (wave[ix2] ** 2 + wave[ix2 + 1] ** 2) * correction;
-
-		let color = cx2rgb([wave[ix2], wave[ix2 + 1]]);
-		color = `rgb(${color[0]*255}, ${color[1]*255}, ${color[2]*255})`;
-		console.log(`%c `, `background-color: ${color}; padding-right: ${mag+5}px; `);
-	}
-}
-window.rainbowDump = rainbowDump;  // so c++ can get to it
 
 /* **************************************************************** eWave */
 
