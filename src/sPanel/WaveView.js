@@ -316,7 +316,7 @@ export class WaveView extends React.Component {
 		// can't make a real GLScene until we have the space!
 		let glScene;
 		if (this.space) {
-			let rbow = true;  // for testing only
+			let rbow = false;  // for testing only
 			let sceneClassName = rbow ? 'rainbowScene' : 'flatScene';
 			let sceneName = rbow ? 'rainbow' : 'mainWave';
 
