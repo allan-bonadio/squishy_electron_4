@@ -12,6 +12,7 @@ import SetWaveTab from './SetWaveTab.js';
 import SetVoltageTab from './SetVoltageTab.js';
 import SetResolutionTab from './SetResolutionTab.js';
 import SetIntegrationTab from './SetIntegrationTab.js';
+import CxRainbowTab from './CxRainbowTab.js';
 import {getASetting, storeASetting, getAGroup, storeAGroup} from '../utils/storeSettings.js';
 import {eSpaceCreatedPromise} from '../engine/eEngine.js';
 import qeFuncs from '../engine/qeFuncs.js';
@@ -416,6 +417,11 @@ export class ControlPanel extends React.Component {
 		/>;
 	}
 
+	/* ********************************************** rainbow tab */
+
+	// Just a display.  No controls, no settings.
+	makeRainbowTab = () => <CxRainbowTab />;
+
 	/* ********************************************** tabs */
 
 	// called when user clicks on a left tab
@@ -443,6 +449,9 @@ export class ControlPanel extends React.Component {
 
 		case 'integration':
 			return this.makeIntegrationTab();
+
+		case 'rainbow':
+			return this.makeRainbowTab();
 
 		default:
 			return `Do not understand showingTab='${s.showingTab}'`;
@@ -488,6 +497,8 @@ export class ControlPanel extends React.Component {
 						onClick={ev => this.setShowingTab('space')}>Space</li>
 					<li  className={s.showingTab == 'integration' ? 'selected' : ''} key='integration'
 						onClick={ev => this.setShowingTab('integration')}>Integration</li>
+					<li  className={s.showingTab == 'rainbow' ? 'selected' : ''} key='rainbow'
+						onClick={ev => this.setShowingTab('rainbow')}>Complex Rainbow</li>
 				</ul>
 				<div className='tabFrame'>
 					{showingTabHtml}
@@ -496,12 +507,6 @@ export class ControlPanel extends React.Component {
 		</div>;
 	}
 
-	//componentDidUpdate() {
-	//	// these should be EQUAL!  but single frame turns it off without
-	//	// updating our state.  Make sure it's ok here.
-	//	if (this.grinder && (this.state.shouldBeIntegrating != this.grinder.shouldBeIntegrating))
-	//		this.setState({shouldBeIntegrating: this.grinder.shouldBeIntegrating});
-	//}
 }
 
 export default ControlPanel;
