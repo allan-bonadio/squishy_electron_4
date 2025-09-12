@@ -146,8 +146,8 @@ export class rainbowDrawing extends abstractDrawing {
 	// called for each image frame on th canvas
 	draw(width, height, specialInfo) {
 		// diagnostic purposes
-		let traceDrawPoints = true;
-		let traceDrawLines = true;
+		let traceDrawPoints = false;
+		let traceDrawLines = false;
 
 		if (traceRainbowDrawing) {
 			console.log(`🌈 🌈 rainbowDrawing  ${this.avatarLabel}: `

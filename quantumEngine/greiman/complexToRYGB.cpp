@@ -3,6 +3,8 @@
 ** Copyright (C) 2025-2025 Tactile Interactive, all rights reserved
 */
 
+this file is no longer used
+
 #include "qAvatar.h"
 
 void complexToRYGB(qCx *ps, qColor3 *colorP) {
