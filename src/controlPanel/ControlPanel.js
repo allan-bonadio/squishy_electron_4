@@ -113,7 +113,7 @@ export class ControlPanel extends React.Component {
 		this.space = space;
 		this.N = space.N;
 		this.mainAvatar = space.mainAvatar;
-		this.mainWave = space.mainWave;
+		this.mainFlick = space.mainFlick;
 
 		this.grinder = space.grinder;
 		this.grinder.stretchedDt = this.state.dtStretch * this.space.dt;
@@ -294,9 +294,9 @@ export class ControlPanel extends React.Component {
 		if (!this.space)
 			return;
 
-		const mainWave = this.space.mainWave;
+		const mainFlick = this.space.mainFlick;
 
-		mainWave.setFamiliarWave(waveParams);  // eSpace does this initially
+		mainFlick.setFamiliarWave(waveParams);  // eSpace does this initially
 
 		qeFuncs.grinder_copyFromAvatar(this.grinder.pointer, this.mainAvatar.pointer);
 		this.props.repaintWholeMainWave();
