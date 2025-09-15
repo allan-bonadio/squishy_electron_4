@@ -133,10 +133,13 @@ ev => {
 // finally started up.  Once only, at page load. do NOT export this; it's global on window
 // cuz quantumEngine.js, the compiled C++ proxy, has to have access to it early
 // on, and it's CJS and can't reach JS module exports.
-function startUpFromCpp(maxDims, nThreads, labBuffer) {
+function startUpFromCpp(maxDims, nThreads, sqdevel) {
 	MAX_DIMENSIONS = maxDims;
 	N_THREADS = nThreads;
-	window.cppLabelText = labBuffer;
+	//window.cppLabelText = labBuffer;
+
+	// the global 'developnment' flag, zero for production
+	globalThis.sqDEVEL = sqdevel;
 
 	window.cppRuntimeInitialized();
 	if (traceStartup) console.log(`threads 🐣  created`);

@@ -16,7 +16,7 @@ cd ..
 
 # -sEMIT_PRODUCERS_SECTION = put info on which compiler/linker/language was
 # built.  Mostly irrelevant.  add it here if you want.
-export DEBUG='-g3 -gsource-map --source-map-base /../quantumEngine/ '
+export DEBUG='-g3 -gsource-map --source-map-base /../quantumEngine/  -DsqDEVEL=1'
 #export DEBUG='-g3 -gsource-map --source-map-base /qEng/ '
 export OPTIMIZE='-O0 '
 
