@@ -104,7 +104,7 @@ export class WaveView extends React.Component {
 		wv = {
 			space: space,
 			grinder: space.grinder,
-			mainAvatar: space.mainAvatar,
+			//mainAvatar: space.mainAvatar,
 
 			// make room for the bumpers for WELL continuum (both sides).  Note that
 			// continuum can change only when page reloads.
@@ -165,7 +165,8 @@ export class WaveView extends React.Component {
 			console.log(`🏄 canvas updateInner: w=${this.canvasInnerWidth} h=${this.canvasInnerHeight}`);
 	}
 
-	// we finally have a canvas; give me a reference so I can save it
+	// we finally have a canvas; give me a reference so I can save it.
+	// (this is repeatedly called right after each render.)
 	setGlCanvas =
 	gl => {
 		if (!gl)
@@ -176,6 +177,14 @@ export class WaveView extends React.Component {
 		}
 		else if (this.gl !== gl)
 			throw `this.gl ≠ gl !`;
+
+		// might be available a few renders later
+		if (this.canvasNode) {
+			const doRepaint = this.canvasNode.doRepaint;
+			this.doRepaint = doRepaint;
+			if (this.props.animator)
+				this.props.animator.doRepaint = doRepaint;
+		}
 	}
 
 	componentDidMount() {
@@ -316,9 +325,8 @@ export class WaveView extends React.Component {
 		// can't make a real GLScene until we have the space!
 		let glScene;
 		if (this.space) {
-			let rbow = false;  // for testing only
-			let sceneClassName = rbow ? 'rainbowScene' : 'flatScene';
-			let sceneName = rbow ? 'rainbow' : 'mainWave';
+			let sceneClassName = 'flatScene';
+			let sceneName = 'mainWave';
 
 			glScene = <GLScene
 				space={s.space} avatar={s.space.mainAvatar}
