@@ -23,8 +23,6 @@ class eGrinder {
 	//constructor(space, avatar, pointer) {
 		let pointer = qeFuncs.grinder_create(space.pointer, 1, 'main');
 		/// ummm...
-
-
 		prepForDirectAccessors(this, pointer);
 		// ?? this.label = window.Module.AsciiToString(this._label);
 
@@ -32,7 +30,7 @@ class eGrinder {
 // 		this.avatar = avatar;  // the avatar it loads into
 // 		avatar.grinder = this;
 
-		// for the flick we only have the pointer.  Similar to a eWave and cross fingers.
+		// for the flick we only have the pointer.  Similar to a eWave
 		this.flick = new eFlick(space, this._flick);
 
 		//console.log(`sentinels: ${qeConsts.grSENTINEL_VALUE} ≟ ${this.sentinel}`);
@@ -56,7 +54,6 @@ class eGrinder {
 	// see qGrinder.cpp to regenerate this. Note these are all scalars; buffers
 	// are passed by pointer and you need to allocate them in JS (eg see
 	// eGrinder.constructor)
-
 
 	get _space() { return this.ints[1]; }
 	get _flick() { return this.ints[3]; }

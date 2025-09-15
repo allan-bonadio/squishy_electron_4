@@ -15,15 +15,13 @@ import eAvatar from '../engine/eAvatar.js';
 
 class rainbowScene extends abstractScene {
 
-	constructor(sceneName,ambiance, space, avatar) {
-		super(sceneName,ambiance, space, avatar);
+	constructor(sceneName, ambiance) {
+		super(sceneName, ambiance);
 
-		// We don't use that avatar, we make our own.
 		this.canvas = ambiance.canvas;
 		this.gl = ambiance.gl;
 
-		// blow off the passed-in avatar.
-		// create avatar but don't stick buffers; the drawing does that
+		// create avatar but don't add buffers; the drawing does that
 		this.avatar = eAvatar.createAvatar(qeConsts.avRAINBOW, sceneName);
 
 		// create relevant drawings.

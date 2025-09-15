@@ -12,7 +12,7 @@
 #include <stdatomic.h>
 
 #include "../hilbert/qSpace.h"
-#include "../greiman/qAvatar.h"
+//#include "../greiman/qAvatar.h"
 #include "qThread.h"
 #include "qGrinder.h"
 #include "grWorker.h"
@@ -137,7 +137,7 @@ void qGrinder::formatDirectOffsets(void) {
 	/* ************************* pointers  for large blocks */
 	makePointerGetter(space);
 	makePointerGetter(flick);
-	// avatar
+
 	makePointerGetter(voltage);
 	makePointerGetter(spect);
 	makePointerGetter(stage);
@@ -227,7 +227,7 @@ void qGrinder::dumpObj(const char *title) {
 	speedyLog("        ==== end of qGrinder::dumpObj(%s) ====\n\n", title);
 }
 
-/* ********************************************************** avatar and view buffer */
+/* ********************************************************** grinder */
 
 // some uses never need this so wait till they do
 qSpectrum *qGrinder::getSpectrum(void) {

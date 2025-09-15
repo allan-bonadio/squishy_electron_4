@@ -6,8 +6,8 @@
 #include <stdexcept>
 
 #include "../hilbert/qSpace.h"
-#include "../greiman/qAvatar.h"
-#include "../schrodinger/qGrinder.h"
+//#include "../greiman/qAvatar.h"
+//#include "../schrodinger/qGrinder.h"
 #include "qWave.h"
 #include "../directAccessors.h"
 

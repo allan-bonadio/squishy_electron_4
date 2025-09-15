@@ -40,7 +40,9 @@ export function tooOldTerminate() {
 
 // create one of these for each canvas, to get the gl context, and other prep.
 // Returns a promise because webgl-lint must load asynchronously.
-// Promise resolves with gl, when it's all ready.
+// Promise resolves with gl, when it's all ready.  NOT UNTIL.
+// although, the second and later should resolve immediately.
+// Also webgl2.
 class glAmbiance {
 	// this decides it - feel free to change this
 	static preferWebGL2 = true;
@@ -49,6 +51,8 @@ class glAmbiance {
 		this.canvas = canvas;
 		this.attachEventHandlers();  // might return errors about context creation/loss
 
+		// yes this is decided for each avatar even though the answer is the same.
+		// Gotta get the GL for the Canvas.
 		if (glAmbiance.preferWebGL2)
 			this.setupGL2(canvas);
 		if (!this.gl)
@@ -95,7 +99,7 @@ class glAmbiance {
 			return null;
 		this.gl = gl;
 
-		// notin webgl1, avail as an extention
+		// note: webgl1, avail as an extention
 		let vaoExt = this.vaoExt = gl.getExtension("OES_vertex_array_object");
 		if (!vaoExt)
 			return null;

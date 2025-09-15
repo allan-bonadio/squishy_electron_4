@@ -12,7 +12,7 @@ import qeConsts from '../engine/qeConsts.js';
 import qeFuncs from '../engine/qeFuncs.js';
 
 let traceViewBufAfterDrawing = false;
-let traceRainbowDrawing = true;
+let traceRainbowDrawing = false;
 
 
 /* ********************************** shaders */
@@ -67,6 +67,7 @@ export class rainbowDrawing extends abstractDrawing {
 	constructor(scene) {
 		super(scene, 'Rainbow');
 		this.avatar = scene.avatar;
+
 		this.vertexShaderSrc = vertexShaderSrc;
 		this.fragmentShaderSrc = fragmentShaderSrc;
 	}
@@ -159,6 +160,7 @@ export class rainbowDrawing extends abstractDrawing {
 		this.viewVariables.forEach(v => v.reloadVariable());
 		//gl.drawArrays(gl.TRIANGLE_STRIP, 0, nVERTS);
 		gl.drawArrays(gl.TRIANGLE_FAN, 0, nVERTS);
+		console.log(`just drewArays-rainbow on avatar ptr=${this.avatar.pointer} this.avatar.label=${this.avatar.label}, buffer label=${this.avatar.bufferNames[0]}`);
 
 		if (traceDrawLines) {
 			gl.lineWidth(1);  // it's the only option anyway
@@ -172,7 +174,6 @@ export class rainbowDrawing extends abstractDrawing {
 		if (traceViewBufAfterDrawing) {
 			this.avatar.dumpViewBuffers(3, `🌈 🌈 finished drawing rainbowDrawing.js; drew buf:`);
 		}
-		// ?? this.gl.bindVertexArray(null);
 	}
 }
 
