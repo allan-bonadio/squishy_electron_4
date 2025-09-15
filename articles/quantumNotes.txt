@@ -39,15 +39,15 @@ taskmaster
 names to replace qWave as it gets confused with buffer->wave:
 caddy
 carton
-cavity *
+cavity **
 chest
 cranny
 crate
 crib
 cubicle
-hollow
+hollow *
 locker
-niche
+niche *
 nook
 packet *
 parcel
@@ -61,7 +61,8 @@ quiver
 swap
 cadence
 
-
+oscillator *
+quiver
 
 2024 Jul 26 ============================================= squishy_electron_4
 
