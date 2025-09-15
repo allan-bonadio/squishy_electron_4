@@ -3,14 +3,17 @@
 ** Copyright (C) 2021-2025 Tactile Interactive, all rights reserved
 */
 
-import {abstractDrawing} from './abstractDrawing.js';
+import abstractDrawing from './abstractDrawing.js';
 import {drawingUniform, drawingAttribute} from './drawingVariable.js';
 import cx2rygb from './cx2rygb/cx2rygb.glsl.js';
+import qeFuncs from '../engine/qeFuncs.js';
+import qeConsts from '../engine/qeConsts.js';
 
 let traceViewBufAfterDrawing = false;
 let traceHighest = false;
 let traceFlatDrawing = false;
 let traceViewport = false;
+let traceCounts = false;
 
 // diagnostic purposes
 let traceDrawPoints = false;
@@ -81,23 +84,25 @@ void main() {
 export class flatDrawing extends abstractDrawing {
 	constructor(scene) {
 		super(scene, 'flatDrawing');
+		this.avatar = scene.avatar;
 
 		this.vertexShaderSrc = vertexSrc;
 		this.fragmentShaderSrc = fragmentSrc;
+
+		this.avatar.attachViewBuffer(0, null, 4, this.space.nPoints * 2, 'flat drawing');
+		console.log(`attachViewBuffer on scene ${scene.sceneName}`);
 	}
 
+	// loads view buffer from corresponding wave, calculates highest norm.
 	// one time set up of variables for this drawing, every time canvas and scene is recreated
 	createVariables() {
 		this.setDrawing();
-
 		if (traceFlatDrawing)
 			console.log(`♭♭♭ flatDrawing: creatingVariables`);
 
-		// loads view buffer from corresponding wave, calculates highest norm.
 		// Need this for starting values for highest & smoothHighest
 		// this is NOT where it gets called after each iter; see GLScene for that
 //this.avatar.loadViewBuffer();
-
 
 		this.maxHeightUniform = new drawingUniform('maxHeight', this,
 			() => {
@@ -107,7 +112,7 @@ export class flatDrawing extends abstractDrawing {
 						+` smoothHighest=${this.avatar.smoothHighest.toFixed(5)}`);
 
 				// add in a few percent
-				return {value: this.avatar.smoothHighest * this.scene.PADDING_ON_BOTTOM, type: '1f'};
+				return {value: this.avatar.d0 * this.scene.PADDING_ON_BOTTOM, type: '1f'};
 			}
 		);
 
@@ -134,8 +139,15 @@ export class flatDrawing extends abstractDrawing {
 		this.vertexCount = nPoints * 2;  // nPoints * vertsPerBar
 		this.rowFloats = 4;
 		this.rowAttr = new drawingAttribute('row', this, this.rowFloats, () => {
-			this.avatar.vBuffer.nTuples = this.vertexCount;
-			return this.avatar.vBuffer;
+
+			if (traceCounts) {
+				console.log(`at flatLoader; this.vertexCount=${this.vertexCount} `
+					+` total floats=${this.vertexCount * this.rowFloats}`);
+			}
+			qeFuncs.avatar_avFlatLoader(this.avatar.pointer, 0, this.space.mainFlick.pointer, this.vertexCount);
+
+			// old this.avatar.vBuffer.nTuples = this.vertexCount;
+			return this.avatar.getViewBuffer(0);
 		});
 
 		// see  abstractDrawing for bindVertexArray()
@@ -159,6 +171,7 @@ export class flatDrawing extends abstractDrawing {
 
 		this.viewVariables.forEach(v => v.reloadVariable());
 		gl.drawArrays(gl.TRIANGLE_STRIP, 0, this.vertexCount);
+		console.log(`just drewArays-flat on avatar ptr=${this.avatar.pointer} this.avatar.label=${this.avatar.label}, buffer label=${this.avatar.bufferNames[0]}`);
 
 		if (traceDrawLines) {
 			gl.lineWidth(1);  // it's the only option anyway

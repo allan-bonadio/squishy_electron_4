@@ -125,12 +125,11 @@ export class starDrawing extends abstractDrawing {
 
 
 export class starScene extends abstractScene {
-	constructor(sceneName, ambiance, space, avatar) {
-		super(sceneName, ambiance, space, avatar);
+	constructor(sceneName, ambiance) {
+		super(sceneName, ambiance);
 
-		if (! this.space || !this.avatar) {
-			throw  new Error(`starScene: being created without space or avatar`);
-		}
+		if (! this.space) throw  new Error(`starScene: being created without space`);
+		this.avatar = eAvatar.createAvatar(qeConsts.avRAINBOW, sceneName);
 
 		// create relevant drawings
 		this.drawings = [new starDrawing(this)];

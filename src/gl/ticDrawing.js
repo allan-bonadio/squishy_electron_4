@@ -66,8 +66,11 @@ void main() {
 
 // the original display that's worth watching: tic upside down hump graph
 export class ticDrawing extends abstractDrawing {
-	constructor(scene) {
+	constructor(scene, space) {
 		super(scene, 'ticDrawing');
+
+		// most drawings don't need space passed in
+		this.space = space;
 
 		// we always use this for our coordinates, generated on the fly
 		this.coordBuffer = new Float32Array(BUFFER_MAX_NTICS * FLOATS_PER_TIC);

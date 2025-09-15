@@ -1,9 +1,10 @@
 /*
-** GLScene -- a webgl image
+** GLScene -- a webgl image for the squish wave.  (not to be confused with other canvas wrappers)
 ** Copyright (C) 2021-2025 Tactile Interactive, all rights reserved
 */
 
 // TODO: rename this GLScene => GLCanvas after the dust settles
+// or something like 'main gl canvas' or something
 
 // GLScene  wraps a canvas for display.  Via webgl.
 // And the Drawing and Scene machinery mgmt.  General for all gl canvases.
@@ -36,7 +37,7 @@ function setPT() {
 
 		// Our caller gets these from eSpaceCreatedPromise; so it must be resolved by now.
 		// We can't just use the promise ourselves; we have to know which avatar
-		avatar: PropTypes.object,
+		//avatar: PropTypes.object,
 		space: PropTypes.object,
 
  		// inner width & height of canvas
@@ -59,6 +60,7 @@ function setPT() {
 // - canvas, and one gl context
 // - one viewdef that encloses one or more drawings
 // Can NOT instantiate this until after the space promise has resolved
+// TODO: split this into general gl canvas, and WaveCanvas
 function GLScene(props) {
 	cfpt(GLScene, props);
 	//PropTypes.checkPropTypes(GLScene.propTypes, props, 'prop', 'GLScene');
@@ -80,10 +82,11 @@ function GLScene(props) {
 	(ambiance) => {
 		let sClass = listOfSceneClasses[p.sceneClassName];
 
-		// use the props.avatar?  we can't get it from the space, cuz which one?
-		effectiveScene = new sClass(p.sceneName, ambiance, p.space, p.avatar);
+		// for this situation, needs the space!  Not just any scene.
+		effectiveScene = new sClass(p.sceneName, ambiance, p.space);
 		effSceneRef.current = effectiveScene;
 
+      effectiveScene.space = p.space;
 		effectiveScene.completeScene(p.specialInfo);
 
 		// now that there's an avatar, we can set these functions so everybody can use them.
@@ -103,7 +106,8 @@ function GLScene(props) {
 	() => {
 		if (! effectiveScene) {
 			if (traceViewBuffer)
-				console.log(`🖼 GLScene ${p.avatar?.label}: too early for doRepaint  effectiveScene=${effectiveScene}`);
+				console.log(`🖼 GLScene ${p.avatar?.label}: too early for doRepaint `
+				   +` effectiveScene=${effectiveScene}`);
 			return null;  // too early
 		}
       // if (traceViewBuffer)
@@ -124,6 +128,10 @@ function GLScene(props) {
 		}
 		return;
 	}
+   if (canvasNode) {
+      // each canvas node (used for gl) has its own doRepaint func with its own closure and variable values.
+      canvasNode.squishDoRepaint ??= doRepaint;
+   }
 
 	if (traceGeometry && 'mainWave' == p.sceneName) {
 		console.log(`🖼 GLScene rend '${p.sceneName}': canvas=${canvasNode?.nodeName} `

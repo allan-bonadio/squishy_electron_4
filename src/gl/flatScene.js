@@ -3,30 +3,32 @@
 ** Copyright (C) 2021-2025 Tactile Interactive, all rights reserved
 */
 
-import {abstractScene} from './abstractScene.js';
-import {flatDrawing} from './flatDrawing.js';
+import abstractScene from './abstractScene.js';
+import flatDrawing from './flatDrawing.js';
+import eAvatar from '../engine/eAvatar.js';
+import qeConsts from '../engine/qeConsts.js';
 // eslint-disable-next-line no-unused-vars
-import {ticDrawing} from './ticDrawing.js';
+import ticDrawing from './ticDrawing.js';
 
 class flatScene extends abstractScene {
+	// must assign space after constructor??
+	constructor(sceneName, ambiance, space) {
+		super(sceneName, ambiance);
 
-	constructor(sceneName, ambiance, space, avatar) {
-		super(sceneName, ambiance, space, avatar);
-
-		if (! this.space) {
-			debugger;
-			throw  `flatScene: being created without space`;
-		}
+		this.space = space;
 
 		// normally autoranging would put the highest peak at the exact bottom.
 		// but we want some extra space.  not much.
 		this.PADDING_ON_BOTTOM = 1.02;
 
+		// create avatar but don't stick buffers; the drawing does that
+		this.avatar = eAvatar.createAvatar(qeConsts.avRAINBOW, sceneName);
+
 		// create relevant drawings.  Do not change this order;
 		// spent a long time on this.
 		this.drawings = [
-// new ticDrawing(this),
-// new flatDrawing(this),
+			new ticDrawing(this, space),
+			new flatDrawing(this, space),
 		];
 
 

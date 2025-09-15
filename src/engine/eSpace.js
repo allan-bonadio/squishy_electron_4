@@ -63,16 +63,21 @@ export class eSpace {
 		// no, done by scene this.mainAvatar = eAvatar.adaptAvatar(this._mainAvatar);
 		// no, done by scene this.miniGraphAvatar = eAvatar.adaptAvatar(this._miniGraphAvatar);
 
-		this.grinder = new eGrinder(this, this.mainAvatar, this._grinder);
-		this.mainWave = this.grinder.flick;  // i know its a flick not a wave
+		this.grinder = new eGrinder(this);
+		this._grinder = this.grinder.pointer;
+
+		this.mainFlick = this.grinder.flick;  // i know its a flick not a wave
+		this._mainFlick = this.mainFlick.pointer;  // i know its a flick not a wave
+
 		this.miniGraphWave = new eWave(this, null, this._miniGraphWave);
+		this._miniGraphWave = this.miniGraphWave.pointer;
 
 		// SetWave most recent settings.
 		let waveParams = getAGroup('waveParams');
-		this.mainWave.setFamiliarWave(waveParams);
+		this.mainFlick.setFamiliarWave(waveParams);
 		this.miniGraphWave.setFamiliarWave(waveParams);
 		if (traceFamiliarWave)
-			console.log(`🚀  done with setFamiliarWave():`, this.mainWave.wave);
+			console.log(`🚀  done with setFamiliarWave():`, this.mainFlick.wave);
 
 		this.sInteStats = new inteStats(this);
 		if (traceSpace) console.log(`🚀  done creating eSpace:`, this);
@@ -117,7 +122,6 @@ export class eSpace {
 	/* ********************************* 🥽 Direct Accessors */
 	// see qSpace.cpp and directAccessors.h to regenerate this.
 
-
 	get _voltage() { return this.ints[1]; }
 
 	get N() { return this.ints[2]; }
@@ -131,11 +135,16 @@ export class eSpace {
 	get nDimensions() { return this.ints[42]; }
 	get spectrumLength() { return this.ints[45]; }
 	get _mainAvatar() { return this.ints[46]; }
+	set _mainAvatar(a) { this.ints[46] = a; }
 	get _miniGraphAvatar() { return this.ints[47]; }
-	get _miniGraphWave() { return this.ints[48]; }
-	get _grinder() { return this.ints[49]; }
-	get _label() { return this.pointer + 200; }
-
+	set _miniGraphAvatar(a) { this.ints[47] = a; }
+	get _mainFlick() { return this.ints[48]; }
+	set _mainFlick(a) { this.ints[48] = a; }
+	get _miniGraphWave() { return this.ints[49]; }
+	set _miniGraphWave(a) { this.ints[49] = a; }
+	get _grinder() { return this.ints[50]; }
+	set _grinder(a) { this.ints[50] = a; }
+	get _label() { return this.pointer + 204; }
 
 
 	/* **************************** 🥽 end of direct accessors */
