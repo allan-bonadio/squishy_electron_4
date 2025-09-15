@@ -6,16 +6,17 @@
 // formerly called: Manifestation, Incarnation, Timeline, ... formerly part of qSpace
 // formerly View Buffer or VIew Buffer Set
 
-// manages viewBuffers.  Not completely Squish-dependent;
+// manages GL attribute buffers.  Not completely Squish-dependent;
 // no waves or voltage.  That gets handed in the load function.
-// Typically, 2 viewBuffers, each float.  position: 2 or 3 floats.  color: 3 or 4 floats.
-// Details specific to the avatarBreed / loader.
+// sometimes, 2 fArrays, each float.  position: 2 or 3 floats.  color: 3 or 4 floats.
+// Details specific to the drawing and loader.
 // each is optional and don't need to be poses or colors
 
+// August Ferdinand Möbius invented homogenous coordinates
 
 
 // one descriptor for a buffer: array of floats, representing vertices of coordinates
-// total floats = nverts * ncoords
+// total floats = nVertices * nCoords
 struct viewBufInfo {
 	float *fArray;
 	int nVertices;
@@ -53,7 +54,6 @@ struct qAvatar {
 	// populates the viewBuffers; depends on avatarBreed.  You can use your own
 	// independent load function; it's not rocket science.
 	// for WaveView, transcribes the complex double numbers (2x8 = 16by) in qwave
-	// use args however, also see num0 and num1
 	void loadViewBuffers(int breed);
 
 	// set this so it doesn't have to do it while running.  Pass either breed
@@ -69,7 +69,7 @@ struct qAvatar {
 	int magic;
 
 	// set to a loader fucntion in same directory
-	int avatarBreed;  // which loader
+	int avatarBreed;  // which loader - kindof obsolete; each drawing has its own loader
 	void (*loader)(qAvatar *);  // actual function pointer
 
 	// args that many loaders need.  Optional but NOT set by the constructor or anything.
@@ -97,16 +97,11 @@ struct qAvatar {
 
 /* *************************************************** loaders in nearby files */
 
-// see qAvatar::getBreedLoader()
-//extern void loaderFlat(qAvatar *avatar);
-//extern void loaderFlatTics(qAvatar *avatar);
-//extern void loaderRainbow(qAvatar *avatar);
-//extern void loaderRainbow(qAvatar *avatar);
-
+extern void avFlatLoader(qAvatar *avatar, int bufIx, qWave *qwave, int nPoints);
 
 
 /* *************************************************** vector types for vb generation */
-// note all of these are with floats, not doubles
+// note all of these are with floats, not doubles.  Not sure i'll use these...
 
 class qPos2 {
 public:
@@ -155,7 +150,7 @@ extern "C" {
 	void avatar_dumpViewBuffers(qAvatar *avatar, int whichBuffers, char *title);
 	void avatar_dumpIndex(qAvatar *avatar, char *title);
 
-	// return one vbuffer, raw floats.  maybe we don't need this?  cuz JS wants the typed array.
+	// return one buffer, raw floats.  maybe we don't need this?  cuz JS wants the typed array.
 	float *avatar_getViewBuffer(qAvatar *avatar, int bufferIx);
 
 	// load up all the set's view viewBuffers based on the space's wave buffer (or whatever)

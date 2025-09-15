@@ -157,7 +157,9 @@ void qAvatar::formatDirectOffsets(void) {
 	makeIntSetter(avatarBreed);
 
 	makePointerGetter(space);
+	makePointerSetter(space);
 	makePointerGetter(qwave);
+	makePointerSetter(qwave);
 
 	// arguments and return values
 	makeIntGetter(i0);
