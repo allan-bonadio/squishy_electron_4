@@ -15,11 +15,11 @@ import PropTypes from 'prop-types';
 import {listOfSceneClasses} from './listOfSceneClasses.js';
 import glAmbiance from './glAmbiance.js';
 
-let traceSetup = false;
+let traceSetup = true;
 let traceGeometry = false;
 
 // this one dumps large buffers
-let traceViewBuffer = false;
+let traceViewBuffer = true;
 
 
 function traceOnScreen(msg) {
@@ -32,13 +32,16 @@ function traceOnScreen(msg) {
 
 function setPT() {
 	GLScene.propTypes = {
-		sceneClassName: PropTypes.string.isRequired,
-		sceneName: PropTypes.string,
+		sceneClassName: PropTypes.string.isRequired,  // what to draw
+		sceneName: PropTypes.string,  // name for debugging
 
 		// Our caller gets these from eSpaceCreatedPromise; so it must be resolved by now.
-		// We can't just use the promise ourselves; we have to know which avatar
-		//avatar: PropTypes.object,
+		// Optional; omit if your scene is not affected by space.
 		space: PropTypes.object,
+
+		// sAnimator - reserved for sAnimator, but I guess you can make your own.
+		// This object will get the doRepaint function attached.  Omit if your GLScene doesn't animate.
+		animator: PropTypes.object,
 
  		// inner width & height of canvas
 		// keep these separate  so any change will trigger render
@@ -47,9 +50,6 @@ function setPT() {
 
 		// object with specific values needed in drawing; for waveview= {bumperWidth}
 		specialInfo: PropTypes.object,
-
-		// if our caller needs the canvas and gl ctx itself, otherwise undef
-		setGlCanvas: PropTypes.func,
 
 		// a help msg, optional
 		title: PropTypes.string,
@@ -63,39 +63,45 @@ function setPT() {
 // TODO: split this into general gl canvas, and WaveCanvas
 function GLScene(props) {
 	cfpt(GLScene, props);
-	//PropTypes.checkPropTypes(GLScene.propTypes, props, 'prop', 'GLScene');
 	const p = props;
+	console.log(`starting GLScene(render), sceneName=${p.sceneName}`);
 
-	// we have to keep the canvas node, to get a gl context.  Then we need to render again.
-	let [canvasNode, setCanvasNode] = useState(null);
+	// we have to keep the canvas node, to get a gl context.
+	// we need it in the state, to trigger rerender, once we've got one (2nd render)
+	let [canvasNode2, setCanvasNode] = useState(null);
+
+	// but this is how we get the canvas node originally, from this ref, from the canvas node.
 	const canvasRef = useRef(null);
+	let canvasNode = canvasRef.current;
 
-	let effSceneRef = useRef(null);
-	let effectiveScene = effSceneRef.current;
-	let glRef = useRef(null);
-	let gl = glRef.current;
+	// also the gl and therefore the scene depend on the ambiance promise
+	// so can't guarantee when they'll be around
+	let [gl, setGl] = useState(null);
+	let [squishScene, setSquishScene] = useState(null);
+// 	let effSceneRef = useRef(null);
+// 	let squishScene = effSceneRef.current;
 
-	// set up the Scene - collection of drawings to draw in one rectangle.  Base classes
-	// abstractDrawing and abstractScene must do this after the canvas AND the
-	// space exist.
-	const initSceneClass =
-	(ambiance) => {
+// 	let glRef = useRef(null);
+// 	let gl = glRef.current;
+
+	// set up the squish Scene - collection of drawings to draw in one canvas.  Base classes
+	// abstractDrawing and abstractScene must do this after the canvas exists.
+	const initSceneClass = (ambiance) => {
 		let sClass = listOfSceneClasses[p.sceneClassName];
 
-		// for this situation, needs the space!  Not just any scene.
-		effectiveScene = new sClass(p.sceneName, ambiance, p.space);
-		effSceneRef.current = effectiveScene;
+		// for this situation, needs the space!  if they passed it to us
+		squishScene = new sClass(p.sceneName, ambiance, p.space);
+		setSquishScene(squishScene);
+		//effSceneRef.current = squishScene;
 
-      effectiveScene.space = p.space;
-		effectiveScene.completeScene(p.specialInfo);
+		squishScene.space = p.space;
+		squishScene.completeScene(p.specialInfo);
 
-		// now that there's an avatar, we can set these functions so everybody can use them.
-		// NO!  p.avatar.doRepaint = doRepaint;
-		effectiveScene.doRepaint = doRepaint;
+		squishScene.doRepaint = doRepaint;
 
 		// intrinsic to avatar p.avatar.reStartDrawing = reStartDrawing;
 		//p.avatar.setGlViewport = setGlViewport;
-		if (traceSetup) console.log(`🖼 GLScene ${p.sceneName} ${p.avatar?.label ?? ''}: `
+		if (traceSetup) console.log(`🖼 GLScene ${p.sceneName}: `
 			+` done with initSceneClass`);
 	};
 
@@ -104,23 +110,22 @@ function GLScene(props) {
 	// and this function redraws on the canvas (with gl).
 	const doRepaint =
 	() => {
-		if (! effectiveScene) {
+		if (! squishScene) {
 			if (traceViewBuffer)
-				console.log(`🖼 GLScene ${p.avatar?.label}: too early for doRepaint `
-				   +` effectiveScene=${effectiveScene}`);
+				console.log(`🖼 GLScene too early for doRepaint squishScene=`, squishScene);
 			return null;  // too early
 		}
-      // if (traceViewBuffer)
-      //    p.avatar.ewave.dump(`🖼 GLScene ${p.sceneName}: got the ewave right here`);
+		// if (traceViewBuffer)
+		//    p.avatar.ewave.dump(`🖼 GLScene ${p.sceneName}: got the ewave right here`);
 
 		// copy from latest wave to view buffer (c++) & pick up highest
 		//p.avatar.loadViewBuffer();
-      // if (traceViewBuffer)
-      //    p.avatar.dumpViewBuffer(`🖼 GLScene ${p.sceneName}: loaded ViewBuffer`);
+		// if (traceViewBuffer)
+		//    p.avatar.dumpViewBuffer(`🖼 GLScene ${p.sceneName}: loaded ViewBuffer`);
 
 		// draw.  This won't set up an ∞ loop, right?
-		effectiveScene.drawAllDrawings(canvasNode.width, canvasNode.height, p.specialInfo);
-		//effectiveScene.drawAllDrawings(p.canvasInnerWidth, p.canvasInnerHeight, p.specialInfo);
+		squishScene.drawAllDrawings(canvasNode.width, canvasNode.height, p.specialInfo);
+		//squishScene.drawAllDrawings(p.canvasInnerWidth, p.canvasInnerHeight, p.specialInfo);
 		if (traceGeometry) {
 			console.log(`🖼 GLScene done doRepaint ${p.sceneName} av=${p.avatar?.label}:   \n`
 					+`canvasInnerWidth=${p.canvasInnerWidth}, canvasInnerHeight=${p.canvasInnerHeight}, `
@@ -128,57 +133,67 @@ function GLScene(props) {
 		}
 		return;
 	}
-   if (canvasNode) {
-      // each canvas node (used for gl) has its own doRepaint func with its own closure and variable values.
-      canvasNode.squishDoRepaint ??= doRepaint;
-   }
+
+	if (canvasNode) {
+		// each canvas node (used for gl) has its own GLScene and squish scene and doRepaint func
+		// with its own closure and variable values.
+		canvasNode.squishDoRepaint = doRepaint;
+	}
 
 	if (traceGeometry && 'mainWave' == p.sceneName) {
 		console.log(`🖼 GLScene rend '${p.sceneName}': canvas=${canvasNode?.nodeName} `
 			+`canv inner dims: w=${p.canvasInnerWidth} h=${p.canvasInnerHeight} `);
 	}
 
+	// now that we have a canvasNode, we can set up the gl, scene, and stick it onto some prominent objects
 	const setupGLContext = () => {
 		const ambiance = new glAmbiance(canvasNode);
 		ambiance.glProm
 		.then(newGl => {
+			if (newGl.canvas !== canvasNode) throw new Error(`newGl !== canvasNode`);
 			gl = newGl;
-			glRef.current = gl;
-			p.setGlCanvas?.(gl);
+			setGl(gl);
+			//glRef.current = gl;
+			// if (!p.setGlCanvas)  throw new Error(`no props.setGlCanvas`);
+			// ??? this is not an object  GLScene.setGlCanvas(thhis, gl, canvasNode);
 
 			canvasNode.squishSceneName = p.sceneName;
+			canvasNode.squishRepaint = doRepaint;
 			initSceneClass(ambiance);
+			if (props.animator)
+				props.animator.doRepaint = doRepaint;
 
 			if (traceSetup)
-				console.log(`🖼 GLScene ${p.sceneName}: canvas, gl, view and the drawing done`);
+				console.log(`🖼 GLScene ${p.sceneName}: canvas ${canvasNode?.className}, gl, view and the drawing done`);
 		});
 	}
 
-   // repaint after each React render of the canvas.  This is an Effect.
+	// repaint after each React render of the canvas.  This is an useEffect Effect.
 	// can't do much first rendering; no canvasNode yet.  Second time, no gl
 	// yet.  but otherwise, after each render.  Renders should be infrequent,
 	// only when dimensions of the canvas change or other big change.
-	const renderRepaint = () => {
-		if (!canvasNode || canvasRef.current !== canvasNode) {
+	const effectRepaint = () => {
+		if (!canvasNode) {
 			if (!canvasRef.current)
 				return;  // no canvas yet, nothing to draw on
 
-			// new canvas or differnt canvas (how could this happen?!?)
-			canvasNode = canvasRef.current;
-			setCanvasNode(canvasNode);  // save for us
 
+			// new canvas — now we've got it
+			canvasNode = canvasRef.current;
+			setCanvasNode(canvasNode);
 			setupGLContext();
 		}
+		if (canvasRef.current && canvasNode && canvasRef.current !== canvasNode)
+			throw new Error('canvasRef.current !== canvasNode');
 
-		// but when it happens, make sure to repaint again
 		doRepaint();
 
 		if (traceSetup) {
-			console.log(`🖼 GLScene ${p.sceneName}: renderRepaint(): completed, canvasNode=`,
+			console.log(`🖼 GLScene ${p.sceneName}: effectRepaint(): completed, canvasNode=`,
 				canvasNode);
 		}
 	}
-	useEffect(renderRepaint);
+	useEffect(effectRepaint);
 
 	// the canvas w&h attributes define its inner coord system (not element's
 	// size) We want them to reflect actual pixels on the screen; should be same
@@ -193,7 +208,7 @@ function GLScene(props) {
 
 	// style attribute needed to set canvas physical width/height.
 	return (
-		<canvas className='GLScene'
+		<canvas className={`GLScene ${p.sceneName}`}
 			width={cWidth}
 			height={cHeight}
 			style={{width: cWidth + 'px', height: cHeight + 'px'}}
