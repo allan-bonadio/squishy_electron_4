@@ -24,13 +24,13 @@ function CxRainbowTab(props) {
 					sceneClassName='rainbowScene' sceneName='CxRainbow'
 					canvasInnerWidth={RAINBOW_SIZE}
 					canvasInnerHeight={RAINBOW_SIZE}
-					title="Colors show the Phase of the Wave"
+					title="Colors show the Complex Phase of the Wave"
 				/>
 			</div>
 			<div key='blurb' style={{flex: '1 1 200px', textAlign: 'left', margin: '1em'}}>
 				The colors in a wave show the phase of that part of the wave.
 				The phase is important because it determines whether the wave
-				reinforces itself or cancels itself out, at a certain place.
+				reinforces itself or cancels itself out, at each place.
 			</div>
 		</div>
 	</div>;

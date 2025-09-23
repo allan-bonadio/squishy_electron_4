@@ -11,7 +11,7 @@
 //#include "../schrodinger/qGrinder.h"
 #include "../debroglie/qWave.h"
 
-static const bool traceViewBuffer = true;
+static const bool traceViewBuffer = false;  // dumps it
 static const bool traceHighest = true;
 static const bool traceInDetail = true;
 
