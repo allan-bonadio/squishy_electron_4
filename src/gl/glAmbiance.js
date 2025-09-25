@@ -10,6 +10,8 @@
 // webgl-lint: sigh.  TODO: get this working.  if ever.
 // webgl-debug: can wrap a gl in checking code.  TODO: do this too.
 
+let traceVersion = false;
+
 // the gl Tests aren't tuned in to node_modules; use the https form for those.
 // the app is fine with it, so use the regular form.
 let webglLintProm;
@@ -18,8 +20,6 @@ if (typeof process == 'undefined') {
 }
 else {
 }
-
-let traceVersion = false;
 
 /* *********************************************** browser-too-old error */
 // TODO: there's another copy of this, I think in errors.js
@@ -41,7 +41,7 @@ export function tooOldTerminate() {
 // create one of these for each canvas, to get the gl context, and other prep.
 // Returns a promise because webgl-lint must load asynchronously.
 // Promise resolves with gl, when it's all ready.  NOT UNTIL.
-// although, the second and later should resolve immediately.
+// although, the second and later, on the same canvas, should resolve immediately.
 // Also webgl2.
 class glAmbiance {
 	// this decides it - feel free to change this

@@ -87,7 +87,6 @@ class sAnimator {
 		this.inteTimes.frameDrawPeriod = startDrawTime - this.inteTimes.prevDrawTime;
 		this.inteTimes.prevDrawTime = startDrawTime;
 
-		debugger;
 		this.doRepaint?.();
 		this.showTimeNFrame();  // part of the draw time
 
