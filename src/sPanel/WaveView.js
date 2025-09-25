@@ -165,27 +165,28 @@ export class WaveView extends React.Component {
 			console.log(`🏄 canvas updateInner: w=${this.canvasInnerWidth} h=${this.canvasInnerHeight}`);
 	}
 
-	// we finally have a canvas; give me a reference so I can save it.
-	// (this is repeatedly called right after each render.)
-	setGlCanvas =
-	gl => {
-		if (!gl)
-			throw `no gl value`;
-		if (!this.gl) {
-			this.gl = gl;
-			this.canvasNode = gl.canvas;
-		}
-		else if (this.gl !== gl)
-			throw `this.gl ≠ gl !`;
-
-		// might be available a few renders later
-		if (this.canvasNode) {
-			const doRepaint = this.canvasNode.doRepaint;
-			this.doRepaint = doRepaint;
-			if (this.props.animator)
-				this.props.animator.doRepaint = doRepaint;
-		}
-	}
+// 	// we finally have a canvas; give me a reference so I can save it.
+// 	// (this is repeatedly called right after each render.)
+// 	static setGlCanvas = (gl, canvas) => {
+// 		if (!gl)
+// 			throw `no gl value`;
+// 		if (!this.gl) {
+// 			this.gl = gl;
+// 			this.canvasNode = canvas;
+// 		}
+// 		else if (this.gl !== gl)
+// 			throw `this.gl ≠ gl !`;
+//
+// 		// might be available a few renders later
+// 		if (this.canvasNode && this.canvasNode.squishRepaint) {
+// 			const doRepaint = this.canvasNode.squishRepaint;
+// 			this.doRepaint = doRepaint;
+// 			if (this.props.animator)
+// 				this.props.animator.doRepaint = doRepaint;
+// 			else
+// 				throw `no doRepaint() on animator`;
+// 		}
+// 	}
 
 	componentDidMount() {
 		let wv = this.context?.waveView;
@@ -302,13 +303,10 @@ export class WaveView extends React.Component {
 
 		// can't figure out when else to do it
 		if (this.props.animator)
-			this.props.animator.context ??= this.context;
+			this.props.animator.context = this.context;
 
 		if (traceContext && this.context) {
-			console.log(`🏄 WaveView Render context:`,
-				this.context.setShouldBeIntegrating,
-				this.context.controlPanel,
-				this.context.waveView);
+			console.log(`🏄 WaveView Render context:`, this.context);
 		}
 
 		// if c++ isn't initialized yet, we can assume the time and frame serial
@@ -329,11 +327,10 @@ export class WaveView extends React.Component {
 			let sceneName = 'mainWave';
 
 			glScene = <GLScene
-				space={s.space} avatar={s.space.mainAvatar}
+				space={s.space} animator={this.props.animator}
 				sceneClassName={sceneClassName} sceneName={sceneName}
 				canvasInnerWidth={this.canvasInnerWidth}
 				canvasInnerHeight={this.canvasInnerHeight}
-				setGlCanvas={this.setGlCanvas}
 				specialInfo={{bumperWidth: this.bumperWidth}}
 			/>;
 		}
