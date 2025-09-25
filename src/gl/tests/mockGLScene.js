@@ -40,7 +40,8 @@ export class mockGLScene {
 		specialInfo: PropTypes.object,
 	}
 
-	constructor(sceneClassName, sceneName) {
+yeah i think this has to change too
+	constructor(sceneName, ambiance) {
 		this.state = {canvas: null};
 		this.space = mockSpace;
 		this.avatar = mockAvatar;
@@ -55,7 +56,7 @@ export class mockGLScene {
 	}
 
 	// yes we get the real canvas in here
-	setGLCanvas(canvas) {
+	setGLCanvas(this, gl, canvas) {
 		if (this.canvas === canvas)
 			return;  // already done
 		this.canvas = canvas;

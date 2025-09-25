@@ -56,7 +56,7 @@ function startGLView() {
 	glView = new mockGLScene(localStorage.completeScene ?? 'star', 'mockGLScene Runner');
 
 	// really set as a ref by React when page renders first time
-	glView.setGLCanvas($('canvas'));
+	//glView.setGLCanvas(this, gl, $('canvas'));
 
 
 	// too soon so ...
