@@ -115,23 +115,28 @@ export function tooOldTerminate(what) {
 
 // React used to include PropTypes that had a function checkPropTypes().
 // Then,they converted to TS.  I'm not.  And I want traditional PropTypes.
-// check-prop-types package ressurrects this.  It's only 8 years old!
-// but it depends on an old version of PropTypes which I can't run.
-// original was PropTypes.checkPropTypes(GLScene.propTypes, props, 'prop', 'GLScene');
+// They still allow original
+// checkPropTypes(GLScene.propTypes, props, 'prop', 'GLScene');
 //  ccpt(this, props);  // class component
 //  cfpt(func, props);  // func component
 // fully featured, this will print out a detailed msg and how to get to the code
 
-// a class component
+// a class component.  Call this after super() call, or shortly after
 function ccpt(_this, props) {
-	const con = _this.constructor;
-	checkPropTypes(con.propTypes, props, 'prop', con.name);
+	const cons = _this.constructor;
+	if (cons)
+		checkPropTypes(cons.propTypes, props, 'prop', cons.name);
+	else
+		throw new Error(`no proptypes on comp class ${cons.name}`)
 }
 
-// a function component.  Crashes if propType isn't installed.
+// a function component.  Crashes if propType isn't installed.    Call this as
+// first call, or shortly after
 function cfpt(func, props) {
 	if (func.propTypes)
 		checkPropTypes(func.propTypes, props, 'prop', func.name);
+	else
+		throw new Error(`no proptypes on comp function ${func.name}`)
 }
 
 // so I can get at them anywhere
