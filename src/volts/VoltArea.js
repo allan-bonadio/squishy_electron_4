@@ -4,7 +4,7 @@
 ** Copyright (C) 2021-2025 Tactile Interactive, all rights reserved
 */
 
-import React, {useRef, useState, useReducer} from 'react';
+import React, {useRef, useState, useReducer, useContext} from 'react';
 
 import PropTypes from 'prop-types';
 
@@ -15,6 +15,7 @@ import {axisLeft as d3_axisLeft} from 'd3-axis';
 import ReactFauxDOM from 'react-faux-dom';
 import clickNDrag from '../widgets/clickNDrag.js';
 import './volts.scss';
+import SquishContext from '../sPanel/SquishContext.js';
 
 let traceVoltageArea = false;
 
@@ -59,6 +60,7 @@ function VoltArea(props) {
 	const mVD = p.mainVDisp;
 	if (traceVoltageArea)
 		console.log(`⚡️ starting VoltArea`);
+	const context = useContext(SquishContext);
 
 	// svg element ref.
 	const svgRef = useRef();
@@ -228,10 +230,8 @@ function VoltArea(props) {
 		}
 	}
 
-	// called upon pointerup or pointerleave
-	const pointerUp =
+	const pointerLeave =
 	(ev) => {
-		// ev.buttons is zero here, this is called after button(s) released
 		if (dragging) {
 			if (traceProfileDragging) {
 				console.log(`⚡⚡️ pointer UP on point (${ev.clientX.toFixed(1)}, ${ev.clientY.toFixed(1)}) `
@@ -248,6 +248,18 @@ function VoltArea(props) {
 				mVD.dumpVoltage('pointer up', 8);
 			ev.preventDefault();
 			ev.stopPropagation();
+		}
+	}
+
+	const pointerUp =
+	(ev) => {
+		if (dragging) {
+			pointerLeave(ev);
+		}
+		else {
+			// just a mouse release, not on anything else, can stop animation (but not start it again)
+			if (context.shouldBeIntegrating)
+				context.controlPanel.stopAnimating(ev);
 		}
 	}
 
@@ -329,7 +341,6 @@ function VoltArea(props) {
 	// all over squish, need a way to update the voltage line on the main display
 	// Instead of handing the function around, just attach it to the space; everybody has a copy
 	p.space.updateDrawnVoltagePath = function updateDrawnVoltagePath() {
-		debugger;
 		const pathAttribute = mVD.makeVoltagePathAttribute(mVD.yScale);
 		visibleEl.setAttribute('d', pathAttribute);
 		tactileEl.setAttribute('d', pathAttribute);
@@ -375,7 +386,7 @@ function VoltArea(props) {
 			x={p.drawingLeft} width={p.drawingWidth} height={p.canvasInnerHeight}
 			ref={svgRefCallback}
 			onPointerMove={pointerMove}
-			onPointerUp={pointerUp} onPointerLeave={pointerUp}
+			onPointerUp={pointerUp} onPointerLeave={pointerLeave}
 		>
 			<g>
 				{renderAxes()}

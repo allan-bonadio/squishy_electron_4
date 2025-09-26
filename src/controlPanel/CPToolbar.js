@@ -77,28 +77,6 @@ function CPToolbar(props) {
 
 		<span className='toolSpacer' style={{width: '.3em'}}></span>
 
-		<button className={`startStopToggle startStopTool ${runningClass}`}
-			onClick={ev => {
-				if (traceCPToolbar)
-					dbLog(`🧰 CPToolbar startStop -> props=`, props);
-				props.cPanel.startStop(ev)
-			}}>
-			{ props.shouldBeIntegrating
-				? <span><big>&nbsp;</big>▐▐ <big>&nbsp;</big></span>
-				: <big>►</big> }
-		</button>
-
-		<button className={`stepButton startStopTool`}
-			onClick={ev=>{
-				if (traceCPToolbar)
-					dbLog(`🧰 CPToolbar singleFrame -> props=`, props);
-				props.cPanel.singleFrame(ev);
-			}}>
-			<big>►</big> ▌
-		</button>
-
-		<span className='toolSpacer' style={{width: '.3em'}}></span>
-
 		<div className='toolbarThing'>
 			<div className='toolbarRow'>
 				<div className='toolbarThing'>
@@ -126,3 +104,25 @@ setPT();
 
 export default CPToolbar;
 
+//<button className={`startStopToggle startStopTool ${runningClass}`}
+//	onClick={ev => {
+//		if (traceCPToolbar)
+//			dbLog(`🧰 CPToolbar startStop -> props=`, props);
+//		props.cPanel.startStop(ev)
+//	}}>
+//	{ props.shouldBeIntegrating
+//		? <span><big>&nbsp;</big>▐▐ <big>&nbsp;</big></span>
+//		: <big>►</big> }
+//</button>
+//
+//<button className={`stepButton startStopTool`}
+//	onClick={ev=>{
+//		if (traceCPToolbar)
+//			dbLog(`🧰 CPToolbar singleFrame -> props=`, props);
+//		props.cPanel.singleFrame(ev);
+//	}}>
+//	<big>►</big> ▌
+//</button>
+//
+//<span className='toolSpacer' style={{width: '.3em'}}></span>
+//

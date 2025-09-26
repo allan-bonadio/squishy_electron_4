@@ -9,6 +9,7 @@ import PropTypes from 'prop-types';
 import LogSlider from '../widgets/LogSlider.js';
 import TextNSlider from '../widgets/TextNSlider.js';
 import {getASetting, alternateMinMaxs} from '../utils/storeSettings.js';
+import InteStats from './InteStats.js';
 
 let traceSliderChanges = false;
 
@@ -86,15 +87,18 @@ function SetIntegrationTab(props) {
 			/>
 
 		</div>
-		{
-			props.space?.sInteStats.renderAllStats()
-			// why doesn't this show up!??!?!
-			//typeof statGlobals != 'undefined' && statGlobals.renderIStats()
-		}
+
+		<InteStats />
 
 	</div>);
 }
 
+
+
+// leftover scraps - delete this soon jun'25
+//{
+//	<InteStats />
+//}
 
 /*
 			<LogSlider
