@@ -3,8 +3,6 @@
 ** Copyright (C) 2022-2025 Tactile Interactive, all rights reserved
 */
 
-//import inteStats from '../controlPanel/inteStats.js';
-//import statGlobals from './statGlobals.js';
 import PropTypes from 'prop-types';
 import LogSlider from '../widgets/LogSlider.js';
 import TextNSlider from '../widgets/TextNSlider.js';

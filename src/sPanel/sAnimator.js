@@ -88,9 +88,7 @@ class sAnimator {
 		this.inteTimes.frameDrawPeriod = startDrawTime - this.inteTimes.prevDrawTime;
 		this.inteTimes.prevDrawTime = startDrawTime;
 
-		this.doRepaint?.();
-		this.showTimeNFrame();  // part of the draw time
-
+		this.doRepaint();
 		this.showTimeNFrame();  // part of the draw time - the picoseconds and frame serial
 
 		// update dom elements in integration tab to latest stats (if it's been shown at least once)

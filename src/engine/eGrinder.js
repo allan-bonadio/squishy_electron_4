@@ -3,8 +3,6 @@
 ** Copyright (C) 2023-2025 Tactile Interactive, all rights reserved
 */
 
-//import inteStats from '../controlPanel/inteStats.js';
-//import statGlobals from '../controlPanel/statGlobals.js';
 import {prepForDirectAccessors} from '../utils/directAccessors.js';
 import qeFuncs from './qeFuncs.js';
 import qeConsts from './qeConsts.js';

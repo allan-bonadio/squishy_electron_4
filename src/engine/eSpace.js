@@ -3,7 +3,7 @@
 ** Copyright (C) 2021-2025 Tactile Interactive, all rights reserved
 */
 import qeFuncs from './qeFuncs.js';
-import inteStats from '../controlPanel/InteStats.js';
+import InteStats from '../controlPanel/InteStats.js';
 import {prepForDirectAccessors} from '../utils/directAccessors.js';
 import voltDisplay from '../volts/voltDisplay.js';
 import eAvatar from './eAvatar.js';
@@ -79,7 +79,7 @@ export class eSpace {
 		if (traceFamiliarWave)
 			console.log(`🚀  done with setFamiliarWave():`, this.mainFlick.wave);
 
-		//this.sInteStats = new inteStats(this);
+		//this.sInteStats = new InteStats(this);
 		if (traceSpace) console.log(`🚀  done creating eSpace:`, this);
 
 		if (traceGlobalSpace)
