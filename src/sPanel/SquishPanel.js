@@ -173,6 +173,9 @@ export class SquishPanel extends React.Component {
 		avatar.doRepaint();
 	}
 
+	setSPElement =
+	(spe) => { this.squishPanelEl = spe; }
+
 	render() {
 		const p = this.props;
 		const s = this.state;
@@ -185,8 +188,8 @@ export class SquishPanel extends React.Component {
 		this.contextObj.shouldBeIntegrating = s.shouldBeIntegrating;
 
 		return (
-			<SquishContext.Provider value={this.contextObj}>
-				<article id={this.props.id} className="SquishPanel">
+			<SquishContext.Provider value={this.contextObj} >
+				<article id={this.props.id} className="SquishPanel" ref={this.setSPElement}>
 					<WaveView
 						outerWidth = {p.bodyWidth}
 						animator={this.animator}
