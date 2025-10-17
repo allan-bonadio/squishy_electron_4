@@ -50,7 +50,7 @@ function setPT() {
 		// style on the <dialog>, including BG color
 		dialogStyles: PropTypes.object,
 
-		// absent: click->close (not good or bad)    function->function callback
+		// undefined means click->close (not good or bad)    or function->function callback
 		backdropAction: PropTypes.any,
 	};
 
@@ -96,7 +96,9 @@ function CommonDialog(props) {
 		</dialog>
 	);
 }
-CommonDialog.propTypes = {dialogStyles: PropTypes.object, dialogContent: PropTypes.string};
+setPT();
+
+//CommonDialog.propTypes = {dialogStyles: PropTypes.object, dialogContent: PropTypes.string};
 
 
 CommonDialog.openDialog =
