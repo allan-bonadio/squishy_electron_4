@@ -78,10 +78,12 @@ export class abstractDrawing {
 		if (success) return shader;
 
 		// error in compilation
-		const msg = gl.getShaderInfoLog(shader);
+		let msg = gl.getShaderInfoLog(shader);
 		//gl.deleteShader(shader);
-		throw new Error(`Error compiling ${shType} `
-			+` shader for ${this.sceneName}: ${msg}`);
+		msg = `Error compiling ${shType} `
+			+` shader for ${this.sceneName}: ${msg}`;
+		console.error(msg);  // somehow react swallows this error sometimes
+		throw new Error(msg);
 	}
 
 	// call this with your sources in setShaders().

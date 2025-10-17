@@ -38,8 +38,6 @@ export class drawingVariable {
 		// whichever variable this is a subclass of, constructors will need this
 		// or maybe this is already done and so this is superflous?
 		drawing.setDrawing();
-//		gl.useProgram(drawing.program);
-//		gl.bindVertexArray(drawing.vao);
 
 		if (traceGLCalls) console.log(`𒐿 created drawingVariable '${varName}', drawing:`, drawing);
 	}
@@ -175,6 +173,9 @@ export class drawingAttribute extends drawingVariable {
 		// WebGL2Fundamentals said we don't have to do this if it's the same buffer (w/diff values) every time.
 		// if I understood them correctly.  afraid to try...
 		let floatArray = this.floatArray = this.getFunc();
+		if (!floatArray) {
+			throw `getFunc() returned null on var=${varName} scene=${this.drawing.drawingName}`;
+		}
 		//if (this.floatArray !== newFloatArray) {
 		//	gl.bindBuffer(gl.ARRAY_BUFFER, this.glBuffer);
 		//	gl.bufferData(gl.ARRAY_BUFFER, newFloatArray, gl.DYNAMIC_DRAW);
