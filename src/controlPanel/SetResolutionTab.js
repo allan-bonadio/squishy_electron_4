@@ -13,7 +13,7 @@ import SquishContext from '../sPanel/SquishContext.js';
 
 function setPT() {
 	SetResolutionTab.propTypes = {
-		grinder: PropTypes.object,
+		//grinder: PropTypes.object,
 		space: PropTypes.object,
 	};
 }
@@ -32,7 +32,7 @@ function SetResolutionTab(props) {
 			const timeWasAdvancing = context.shouldBeIntegrating;
 			context.controlPanel.stopAnimating();
 
-			ResolutionDialog.openResolutionDialog(props.grinder);  // reloads the page on OK!
+			ResolutionDialog.openResolutionDialog();
 
 			if (timeWasAdvancing)
 				context.controlPanel.startAnimating();

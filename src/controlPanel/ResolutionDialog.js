@@ -15,6 +15,7 @@ import LogSlider from '../widgets/LogSlider.js';
 //import {eSpaceCreatedPromise} from '../engine/eEngine.js';
 import {getASetting, storeAGroup} from '../utils/storeSettings.js';
 
+// the insides of the Resolution (space) dialog
 export default class ResolutionDialog extends React.Component {
 	static propTypes = {
 	};
@@ -68,7 +69,7 @@ export default class ResolutionDialog extends React.Component {
 
 
 	// puts up the resolution dialog, starting with the values from the state
-	static openResolutionDialog(grinder) {
+	static openResolutionDialog() {
 		// pass our state upward to load into the dialog
 		ResolutionDialog.openResDialog(
 			// OK callback
