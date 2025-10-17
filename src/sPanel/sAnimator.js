@@ -16,7 +16,7 @@ let traceTheViewBuffer = false;
 let traceHeartbeats = false;
 let traceFrameProgress = false;
 let traceFrameMenuRates = false;
-let traceSingleFrame = true;
+let traceSingleFrame = false;
 
 let tracerAFPeriod = false;
 let traceTypicalVideoPeriod = false;
@@ -88,7 +88,7 @@ class sAnimator {
 		this.inteTimes.frameDrawPeriod = startDrawTime - this.inteTimes.prevDrawTime;
 		this.inteTimes.prevDrawTime = startDrawTime;
 
-		this.doRepaint();
+		this.glRepaint();
 		this.showTimeNFrame();  // part of the draw time - the picoseconds and frame serial
 
 		// update dom elements in integration tab to latest stats (if it's been shown at least once)

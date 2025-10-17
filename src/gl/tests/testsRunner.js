@@ -70,7 +70,7 @@ function startGLView() {
 		gl.clearColor(.3, .7, .5, 1);
 		gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
-		glView.doRepaint()
+		glView.glRepaint()
 	}, 1000)
 }
 

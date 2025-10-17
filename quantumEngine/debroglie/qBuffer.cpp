@@ -23,8 +23,8 @@ qFlick - object that owns a list of waves, and points to its space
 
 static bool traceInnerProduct = false;
 static bool traceNormalize = false;
-static bool traceAllocate = true;
-static bool traceInit = true;
+static bool traceAllocate = false;
+static bool traceInit = false;
 
 // make one, any size.  For single floats, ints, whatever.  Mostly for use from JS.
 void *allocateBuffer(int byteSize) {

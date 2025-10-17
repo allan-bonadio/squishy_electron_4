@@ -120,7 +120,7 @@ qAvatar::~qAvatar(void) {
 
 // attach given buffer (useThisBuffer) as a view buffer in this avatar at
 // position whichBuffer.  If useThisBuffer is null, then allocate it and use
-// that.
+// that.  does NOT clear or init the buffer.
 float *qAvatar::attachViewBuffer(int whichBuffer, float *useThisBuffer,
 		int nCoordsPerVertex, int nVertices) {
 	viewBufInfo *vb = viewBuffers + whichBuffer;
@@ -206,21 +206,21 @@ void qAvatar::dumpMeta(const char *title) {
 	printf("        ==== end of qAvatar ====🚥 🚥 \n\n");
 }
 
-// dump out ALL the vertex buffer data, according to whichBuffers.
+// dump out ALL the vertex buffer data, according to bufferMask.
 // bitwise OR together: 1=buf 0, 2=buf1, 4=buf2, 8=buf3,
-// whichBuffers is a bit-mask: 1=viewbuf[0], 2=viewbuf[1],4=buf2, 8=buf3, etc
+// bufferMask is a bit-mask: 1=viewbuf[0], 2=viewbuf[1],4=buf2, 8=buf3, etc
 // Always omits buffers that aren't there yet.
-void qAvatar::dumpViewBuffers(int whichBuffers, const char *title) {
+void qAvatar::dumpViewBuffers(int bufferMask, const char *title) {
 	txt[TXTLEN - 1] = 101;
 	if (!title) title = "no title 🧨 🧨";
 
-	printf(" 🚥 %s avatar ✈️ %d vertices (which viewBuffers: 0x%x)\n",
-		title, viewBuffers[0].nVertices, whichBuffers);    // WRONG only for buf zero
+	printf(" 🚥 %s avatar ✈️ %d vertices (bufferMask: %x)\n",
+		title, viewBuffers[0].nVertices, bufferMask);    // WRONG only for buf zero
 
 	// HEADING row.  Pay careful attention to chars across so rows line up,
 	// and line up with headings.  Right just.
 	charsUsed = 0;
-	int which = whichBuffers;
+	int which = bufferMask;
 	charsUsed += snprintf(txt+charsUsed, TXTLEN - charsUsed, "vtex ");
 	for (int bufferIx = 0; (bufferIx < MAX_N_BUFFERS) && which; bufferIx++) {
 		//printf("heading buffer %d\n", bufferIx);
@@ -256,7 +256,7 @@ void qAvatar::dumpViewBuffers(int whichBuffers, const char *title) {
 		// on this line: do which viewBuffers at vertexIx, and each of their coordinates
 			// row heading
 		charsUsed += snprintf(txt+charsUsed, TXTLEN - charsUsed, "%4d ", vertexIx);
-		which = (whichBuffers & 0xF);
+		which = (bufferMask & 0xF);
 		for (int bufferIx = 0; (bufferIx < MAX_N_BUFFERS) && which; bufferIx++) {
 
 			if ((which & 1) && (viewBuffers[bufferIx].fArray)) {
@@ -287,9 +287,9 @@ void qAvatar::dumpViewBuffers(int whichBuffers, const char *title) {
 }
 
 
-// dump out ALL the vertex buffer data, according to whichBuffers.
+// dump out ALL the vertex buffer data, according to bufferMask.
 // bitwise OR together: 1=buf 0, 2=buf1, 4=buf2, 8=buf3,
-// whichBuffers is a bit-mask: 1=viewbuf[0], 2=viewbuf[1],4=buf2, 8=buf3, etc
+// bufferMask is a bit-mask: 1=viewbuf[0], 2=viewbuf[1],4=buf2, 8=buf3, etc
 // Always omits buffers that aren't there yet.
 void qAvatar::dumpIndex(const char *title) {
 	txt[TXTLEN - 1] = 101;
@@ -323,7 +323,7 @@ void qAvatar::dumpIndex(const char *title) {
 
 // SAVE THIS FOR LATER phase on the above dump
 //// dump the view buffer just before it heads off to webgl.  TODO: remove
-//static void old_qAvatar__dumpViewBuffers(int whichBuffers, const char *title) {
+//static void old_qAvatar__dumpViewBuffers(int bufferMask, const char *title) {
 //	float prevPhase = 0;
 //	#define FORMAT_BASE      "%6d |  %8.5f  %8.5f  %6.5g  %6.5g"
 //	#define FORMAT_SUFFIX  " | %6.5f %6.5f  %6.5f m𝜓/nm\n"
@@ -433,8 +433,8 @@ void avatar_dumpMeta(qAvatar *avatar, char *title) {
 	avatar->dumpMeta(title);
 }
 
-void avatar_dumpViewBuffers(qAvatar *avatar, int whichBuffers, char *title) {
-	avatar->dumpViewBuffers(whichBuffers, title);
+void avatar_dumpViewBuffers(qAvatar *avatar, int bufferMask, char *title) {
+	avatar->dumpViewBuffers(bufferMask, title);
 }
 
 void avatar_dumpIndex(qAvatar *avatar, char *title) {

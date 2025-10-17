@@ -57,7 +57,8 @@ function SetWaveTab(props) {
 			console.log(`Regenerating WaveTab minigraph.  params: `, waveParams);
 		space.miniGraphAvatar.ewave.setFamiliarWave(waveParams);
 		space.miniGraphAvatar.smoothHighest = 0;
-		space.miniGraphAvatar.doRepaint?.();
+		space.miniGraphAvatar.glRepaint();
+		//space.miniGraphAvatar.glRepaint?.();
 	}
 
 	// set any combination of the wave params, in the Control Panel state.

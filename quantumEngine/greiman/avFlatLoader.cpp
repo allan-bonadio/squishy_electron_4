@@ -12,8 +12,8 @@
 #include "../debroglie/qWave.h"
 
 static const bool traceViewBuffer = false;  // dumps it
-static const bool traceHighest = true;
-static const bool traceInDetail = true;
+static const bool traceHighest = false;
+static const bool traceInDetail = false;
 
 
 void dumpViewBuffer(qAvatar *avatar, int bufIx, int nPoints, const char *title) {
@@ -57,8 +57,8 @@ void dumpViewBuffer(qAvatar *avatar, int bufIx, int nPoints, const char *title) 
 // Two vertices per datapoint: bottom then top, same data.
 // also converts from doubles to floats for GL.
 void avFlatLoader(qAvatar *avatar, int bufIx, qWave *qwave, int nPoints) {
-	if (traceViewBuffer) printf("\n📺 avFlatLoader to avatr %s starts:\n",
-		avatar->label);
+	if (traceViewBuffer)
+		printf("\n📺 avFlatLoader to avatar %s starts:\n", avatar->label);
 	qCx *wave = qwave->wave;  // from here
 	float *fArray = avatar->viewBuffers[bufIx].fArray;  // to here
 
@@ -72,8 +72,8 @@ void avFlatLoader(qAvatar *avatar, int bufIx, qWave *qwave, int nPoints) {
 		qwave->dump("📺 at start of avFlatLoader()");
 	}
 
-	// this is index into the complex point, which translates to 2 GL vertices
-	printf("avFlatLoader about to do all the pts\n");
+	// this is index into the complex point, which translates to 2 GL vertices, eight single floats, 32 bytes
+	//printf("avFlatLoader about to do nPoints pts: %d\n", nPoints);
 	for (int pointNum = 0; pointNum < nPoints; pointNum++) {
 		if (traceInDetail) {
 			printf("📺 avFlatLoader fArray %p\n",
@@ -127,7 +127,7 @@ void avFlatLoader(qAvatar *avatar, int bufIx, qWave *qwave, int nPoints) {
 	}
 
 	avatar->d0 = highest;
-	printf("end of avFlatLoader: d0=%lf  highest=%lf\n", avatar->d0, highest);
+	//printf("end of avFlatLoader: d0=%lf  highest=%lf\n", avatar->d0, highest);
 	// all return values returned on the avatar in [di][01]
 }
 

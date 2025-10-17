@@ -13,7 +13,7 @@ import eWave from './eWave.js';
 let traceSetFamiliarFlick = false;
 let traceGaussian = false;
 let traceFamiliarResult = false;
-let traceAllocate = true;
+let traceAllocate = false;
 
 const _ = num => num.toFixed(4).padStart(9);
 

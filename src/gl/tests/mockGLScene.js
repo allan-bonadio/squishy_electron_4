@@ -93,13 +93,13 @@ yeah i think this has to change too
 			this.effectiveView =
 			new sClass(this.sceneClassName, this, mockSpace, mockAvatar);
 		this.effectiveView.completeScene(specialInfo);
-		this.avatar.doRepaint = this.doRepaint;
+		this.avatar.glRepaint = this.glRepaint;
 
 	}
 
 	// repaint whole GL image.
-	doRepaint() {
-		console.log('doRepaint');
+	glRepaint() {
+		console.log('glRepaint');
 		mockAvatar.loadViewBuffer();
 		this.effectiveView.drawAllDrawings(width, height, p.specialInfo);
 	}

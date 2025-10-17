@@ -48,7 +48,7 @@ struct qAvatar {
 	void dumpMeta(const char *title);
 
 	// print contents of viewBuffers
-	void dumpViewBuffers(int whichBuffers, const char *title);
+	void dumpViewBuffers(int bufferMask, const char *title);
 	void dumpIndex(const char *title);
 
 	// populates the viewBuffers; depends on avatarBreed.  You can use your own
@@ -147,7 +147,7 @@ extern "C" {
 	short *avatar_attachIndexBuffer(qAvatar *avatar, short *useThisBuffer, int nItems);
 
 	void avatar_dumpMeta(qAvatar *avatar, char *title);
-	void avatar_dumpViewBuffers(qAvatar *avatar, int whichBuffers, char *title);
+	void avatar_dumpViewBuffers(qAvatar *avatar, int bufferMask, char *title);
 	void avatar_dumpIndex(qAvatar *avatar, char *title);
 
 	// return one buffer, raw floats.  maybe we don't need this?  cuz JS wants the typed array.

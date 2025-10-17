@@ -33,7 +33,7 @@ static bool traceJustWave = false;
 static bool dumpFFHiResSpectums = false;
 static bool traceIProd = false;
 
-static bool traceConstructor = true;
+static bool traceConstructor = false;
 
 static bool traceDivergence = false;
 static bool traceKinks = false;

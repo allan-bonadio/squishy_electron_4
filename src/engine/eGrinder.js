@@ -10,7 +10,7 @@ import {getASetting} from '../utils/storeSettings.js';
 import {thousandsSpaces} from '../utils/formatNumber.js';
 import eFlick from './eFlick.js';
 
-let traceCreation = true;
+let traceCreation = false;
 let traceIntegration = false;
 let traceTriggerIteration = false;
 

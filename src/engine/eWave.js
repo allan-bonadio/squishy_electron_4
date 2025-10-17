@@ -12,7 +12,7 @@ import eSpace from './eSpace.js';
 let traceSetFamiliarWave = false;
 let traceGaussian = false;
 let traceFamiliarResult = false;
-let traceAllocate = true;
+let traceAllocate = false;
 
 const _ = num => num.toFixed(4).padStart(9);
 const abs = Math.abs;

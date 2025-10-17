@@ -26,7 +26,7 @@ import StartStopOverlay from './StartStopOverlay.js';
 import resizeIcon from './waveViewIcons/resize.png';
 
 let traceBumpers = false;
-let traceDimensions = false;
+let traceDimensions = true;
 let traceDragCanvasHeight = false;
 let traceHover = false;
 let traceContext = false;
@@ -178,13 +178,13 @@ export class WaveView extends React.Component {
 // 			throw `this.gl ≠ gl !`;
 //
 // 		// might be available a few renders later
-// 		if (this.canvasNode && this.canvasNode.squishRepaint) {
-// 			const doRepaint = this.canvasNode.squishRepaint;
-// 			this.doRepaint = doRepaint;
+// 		if (this.canvasNode && this.canvasNode.glRepaint) {
+// 			const glRepaint = this.canvasNode.glRepaint;
+// 			this.glRepaint = glRepaint;
 // 			if (this.props.animator)
-// 				this.props.animator.doRepaint = doRepaint;
+// 				this.props.animator.glRepaint = glRepaint;
 // 			else
-// 				throw `no doRepaint() on animator`;
+// 				throw `no glRepaint() on animator`;
 // 		}
 // 	}
 

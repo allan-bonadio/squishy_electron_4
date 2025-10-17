@@ -88,10 +88,10 @@ class eAvatar {
 			throw `🚦 Second allocate of typed array ${this.label} buffer ${whichBuffer}`;
 		this.bufferNames[whichBuffer] = name;
 
-		// buffer of floats, 4 by apiece
+		// buffer of floats, 4 by apiece.  Extra factor of 2 cuz I dunno
 		const nFloats = nCoordsPerVertex * nVertices;
 		if (!useThisMemory)
-			useThisMemory = qeFuncs.buffer_allocateBuffer(4 * nFloats);
+			useThisMemory = qeFuncs.buffer_allocateBuffer(nFloats * 8);
 
 		let pointer = qeFuncs.avatar_attachViewBuffer(this.pointer, whichBuffer,
 				useThisMemory, nCoordsPerVertex, nVertices);
@@ -177,11 +177,9 @@ class eAvatar {
 	}
 
 	// 0-15 for vertex bufs, any combo; 128 for index buf
-	dumpViewBuffers(whichBuffers, title) {
-		// if (whichBuffers & -16)
-		// 	throw Error(`🚦 dumpViewBuffers with bad whichBuffers ${whichBuffers}`);
+	dumpViewBuffers(bufferMask, title) {
 		console.group(title);
-		qeFuncs.avatar_dumpViewBuffers(this.pointer, whichBuffers, ' ');
+		qeFuncs.avatar_dumpViewBuffers(this.pointer, bufferMask, ' ');
 		console.groupEnd();
 	}
 

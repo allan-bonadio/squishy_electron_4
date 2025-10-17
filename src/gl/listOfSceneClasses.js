@@ -7,7 +7,7 @@ import {abstractScene} from './abstractScene.js';
 import flatScene from './flatScene.js';
 import rainbowScene from './rainbowScene.js';
 
-let traceSceneClasses = true;
+let traceSceneClasses = false;
 
 // unfortunately, we hafe to have a list of all the view types.  here.
 // this will appear in the resolution dialog
