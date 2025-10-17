@@ -89,6 +89,8 @@ export class flatDrawing extends abstractDrawing {
 		this.vertexShaderSrc = vertexSrc;
 		this.fragmentShaderSrc = fragmentSrc;
 
+		// each point in the wave results in two vertices, top and wave.
+		// And each of those is four single floats going to the GPU
 		this.avatar.attachViewBuffer(0, null, 4, this.space.nPoints * 2, 'flat drawing');
 		console.log(`attachViewBuffer on scene ${scene.sceneName}`);
 	}
@@ -137,6 +139,7 @@ export class flatDrawing extends abstractDrawing {
 		if (traceFlatDrawing) console.log(`♭♭♭ barWidth= ${barWidth}`);
 
 		this.vertexCount = nPoints * 2;  // nPoints * vertsPerBar
+//this.vertexCount += this.vertexCount;////
 		this.rowFloats = 4;
 		this.rowAttr = new drawingAttribute('row', this, this.rowFloats, () => {
 
@@ -155,6 +158,7 @@ export class flatDrawing extends abstractDrawing {
 
 	// called for each image frame on th canvas
 	draw(width, height, specialInfo) {
+
 		if (traceFlatDrawing) {
 			console.log(`♭♭♭ flatDrawing  ${this.avatarLabel}: `
 				+` width=${width}, height=${height}  drawing ${this.vertexCount/2} points`);
@@ -168,10 +172,10 @@ export class flatDrawing extends abstractDrawing {
 			console.log(`♭♭♭ flatDrawing set viewport on ${this.avatarLabel}: `
 				+` width-2bw=${width - 2 * bw}, height=${height}  drawing ${this.vertexCount/2} points`);
 
-
 		this.viewVariables.forEach(v => v.reloadVariable());
 		gl.drawArrays(gl.TRIANGLE_STRIP, 0, this.vertexCount);
-		console.log(`just drewArays-flat on avatar ptr=${this.avatar.pointer} this.avatar.label=${this.avatar.label}, buffer label=${this.avatar.bufferNames[0]}`);
+		// console.log(`just drewArays-flat on avatar ptr=${this.avatar.pointer} `
+		// 	+` this.avatar.label=${this.avatar.label}, buffer label=${this.avatar.bufferNames[0]}`);
 
 		if (traceDrawLines) {
 			gl.lineWidth(1);  // it's the only option anyway
