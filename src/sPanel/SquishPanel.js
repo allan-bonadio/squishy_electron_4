@@ -169,8 +169,8 @@ export class SquishPanel extends React.Component {
 		grinder.frameSerial = 0;
 
 		// directly redraw the GL
-		avatar.smoothHighest = 0;
-		avatar.doRepaint();
+		avatar.d0 = 0;
+		this.animator.glRepaint();
 	}
 
 	render() {
