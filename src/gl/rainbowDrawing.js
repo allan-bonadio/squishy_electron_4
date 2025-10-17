@@ -22,13 +22,11 @@ const vertexShaderSrc = `${cx2rygb}
 #line 23
 precision highp float;
 attribute vec2 pos;
-attribute vec3 col;
+//attribute vec3 col;
 attribute vec2 wave;
 varying vec3 colorVar;
 
 void main() {
-	vec3 distract;  // pretend to use the attrs we don't use
-
 	gl_PointSize = 4.;
 	gl_Position = vec4(pos, 0, 1);
 
@@ -37,14 +35,11 @@ void main() {
 
 	// for actual testing of cx to rygb
 	colorVar = cx2rygb(wave);
-
-	distract.bgr = col.rgb;
-	distract.gb = wave.rg;
 }
 `;
 
 const fragmentShaderSrc = `
-#line 38
+#line 43
 precision highp float;
 varying vec3 colorVar;
 
@@ -79,7 +74,7 @@ export class rainbowDrawing extends abstractDrawing {
 			console.log(`🌈 🌈 rainbow: creatingVariables`);
 
 		const pos = this.pos = this.avatar.attachViewBuffer(0, null, 2, nVERTS, 'pos');
-		const col = this.col = this.avatar.attachViewBuffer(1, null, 3, nVERTS, 'col');
+		//const col = this.col = this.avatar.attachViewBuffer(1, null, 3, nVERTS, 'col');
 		const wave = this.wave = this.avatar.attachViewBuffer(2, null, 2, nVERTS, 'wave');
 
 		// load the data before sending off the buffers
@@ -89,9 +84,9 @@ export class rainbowDrawing extends abstractDrawing {
 			return pos;
 		});
 
-		this.colAttr = new drawingAttribute('col', this, 3, () => {
-			return col;
-		});
+		// this.colAttr = new drawingAttribute('col', this, 3, () => {
+		// 	return col;
+		// });
 
 		this.waveAttr = new drawingAttribute('wave', this, 2, () => {
 			return wave;
@@ -102,7 +97,7 @@ export class rainbowDrawing extends abstractDrawing {
 	// load up the avatar with numbers.  We generate bare coords ±1
 	loader(avatar) {
 		const pos = avatar.getViewBuffer(0);
-		const col = avatar.getViewBuffer(1);
+		//const col = avatar.getViewBuffer(1);
 		const wave = avatar.getViewBuffer(2);
 		let p = 0, c = 0, w = 0;
 		const RADIUS = 1;
@@ -112,14 +107,14 @@ export class rainbowDrawing extends abstractDrawing {
 		pos[p+0] = originX;
 		pos[p+1] = originY;
 
-		col[c+0] = col[c+1] = col[c+2] = 1;
+		///col[c+0] = col[c+1] = col[c+2] = 1;
 
 		wave[w+0] = wave[w+1] = 0;
 
 		// all the vertices, plus the initial [1] vert again
 		for (let s = 0; s <= nSEGS; s++) {
 			p = s * 2 + 2;
-			c = s * 3 + 3;
+			//c = s * 3 + 3;
 			w = s * 2 + 2;
 
 			let angle = s * RADIANS_PER_SEG;
@@ -133,9 +128,9 @@ export class rainbowDrawing extends abstractDrawing {
 			pos[p + 1] = RADIUS * si0 + originY;
 
 
-			col[c + 0] = (si0 + 1) / 2;
-			col[c + 1] = (co0 + 1) / 2;
-			col[c + 2] = s / nSEGS;
+			// col[c + 0] = (si0 + 1) / 2;
+			// col[c + 1] = (co0 + 1) / 2;
+			// col[c + 2] = 0;
 
 			wave[w + 0] = co0;
 			wave[w + 1] = si0;
@@ -158,9 +153,14 @@ export class rainbowDrawing extends abstractDrawing {
 		this.setDrawing();
 
 		this.viewVariables.forEach(v => v.reloadVariable());
+
+		this.avatar.dumpViewBuffers(5, `avatar for rainbow cx just before draw`);
+
 		//gl.drawArrays(gl.TRIANGLE_STRIP, 0, nVERTS);
 		gl.drawArrays(gl.TRIANGLE_FAN, 0, nVERTS);
-		console.log(`just drewArays-rainbow on avatar ptr=${this.avatar.pointer} this.avatar.label=${this.avatar.label}, buffer label=${this.avatar.bufferNames[0]}`);
+		// console.log(`just drewArays-rainbow on avatar ptr=${this.avatar.pointer} `
+		// 	+` this.avatar.label=${this.avatar.label}, buffer label= `
+		// 	+` ${this.avatar.bufferNames[0]}`);
 
 		if (traceDrawLines) {
 			gl.lineWidth(1);  // it's the only option anyway
