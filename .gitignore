@@ -11,3 +11,7 @@ package-lock.json
 /build.zip
 
 npm-debug.log*
+
+# special project - ignore these files after oct 2025
+*@TH3*
+

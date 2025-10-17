@@ -18,24 +18,24 @@ TEST_GROUP(qFlick)
 /* ***************************************************************************** Alloc */
 static void testAnAlloc(int N, int nW) {
 	qSpace *space = makeBareSpace(N);
-	qFlick *qflick = new qFlick(space, nW, 1);
+	qFlick *flick = new qFlick(space, nW, 1);
 
-	LONGS_EQUAL_TEXT('Flic', qflick->magic, "qFlick magic");
-	CHECK_TEXT(qflick->wave, "qFlick wave");
-	CHECK_TEXT(qflick->dynamicallyAllocated, "qFlick dynamicallyAllocated");
-	CHECK_TEXT(qflick->waves, "waves");
+	LONGS_EQUAL_TEXT('Flic', flick->magic, "qFlick magic");
+	CHECK_TEXT(flick->wave, "qFlick wave");
+	CHECK_TEXT(flick->dynamicallyAllocated, "qFlick dynamicallyAllocated");
+	CHECK_TEXT(flick->waves, "waves");
 
 	for (int w = 0; w < nW; w++) {
-		qCx *wave = qflick->waves[w];
+		qCx *wave = flick->waves[w];
 		CHECK_TEXT(wave, "wave w exists");
 		proveItsMine(wave, space->nPoints * sizeof(qCx));
 	}
 
-	LONGS_EQUAL_TEXT(1, qflick->start, "qFlick start");
-	LONGS_EQUAL_TEXT(N+1, qflick->end, "qFlick end");
-	LONGS_EQUAL_TEXT(N+2, qflick->nPoints, "qFlick nPoints");
+	LONGS_EQUAL_TEXT(1, flick->start, "qFlick start");
+	LONGS_EQUAL_TEXT(N+1, flick->end, "qFlick end");
+	LONGS_EQUAL_TEXT(N+2, flick->nPoints, "qFlick nPoints");
 
-	delete qflick;
+	delete flick;
 	delete space;
 }
 
@@ -52,34 +52,34 @@ static int maxi(int a, int b) {
 }
 
 // pass what nWaves and allocWaves should be; this will verify
-static void proveIt(qFlick *qflick, int nWaves, int allocWaves) {
-	LONGS_EQUAL_TEXT(nWaves, qflick->nWaves, "SetNWaves nWaves wrong");
-	LONGS_EQUAL_TEXT(allocWaves, qflick->allocWaves, "SetNWaves allocWaves wrong");
+static void proveIt(qFlick *flick, int nWaves, int allocWaves) {
+	LONGS_EQUAL_TEXT(nWaves, flick->nWaves, "SetNWaves nWaves wrong");
+	LONGS_EQUAL_TEXT(allocWaves, flick->allocWaves, "SetNWaves allocWaves wrong");
 
 	// verify waves are there
 	for (int w = 0; w < nWaves; w++)
-		proveItsMine(qflick->waves[w], 18 * sizeof(qCx));
+		proveItsMine(flick->waves[w], 18 * sizeof(qCx));
 
 	// make sure the rest are null
 	for (int w = nWaves; w < allocWaves; w++)
-		POINTERS_EQUAL(NULL, qflick->waves[w]);
+		POINTERS_EQUAL(NULL, flick->waves[w]);
 }
 
 static void testSetNWaves(int size0, int size1, int size2) {
 	qSpace *space = makeBareSpace(16);
-	qFlick *qflick = new qFlick(space, size0, 1);
-	proveIt(qflick, size0, size0);
+	qFlick *flick = new qFlick(space, size0, 1);
+	proveIt(flick, size0, size0);
 	int maxW = size0;
 
-	qflick->setNWaves(size1);
+	flick->setNWaves(size1);
 	maxW = maxi(maxW, size1);
-	proveIt(qflick, size1, maxW);
+	proveIt(flick, size1, maxW);
 
-	qflick->setNWaves(size2);
+	flick->setNWaves(size2);
 	maxW = maxi(maxW, size2);
-	proveIt(qflick, size2, maxW);
+	proveIt(flick, size2, maxW);
 
-	delete qflick;
+	delete flick;
 	delete space;
 }
 

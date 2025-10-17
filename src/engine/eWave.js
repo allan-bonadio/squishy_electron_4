@@ -6,13 +6,13 @@
 // There is no eBuffer or eSpectrum; C++ deals with those exclusively
 
 import qeConsts from './qeConsts.js';
-import cx2rgb from '../gl/cx2rgb/cx2rgb.txlated.js';
 import {cppObjectRegistry, prepForDirectAccessors} from '../utils/directAccessors.js';
 import eSpace from './eSpace.js';
 
 let traceSetFamiliarWave = false;
 let traceGaussian = false;
 let traceFamiliarResult = false;
+let traceAllocate = false;
 
 const _ = num => num.toFixed(4).padStart(9);
 const abs = Math.abs;
@@ -48,98 +48,93 @@ function dumpRow(ix, re, im, prev, isBorder) {
 		`${_(phase)} ${_(dPhase)}} ${_(mag * 1000)} m𝜓/nm\n` ;
 }
 
-
-// Dump a wave buffer as a colored bargraph in the JS console
-// this is also called by C++ so it's easier as a standalone function
-// see also eWave method by same name (but different args)
-export function rainbowDump(wave, start, end, nPoints, title) {
-	let start2 = 2 * start;
-	let end2 = 2 * end;
-	if (isNaN(start2) || isNaN(end2))
-		debugger;
-
-	// maybe doesn't work when called from c++?
-	console.log(`%c rainbowDump  🌊 |  ${title} `,
-		`color: #222; background-color: #fff; font: 14px Palatino;`);
-
-	// autorange
-	let maxi = 0;
-	for (let ix2 = start2; ix2 < end2; ix2 += 2)
-		maxi = Math.max(maxi, wave[ix2] ** 2 + wave[ix2 + 1] ** 2);
-	let correction = 1000 / maxi;  // intended max width in console
-
-	for (let ix2 = start2; ix2 < end2; ix2 += 2) {
-		let mag = (wave[ix2] ** 2 + wave[ix2 + 1] ** 2) * correction;
-
-		let color = cx2rgb([wave[ix2], wave[ix2 + 1]]);
-		color = `rgb(${color[0]*255}, ${color[1]*255}, ${color[2]*255})`;
-		console.log(`%c `, `background-color: ${color}; padding-right: ${mag+5}px; `);
-	}
-}
-window.rainbowDump = rainbowDump;  // so c++ can get to it
-
 /* **************************************************************** eWave */
 
 // this is just a 1D wave.  someday...
 class eWave {
-	// waveArg is one of these:
-	// • a C++ wave/spectrum buffer ptr, ask any qBuffer to pass back its wave and it comes out as an integer
+	// useThis32F is one of these:
+	// • NO obsolete! (maybe still works but Float64Array() allocates its
+	//       own buffer) a C++ wave/spectrum buffer ptr, integer
 	// • a Float64Array[2*nPoints], with pairs being the real and im parts of psi.
-	//       From any source, C++ or JS.
+	//       From C++ so bytes are in the emscripten heap
 	// 		 (I bet you could pass it a JS array and some stuff would work)
-	// • Or absent/null, in which case it's dynamially allocated to space.nPoints; JS only
+	// • Or absent/null, in which case it's dynamially allocated to 2*space.nPoints size
+	//        (JS only)
 	// pointer should be pointer to qWave in C++, otherwise leave it falsy.
-	// If you use pointer, leave the waveArg null; it's ignpored
-	constructor(space, waveArg, pointer) {
-		prepForDirectAccessors(this, pointer);
-
+	// If you use pointer, leave the useThis32F null; it's ignored
+	constructor(space, useThis32F, pointer) {
 		this.space = space;
 		if (!(space instanceof eSpace))
 			throw new Error("new eWave: space is not an eSpace")
 
 		if (pointer) {
 			this.pointer = pointer;  // a qWave
-			waveArg = this._wave;
+			//?? waveArg = this._wave;
 		}
 		else {
-			// a home brew wave, not from C++.  make a phony qWave for those ints to be
-			this.pointer = new Int32Array(20);
+			// a home brew wave, not from C++.  make a phony qWave for those ints
+			// a hack to get it running so you can run the direct accessor code to get the getters..
+			// not for 'real' use
+			//debugger;
+			this.pointer = qeFuncs.wave_create(space.pointer, null);
 		}
+		prepForDirectAccessors(this, this.pointer);
 
 		// now for the buffer
-		if (!waveArg) {
-			// zeroes.  if you're lucky.
-			this.wave = new Float64Array(2 * space.nPoints);
+		this.completeWave(useThis32F);
+	}
+
+			// console.assert(pointer, `eWave being constructed with no pointer `
+			// 	+` (${pointer}) and no buffer useThis32F (${useThis32F})`)
+		//useThis32F = this._wave;
+
+	// finish the construction.  eFlick has to do it differently.
+	completeWave(useThis32F) {
+		if (!useThis32F) {
+			// _wave must be a pointer to the existing qWave's buffer
+			if (this._wave < 256) {
+				console.error(`this._wave pointer is too small ${this._wave}, but ok if just generating direct accessors`);
+				let temp_wave = qeFuncs.buffer_allocateWave(this.space.nPoints * 2);
+				this.wave = new Float64Array(Module.HEAPF64.buffer, temp_wave, 2 * this.space.nPoints );
+			}
+			else {
+				this.wave = new Float64Array(window.Module.HEAPF64.buffer, this._wave, 2 * this.space.nPoints );
+			}
 		}
-		else if (Array.isArray(waveArg) & 'Float64Array' == waveArg.constructor.name) {
+		else if (Array.isArray(useThis32F) & 'Float64Array' == useThis32F.constructor.name) {
 			// an existing Float64Array, should be
-			this.wave = waveArg;
+			this.wave = useThis32F;
 		}
-		else if (Number.isInteger(waveArg)) {
-			// Mapped from C++; waveArg is integer offset from start of C++ space
-			const wave = new Float64Array(window.Module.HEAPF64.buffer, waveArg, 2 * space.nPoints);
-			this.wave = wave;
-			cppObjectRegistry[waveArg] = wave;
+		else if (Number.isInteger(useThis32F)) {
+			// Mapped from C++; useThis32F is integer offset from start of C++ space
+			debugger;
+			const wave = this.wave = new Float64Array(window.Module.HEAPF64.buffer,
+				useThis32F, 2 * space.nPoints);
+			cppObjectRegistry[useThis32F] = wave;
 
 			// smoke test - the values a raw, freshly created qWave gets
-			for (let j = 0; j < this.nPoints*2; j++)
-				wave[j] = -99.;
-			// qBuffer::allocateWave() fills to -77 (if trace turned on); allocateZeroedWave() leaves all zeroes
+			if (traceAllocate) {
+				for (let j = 0; j < this.nPoints*2; j++)
+					wave[j] = -99.;
+					// qBuffer::allocateWave() also fills to -77 (if trace turned on);
+					//allocateZeroedWave() leaves all zeroes
+			}
 		}
 		else {
 			debugger;
-			throw new Error(`call to construct eWave failed cuz bad waveArg=${waveArg}`);
+			throw new Error(`call to construct eWave failed cuz bad useThis32F=${useThis32F}`);
 		}
 	}
 
 	// delete, except 'delete' is a reserved word.  Turn everything off.
-	// null out all other JS objects and buffers it points to, so ref counting can recycle it all
+	// null out all other JS objects and buffers it points to, so ref counting
+	// can recycle it all
 	liquidate() {
+		wave_delete(this.pointer);
 		this.space = this.wave = null;
-		// qAvatar frees its own qBuffer(s)
 	}
 
-	/* **************************************************************** direct access */
+	/* **************************************************** 🥽 direct access */
 
 	get _wave() { return this.ints[3]; }
 
@@ -147,14 +142,15 @@ class eWave {
 	get start() { return this.ints[5]; }
 	get end() { return this.ints[6]; }
 	get continuum() { return this.ints[7]; }
-	/* **************************** end of direct accessors */
 
-	/* **************************************************************** dumping */
+	/* **************************** 🥽 end of direct accessors */
+
+	/* ************************************************* dumping */
 
 	// dump any wave buffer according to that space.
 	// RETURNS A STRING of the wave.
 	dumpThat(wave) {
-		if (this.nPoints <= 0) throw "🚀  eSpace::dumpThat	() with zero points";
+		if (this.nPoints <= 0) throw Error("🚀  eSpace::dumpThat	() with zero points");
 
 		const {start2, end2, continuum} = this.space.startEnd2;
 		let ix2 = 0;
@@ -187,7 +183,7 @@ class eWave {
 	}
 
 
-	/* ********************************************************************** calculatons */
+	/* ******************************************************* calculatons */
 
 	// calculate ⟨𝜓 | 𝜓⟩  'inner product'.
 	// See also C++ function of same name, that one's official.
@@ -226,7 +222,7 @@ class eWave {
 	// refresh the wraparound points
 	// modeled after fixThoseBoundaries() in C++ pls keep in sync!
 	fixBoundaries() {
-		if ( this.space.nPoints <= 0) throw "🚀  eWave::fixThoseBoundaries() with zero points";
+		if ( this.space.nPoints <= 0) throw Error("🚀  eWave::fixThoseBoundaries() with zero points");
 		const {end2, continuum} = this.space.startEnd2;
 		const w = this.wave;
 
@@ -252,11 +248,12 @@ class eWave {
 
 		default:
 			debugger;
-			throw new Error(`🚀  bad continuum '${continuum}' in  eSpace.fixThoseBoundaries()`);
+			throw new Error(`🚀  bad continuum '${continuum}' in `
+				+` eSpace.fixThoseBoundaries()`);
 		}
 	}
 
-	/* ********************************************************************** set wave */
+	/* **************************************************** familiar waves */
 
 	// n is  number of cycles all the way across N points.
 	// n 'should' be an integer to make it meet up on ends if endless
@@ -373,6 +370,9 @@ class eWave {
 		}
 	}
 
+	// this is currently in trouble and disabled.  Goal is to make a wave packet
+	//that resonates with the length of your space, so like frequency is
+	//always a whole fraction of the length of the space.
 	// 2stdDev is width of the packet, as percentage of N (0%...100%).
 	// offset is how far along is the peak, as an integer X value (0...N).
 	setChordWave(freqUi, pulseWidthUi, offsetUi) {
@@ -415,7 +415,9 @@ class eWave {
 	// set one of the above canned waveforms, according to the waveParams object's values
 	setFamiliarWave(waveParams) {
 		waveParams = {...waveParams};
-		waveParams.pulseWidth = Math.max(1, waveParams.pulseWidth);  // emergency!!  this gets really slow
+
+		  // emergency!!  this gets really slow if it's a small number.  And not useful.
+		waveParams.pulseWidth = Math.max(1, waveParams.pulseWidth);
 		if (traceFamiliarResult) {
 			console.log(`🌊 setFamiliarWave() starts, wave params: `+
 			`waveBreed=${waveParams.waveBreed}   `+

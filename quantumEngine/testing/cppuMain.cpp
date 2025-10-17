@@ -10,7 +10,6 @@
 #include "../debroglie/qFlick.h"
 #include "../fourier/qSpectrum.h"
 #include "../greiman/qAvatar.h"
-#include "../greiman/qViewBuffer.h"
 #include "../schrodinger/qGrinder.h"
 // #include "../schrodinger/abacus.h"
 #include "../hilbert/qSpace.h"
@@ -24,9 +23,9 @@
 // for memory leaks that cppu conveniently gives us, some clues:
 static void dumpSizes(void) {
 	printf("byte sizes... sz(qSpace)=%lu  sz(qWave)=%lu  sz(qBuffer)=%lu  sz(qSpectrum)=%lu  \n"
-		"sz(qFlick)=%lu  sz(qViewBuffer)=%lu  sz(qAvatar)=%lu  sz(qGrinder)=%lu\n\n",
+		"sz(qFlick)=%lu   sz(qAvatar)=%lu  sz(qGrinder)=%lu\n\n",
 		sizeof(qSpace), sizeof(qWave), sizeof(qBuffer), sizeof(qSpectrum),
-		sizeof(qFlick), sizeof(qViewBuffer), sizeof(qAvatar), sizeof(qGrinder));
+		sizeof(qFlick), sizeof(qAvatar), sizeof(qGrinder));
 }
 
 

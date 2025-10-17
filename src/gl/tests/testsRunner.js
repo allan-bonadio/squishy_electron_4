@@ -56,7 +56,7 @@ function startGLView() {
 	glView = new mockGLScene(localStorage.completeScene ?? 'star', 'mockGLScene Runner');
 
 	// really set as a ref by React when page renders first time
-	glView.setGLCanvas($('canvas'));
+	//glView.setGLCanvas(this, gl, $('canvas'));
 
 
 	// too soon so ...
@@ -70,7 +70,7 @@ function startGLView() {
 		gl.clearColor(.3, .7, .5, 1);
 		gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
-		glView.doRepaint()
+		glView.glRepaint()
 	}, 1000)
 }
 

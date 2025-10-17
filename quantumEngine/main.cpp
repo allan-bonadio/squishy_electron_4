@@ -14,12 +14,12 @@
 // call this JS callback so JS knows we're up and ready.
 // Hand it some numbers from the builder script.
 // all these param names must be lower case for some reason.
-EM_JS(int, qeStarted, (int max_dimensions, int n_threads), {
+EM_JS(int, qeStarted, (int max_dimensions, int n_threads, int sqdevel), {
 	// sometimes these things start in the wrong order
 	let inter = setInterval(() => {
 		if (window.startUpFromCpp) {
 			// this function in src/engine/eEngine.js
-			window.startUpFromCpp(max_dimensions, n_threads);
+			window.startUpFromCpp(max_dimensions, n_threads, sqdevel);
 			clearInterval(inter);
 		}
 		else {
@@ -33,7 +33,7 @@ EM_JS(int, qeStarted, (int max_dimensions, int n_threads), {
 int main() {
 	printf(" 🐣 bonjour le monde!\n");
 
-	qeStarted(MAX_DIMENSIONS, N_THREADS);
+	qeStarted(MAX_DIMENSIONS, N_THREADS, sqDEVEL);
 	return 0;
 }
 

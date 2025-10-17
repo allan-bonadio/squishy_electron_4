@@ -3,14 +3,17 @@
 ** Copyright (C) 2021-2025 Tactile Interactive, all rights reserved
 */
 
-import {abstractDrawing} from './abstractDrawing.js';
-import cx2rgb from './cx2rgb/cx2rgb.glsl.js';
+import abstractDrawing from './abstractDrawing.js';
 import {drawingUniform, drawingAttribute} from './drawingVariable.js';
+import cx2rygb from './cx2rygb/cx2rygb.glsl.js';
+import qeFuncs from '../engine/qeFuncs.js';
+import qeConsts from '../engine/qeConsts.js';
 
 let traceViewBufAfterDrawing = false;
 let traceHighest = false;
 let traceFlatDrawing = false;
 let traceViewport = false;
+let traceCounts = false;
 
 // diagnostic purposes
 let traceDrawPoints = false;
@@ -28,7 +31,7 @@ let pointSize = traceDrawPoints ? `gl_PointSize = 10.;` : '';
 */
 
 // make the line number for the start correspond to this JS file line number - the NEXT line
-const vertexSrc = `${cx2rgb}
+const vertexSrc = `${cx2rygb}
 #line 32
 varying highp vec4 vColor;
 attribute vec4 row;
@@ -55,7 +58,9 @@ void main() {
 	gl_Position = vec4(x, y, 0., 1.);
 
 	//  for the color, convert the complex values via this algorithm
-	vColor = vec4(cx2rgb(vec2(row.x, row.y)), 1.);
+	vColor = vec4(cx2rygb(vec2(row.x, row.y)), 1.);
+
+	// make the colors darker toward zero (top)
 	if (!odd)
 		vColor = vec4(vColor.r/2., vColor.g/2., vColor.b/2., vColor.a);
 	//vColor = vec4(.9, .9, .1, 1.);
@@ -79,23 +84,27 @@ void main() {
 export class flatDrawing extends abstractDrawing {
 	constructor(scene) {
 		super(scene, 'flatDrawing');
+		this.avatar = scene.avatar;
 
 		this.vertexShaderSrc = vertexSrc;
 		this.fragmentShaderSrc = fragmentSrc;
+
+		// each point in the wave results in two vertices, top and wave.
+		// And each of those is four single floats going to the GPU
+		this.avatar.attachViewBuffer(0, null, 4, this.space.nPoints * 2, 'flat drawing');
+		console.log(`attachViewBuffer on scene ${scene.sceneName}`);
 	}
 
+	// loads view buffer from corresponding wave, calculates highest norm.
 	// one time set up of variables for this drawing, every time canvas and scene is recreated
 	createVariables() {
 		this.setDrawing();
-
 		if (traceFlatDrawing)
 			console.log(`♭♭♭ flatDrawing: creatingVariables`);
 
-		// loads view buffer from corresponding wave, calculates highest norm.
 		// Need this for starting values for highest & smoothHighest
 		// this is NOT where it gets called after each iter; see GLScene for that
-		this.avatar.loadViewBuffer();
-
+//this.avatar.loadViewBuffer();
 
 		this.maxHeightUniform = new drawingUniform('maxHeight', this,
 			() => {
@@ -105,7 +114,7 @@ export class flatDrawing extends abstractDrawing {
 						+` smoothHighest=${this.avatar.smoothHighest.toFixed(5)}`);
 
 				// add in a few percent
-				return {value: this.avatar.smoothHighest * this.scene.PADDING_ON_BOTTOM, type: '1f'};
+				return {value: this.avatar.d0 * this.scene.PADDING_ON_BOTTOM, type: '1f'};
 			}
 		);
 
@@ -130,10 +139,18 @@ export class flatDrawing extends abstractDrawing {
 		if (traceFlatDrawing) console.log(`♭♭♭ barWidth= ${barWidth}`);
 
 		this.vertexCount = nPoints * 2;  // nPoints * vertsPerBar
+//this.vertexCount += this.vertexCount;////
 		this.rowFloats = 4;
 		this.rowAttr = new drawingAttribute('row', this, this.rowFloats, () => {
-			this.avatar.vBuffer.nTuples = this.vertexCount;
-			return this.avatar.vBuffer;
+
+			if (traceCounts) {
+				console.log(`at flatLoader; this.vertexCount=${this.vertexCount} `
+					+` total floats=${this.vertexCount * this.rowFloats}`);
+			}
+			qeFuncs.avatar_avFlatLoader(this.avatar.pointer, 0, this.space.mainFlick.pointer, this.vertexCount);
+
+			// old this.avatar.vBuffer.nTuples = this.vertexCount;
+			return this.avatar.getViewBuffer(0);
 		});
 
 		// see  abstractDrawing for bindVertexArray()
@@ -141,6 +158,7 @@ export class flatDrawing extends abstractDrawing {
 
 	// called for each image frame on th canvas
 	draw(width, height, specialInfo) {
+
 		if (traceFlatDrawing) {
 			console.log(`♭♭♭ flatDrawing  ${this.avatarLabel}: `
 				+` width=${width}, height=${height}  drawing ${this.vertexCount/2} points`);
@@ -154,9 +172,10 @@ export class flatDrawing extends abstractDrawing {
 			console.log(`♭♭♭ flatDrawing set viewport on ${this.avatarLabel}: `
 				+` width-2bw=${width - 2 * bw}, height=${height}  drawing ${this.vertexCount/2} points`);
 
-
 		this.viewVariables.forEach(v => v.reloadVariable());
 		gl.drawArrays(gl.TRIANGLE_STRIP, 0, this.vertexCount);
+		// console.log(`just drewArays-flat on avatar ptr=${this.avatar.pointer} `
+		// 	+` this.avatar.label=${this.avatar.label}, buffer label=${this.avatar.bufferNames[0]}`);
 
 		if (traceDrawLines) {
 			gl.lineWidth(1);  // it's the only option anyway

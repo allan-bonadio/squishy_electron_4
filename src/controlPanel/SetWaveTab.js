@@ -3,7 +3,7 @@
 ** Copyright (C) 2021-2025 Tactile Interactive, all rights reserved
 */
 
-import React, {useContext} from 'react';
+import React from 'react';
 import PropTypes, {checkPropTypes} from 'prop-types';
 import {scaleLinear} from 'd3-scale';
 
@@ -46,7 +46,8 @@ function setPT() {
 
 // a component that renders the Wave tab, to set a new wave
 function SetWaveTab(props) {
-	checkPropTypes(SetWaveTab.propTypes, props, 'prop', 'SetWaveTab');
+	cfpt(SetWaveTab, props);
+	//checkPropTypes(SetWaveTab.propTypes, props, 'prop', 'SetWaveTab');
 	let {saveMainWave, waveParams, setWaveParams, space} = props;
 
 	// set the captive minGraph wave to the new settings, after user changed one.
@@ -56,7 +57,8 @@ function SetWaveTab(props) {
 			console.log(`Regenerating WaveTab minigraph.  params: `, waveParams);
 		space.miniGraphAvatar.ewave.setFamiliarWave(waveParams);
 		space.miniGraphAvatar.smoothHighest = 0;
-		space.miniGraphAvatar.doRepaint?.();
+		space.miniGraphAvatar.glRepaint();
+		//space.miniGraphAvatar.glRepaint?.();
 	}
 
 	// set any combination of the wave params, in the Control Panel state.

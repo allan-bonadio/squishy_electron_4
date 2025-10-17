@@ -91,8 +91,8 @@ struct abacus {
 	int magic;
 
 	qSpace *space;
-	qGrinder *qgrinder;
-	qFlick *qflick;
+	qGrinder *grinder;
+	qFlick *flick;
 	qCx **waves;  // copy from qFlick
 	int nWaves;
 

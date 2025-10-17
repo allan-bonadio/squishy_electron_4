@@ -12,7 +12,7 @@
 #include <stdatomic.h>
 
 #include "../hilbert/qSpace.h"
-#include "../greiman/qAvatar.h"
+//#include "../greiman/qAvatar.h"
 #include "qThread.h"
 #include "qGrinder.h"
 #include "grWorker.h"
@@ -51,18 +51,21 @@ static std::runtime_error nullException("");
 // create new grinder, complete with its own stage buffers. make sure
 // these values are doable by the sliders' steps. Space is definitely
 // created by creation time here, although a few details left  to do.
-qGrinder::qGrinder(qSpace *sp, qAvatar *av, int nGrWorkers, const char *lab)
-	: magic('Grnd'), space(sp), avatar(av), qspect(NULL),
+qGrinder::qGrinder(qSpace *sp, int nGrWorkers, const char *lab)
+	: magic('Grnd'), space(sp), spect(NULL),
 		stepsPerFrame(48), videoFP(.05), stretchedDt(60),
 		elapsedTime(0), frameSerial(0), nGrWorkers(nGrWorkers),
 		integrationEx(nullException), exceptionCode(""), _zero(0), hadException(false),
 		shouldBeIntegrating(false), isIntegrating(false),
 		pleaseFFT(false), sentinel(grSENTINEL_VALUE) {
 
-	// number of waves; number of threads
-	qflick = new qFlick(space, 3, 0);
+	// number of waves
+	flick = new qFlick(space, 3);
 
-	// so wave in the qflick points to the zero-th wave
+	// recieves wave after a frame is done; then vbufs generated from that
+	stage = new qWave(space, NULL);
+
+	// so wave in the flick points to the zero-th wave
 
 	// use these for grinding
 	voltage = sp->voltage;
@@ -89,7 +92,7 @@ qGrinder::qGrinder(qSpace *sp, qAvatar *av, int nGrWorkers, const char *lab)
 			dims[0].continuum, dims[0].spectrumLength, dims[0].label);
 
 		printf("      the qSpace for 🪓 grinder %s:   magic=" MAGIC_FORMAT " spacelabel=%s\n",
-			label, MAGIC_ARGS,space->label);
+			label, MAGIC_ARGS, space->label);
 		printf("         nDimesions=%d   nStates=%d nPoints=%d voltage=%p spectrumLength=%d  samplePoint=%d\n",
 			space->nDimensions, space->nStates, space->nPoints,
 			space->voltage, space->spectrumLength,
@@ -105,13 +108,13 @@ qGrinder::~qGrinder(void) {
 	// we delete any buffers hanging off the qGrinder here.
 	// eGrinder will delete the Grinder object and any others needed.
 
-	delete qflick;
-	qflick = NULL;
+	delete flick;
+	flick = NULL;
 
 	// these may or may not have been allocated, depending on whether they were needed
-	if (qspect)
-		delete qspect;
-	qspect = NULL;
+	if (spect)
+		delete spect;
+	spect = NULL;
 };
 
 // need these numbers for the js interface to this object, to figure out
@@ -123,16 +126,17 @@ qGrinder::~qGrinder(void) {
 // out when it all works.
 void qGrinder::formatDirectOffsets(void) {
 	// don't need magic
-	printf("🪓 🪓 --------------- starting qGrinder direct access JS getters & setters--------------\n\n");
+	printf("🪓 🪓 --------------- starting 🥽 eGrinder direct access 🥽 JS getters & setters--------------\n\n");
 	// these can come in any order; the .h file determines the memory layout
 	// but keep in same order as the .h file so I don't go crazy.  Commented ones don't have js accessors.
 
 	/* ************************* pointers  for large blocks */
 	makePointerGetter(space);
-	makePointerGetter(qflick);
-	// avatar
+	makePointerGetter(flick);
+
 	makePointerGetter(voltage);
-	makePointerGetter(qspect);
+	makePointerGetter(spect);
+	makePointerGetter(stage);
 	printf("\n");
 
 	/* ************************* timing */
@@ -196,7 +200,7 @@ void qGrinder::formatDirectOffsets(void) {
 	makeByteGetter(sentinel);  // should always be value grSENTINEL_VALUE; only for validation
 	makeByteSetter(sentinel);
 
-	printf("\n🪓 🪓 --------------- done with qGrinder direct access --------------\n");
+	printf("\n🪓 🪓 --------------- done with 🥽 eGrinder direct access 🥽 --------------\n");
 }
 
 /* ********************************************************** dumpObj  */
@@ -210,8 +214,8 @@ void qGrinder::dumpObj(const char *title) {
 	speedyLog("        elapsedTime=%lf, frameSerial=%d, dt=%lf, \n",
 		elapsedTime, frameSerial, space->dt);
 
-	speedyLog("        qflick=%p, voltage=%p, qspect=%p\n",
-		qflick, voltage, qspect);
+	speedyLog("        flick=%p, voltage=%p, spect=%p\n",
+		flick, voltage, spect);
 
 	speedyLog("        shouldBeIntegrating: %hhu   isIntegrating: %hhu   pleaseFFT=%hhu \n",
 		shouldBeIntegrating, isIntegrating, pleaseFFT);
@@ -219,32 +223,34 @@ void qGrinder::dumpObj(const char *title) {
 	speedyLog("        ==== end of qGrinder::dumpObj(%s) ====\n\n", title);
 }
 
-/* ********************************************************** avatar and view buffer */
+/* ********************************************************** grinder */
 
 // some uses never need this so wait till they do
 qSpectrum *qGrinder::getSpectrum(void) {
-	if (!qspect)
-		qspect = new qSpectrum(space);
-	return qspect;
+	if (!spect)
+		spect = new qSpectrum(space);
+	return spect;
 };
 
-void qGrinder::copyFromAvatar(qAvatar *avatar) {
-	qflick->copyBuffer(qflick, avatar->qwave);  // to buffer zero
+void qGrinder::copyFromStage(void) {
+	//throw std::runtime_error("qGrinder::copyFromStage() not implenented)";
+	flick->copyBuffer(flick, stage);  // to buffer zero
 }
 
 // JS interface
-void grinder_copyFromAvatar(qGrinder *qgrinder, qAvatar *avatar) {
-	qgrinder->copyFromAvatar(avatar);
-}
+//void grinder_copyFromAvatar(qGrinder *grinder, qAvatar *avatar) {
+//	grinder->copyFromStage(avatar);
+//}
 
-void qGrinder::copyToAvatar(qAvatar *avatar) {
-	qflick->copyBuffer(avatar->qwave, qflick);  // from buffer zero
+void qGrinder::qGrinder::copyToStage(void) {
+	//throw std::runtime_error("qGrinder::copyFromStage() not implenented");
+	flick->copyBuffer(stage, flick);  // from flick buffer zero
 }
 
 // JS interface
-void grinder_copyToAvatar(qGrinder *qgrinder, qAvatar *avatar) {
-	qgrinder->copyToAvatar(avatar);
-}
+//void grinder_copyToStage(qGrinder *grinder, qAvatar *avatar) {
+//	grinder->copyToStage(avatar);
+//}
 
 /* *********************************************** divergence & tallying  */
 
@@ -290,7 +296,7 @@ void qGrinder::tallyUpKinks(qWave *qwave) {
 // see how many alternating derivatives we have.  Then convert to a user-visible
 // number and issue errors or warnings
 void qGrinder::measureDivergence() {
-	tallyUpKinks(qflick);
+	tallyUpKinks(flick);
 	if (divergence > 20) {
 		int N = space->dimensions[0].N;
 
@@ -328,18 +334,18 @@ void qGrinder::oneFrame() {
 	}
 	if (traceIntegrationDetailed)
 		qGrinder::dumpObj("qGrinder 🪓 starting oneFrame()");
-	qCx *wave0 = qflick->waves[0];
-	qCx *wave1 = qflick->waves[1];
-	qCx *wave2 = qflick->waves[2];
+	qCx *wave0 = flick->waves[0];
+	qCx *wave1 = flick->waves[1];
+	qCx *wave2 = flick->waves[2];
 
 	double dt = stretchedDt;
 	double dtHalf = dt / 2;
 
-	// half step in beginning to move Im forward dt/2
+	// half step in beginning to move Im forward dt/2 = dtHalf
 	// cuz outside of here, re and im are synchronized.
-	qflick->fixThoseBoundaries(wave0);
+	flick->fixThoseBoundaries(wave0);
 	hitReal(wave1, wave0, wave0, 0);
-	hitImaginary(wave1, wave0, wave0, dt/2);
+	hitImaginary(wave1, wave0, wave0, dtHalf);
 
 	// do stepsPerFrame steps of  integration.
 	// Note here the latest is in [1]; frame continues this,
@@ -362,19 +368,19 @@ void qGrinder::oneFrame() {
 
 	// half hit at completion to move Re forward dt / 2
 	// and copy back to Main
-	qflick->fixThoseBoundaries(wave1);
-	hitReal(wave0, wave1, wave1, dt/2);
+	flick->fixThoseBoundaries(wave1);
+	hitReal(wave0, wave1, wave1, dtHalf);
 	hitImaginary(wave0, wave1, wave1, 0);
 
 	// normalize it and return the old inner product, see how close to 1.000 it is
-	double iProd = qflick->normalize();
-	if (dumpFFHiResSpectums) qflick->dumpHiRes("wave END fourierFilter() after normalize");
+	double iProd = flick->normalize();
+	if (dumpFFHiResSpectums) flick->dumpHiRes("wave END fourierFilter() after normalize");
 	if (traceIProd && ((int) frameSerial & 31) == 0)
 		speedyLog("      🪓 qGrinder frame %d elapsed %4.6lf  iProd= %lf \n",
 			frameSerial, elapsedTime, iProd);
 
 	if (traceJustWave)
-		qflick->dump("     🪓 qGrinder traceJustWave at end of frame", true);
+		flick->dump("     🪓 qGrinder traceJustWave at end of frame", true);
 
 	if (traceIntegration) {
 		speedyLog("🪓 qGrinder::oneFrame() done; shouldBeIntegrating: %hhu   isIntegrating: %hhu \n"
@@ -445,25 +451,25 @@ void qGrinder::threadsHaveFinished() {
 				shouldBeIntegrating, isIntegrating);
 	}
 
-	// now, copy it to the Avatar's wave buffer, so it can copy it to
-	// its ViewBuffer, so webgl can pick it up.  quick!  No mutexes or anything;
+	// now, copy it to the stage wave buffer, so it can copy it to
+	// its avatar, so webgl can pick it up.  quick!  No mutexes or anything;
 	// this here runs in thread time.  webgl runs in UI time.  Worst
 	// thing that'll happen is the image will be part one frame and part
 	// the next frame.
 	// THis tail thread should also snarf off a copy of the raw wave, and do an FFT on it,
 	// for display on the frequency chart
-	copyToAvatar(avatar);
+	copyToStage();
 	needsRepaint = true;
 
 	if (traceTHFBenchmarks && 0 == (frameSerial & 63)) {
-		speedyLog("🪓 threadsHaveFinished()— copyToAvatar()÷64 at %10.6lf ms - needsRepaint=%hhu"
+		speedyLog("🪓 threadsHaveFinished()— copyToStage()÷64 at %10.6lf ms - needsRepaint=%hhu"
 			" shouldBeIntegrating=%hhu   isIntegrating=%hhu\n",
 			getTimeDouble() - thfTime, needsRepaint, shouldBeIntegrating, isIntegrating);
 	}
 
 	// what is this doing here?  Prob should be done in another thread.
 	if (this->pleaseFFT)
-		analyzeWaveFFT(qflick, "latest fft");
+		analyzeWaveFFT(flick, "latest fft");
 	this->pleaseFFT = false;
 
 	measureDivergence();
@@ -518,6 +524,17 @@ void grinder_triggerIteration(qGrinder *grinder) {
 	grinder->triggerIteration();
 }
 
+/* ********************************************************** birth and death  */
+
+qGrinder *grinder_create(qSpace *space, int nGrWorkers, const char *label) {
+	return new	qGrinder(space, nGrWorkers, label);
+}
+
+void grinder_delete(qGrinder *grinder) {
+	delete grinder;
+}
+
+
 /* ********************************************************** exceptions  */
 
 // any error in the threads, send it here and the UI thread will grab it.
@@ -549,7 +566,7 @@ const char *grinder_getExceptionMessage(qGrinder *grinder) {
 
 // user button to print it out now, while not running.  See also pleaseFFT for when it is
 void qGrinder::askForFFT(void) {
-	analyzeWaveFFT(qflick, "askForFFT while idle");
+	analyzeWaveFFT(flick, "askForFFT while idle");
 }
 
 // if integrating, FFT as the current frame finishes, before and after fourierFilter().

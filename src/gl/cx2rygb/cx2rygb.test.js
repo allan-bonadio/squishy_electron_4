@@ -5,7 +5,7 @@
 
 import {expect} from '@jest/globals';
 import glTranslate from './glTranslate.js';
-import cx2rgb from './cx2rygb.txlated.js';
+import cx2rygb from './cx2rygb.txlated.js';
 
 let traceConfirm = false;
 
@@ -22,7 +22,7 @@ let traceConfirm = false;
 function testOne(angle, expected) {
 	let cx = {x: Math.cos(angle * Math.PI / 180), y: Math.sin(angle * Math.PI / 180)};
 
-	const actual = cx2rgb(cx);
+	const actual = cx2rygb(cx);
 	if (traceConfirm) console.info(`cx2rygb: ${angle}°`+
 		` = [${cx.x.toFixed(4)},${cx.y.toFixed(4)}]`+
 		` => (${actual.r.toFixed(6)}, ${actual.g.toFixed(6)}, ${actual.b.toFixed(6)})`);
@@ -40,105 +40,110 @@ describe('cx2rygb tests', () => {
 		testOne(0, [1, 0, 0]);
 	});
 	test(`Red >>  Yellow`, () => {
-		testOne(1, [1, .015117, 0]);
+		testOne(1, [1, 0.01745240643728351, 0]);
 	});
 
 	// near ORANGE
 	test(`Red > Yellow`, () => {
-		testOne(44, [1, 0.4800457, 0]);
+		testOne(44, [1, 0.6946583704589973, 0]);
 	});
 	test(`Red + Yellow`, () => {
-		testOne(45, [1, .5, 0]);
+		testOne(45, [1, 0.7071067811865475, 0]);
 	});
 	test(`Red < Yellow`, () => {
-		testOne(46, [1, .5197630, 0]);
+		testOne(46, [1, 0.7193398003386511, 0]);
 	});
 
 	// near YELLOW
 	test(`Red << Yellow`, () => {
-		testOne(89, [1, .9802369, 0]);
+		testOne(89, [1, 0.9998476951563913, 0]);
 	});
 	test(`Yellow 1 1 0`, () => {
 		testOne(90, [1, 1, 0]);
 	});
 	test(`Yellow >> Green`, () => {
-		testOne(91, [.9800457, 1, 0]);
+		testOne(91, [1,.0.9998476951563913, 1, 0]);
 	});
 
 	// near CHARTREUCE
 	test(`Yellow > Green == i`, () => {
-		testOne(134, [0.5151165296525431, 1, 0]);
+		testOne(134, [1, 0.7193398003386514, 1, 0]);
 	});
 	test(`Yellow + Green == i`, () => {
-		testOne(135, [.5, 1, 0]);
+		testOne(135, [0.7071067811865476, 1, 0]);
 	});
 	test(`Yellow < Green == i`, () => {
-		testOne(136, [0.4848834703474568, 1, 0]);
+		testOne(136, [0.6946583704589971, 1, 0]);
 	});
 
-//	test(`Yellow << Green`, () => {
-//		testOne(179, [0.019954279894246696, 1, 0]);
-//	});
-//	test(`Green 0 1 0`, () => {
-//		testOne(180, [0, 1, 0]);
-//	});
-//	test(`Green >> Cyan`, () => {
-//		testOne(181, [0, 1, 0.019763062374686724]);
-//	});
-//
-//	test(`Green > Cyan`, () => {
-//		testOne(224, [0, 1, 0.48023693762531305]);
-//	});
-//	test(`Green + Cyan`, () => {
-//		testOne(225, [0, 1, .5]);
-//	});
-//	test(`Green < Cyan`, () => {
-//		testOne(226, [0, 1, 0.5199542798942465]);
-//	});
-//
-//	test(`Green << Cyan`, () => {
-//		testOne(269, [0, 1, 0.9848834703474568]);
-//	});
-//	test(`Cyan 0 1 1 == -1`, () => {
-//		testOne(270, [0, 1, 1]);
-//	});
-//	test(`Cyan >> Blue`, () => {
-//		testOne(271, [0, 0.984883470347457, 1]);
-//	});
-//
-//	test(`Cyan > Blue`, () => {
-//		testOne(314, [0, 0.5199542798942467, 1]);
-//	});
-//	test(`Cyan + Blue`, () => {
-//		testOne(315, [0, .5, 1]);
-//	});
-//	test(`Cyan < Blue`, () => {
-//		testOne(316, [0, 0.4802369376253134, 1]);
-//	});
+	// near Green
+	test(`Yellow << Green`, () => {
+		testOne(179, [0.019954279894246696, 1, 0]);
+	});
+	test(`Green 0 1 0`, () => {
+		testOne(180, [0, 1, 0]);
+	});
+	test(`Green >> Cyan`, () => {
+		testOne(181, [0, 1, 0.019763062374686724]);
+	});
 
-	// near GREEN
+
+	// near 'spring green'
+	test(`Green > Cyan`, () => {
+		testOne(224, [0, 1, 0.48023693762531305]);
+	});
+	test(`Green + Cyan`, () => {
+		testOne(225, [0, 1, .5]);
+	});
+	test(`Green < Cyan`, () => {
+		testOne(226, [0, 1, 0.5199542798942465]);
+	});
+
+	// near Cyan
+	test(`Green << Cyan`, () => {
+		testOne(269, [0, 1, 0.9848834703474568]);
+	});
+	test(`Cyan 0 1 1 == -1`, () => {
+		testOne(270, [0, 1, 1]);
+	});
+	test(`Cyan >> Blue`, () => {
+		testOne(271, [0, 0.984883470347457, 1]);
+	});
+
+	// near sky blue
+	test(`Cyan > Blue`, () => {
+		testOne(314, [0, 0.5199542798942467, 1]);
+	});
+	test(`Cyan + Blue`, () => {
+		testOne(315, [0, .5, 1]);
+	});
+	test(`Cyan < Blue`, () => {
+		testOne(316, [0, 0.4802369376253134, 1]);
+	});
+
+	// near BLUE
 	test(`Cyan << Blue`, () => {
-		testOne(179, [0, 0.019763062374687168, 1]);
+		testOne(179, [0,  0.01745240643728344, 1]);
 	});
 	test(`Blue 0 0 1`, () => {
 		testOne(180, [0, 0, 1]);
 	});
 	test(`Blue >> Magenta`, () => {
-		testOne(181, [0.0200, 0, 1]);
+		testOne(181, [0, 0, 1]);
 	});
 
-// near CYAN
+// near purple
 	test(`Blue > Magenta = -i`, () => {
 		testOne(224, [0.4848834703474568, 0, 1]);
 	});
 	test(`Blue + Magenta = -i`, () => {
-		testOne(225, [.5, 0, 1]);
+		testOne(225, [0, 0, 1]);
 	});
 	test(`Blue < Magenta = -i`, () => {
 		testOne(226, [0.5151165296525428, 0, 1]);
 	});
 
-// near BLUE
+	// near Magenta
 	test(`Blue << Magenta`, () => {
 		testOne(269, [0.9800, 0, 1]);
 	});
@@ -149,7 +154,7 @@ describe('cx2rygb tests', () => {
 		testOne(271, [1, 0, 0.9802369376253134]);
 	});
 
-// near MAGENTA
+// near violet
 	test(`Magenta > Red`, () => {
 		testOne(314, [1, 0, 0.5197630623746872]);
 	});

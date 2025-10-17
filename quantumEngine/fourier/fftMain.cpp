@@ -33,7 +33,7 @@ void qDimension::chooseSpectrumLength(void) {
 /* ********************************************************* qWave interface */
 
 // Calculate the FFT of this qWave and deposit it in the spectrum.
-// must make/free your own qSpectrum *qspect = new qSpectrum(origSpace);
+// must make/free your own qSpectrum *spect = new qSpectrum(origSpace);
 void qSpectrum::generateSpectrum(qWave *inputQWave) {
 	int start = inputQWave->start;
 	int N = inputQWave->end - start;
@@ -67,14 +67,14 @@ void analyzeWaveFFT(qWave *original, const char *title) {
 		throw std::runtime_error("null original in analyzeWaveFFT()");
 	if (!original->space)
 		throw std::runtime_error("null space in analyzeWaveFFT()");
-	qSpectrum *qspect = new qSpectrum(original->space, NULL);
-	qspect->generateSpectrum(original);
+	qSpectrum *spect = new qSpectrum(original->space, NULL);
+	spect->generateSpectrum(original);
 
 	char buf[150];
 	strcpy(buf, "🌈  analyze spectrum: ");
 	strcat(buf, title);
-	qspect->dumpSpectrum(buf);
-	delete qspect;
+	spect->dumpSpectrum(buf);
+	delete spect;
 }
 
 

@@ -164,7 +164,7 @@ void qGrinder::hitReal(qCx *newW, qCx *oldW, qCx *hamiltW, double dt) {
 		usedIx = ix;
 		pointReal(newW + ix, oldW + ix, hamiltW + ix, voltage[ix], dt);
 	}
-	qflick->fixThoseBoundaries(newW);
+	flick->fixThoseBoundaries(newW);
 	//elapsedTime += dt/2;  // could be 0 or already dt/2
 
 	if (traceVischerBench) speedyLog("      hitReal, done: time=%lf ms\n",
@@ -185,7 +185,7 @@ void qGrinder::hitImaginary(qCx *newW, qCx *oldW, qCx *hamiltW, double dt) {
 		pointImaginary(newW + ix, oldW + ix, hamiltW + ix, voltage[ix], dt);
 	}
 
-	qflick->fixThoseBoundaries(newW);
+	flick->fixThoseBoundaries(newW);
 	//elapsedTime += dt/2;  // could be 0 or already dt/2
 
 	if (traceVischerBench) speedyLog("      hitImaginary done: time=%lf ms\n",
@@ -197,9 +197,9 @@ void qGrinder::hitImaginary(qCx *newW, qCx *oldW, qCx *hamiltW, double dt) {
 // this is what will be replaced by stepMidpoint.
 // Cuz, you can't really do two Real steps in a row; must do an Imag step in between.  And vice versa.
 void qGrinder::hitRealImaginary(qCx *newW, qCx *oldW, qCx *hamiltW, double dt) {
-	qflick->fixThoseBoundaries(oldW);
+	flick->fixThoseBoundaries(oldW);
 	if (oldW != hamiltW)
-		qflick->fixThoseBoundaries(hamiltW);
+		flick->fixThoseBoundaries(hamiltW);
 
 	hitReal(newW, oldW, hamiltW, dt);
 	hitImaginary(newW, oldW, hamiltW, dt);
@@ -211,12 +211,12 @@ void qGrinder::hitRealImaginary(qCx *newW, qCx *oldW, qCx *hamiltW, double dt) {
 // each of these is 4 hits = 2 steps of dt
 void qGrinder::stepMidpoint(qCx *newW, qCx *oldW, qCx *scratch, double dt) {
 	// first calculate the normal step taking derivatives at the beginning of dt
-	// already done in hit func qflick->fixThoseBoundaries(oldW);
+	// already done in hit func flick->fixThoseBoundaries(oldW);
 	hitReal(scratch, oldW, oldW, dt);
 	hitImaginary(scratch, oldW, oldW, dt);
 
 	// now do it again with the derivatives at the end
-	// already done in hit func qflick->fixThoseBoundaries(scratch);
+	// already done in hit func flick->fixThoseBoundaries(scratch);
 	hitReal(newW, oldW, scratch, dt);
 	hitImaginary(newW, oldW, scratch, dt);
 

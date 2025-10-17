@@ -11,7 +11,7 @@ let traceAttributes = false;
 // you can set a static value or a function that'll return it
 // The set is drawing-specific.
 
-// superclass for all of these.
+// abstract superclass for all of these.
 export class drawingVariable {
 	// the drawing is what it's used in.  Must have a:
 	// gl, viewVariables array, program,
@@ -25,7 +25,8 @@ export class drawingVariable {
 
 		this.varName = varName;
 		if (! varName || ! drawing)
-			throw new Error(`bad name ${varName} or drawing ${drawing} used to create a view var`);
+			throw new Error(`bad name ${varName} or drawing ${drawing} `
+				+` used to create a view var`);
 
 		let vv = drawing.viewVariables;
 		if (vv.includes(this)) {
@@ -37,8 +38,6 @@ export class drawingVariable {
 		// whichever variable this is a subclass of, constructors will need this
 		// or maybe this is already done and so this is superflous?
 		drawing.setDrawing();
-//		gl.useProgram(drawing.program);
-//		gl.bindVertexArray(drawing.vao);
 
 		if (traceGLCalls) console.log(`𒐿 created drawingVariable '${varName}', drawing:`, drawing);
 	}
@@ -134,16 +133,19 @@ export class drawingAttribute extends drawingVariable {
 		this.drawing.setDrawing();
 
 		// small integer indicating which attr this is.  Set by compileProgram() for each drawing in the view def
-		const attrLocation = this.attrLocation = this.gl.getAttribLocation(drawing.program, varName);
+		this.attrLocation = this.gl.getAttribLocation(drawing.program, varName);
 
-		if (attrLocation < 0)
-			throw new Error(`𒐿 drawingAttribute:attr loc for '${varName}' is bad: `+ attrLocation);
+		if (this.attrLocation < 0) {
+			throw new Error(`𒐿 drawingAttribute:attr loc for '${varName}' is bad: `+
+				this.attrLocation);
+		}
 
 		// create gl GPU buffer
-		const glBuffer = this.glBuffer = gl.createBuffer();
-		this.tagObject(glBuffer, `${drawing.avatarLabel}-${drawing.drawingName}-${varName}-va`);
+		this.glBuffer = gl.createBuffer();
+		this.tagObject(this.glBuffer, `${drawing.avatarLabel}-${drawing.drawingName}-${varName}-va`);
 
-		// connect  ARRAY_BUFFER to glBuffer.  do I have to do this if I'm not (yet) attaching the JS-space array?
+		// connect  ARRAY_BUFFER to glBuffer.
+		// do I have to do this if I'm not (yet) attaching the JS-space array?
 		gl.bindBuffer(gl.ARRAY_BUFFER, this.glBuffer);
 
 		// our attribute here, connect it to that glBuffer
@@ -152,7 +154,9 @@ export class drawingAttribute extends drawingVariable {
 				this.attrLocation,
 				tupleWidth, gl.FLOAT,
 				false, tupleWidth * 4, 0);  // normalize, stride, offset
-		if (traceGLCalls) console.log(`𒐿  drawingAttribute '${this.varName}' connected to its glBuffer to tupleWidth=${tupleWidth}`);
+		if (traceGLCalls)
+			console.log(`𒐿  drawingAttribute '${this.varName}' connected to its `
+				+` glBuffer to tupleWidth=${tupleWidth}`);
 
 		// we haven't touched the actual JS data yet, this does it
 		this.reloadVariable();
@@ -169,6 +173,9 @@ export class drawingAttribute extends drawingVariable {
 		// WebGL2Fundamentals said we don't have to do this if it's the same buffer (w/diff values) every time.
 		// if I understood them correctly.  afraid to try...
 		let floatArray = this.floatArray = this.getFunc();
+		if (!floatArray) {
+			throw `getFunc() returned null on var=${varName} scene=${this.drawing.drawingName}`;
+		}
 		//if (this.floatArray !== newFloatArray) {
 		//	gl.bindBuffer(gl.ARRAY_BUFFER, this.glBuffer);
 		//	gl.bufferData(gl.ARRAY_BUFFER, newFloatArray, gl.DYNAMIC_DRAW);

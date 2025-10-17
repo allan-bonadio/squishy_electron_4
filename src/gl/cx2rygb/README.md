@@ -4,7 +4,7 @@
 
 This is the scheme for the Octogon Algorithm, mapping from Re, Im to RYGB to RGB.
 the octagon:
-√ =  √0.5 or 1/√2
+√ =  √0.5 or 1/√2 or maybe 1, keep changing my mind
 
 ```
 								yellow 1,1,0
@@ -31,7 +31,5 @@ phase tangent =x / (y + 1e-6)
 
 
 ### How to Test
-
-./glTranslate.js
-./cx2rygb.test.js
+  glTranslate.js  cx2rygb.test.js
 

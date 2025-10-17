@@ -12,7 +12,6 @@
 #include "../greiman/qAvatar.h"
 #include "../schrodinger/qGrinder.h"
 #include "../debroglie/qWave.h"
-#include "../greiman/qViewBuffer.h"
 #include "../fourier/fftMain.h"
 #include "../directAccessors.h"
 
@@ -154,7 +153,7 @@ qSpace::~qSpace(void) {
 // Insert this into the constructor and run this once.  Copy text output.
 // Paste the output into class eGrinder, the class itself, to replace the existing ones
 void qSpace::formatDirectOffsets(void) {
-	printf("🚀 🚀--------------- starting qSpace direct access JS getters & setters--------------\n\n");
+	printf("🚀 🚀--------------- starting 🥽 eSpace direct access 🥽 JS getters & setters--------------\n\n");
 
 	makePointerGetter(voltage);
 	printf("\n");
@@ -187,12 +186,21 @@ void qSpace::formatDirectOffsets(void) {
 	makeIntGetter(spectrumLength);
 
 	makePointerGetter(mainAvatar);
+	makePointerSetter(mainAvatar);
 	makePointerGetter(miniGraphAvatar);
-	makePointerGetter(qgrinder);
+	makePointerSetter(miniGraphAvatar);
+
+	makePointerGetter(mainFlick);
+	makePointerSetter(mainFlick);
+	makePointerGetter(miniGraphWave);
+	makePointerSetter(miniGraphWave);
+
+	makePointerGetter(grinder);
+	makePointerSetter(grinder);
 
 	makeStringPointer(label);
 
-	printf("\n🖼 🖼 --------------- done with qSpace direct access --------------\n");
+	printf("\n🚀 🚀  --------------- done with 🥽 eSpace direct access 🥽 --------------\n");
 }
 
 /* ********************************************************** dumping */

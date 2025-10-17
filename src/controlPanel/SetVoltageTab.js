@@ -39,6 +39,7 @@ function setPT() {
 
 // the tab that user sets voltage buffer with
 function SetVoltageTab(p) {
+	cfpt(SetVoltageTab, p);
 	// these are all the local versions, for use and setting in this Voltage Tab
 	const {voltageParams, setVoltageParams, showVoltage, changeShowVoltage,
 		saveMainVoltage, space} = p;

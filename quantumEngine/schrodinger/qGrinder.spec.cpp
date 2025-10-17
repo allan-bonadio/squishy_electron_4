@@ -9,7 +9,6 @@
 #include "../greiman/qAvatar.h"
 #include "../schrodinger/qGrinder.h"
 #include "../debroglie/qFlick.h"
-#include "../greiman/qViewBuffer.h"
 #include "../fourier/qSpectrum.h"
 
 #include "../testing/testingHelpers.h"
@@ -30,39 +29,39 @@ TEST(qGrinder, CheckGrinderConstructor)
 {
 	qSpace *space = makeBareSpace(8, contENDLESS);
 	qAvatar *avatar = new qAvatar(space, "grindAway");
-	qGrinder *qgrinder = new qGrinder(space, avatar, 1, "myGrinder");
+	qGrinder *grinder = new qGrinder(space, avatar, 1, "myGrinder");
 
-	LONGS_EQUAL('Grin', qgrinder->magic);
-	POINTERS_EQUAL(space, qgrinder->space);
-	POINTERS_EQUAL(avatar, qgrinder->avatar);
+	LONGS_EQUAL('Grin', grinder->magic);
+	POINTERS_EQUAL(space, grinder->space);
+	POINTERS_EQUAL(avatar, grinder->avatar);
 
-	DOUBLES_EQUAL(0., qgrinder->elapsedTime, ERROR_RADIUS);
-	DOUBLES_EQUAL(0., qgrinder->frameSerial, ERROR_RADIUS);
-	DOUBLES_EQUAL(1e-3, qgrinder->dt, ERROR_RADIUS);
-
-
-	// LONGS_EQUAL(1, qgrinder->lowPassFilter);
-	// LONGS_EQUAL(100, qgrinder->stepsPerFrame);
-
-	LONGS_EQUAL(space->nPoints, qgrinder->qflick->nPoints);
-	proveItsMine(qgrinder->qflick->waves[0], space->nPoints * sizeof(qCx));
-	proveItsMine(qgrinder->qflick->waves[1], space->nPoints * sizeof(qCx));
-
-	POINTERS_EQUAL(space->voltage, qgrinder->voltage);
-
-	POINTERS_EQUAL(NULL, qgrinder->qspect);
-	qSpectrum *spect = qgrinder->getSpectrum();
-	POINTERS_EQUAL(spect, qgrinder->qspect);
-	proveItsMine(qgrinder->qspect->wave, space->nStates * sizeof(qCx));
+	DOUBLES_EQUAL(0., grinder->elapsedTime, ERROR_RADIUS);
+	DOUBLES_EQUAL(0., grinder->frameSerial, ERROR_RADIUS);
+	DOUBLES_EQUAL(1e-3, grinder->dt, ERROR_RADIUS);
 
 
-	LONGS_EQUAL(false, qgrinder->isIntegrating);
-	LONGS_EQUAL(false, qgrinder->shouldBeIntegrating);
-	LONGS_EQUAL(false, qgrinder->pleaseFFT);
+	// LONGS_EQUAL(1, grinder->lowPassFilter);
+	// LONGS_EQUAL(100, grinder->stepsPerFrame);
 
-	STRCMP_EQUAL("myGrind", qgrinder->label);
+	LONGS_EQUAL(space->nPoints, grinder->flick->nPoints);
+	proveItsMine(grinder->flick->waves[0], space->nPoints * sizeof(qCx));
+	proveItsMine(grinder->flick->waves[1], space->nPoints * sizeof(qCx));
 
-	delete qgrinder;
+	POINTERS_EQUAL(space->voltage, grinder->voltage);
+
+	POINTERS_EQUAL(NULL, grinder->spect);
+	qSpectrum *spect = grinder->getSpectrum();
+	POINTERS_EQUAL(spect, grinder->spect);
+	proveItsMine(grinder->spect->wave, space->nStates * sizeof(qCx));
+
+
+	LONGS_EQUAL(false, grinder->isIntegrating);
+	LONGS_EQUAL(false, grinder->shouldBeIntegrating);
+	LONGS_EQUAL(false, grinder->pleaseFFT);
+
+	STRCMP_EQUAL("myGrind", grinder->label);
+
+	delete grinder;
 	delete avatar;
 	delete space;
 }
@@ -130,10 +129,10 @@ static void isAllZeroesExceptFor(qBuffer *qwave, int except1, bool shouldFail, c
 //
 // 	qSpace *space = makeBareSpace(N, contENDLESS);
 // 	qAvatar *avatar = new qAvatar(space, "tryFourierAva");
-// 	qGrinder *qgrinder = new qGrinder(space, avatar, 1, "tryFourierGri");
-// 	qFlick *qf = qgrinder->qflick;
+// 	qGrinder *grinder = new qGrinder(space, avatar, 1, "tryFourierGri");
+// 	qFlick *qf = grinder->flick;
 // 	qWave *addOn = new qWave(space);
-// 	qSpectrum *rainbow = qgrinder->getSpectrum();
+// 	qSpectrum *rainbow = grinder->getSpectrum();
 //
 // 	qf->setCircularWave(goodFreq);
 // 	addOn->setCircularWave(badFreq);
@@ -144,7 +143,7 @@ static void isAllZeroesExceptFor(qBuffer *qwave, int except1, bool shouldFail, c
 // 		rainbow->dumpSpectrum("spectrum before FourierFilter(), input wave:");
 //
 // 	// now the actual filter, do it!
-// 	qgrinder->fourierFilter(lowPassFilter);
+// 	grinder->fourierFilter(lowPassFilter);
 //
 // 	// now take a look at what we got
 // 	rainbow->generateSpectrum(qf);
@@ -211,7 +210,7 @@ static void fourierExperiments(int N) {
 
 	delete allOnes;
 	delete onesWave;
-	delete qgrinder;
+	delete grinder;
 	delete space;
 }
 

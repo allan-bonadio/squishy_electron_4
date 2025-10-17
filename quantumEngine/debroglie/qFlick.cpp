@@ -8,7 +8,9 @@
 
 #include "../hilbert/qSpace.h"
 #include "../schrodinger/qGrinder.h"
+#include "qWave.h"
 #include "qFlick.h"
+#include "../directAccessors.h"
 
 static bool traceConstruction = false;
 static bool traceSetNWaves = false;
@@ -27,8 +29,7 @@ void qFlick::reset(void) {
 /* ************************************************************ birth & death & basics */
 
 // each buffer is initialized to zero bytes therefore 0.0 everywhere
-// HEY!  the grinder arg is not used!
-qFlick::qFlick(qSpace *space, int nW, int nTProgresses)
+qFlick::qFlick(qSpace *space, int nW)
 	: qWave(space), nWaves(nW),  allocWaves(nW), currentWave(0)
 {
 	if (! space)
@@ -45,6 +46,8 @@ qFlick::qFlick(qSpace *space, int nW, int nTProgresses)
 	waves[0] = wave;
 	for (int w = 1; w < nWaves; w++)
 		waves[w] = allocateWave(nPoints);
+
+	FORMAT_DIRECT_OFFSETS;
 }
 
 
@@ -65,8 +68,30 @@ qFlick::~qFlick() {
 		printf("    freed waves..done with qFlick destructor..\n");
 }
 
+/* *********************************************** direct access */
+
+// although qFlick is a subclass, and I'd expect it to exactly overlap qWave,
+// there seems to be an extra 128 bits.
+// So, do it over.  All these will have different offsets from the same thing in qWave.
+void qFlick::formatDirectOffsets(void) {
+	printf("🚦 🚦 --------------- starting 🥽 eFlick direct access 🥽 JS getters & setters --------------\n\n");
+
+	makePointerGetter(wave);
+
+	printf("\n");
+	makeIntGetter(nPoints);
+	makeIntGetter(start);
+	makeIntGetter(end);
+	makeIntGetter(continuum);
+
+	printf("\n🚦 🚦 --------------- done with 🥽 eFlick direct access 🥽 --------------\n");
+}
+
+
+	/* *********************************************** more/less waves */
+
 void qFlick::setNWaves(int newNW) {
-	// do we have to stretch the allocation?
+	// do we have to stretch the allocation to add new waves?
 	if (newNW >nWaves) {
 		if (newNW > allocWaves) {
 			waves = (qCx **) realloc(waves, newNW * sizeof(qCx *));
@@ -231,7 +256,7 @@ void qFlick::setCurrent(int newSerial) {
 	wave = waves[newSerial];
 }
 
-/* ************************************************ save this code as we may need it someday. */
+/* ************* save this code as we may need it to do visscher inner products etc. */
 
 // do an inner product the way Visscher described.
 // doubleSerial = integer time in the past, in units of dt/2; must be >= 0 & 0 is most recent
@@ -292,3 +317,13 @@ void qFlick::setCurrent(int newSerial) {
 //	fixBoundaries();
 //	dump("qFlick::normalize done", true);
 //}
+
+qFlick *flick_create(qSpace *space, int nWaves) {
+	// useThisBuffer, usually null, haven't tested lately
+	return new qFlick(space, nWaves);
+}
+
+void flick_delete(qFlick *flick) {
+	delete flick;
+}
+

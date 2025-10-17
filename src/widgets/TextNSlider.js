@@ -37,6 +37,7 @@ function setPT() {
 }
 
 function TextNSlider(props) {
+	cfpt(TextNSlider, props);
 	const p = props;
 
 	const limit =

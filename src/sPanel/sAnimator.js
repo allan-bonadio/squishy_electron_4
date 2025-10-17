@@ -88,8 +88,7 @@ class sAnimator {
 		this.inteTimes.frameDrawPeriod = startDrawTime - this.inteTimes.prevDrawTime;
 		this.inteTimes.prevDrawTime = startDrawTime;
 
-		this.space.mainEAvatar.doRepaint?.();  // actual webgl drawing
-
+		this.glRepaint();
 		this.showTimeNFrame();  // part of the draw time - the picoseconds and frame serial
 
 		// update dom elements in integration tab to latest stats (if it's been shown at least once)
@@ -325,8 +324,8 @@ class sAnimator {
 					ControlPanel.stopAnimating();
 
 					this.setState({
-						runningCycleElapsedTime: this.mainEAvatar.elapsedTime - this.runningCycleStartingTime,
-						runningCycleIntegrateSerial: this.mainEAvatar.frameSerial - this.runningCycleStartingSerial,
+						runningCycleElapsedTime: this.mainAvatar.elapsedTime - this.runningCycleStartingTime,
+						runningCycleIntegrateSerial: this.mainAvatar.frameSerial - this.runningCycleStartingSerial,
 					});
 
 					this.goingDown = false;

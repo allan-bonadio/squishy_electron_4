@@ -3,7 +3,7 @@
 ** Copyright (C) 2021-2025 Tactile Interactive, all rights reserved
 */
 
-import React, {useContext} from 'react';
+import React from 'react';
 import PropTypes from 'prop-types';
 import eSpace from '../engine/eSpace.js';
 //import {ShowVoltageControl} from './SetVoltageTab.js';
@@ -58,6 +58,7 @@ const menuFreqs = [
 const rateOptions = menuFreqs.map(freq => optionForFreq(freq));
 
 function CPToolbar(props) {
+	cfpt(CPToolbar, props);
 	if (traceCPToolbar)
 		dbLog(`🧰 CPToolbar starts.  props=`, props);
 	let {chosenRate, setChosenRate} = props;

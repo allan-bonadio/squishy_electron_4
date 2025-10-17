@@ -35,9 +35,9 @@ static void tryOutFFT(int N, double freq) {
 	original->setCircularWave(freq);
 	if (traceDumpWaves) original->dump("    tryOutFFT:  orignal wave set", true);
 
-	qSpectrum *qspect = new qSpectrum(space);
-	qspect->generateSpectrum(original);
-	if (traceDumpWaves) qspect->dumpSpectrum("    tryOutFFT: generated spectrum");
+	qSpectrum *spect = new qSpectrum(space);
+	spect->generateSpectrum(original);
+	if (traceDumpWaves) spect->dumpSpectrum("    tryOutFFT: generated spectrum");
 
 	// now there should be 1 number that's nonzero; we should be able to predict what and where
 	// should be real and should be at position freq from whichever end
@@ -50,7 +50,7 @@ static void tryOutFFT(int N, double freq) {
 	if (traceWhichParams) printf("     tryOutFFT: ... pos=%d  expected=%lf\n", pos, expected);
 
 	// now verify that
-	qCx *sw = qspect->wave;
+	qCx *sw = spect->wave;
 	for (int ix = 0; ix < N; ix++) {
 		char reBuf[100], imBuf[100];
 		qCx s = sw[ix];
@@ -66,7 +66,7 @@ static void tryOutFFT(int N, double freq) {
 	}
 
 	delete original;
-	delete qspect;
+	delete spect;
 	delete space;
 	if (traceWhichParams) printf("     finished tryOutFFT\n");
 }
@@ -102,9 +102,9 @@ static void trySquareWaveFFT(int N) {
 		o[ix] = qCx(-1);
 
 	// make a spectrum and FFT it
-	qSpectrum *qspect = new qSpectrum(space);
-	qspect->generateSpectrum(original);
-	if (traceDumpWaves) qspect->dumpSpectrum("    trySquareWaveFFT: generated spectrum");
+	qSpectrum *spect = new qSpectrum(space);
+	spect->generateSpectrum(original);
+	if (traceDumpWaves) spect->dumpSpectrum("    trySquareWaveFFT: generated spectrum");
 
 	// resulting spectrum looks like this: alternating 2s (-1...1) and zeroes for the real
 	// imaginary has different values that are mirrored in negative in the complementary point
@@ -114,7 +114,7 @@ static void trySquareWaveFFT(int N) {
 	//	[3] (  2.0000, -6.5931) ...
 
 	// two rows at a time:
-	qCx *sw = qspect->wave;
+	qCx *sw = spect->wave;
 	for (int ix = 0; ix < N; ix += 2) {
 		char reBuf[100], imBuf[100];
 		qCx pt = sw[ix];
@@ -131,7 +131,7 @@ static void trySquareWaveFFT(int N) {
 	}
 
 	delete original;
-	delete qspect;
+	delete spect;
 	delete space;
 	if (traceWhichParams) printf("      finished trySquareWaveFFT\n");
 }
@@ -167,13 +167,13 @@ static void tryInverseFFT(int N, double seed) {
 	if (traceDumpWaves) original->dump("    tryInverseFFT:  orignal wave set", true);
 
 	// make a spectrum and FFT it
-	qSpectrum *qspect = new qSpectrum(space);
-	qspect->generateSpectrum(original);
-	if (traceDumpWaves) qspect->dumpSpectrum("    tryInverseFFT: generated spectrum");
+	qSpectrum *spect = new qSpectrum(space);
+	spect->generateSpectrum(original);
+	if (traceDumpWaves) spect->dumpSpectrum("    tryInverseFFT: generated spectrum");
 
 	// now convert it back
 	qWave *result = new qWave(space);
-	qspect->generateWave(result);
+	spect->generateWave(result);
 
 	// make sure it's the same
 	qCx *r = result->wave;
@@ -187,7 +187,7 @@ static void tryInverseFFT(int N, double seed) {
 
 	delete result;
 	delete original;
-	delete qspect;
+	delete spect;
 	delete space;
 	if (traceWhichParams) printf("     finished tryInverseFFT\n");
 }

@@ -18,7 +18,6 @@ let traceContext = false;
 // no props!  does everything thru context.
 function StartStopOverlay(props) {
 	const context = useContext(SquishContext);
-	//const context = props.context;
 	if (traceContext) {
 		console.log(`StartStopOverlay starting context:`,
 				context.setShouldBeIntegrating,

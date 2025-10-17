@@ -3,7 +3,7 @@ These files are concerned with webgl for Squishy Electron.  See view directory f
 
 # Strategic Files
 
-* GLScene.js - react component that wraps the <canvas and interfaces directly with the rest of the JS code.
+* GLScene or GLCanvas.js - react component that wraps the <canvas and interfaces directly with the rest of the JS code.
 * abstract*.js - base classes for viewDefs and drawings
 * *Def.js - Scene classes, instances manage one or more Drawing instances
 * *Drawing.js - Drawing classes; each draws one piece of stuff for a Scene

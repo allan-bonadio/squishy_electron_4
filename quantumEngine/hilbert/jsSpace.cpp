@@ -9,7 +9,6 @@
 #include "../greiman/qAvatar.h"
 #include "../schrodinger/qGrinder.h"
 #include "../debroglie/qWave.h"
-#include "../greiman/qViewBuffer.h"
 
 static bool traceSpaceCreation = false;
 static bool traceAvatarDetail = false;
@@ -19,11 +18,8 @@ static bool traceAvatarDetail = false;
 // these are for JS only; they're all extern "C"
 extern "C" {
 
-void qSpace_dumpVoltage(qSpace *space, char *title) { space->dumpVoltage(title); }
-
-// this will normalize with the C++ normalize
-void wave_normalize(qWave *qwave) {
-	qwave->normalize();
+void qSpace_dumpVoltage(qSpace *space, char *title) {
+	space->dumpVoltage(title);
 }
 
 /* ******************************************************** space creation from JS */
@@ -47,7 +43,8 @@ qSpace *startNewSpace(const char *label) {
 }
 
 // call this from JS to add one or more dimensions
-void addSpaceDimension(qSpace *space, int N, int continuum, double dimLength, const char *label) {
+void addSpaceDimension(qSpace *space, int N, int continuum,
+			double dimLength, const char *label) {
 	space->addDimension(N, continuum, dimLength, label);
 }
 
@@ -60,18 +57,39 @@ qSpace *completeNewSpace(qSpace *space, int nGrWorkers) {
 	// finish up all the dimensions now that we know them all
 	space->initSpace();
 
-	if (traceAvatarDetail) printf("🚀 about to create avatars\n");
+//	qGrinder *grinder = space->grinder
+//		= new qGrinder(space, nGrWorkers, "mainGrinder");
+//	if (traceSpaceCreation) printf("🚀 created Grinder\n");
 
-	qAvatar *mainAvatar = space->mainAvatar = new qAvatar(space, "mainAvatar");
-	if (traceAvatarDetail) printf("🚀 created mainAvatar\n");
+//	if (traceAvatarDetail) printf("🚀 about to create avatars\n");
+//
+//	qAvatar *mainAvatar = space->mainAvatar = new qAvatar(0, "mainAvatar");
+//	//space, "mainAvatar");
+//	mainAvatar->space = space;
+//	mainAvatar->qwave = (qWave *) grinder->flick;  // very carefully
+//	mainAvatar->attachViewBuffer(0, NULL, 4, space->nPoints * 2);
+//	if (traceAvatarDetail) printf("🚀 created mainAvatar\n");
 
-	qGrinder *qgrinder = space->qgrinder = new qGrinder(space, mainAvatar, nGrWorkers, "mainGrinder");
+//	int *vb = (int *) (mainAvatar->viewBuffers);
+//	printf("viewBuffer ints: ox%x ox%x ox%x ox%x ox%x ox%x and vb itself is %p or %x\n",
+//		vb[0], vb[1], vb[2], vb[3], vb[4], vb[5], vb, (int) vb);
 
-	space->miniGraphAvatar = new qAvatar(space, "miniGraph");
+//	space->miniGraphAvatar = new qAvatar(avFLAT, "miniGraph");
 
 	//space->dumpSpace();
 //	if (traceSpaceCreation) printf("   🚀 qSpace created: space=%p  mainAvatar=%p  grinder=%p\n",
 //		space, mainAvatar, qgrinder);
+
+	qWave *miniGraphWave = space->miniGraphWave
+		= new qWave(space);
+	printf("miniGraphWave: %p\n", miniGraphWave);
+	qAvatar *miniGraphAvatar = space->miniGraphAvatar
+		= new qAvatar(avFLAT, "miniGraph");
+	miniGraphAvatar->space = space;
+	miniGraphAvatar->qwave = miniGraphWave;
+	space->miniGraphAvatar->attachViewBuffer(0, NULL, 2, space->nPoints * 2);
+
+	if (traceSpaceCreation) printf("🚀 created miniGraph Wave and Avatar\n");
 	return space;
 }
 
@@ -88,8 +106,8 @@ void deleteFullSpace(qSpace *space) {
 		delete space->miniGraphAvatar;
 		space->miniGraphAvatar = NULL;
 
-		delete space->qgrinder;
-		space->qgrinder = NULL;
+		delete space->grinder;
+		space->grinder = NULL;
 	}
 
 	// deletes its voltage

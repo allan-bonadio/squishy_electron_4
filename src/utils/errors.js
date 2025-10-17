@@ -3,6 +3,8 @@
 ** Copyright (C) 2022-2025 Tactile Interactive, all rights reserved
 */
 
+import PropTypes, {checkPropTypes} from 'prop-types';
+
 import qeFuncs from '../engine/qeFuncs.js';
 
 /* ****************************************************** diagnostics */
@@ -20,7 +22,7 @@ export function dumpJsStack(where = 'somewhere') {
 }
 window.dumpJsStack = dumpJsStack;
 
-/* ****************************************************** error/exception handling from C++ */
+/* ************************************** error/exception handling from C++ */
 
 // c++ will set this in exceptions.cpp someday
 window.cppErrorStack = '';
@@ -59,7 +61,7 @@ export function interpretCppException(ex) {
 //	result: 2152923161
 //	stack: "makeAWorker@http://localhost:6600/qEng/quantumEngine.main.js:2795:9\neThread@http://localhost:6600/static/js/bundle.js:53639:39\ncreateThreads@http://localhost:6600/static/js/bundle.js:53672:32\n./src/engine/eEngine.js/startUpWithThreads/<@http://localhost:6600/static/js/bundle.js:53046:57\npromise callback*startUpWithThreads@http://localhost:6600/static/js/bundle.js:53045:24\n@http://localhost:6600/qEng/quantumEngine.main.js:2866:10\nEventListener.handleEvent*@http://localhost:6600/qEng/quantumEngine.main.js:2861:10\n"
 
-
+// TODO: use this all over
 // general purpose exception reporter, use like this:
 //  try/catch:      ...} catch (ex) {excRespond(ex, `reindexing of alligator`)}
 //	promise:          .catch(ex => excRespond(ex, `reindexing of alligator`));
@@ -69,6 +71,7 @@ export function excRespond(exc, where, andDebug) {
 	if (andDebug)
 		debugger;
 }
+window.excRespond = excRespond;  // make it global
 
 // easier than writing out a try-catch all the time, this'll just guard a single function call
 // use this for event handlers and React lifecycle methods where react swallows the exception
@@ -79,8 +82,9 @@ export function wrapForExc(func, where, andDebug) {
 }
 
 
-/* ****************************************************** browser Too Old */
+/* *********************************************** browser Too Old */
 
+// TODO: isn't this a duplicate ofwhats in glAmbiance?
 // call this if the browser/machine are just way too old to support the stuff we use:
 // what = 'WebGL' at least v1, 'WebAssembly', dedicated 'WebWorkers', ...
 export function tooOldTerminate(what) {
@@ -105,3 +109,36 @@ export function tooOldTerminate(what) {
 	inHere.style.fontSize = '1.5em' ;
 	throw `So long, and thanks for all the fish!`;
 }
+
+
+/* *********************************************** check prop types */
+
+// React used to include PropTypes that had a function checkPropTypes().
+// Then,they converted to TS.  I'm not.  And I want traditional PropTypes.
+// They still allow original
+// checkPropTypes(GLScene.propTypes, props, 'prop', 'GLScene');
+//  ccpt(this, props);  // class component
+//  cfpt(func, props);  // func component
+// fully featured, this will print out a detailed msg and how to get to the code
+
+// a class component.  Call this after super() call, or shortly after
+function ccpt(_this, props) {
+	const cons = _this.constructor;
+	if (cons)
+		checkPropTypes(cons.propTypes, props, 'prop', cons.name);
+	else
+		throw new Error(`no proptypes on comp class ${cons.name}`)
+}
+
+// a function component.  Crashes if propType isn't installed.    Call this as
+// first call, or shortly after
+function cfpt(func, props) {
+	if (func.propTypes)
+		checkPropTypes(func.propTypes, props, 'prop', func.name);
+	else
+		throw new Error(`no proptypes on comp function ${func.name}`)
+}
+
+// so I can get at them anywhere
+window.ccpt = ccpt;
+window.cfpt = cfpt;

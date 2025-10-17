@@ -6,8 +6,8 @@
 #include <stdexcept>
 
 #include "../hilbert/qSpace.h"
-#include "../greiman/qAvatar.h"
-#include "../schrodinger/qGrinder.h"
+//#include "../greiman/qAvatar.h"
+//#include "../schrodinger/qGrinder.h"
 #include "qWave.h"
 #include "../directAccessors.h"
 
@@ -20,7 +20,7 @@ qWave::qWave(qSpace *sp, qCx *useThisBuffer)
 	: qBuffer() {
 
 	if (! sp)
-		throw "qWave::qWave null space";
+		throw std::runtime_error("qWave::qWave null space");
 	magic = 'Wave';
 	space = sp;
 
@@ -31,7 +31,7 @@ qWave::qWave(qSpace *sp, qCx *useThisBuffer)
 		printf("      🌊🌊        qWave: %p\n", (this));
 	}
 
-	initBuffer(space->nPoints, useThisBuffer);
+	initBuffer(space->nPoints, useThisBuffer);  // qBuffer method
 
 	if (traceCreate)
 		printf("      🌊🌊  allocated wave: %p\n", (wave));
@@ -60,14 +60,13 @@ qWave::~qWave(void) {
 	}
 }
 
-
 	/* *********************************************** direct access */
 
 // Insert this into the constructor and run this once.  Copy text output.
 // Paste the output into class eWave, the class itself, to replace the existing ones
 void qWave::formatDirectOffsets(void) {
 	// don't need magic
-	printf("🚦 🚦 --------------- starting qWave direct access JS getters & setters --------------\n\n");
+	printf("🚦 🚦 ----------- starting 🥽 eWave direct access 🥽 JS getters & setters ----------\n\n");
 
 	makePointerGetter(wave);
 
@@ -77,7 +76,7 @@ void qWave::formatDirectOffsets(void) {
 	makeIntGetter(end);
 	makeIntGetter(continuum);
 
-	printf("\n🚦 🚦 --------------- done with qWave direct access --------------\n");
+	printf("\n🚦 🚦 --------------- done with 🥽 eWave direct access 🥽 --------------\n");
 }
 
 
@@ -126,5 +125,21 @@ void qWave::prune() {
 		wave[ix].re = cleanOneNumber(wave[ix].re, ix, ix & 1);
 		wave[ix].im = cleanOneNumber(wave[ix].im, ix, ix & 2);
 	}
+}
+
+/* ******************************************************* C for JS */
+
+qWave *wave_create(qSpace *space, qCx *useThisBuffer) {
+	// useThisBuffer, usually null, haven't tested lately
+	return new qWave(space, useThisBuffer);
+}
+
+void wave_delete(qWave *qwave) {
+	delete qwave;
+}
+
+// this will normalize with the C++ normalize
+void wave_normalize(qWave *qwave) {
+	qwave->normalize();
 }
 

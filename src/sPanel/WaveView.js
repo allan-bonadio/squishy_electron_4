@@ -26,7 +26,7 @@ import StartStopOverlay from './StartStopOverlay.js';
 import resizeIcon from './waveViewIcons/resize.png';
 
 let traceBumpers = false;
-let traceDimensions = false;
+let traceDimensions = true;
 let traceDragCanvasHeight = false;
 let traceHover = false;
 let traceContext = false;
@@ -57,13 +57,14 @@ export class WaveView extends React.Component {
 
 	constructor(props) {
 		super(props);
-		checkPropTypes(this.constructor.propTypes, props, 'prop', this.constructor.name);
+		ccpt(this, props);
+		// checkPropTypes(this.constructor.propTypes, props, 'prop',
+		// 		this.constructor.name);
 
 		this.state = {
 			// height of just the canvas + DOUBLE_THICKNESSpx, as set by user with size box
-			outerHeight: round(getASetting('miscSettings', 'waveViewHeight')),  // integer pixels
-
-			// no!  handed in by promise space: null,  // set when promise comes in
+			// integer pixels
+			outerHeight: round(getASetting('miscSettings', 'waveViewHeight')),
 		}
 
 		this.updateInnerDims();  // after outerWidth done
@@ -103,7 +104,7 @@ export class WaveView extends React.Component {
 		wv = {
 			space: space,
 			grinder: space.grinder,
-			mainEAvatar: space.mainEAvatar,
+			//mainAvatar: space.mainAvatar,
 
 			// make room for the bumpers for WELL continuum (both sides).  Note that
 			// continuum can change only when page reloads.
@@ -140,7 +141,7 @@ export class WaveView extends React.Component {
 		this.space = space;  // for immediate access
 
 		this.grinder = space.grinder;
-		this.mainEAvatar = space.mainEAvatar;
+		this.mainAvatar = space.mainAvatar;
 
 		// make room for the bumpers for WELL continuum (both sides).  Note that
 		// continuum can change only when page reloads.
@@ -164,18 +165,28 @@ export class WaveView extends React.Component {
 			console.log(`🏄 canvas updateInner: w=${this.canvasInnerWidth} h=${this.canvasInnerHeight}`);
 	}
 
-	// we finally have a canvas; give me a reference so I can save it
-	setGlCanvas =
-	gl => {
-		if (!gl)
-			throw `no gl value`;
-		if (!this.gl) {
-			this.gl = gl;
-			this.canvasNode = gl.canvas;
-		}
-		else if (this.gl !== gl)
-			throw `this.gl ≠ gl !`;
-	}
+// 	// we finally have a canvas; give me a reference so I can save it.
+// 	// (this is repeatedly called right after each render.)
+// 	static setGlCanvas = (gl, canvas) => {
+// 		if (!gl)
+// 			throw `no gl value`;
+// 		if (!this.gl) {
+// 			this.gl = gl;
+// 			this.canvasNode = canvas;
+// 		}
+// 		else if (this.gl !== gl)
+// 			throw `this.gl ≠ gl !`;
+//
+// 		// might be available a few renders later
+// 		if (this.canvasNode && this.canvasNode.glRepaint) {
+// 			const glRepaint = this.canvasNode.glRepaint;
+// 			this.glRepaint = glRepaint;
+// 			if (this.props.animator)
+// 				this.props.animator.glRepaint = glRepaint;
+// 			else
+// 				throw `no glRepaint() on animator`;
+// 		}
+// 	}
 
 	componentDidMount() {
 		let wv = this.context?.waveView;
@@ -195,14 +206,14 @@ export class WaveView extends React.Component {
 		// only need this when the WaveView outer dims change, either a user
 		// change height or window change width.  On that occasion, we have to adjust
 		// a lot, including resizing the canvas.
-		if (this.mainEAvatar && (this.formerWidth != this.outerWidth
+		if (this.mainAvatar && (this.formerWidth != this.outerWidth
 					|| this.formerHeight != s.outerHeight) ) {
 
 			//this.updateInnerDims();
 
 			// Size of window & canvas changed!  (or, will change soon)
 			if (traceDimensions) {
-				console.log(`🏄 wv Resizing  👀 mainEAvatar=${this.mainEAvatar.label}
+				console.log(`🏄 wv Resizing  👀 mainAvatar=${this.mainAvatar.label}
 					formerWidth=${this.formerWidth} ≟➔ outerWidth=${this.outerWidth}
 					formerHeight=${this.formerHeight} ≟➔ outerHeight=${s.outerHeight}
 					btw props.outerWidth=${this.props.outerWidth}
@@ -292,13 +303,10 @@ export class WaveView extends React.Component {
 
 		// can't figure out when else to do it
 		if (this.props.animator)
-			this.props.animator.context ??= this.context;
+			this.props.animator.context = this.context;
 
 		if (traceContext && this.context) {
-			console.log(`🏄 WaveView Render context:`,
-				this.context.setShouldBeIntegrating,
-				this.context.controlPanel,
-				this.context.waveView);
+			console.log(`🏄 WaveView Render context:`, this.context);
 		}
 
 		// if c++ isn't initialized yet, we can assume the time and frame serial
@@ -315,12 +323,14 @@ export class WaveView extends React.Component {
 		// can't make a real GLScene until we have the space!
 		let glScene;
 		if (this.space) {
+			let sceneClassName = 'flatScene';
+			let sceneName = 'mainWave';
+
 			glScene = <GLScene
-				space={s.space} avatar={s.space.mainEAvatar}
-				sceneClassName='flatScene' sceneName='mainWave'
+				space={s.space} animator={this.props.animator}
+				sceneClassName={sceneClassName} sceneName={sceneName}
 				canvasInnerWidth={this.canvasInnerWidth}
 				canvasInnerHeight={this.canvasInnerHeight}
-				setGlCanvas={this.setGlCanvas}
 				specialInfo={{bumperWidth: this.bumperWidth}}
 			/>;
 		}

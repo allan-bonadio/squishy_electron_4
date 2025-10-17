@@ -3,13 +3,12 @@
 ** Copyright (C) 2023-2025 Tactile Interactive, all rights reserved
 */
 
-//import inteStats from '../controlPanel/inteStats.js';
-//import statGlobals from '../controlPanel/statGlobals.js';
 import {prepForDirectAccessors} from '../utils/directAccessors.js';
 import qeFuncs from './qeFuncs.js';
 import qeConsts from './qeConsts.js';
 import {getASetting} from '../utils/storeSettings.js';
 import {thousandsSpaces} from '../utils/formatNumber.js';
+import eFlick from './eFlick.js';
 
 let traceCreation = false;
 let traceIntegration = false;
@@ -18,25 +17,26 @@ let traceTriggerIteration = false;
 // a qGrinder manages integration frames of a wave
 class eGrinder {
 	// eSpace we're in , creates its eGrinder
-	constructor(space, avatar, pointer) {
+	constructor(space) {
+	//constructor(space, avatar, pointer) {
+		let pointer = qeFuncs.grinder_create(space.pointer, 1, 'main');
+		/// ummm...
 		prepForDirectAccessors(this, pointer);
-		this.label = window.Module.AsciiToString(this._label);
+		// ?? this.label = window.Module.AsciiToString(this._label);
 
 		this.space = space;
-		this.avatar = avatar;
-		avatar.grinder = this;
+// 		this.avatar = avatar;  // the avatar it loads into
+// 		avatar.grinder = this;
 
-		//console.log(`matching sentinel:
-		//qeConsts.grSENTINEL_VALUE=${qeConsts.grSENTINEL_VALUE} !==
-		//this.sentinel=${this.sentinel}`)
-//
-//		console.log(`sentinels: ${qeConsts.grSENTINEL_VALUE}  ${this.sentinel}`);
-//this.sentinel = qeConsts.grSENTINEL_VALUE;  // try this
+		// for the flick we only have the pointer.  Similar to a eWave
+		this.flick = new eFlick(space, this._flick);
+
+		//console.log(`sentinels: ${qeConsts.grSENTINEL_VALUE} ≟ ${this.sentinel}`);
 
 		if (qeConsts.grSENTINEL_VALUE !== this.sentinel)
-			throw "🔥 🔥 Grinder offsets not correct (36) 🔥 🔥";
+			throw Error("🔥 🔥 Grinder offsets not correct (36) 🔥 🔥");
 		if (traceCreation)
-			console.log(`🪚 eGrinder constructed:`, this);
+			console.log(`🪚 eGrinder constructed: %o`, this);
 	}
 
 	// delete, except 'delete' is a reserved word.  Turn everything off.
@@ -45,18 +45,19 @@ class eGrinder {
 		this.ewave.liquidate();
 		this.space = this.ewave = this.vBuffer = null;
 
-		//qeFuncs.grinder_delete(this.pointer);
+		qeFuncs.grinder_delete(this.pointer);
 	}
 
-	/* *************************************************************** Direct Accessors */
+	/* ***************************** 🥽 Direct Accessors */
 	// see qGrinder.cpp to regenerate this. Note these are all scalars; buffers
 	// are passed by pointer and you need to allocate them in JS (eg see
 	// eGrinder.constructor)
 
 	get _space() { return this.ints[1]; }
-	get _qflick() { return this.ints[3]; }
+	get _flick() { return this.ints[3]; }
 	get _voltage() { return this.ints[4]; }
-	get _qspect() { return this.ints[5]; }
+	get _spect() { return this.ints[5]; }
+	get _stage() { return this.ints[2]; }
 
 	get stepsPerFrame() { return this.ints[7]; }
 	set stepsPerFrame(a) { this.ints[7] = a; }
@@ -92,8 +93,7 @@ class eGrinder {
 	get needsRepaint() { return Boolean(this.bytes[155]); }
 	set needsRepaint(a) { this.bytes[155] = Boolean(a); }
 	get sentinel() { return this.bytes[156]; }
-
-
+	set sentinel(a) { this.bytes[156] = a; }
 
 	/* ******************* end of direct accessors */
 

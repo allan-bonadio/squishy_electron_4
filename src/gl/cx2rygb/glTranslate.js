@@ -77,7 +77,7 @@ const vec3 = (r=0, g=0, b=0) => ({r, g, b});
 `;
 
 const suffix = `
-export default cx2rgb;
+export default cx2rygb;
 `;
 
 function glTranslate() {

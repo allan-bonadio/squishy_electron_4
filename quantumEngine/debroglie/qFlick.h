@@ -14,8 +14,10 @@ struct qGrinder;
 // Multiple complex buffers identical to the single qWave buffer.
 // The qBuffer 'wave' var points to whichever wave in the sequence is the 'it' wave
 struct qFlick : public qWave {
-	qFlick(qSpace *space, int nWaves, int nTProgresses);
+	qFlick(qSpace *space, int nWaves);
 	~qFlick();
+
+	void formatDirectOffsets(void);
 
 	// dump
 	double dumpRow(char *buf, int doubleSerial, int ix, double *pPrevPhase, bool withExtras);
@@ -54,3 +56,7 @@ struct qFlick : public qWave {
 
 };
 
+extern "C" {
+	qFlick *flick_create(qSpace *space, int nWaves);
+	void flick_delete(qFlick *flick);
+}

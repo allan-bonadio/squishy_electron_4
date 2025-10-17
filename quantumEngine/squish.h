@@ -27,7 +27,7 @@ extern const double inverseℏ;  //  = 1 / ℏ;  // units ps / pfg nm^2
 
 extern const double NaN;
 
-#define MAX_LABEL_LEN 15
+//#define MAX_LABEL_LEN 15
 
 #ifdef qDEV_VERSION
 	extern void qCheck(qCx aCx, const char *where = "", int index = -999999999);
@@ -44,6 +44,9 @@ extern void speedyFlush(void);
 
 #define MAGIC_FORMAT "%c%c%c%c"
 #define MAGIC_ARGS magic >> 24, magic >> 16, magic >> 8, magic
+
+// dynamically allocated but [MAX_LABEL_LEN + 1]
+extern char *cppLabelText;
 
 #endif
 

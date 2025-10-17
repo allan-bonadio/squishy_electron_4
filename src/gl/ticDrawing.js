@@ -66,8 +66,11 @@ void main() {
 
 // the original display that's worth watching: tic upside down hump graph
 export class ticDrawing extends abstractDrawing {
-	constructor(scene) {
+	constructor(scene, space) {
 		super(scene, 'ticDrawing');
+
+		// most drawings don't need space passed in
+		this.space = space;
 
 		// we always use this for our coordinates, generated on the fly
 		this.coordBuffer = new Float32Array(BUFFER_MAX_NTICS * FLOATS_PER_TIC);
@@ -91,7 +94,8 @@ export class ticDrawing extends abstractDrawing {
 						` smoothHighest=${this.avatar.smoothHighest?.toFixed(5)}`);
 
 				// add in a few percent
-				return {value: this.avatar.smoothHighest * this.scene.PADDING_ON_BOTTOM,
+				let h = this.avatar?.smoothHighest ?? 100;
+				return {value: h * this.scene.PADDING_ON_BOTTOM,
 					type: '1f'};
 			}
 		);
@@ -112,9 +116,9 @@ export class ticDrawing extends abstractDrawing {
 				` highest is ${this.avatar.highest?.toFixed(6)}`);
 
 		// number of tics on left side, comes from the flatDrawing scalebut handle it if it isn't drawing
-		let avgψ = 1 /  this.avatar.space.nStates;
+		let avgψ = 1 /  this.space.nStates;
 		// if smooth highest isn't calculated yet, just use average ψ
-		let highest = this.avatar.smoothHighest ?? avgψ;
+		let highest = this.avatar?.smoothHighest || avgψ;
 		let highestInAvgψs = highest / avgψ;
 
 		// this is number of tics should be, except we skip the one at zero

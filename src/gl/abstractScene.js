@@ -1,20 +1,14 @@
 /*
-** abstract View Def -- superclass for all the views, which live inside the WaveView
+** abstract Scene -- superclass for all the squish scenes, which live inside the WaveView
 ** Copyright (C) 2021-2025 Tactile Interactive, all rights reserved
 */
-
-// should have one VAO per viewdef, or per drawing?
-// per drawing seems to be the winner.
-// But keep this so we can go back and forth.
-let perDrawingVAO = true;   // false;
 
 let tracePaint = false;
 
 // Each abstractScene subclass is a definition of a kind of picture or scene;
 // one per each kind of scene. Each drawing is a definition of a part of a scene
-// (usually drawn with 1 program).  A Scene has one or more drawings in it.  A
-// WaveView hosts an instance of the Scene and is a React component enclosing
-// the canvas.
+// (usually drawn with 1 GL program).  A Scene has one or more drawings in it.  There's always a  compoent with a canvas that hosts an instance of the Scene and is a React component enclosing
+// the canvas.  (example WaveView, SetWaveTab)
 
 /* ****************************************  */
 
@@ -28,24 +22,17 @@ export class abstractScene {
 	// sceneName: personal name for the scene instance, for error msgs
 	// canvas: real <canvas> DOM element, after it's been created by React
 	// class name from instance: vu.constructor.name   from class: vuClass.name
-	constructor(sceneName, ambiance, space, avatar) {
+	// A scene is always constructed with args sceneName, ambiance, space
+	// The scene constructor sometimes ignores the space but it's passed anyway.
+	constructor(sceneName, ambiance) {
 		this.sceneName = sceneName;
 		this.canvas = ambiance.canvas;
 		this.gl = ambiance.gl;
 		this.tagObject = ambiance.tagObject;
 		if (! this.canvas) throw new Error(`abstractScene: being created without canvas`);
 
-		this.space = space;
-		this.avatar = avatar;
-
-		// boolean cuz I can't find any docs telling me how to use vao, in detail
-		this.perDrawingVAO = perDrawingVAO;
-
-		if (!this.perDrawingVAO) {
-			// vao for all drawings in this viewdef
-			this.vao = this.gl.createVertexArray();
-			this.tagObject(this.vao, `${this.constructor.name}-${avatar.label}-vao`);
-		}
+		//this.space = space;  get this after creation, if needed
+		//this.avatar = avatar;
 
 		// all of the drawings in this scene
 		// they get prepared, and drawn, in this same order
@@ -66,10 +53,6 @@ export class abstractScene {
 			console.log(`🦊 abs completeScene() width=${this.canvas.width}, height=${this.canvas.height},`);
 
 		this.drawAllDrawings(this.canvas.width, this.canvas.height, specialInfo);
-
-		// and set up interactivity
-		// maybe i should get rid of this
-		//this.domSetupForAllDrawings(this.canvas);
 	}
 
 	/* ****************************************** Shader s */

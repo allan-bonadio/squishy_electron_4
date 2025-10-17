@@ -9,7 +9,7 @@ cd `dirname $0`
 cd ..
 
 # in the short term, keep some tracing stuff in; we'll be debugging the production version!
-export DEBUG='-gsource-map --source-map-base /qEng/ '
+export DEBUG='-gsource-map --source-map-base /qEng/  -DsqDEVEL=0'
 export OPTIMIZE='-O3 -flto --closure 1 '
 
 # see in dev version
