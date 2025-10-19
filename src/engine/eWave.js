@@ -8,10 +8,11 @@
 import qeConsts from './qeConsts.js';
 import {cppObjectRegistry, prepForDirectAccessors} from '../utils/directAccessors.js';
 import eSpace from './eSpace.js';
+import rainbowDump from '../utils/rainbowDump.js';
 
 let traceSetFamiliarWave = false;
 let traceGaussian = false;
-let traceFamiliarResult = false;
+let traceFamiliarResult = true;
 let traceAllocate = false;
 
 const _ = num => num.toFixed(4).padStart(9);
@@ -26,7 +27,6 @@ const atan2 = Math.atan2;
 // generate string for this one cx value, w, at location ix
 // rewritten from the c++ version in qBuffer::dumpRow()
 // pls keep in sync!
-// this should be moved to eWave!
 function dumpRow(ix, re, im, prev, isBorder) {
 	const mag = re * re + im * im;
 
@@ -44,13 +44,15 @@ function dumpRow(ix, re, im, prev, isBorder) {
 	// calculate inner product while we're at it, displayed on last line
 	if (!isBorder) prev.innerProd += mag;
 
-	return`[${ix}] (${_(re)} , ${_(im)}) | `+
+	const index = String(ix).padStart(3);
+	return`[${index}] (${_(re)} , ${_(im)}) | `+
 		`${_(phase)} ${_(dPhase)}} ${_(mag * 1000)} m𝜓/nm\n` ;
 }
 
-/* **************************************************************** eWave */
+/* ******************************************************* eWave */
 
-// this is just a 1D wave.  someday...
+// this is just a 1D wave.  Used typically for internal calculations with complex
+// numbers.  Or use eFlick.
 class eWave {
 	// useThis32F is one of these:
 	// • NO obsolete! (maybe still works but Float64Array() allocates its
@@ -72,9 +74,7 @@ class eWave {
 			//?? waveArg = this._wave;
 		}
 		else {
-			// a home brew wave, not from C++.  make a phony qWave for those ints
-			// a hack to get it running so you can run the direct accessor code to get the getters..
-			// not for 'real' use
+			// make a new qWave
 			//debugger;
 			this.pointer = qeFuncs.wave_create(space.pointer, null);
 		}
@@ -83,10 +83,6 @@ class eWave {
 		// now for the buffer
 		this.completeWave(useThis32F);
 	}
-
-			// console.assert(pointer, `eWave being constructed with no pointer `
-			// 	+` (${pointer}) and no buffer useThis32F (${useThis32F})`)
-		//useThis32F = this._wave;
 
 	// finish the construction.  eFlick has to do it differently.
 	completeWave(useThis32F) {
@@ -145,7 +141,7 @@ class eWave {
 
 	/* **************************** 🥽 end of direct accessors */
 
-	/* ************************************************* dumping */
+	/* ******************************************** dumping */
 
 	// dump any wave buffer according to that space.
 	// RETURNS A STRING of the wave.
@@ -183,7 +179,7 @@ class eWave {
 	}
 
 
-	/* ******************************************************* calculatons */
+	/* ******************************************* calculatons */
 
 	// calculate ⟨𝜓 | 𝜓⟩  'inner product'.
 	// See also C++ function of same name, that one's official.
