@@ -17,10 +17,6 @@ class flatScene extends abstractScene {
 
 		this.space = space;
 
-		// normally autoranging would put the highest peak at the exact bottom.
-		// but we want some extra space.  not much.
-		this.PADDING_ON_BOTTOM = 1.02;
-
 		// create avatar but don't stick buffers; the drawing does that
 		this.avatar = eAvatar.createAvatar(qeConsts.avFLAT, sceneName);
 

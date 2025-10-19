@@ -10,7 +10,7 @@ import qeFuncs from '../engine/qeFuncs.js';
 import qeConsts from '../engine/qeConsts.js';
 
 let traceViewBufAfterDrawing = false;
-let traceHighest = false;
+let traceMaxHeight = false;
 let traceFlatDrawing = false;
 let traceViewport = false;
 let traceCounts = false;
@@ -20,6 +20,7 @@ let traceDrawPoints = false;
 let traceDrawLines = false;
 
 let pointSize = traceDrawPoints ? `gl_PointSize = 10.;` : '';
+let displayWrapEdges = false;  // soon to be a pref
 
 /* ******************************************************* flat drawing */
 
@@ -39,15 +40,16 @@ uniform float barWidth;
 uniform float maxHeight;
 
 void main() {
-	// figure out y
-	float y;
 	int vertexSerial = int(row.w);
 	bool odd = int(vertexSerial) / 2 * 2 < vertexSerial;
+
+	// figure out y
+	float y;
 	if (odd) {
 		y = (row.x * row.x + row.y * row.y) / maxHeight;
 	}
 	else {
-		y = 0.;
+		y = 0.;  // top of the screen
 	}
 	y = 1. - 2. * y;
 
@@ -58,12 +60,14 @@ void main() {
 	gl_Position = vec4(x, y, 0., 1.);
 
 	//  for the color, convert the complex values via this algorithm
-	vColor = vec4(cx2rygb(vec2(row.x, row.y)), 1.);
+	vColor.rgb = cx2rygb(row.xy);
+	//vColor.rgb = cx2rygb(vec2(row.x, row.y));
+	vColor.a = 1.;
+	//vColor = vec4(cx2rygb(vec2(row.x, row.y)), 1.);
 
 	// make the colors darker toward zero (top)
 	if (!odd)
 		vColor = vec4(vColor.r/2., vColor.g/2., vColor.b/2., vColor.a);
-	//vColor = vec4(.9, .9, .1, 1.);
 
 	// dot size, in pixels not clip units.  actually a square.
 	${pointSize}
@@ -92,7 +96,7 @@ export class flatDrawing extends abstractDrawing {
 		// each point in the wave results in two vertices, top and wave.
 		// And each of those is four single floats going to the GPU
 		this.avatar.attachViewBuffer(0, null, 4, this.space.nPoints * 2, 'flat drawing');
-		console.log(`attachViewBuffer on scene ${scene.sceneName}`);
+		//console.log(`attachViewBuffer on scene ${scene.sceneName}`);
 	}
 
 	// loads view buffer from corresponding wave, calculates highest norm.
@@ -102,19 +106,25 @@ export class flatDrawing extends abstractDrawing {
 		if (traceFlatDrawing)
 			console.log(`♭♭♭ flatDrawing: creatingVariables`);
 
-		// Need this for starting values for highest & smoothHighest
-		// this is NOT where it gets called after each iter; see GLScene for that
-//this.avatar.loadViewBuffer();
+		// normally autoranging would put the highest peak at the exact bottom.
+		// but we want some extra space.  not much.
+		const vertStretch = 0.7;  // not sure why
+		const PADDING_ON_BOTTOM = 1.02 * vertStretch;
 
 		this.maxHeightUniform = new drawingUniform('maxHeight', this,
 			() => {
-				if (traceHighest)
-					console.log(`♭♭♭ flatDrawing reloading outer:  `
-						+` highest=${this.avatar.highest.toFixed(5)} `
-						+` smoothHighest=${this.avatar.smoothHighest.toFixed(5)}`);
+				// fresh out of the loader, maxHeight wobbles up and down.  Smooth it.
+				if (!this.maxHeight)
+					this.maxHeight = this.avatar.d0;
+				else
+					this.maxHeight = (this.maxHeight * 15 + this.avatar.d0) / 16;
+					//this.maxHeight = (this.maxHeight * 255 + this.avatar.d0) / 256;
 
-				// add in a few percent
-				return {value: this.avatar.d0 * this.scene.PADDING_ON_BOTTOM, type: '1f'};
+				if (traceMaxHeight)
+					console.log(`♭♭♭ flatDrawing reloading outer:  `
+						+` maxHeight=${this.avatar.maxHeight.toFixed(5)} `);
+
+				return {value: this.maxHeight * PADDING_ON_BOTTOM, type: '1f'};
 			}
 		);
 
@@ -147,7 +157,8 @@ export class flatDrawing extends abstractDrawing {
 				console.log(`at flatLoader; this.vertexCount=${this.vertexCount} `
 					+` total floats=${this.vertexCount * this.rowFloats}`);
 			}
-			qeFuncs.avatar_avFlatLoader(this.avatar.pointer, 0, this.space.mainFlick.pointer, this.vertexCount);
+			qeFuncs.avatar_avFlatLoader(this.avatar.pointer, 0, this.space.mainFlick.pointer,
+					this.vertexCount);
 
 			// old this.avatar.vBuffer.nTuples = this.vertexCount;
 			return this.avatar.getViewBuffer(0);
@@ -158,20 +169,21 @@ export class flatDrawing extends abstractDrawing {
 
 	// called for each image frame on th canvas
 	draw(width, height, specialInfo) {
-
 		if (traceFlatDrawing) {
 			console.log(`♭♭♭ flatDrawing  ${this.avatarLabel}: `
-				+` width=${width}, height=${height}  drawing ${this.vertexCount/2} points`);
+				+` width=${width}, height=${height}  drawing ${this.vertexCount/2} points `
+				+` maxHeight=${this.maxHeight}`);
 		}
 		const gl = this.gl;
 		this.setDrawing();
 
 		let bw = specialInfo.bumperWidth;
 		gl.viewport(bw, 0, width - 2 * bw, height);
-		if (traceViewport)
+		if (traceViewport) {
 			console.log(`♭♭♭ flatDrawing set viewport on ${this.avatarLabel}: `
-				+` width-2bw=${width - 2 * bw}, height=${height}  drawing ${this.vertexCount/2} points`);
-
+				+` width-2bw=${width - 2 * bw}, height=${height}  `
+				+` drawing ${this.vertexCount/2} points`);
+		}
 		this.viewVariables.forEach(v => v.reloadVariable());
 		gl.drawArrays(gl.TRIANGLE_STRIP, 0, this.vertexCount);
 		// console.log(`just drewArays-flat on avatar ptr=${this.avatar.pointer} `
