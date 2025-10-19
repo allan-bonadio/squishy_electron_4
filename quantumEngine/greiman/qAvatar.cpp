@@ -408,8 +408,8 @@ void qAvatar::loadViewBuffers(int breed) {
 // for the JS side
 
 qAvatar *avatar_create(int avatarBreed, char *label) {
-//	printf(" 🚥 creating new qAvatar.  breed=%d  label='%s' %p\n",
-//		avatarBreed, label, label);
+printf(" 🚥 creating new qAvatar.  breed=%d  label='%s' %p\n",
+	avatarBreed, label, label);
 	return new qAvatar(avatarBreed, label);
 }
 
