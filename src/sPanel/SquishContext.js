@@ -15,6 +15,7 @@ export const SquishContext = createContext({
 	shouldBeIntegrating: false,
 	controlPanel: {},
 	waveView: {},
+	space: null,
 });
 SquishContext.displayName = 'SquishContext';
 
