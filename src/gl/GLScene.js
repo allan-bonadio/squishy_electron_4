@@ -6,7 +6,7 @@
 // TODO: rename this GLScene => GLCanvas after the dust settles
 // or something like 'main gl canvas' or something
 
-// GLScene  wraps a canvas for display.  Via webgl.
+// GLScene	wraps a canvas for display.	 Via webgl.
 // And the Drawing and Scene machinery mgmt.  General for all gl canvases.
 
 import React, {useState, useRef, useEffect} from 'react';
@@ -40,26 +40,29 @@ function setPT() {
 		// Optional; omit if your scene is not affected by space.
 		space: PropTypes.object,
 
-		// sAnimator - reserved for sAnimator, but I guess you can make your own.
-		// This object will get the glRepaint function attached.  Omit if your GLScene doesn't animate.
+	  // sAnimator - reserved for sAnimator, but I guess you
+	  // can make your own. This object will get the
+	  // glRepaint function attached.  Omit if your GLScene
+	  // doesn't animate.
 		animator: PropTypes.object,
 
- 		// inner width & height of canvas
-		// keep these separate  so any change will trigger render
+		// inner width & height of canvas
+		// keep these separate	so any change will trigger render
 		canvasInnerWidth: PropTypes.number.isRequired,
 		canvasInnerHeight: PropTypes.number.isRequired,
 
 		// object with specific values needed in drawing; for waveview= {bumperWidth}
 		specialInfo: PropTypes.object,
 
+	  // if the caller needs the repaint function for this canvas, pass a func to pick it up
+		setGLRepaint: PropTypes.func,
+
 		// a help msg, optional
 		title: PropTypes.string,
 	};
 }
 
-// 		// each canvas node (used for gl) has its own squish scene and glRepaint func
-// 		// with
-
+// Wraps a DOM canvas to do webgl.	All webgl rectangles should use this.
 // For each GLScene, there's one:
 // - canvas element, and one gl drawing context
 // - one Scene that encloses one or more drawings
@@ -85,12 +88,12 @@ function GLScene(props) {
 	let [gl, setGl] = useState(null);
 	let [squishScene, setSquishScene] = useState(null);
 
-	// set up the squish Scene - collection of drawings to draw in one canvas.  Base classes
-	// abstractDrawing and abstractScene must do this after the ambiance and canvas exists.  Once only.
+	// set up the squish Scene - collection of drawings to draw in one canvas.	Base classes
+	// abstractDrawing and abstractScene must do this after the ambiance and canvas exists.	 Once only.
 	const initSceneClass = (ambiance) => {
 		let sClass = listOfSceneClasses[p.sceneClassName];
 
-		// for this situation, needs the space!  if they passed it to us
+		// for this situation, needs the space!	 if they passed it to us
 		squishScene = new sClass(p.sceneName, ambiance, p.space);
 		setSquishScene(squishScene);
 		//effSceneRef.current = squishScene;
@@ -104,7 +107,7 @@ function GLScene(props) {
 			+` done with initSceneClass`);
 	};
 
-	// repaint whole GL image.  this is repainting a canvas with GL.
+	// repaint whole GL image.	this is repainting a canvas with GL.
 	// This is not 'render' as in React; react places the canvas element
 	// and this function redraws on the canvas (with gl).
 	const glRepaint =
@@ -132,12 +135,13 @@ function GLScene(props) {
 		}
 		return;
 	}
+	props.setGLRepaint?.(glRepaint);
 
-// 	if (canvasNode) {
-// 		// each canvas node (used for gl) has its own GLScene and squish scene and glRepaint func
-// 		// with its own closure and variable values.
-// 		canvasNode.glRepaint = glRepaint;
-// 	}
+//	if (canvasNode) {
+//		// each canvas node (used for gl) has its own GLScene and squish scene and glRepaint func
+//		// with its own closure and variable values.
+//		canvasNode.glRepaint = glRepaint;
+//	}
 
 	if (traceGeometry && 'mainWave' == p.sceneName) {
 		console.log(`🖼 GLScene rend '${p.sceneName}': canvas=${canvasNode?.nodeName} `
@@ -159,9 +163,9 @@ function GLScene(props) {
 				throw `GL already claimed: gl.sceneName=${gl.sceneName} `
 				+` canvasNode.squishSceneName=${canvasNode.squishSceneName} `
 				+` canvasNode.glRepaint:${canvasNode.glRepaint}`;
-			gl.sceneName = p.sceneName;  // for my debugging
+			gl.sceneName = p.sceneName;	 // for my debugging
 			//glRef.current = gl;
-			// if (!p.setGlCanvas)  throw new Error(`no props.setGlCanvas`);
+			// if (!p.setGlCanvas)	throw new Error(`no props.setGlCanvas`);
 
 			initSceneClass(ambiance);
 			if (props.animator)
@@ -176,12 +180,12 @@ function GLScene(props) {
 	// Effect.
 	// can't do much first rendering; no canvasNode cuz no canvasRef.current yet.
 	// But, in the effect after the first render, this func will get the canvas node
-	// from the ref and set everything up.  Renders should be infrequent,
+	// from the ref and set everything up.	Renders should be infrequent,
 	// only when dimensions of the canvas change or other big change.
 	const effectRepaint = () => {
 		if (!canvasNode) {
 			if (!canvasRef.current)
-				return;  // no canvas yet, nothing to draw on
+				return;	 // no canvas yet, nothing to draw on
 
 
 			// new canvas — now we've got it
