@@ -98,14 +98,16 @@ qSpace *completeNewSpace(qSpace *space, int nGrWorkers) {
 void deleteFullSpace(qSpace *space) {
 	// deleting the avatars will delete their qWaves and qViewBuffers
 	// not there if completeNewSpace() never called, even if initSpace() called
-	if (space->mainAvatar) {
-		if (traceAvatarDetail) printf("   🚀 deleteFullSpace(): deleting avatars\n");
-		delete space->mainAvatar;
-		space->mainAvatar = NULL;
+	// if (space->mainAvatar) {
+	// 	if (traceAvatarDetail) printf("   🚀 deleteFullSpace(): deleting avatars\n");
+	// 	delete space->mainAvatar;
+	// 	space->mainAvatar = NULL;
+	//
+	// 	delete space->miniGraphAvatar;
+	// 	space->miniGraphAvatar = NULL;
+	// }
 
-		delete space->miniGraphAvatar;
-		space->miniGraphAvatar = NULL;
-
+	if (space->grinder) {
 		delete space->grinder;
 		space->grinder = NULL;
 	}

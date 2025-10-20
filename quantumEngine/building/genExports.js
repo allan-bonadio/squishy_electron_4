@@ -66,7 +66,7 @@ let exportsSrc  = [
 	// most accept an integer pointer to the avatar as first argument
 	// except this that creates a new one.  When a space is created,
 	// it also makes its own avatars.
-	{name: 'avatar_create', args: ['number', 'number', 'string'], retType: 'number'},
+	{name: 'avatar_create', args: ['number', 'string'], retType: 'number'},
 
 	{name: 'avatar_setWaveSpace',
 		args: ['number', 'number', 'number'], retType: null},

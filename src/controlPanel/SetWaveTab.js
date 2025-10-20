@@ -3,7 +3,7 @@
 ** Copyright (C) 2021-2025 Tactile Interactive, all rights reserved
 */
 
-import React from 'react';
+import React, {useRef} from 'react';
 import PropTypes, {checkPropTypes} from 'prop-types';
 import {scaleLinear} from 'd3-scale';
 
@@ -50,18 +50,34 @@ function SetWaveTab(props) {
 	//checkPropTypes(SetWaveTab.propTypes, props, 'prop', 'SetWaveTab');
 	let {saveMainWave, waveParams, setWaveParams, space} = props;
 
-	// set the captive minGraph wave to the new settings, after user changed one.
-	// this will do a GL draw.
+	const minigraphRepaintRef = useRef(null);
+	const minigraphWaveRef = useRef(null);
+	if (!minigraphWaveRef.current)
+		minigraphWaveRef.current = new eWave(props.space);
+	let minigraphWave = minigraphWaveRef.current;
+	let minigraphRepaint = minigraphRepaintRef.current;
+
+	function setMinigraphRepaint(repaint) {
+		minigraphRepaintRef.current = minigraphRepaint = repaint;
+	}
+
+	// set the captive minGraph wave to the new settings,
+	// after user changed one. this will do a GL draw.
 	function regenerateMiniGraphWave() {
-		if (traceRegenerate)
-			console.log(`Regenerating WaveTab minigraph.  params: `, waveParams);
-		space.miniGraphAvatar.ewave.setFamiliarWave(waveParams);
-		space.miniGraphAvatar.smoothHighest = 0;
-		space.miniGraphAvatar.glRepaint();
-		//space.miniGraphAvatar.glRepaint?.();
+		if (!minigraphRepaint)
+			return;
+
+		if (traceRegenerate) {
+			console.log(`Regenerating WaveTab minigraph.  params: `,
+					waveParams);
+		}
+
+		minigraphWave.setFamiliarWave(waveParams);
+		minigraphRepaint();
 	}
 
 	// set any combination of the wave params, in the Control Panel state.
+	// then repaint it
 	function setAndRegenerate(wp) {
 		setWaveParams(wp);
 
@@ -128,10 +144,11 @@ function SetWaveTab(props) {
 
 	// the minigraph
 	const glScene = <GLScene
-		space={space} avatar={space.miniGraphAvatar}
+		space={space}
 		sceneClassName='flatScene' sceneName='setWaveMiniGraph'
 		canvasInnerWidth={MINI_WIDTH}
 		canvasInnerHeight={MINI_HEIGHT}
+		setGLRepaint={setMinigraphRepaint}
 		specialInfo={{bumperWidth: 0}}
 		title="preview of what your wave will look like after clicking Set Wave"
 	/>;
@@ -168,7 +185,8 @@ function SetWaveTab(props) {
 		<h3>Design a new Wave</h3>
 		<div className='waveTabCol '>
 			{breedSelector}
-			<button className='setWaveButton' onClick={ev => saveMainWave(waveParams)}
+			<button className='setWaveButton'
+					onClick={ev => saveMainWave(waveParams)}
 					title='start using it' >
 				Set Wave
 			</button>

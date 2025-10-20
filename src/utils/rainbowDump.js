@@ -28,7 +28,7 @@ export function rainbowDump(wave, start, end, nPoints, title) {
 	for (let ix2 = start2; ix2 < end2; ix2 += 2) {
 		let mag = (wave[ix2] ** 2 + wave[ix2 + 1] ** 2) * correction;
 
-		let color = cx2rygb([wave[ix2], wave[ix2 + 1]]);
+		let color = cx2rygb({x: wave[ix2],y:  wave[ix2 + 1]});
 		color = `rgb(${color[0]*255}, ${color[1]*255}, ${color[2]*255})`;
 		console.log(`%c `, `background-color: ${color}; padding-right: ${mag+5}px; `);
 	}

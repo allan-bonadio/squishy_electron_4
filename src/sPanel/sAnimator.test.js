@@ -49,7 +49,7 @@ describe(`sAnimator recalcFrameMenuRates() `, () => {
 describe(`sAnimator findNearestMenuFreq`, () => {
 	let sAnim;
 	beforeAll(() => {
-		sAnim = new sAnimator({cPanel: null}, {grinder: {hadException: null}} );
+		sAnim = new sAnimator({cPanel: null}, {grinder: {hadException: null}}, 'glReddraw func' );
 	})
 
 	const tezts = [

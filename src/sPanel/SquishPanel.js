@@ -54,6 +54,10 @@ export class SquishPanel extends React.Component {
 			shouldBeIntegrating: getASetting('frameSettings', 'shouldBeIntegrating'),
 		};
 
+		// will be set by subcomponents
+		this.mainRepaint = null;
+		this.spectRepaint = null;
+
 		this.state = {
 			mainSceneClassName: DEFAULT_SCENE_NAME,
 
@@ -87,15 +91,17 @@ export class SquishPanel extends React.Component {
 	};
 
 	// these functions are passed in props to lower levels mostly for initialization.
-	// called once ONLY in control panel during setup
+	// called once ONLY in control panel during setup.  Either one can set space.
 	setCPContext = (cp) => {
 		this.setState({controlPanel: cp});
+		this.setState({space: cp.space});
 		this.contextObj.controlPanel = cp;
 	}
 
-	// called once ONLY in waveView during setup
+	// called once ONLY in waveView during setup  Either one can set space.
 	setWVContext = (wv) => {
 		this.setState({waveView: wv});
+		this.setState({space: wv.space});
 		this.contextObj.waveView = wv;
 	}
 
@@ -113,10 +119,9 @@ export class SquishPanel extends React.Component {
 			this.space = space;
 			this.setState({space});  // maybe i don't need this if it's in the context?
 			pointerContextMap.register(space.pointer, this.context);
+			this.animator = new sAnimator(this, space, this.setShouldBeIntegrating, this.glRepaint, this.spectrumRepaint);
 
-			this.animator = new sAnimator(this, space, this.setShouldBeIntegrating);
-
-			this.mainAvatar = space.mainAvatar;
+			//this.mainAvatar = space.mainAvatar;
 			this.grinder = space.grinder;
 			pointerContextMap.register(space.grinder.pointer, this.context);
 			//pointerContextMap.dump();
@@ -161,7 +166,7 @@ export class SquishPanel extends React.Component {
 	// ControlPanel but affects WaveView.  Should be implemented thru context TODO
 	repaintWholeMainWave = () => {
 		debugger;
-		let avatar = this.mainAvatar;
+		//let avatar = this.mainAvatar;
 		let grinder = this.grinder;
 
 		// trigger redrawing of WaveView cuz they're passed in via props
@@ -169,12 +174,12 @@ export class SquishPanel extends React.Component {
 		grinder.frameSerial = 0;
 
 		// directly redraw the GL
-		avatar.d0 = 0;
+		//avatar.d0 = 0;
 		this.animator.glRepaint();
 	}
 
-	setSPElement =
-	(spe) => { this.squishPanelEl = spe; }
+	setMainRepaint = (mainRepaint) => this.mainRepaint = mainRepaint;
+	setSpectRepaint = (spectRepaint) => this.spectRepaint = spectRepaint;
 
 	render() {
 		const p = this.props;
@@ -182,10 +187,11 @@ export class SquishPanel extends React.Component {
 
 		if (traceWidth) console.log(`👑 SquishPanel render, p.bodyWidth=${p.bodyWidth} = outerWidth `
 			+ ` body.clientWidth=${document.body.clientWidth}`);
-		const space = s.space;
 
 		// make sure the context object doesn't keep getting replaced by using the same one every time
+		// this is the crucial time when the contextObj changes and is passed down
 		this.contextObj.shouldBeIntegrating = s.shouldBeIntegrating;
+		this.contextObj.space = s.space;
 
 		return (
 			<SquishContext.Provider value={this.contextObj} >
@@ -195,6 +201,8 @@ export class SquishPanel extends React.Component {
 						animator={this.animator}
 						setWVContext={this.setWVContext}
 						setShouldBeIntegrating={this.setShouldBeIntegrating}
+						setMainRepaint={this.setMainRepaint}
+						setSpectRepaint={this.setSpectRepaint}
 						sPanel={this}
 					/>
 					<ControlPanel

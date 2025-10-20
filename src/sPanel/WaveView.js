@@ -53,6 +53,9 @@ export class WaveView extends React.Component {
 
 		setShouldBeIntegrating: PropTypes.func.isRequired,
 		sPanel: PropTypes.object.isRequired,
+
+		setMainRepaint: PropTypes.func,
+		setSpectRepaint: PropTypes.func,
 	};
 
 	constructor(props) {
@@ -141,7 +144,7 @@ export class WaveView extends React.Component {
 		this.space = space;  // for immediate access
 
 		this.grinder = space.grinder;
-		this.mainAvatar = space.mainAvatar;
+		//?? this.mainAvatar = space.mainAvatar;
 
 		// make room for the bumpers for WELL continuum (both sides).  Note that
 		// continuum can change only when page reloads.
@@ -206,18 +209,19 @@ export class WaveView extends React.Component {
 		// only need this when the WaveView outer dims change, either a user
 		// change height or window change width.  On that occasion, we have to adjust
 		// a lot, including resizing the canvas.
-		if (this.mainAvatar && (this.formerWidth != this.outerWidth
+		if ((this.formerWidth != this.outerWidth
 					|| this.formerHeight != s.outerHeight) ) {
+		// if (this.mainAvatar && (this.formerWidth != this.outerWidth
+		// 			|| this.formerHeight != s.outerHeight) ) {
 
 			//this.updateInnerDims();
 
 			// Size of window & canvas changed!  (or, will change soon)
 			if (traceDimensions) {
-				console.log(`🏄 wv Resizing  👀 mainAvatar=${this.mainAvatar.label}
+				console.log(`🏄 wv Resizing  👀
 					formerWidth=${this.formerWidth} ≟➔ outerWidth=${this.outerWidth}
 					formerHeight=${this.formerHeight} ≟➔ outerHeight=${s.outerHeight}
-					btw props.outerWidth=${this.props.outerWidth}
-					canvas: ${this.canvasNode.width}, ${this.canvasNode.height}`);
+					btw props.outerWidth=${this.props.outerWidth}`);
 			}
 
 			// trigger a render
@@ -296,6 +300,14 @@ export class WaveView extends React.Component {
 
 	/* ********************************************************* render */
 
+	setMainRepaint = (mainRepaint) => {
+		this.mainRepaint = mainRepaint;
+		this.props.setMainRepaint(mainRepaint);
+	};
+	setSpectRepaint = (spectRepaint) => {
+		this.spectRepaint = spectRepaint;
+		this.props.setSpectRepaint(spectRepaint);
+	};
 
 	render() {
 		const p = this.props;
@@ -323,6 +335,7 @@ export class WaveView extends React.Component {
 		// can't make a real GLScene until we have the space!
 		let glScene;
 		if (this.space) {
+			// this is the main wave, always
 			let sceneClassName = 'flatScene';
 			let sceneName = 'mainWave';
 
@@ -331,6 +344,7 @@ export class WaveView extends React.Component {
 				sceneClassName={sceneClassName} sceneName={sceneName}
 				canvasInnerWidth={this.canvasInnerWidth}
 				canvasInnerHeight={this.canvasInnerHeight}
+				setGLRepaint={this.setMainRepaint}
 				specialInfo={{bumperWidth: this.bumperWidth}}
 			/>;
 		}

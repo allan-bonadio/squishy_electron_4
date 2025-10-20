@@ -28,16 +28,17 @@ const MAX_rAF_PERIOD =  50;
 const round = Math.round;
 const abs = Math.abs;
 
-
+// This manages animation of the main glScene.  TODO: split off a version that works on any canvas
 // Note: the sAnimator is NOT a React Component!  Just an object created in the SquishPanel
 class sAnimator {
 
 	// spanel is SquishPanel
-	constructor(spanel, space, setShouldBeIntegrating) {
+	constructor(spanel, space, setShouldBeIntegrating, mainRepaint) {
 		this.sPanel = spanel;
 		this.space = space;
 		this.grinder = space.grinder;
 		this.setShouldBeIntegrating = setShouldBeIntegrating;
+		this.mainRepaint = mainRepaint;
 
 		this.frameProgress = 0;  // part of the FP stabilization
 		this.chosenFP = getASetting('frameSettings', 'chosenFP')
@@ -88,7 +89,7 @@ class sAnimator {
 		this.inteTimes.frameDrawPeriod = startDrawTime - this.inteTimes.prevDrawTime;
 		this.inteTimes.prevDrawTime = startDrawTime;
 
-		this.glRepaint();
+		this.mainRepaint();
 		this.showTimeNFrame();  // part of the draw time - the picoseconds and frame serial
 
 		// update dom elements in integration tab to latest stats (if it's been shown at least once)

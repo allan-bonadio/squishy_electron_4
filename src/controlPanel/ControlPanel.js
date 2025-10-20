@@ -301,7 +301,7 @@ export class ControlPanel extends React.Component {
 
 		mainFlick.setFamiliarWave(waveParams);  // eSpace does this initially
 
-		qeFuncs.grinder_copyFromAvatar(this.grinder.pointer, this.mainAvatar.pointer);
+		//qeFuncs.grinder_copyFromAvatar(this.grinder.pointer, this.mainAvatar.pointer);
 		this.props.repaintWholeMainWave();
 	}
 
