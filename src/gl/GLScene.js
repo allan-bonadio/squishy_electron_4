@@ -16,7 +16,7 @@ import {listOfSceneClasses} from './listOfSceneClasses.js';
 import glAmbiance from './glAmbiance.js';
 
 let traceSetup = false;
-let traceGeometry = true;
+let traceGeometry = false;
 
 // this one dumps large buffers
 let traceTooEarly = false;
@@ -40,10 +40,10 @@ function setPT() {
 		// Optional; omit if your scene is not affected by space.
 		space: PropTypes.object,
 
-	  // sAnimator - reserved for sAnimator, but I guess you
-	  // can make your own. This object will get the
-	  // glRepaint function attached.  Omit if your GLScene
-	  // doesn't animate.
+		// sAnimator - reserved for sAnimator, but I guess you
+		// can make your own. This object will get the
+		// glRepaint function attached. Omit if your GLScene
+		// doesn't animate.
 		animator: PropTypes.object,
 
 		// inner width & height of canvas
