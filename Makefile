@@ -4,7 +4,8 @@
 #
 
 quantumEngine/quantumEngine.js : quantumEngine/*.h quantumEngine/*.cpp  quantumEngine/*/*.*
-	cd quantumEngine; make
+	cd quantumEngine; make; cd ..
+	src/gl/cx2rygb/glTranslate.js
 
 clean :
 	cd quantumEngine; make clean; cd ..
