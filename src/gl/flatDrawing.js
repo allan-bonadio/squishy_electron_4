@@ -88,14 +88,15 @@ void main() {
 export class flatDrawing extends abstractDrawing {
 	constructor(scene) {
 		super(scene, 'flatDrawing');
+
+		// each point in the wave results in two vertices, top and wave.
+		// And each of those is four single floats going to the GPU
 		this.avatar = scene.avatar;
+		this.avatar.attachViewBuffer(0, null, 4, this.space.nPoints * 2, 'flat drawing');
 
 		this.vertexShaderSrc = vertexSrc;
 		this.fragmentShaderSrc = fragmentSrc;
 
-		// each point in the wave results in two vertices, top and wave.
-		// And each of those is four single floats going to the GPU
-		this.avatar.attachViewBuffer(0, null, 4, this.space.nPoints * 2, 'flat drawing');
 		//console.log(`attachViewBuffer on scene ${scene.sceneName}`);
 	}
 
@@ -108,7 +109,8 @@ export class flatDrawing extends abstractDrawing {
 
 		// normally autoranging would put the highest peak at the exact bottom.
 		// but we want some extra space.  not much.
-		const vertStretch = 0.7;  // not sure why
+		const vertStretch = 1.0;  // not sure why
+		//const vertStretch = 0.7;  // not sure why
 		const PADDING_ON_BOTTOM = 1.02 * vertStretch;
 
 		this.maxHeightUniform = new drawingUniform('maxHeight', this,
