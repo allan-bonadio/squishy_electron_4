@@ -33,7 +33,7 @@ const DEFAULT_SCENE_NAME = 'flatScene';
 
 /* ************************************************ construction & reconstruction */
 
-export class SquishPanel extends React.Component {
+class SquishPanel extends React.Component {
 	static propTypes = {
 		id: PropTypes.string.isRequired,
 		bodyWidth: PropTypes.number.isRequired,
@@ -69,6 +69,10 @@ export class SquishPanel extends React.Component {
 			controlPanel: {},
 			waveView: {},
 		};
+
+		// animator will still need grinder, mainRepaint() and context,
+		// which don't exist yet.  Each will be on this.whatever
+		this.animator = new sAnimator(this, this.setShouldBeIntegrating);
 
 		if (traceSquishPanel) console.log(`👑 SquishPanel constructor done`);
 	}
@@ -119,12 +123,15 @@ export class SquishPanel extends React.Component {
 			this.space = space;
 			this.setState({space});  // maybe i don't need this if it's in the context?
 			pointerContextMap.register(space.pointer, this.context);
-			this.animator = new sAnimator(this, space, this.setShouldBeIntegrating, this.glRepaint, this.spectrumRepaint);
 
 			//this.mainAvatar = space.mainAvatar;
 			this.grinder = space.grinder;
 			pointerContextMap.register(space.grinder.pointer, this.context);
 			//pointerContextMap.dump();
+			this.animator.grinder = this.grinder;
+			this.animator.space = this.space;
+			this.animator.context = this.context;
+			//debugger;
 
 			// somebody needs to start this going if it was already on last time
 			// but wait till everything is ready.  TODO: should do this in a sync
@@ -175,23 +182,31 @@ export class SquishPanel extends React.Component {
 
 		// directly redraw the GL
 		//avatar.d0 = 0;
-		this.animator.glRepaint();
+		this.mainRepaint();
 	}
 
-	setMainRepaint = (mainRepaint) => this.mainRepaint = mainRepaint;
-	setSpectRepaint = (spectRepaint) => this.spectRepaint = spectRepaint;
+	setMainRepaint = (mainRepaint) => {
+		if (this.mainRepaint) return;
+		this.mainRepaint = this.animator.mainRepaint = mainRepaint;
+	};
+	setSpectRepaint = (spectRepaint) => {
+		if (this.spectRepaint) return;
+		this.spectRepaint = this.animator.spectRepaint = spectRepaint;
+	};
 
 	render() {
 		const p = this.props;
 		const s = this.state;
 
-		if (traceWidth) console.log(`👑 SquishPanel render, p.bodyWidth=${p.bodyWidth} = outerWidth `
-			+ ` body.clientWidth=${document.body.clientWidth}`);
+		if (traceWidth)
+			console.log(`👑 SquishPanel render, p.bodyWidth=${p.bodyWidth} = outerWidth `
+				+ ` body.clientWidth=${document.body.clientWidth}`);
 
 		// make sure the context object doesn't keep getting replaced by using the same one every time
 		// this is the crucial time when the contextObj changes and is passed down
 		this.contextObj.shouldBeIntegrating = s.shouldBeIntegrating;
 		this.contextObj.space = s.space;
+		//debugger;
 
 		return (
 			<SquishContext.Provider value={this.contextObj} >
