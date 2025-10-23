@@ -126,7 +126,7 @@ export default class ResolutionDialog extends React.Component {
 			powerIndex: +powerIndex,
 			N: +N,
 		});
-		console.info(`handleResChange, not effective yet (N=${N}, powerIndex=${powerIndex}) `)
+		console.log(`handleResChange, not effective yet (N=${N}, powerIndex=${powerIndex}) `)
 	}
 
 	// Endless or Well
