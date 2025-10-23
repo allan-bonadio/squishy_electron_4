@@ -318,7 +318,7 @@ export class voltDisplay {
 		this.setBottomVolts(this.bottomVolts + distance);
 
 		if (traceScrolling)
-			console.info(`userScroll(frac=${frac}) => bottomVolts=${this.bottomVolts}`);
+			console.log(`userScroll(frac=${frac}) => bottomVolts=${this.bottomVolts}`);
 	}
 
 	// called when human zooms in or out.  pass +1 or -1.  heightVolts expands

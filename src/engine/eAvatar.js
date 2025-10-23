@@ -25,7 +25,8 @@ class eAvatar {
 	// create An eAvatar complete with its inner qAvatar.  (zero buffers)
 	// use this if you're doing something other than the original  space's avatars
 	static createAvatar(avatarBreed, label) {
-		console.log(`🚦 createAvatar: avatarBreed=${avatarBreed} lab='${label}'`);
+		if (traceCreation)
+			console.log(`🚦 createAvatar: avatarBreed=${avatarBreed} lab='${label}'`);
 		let qA = qeFuncs.avatar_create(avatarBreed, label);
 		return new eAvatar(qA);
 	}
@@ -33,6 +34,8 @@ class eAvatar {
 	// given a pointer to a qAvatar, return  an eAvatar that wraps it.
 	// Including existing buffers.
 	static adaptAvatar(pointer) {
+		if (traceCreation)
+			console.log(`🚦 adaptAvatar lab='${UTF8ToString(this._label, qeConsts.MAX_LABEL_LEN)}'`);
 		let av = new eAvatar(pointer);
 		av.wrapViewBuffers();
 		return av;

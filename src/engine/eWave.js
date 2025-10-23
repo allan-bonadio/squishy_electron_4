@@ -12,7 +12,7 @@ import rainbowDump from '../utils/rainbowDump.js';
 
 let traceSetFamiliarWave = false;
 let traceGaussian = false;
-let traceFamiliarResult = true;
+let traceFamiliarResult = false;
 let traceAllocate = false;
 
 const _ = num => num.toFixed(4).padStart(9);

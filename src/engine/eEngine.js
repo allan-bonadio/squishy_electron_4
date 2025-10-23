@@ -29,7 +29,7 @@ function resetSpaceCreatedPromise() {
 		eSpaceCreatedSucceed = succeed;
 		eSpaceCreatedFail = fail;
 		if (tracePromises)
-			console.info(`🐥 eSpaceCreatedPromise (re)created:`, succeed, fail);
+			console.log(`🐥 eSpaceCreatedPromise (re)created:`, succeed, fail);
 	});
 	if (traceStartup)
 		console.log(`spaceCreatedPromise 🐣 ... created but NOT YET RESOLVED`);

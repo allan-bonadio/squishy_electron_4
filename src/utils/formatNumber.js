@@ -143,7 +143,7 @@ export function formatAsPO2Rational(n, normalAscii) {
 // // 			let frac = m[2] / m[3];
 // // 			if (m[1]) frac = -frac;
 // //
-// // 			console.info(`num/denom=${frac}  m=`, m)
+// // 			console.log(`num/denom=${frac}  m=`, m)
 // // 			if (frac != n) console.error(`errror with fraction ${n}: '${f}' instead`);
 // // 		}
 // // 		else {

@@ -41,7 +41,7 @@ this isnt right whats that secondargument?
 		let n;
 		for (n = 1e-6; n < 1e6; n *= 10) {
 			for (let f = 1; f < 10; f *= 1.4)
-				console.info(`  testThousands, progressive fractions: ${n*f} =>`,
+				console.log(`  testThousands, progressive fractions: ${n*f} =>`,
 					thousandsSpaces(n * f));
 			console.log();
 		}
@@ -56,7 +56,7 @@ this isnt right whats that secondargument?
 		let n;
 		for (n = 1e-6; n < 1e6; n *= 10) {
 			for (let f = 1; f < 10; f *= 1.4)
-				console.info(`  testThousands, progressive fractions: ${n*f} =>`,
+				console.log(`  testThousands, progressive fractions: ${n*f} =>`,
 					thousandsSpaces(n * f));
 			console.log();
 		}
@@ -72,7 +72,7 @@ this isnt right whats that secondargument?
 		for (let spdStr in stepsPerDecadeStepFactors) {
 			const spd = +spdStr;
 			let stepFactors = stepsPerDecadeStepFactors[spd];
-			console.info(`spd: ${spd}  stepFactors:`, stepFactors.map(f => f.toFixed(2)).join(', ') );
+			console.log(`spd: ${spd}  stepFactors:`, stepFactors.map(f => f.toFixed(2)).join(', ') );
 
 			for (let offset = -6; offset < 6; offset += spd) {
 				let totalOffset = spd*offset;
@@ -80,7 +80,7 @@ this isnt right whats that secondargument?
 					let ix = ixNear + totalOffset;
 					let power = indexToPower(false, stepFactors, spd, ix);
 					let ixBack = powerToIndex(spd, power);
-					console.info(`   ${ix} ➡︎ ${power} ➡ ${ixBack}`);
+					console.log(`   ${ix} ➡︎ ${power} ➡ ${ixBack}`);
 					if (ix != ixBack)
 						console.error(`  ix:${ix} ≠ ixBack:${ixBack}`);
 				})

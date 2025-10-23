@@ -18,7 +18,7 @@ export function dumpJsStack(where = 'somewhere') {
 		.replace(/^.*\n.*at dumpJsStack.*\n/, '\n')
 		.replace(/Error: /, '\n')
 		.substr(0, 500)
-	console.info(`\n${where} traceback: ${tb}`);
+	console.log(`\n${where} traceback: ${tb}`);
 }
 window.dumpJsStack = dumpJsStack;
 
@@ -32,7 +32,8 @@ class cppError extends Error {
 	constructor(exNumber) {
 		super('from C++: ' + window.UTF8ToString(qeFuncs.getCppExceptionMessage(exNumber)));
 
-		console.info(`🧯 cppError(${exNumber}) =>`, window.UTF8ToString(qeFuncs.getCppExceptionMessage(exNumber)));
+		console.log(`🧯 cppError(${exNumber}) =>`,
+			window.UTF8ToString(qeFuncs.getCppExceptionMessage(exNumber)));
 		this.exPointer = exNumber;
 	}
 

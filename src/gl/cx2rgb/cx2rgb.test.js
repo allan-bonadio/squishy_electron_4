@@ -19,7 +19,7 @@ function testOne(angle, expected) {
 	let cx = {x: Math.cos(angle * Math.PI / 180), y: Math.sin(angle * Math.PI / 180)};
 
 	const actual = cx2rgb(cx);
-	if (traceConfirm) console.info(`cx2rgb: ${angle}°`+
+	if (traceConfirm) console.log(`cx2rgb: ${angle}°`+
 		` = [${cx.x.toFixed(4)},${cx.y.toFixed(4)}]`+
 		` => (${actual.r.toFixed(6)}, ${actual.g.toFixed(6)}, ${actual.b.toFixed(6)})`);
 

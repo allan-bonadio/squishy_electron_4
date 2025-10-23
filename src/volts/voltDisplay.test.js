@@ -40,7 +40,7 @@ let vDisp;  // typically a voltDisplay to go with volts16
 
 describe(`findVoltExtremes() method`, () => {
 	beforeEach(() => {
-		 //console.info(`findVoltExtremes() method`);
+		 //console.log(`findVoltExtremes() method`);
 		// shouldn't matter what the settings passed in are
 		volts16 = new Float64Array(16);  // all zeroes, right?
 		// TODO: should also test well continuum!
