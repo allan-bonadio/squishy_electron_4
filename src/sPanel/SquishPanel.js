@@ -72,7 +72,7 @@ class SquishPanel extends React.Component {
 
 		// animator will still need grinder, mainRepaint() and context,
 		// which don't exist yet.  Each will be on this.whatever
-		this.animator = new sAnimator(this, this.setShouldBeIntegrating);
+		this.animator = new sAnimator(this, this.setShouldBeIntegrating, this.getContext);
 
 		if (traceSquishPanel) console.log(`👑 SquishPanel constructor done`);
 	}
@@ -84,15 +84,21 @@ class SquishPanel extends React.Component {
 	// this should be the only way to set sbi.  Note does NOT trigger!
 	setShouldBeIntegrating = (sbi) => {
 		this.setState({shouldBeIntegrating: sbi});
-		if (this.grinder) {
-			this.grinder.shouldBeIntegrating = sbi;
-			if (sbi)
-				this.grinder.triggerIteration();
-		}
 
 		storeASetting('frameSettings', 'shouldBeIntegrating', sbi);
 		console.trace(`👑 called setShouldBeIntegrating(${sbi})`);
 	};
+
+	componentDidUpdate() {
+		// when it really starts integrating
+		if (this.grinder) {
+			const sbi = this.state.shouldBeIntegrating;
+			this.grinder.shouldBeIntegrating = sbi;
+			if (sbi)
+				this.grinder.triggerIteration();
+			console.log(`👑  shouldBeIntegrating ${sbi} and ${this.grinder.shouldBeIntegrating} now in effect\n \n \n \n `);
+		}
+	}
 
 	// these functions are passed in props to lower levels mostly for initialization.
 	// called once ONLY in control panel during setup.  Either one can set space.
@@ -108,6 +114,8 @@ class SquishPanel extends React.Component {
 		this.setState({space: wv.space});
 		this.contextObj.waveView = wv;
 	}
+
+	getContext = () => this.contextObj;
 
 	/* ****************************************** space & wave creation */
 
@@ -167,12 +175,11 @@ class SquishPanel extends React.Component {
 
 
 	/* ******************************************************* rendering */
-	// Base function that draws the WebGL, whether during iteration, or during
-	// idle times if waveParams change. call this when you change both the GL and iter
-	// and elapsed time. We need it here in SquishPanel cuz it's often called in
+	// Base function that draws the WebGL after waveParams change.
+	// We need it here in SquishPanel cuz it's often called in
 	// ControlPanel but affects WaveView.  Should be implemented thru context TODO
-	repaintWholeMainWave = () => {
-		debugger;
+	resetAndRepaintMainWave = () => {
+		//debugger;
 		//let avatar = this.mainAvatar;
 		let grinder = this.grinder;
 
@@ -181,10 +188,11 @@ class SquishPanel extends React.Component {
 		grinder.frameSerial = 0;
 
 		// directly redraw the GL
-		//avatar.d0 = 0;
 		this.mainRepaint();
 	}
 
+	// we need the repaint func for the main canvas, and (someday) the spectrum canvas
+	// GLScene will pass that up when they get rendered
 	setMainRepaint = (mainRepaint) => {
 		if (this.mainRepaint) return;
 		this.mainRepaint = this.animator.mainRepaint = mainRepaint;
@@ -193,6 +201,8 @@ class SquishPanel extends React.Component {
 		if (this.spectRepaint) return;
 		this.spectRepaint = this.animator.spectRepaint = spectRepaint;
 	};
+
+	setSPElement = (el) => this.squishPanelEl = el;
 
 	render() {
 		const p = this.props;
@@ -221,7 +231,7 @@ class SquishPanel extends React.Component {
 						sPanel={this}
 					/>
 					<ControlPanel
-						repaintWholeMainWave={this.repaintWholeMainWave}
+						resetAndRepaintMainWave={this.resetAndRepaintMainWave}
 
 						iStats={this.iStats}
 						animator={this.animator}

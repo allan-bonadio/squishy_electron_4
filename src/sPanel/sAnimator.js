@@ -5,7 +5,7 @@
 
 import ControlPanel from '../controlPanel/ControlPanel.js';
 import {interpretCppException} from '../utils/errors.js';
-import SquishPanel from './SquishPanel.js';
+//import SquishPanel from './SquishPanel.js';
 import CommonDialog from '../widgets/CommonDialog.js';
 import {getASetting} from '../utils/storeSettings.js';
 import {thousands, thousandsSpaces} from '../utils/formatNumber.js';
@@ -16,7 +16,8 @@ let traceTheViewBuffer = false;
 let traceHeartbeats = false;
 let traceFrameProgress = false;
 let traceFrameMenuRates = false;
-let traceSingleFrame = false;
+let traceSingleFrame = true;
+let traceIntegration = true;
 
 let tracerAFPeriod = false;
 let traceTypicalVideoPeriod = false;
@@ -32,17 +33,17 @@ const abs = Math.abs;
 // Note: the sAnimator is NOT a React Component!  Just an object created in the SquishPanel
 class sAnimator {
 
-	// spanel is SquishPanel
-	constructor(spanel, space, setShouldBeIntegrating, mainRepaint) {
-		this.sPanel = spanel;
-		this.space = space;
-		this.grinder = space.grinder;
+	// sqPanel is SquishPanel actual component obj
+	constructor(sqPanel, setShouldBeIntegrating, getContext) {
+		this.sqPanel = sqPanel;
 		this.setShouldBeIntegrating = setShouldBeIntegrating;
-		this.mainRepaint = mainRepaint;
+		this.getContext = getContext;
+
+		// will still need grinder, mainRepaint(), available later in SquishPanel
 
 		this.frameProgress = 0;  // part of the FP stabilization
 		this.chosenFP = getASetting('frameSettings', 'chosenFP')
-		this.nFramesToGo = -1;
+		this.nFramesToGo = 0;
 
 		// defaults - will work until set by real life
 		this.avgVideoFP = 1000 / 60;
@@ -62,6 +63,7 @@ class sAnimator {
 		// advance forward with each iter.  NOT SAME as shown on WaveView!
 		this.runningCycleElapsedTime = 0;
 		this.runningCycleIntegrateSerial = 0;
+
 		// eslint-disable-next-line
 		this.allowRunningDiagnosticCycle = /allowRunningDiagnosticCycle/.test(location.search);
 	}
@@ -81,7 +83,8 @@ class sAnimator {
 			ne.innerHTML =  tnf.frameSerialText;
 	}
 
-	// Repaint, with webgl, the waveview.  (not render!)  Also,, update integration statistics.
+	// Repaint, with webgl, the latest waveview.
+	// Measure how long it takes to paint; update integration statistics.
 	drawLatestFrame() {
 		//if (traceStats) console.log(`🎥 time since last tic: ${performance.now()
 		//		- this.inteTimes.startIntegrationTime}ms`);
@@ -89,7 +92,7 @@ class sAnimator {
 		this.inteTimes.frameDrawPeriod = startDrawTime - this.inteTimes.prevDrawTime;
 		this.inteTimes.prevDrawTime = startDrawTime;
 
-		this.mainRepaint();
+		this.mainRepaint?.();   // mainRepaint() func won't be here until GLScene renders
 		this.showTimeNFrame();  // part of the draw time - the picoseconds and frame serial
 
 		// update dom elements in integration tab to latest stats (if it's been shown at least once)
@@ -103,6 +106,16 @@ class sAnimator {
 
 		this.continueRunningDiagnosticCycle();
 	}
+
+	// do the paint showing new frame
+	rAFPaint() {
+		// this is turned on after each frame is ground, in c++.  but only if it's ground.
+		if (!this.grinder.needsRepaint) return;
+
+		this.drawLatestFrame();
+		this.grinder.needsRepaint = false;
+	}
+
 
 	/* ************************************************ Frame timing */
 
@@ -167,22 +180,22 @@ class sAnimator {
 	/* ********************************************************* single frame */
 
 	// call when human clicks on Single Frame button, with n of frames they asked for
-	singleFrame = (nFrames) => {
-		console.log(`🎥 sAnimator singleFrame starts with '${nFrames}'`);
+	startSingleFrame = (nFrames) => {
+		console.log(`🎥 sAnimator startSingleFrame starts with '${nFrames}'`);
 		this.setShouldBeIntegrating(true);
 		this.nFramesToGo = nFrames - 1;
 
 		if (traceSingleFrame) console.log(`🎥  sAnimator singleFrame,`
 			+` nFramesToGo=${this.nFramesToGo}, `
-			+` ctx.shouldBeIntegrating=${this.context.shouldBeIntegrating}, `
-			+` gr.shouldBeIntegrating=${this.grinder.shouldBeIntegrating}, `
-			+`isIntegrating=${this.grinder.isIntegrating}   `);
+			+` this.shouldBeIntegrating=${this.shouldBeIntegrating}, `
+			+` gr.shouldBeIntegrating=${this.grinder?.shouldBeIntegrating}, `
+			+`isIntegrating=${this.grinder?.isIntegrating}   `);
 	}
 
-	/* *************************************  the heartbeat */
-	// start to jiggle whole screen if starting to diverge.  Directly, not thru React
+	/* *************************************  divergence */
+	// start to jiggle whole squishPanel if starting to diverge.  Directly, not thru React
 	divergenceJiggle(divergence)  {
-		let sps = this.sPanel.squishPanelEl.style;
+		let sps = this.sqPanel.squishPanelEl.style;
 		if (divergence == 0) {
 			sps.marginLeft = sps.marginRight = sps.marginTop = sps.marginBottom = '0';
 			return;
@@ -197,98 +210,116 @@ class sAnimator {
 		sps.marginBottom = '-'+ jTop;
 	}
 
+	// jiggle the SP if it starts to diverge
+	rAFDivergence() {
+		if (this.grinder.divergence <= 10) return;
+
+		// normally we don't go thru this overhead, but it's diverging
+		if (this.shouldBeIntegrating)
+			this.divergenceJiggle(this.grinder.divergence);
+		else
+			this.divergenceJiggle(0);  // make sure it's off
+	}
+
+	/* *************************************  exceptions */
+	// handle any mishaps (prob in the C++) during the cycle
+	rAFExceptions() {
+		if (!this.grinder.hadException) return;
+
+		// an error (eg divergence) will halt integration.  Start Over will put it back.
+		console.log(`🎥 sAnimator: hadException   will dialog`);
+		this.context.controlPanel.stopAnimating();
+		this.errorMessage = qeFuncs.grinder_getExceptionMessage(grinder.pointer);
+		if (!this.errorMessage) this.errorMessage = 'sorry, no message.  🫦 🥺';
+		console.error(`had Exception!  '${this.errorMessage}'  ex=${this.grinder.hadException} `);
+		debugger;  // won't stop if we're not in the debugger
+		const ex = new Error(this.errorMessage);
+		ex.code  = UTF8ToString(grinder._exceptionCode);
+
+		this.divergenceJiggle(0);  // stop it
+
+		// throwing in the rAF handler is problematic, but a dialog isn't.
+		CommonDialog.openErrorDialog({message: this.errorMessage},
+			`while integrating Schrodinger's`);
+		grinder.hadException = false;
+	}
+
+	// do the grind for this time around
+	rAFIntegrate() {
+		if (!this.context.shouldBeIntegrating) return;
+
+		// do the integration, one  frame
+		this.frameProgress += this.avgVideoFP;
+
+		if (traceIntegration)
+			console.log(`🎥 frameProgress (${this.frameProgress}) vs  chosenFP (${this.chosenFP})`);
+
+		// singleFrame - are we at the end?
+		if (traceSingleFrame)
+			console.log(`🎥 singleFrame - are we at the end?  nFramesToGo=${this.nFramesToGo}`);
+		if (this.nFramesToGo) {
+			this.grinder.triggerIteration();
+			// 'single' frames - whatever the count is.  or we just go around again
+			if (0 == this.nFramesToGo--) {
+				// we're done
+				this.context.controlPanel.stopAnimating();
+				if (traceSingleFrame) console.log(`🎥 stopped single frame 🟥`);
+			}
+		}
+		else {
+			// time for another normal iteration.  Trigger the threads.
+			this.grinder.triggerIteration();
+			if (traceIntegration)
+				console.log(`🎥 another normal integration frame done `
+					+`at ${performance.now() & 16383} arbitrary ms`);
+		}
+
+	}
+
+	// do one frame
+	rAFFrame() {
+		this.context = this.getContext();
+		if (this.grinder) {
+			this.rAFDivergence();
+			this.rAFExceptions();
+			this.rAFIntegrate();
+			this.rAFPaint();
+		}
+	}
+
 	rAFHandler =
 	now => {
 		this.measureAndUpdateVideoFP(now);  // must measure  rAF frequency always
 
-		// sometimes these can pile up on the stack or list of threads or something
-		// so here, if one already started, return quickly from any new ones that get started
-		if (this.alreadyRAF) {
-			console.log(`skipping RAF beat`);
-			return;
-		}
-		this.alreadyRAF = true;
+		if (this.frameProgress >= this.chosenFP) {
+			// we only get here every chosenFP ms
 
-		const grinder = this.grinder;
+			// sometimes (debugger) these can pile up on the stack or list of threads or something
+			// so here, if one already started, return quickly from any new ones that get started
+			if (this.alreadyRAF) {
+				console.log(`skipping RAF beat`);
+				debugger;  // this doesn't do anything
+				return;
+			}
+			this.alreadyRAF = true;
 
-		if (grinder.divergence > 10) {
-			// normally we don't go thru this overhead, but it's diverging
-			if (this.context?.shouldBeIntegrating)
-				this.divergenceJiggle(grinder.divergence);
-			else
-				this.divergenceJiggle(0);  // make sure it's off
-		}
+			this.rAFFrame();
 
-		// an error (eg divergence) will halt integration.  Start Over will put it back.
-		if (grinder.hadException) {
-			console.log(`🎥 sAnimator: hadException   will dialog`);
-			this.context.controlPanel.stopAnimating();
-			this.errorMessage = qeFuncs.grinder_getExceptionMessage(grinder.pointer);
-			if (!this.errorMessage) this.errorMessage = 'sorry, no message.  🫦 🥺';
-			console.error(`had Exception!  '${this.errorMessage}'  ex=${this.grinder.hadException} `);
-			debugger;  // won't stop if we're not in the debugger
-			const ex = new Error(this.errorMessage);
-			ex.code  = UTF8ToString(grinder._exceptionCode);
-
-			this.divergenceJiggle(0);
-
-			// throwing in the rAF handler is problematic, but a dialog isn't.
-			CommonDialog.openErrorDialog({message: this.errorMessage},
-				`while integrating Schrodinger's`);
-			grinder.hadException = false;
-		}
-
-		if (traceFrameProgress) {
-			let da = new Date();
-			let time = da.getSeconds() + da.getMilliseconds() / 1e3;
-			if (da.getMilliseconds() < 14) {
-				console.log(`🎥 b4 needsRepaint=${grinder.needsRepaint} latest frame `
-					+ `nFramesToGo=${this.nFramesToGo} `
-					+ `frameSerial=${this.frameSerial} at :${time.toFixed(3)} seconds (wall)`,
-					this.context, this.context?.controlPanel);
+			// even if the chosenFP doesn't evenly divide by videoFP,
+			// this'll do it (approximately) right.  Leftovers goes into next period.
+			// you might get like chosen/video = 6 6 5 6 6 6 5 6 6 5 but user won't notice
+			this.frameProgress -= this.chosenFP
+			if (traceFrameProgress) {
+				let da = new Date();
+				let time = da.getSeconds() + da.getMilliseconds() / 1e3;
+				console.log(`🎥 after grind frameProgress=${this.frameProgress}  `
+					+ `chosenFP=${this.chosenFP} at :${time.toFixed(3)} `
+					+ `nFramesToGo=${this.nFramesToGo}`);
 			}
 		}
-
-		if (this.context?.shouldBeIntegrating) {    // && qeConsts.FASTEST != this.chosenFP
-			// do the integration, if on a numerical frame rate.
-			// NOT fastest, so integration is only triggered according to the chosen rate
-			this.frameProgress += this.avgVideoFP;
-
-			if (this.frameProgress >= this.chosenFP) {
-				// singleFrame - are we at the end?
-				if (0 == this.nFramesToGo--) {
-					// nFramesToGo next time will become -1 and then more negative
-					this.context.controlPanel?.stopAnimating?.();
-					if (traceSingleFrame) console.log(`🎥 stop single frame 🟥`);
-				}
-				else {
-					// time for another grind.  Trigger the threads.
-					this.grinder.triggerIteration();
-					if (traceSingleFrame) console.log(`🎥 another frame ${this.nFramesToGo >= 0 ? this.nFramesToGo : ''}`);
-				}
-
-				// even if the chosenFP doesn't evenly divide by videoFP,
-				// this'll do it (approximately) right.  Leftovers goes into next period.
-				// you might get like chosen/video = 6 6 5 6 6 6 5 6 6 5 but user won't notice
-				this.frameProgress -= this.chosenFP
-				if (traceFrameProgress) {
-					let da = new Date();
-					let time = da.getSeconds() + da.getMilliseconds() / 1e3;
-					console.log(`🎥 after grind frameProgress=${this.frameProgress}  `
-						+ `chosenFP=${this.chosenFP} at :${time.toFixed(3)} `
-						+ `nFramesToGo=${this.nFramesToGo}`);
-				}
-			}
-		}
-
-		// this is turned on after each frame is ground, in c++.  but only if it's ground.
-		if (grinder.needsRepaint) {
-			this.drawLatestFrame();
-			grinder.needsRepaint = false;
-		}
-
-		requestAnimationFrame(this.rAFHandler);
+		this.frameProgress += this.avgVideoFP;
 		this.alreadyRAF = false;
+		requestAnimationFrame(this.rAFHandler);
 	}
 
 	/* *************************************  runningDiagnosticCycle of circular wave*/

@@ -26,7 +26,7 @@ import StartStopOverlay from './StartStopOverlay.js';
 import resizeIcon from './waveViewIcons/resize.png';
 
 let traceBumpers = false;
-let traceDimensions = true;
+let traceDimensions = false;
 let traceDragCanvasHeight = false;
 let traceHover = false;
 let traceContext = false;
@@ -78,7 +78,11 @@ export class WaveView extends React.Component {
 		// make the proptypes shuddup about it being undefined
 		this.mainVDisp = null;
 
-		eSpaceCreatedPromise.then(this.handleSpacePromise,
+		this.animator = this.props.animator;
+
+		eSpaceCreatedPromise.then(
+			this.handleSpacePromise,  // call this with (space)
+
 			// catch
 			ex => {
 				console.error(`eSpaceCreatedPromise failed:`, ex.stack ?? ex.message ?? ex);
@@ -144,7 +148,10 @@ export class WaveView extends React.Component {
 		this.space = space;  // for immediate access
 
 		this.grinder = space.grinder;
-		//?? this.mainAvatar = space.mainAvatar;
+
+		const ani = this.props.animator;
+		if (ani && !ani.grinder)
+			ani.grinder = this.grinder;
 
 		// make room for the bumpers for WELL continuum (both sides).  Note that
 		// continuum can change only when page reloads.
@@ -191,15 +198,15 @@ export class WaveView extends React.Component {
 // 		}
 // 	}
 
-	componentDidMount() {
-		let wv = this.context?.waveView;
-		if (!wv || wv.space)
-			return;
-
-		//this.setUpContext();
-		//wv.space = {};
-		console.log(`🏄  WaveView componentDidMount context: `, this.context);
-	}
+	//componentDidMount() {
+	//	let wv = this.context?.waveView;
+	//	if (!wv || wv.space)
+	//		return;
+	//
+	//	//this.setUpContext();
+	//	//wv.space = {};
+	//	console.log(`🏄  WaveView componentDidMount context: `, this.context);
+	//}
 
 	componentDidUpdate() {
 		const p = this.props;
@@ -209,11 +216,7 @@ export class WaveView extends React.Component {
 		// only need this when the WaveView outer dims change, either a user
 		// change height or window change width.  On that occasion, we have to adjust
 		// a lot, including resizing the canvas.
-		if ((this.formerWidth != this.outerWidth
-					|| this.formerHeight != s.outerHeight) ) {
-		// if (this.mainAvatar && (this.formerWidth != this.outerWidth
-		// 			|| this.formerHeight != s.outerHeight) ) {
-
+		if ((this.formerWidth != this.outerWidth || this.formerHeight != s.outerHeight) ) {
 			//this.updateInnerDims();
 
 			// Size of window & canvas changed!  (or, will change soon)
@@ -245,7 +248,7 @@ export class WaveView extends React.Component {
 		this.resizing = true;
 		this.yOffset = round(this.state.outerHeight - ev.pageY);
 		if (traceDragCanvasHeight)
-			console.info(`🏄 resizePointer down ${ev.pageX} ${ev.pageY} offset=${this.yOffset}`);
+			console.log(`🏄 resizePointer down ${ev.pageX} ${ev.pageY} offset=${this.yOffset}`);
 		ev.target.setPointerCapture(ev.pointerId);
 		ev.preventDefault();
 		ev.stopPropagation();
@@ -261,7 +264,7 @@ export class WaveView extends React.Component {
 			this.setState({outerHeight: vHeight});
 		storeASetting('miscSettings', 'waveViewHeight', vHeight);
 		if (traceDragCanvasHeight)
-			console.info(`🏄 resizePointer drag ${ev.pageX} ${ev.pageY}  newheight=${ev.pageY + this.yOffset}`);
+		console.log(`🏄 resizePointer drag ${ev.pageX} ${ev.pageY}  newheight=${ev.pageY + this.yOffset}`);
 
 		ev.preventDefault();
 		ev.stopPropagation();
@@ -272,7 +275,7 @@ export class WaveView extends React.Component {
 	resizePointerUp =
 	ev => {
 		if (traceDragCanvasHeight)
-			console.info(`🏄 resizePointer up ${ev.pageX} ${ev.pageY}`);
+		console.log(`🏄 resizePointer up ${ev.pageX} ${ev.pageY}`);
 		this.resizing = false;
 		ev.preventDefault();
 		ev.stopPropagation();
@@ -300,22 +303,21 @@ export class WaveView extends React.Component {
 
 	/* ********************************************************* render */
 
+	// pass along the vital repaint functions
 	setMainRepaint = (mainRepaint) => {
-		this.mainRepaint = mainRepaint;
+		this.mainRepaint ??= mainRepaint;
 		this.props.setMainRepaint(mainRepaint);
+		this.animator.mainRepaint ??= mainRepaint;
 	};
 	setSpectRepaint = (spectRepaint) => {
-		this.spectRepaint = spectRepaint;
+		this.spectRepaint ??= spectRepaint;
 		this.props.setSpectRepaint(spectRepaint);
+		this.animator.spectRepaint ??= spectRepaint;
 	};
 
 	render() {
 		const p = this.props;
 		const s = this.state;
-
-		// can't figure out when else to do it
-		if (this.props.animator)
-			this.props.animator.context = this.context;
 
 		if (traceContext && this.context) {
 			console.log(`🏄 WaveView Render context:`, this.context);
@@ -340,8 +342,9 @@ export class WaveView extends React.Component {
 			let sceneName = 'mainWave';
 
 			glScene = <GLScene
-				space={s.space} animator={this.props.animator}
+				space={s.space} animator={this.animator}
 				sceneClassName={sceneClassName} sceneName={sceneName}
+				inputInfo={this.space.mainFlick}
 				canvasInnerWidth={this.canvasInnerWidth}
 				canvasInnerHeight={this.canvasInnerHeight}
 				setGLRepaint={this.setMainRepaint}
