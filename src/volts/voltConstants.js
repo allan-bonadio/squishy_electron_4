@@ -25,9 +25,6 @@ export let VALLEY_FACTOR = 1e-5;
 // Adjust this subjectively to fit.
 export let SLOT_FACTOR = 1e-5;
 
-// for debugging
-window.adjustVC = () => {debugger};
-
 // size of the size box at lower right of canvas.
 //  Sorry these aren't proportional to font size.
 export const SIZE_BOX_SIZE = 24;

@@ -7,6 +7,10 @@ import PropTypes, {checkPropTypes} from 'prop-types';
 
 import qeFuncs from '../engine/qeFuncs.js';
 
+// for debugging - will stop a runaway app i think
+window.stopMe = () => {debugger};
+
+
 /* ****************************************************** diagnostics */
 
 // this is global so we can use it anywhere in JS
