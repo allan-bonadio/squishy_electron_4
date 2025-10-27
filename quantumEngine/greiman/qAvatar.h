@@ -54,7 +54,7 @@ struct qAvatar {
 	// populates the viewBuffers; depends on avatarBreed.  You can use your own
 	// independent load function; it's not rocket science.
 	// for WaveView, transcribes the complex double numbers (2x8 = 16by) in qwave
-	void loadViewBuffers(int breed);
+	//void loadViewBuffers(int breed);
 
 	// set this so it doesn't have to do it while running.  Pass either breed
 	//integer (from js) or direct func pointer (from C++).  One or the other,
@@ -155,7 +155,7 @@ extern "C" {
 
 	// load up all the set's view viewBuffers based on the space's wave buffer (or whatever)
 	// ?? returns the highest height of norm of wave entries.  Flat does.  Should.  Soon.
-	void avatar_loadViewBuffers(qAvatar *avatar, int breed);
+	//void avatar_loadViewBuffers(qAvatar *avatar, int breed);
 
 // this is obsolete right>?  cuz the constructor does it.
 //	void avatar_setLoader(qAvatar *avatar, int loaderIx);
