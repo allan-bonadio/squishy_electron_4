@@ -10,7 +10,6 @@ import {cppObjectRegistry, prepForDirectAccessors} from '../utils/directAccessor
 import eSpace from './eSpace.js';
 import rainbowDump from '../utils/rainbowDump.js';
 
-let traceSetFamiliarWave = false;
 let traceGaussian = false;
 let traceFamiliarResult = false;
 let traceAllocate = false;
@@ -64,7 +63,8 @@ class eWave {
 	//        (JS only)
 	// pointer should be pointer to qWave in C++, otherwise leave it falsy.
 	// If you use pointer, leave the useThis32F null; it's ignored
-	constructor(space, useThis32F, pointer) {
+	// label is optional and only JS side
+	constructor(space, label = 'wave', useThis32F, pointer) {
 		this.space = space;
 		if (!(space instanceof eSpace))
 			throw new Error("new eWave: space is not an eSpace")
@@ -79,12 +79,14 @@ class eWave {
 			this.pointer = qeFuncs.wave_create(space.pointer, null);
 		}
 		prepForDirectAccessors(this, this.pointer);
+		this.label = label;
 
 		// now for the buffer
 		this.completeWave(useThis32F);
 	}
 
 	// finish the construction.  eFlick has to do it differently.
+	// label is optional and only JS side
 	completeWave(useThis32F) {
 		if (!useThis32F) {
 			// _wave must be a pointer to the existing qWave's buffer
@@ -166,12 +168,11 @@ class eWave {
 		return output.slice(0, -1) + ' innerProd=' + _(prev.innerProd) +'\n';
 	}
 
-	// dump out wave content.
-	dump(title) {
-		const avatarLabel = this.avatarLabel || '';
-		console.log(`\n🌊 ≡≡≡≡≡ eWave ${avatarLabel} | ${title} `+
+	// e-z dump out wave content.
+	dump(title = 'a wave') {
+		console.log(`\n🌊 ≡≡≡≡≡ eWave ${this.label ?? ''} | ${title} `+
 			this.dumpThat(this.wave) +
-			`\n🌊 ≡≡≡≡≡ end of eWave ≡≡≡≡≡\n\n`);
+			`\n🌊 ≡≡≡≡≡ end of eWave ${title} ≡≡≡≡≡\n\n`);
 	}
 
 	rainbowDump(title) {
@@ -250,6 +251,7 @@ class eWave {
 	}
 
 	/* **************************************************** familiar waves */
+	// TODO: break these functions out into a separate file and assign them into eWave class
 
 	// n is  number of cycles all the way across N points.
 	// n 'should' be an integer to make it meet up on ends if endless
@@ -266,7 +268,6 @@ class eWave {
 			wave[ix2 + 1] = sin(angle);
 		}
 	}
-
 
 	// make a superposition of two waves in opposite directions.
 	// frequency n 'should' be an integer to make it meet up on ends if wraparound
@@ -415,7 +416,7 @@ class eWave {
 		  // emergency!!  this gets really slow if it's a small number.  And not useful.
 		waveParams.pulseWidth = Math.max(1, waveParams.pulseWidth);
 		if (traceFamiliarResult) {
-			console.log(`🌊 setFamiliarWave() starts, wave params: `+
+			console.log(`🌊 setFamiliarWave() starts on ${this.label}, wave params: `+
 			`waveBreed=${waveParams.waveBreed}   `+
 			`waveFrequency UI=${waveParams.waveFrequency.toFixed(2)}/N   `+
 			`pulseWidth UI=${waveParams.pulseWidth.toFixed(2)}%   `+
@@ -448,7 +449,8 @@ class eWave {
 		this.fixBoundaries();
 
 		if (traceFamiliarResult)
-			this.rainbowDump(`eWave.setFamiliarWave(${waveParams.waveBreed}) done`);
+			this.dump(`familiarResult of ${this.label}`);
+			//this.rainbowDump(`eWave.setFamiliarWave(${waveParams.waveBreed}) done`);
 	}
 }
 

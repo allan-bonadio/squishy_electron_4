@@ -25,8 +25,9 @@ class eFlick extends eWave {
 	// variables are in different places!! but everything else should work ok.  i
 	// think.  Only available constructor is with pointer and no typed array buffer.
 	// cuz there's multiple waves.
-	constructor(space, pointer) {
-		super(space, null, pointer);
+	// label is optional and only JS side
+	constructor(space, label, pointer) {
+		super(space, label, null, pointer);
 
 		// no already created.  Figure this out later.  qeFuncs.flick_create(space.pointer);
 	}

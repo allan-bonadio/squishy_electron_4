@@ -29,7 +29,7 @@ class eGrinder {
 // 		avatar.grinder = this;
 
 		// for the flick we only have the pointer.  Similar to a eWave
-		this.flick = new eFlick(space, this._flick);
+		this.flick = new eFlick(space, 'mainFlick', this._flick);
 
 		//console.log(`sentinels: ${qeConsts.grSENTINEL_VALUE} ≟ ${this.sentinel}`);
 
