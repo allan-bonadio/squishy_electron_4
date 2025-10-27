@@ -100,6 +100,8 @@ class glAmbiance {
 		this.gl = gl;
 
 		// note: webgl1, avail as an extention
+		// Turns out this isn't needed at all, and only excludes browsers that don't have this ext.
+		// TODO: get rid of this I guess.
 		let vaoExt = this.vaoExt = gl.getExtension("OES_vertex_array_object");
 		if (!vaoExt)
 			return null;

@@ -57,6 +57,11 @@ void dumpViewBuffer(qAvatar *avatar, int bufIx, int nPoints, const char *title) 
 // Two vertices per datapoint: bottom then top, same data.
 // also converts from doubles to floats for GL.
 void avFlatLoader(qAvatar *avatar, int bufIx, qWave *qwave, int nPoints) {
+//	int *p = (int *) avatar;
+//	printf("%8lx %8lx %8lx %8lx %8lx %8lx %8lx %8lx ",
+//		p[0], p[1], p[2], p[3], p[4], p[5], p[6], p[7]);
+
+
 	if (traceViewBuffer)
 		printf("\n📺 avFlatLoader to avatar %s starts:\n", avatar->label);
 	qCx *wave = qwave->wave;  // from here
