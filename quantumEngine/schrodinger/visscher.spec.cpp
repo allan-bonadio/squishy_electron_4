@@ -43,7 +43,7 @@ TEST(visscher, VisscherOneStep4)
 	oldWave4->setCircularWave(1.);
 	if (traceOneStep) oldWave4->dump("start VisscherOneStep test");
 
-	qAvatar *avatar = new qAvatar(space4, "VisscherOneStep");
+	qAvatar *avatar = new qAvatar(space4, "Visscher1Step");
 	qGrinder *grinder = new qGrinder(space4, avatar, 1, "Visscher1Step");
 
 
