@@ -69,13 +69,15 @@ export class eSpace {
 		this.mainFlick = this.grinder.flick;  // i know its a flick not a wave
 		this._mainFlick = this.mainFlick.pointer;  // i know its a flick not a wave
 
-		this.miniGraphWave = new eWave(this, null, this._miniGraphWave);
-		this._miniGraphWave = this.miniGraphWave.pointer;
+		// TODO: is this used?  I don't think so.
+		//this.miniGraphWave = new eWave(this, 'miniGraph in Space',
+		//	null, this._miniGraphWave);
+		//this._miniGraphWave = this.miniGraphWave.pointer;
 
 		// SetWave most recent settings.
 		let waveParams = getAGroup('waveParams');
 		this.mainFlick.setFamiliarWave(waveParams);
-		this.miniGraphWave.setFamiliarWave(waveParams);
+		//this.miniGraphWave.setFamiliarWave(waveParams);
 		if (traceFamiliarWave)
 			console.log(`🚀  done with setFamiliarWave():`, this.mainFlick.wave);
 
@@ -134,17 +136,13 @@ export class eSpace {
 	get dt() { return this.doubles[20]; }
 	get nDimensions() { return this.ints[42]; }
 	get spectrumLength() { return this.ints[45]; }
-	get _mainAvatar() { return this.ints[46]; }
-	set _mainAvatar(a) { this.ints[46] = a; }
-	get _miniGraphAvatar() { return this.ints[47]; }
-	set _miniGraphAvatar(a) { this.ints[47] = a; }
-	get _mainFlick() { return this.ints[48]; }
-	set _mainFlick(a) { this.ints[48] = a; }
-	get _miniGraphWave() { return this.ints[49]; }
-	set _miniGraphWave(a) { this.ints[49] = a; }
-	get _grinder() { return this.ints[50]; }
-	set _grinder(a) { this.ints[50] = a; }
-	get _label() { return this.pointer + 204; }
+	get _mainFlick() { return this.ints[46]; }
+	set _mainFlick(a) { this.ints[46] = a; }
+	get _miniGraphWave() { return this.ints[47]; }
+	set _miniGraphWave(a) { this.ints[47] = a; }
+	get _grinder() { return this.ints[48]; }
+	set _grinder(a) { this.ints[48] = a; }
+	get _label() { return this.pointer + 196; }
 
 
 	/* **************************** 🥽 end of direct accessors */

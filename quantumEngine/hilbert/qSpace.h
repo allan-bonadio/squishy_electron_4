@@ -118,13 +118,8 @@ public:
 	int nPoints;  // allocated size
 	int spectrumLength;  // should == nStates
 
-	// each of these objects is created and linked into the space  in js, when ready
-	int dummyForMainAvatar;
-	//struct qAvatar *mainAvatar;
-	struct qAvatar *miniGraphAvatar;
-
 	struct qWave *mainFlick;
-	struct qWave *miniGraphWave;
+	struct qWave *miniGraphWave;  // TODO: get rid of this
 
 	struct qGrinder *grinder;
 

@@ -80,16 +80,15 @@ qSpace *completeNewSpace(qSpace *space, int nGrWorkers) {
 //	if (traceSpaceCreation) printf("   🚀 qSpace created: space=%p  mainAvatar=%p  grinder=%p\n",
 //		space, mainAvatar, qgrinder);
 
-	qWave *miniGraphWave = space->miniGraphWave
-		= new qWave(space);
-	printf("miniGraphWave: %p\n", miniGraphWave);
-	qAvatar *miniGraphAvatar = space->miniGraphAvatar
-		= new qAvatar(avFLAT, "miniGraph");
-	miniGraphAvatar->space = space;
-	miniGraphAvatar->qwave = miniGraphWave;
-	space->miniGraphAvatar->attachViewBuffer(0, NULL, 2, space->nPoints * 2);
+	//qWave *miniGraphWave = space->miniGraphWave
+	//	= new qWave(space);
+	//if (traceSpaceCreation)
+	//	printf("miniGraphWave: %p\n", miniGraphWave);
+	//	miniGraphAvatar->space = space;
+	//	miniGraphAvatar->qwave = miniGraphWave;
+	//	space->miniGraphAvatar->attachViewBuffer(0, NULL, 2, space->nPoints * 2);
 
-	if (traceSpaceCreation) printf("🚀 created miniGraph Wave and Avatar\n");
+	//if (traceSpaceCreation) printf("🚀 created miniGraph Wave and Avatar\n");
 	return space;
 }
 
