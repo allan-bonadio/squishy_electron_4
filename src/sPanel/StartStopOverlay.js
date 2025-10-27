@@ -14,6 +14,7 @@ import singleStepIcon from './waveViewIcons/singleStep2.png';
 
 
 let traceContext = false;
+let traceStartStop = true;
 
 // no props!  does everything thru context.
 function StartStopOverlay(props) {
@@ -31,34 +32,45 @@ function StartStopOverlay(props) {
 	function startStopHandler(ev) {
 		cp.startStop?.(ev);
 	}
-	function singleFrameHandler(ev) {
-		cp.singleFrame?.(ev);
+	function startSingleFrameHandler(ev) {
+		cp.startSingleFrame?.(ev);
 	}
 	function preventDragAway(ev) {
 		ev.preventDefault();
 	}
 
-	const helpSS = context.shouldBeIntegrating ? 'stop integrating' : 'start integrating'
-	const helpSF = 'only do 1 frame.  Use opt or ctrl=10, shift=100) ';
+	const helpSF = 'only do 1 frame.  Use Option , Alt or Control ^ for 10, Shift for 100) ';
+	let ssButton;
+	if (context.shouldBeIntegrating) {
+		if (traceStartStop)
+			console.log(`🛑 was integrating, making stop button`)
+		ssButton = <button className='startStopWidget stopButton' onClick={cp.stopAnimating}
+				alt='🛑 stop integrating' title='🛑 stop integrating' >
+			<img onMouseDown={preventDragAway} src={stopIcon} />
+		</button>
+	}
+	else {
+		if (traceStartStop)
+			console.log(`🎬 integration is stopped, making start button`)
+		ssButton = <button className='startStopWidget startButton' onClick={cp.startAnimating}
+				alt='🎬 begin integrating'  title='🎬 begin integrating' >
+			<img onMouseDown={preventDragAway} src={startIcon} />
+		</button>
+	}
 
 	// the start/stop icon toggles depending on state
 	return <section className='StartStopOverlay waveButtonPanel' >
-		<button className='startStopWidget' onClick={startStopHandler}
-				alt={helpSS} title={helpSS} >
-			<img onMouseDown={preventDragAway}
-					src={context.shouldBeIntegrating ? stopIcon : startIcon} />
-		</button>
+		{ssButton}
 
 		<span style={{width: '2em', display: 'inline-block'}} />
 
-		<button className='singleFrameWidget' onClick={singleFrameHandler}
+		<button className='startSingleFrameWidget' onClick={startSingleFrameHandler}
 				alt={helpSF} title={helpSF} onMouseMove={preventDragAway} >
 			<img onMouseDown={preventDragAway}
 					src={singleStepIcon} />
 		</button>
 
 	</section>;
-
 }
 
 export default StartStopOverlay;
