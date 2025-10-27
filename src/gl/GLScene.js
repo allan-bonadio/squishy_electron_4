@@ -36,12 +36,15 @@ function setPT() {
 		sceneClassName: PropTypes.string.isRequired,  // what to draw
 		sceneName: PropTypes.string,  // name for debugging
 
+		// eWave(s) or other buffers to draw or any data.  Any format; passed to avatar
+		//inputInfo: PropTypes.any,
+
 		// Our caller gets these from eSpaceCreatedPromise; so it must be resolved by now.
 		// Optional; omit if your scene is not affected by space.
 		space: PropTypes.object,
 
 		// sAnimator - reserved for sAnimator, but I guess you
-		// can make your own. This object will get the
+		// can make your own. Or, blow it off.  This object will get the
 		// glRepaint function attached. Omit if your GLScene
 		// doesn't animate.
 		animator: PropTypes.object,
@@ -52,6 +55,7 @@ function setPT() {
 		canvasInnerHeight: PropTypes.number.isRequired,
 
 		// object with specific values needed in drawing; for waveview= {bumperWidth}
+		// TODO: include this in inputInfo and rename
 		specialInfo: PropTypes.object,
 
 	  // if the caller needs the repaint function for this canvas, pass a func to pick it up
@@ -94,7 +98,7 @@ function GLScene(props) {
 		let sClass = listOfSceneClasses[p.sceneClassName];
 
 		// for this situation, needs the space!	 if they passed it to us
-		squishScene = new sClass(p.sceneName, ambiance, p.space);
+		squishScene = new sClass(p.sceneName, ambiance, p.inputInfo, p.space);
 		setSquishScene(squishScene);
 		//effSceneRef.current = squishScene;
 
@@ -112,9 +116,11 @@ function GLScene(props) {
 	// and this function redraws on the canvas (with gl).
 	const glRepaint =
 	() => {
-		if (! squishScene) {
+		// make sure we have this cuz this func gets called from all over
+		const scene = squishScene, node = canvasNode, info=p.specialInfo;
+		if (! scene) {
 			if (traceTooEarly)
-				console.log(`🖼 GLScene too early for glRepaint. squishScene=`, squishScene);
+				console.log(`🖼 GLScene too early for glRepaint. squishScene=`, scene);
 			return null;  // too early
 		}
 		// if (traceViewBuffer)
@@ -126,12 +132,12 @@ function GLScene(props) {
 		//	 p.avatar.dumpViewBuffer(`🖼 GLScene ${p.sceneName}: loaded ViewBuffer`);
 
 		// draw.  This won't set up an ∞ loop, right?
-		squishScene.drawAllDrawings(canvasNode.width, canvasNode.height, p.specialInfo);
-		//squishScene.drawAllDrawings(p.canvasInnerWidth, p.canvasInnerHeight, p.specialInfo);
+		scene.drawAllDrawings(node.width, node.height, info);
+		//scene.drawAllDrawings(p.canvasInnerWidth, p.canvasInnerHeight, info);
 		if (traceGeometry) {
 			console.log(`🖼 GLScene finished glRepaint() ${p.sceneName}:	\n`
 					+`canvasInnerWidth=${p.canvasInnerWidth}, canvasInnerHeight=${p.canvasInnerHeight}, `
-					+`specialInfo=`, p.specialInfo);
+					+`specialInfo=`, info);
 		}
 		return;
 	}

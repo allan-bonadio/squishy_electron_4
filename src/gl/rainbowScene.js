@@ -15,7 +15,7 @@ import eAvatar from '../engine/eAvatar.js';
 
 class rainbowScene extends abstractScene {
 
-	constructor(sceneName, ambiance) {
+	constructor(sceneName, ambiance, inputInfo) {
 		super(sceneName, ambiance);
 
 		this.canvas = ambiance.canvas;

@@ -32,6 +32,7 @@ export class abstractDrawing {
 		this.scene = scene;
 		this.gl = scene.gl;
 		this.sceneName = scene.sceneName;
+		this.vao = scene.vao;
 		this.tagObject = scene.tagObject;
 		this.space = scene.space;
 		this.avatar = scene.avatar;
@@ -42,11 +43,7 @@ export class abstractDrawing {
 
 		this.drawingName = drawingName;
 
-		// vao for this drawing only
-		this.vao = this.gl.createVertexArray();
-		this.tagObject(this.vao, `${this.avatarLabel}-${this.drawingName}-vao`);
-
-		this.viewVariables = [];  // vars for this drawing ONLY
+		this.drawVariables = [];  // vars for this drawing ONLY
 	}
 
 	/* *********************************** Shader Creation/Compile */
@@ -60,7 +57,6 @@ export class abstractDrawing {
 			throw `in drawing: bad vao=${this.vao}`;
 
 		gl.useProgram(this.program);
-		gl.bindVertexArray(this.vao);
 	}
 
 	// compile one or the other shader; used only by compileProgram()
@@ -69,12 +65,11 @@ export class abstractDrawing {
 		const shType = this.shaderTypes[type];
 
 		let shader = gl.createShader(type);
-		this.tagObject(shader,
-			`${this.avatarLabel}-${this.drawingName}-${shType}-sh`);
 
 		gl.shaderSource(shader, srcString);
 		gl.compileShader(shader);
 		var success = gl.getShaderParameter(shader, gl.COMPILE_STATUS);
+
 		if (success) return shader;
 
 		// error in compilation
@@ -95,18 +90,23 @@ export class abstractDrawing {
 
 		// create program (and vao?) for this drawing, and put them into use
 		const program = gl.createProgram();
-		this.tagObject(program, `${this.avatarLabel}-${this.drawingName}-pgm`);
+		let label = program.$qLabel = `${this.sceneName}-${this.drawingName}-program`;
+		this.tagObject(program, label);
 
 
 		const vertexShader = this.compileShader(gl.VERTEX_SHADER,
 			this.vertexShaderSrc);
 		gl.attachShader(program, vertexShader);
 		this.vertexShader = vertexShader;
+		label = vertexShader.$qLabel = `${this.sceneName}-${this.drawingName}-vshader`;
+		this.tagObject(vertexShader, label);
 
 		const fragmentShader = this.compileShader(gl.FRAGMENT_SHADER,
 			this.fragmentShaderSrc);
 		gl.attachShader(program, fragmentShader);
 		this.fragmentShader = fragmentShader;
+		label = fragmentShader.$qLabel = `${this.sceneName}-${this.drawingName}-fshader`;
+		this.tagObject(fragmentShader, label);
 
 		gl.linkProgram(program);
 		if (gl.getProgramParameter(program, gl.LINK_STATUS)) {
@@ -116,18 +116,19 @@ export class abstractDrawing {
 			if (traceAttrNames)
 				this.dumpAttrNames('right after link');
 			return
-			// after this, you'll attach your viewVariables with your subclassed createVariables() method.
+			// after this, you'll attach your drawVariables with your subclassed createVariables() method.
 		}
 
 		// somehow failed compile.  So, no program
 		const msg = gl.getProgramInfoLog(program);
 		//gl.deleteProgram(program);
 		throw new Error(`Error linking program for
-			${this.scene.sceneName} ${this.drawingName}: ${msg}`);
+			${this.sceneName} ${this.drawingName}: ${msg}`);
 	}
 
 	draw(width, height, specialInfo) {
-		throw new Error(`abstract drawing draw(${width, height})`);
+		throw new Error(`cannot draw abstract drawing scene ${this.sceneName} `
+			+` drawing ${this.drawingName}`);
 	}
 
 }

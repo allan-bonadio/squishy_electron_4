@@ -1,11 +1,12 @@
 /*
-** view variable -- maintaining and attaching webgl Attribute and Uniform variables
+** drawing variable -- maintaining and attaching webgl Attribute and Uniform variables
 ** Copyright (C) 2021-2025 Tactile Interactive, all rights reserved
 */
 
 let traceGLCalls = false;
 let traceUniforms = false;
-let traceAttributes = false;
+let traceAttrs = true;  // quick update every reload
+let traceAttributes = false;  // full dumps every reload
 
 // attr arrays and uniforms that can change on every frame.
 // you can set a static value or a function that'll return it
@@ -14,7 +15,7 @@ let traceAttributes = false;
 // abstract superclass for all of these.
 export class drawingVariable {
 	// the drawing is what it's used in.  Must have a:
-	// gl, viewVariables array, program,
+	// gl, drawVariables array, program,
 	// getFunc will AUTOMATICALLY be called before each frame to refresh the value
 	constructor(varName, drawing, getFunc) {
 		this.drawing = drawing;
@@ -28,7 +29,7 @@ export class drawingVariable {
 			throw new Error(`bad name ${varName} or drawing ${drawing} `
 				+` used to create a view var`);
 
-		let vv = drawing.viewVariables;
+		let vv = drawing.drawVariables;
 		if (vv.includes(this)) {
 			console.error(`𒐿 duplicate variable ${varName}!!`);
 			return null;
@@ -67,7 +68,8 @@ export class drawingUniform extends drawingVariable {
 
 		// this turns out to be an internal magic object
 		this.uniformLoc = this.gl.getUniformLocation(this.drawing.program, varName);
-		if (!this.uniformLoc) throw new Error(`Cannot find uniform loc for uniform variable ${varName}`);
+		if (!this.uniformLoc)
+			throw new Error(`Cannot find uniform loc for uniform variable ${varName}`);
 		if (traceUniforms) console.log(`𒐿 created drawingUniform '${varName}'`);
 
 		this.reloadVariable();
@@ -94,7 +96,7 @@ export class drawingUniform extends drawingVariable {
 		}
 
 		const gl = this.gl;
-		this.uniformLoc = gl.getUniformLocation(this.drawing.program, this.varName);
+		// already done this.uniformLoc = gl.getUniformLocation(this.drawing.program, this.varName);
 
 		const method = `uniform${type}`;
 
@@ -130,10 +132,13 @@ export class drawingAttribute extends drawingVariable {
 		super(varName, drawing, getFunc);
 		const gl = this.gl;
 		this.tupleWidth = tupleWidth;  // num of float32s in each row/tuple
+		this.sceneName = this.drawing.sceneName;
 		this.drawing.setDrawing();
 
-		// small integer indicating which attr this is.  Set by compileProgram() for each drawing in the view def
+		// small integer indicating which attr this is.
+		// Set by compileProgram() for each attr in each drawing in GL context
 		this.attrLocation = this.gl.getAttribLocation(drawing.program, varName);
+		gl.enableVertexAttribArray(this.attrLocation);
 
 		if (this.attrLocation < 0) {
 			throw new Error(`𒐿 drawingAttribute:attr loc for '${varName}' is bad: `+
@@ -142,25 +147,27 @@ export class drawingAttribute extends drawingVariable {
 
 		// create gl GPU buffer
 		this.glBuffer = gl.createBuffer();
-		this.tagObject(this.glBuffer, `${drawing.avatarLabel}-${drawing.drawingName}-${varName}-va`);
+		let label = `${drawing.avatarLabel}-${drawing.drawingName}-${varName}-glbuf`;
+		this.tagObject(this.glBuffer, label);
+		this.glBuffer.$qLabel = label;
 
 		// connect  ARRAY_BUFFER to glBuffer.
-		// do I have to do this if I'm not (yet) attaching the JS-space array?
+		// do I have to do this if I'm not (yet) attaching the JS-space array with bufferData?
 		gl.bindBuffer(gl.ARRAY_BUFFER, this.glBuffer);
 
-		// our attribute here, connect it to that glBuffer
-		gl.enableVertexAttribArray(this.attrLocation);
-		gl.vertexAttribPointer(
-				this.attrLocation,
-				tupleWidth, gl.FLOAT,
+		// our attribute here, connect it to ARRAY_BUFFER and therefore that glBuffer
+		gl.vertexAttribPointer(this.attrLocation, tupleWidth, gl.FLOAT,
 				false, tupleWidth * 4, 0);  // normalize, stride, offset
 		if (traceGLCalls)
 			console.log(`𒐿  drawingAttribute '${this.varName}' connected to its `
 				+` glBuffer to tupleWidth=${tupleWidth}`);
 
-		// we haven't touched the actual JS data yet, this does it
+		// we haven't touched the actual JS data yet, this does it.  Although a lot of
+		// other stuff isn't ready.
 		this.reloadVariable();
 	}
+
+	diditOnce = false;  // TODO remove this
 
 	// call this when the array's values change, to reload them into the GPU.
 	// getFunc() gets past the previous array (or undefined first time)
@@ -171,26 +178,27 @@ export class drawingAttribute extends drawingVariable {
 
 		// get the latest from the real world.
 		// WebGL2Fundamentals said we don't have to do this if it's the same buffer (w/diff values) every time.
-		// if I understood them correctly.  afraid to try...
+		// if I understood them correctly.  afraid to try... or maybe misunderstood...
 		let floatArray = this.floatArray = this.getFunc();
 		if (!floatArray) {
 			throw `getFunc() returned null on var=${varName} scene=${this.drawing.drawingName}`;
 		}
-		//if (this.floatArray !== newFloatArray) {
-		//	gl.bindBuffer(gl.ARRAY_BUFFER, this.glBuffer);
-		//	gl.bufferData(gl.ARRAY_BUFFER, newFloatArray, gl.DYNAMIC_DRAW);
-		//	this.floatArray  = newFloatArray;
-		//}
 		this.nTuples = this.floatArray.nTuples;
 
-		// must do a bufferData() every frame now with our own personal vao?  maybe not
-		gl.bufferData(gl.ARRAY_BUFFER, floatArray, gl.DYNAMIC_DRAW);
+		if (!this.diditOnce) {
+			// must do a bufferData() every frame?  I guess not.
+			gl.bindBuffer(gl.ARRAY_BUFFER, this.glBuffer);
+			gl.bufferData(gl.ARRAY_BUFFER, floatArray, gl.DYNAMIC_DRAW);
+		}
+
+		if (traceAttrs)
+			console.log(`𒐿 reload drawingAttribute '${this.varName}' in ${this.drawing.sceneName} reloaded`);
 
 		if (traceAttributes) {
-			console.log(`𒐿 drawingAttribute '${this.varName}' reloaded, ${this.nTuples}`
+			console.log(`𒐿 reload drawingAttribute '${this.varName}' in ${this.drawing.sceneName} reloaded, ${this.nTuples}`
 				+ ` tuples of ${this.tupleWidth} floats each:`);
 			for (let t = 0; t < this.nTuples; t++) {
-				let line = `[${t}]  `;
+				let line = `[${String(t).padStart(4)}]  `;
 				for (let f = 0; f < this.tupleWidth; f++)
 					line += `  ${this.floatArray[t * this.tupleWidth + f].toFixed(6)}`;
 				console.log(line);
