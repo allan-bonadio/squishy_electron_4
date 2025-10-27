@@ -8,8 +8,8 @@ import {cppObjectRegistry, prepForDirectAccessors} from '../utils/directAccessor
 import qeFuncs from './qeFuncs.js';
 import qeConsts from './qeConsts.js';
 
-let traceCreation = false;
-let traceHighest = false;
+let traceCreation = true;
+//let traceHighest = false;
 let traceVBuffer = false;
 
 // HOW TO USE     use avatars this way:
@@ -74,7 +74,7 @@ class eAvatar {
 	// set an element in the typedArray bloc
 	reserveTypedArray(whichBuffer, array) {
 		if (this.typedArrays[whichBuffer])
-			throw Error(`🚦 typed array ${whichBuffer} already reserved`);
+			throw Error(`🚦 typed array ${whichBuffer} already reserved in ${this.label} avatar`);
 		return this.typedArrays[whichBuffer] = array;
 	}
 
@@ -139,9 +139,9 @@ class eAvatar {
 
 	// populate whatever buffers in this avatar, written in C++.
 	// Go ahead and write your own in JS if you want and use that instead.
-	loadViewBuffers(breed) {
-		qeFuncs.avatar_loadViewBuffers(this.pointer, breed);
-	}
+	//loadViewBuffers(breed) {
+	//qeFuncs.avatar_loadViewBuffers(this.pointer, breed);
+	//}
 
 	/* ***************************************** 🥽 Direct Accessors */
 	// see qAvatar.cpp to regenerate this. Note these are all scalars; buffers

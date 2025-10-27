@@ -86,7 +86,7 @@ let exportsSrc  = [
 
 	{name: 'avatar_getViewBuffer', args: ['number', 'number'], retType: 'number'},
 
-	{name: 'avatar_loadViewBuffers', args: ['number', 'number'], retType: null},  // kindof defunct
+	//{name: 'avatar_loadViewBuffers', args: ['number', 'number'], retType: null},  // kindof defunct
 
 	{name: 'avatar_avFlatLoader', args: ['number', 'number', 'number', 'number'], retType: null},
 
