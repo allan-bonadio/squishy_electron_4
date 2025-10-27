@@ -32,7 +32,6 @@ export class abstractDrawing {
 		this.scene = scene;
 		this.gl = scene.gl;
 		this.sceneName = scene.sceneName;
-		this.vao = scene.vao;
 		this.tagObject = scene.tagObject;
 		this.space = scene.space;
 		this.avatar = scene.avatar;
@@ -48,14 +47,10 @@ export class abstractDrawing {
 
 	/* *********************************** Shader Creation/Compile */
 
-	// tell GL that this is the vao and program to use.  On this gl context, till another setDrawing.
+	// tell GL that this is the program to use.  On this gl context, till another setDrawing.
 	setDrawing() {
-		const gl = this.gl;
 		if (!this.program)
 			throw `in drawing: bad program=${this.program}`;
-		if (!this.vao)
-			throw `in drawing: bad vao=${this.vao}`;
-
 		gl.useProgram(this.program);
 	}
 
@@ -88,7 +83,7 @@ export class abstractDrawing {
 	compileProgram() {
 		const {gl} = this;
 
-		// create program (and vao?) for this drawing, and put them into use
+		// create program for this drawing, and put them into use
 		const program = gl.createProgram();
 		let label = program.$qLabel = `${this.sceneName}-${this.drawingName}-program`;
 		this.tagObject(program, label);

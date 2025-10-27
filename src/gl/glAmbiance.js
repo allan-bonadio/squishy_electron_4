@@ -90,7 +90,7 @@ class glAmbiance {
 		}
 	}
 
-	// try to set up GL1, return falsy if it can't.  Also shim the vao methods
+	// try to set up GL1, return falsy if it can't.  Also shims if any
 	setupGL1() {
 		let gl = this.canvas.getContext("webgl");  // gl.VERSION: 7938
 		if (! gl)
@@ -99,17 +99,19 @@ class glAmbiance {
 			return null;
 		this.gl = gl;
 
-		// note: webgl1, avail as an extention
-		// Turns out this isn't needed at all, and only excludes browsers that don't have this ext.
-		// TODO: get rid of this I guess.
-		let vaoExt = this.vaoExt = gl.getExtension("OES_vertex_array_object");
-		if (!vaoExt)
-			return null;
+			////// SAVE THIS.  note: Vector Array Object.  webgl1, vao avail as an extention
+			////// Turns out this isn't needed at all, and only excludes browsers that don't have this ext.
+			////// doing it cuz gregman said to.  Turns out, it's for if lots of attrs need to  be swapped in/out quickly.
+			////// Otherwise, no difference and all; other calls the same.  So really I can get rid of  this.
+			////let vaoExt = this.vaoExt = gl.getExtension("OES_vertex_array_object");
+			////if (!vaoExt)
+			////	return null;
+			////
+			////// backfill these methods for consistent usage with v2
+			////gl.createVertexArray = vaoExt.createVertexArrayOES.bind(vaoExt);
+			////gl.deleteVertexArray = vaoExt.deleteVertexArrayOES.bind(vaoExt);
+			////gl.bindVertexArray = vaoExt.bindVertexArrayOES.bind(vaoExt);
 
-		// backfill these methods for consistent usage
-		gl.createVertexArray = vaoExt.createVertexArrayOES.bind(vaoExt);
-		gl.deleteVertexArray = vaoExt.deleteVertexArrayOES.bind(vaoExt);
-		gl.bindVertexArray = vaoExt.bindVertexArrayOES.bind(vaoExt);
 		this.WebGLVersion = 1;
 		if (traceVersion)
 			console.log(`enabled original WebGL 1`);

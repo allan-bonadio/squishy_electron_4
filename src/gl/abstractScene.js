@@ -33,14 +33,6 @@ export class abstractScene {
 		this.inputInfo = inputInfo;
 		if (! this.canvas) throw new Error(`abstractScene: being created without canvas`);
 
-		// vao for all drawings in this scene/gl context.  Maybe these should be enclosed in the avatar?
-		// doing it cuz gregman said to.  Turns out it's for if lots of attrs need to  be swapped in/out quickly.
-		// Otherwise, no difference and all other calls the same.  So really I can get rid of  this.
-		this.vao = this.gl.createVertexArray();
-		let label = this.vao.$qLabel = `${sceneName}-vao`;
-		this.tagObject(this.vao, label);
-		this.gl.bindVertexArray(this.vao);
-
 		// all of the drawings in this scene
 		// they get prepared, and drawn, in this same order
 		this.drawings = [];
