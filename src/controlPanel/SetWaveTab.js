@@ -20,9 +20,7 @@ import {interpretCppException} from '../utils/errors.js';
 const MINI_WIDTH = 300;
 const MINI_HEIGHT = 150;
 
-
-let traceRegenerate = false;
-
+let traceRegenerate = true;
 
 function setPT() {
 	// variables from on high, and the funcs needed to change them
@@ -50,13 +48,15 @@ function SetWaveTab(props) {
 	//checkPropTypes(SetWaveTab.propTypes, props, 'prop', 'SetWaveTab');
 	let {saveMainWave, waveParams, setWaveParams, space} = props;
 
-	const minigraphRepaintRef = useRef(null);
+	// must remember our own wave for minigraph
 	const minigraphWaveRef = useRef(null);
 	if (!minigraphWaveRef.current)
-		minigraphWaveRef.current = new eWave(props.space);
+		minigraphWaveRef.current = new eWave(props.space, 'minigraphWave');
 	let minigraphWave = minigraphWaveRef.current;
-	let minigraphRepaint = minigraphRepaintRef.current;
 
+	// must remember our repaint func
+	const minigraphRepaintRef = useRef(null);
+	let minigraphRepaint = minigraphRepaintRef.current;
 	function setMinigraphRepaint(repaint) {
 		minigraphRepaintRef.current = minigraphRepaint = repaint;
 	}
@@ -73,7 +73,12 @@ function SetWaveTab(props) {
 		}
 
 		minigraphWave.setFamiliarWave(waveParams);
+
 		minigraphRepaint();
+
+
+console.log(`the minigraph wave after set fam wave & repaint`, minigraphWave);
+//debugger;
 	}
 
 	// set any combination of the wave params, in the Control Panel state.
@@ -145,7 +150,8 @@ function SetWaveTab(props) {
 	// the minigraph
 	const glScene = <GLScene
 		space={space}
-		sceneClassName='flatScene' sceneName='setWaveMiniGraph'
+		sceneClassName='flatScene' sceneName='swMiniGraph'
+		inputInfo={minigraphWave}
 		canvasInnerWidth={MINI_WIDTH}
 		canvasInnerHeight={MINI_HEIGHT}
 		setGLRepaint={setMinigraphRepaint}
@@ -181,7 +187,7 @@ function SetWaveTab(props) {
 	</div>;
 
 	return <div className='SetWaveTab  controlPanelPanel'
-			title="This tab will set the main wave, and save it for next time.">
+			title="Use this tab to set the main wave, and save these parameters for next time.">
 		<h3>Design a new Wave</h3>
 		<div className='waveTabCol '>
 			{breedSelector}
