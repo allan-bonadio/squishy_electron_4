@@ -141,7 +141,7 @@ extern "C" {
 	// qwave and space are both optional, pass null for none or just don't call this
 	void avatar_setWaveSpace(qAvatar *avatar, qWave *qwave, qSpace *space);
 
-	// create one buffer in the set - obsolete!  TODO
+	// create one buffer in the set
 	float *avatar_attachViewBuffer(qAvatar *avatar, int whichBuffer, float *useThisBuffer,
 		int nCoordsPerVertex, int nVertices);
 	short *avatar_attachIndexBuffer(qAvatar *avatar, short *useThisBuffer, int nItems);

@@ -367,15 +367,6 @@ export class ControlPanel extends React.Component {
 		this.space.updateDrawnVoltagePath();  // visible change on screen
 	}
 
-	// the Set Voltage button on the Set Voltage tab - always a familiar voltage profile
-	// TODO: move this to the end of this section
-	saveMainVoltage = (ev) => {
-		let voltageParams = this.getVoltageParams()
-		this.setVoltageParams(voltageParams);  // to display in volt tab
-		this.setAndRenderFamiliarVoltage(voltageParams);  // for the space, and the WaveView
-		storeAGroup('voltageParams', voltageParams);  // remember from now on
-	}
-
 	// fills in the voltage buffer with familiar voltage most recently set for
 	// stored voltageParams. called when user clicks reset voltage on cptoolbar
 	resetVoltageHandler = (ev) => {
@@ -402,6 +393,14 @@ export class ControlPanel extends React.Component {
 		const sv = ev.target.value;
 		this.setState({showVoltage: sv});
 		this.space.updateShowVoltage(sv);  // on the screen
+	}
+
+	// the Set Voltage button on the Set Voltage tab - always a familiar voltage profile
+	saveMainVoltage = (ev) => {
+		let voltageParams = this.getVoltageParams()
+		this.setVoltageParams(voltageParams);  // to display in volt tab
+		this.setAndRenderFamiliarVoltage(voltageParams);  // for the space, and the WaveView
+		storeAGroup('voltageParams', voltageParams);  // remember from now on
 	}
 
 	/* ********************************************** integration tab */

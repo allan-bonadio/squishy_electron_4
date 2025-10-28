@@ -69,17 +69,11 @@ export class eSpace {
 		this.mainFlick = this.grinder.flick;  // i know its a flick not a wave
 		this._mainFlick = this.mainFlick.pointer;  // i know its a flick not a wave
 
-		// TODO: is this used?  I don't think so.
-		//this.miniGraphWave = new eWave(this, 'miniGraph in Space',
-		//	null, this._miniGraphWave);
-		//this._miniGraphWave = this.miniGraphWave.pointer;
-
 		// SetWave most recent settings.
 		let waveParams = getAGroup('waveParams');
 		this.mainFlick.setFamiliarWave(waveParams);
-		//this.miniGraphWave.setFamiliarWave(waveParams);
 		if (traceFamiliarWave)
-			console.log(`🚀  done with setFamiliarWave():`, this.mainFlick.wave);
+			console.log(`🚀  done with setFamiliarWave() on main wave:`, this.mainFlick.wave);
 
 		//this.sInteStats = new InteStats(this);
 		if (traceSpace) console.log(`🚀  done creating eSpace:`, this);

@@ -91,9 +91,7 @@ struct qBuffer {
 	// but for just a bare qBuffer, this can be null, for freelance buffers.
 	qSpace *space;
 
-	// TODO: this is not aligned!  Or, maybe its the last?  Oh wait, see
-	// subclasses and their alignment.  Only qFlick so should pad this to 4
-	// bytes
+	// Only qFlick need to pad this to 4 bytes
 	bool dynamicallyAllocated;
 
 	byte xxx[3];

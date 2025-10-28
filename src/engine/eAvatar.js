@@ -191,22 +191,6 @@ class eAvatar {
 		qeFuncs.avatar_dumpIndex(this.pointer, title);
 		console.groupEnd();
 	}
-
-		// TODO: make this owrk  flatDrawing will use this for tweaking the highest uniform
-//		this.highest = qeFuncs.avatar_loadViewBuffer(this.pointer);
-//		if (!this.smoothHighest)
-//			this.smoothHighest = this.highest;
-//		else
-//			this.smoothHighest = (this.highest + 3*this.smoothHighest) / 4;
-//		if (traceHighest) console.log(`🚦 cti eAvatar ${this.label}: highest=${this.highest}  `+
-//			`smoothHighest=${this.smoothHighest}`);
-//		if (traceVBuffer)
-//			this.dumpViewBuffer(`🚦 afterLoadViewBuffer`);
-
-	// delete the eAvatar and qAvatar and its owned buffers
-//	deleteAvatar() {
-//		qeFuncs.avatar_delete(this.pointer);
-//	}
 }
 
 export default eAvatar;

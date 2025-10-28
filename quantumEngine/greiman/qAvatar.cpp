@@ -70,13 +70,8 @@ qAvatar::qAvatar(int breed, const char *lab)
 	: magic('Avat'), avatarBreed(breed), loader(NULL), space(NULL),
 	qwave(NULL), d0(0), d1(0), i0(0), i1(0) {
 
-	//strcpy(label, "ra");  // TODO fix this
-	//// this crashes all the time.  I have no idea why.
 	strncpy(label, lab, MAX_LABEL_LEN);
 	label[MAX_LABEL_LEN-1] = 0;
-
-	//	qwave = new qWave(space);
-	//	voltage = sp->voltage;
 
 	printf(" construct avatar.   label: %p      this=%p\n", lab, this );
 	printf("the label passed in is %s\n", lab);
@@ -302,7 +297,7 @@ void qAvatar::dumpIndex(const char *title) {
 
 
 // SAVE THIS FOR LATER phase on the above dump
-//// dump the view buffer just before it heads off to webgl.  TODO: remove
+//// dump the view buffer just before it heads off to webgl.
 //static void old_qAvatar__dumpViewBuffers(int bufferMask, const char *title) {
 //	float prevPhase = 0;
 //	#define FORMAT_BASE      "%6d |  %8.5f  %8.5f  %6.5g  %6.5g"

@@ -36,9 +36,6 @@ function setPT() {
 		chosenRate: PropTypes.number.isRequired,
 		setChosenRate: PropTypes.func.isRequired,
 
-		// should get rid of this at some point TODO
-		//shouldBeIntegrating: PropTypes.bool.isRequired,
-
 		startOverHandler: PropTypes.func.isRequired,
 		resetVoltageHandler: PropTypes.func.isRequired,
 		//showVoltage: PropTypes.string.isRequired,

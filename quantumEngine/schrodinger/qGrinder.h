@@ -47,7 +47,7 @@ struct qStage;
 struct grWorker;
 
 // TODO: I should break up qGrinder: spin off qIterator with the down and dirty
-// stuff that has to be fast.
+// stuff that has to be fast.  or vice versa
 struct qGrinder {
 	qGrinder(qSpace *, int nGrWorkers, const char *label);
 	~qGrinder(void);

@@ -3,8 +3,6 @@
 ** Copyright (C) 2021-2025 Tactile Interactive, all rights reserved
 */
 
-// TODO merge qViewBuffer into qAvatar
-
 #include <stdexcept>
 
 #include "../hilbert/qSpace.h"

@@ -69,10 +69,6 @@ const preface = `
 // mostly for testing purposes.  do not edit!  instead edit cx2rygb.glsl.js & run unit tests
 // this file written ${new Date()}
 
-// TODO: use these someday?
-//let traceQuarter = false;
-//const  _  = (v) => v.toFixed(4);
-
 // needed defs of vec2 (complex only) and vec3 (rgb only)
 const vec2 = (x=0, y=0) => ({x, y});
 const vec3 = (r=0, g=0, b=0) => ({r, g, b});

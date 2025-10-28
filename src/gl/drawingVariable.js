@@ -185,8 +185,8 @@ export class drawingAttribute extends drawingVariable {
 		}
 		this.nTuples = this.floatArray.nTuples;
 
+		// must do a bufferData() every frame?  I guess not.  O, c'mon, i'll have to put this back someday
 		if (!this.diditOnce) {
-			// must do a bufferData() every frame?  I guess not.
 			gl.bindBuffer(gl.ARRAY_BUFFER, this.glBuffer);
 			gl.bufferData(gl.ARRAY_BUFFER, floatArray, gl.DYNAMIC_DRAW);
 		}
