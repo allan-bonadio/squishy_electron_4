@@ -51,7 +51,7 @@ export class abstractDrawing {
 	setDrawing() {
 		if (!this.program)
 			throw `in drawing: bad program=${this.program}`;
-		gl.useProgram(this.program);
+		this.gl.useProgram(this.program);
 	}
 
 	// compile one or the other shader; used only by compileProgram()
