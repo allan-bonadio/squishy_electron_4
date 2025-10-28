@@ -89,7 +89,6 @@ export function wrapForExc(func, where, andDebug) {
 
 /* *********************************************** browser Too Old */
 
-// TODO: isn't this a duplicate ofwhats in glAmbiance?
 // call this if the browser/machine are just way too old to support the stuff we use:
 // what = 'WebGL' at least v1, 'WebAssembly', dedicated 'WebWorkers', ...
 export function tooOldTerminate(what) {
@@ -99,13 +98,13 @@ export function tooOldTerminate(what) {
 		<p>Probably the best solution: click to get a more recent copy of
 			<a href=https://www.mozilla.org/en-US/firefox/new/>Firefox</a>,
 			<a href=https://www.google.com/chrome/dr/download>Google Chrome</a>,
-			<a href=https://support.apple.com/downloads/safari>Safari</a>, or
-			<a href=https://www.microsoft.com/en-us/edge>MS Edge</a>.
-			If your machine is old, you might be able to download an older ('legacy') version.
+			<a href=https://support.apple.com/downloads/safari>Safari</a>,
+			<a href=https://opera.en.softonic.com/mac/download>Opera Mac</a>,
+			<a href=https://opera.en.softonic.com/>Opera Win</a>,
+			or <a href=https://www.microsoft.com/en-us/edge>MS Edge</a>.
+			If your machine is old, you might be able to download an older ('legacy') version in between.
 	`;
-	//if ('WebGL' == what)
-	//	tooOldMessage += tryWebGL;
-	let inHere = document.querySelector('#theSquishPanel') || document.body;
+	let inHere = document.querySelector('.SquishPanel') || document.body;
 	inHere.innerHTML = tooOldMessage;
 	inHere.style.backgroundColor = '#f44' ;
 	inHere.style.color = '#000' ;

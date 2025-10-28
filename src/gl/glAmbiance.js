@@ -3,12 +3,14 @@
 ** Copyright (C) 2023-2025 Tactile Interactive, all rights reserved
 */
 
+import {tooOldTerminate} from '../utils/errors.js';
+
 // Creates a webgl context from the canvas upon startup.  Also handles a number
 // of details; choosing between webgl1 or 2, attaches shims for features in 2
 // that are absent in 1, a few other things.  includes gl, canvas node, and some squirrelly code.
 
 // webgl-lint: sigh.  TODO: get this working.  if ever.
-// webgl-debug: can wrap a gl in checking code.  TODO: do this too.
+// webgl-debug: can wrap a gl in checking code.  Spector browser plugin does this.
 
 let traceVersion = false;
 
@@ -20,23 +22,6 @@ if (typeof process == 'undefined') {
 }
 else {
 }
-
-/* *********************************************** browser-too-old error */
-// TODO: there's another copy of this, I think in errors.js
-// call this if the browser/machine are just way too old to support webgl
-export function tooOldTerminate() {
-	let tooOldMessage = `Sorry, your browser is too old for WebGL.
-		That's really really old!!
-		Probably the best solution is to get a more recent browser.`;
-	let b = document.body;
-	b.innerHTML = tooOldMessage;
-	b.style.backgroundColor = '#f88' ;
-	b.style.color = '#000' ;
-	b.style.padding = '4em' ;
-	throw `So long, and thanks for all the fish!`;
-}
-
-/* ***************************************** actual glAmbiance class */
 
 // create one of these for each canvas, to get the gl context, and other prep.
 // Returns a promise because webgl-lint must load asynchronously.
