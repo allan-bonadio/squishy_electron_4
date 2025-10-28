@@ -119,7 +119,6 @@ public:
 	int spectrumLength;  // should == nStates
 
 	struct qWave *mainFlick;
-	struct qWave *miniGraphWave;  // TODO: get rid of this
 
 	struct qGrinder *grinder;
 
