@@ -220,7 +220,7 @@ class SquishPanel extends React.Component {
 
 		return (
 			<SquishContext.Provider value={this.contextObj} >
-				<article id={this.props.id} className="SquishPanel" ref={this.setSPElement}>
+				<article className="SquishPanel" ref={this.setSPElement}>
 					<WaveView
 						outerWidth = {p.bodyWidth}
 						animator={this.animator}
