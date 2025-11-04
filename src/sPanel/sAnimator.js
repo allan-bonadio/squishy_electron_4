@@ -16,8 +16,8 @@ let traceTheViewBuffer = false;
 let traceHeartbeats = false;
 let traceFrameProgress = false;
 let traceFrameMenuRates = false;
-let traceSingleFrame = true;
-let traceIntegration = true;
+let traceSingleFrame = false;
+let traceIntegration = false;
 
 let tracerAFPeriod = false;
 let traceTypicalVideoPeriod = false;
@@ -229,12 +229,12 @@ class sAnimator {
 		// an error (eg divergence) will halt integration.  Start Over will put it back.
 		console.log(`🎥 sAnimator: hadException   will dialog`);
 		this.context.controlPanel.stopAnimating();
-		this.errorMessage = qeFuncs.grinder_getExceptionMessage(grinder.pointer);
+		this.errorMessage = qeFuncs.grinder_getExceptionMessage(this.grinder.pointer);
 		if (!this.errorMessage) this.errorMessage = 'sorry, no message.  🫦 🥺';
 		console.error(`had Exception!  '${this.errorMessage}'  ex=${this.grinder.hadException} `);
 		debugger;  // won't stop if we're not in the debugger
 		const ex = new Error(this.errorMessage);
-		ex.code  = UTF8ToString(grinder._exceptionCode);
+		ex.code  = UTF8ToString(this.grinder._exceptionCode);
 
 		this.divergenceJiggle(0);  // stop it
 
