@@ -11,9 +11,9 @@ import qeConsts from '../engine/qeConsts.js';
 
 let traceViewBufAfterDrawing = false;
 let traceMaxHeight = false;
-let traceFlatDrawing = true;
-let traceViewport = true;
-let traceReloadRow = true;
+let traceFlatDrawing = false;
+let traceViewport = false;
+let traceReloadRow = false;
 
 // diagnostic purposes; draws more per vertex
 let traceDrawPoints = false;

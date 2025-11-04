@@ -303,7 +303,7 @@ class eWave {
 
 	// freq is just like circular, although as a fraction of the pulseWidth instead of N
 	// pulseWidthUi is width of the packet, as percentage of N (0%...100%).
-	// offset is how far along is the peak, as an integer X value (0...N).
+	// offset is how far is the peak from left edge, as an integer X value (0...N).
 	setGaussianWave(freqUi, pulseWidthUi, offsetUi) {
 		const {start, end, N} = this.space.startEnd;
 		let pulseWidth = pulseWidthUi * N / 100;  // now in units of X; needn't be an integer
