@@ -8,7 +8,7 @@ import {prepForDirectAccessors} from '../utils/directAccessors.js';
 import voltDisplay from '../volts/voltDisplay.js';
 import eAvatar from './eAvatar.js';
 import eGrinder from './eGrinder.js';
-import eWave from './eWave.js';
+import eCavity from './eCavity.js';
 import eFlick from './eFlick.js';
 import {getAGroup} from '../utils/storeSettings.js';
 import {interpretCppException} from '../utils/errors.js';

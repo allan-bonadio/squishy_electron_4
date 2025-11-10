@@ -8,7 +8,7 @@
 #include "qSpace.h"
 #include "../greiman/qAvatar.h"
 #include "../schrodinger/qGrinder.h"
-#include "../debroglie/qWave.h"
+#include "../debroglie/qCavity.h"
 
 static bool traceSpaceCreation = false;
 static bool traceAvatarDetail = false;
@@ -66,7 +66,7 @@ qSpace *completeNewSpace(qSpace *space, int nGrWorkers) {
 //	qAvatar *mainAvatar = space->mainAvatar = new qAvatar(0, "mainAvatar");
 //	//space, "mainAvatar");
 //	mainAvatar->space = space;
-//	mainAvatar->qwave = (qWave *) grinder->flick;  // very carefully
+//	mainAvatar->cavity = (qCavity *) grinder->flick;  // very carefully
 //	mainAvatar->attachViewBuffer(0, NULL, 4, space->nPoints * 2);
 //	if (traceAvatarDetail) printf("🚀 created mainAvatar\n");
 
@@ -80,32 +80,22 @@ qSpace *completeNewSpace(qSpace *space, int nGrWorkers) {
 //	if (traceSpaceCreation) printf("   🚀 qSpace created: space=%p  mainAvatar=%p  grinder=%p\n",
 //		space, mainAvatar, qgrinder);
 
-	//qWave *miniGraphWave = space->miniGraphWave
-	//	= new qWave(space);
+	//qCavity *miniGraphWave = space->miniGraphWave
+	//	= new qCavity(space);
 	//if (traceSpaceCreation)
 	//	printf("miniGraphWave: %p\n", miniGraphWave);
 	//	miniGraphAvatar->space = space;
-	//	miniGraphAvatar->qwave = miniGraphWave;
+	//	miniGraphAvatar->cavity = miniGraphWave;
 	//	space->miniGraphAvatar->attachViewBuffer(0, NULL, 2, space->nPoints * 2);
 
 	//if (traceSpaceCreation) printf("🚀 created miniGraph Wave and Avatar\n");
 	return space;
 }
 
-// dispose of ALL of everything attached to the space
+// dispose of ALL of everything attached to the space incl grinder
 // use this to get rid of a space created with startNewSpace/addSpaceDimension/completeNewSpace
 void deleteFullSpace(qSpace *space) {
-	// deleting the avatars will delete their qWaves and qViewBuffers
 	// not there if completeNewSpace() never called, even if initSpace() called
-	// if (space->mainAvatar) {
-	// 	if (traceAvatarDetail) printf("   🚀 deleteFullSpace(): deleting avatars\n");
-	// 	delete space->mainAvatar;
-	// 	space->mainAvatar = NULL;
-	//
-	// 	delete space->miniGraphAvatar;
-	// 	space->miniGraphAvatar = NULL;
-	// }
-
 	if (space->grinder) {
 		delete space->grinder;
 		space->grinder = NULL;

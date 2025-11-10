@@ -1,5 +1,5 @@
 /*
-** eWave -- JS equivalent to a qWave (roughly)
+** eCavity -- JS equivalent to a qCavity (roughly)
 ** Copyright (C) 2021-2025 Tactile Interactive, all rights reserved
 */
 
@@ -48,11 +48,11 @@ function dumpRow(ix, re, im, prev, isBorder) {
 		`${_(phase)} ${_(dPhase)}} ${_(mag * 1000)} m𝜓/nm\n` ;
 }
 
-/* ******************************************************* eWave */
+/* ******************************************************* eCavity */
 
 // this is just a 1D wave.  Used typically for internal calculations with complex
 // numbers.  Or use eFlick.
-class eWave {
+class eCavity {
 	// useThis32F is one of these:
 	// • NO obsolete! (maybe still works but Float64Array() allocates its
 	//       own buffer) a C++ wave/spectrum buffer ptr, integer
@@ -61,20 +61,20 @@ class eWave {
 	// 		 (I bet you could pass it a JS array and some stuff would work)
 	// • Or absent/null, in which case it's dynamially allocated to 2*space.nPoints size
 	//        (JS only)
-	// pointer should be pointer to qWave in C++, otherwise leave it falsy.
+	// pointer should be pointer to qCavity in C++, otherwise leave it falsy.
 	// If you use pointer, leave the useThis32F null; it's ignored
 	// label is optional and only JS side
 	constructor(space, label = 'wave', useThis32F, pointer) {
 		this.space = space;
 		if (!(space instanceof eSpace))
-			throw new Error("new eWave: space is not an eSpace")
+			throw new Error("new eCavity: space is not an eSpace")
 
 		if (pointer) {
-			this.pointer = pointer;  // a qWave
+			this.pointer = pointer;  // a qCavity
 			//?? waveArg = this._wave;
 		}
 		else {
-			// make a new qWave
+			// make a new qCavity
 			//debugger;
 			this.pointer = qeFuncs.wave_create(space.pointer, null);
 		}
@@ -89,7 +89,7 @@ class eWave {
 	// label is optional and only JS side
 	completeWave(useThis32F) {
 		if (!useThis32F) {
-			// _wave must be a pointer to the existing qWave's buffer
+			// _wave must be a pointer to the existing qCavity's buffer
 			if (this._wave < 256) {
 				console.error(`this._wave pointer is too small ${this._wave}, but ok if just generating direct accessors`);
 				let temp_wave = qeFuncs.buffer_allocateWave(this.space.nPoints * 2);
@@ -110,7 +110,7 @@ class eWave {
 				useThis32F, 2 * space.nPoints);
 			cppObjectRegistry[useThis32F] = wave;
 
-			// smoke test - the values a raw, freshly created qWave gets
+			// smoke test - the values a raw, freshly created qCavity gets
 			if (traceAllocate) {
 				for (let j = 0; j < this.nPoints*2; j++)
 					wave[j] = -99.;
@@ -120,7 +120,7 @@ class eWave {
 		}
 		else {
 			debugger;
-			throw new Error(`call to construct eWave failed cuz bad useThis32F=${useThis32F}`);
+			throw new Error(`call to construct eCavity failed cuz bad useThis32F=${useThis32F}`);
 		}
 	}
 
@@ -170,9 +170,9 @@ class eWave {
 
 	// e-z dump out wave content.
 	dump(title = 'a wave') {
-		console.log(`\n🌊 ≡≡≡≡≡ eWave ${this.label ?? ''} | ${title} `+
+		console.log(`\n🌊 ≡≡≡≡≡ eCavity ${this.label ?? ''} | ${title} `+
 			this.dumpThat(this.wave) +
-			`\n🌊 ≡≡≡≡≡ end of eWave ${title} ≡≡≡≡≡\n\n`);
+			`\n🌊 ≡≡≡≡≡ end of eCavity ${title} ≡≡≡≡≡\n\n`);
 	}
 
 	rainbowDump(title) {
@@ -219,7 +219,7 @@ class eWave {
 	// refresh the wraparound points
 	// modeled after fixThoseBoundaries() in C++ pls keep in sync!
 	fixBoundaries() {
-		if ( this.space.nPoints <= 0) throw Error("🚀  eWave::fixThoseBoundaries() with zero points");
+		if ( this.space.nPoints <= 0) throw Error("🚀  eCavity::fixThoseBoundaries() with zero points");
 		const {end2, continuum} = this.space.startEnd2;
 		const w = this.wave;
 
@@ -251,7 +251,7 @@ class eWave {
 	}
 
 	/* **************************************************** familiar waves */
-	// TODO: break these functions out into a separate file and assign them into eWave class
+	// TODO: break these functions out into a separate file and assign them into eCavity class
 
 	// n is  number of cycles all the way across N points.
 	// n 'should' be an integer to make it meet up on ends if endless
@@ -450,10 +450,10 @@ class eWave {
 
 		if (traceFamiliarResult)
 			this.dump(`familiarResult of ${this.label}`);
-			//this.rainbowDump(`eWave.setFamiliarWave(${waveParams.waveBreed}) done`);
+			//this.rainbowDump(`eCavity.setFamiliarWave(${waveParams.waveBreed}) done`);
 	}
 }
 
-window.eWave = eWave;  // debugging
-export default eWave;
+window.eCavity = eCavity;  // debugging
+export default eCavity;
 

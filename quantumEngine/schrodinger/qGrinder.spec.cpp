@@ -70,10 +70,10 @@ TEST(qGrinder, CheckGrinderConstructor)
 /* ******************************************************************************************** FourierFilter */
 
 // need this to verify waves have a certain specific frequency.  Do this to the spectrum.
-static void isAllZeroesExceptFor(qBuffer *qwave, int except1, bool shouldFail, const char *msg) {
-	qCx *wave = qwave->wave;
-	int start = qwave->start;
-	int end = qwave->end;
+static void isAllZeroesExceptFor(qBuffer *qcavity, int except1, bool shouldFail, const char *msg) {
+	qCx *wave = qcavity->wave;
+	int start = qcavity->start;
+	int end = qcavity->end;
 	char buf[100];
 
 	buf[0] = 0;
@@ -131,7 +131,7 @@ static void isAllZeroesExceptFor(qBuffer *qwave, int except1, bool shouldFail, c
 // 	qAvatar *avatar = new qAvatar(space, "tryFourierAva");
 // 	qGrinder *grinder = new qGrinder(space, avatar, 1, "tryFourierGri");
 // 	qFlick *qf = grinder->flick;
-// 	qWave *addOn = new qWave(space);
+// 	qCavity *addOn = new qCavity(space);
 // 	qSpectrum *rainbow = grinder->getSpectrum();
 //
 // 	qf->setCircularWave(goodFreq);
@@ -204,8 +204,8 @@ static void fourierExperiments(int N) {
 
 	allOnes->dumpSpectrum("all ones");
 
-	qWave *onesWave = new qWave(space);
-	allOnes->generateWave(onesWave);
+	qCavity *onesWave = new qCavity(space);
+	allOnes->generateCavity(onesWave);
 	onesWave->dump("onesWave after conversion", true);
 
 	delete allOnes;

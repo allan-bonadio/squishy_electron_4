@@ -11,7 +11,7 @@ extern void paChineseFFT(qCx *dest, qCx *src, int N);
 extern void paChineseIFFT(qCx *dest, qCx *src, int N);
 
 // nice console dump of wave and FFT centered at zero.  For iteration.
-extern void analyzeWaveFFT(qWave *qw, const char *title = "untitled");
+extern void analyzeCavityFFT(qCavity *qw, const char *title = "untitled");
 
 // rounds up to the nearest power of two or whatever
 extern int chooseSpectrumLength(qSpace *);

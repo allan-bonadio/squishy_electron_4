@@ -7,7 +7,7 @@
 #include "../hilbert/qSpace.h"
 #include "qAvatar.h"
 #include "../schrodinger/qGrinder.h"
-#include "../debroglie/qWave.h"
+#include "../debroglie/qCavity.h"
 #include "../fourier/qSpectrum.h"
 
 #include "../testing/testingHelpers.h"
@@ -28,14 +28,14 @@ TEST(qAvatar, CheckAvatarConstructor)
 	qSpace *space = makeBareSpace(8, contENDLESS);
 	qAvatar *avatar = new qAvatar(space, "outcome");
 
-	LONGS_EQUAL(space->nPoints, avatar->qwave->nPoints);
-	proveItsMine(avatar->qwave->wave	, space->nPoints * sizeof(qCx));
+	LONGS_EQUAL(space->nPoints, avatar->cavity->nPoints);
+	proveItsMine(avatar->cavity->wave	, space->nPoints * sizeof(qCx));
 	proveItsMine(avatar->qvBuffer->vBuffer, space->nPoints * sizeof(float) * 8);
 
 	LONGS_EQUAL('Avat', avatar->magic);
 	POINTERS_EQUAL(space, avatar->space);
 
-	LONGS_EQUAL(space->nPoints, avatar->qwave->nPoints);
+	LONGS_EQUAL(space->nPoints, avatar->cavity->nPoints);
 
 	POINTERS_EQUAL(space->voltage, avatar->voltage);
 

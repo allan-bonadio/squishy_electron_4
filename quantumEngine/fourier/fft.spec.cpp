@@ -7,7 +7,7 @@
 #include "../hilbert/qSpace.h"
 #include "../greiman/qAvatar.h"
 #include "../schrodinger/qGrinder.h"
-#include "../debroglie/qWave.h"
+#include "../debroglie/qCavity.h"
 #include "qSpectrum.h"
 
 #include "../testing/testingHelpers.h"
@@ -31,7 +31,7 @@ static void tryOutFFT(int N, double freq) {
 	// this also tests contDISCRETE a little
 	qSpace *space = makeBareSpace(N, contDISCRETE);
 
-	qWave *original = new qWave(space);
+	qCavity *original = new qCavity(space);
 	original->setCircularWave(freq);
 	if (traceDumpWaves) original->dump("    tryOutFFT:  orignal wave set", true);
 
@@ -92,7 +92,7 @@ static void trySquareWaveFFT(int N) {
 	// this also tests contDISCRETE a little
 	qSpace *space = makeBareSpace(N, contDISCRETE);
 
-	qWave *original = new qWave(space);
+	qCavity *original = new qCavity(space);
 
 	// now fill it with a square wave
 	qCx *o = original->wave;
@@ -155,7 +155,7 @@ static void tryInverseFFT(int N, double seed) {
 
 	qSpace *space = makeBareSpace(N, contDISCRETE);
 
-	qWave *original = new qWave(space);
+	qCavity *original = new qCavity(space);
 
 	// now fill it using a repeatable 'random' sequence
 	qCx *o = original->wave;
@@ -172,8 +172,8 @@ static void tryInverseFFT(int N, double seed) {
 	if (traceDumpWaves) spect->dumpSpectrum("    tryInverseFFT: generated spectrum");
 
 	// now convert it back
-	qWave *result = new qWave(space);
-	spect->generateWave(result);
+	qCavity *result = new qCavity(space);
+	spect->generateCavity(result);
 
 	// make sure it's the same
 	qCx *r = result->wave;

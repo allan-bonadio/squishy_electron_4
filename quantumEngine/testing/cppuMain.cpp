@@ -6,7 +6,7 @@
 #include <stdexcept>
 #include <cstring>
 
-#include "../debroglie/qWave.h"
+#include "../debroglie/qCavity.h"
 #include "../debroglie/qFlick.h"
 #include "../fourier/qSpectrum.h"
 #include "../greiman/qAvatar.h"
@@ -22,9 +22,9 @@
 
 // for memory leaks that cppu conveniently gives us, some clues:
 static void dumpSizes(void) {
-	printf("byte sizes... sz(qSpace)=%lu  sz(qWave)=%lu  sz(qBuffer)=%lu  sz(qSpectrum)=%lu  \n"
+	printf("byte sizes... sz(qSpace)=%lu  sz(qCavity)=%lu  sz(qBuffer)=%lu  sz(qSpectrum)=%lu  \n"
 		"sz(qFlick)=%lu   sz(qAvatar)=%lu  sz(qGrinder)=%lu\n\n",
-		sizeof(qSpace), sizeof(qWave), sizeof(qBuffer), sizeof(qSpectrum),
+		sizeof(qSpace), sizeof(qCavity), sizeof(qBuffer), sizeof(qSpectrum),
 		sizeof(qFlick), sizeof(qAvatar), sizeof(qGrinder));
 }
 

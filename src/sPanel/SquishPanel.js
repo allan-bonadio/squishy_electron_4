@@ -35,7 +35,6 @@ const DEFAULT_SCENE_NAME = 'flatScene';
 
 class SquishPanel extends React.Component {
 	static propTypes = {
-		id: PropTypes.string.isRequired,
 		bodyWidth: PropTypes.number.isRequired,
 	};
 
@@ -220,7 +219,7 @@ class SquishPanel extends React.Component {
 
 		return (
 			<SquishContext.Provider value={this.contextObj} >
-				<article className="SquishPanel" ref={this.setSPElement}>
+				<article className={`SquishPanel space` + this.contextObj.name} ref={this.setSPElement}>
 					<WaveView
 						outerWidth = {p.bodyWidth}
 						animator={this.animator}

@@ -9,9 +9,9 @@ a long array of qCx complex numbers, plus some other meta info
 Data structures used for these buffers:
 qCx *wave  # wave: just an array of complex nums that's nPoints = nPoints/2 long
 	In JS, it turns into a Float64Array with nPoints complex numbers
-qBuffer - object, superclass of qWave and qSpectrum
-qWave - object that owns a single wave, and points to its space
-qSpectrum - object that owns a single qSpectrum, and points to its space
+qBuffer - object, superclass of qCavity and qSpectrum
+qCavity - object that owns a single wave, and points to its space
+qSpectrum - object that owns a single spectrum wave, and points to its space
 qFlick - object that owns a list of waves, and points to its space
 */
 
@@ -221,9 +221,9 @@ void qBuffer::dumpHiRes(const char *title) {
 	printf(" 🍕 🍕  HIRES innerProduct: %22.16lg\n", iProd);
 }
 
-// calls the JS dumpRainbow method of eWave.  Note we can't compile this for
-// straight C++ code (like specs) cuz there's no emscripten or JS.  So the app,
-// or node with emscripten
+// calls the JS dumpRainbow method of eCavity.  Note we can't compile this for
+// straight C++ code (like specs) cuz there's no emscripten or JS.  So the web app,
+// or node with emscripten, only
 void qBuffer::rainbowDump(const char *title) {
 	printf("about to rainbowDump EM_ASM %p %d %d %d %s\n\n", wave, start, end, nPoints, title);
 	// this also has to compile for standard C++ with no emscripten
@@ -334,7 +334,7 @@ double qBuffer::normalize(void) {
 
 // a little bit dangerous if your waves don't have the same continuum
 void qBuffer::copyThatWave(qCx *dest, qCx *src, int nCxes) {
-//	printf(" 🍕 qWave::copyThatWave(%d <== %d)\n", (int) dest, (int) src);
+//	printf(" 🍕 qCavity::copyThatWave(%d <== %d)\n", (int) dest, (int) src);
 	if (!dest) dest = wave;
 	if (!src) src = wave;
 	if (nCxes < 0)
@@ -435,8 +435,8 @@ void qBuffer::add(double coeff1, qCx *wave1, double coeff2, qCx *wave2) {
 
 // add these two waves, modulated by the coefficients, leaving result in this->wave
 // UN-normalized, UN-fixed boundaries.
-void qBuffer::add(double coeff1, qBuffer *qwave1, double coeff2, qBuffer *qwave2) {
-	add(coeff1, qwave1->wave + qwave1->start, coeff2, qwave2->wave + qwave2->start);
+void qBuffer::add(double coeff1, qBuffer *buffer1, double coeff2, qBuffer *buffer2) {
+	add(coeff1, buffer1->wave + buffer1->start, coeff2, buffer2->wave + buffer2->start);
 }
 
 

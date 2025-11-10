@@ -28,7 +28,7 @@ class eGrinder {
 // 		this.avatar = avatar;  // the avatar it loads into
 // 		avatar.grinder = this;
 
-		// for the flick we only have the pointer.  Similar to a eWave
+		// for the flick we only have the pointer.  Similar to a eCavity
 		this.flick = new eFlick(space, 'mainFlick', this._flick);
 
 		//console.log(`sentinels: ${qeConsts.grSENTINEL_VALUE} ≟ ${this.sentinel}`);
@@ -42,8 +42,8 @@ class eGrinder {
 	// delete, except 'delete' is a reserved word.  Turn everything off.
 	// null out all other JS objects and buffers it points to, so ref counting can recycle it all
 	liquidate() {
-		this.ewave.liquidate();
-		this.space = this.ewave = this.vBuffer = null;
+		this.cavity.liquidate();
+		this.space = this.cavity = this.vBuffer = null;
 
 		qeFuncs.grinder_delete(this.pointer);
 	}

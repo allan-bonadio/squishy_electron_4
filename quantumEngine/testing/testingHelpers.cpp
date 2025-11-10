@@ -6,7 +6,7 @@
 #include <stdexcept>
 #include <cstring>
 
-#include "../debroglie/qWave.h"
+#include "../debroglie/qCavity.h"
 #include "../fourier/qSpectrum.h"
 #include "../greiman/qAvatar.h"
 #include "../schrodinger/qGrinder.h"

@@ -1,5 +1,5 @@
 /*
-** Flick -- a qWave that contains a dynamic sequence of waves
+** Flick -- a qCavity that contains a dynamic sequence of waves
 ** Copyright (C) 2021-2025 Tactile Interactive, all rights reserved
 */
 
@@ -8,7 +8,7 @@
 
 #include "../hilbert/qSpace.h"
 #include "../schrodinger/qGrinder.h"
-#include "qWave.h"
+#include "qCavity.h"
 #include "qFlick.h"
 #include "../directAccessors.h"
 
@@ -30,7 +30,7 @@ void qFlick::reset(void) {
 
 // each buffer is initialized to zero bytes therefore 0.0 everywhere
 qFlick::qFlick(qSpace *space, int nW)
-	: qWave(space), nWaves(nW),  allocWaves(nW), currentWave(0)
+	: qCavity(space), nWaves(nW),  allocWaves(nW), currentWave(0)
 {
 	if (! space)
 		throw std::runtime_error("qFlick::qFlick NULL space");
@@ -42,7 +42,7 @@ qFlick::qFlick(qSpace *space, int nW)
 	// array of waves, just the pointers to them
 	waves = (qCx **) calloc(nPoints, sizeof(qCx *));
 
-	// being a qWave, we already have one, just need the rest.  For many purposes,
+	// being a qCavity, we already have one, just need the rest.  For many purposes,
 	waves[0] = wave;
 	for (int w = 1; w < nWaves; w++)
 		waves[w] = allocateWave(nPoints);
@@ -70,9 +70,9 @@ qFlick::~qFlick() {
 
 /* *********************************************** direct access */
 
-// although qFlick is a subclass, and I'd expect it to exactly overlap qWave,
+// although qFlick is a subclass, and I'd expect it to exactly overlap qCavity,
 // there seems to be an extra 128 bits.
-// So, do it over.  All these will have different offsets from the same thing in qWave.
+// So, do it over.  All these will have different offsets from the same thing in qCavity.
 void qFlick::formatDirectOffsets(void) {
 	printf("🚦 🚦 --------------- starting 🥽 eFlick direct access 🥽 JS getters & setters --------------\n\n");
 
@@ -246,7 +246,7 @@ double qFlick::magnitude(int doubleSerial, int ix) {
 }
 
 
-// set which one is 'current', so if someone uses this as a qWave,
+// set which one is 'current', so if someone uses this as a qCavity,
 // that's what they see, that's what gets 'normalized' or whatever
 // to 'getCurrent' wave, just get qfk->wave;
 void qFlick::setCurrent(int newSerial) {

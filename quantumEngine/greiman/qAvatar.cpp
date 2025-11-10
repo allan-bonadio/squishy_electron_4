@@ -11,7 +11,7 @@
 //#include "../hilbert/qSpace.h"
 #include "qAvatar.h"
 //#include "../schrodinger/qGrinder.h"
-//#include "../debroglie/qWave.h"
+//#include "../debroglie/qCavity.h"
 //#include "../fourier/qSpectrum.h"
 //#include "../fourier/fftMain.h"
 #include "../directAccessors.h"
@@ -68,7 +68,7 @@ viewBufInfo::viewBufInfo(void) {
 // create new avatar, complete with zero viewBuffers
 qAvatar::qAvatar(int breed, const char *lab)
 	: magic('Avat'), avatarBreed(breed), loader(NULL), space(NULL),
-	qwave(NULL), d0(0), d1(0), i0(0), i1(0) {
+	cavity(NULL), d0(0), d1(0), i0(0), i1(0) {
 
 	strncpy(label, lab, MAX_LABEL_LEN);
 	label[MAX_LABEL_LEN-1] = 0;
@@ -133,8 +133,8 @@ void qAvatar::formatDirectOffsets(void) {
 
 	makePointerGetter(space);
 	makePointerSetter(space);
-	makePointerGetter(qwave);
-	makePointerSetter(qwave);
+	makePointerGetter(cavity);
+	makePointerSetter(cavity);
 
 	// arguments and return values
 	makeIntGetter(i0);
@@ -349,9 +349,9 @@ qAvatar *avatar_create(int avatarBreed, char *label) {
 	return new qAvatar(avatarBreed, label);
 }
 
-// qwave and space are both optional, pass null for none or just don't call this
-void avatar_setWaveSpace(qAvatar *avatar, qWave *qwave, qSpace *space) {
-	avatar->qwave = qwave;
+// cavity and space are both optional, pass null for none or just don't call this
+void avatar_setCavitySpace(qAvatar *avatar, qCavity *cavity, qSpace *space) {
+	avatar->cavity = cavity;
 	avatar->space = space;
 }
 
@@ -377,11 +377,11 @@ void avatar_dumpIndex(qAvatar *avatar, char *title) {
 	avatar->dumpIndex(title);
 }
 
-// return the vbuffer, address of raw float array.  Simple enough to do by hand;
-// not needed for C++. take this int in JS and make a typed array out of it to
+// return the address of raw float array.  Simple enough to do by hand;
+// not needed for C++. in JS, take this viewBuffer  and make a typed array out of it to
 // access the elements
 float *avatar_getViewBuffer(qAvatar *avatar, int bufferIx) {
-	return avatar->buf(bufferIx);
+	return avatar->viewBuffers[bufferIx].fArray;
 }
 
 //void avatar_loadViewBuffers(qAvatar *avatar, int breed) {

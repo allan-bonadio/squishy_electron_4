@@ -4,7 +4,7 @@
 */
 
 import {cppObjectRegistry, prepForDirectAccessors} from '../utils/directAccessors.js';
-//import eWave from './eWave.js';
+//import eCavity from './eCavity.js';
 import qeFuncs from './qeFuncs.js';
 import qeConsts from './qeConsts.js';
 
@@ -67,8 +67,8 @@ class eAvatar {
 	// it all
 	liquidate() {
 		throw Error("eAvatar liquidate not yet implemented")
-		//this.ewave.liquidate();
-		//this.space = this.ewave = this.vBuffer = null;
+		//this.cavity.liquidate();
+		//this.space = this.cavity = this.vBuffer = null;
 	}
 
 	// set an element in the typedArray bloc
@@ -152,7 +152,7 @@ class eAvatar {
 	get avatarBreed() { return this.ints[1]; }
 	set avatarBreed(a) { this.ints[1] = a; }
 	get _space() { return this.ints[3]; }
-	get _qwave() { return this.ints[4]; }
+	get _cavity() { return this.ints[4]; }
 	get i0() { return this.ints[5]; }
 	set i0(a) { this.ints[5] = a; }
 	get i1() { return this.ints[6]; }

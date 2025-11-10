@@ -7,7 +7,7 @@
 
 struct qSpectrum : public virtual  qBuffer {
 
-	// create a qWave, dynamically allocated or hand in a buffer to use
+	// create a qCavity, dynamically allocated or hand in a buffer to use
 	qSpectrum(qSpace *space, qCx *useThisBuffer = NULL);
 
 	~qSpectrum();
@@ -18,10 +18,10 @@ struct qSpectrum : public virtual  qBuffer {
 		{this->dumpSpectrum(title, withExtras);};
 
 	// do fft
-	void generateSpectrum(qWave *inputQWave);
+	void generateSpectrum(qCavity *inputQWave);
 
 	// do inverse fft
-	void generateWave(qWave *outputWave);
+	void generateCavity(qCavity *outputWave);
 };
 
 

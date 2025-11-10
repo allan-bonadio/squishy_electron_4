@@ -63,7 +63,7 @@ qGrinder::qGrinder(qSpace *sp, int nGrWorkers, const char *lab)
 	flick = new qFlick(space, 3);
 
 	// recieves wave after a frame is done; then vbufs generated from that
-	stage = new qWave(space, NULL);
+	stage = new qCavity(space, NULL);
 
 	// so wave in the flick points to the zero-th wave
 
@@ -266,13 +266,13 @@ static void difft(double p, double q, double r) {
 
 // count up how many sign reversals, for the derivative, in consecutive cells we
 // have
-void qGrinder::tallyUpKinks(qWave *qwave) {
+void qGrinder::tallyUpKinks(qCavity *qcavity) {
 	tally = 0;
-	qCx *wave = qwave->wave;
-	qCx a = wave[qwave->start];
-	qCx b = wave[qwave->start + 1];
+	qCx *wave = qcavity->wave;
+	qCx a = wave[qcavity->start];
+	qCx b = wave[qcavity->start + 1];
 	qCx c;
-	for (int ix = qwave->start + 2; ix <= qwave->end; ix++) {
+	for (int ix = qcavity->start + 2; ix <= qcavity->end; ix++) {
 		c = wave[ix];
 
 		difft(a.re, b.re, c.re);
@@ -284,7 +284,7 @@ void qGrinder::tallyUpKinks(qWave *qwave) {
 	// NO!  percent is higher for smaller buffers.  I think number of kinks is better
 	//double percent = 100.0 * tally / N / 2.;
 	// figure rate.  ÷2 for real, imag
-	int N = qwave->end - qwave->start;
+	int N = qcavity->end - qcavity->start;
 	divergence = tally/2;
 
 	if (traceKinks) {
@@ -469,7 +469,7 @@ void qGrinder::threadsHaveFinished() {
 
 	// what is this doing here?  Prob should be done in another thread.
 	if (this->pleaseFFT)
-		analyzeWaveFFT(flick, "latest fft");
+		analyzeCavityFFT(flick, "latest fft");
 	this->pleaseFFT = false;
 
 	measureDivergence();
@@ -566,7 +566,7 @@ const char *grinder_getExceptionMessage(qGrinder *grinder) {
 
 // user button to print it out now, while not running.  See also pleaseFFT for when it is
 void qGrinder::askForFFT(void) {
-	analyzeWaveFFT(flick, "askForFFT while idle");
+	analyzeCavityFFT(flick, "askForFFT while idle");
 }
 
 // if integrating, FFT as the current frame finishes, before and after fourierFilter().

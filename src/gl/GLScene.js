@@ -36,7 +36,7 @@ function setPT() {
 		sceneClassName: PropTypes.string.isRequired,  // what to draw
 		sceneName: PropTypes.string,  // name for debugging
 
-		// eWave(s) or other buffers to draw or any data.  Any format; passed to avatar
+		// eCavity(s) or other buffers to draw or any data.  Any format; passed to avatar
 		//inputInfo: PropTypes.any,
 
 		// Our caller gets these from eSpaceCreatedPromise; so it must be resolved by now.
@@ -124,7 +124,7 @@ function GLScene(props) {
 			return null;  // too early
 		}
 		// if (traceViewBuffer)
-		// p.avatar.ewave.dump(`🖼 GLScene ${p.sceneName}: got the ewave right here`);
+		// p.avatar.cavity.dump(`🖼 GLScene ${p.sceneName}: got the cavity right here`);
 
 		// copy from latest wave to view buffer (c++) & pick up highest
 		//p.avatar.loadViewBuffer();

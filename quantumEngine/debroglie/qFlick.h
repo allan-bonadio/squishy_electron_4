@@ -3,7 +3,7 @@
 ** Copyright (C) 2021-2025 Tactile Interactive, all rights reserved
 */
 
-#include "qWave.h"
+#include "qCavity.h"
 
 #define UNLOCKED  255
 #define MAX_T_PROGRESSES 254
@@ -11,9 +11,9 @@
 
 struct qGrinder;
 
-// Multiple complex buffers identical to the single qWave buffer.
+// Multiple complex buffers identical to the single qCavity buffer.
 // The qBuffer 'wave' var points to whichever wave in the sequence is the 'it' wave
-struct qFlick : public qWave {
+struct qFlick : public qCavity {
 	qFlick(qSpace *space, int nWaves);
 	~qFlick();
 

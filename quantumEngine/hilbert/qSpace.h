@@ -118,7 +118,7 @@ public:
 	int nPoints;  // allocated size
 	int spectrumLength;  // should == nStates
 
-	struct qWave *mainFlick;
+	struct qCavity *mainFlick;
 
 	struct qGrinder *grinder;
 
@@ -141,7 +141,7 @@ extern "C" {
 
 	// do i need this?  maybe not.
 	// void linkUp(qSpace *space,
-	// 	qAvatar *mainAvatar, qAvatar *miniGraphAvatar, qWave *mainFlickWave, qWave *miniGraphWave );
+	// 	qAvatar *mainAvatar, qAvatar *miniGraphAvatar, qCavity *mainFlickWave, qCavity *miniGraphWave );
 
 	// destroy
 	void deleteFullSpace(qSpace *space);

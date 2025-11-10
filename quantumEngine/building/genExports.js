@@ -50,12 +50,12 @@ let exportsSrc  = [
 	// any size data
 	{name: 'buffer_allocateBuffer', args: ['number'], retType: 'number'},
 
-	// accept an integer pointer to the qWave as first arg
-	{name: 'wave_normalize', args: ['number'], retType: null},
+	// accept an integer pointer to the qCavity as first arg
+	{name: 'cavity_normalize', args: ['number'], retType: null},
 
-	// create a new qWave, allocating the space dynamically, that conforms to the space passed in
-	{name: 'wave_create', args: ['number', 'number'], retType: 'number'},
-	{name: 'wave_delete', args: ['number'], retType: null},
+	// create a new qCavity, allocating the space dynamically, that conforms to the space passed in
+	{name: 'cavity_create', args: ['number', 'number'], retType: 'number'},
+	{name: 'cavity_delete', args: ['number'], retType: null},
 
 	{name: 'flick_create', args: ['number', 'number'], retType: 'number'},
 	{name: 'flick_delete', args: ['number'], retType: null},
