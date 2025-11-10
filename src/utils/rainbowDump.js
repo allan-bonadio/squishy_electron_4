@@ -10,7 +10,7 @@ let traceColors = true;
 
 // Dump a wave buffer as a colored bargraph in the JS console
 // this is also called by C++ so it's easier as a standalone function
-// see also eWave method by same name (but different args)
+// see also eCavity method by same name (but different args)
 export function rainbowDump(wave, start, end, nPoints, title) {
 	let start2 = 2 * start;
 	let end2 = 2 * end;
