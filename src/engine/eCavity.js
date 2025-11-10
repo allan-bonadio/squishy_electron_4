@@ -76,7 +76,7 @@ class eCavity {
 		else {
 			// make a new qCavity
 			//debugger;
-			this.pointer = qeFuncs.wave_create(space.pointer, null);
+			this.pointer = qeFuncs.cavity_create(space.pointer, null);
 		}
 		prepForDirectAccessors(this, this.pointer);
 		this.label = label;
