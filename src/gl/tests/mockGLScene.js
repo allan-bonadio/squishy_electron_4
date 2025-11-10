@@ -41,7 +41,7 @@ export class mockGLScene {
 	}
 
 yeah i think this has to change too
-	constructor(sceneName, ambiance) {
+	constructor(sceneName, ambiance, inputInfo) {
 		this.state = {canvas: null};
 		this.space = mockSpace;
 		this.avatar = mockAvatar;

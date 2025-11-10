@@ -11,29 +11,13 @@
 //#include "../hilbert/qSpace.h"
 #include "qAvatar.h"
 //#include "../schrodinger/qGrinder.h"
-//#include "../debroglie/qWave.h"
+//#include "../debroglie/qCavity.h"
 //#include "../fourier/qSpectrum.h"
 //#include "../fourier/fftMain.h"
 #include "../directAccessors.h"
 
-
-
-// TODO: merge ViewBuffer into this; I think avatar has almost everything, just gotta make sure
-
-static bool traceJustWave = false;
-static bool traceJustInnerProduct = false;
-
-static bool traceFourierFilter = false;
-
-static bool dumpFFHiResSpectums = false;
-static bool traceIProd = false;
-
-// those apply to these tracing flags
-static bool traceEachFFSquelch = false;
-static bool traceEndingFFSpectrum = false;
-static const bool traceViewBuffer = false;
+static const bool traceCreation = false;
 static const bool traceHighest = false;
-static const bool traceInDetail = false;
 
 #define MAX_N_BUFFERS  4
 
@@ -84,29 +68,20 @@ viewBufInfo::viewBufInfo(void) {
 // create new avatar, complete with zero viewBuffers
 qAvatar::qAvatar(int breed, const char *lab)
 	: magic('Avat'), avatarBreed(breed), loader(NULL), space(NULL),
-	qwave(NULL), d0(0), d1(0), i0(0), i1(0) {
+	cavity(NULL), d0(0), d1(0), i0(0), i1(0) {
 
-	strcpy(label, "ra");
-	// this crashes all the time.  I have no idea why.
-	//	strncpy(label, lab, MAX_LABEL_LEN);
-	//	label[MAX_LABEL_LEN] = 0;
+	strncpy(label, lab, MAX_LABEL_LEN);
+	label[MAX_LABEL_LEN-1] = 0;
 
-	//	qwave = new qWave(space);
-	//	voltage = sp->voltage;
-
-	//printf(" construct avatar.   label: %p      this=%p\n", lab, this );
-	printf("MAX_LABEL_LEN: %d\n", MAX_LABEL_LEN );
+	printf(" construct avatar.   label: %p      this=%p\n", lab, this );
+	printf("the label passed in is %s\n", lab);
+	if (traceCreation)
+		printf(" 🚥 creating new qAvatar.  ptr=%p breed=%d  label='%s' MAX_LABEL_LEN: %d\n",
+			this, avatarBreed, label, MAX_LABEL_LEN);
 	// crashes!! printf("lab input string: 0x %2x %2x %2x %2x %2x %2x \n", lab[0], lab[1], lab[2], lab[3], lab[4], lab[5] );
 
 	for (int b = 0; b < MAX_N_BUFFERS; b++)
 		viewBuffers[b].fArray = NULL;
-
-
-					//	printf(" qAvatar::qAvatar(int breed=%d, loader=%p, const char *lab='%s'; lab[0]=%d lab[1]=%d)\n",
-					//		avatarBreed, loader, label, (int) label[0], (int) label[1]);
-//	loader = getBreedLoader(avatarBreed);
-//	printf("qAvatar::qAvatar(after loader set: loader=%p, ...)\n",
-//		loader);
 
 	// enable this when qAvatar.h fields change
 	FORMAT_DIRECT_OFFSETS;
@@ -158,8 +133,8 @@ void qAvatar::formatDirectOffsets(void) {
 
 	makePointerGetter(space);
 	makePointerSetter(space);
-	makePointerGetter(qwave);
-	makePointerSetter(qwave);
+	makePointerGetter(cavity);
+	makePointerSetter(cavity);
 
 	// arguments and return values
 	makeIntGetter(i0);
@@ -322,7 +297,7 @@ void qAvatar::dumpIndex(const char *title) {
 
 
 // SAVE THIS FOR LATER phase on the above dump
-//// dump the view buffer just before it heads off to webgl.  TODO: remove
+//// dump the view buffer just before it heads off to webgl.
 //static void old_qAvatar__dumpViewBuffers(int bufferMask, const char *title) {
 //	float prevPhase = 0;
 //	#define FORMAT_BASE      "%6d |  %8.5f  %8.5f  %6.5g  %6.5g"
@@ -361,61 +336,22 @@ void qAvatar::dumpIndex(const char *title) {
 
 /* ******************************************************** loading */
 
-// fill in arguments in avatar before calling.  Some return values left in avatar, too.
-// Actually, this is getting less official - you can write your loader in JS or C++.
-// just call it at the right time.
-void qAvatar::loadViewBuffers(int breed) {
-	printf("qAvatar::loadViewBuffers: um... not implemented right now\n");
-//
-////fuck it
-//		loaderRainbow(this);
-//		return;
-//
-//	printf(" 🚥 avatar_loadViewBuffers: avatar  ptr=%p  breed=%d\n", this, avatarBreed);
-//
-//	breed = breed ? breed : avatarBreed;
-//	switch (breed) {
-//	case avNULL:
-//		throw std::runtime_error("Cannot load avNULL");
-//
-//	case avOldFLAT:
-//		throw std::runtime_error("Cannot load oldFlat");  // actual code doesn't relly work
-//
-//	case avFLAT:
-//		loaderFlat(this);
-//		break;
-//
-//	case avFLAT_TICS:
-//		loaderFlatTics(this);
-//		break;
-//
-//	case avRAINBOW:
-//		loaderRainbow(this);
-//		break;
-//
-//	default:
-//		printf("Cannot load avatarBreed=%d\n", avatarBreed);
-//		throw std::runtime_error("Cannot load avatarBreed");
-//		break;
-//
-//	}
-
-}
-
+// see avFlatLoader
 
 /* ************************************************************** C */
 
 // for the JS side
 
 qAvatar *avatar_create(int avatarBreed, char *label) {
-printf(" 🚥 creating new qAvatar.  breed=%d  label='%s' %p\n",
-	avatarBreed, label, label);
+	if (traceCreation)
+		printf(" 🚥 avatar_create()  breed=%d  label='%s' %p\n",
+			avatarBreed, label, label);
 	return new qAvatar(avatarBreed, label);
 }
 
-// qwave and space are both optional, pass null for none or just don't call this
-void avatar_setWaveSpace(qAvatar *avatar, qWave *qwave, qSpace *space) {
-	avatar->qwave = qwave;
+// cavity and space are both optional, pass null for none or just don't call this
+void avatar_setCavitySpace(qAvatar *avatar, qCavity *cavity, qSpace *space) {
+	avatar->cavity = cavity;
 	avatar->space = space;
 }
 
@@ -441,16 +377,16 @@ void avatar_dumpIndex(qAvatar *avatar, char *title) {
 	avatar->dumpIndex(title);
 }
 
-// return the vbuffer, address of raw float array.  Simple enough to do by hand;
-// not needed for C++. take this int in JS and make a typed array out of it to
+// return the address of raw float array.  Simple enough to do by hand;
+// not needed for C++. in JS, take this viewBuffer  and make a typed array out of it to
 // access the elements
 float *avatar_getViewBuffer(qAvatar *avatar, int bufferIx) {
-	return avatar->buf(bufferIx);
+	return avatar->viewBuffers[bufferIx].fArray;
 }
 
-void avatar_loadViewBuffers(qAvatar *avatar, int breed) {
-	printf("avatar_loadViewBuffers avatar=%p  breed passedin=%d  created=%d\n",
-		avatar, breed, avatar->avatarBreed);
-	avatar->loadViewBuffers(breed);
-}
+//void avatar_loadViewBuffers(qAvatar *avatar, int breed) {
+//	printf("avatar_loadViewBuffers avatar=%p  breed passedin=%d  created=%d\n",
+//		avatar, breed, avatar->avatarBreed);
+//	avatar->loadViewBuffers(breed);
+//}
 

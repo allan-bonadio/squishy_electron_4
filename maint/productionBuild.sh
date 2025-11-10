@@ -1,5 +1,6 @@
 #!/bin/bash
 
+# this is 'npm run build'
 # Start with this script to make a new version for the server,
 # or just a prod version on this local machine.
 

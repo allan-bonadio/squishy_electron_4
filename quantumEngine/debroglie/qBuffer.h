@@ -1,22 +1,22 @@
 /*
-** quantum buffer -- a buffer of qCx values that represents a qWave or a qSpectrum
+** quantum buffer -- a buffer of qCx values that represents a qCavity or a qSpectrum
 ** Copyright (C) 2022-2025 Tactile Interactive, all rights reserved
 */
 
 // a 'wave' is a straight array of qCx, of length space->nPoints.
 //    named this way even for spectrums
 // a 'qBuffer' is a wrapped wave that knows how to traverse itself
-// a 'qWave' is an object with cool methods for the wave it encloses,
+// a 'qCavity' is an object with cool methods for the wave it encloses,
 //    plus a qSpace pointer.  Subclass of qBuffer.
 // a 'qFlick' (see below) is a sequence of waves
-// a 'qSpectrum' is like a qWave designed for FFT results - momentums not locations.  Subclass of qBuffer.
+// a 'qSpectrum' is like a qCavity designed for FFT results - momentums not locations.  Subclass of qBuffer.
 
 #ifndef __QBUFFER_H__
 #define __QBUFFER_H__
 
 
 struct qSpace;
-struct qWave;
+struct qCavity;
 
 extern void *allocateBuffer(int byteSize);
 
@@ -31,7 +31,7 @@ struct qBuffer {
 	qBuffer(void);
 	virtual ~qBuffer();
 
-	// constructor for qWave and qSpectrum calls this to finish up & alloc buffer
+	// constructor for qCavity and qSpectrum calls this to finish up & alloc buffer
 	// length is length in qCxs
 	void initBuffer(int length, qCx *useThisBuffer = NULL);
 
@@ -47,7 +47,7 @@ struct qBuffer {
 	// print headings for the columns these dump functions print
 	static void dumpHeadings(bool withNewline = false, bool withExtras = true);
 
-	// for a naked wave, and for a qWave.
+	// for a naked wave, and for a qCavity.
 	// so the length of each buffer is nPoints from the wave's space.
 	void dumpThat(qCx *wave, bool withExtras = true);
 	void dump(const char *title = "any buffer", bool withExtras = true);
@@ -66,7 +66,7 @@ struct qBuffer {
 	void copyTo(qBuffer *dest);
 
 	// Add any two qBuffers, leave result in this.  Must have same space N, although not continuum.
-	void add(double coeff1, qBuffer *qwave1, double coeff2, qBuffer *qwave2);
+	void add(double coeff1, qBuffer *cavity1, double coeff2, qBuffer *cavity2);
 
 	// Same, but you can pass raw waves; the waves assume same N as this wave.
 	// YOU MUST OFFSET THE WAVE POINTERS YOURSELF!
@@ -87,13 +87,11 @@ struct qBuffer {
 	int nPoints, start, end, continuum;
 
 	// if it used the first constructor
-	// this has, among other things, the count of points and states in all qWave buffers
+	// this has, among other things, the count of points and states in all qCavity buffers
 	// but for just a bare qBuffer, this can be null, for freelance buffers.
 	qSpace *space;
 
-	// TODO: this is not aligned!  Or, maybe its the last?  Oh wait, see
-	// subclasses and their alignment.  Only qFlick so should pad this to 4
-	// bytes
+	// Only qFlick need to pad this to 4 bytes
 	bool dynamicallyAllocated;
 
 	byte xxx[3];

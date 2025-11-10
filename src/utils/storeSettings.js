@@ -313,11 +313,11 @@ export function storeASetting(groupName, varName, newValue) {
 	// if bad value, just set to default.
 	// Should clamp continuum variables to min or max!  should eliminate variables no longer part of the group!
 // not sure what went wrong here but i fixed it...
-//console.info(`groupName=${groupName}   varName=${varName}`);
-//console.info(`alternateStoreVerifiers=`, alternateStoreVerifiers);
-//console.info(`alternateStoreVerifiers[${groupName}]=`, alternateStoreVerifiers?.[groupName]);
-//console.info(`alternateStoreVerifi...[${varName}]=`, alternateStoreVerifiers?.[groupName]?.[varName]);
-//console.info(`alternateStoreVerif[...](newValue)=`, alternateStoreVerifiers?.[groupName]?.[varName]?.(newValue));
+//console.log(`groupName=${groupName}   varName=${varName}`);
+//console.log(`alternateStoreVerifiers=`, alternateStoreVerifiers);
+//console.log(`alternateStoreVerifiers[${groupName}]=`, alternateStoreVerifiers?.[groupName]);
+//console.log(`alternateStoreVerifi...[${varName}]=`, alternateStoreVerifiers?.[groupName]?.[varName]);
+//console.log(`alternateStoreVerif[...](newValue)=`, alternateStoreVerifiers?.[groupName]?.[varName]?.(newValue));
 
 	let savedGroup = getAGroup(groupName);
 	savedGroup[varName] = newValue;

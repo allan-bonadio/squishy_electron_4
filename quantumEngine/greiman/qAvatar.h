@@ -53,8 +53,8 @@ struct qAvatar {
 
 	// populates the viewBuffers; depends on avatarBreed.  You can use your own
 	// independent load function; it's not rocket science.
-	// for WaveView, transcribes the complex double numbers (2x8 = 16by) in qwave
-	void loadViewBuffers(int breed);
+	// for WaveView, transcribes the complex double numbers (2x8 = 16by) in qcavity
+	//void loadViewBuffers(int breed);
 
 	// set this so it doesn't have to do it while running.  Pass either breed
 	//integer (from js) or direct func pointer (from C++).  One or the other,
@@ -62,7 +62,7 @@ struct qAvatar {
 	//do it by hand void setLoader(void (*loaderFunc)(qAvatar *avatar));
 
 	// handy
-	float *buf(int bufferIx){return viewBuffers[bufferIx].fArray; }
+	//float *buf(int bufferIx){return viewBuffers[bufferIx].fArray; }
 
 	/* *********************************************** data fields */
 
@@ -74,7 +74,7 @@ struct qAvatar {
 
 	// args that many loaders need.  Optional but NOT set by the constructor or anything.
 	struct qSpace *space;
-	struct qWave *qwave;
+	struct qCavity *cavity;
 
 	// different drawings might have numbers going in or out; drawing-specific
 	int i0;
@@ -90,6 +90,7 @@ struct qAvatar {
 	short *indexBuffer;
 	int nIndices;
 
+	// each of the buffers, ready to be handed to webGL
 	viewBufInfo viewBuffers[MAX_VIEW_BUFFERS];
 
 };
@@ -97,7 +98,7 @@ struct qAvatar {
 
 /* *************************************************** loaders in nearby files */
 
-extern void avFlatLoader(qAvatar *avatar, int bufIx, qWave *qwave, int nPoints);
+extern void avFlatLoader(qAvatar *avatar, int bufIx, qCavity *cavity, int nPoints);
 
 
 /* *************************************************** vector types for vb generation */
@@ -138,10 +139,10 @@ void complexToRYGB(qCx *cx, qColor3 *color);
 extern "C" {
 	qAvatar *avatar_create(int avatarBreed, char *label);
 
-	// qwave and space are both optional, pass null for none or just don't call this
-	void avatar_setWaveSpace(qAvatar *avatar, qWave *qwave, qSpace *space);
+	// qcavity and space are both optional, pass null for none or just don't call this
+	void avatar_setCavitySpace(qAvatar *avatar, qCavity *cavity, qSpace *space);
 
-	// create one buffer in the set - obsolete!  TODO
+	// create one buffer in the set
 	float *avatar_attachViewBuffer(qAvatar *avatar, int whichBuffer, float *useThisBuffer,
 		int nCoordsPerVertex, int nVertices);
 	short *avatar_attachIndexBuffer(qAvatar *avatar, short *useThisBuffer, int nItems);
@@ -155,7 +156,7 @@ extern "C" {
 
 	// load up all the set's view viewBuffers based on the space's wave buffer (or whatever)
 	// ?? returns the highest height of norm of wave entries.  Flat does.  Should.  Soon.
-	void avatar_loadViewBuffers(qAvatar *avatar, int breed);
+	//void avatar_loadViewBuffers(qAvatar *avatar, int breed);
 
 // this is obsolete right>?  cuz the constructor does it.
 //	void avatar_setLoader(qAvatar *avatar, int loaderIx);

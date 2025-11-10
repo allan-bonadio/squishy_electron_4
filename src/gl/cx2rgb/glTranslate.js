@@ -27,7 +27,7 @@ function convertFile(text) {
 	//text = text.replace(/return vec3\((.+?)\);/g, 'return [$1];');
 
 	// in the gl, the console.log stmts are commented out
-	text = text.replace(/\/\/trace(\w+)/g, 'if (trace$1) console.info');
+	text = text.replace(/\/\/trace(\w+)/g, 'if (trace$1) console.log');
 
 	// the #line directives I need.  this regex is funny - some bug.  don't mess with it.
 	text = text.replace(/#line.*/g, '');

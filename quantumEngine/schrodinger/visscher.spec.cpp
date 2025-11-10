@@ -4,7 +4,7 @@
 */
 
 
-#include "../debroglie/qWave.h"
+#include "../debroglie/qCavity.h"
 #include "../hilbert/qSpace.h"
 #include "../greiman/qAvatar.h"
 #include "qGrinder.h"
@@ -26,8 +26,8 @@ TEST_GROUP(visscher)
 
 // created once and never freed; cppuTest won't notice they're never freed.
 qSpace *space4 = makeBareSpace(4);
-qWave *oldWave4 = new qWave(space4);
-qWave *newWave4 = new qWave(space4);
+qCavity *oldWave4 = new qCavity(space4);
+qCavity *newWave4 = new qCavity(space4);
 
 qCx ex4Wave[6] = {
 	qCx(-0.01, -.5),
@@ -35,7 +35,7 @@ qCx ex4Wave[6] = {
 	qCx(-.5, 0.01), qCx(-0.01, -.5),
 	qCx(.5, -0.01)
 };
-qWave *expectedWave4 = new qWave(space4, ex4Wave);
+qCavity *expectedWave4 = new qCavity(space4, ex4Wave);
 
 // this seems to crash early in hitReal, but I can't figure out what's gone wrong.  One integration works fine.
 TEST(visscher, VisscherOneStep4)
@@ -43,7 +43,7 @@ TEST(visscher, VisscherOneStep4)
 	oldWave4->setCircularWave(1.);
 	if (traceOneStep) oldWave4->dump("start VisscherOneStep test");
 
-	qAvatar *avatar = new qAvatar(space4, "VisscherOneStep");
+	qAvatar *avatar = new qAvatar(space4, "Visscher1Step");
 	qGrinder *grinder = new qGrinder(space4, avatar, 1, "Visscher1Step");
 
 
@@ -130,8 +130,8 @@ TEST(visscher, VisscherOneFrame32)
 		dumpWaveInitializer("expectedArray", fl->wave, space->nPoints);
 
 	// we'll use this to compare against
-	qWave *expectedQWave = new qWave(space, expectedArray);
-	compareWaves(expectedQWave, av->qwave);
+	qCavity *expectedQWave = new qCavity(space, expectedArray);
+	compareWaves(expectedQWave, av->qcavity);
 	delete expectedQWave;
 
 	// simulate the app ... will also delete avatar and grinder.

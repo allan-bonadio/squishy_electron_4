@@ -140,8 +140,8 @@ class ErrorBoundary extends React.Component {
 	// come up with something to say about the errors that just happened
 	renderDialogContent(eObj) {
 		const { errorObj, infoObj } = this.state;
-		console.info(`error obj & info`, errorObj)
-		console.info(infoObj);
+		console.log(`error obj & info`, errorObj)
+		console.log(infoObj);
 
 		// might have these, src line number & stuff where it happened
 		let where = '';

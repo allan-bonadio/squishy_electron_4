@@ -65,8 +65,8 @@ void main() {
 
 export class noiseDrawing extends abstractDrawing {
 
-	constructor(viewDef) {
-		super(viewDef, 'noiseDrawing');
+	constructor(sceneName, ambiance, inputInfo, space) {
+		super(sceneName, ambiance, inputInfo, space);
 
 		this.vertexShaderSrc = vertexSrc;
 		this.fragmentShaderSrc = fragmentSrc;

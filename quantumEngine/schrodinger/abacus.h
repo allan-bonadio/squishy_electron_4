@@ -84,7 +84,7 @@ struct progress {
 // creating an abacus, you can set your own functions to integrate one point re and im
 typedef 	void (*integrator)(qCx *newWave, qCx *oldWave, qCx *hamiltWave, double dt);
 
-// Multiple real buffers for the real & im parts of  eg. a single qWave buffer.
+// Multiple real buffers for the real & im parts of  eg. a single qCavity buffer.
 struct abacus {
 	abacus(qSpace *space, qGrinder *qgr, int nWaves, int nThreads);
 	~abacus();

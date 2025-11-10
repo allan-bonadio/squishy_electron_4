@@ -118,13 +118,7 @@ public:
 	int nPoints;  // allocated size
 	int spectrumLength;  // should == nStates
 
-	// each of these objects is created and linked into the space  in js, when ready
-	int dummyForMainAvatar;
-	//struct qAvatar *mainAvatar;
-	struct qAvatar *miniGraphAvatar;
-
-	struct qWave *mainFlick;
-	struct qWave *miniGraphWave;
+	struct qCavity *mainFlick;
 
 	struct qGrinder *grinder;
 
@@ -147,7 +141,7 @@ extern "C" {
 
 	// do i need this?  maybe not.
 	// void linkUp(qSpace *space,
-	// 	qAvatar *mainAvatar, qAvatar *miniGraphAvatar, qWave *mainFlickWave, qWave *miniGraphWave );
+	// 	qAvatar *mainAvatar, qAvatar *miniGraphAvatar, qCavity *mainFlickWave, qCavity *miniGraphWave );
 
 	// destroy
 	void deleteFullSpace(qSpace *space);

@@ -86,7 +86,7 @@ class LogSlider extends React.Component {
 		if (!props)
 			debugger;
 		const p = props;
-		if (traceThisSlider.test(p.unique)) console.info(`LogSlider props=`, JSON.stringify(props));
+		if (traceThisSlider.test(p.unique)) console.log(`LogSlider props=`, JSON.stringify(props));
 		this.wasOriginal = p.original ? <small>&nbsp; (was {thousands(p.original)})</small> : '';
 
 		// these don't change dynamically i promise
@@ -97,7 +97,7 @@ class LogSlider extends React.Component {
 	pointerDown =
 	ev => {
 		const p = this.props;
-		if (traceThisSlider.test(p.unique)) console.info(`pointerDown avgValue=`, this.avgValue);
+		if (traceThisSlider.test(p.unique)) console.log(`pointerDown avgValue=`, this.avgValue);
 		this.avgValue = +ev.currentTarget.value;
 		ev.target.setPointerCapture(ev.pointerId);
 	}
@@ -108,10 +108,10 @@ class LogSlider extends React.Component {
 		const spd = p.stepsPerDecade;
 		const stepFactors = stepsPerDecadeStepFactors[spd];
 
-		if (traceThisSlider.test(p.unique)) console.info(`handleChange ev=`, ev);
+		if (traceThisSlider.test(p.unique)) console.log(`handleChange ev=`, ev);
 		const ix = +ev.currentTarget.value;
 		const power = indexToPower(p.willRoundPowers, stepFactors, spd, ix, p.substitutes);
-		if (traceThisSlider.test(p.unique)) console.info(`handleChange  ix=${ix}  power=${power}`);
+		if (traceThisSlider.test(p.unique)) console.log(`handleChange  ix=${ix}  power=${power}`);
 		p.handleChange(power, ix);
 	}
 
@@ -126,7 +126,7 @@ class LogSlider extends React.Component {
 		// right on the edge of transition, it can vibrate!  average this out. so it slides gently
 		let val = powerToIndex(spd, p.current, p.substitutes);
 
-		if (traceThisSlider.test(p.unique)) console.info(
+		if (traceThisSlider.test(p.unique)) console.log(
 			`LogSlider render..  spd=${spd}, p.current=${p.current}   value=${val} props=`, p);
 
 		const annotation = p.annotation

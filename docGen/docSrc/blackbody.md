@@ -48,3 +48,12 @@ That's the temperature of the surface of the sun.  So, you can see, that even th
 
 Similarly, your body, sitting in your chair, is about 300K°, about room temperature.
 That also gives off light, low frequency infrared light.  That light goes off and hits some other surface, keeping it warm, as that surface is also radiating infrared.
+
+
+
+// great historical explainaion of  blackbody radiation
+
+Something Strange Happens When You Trust Quantum Mechanics
+
+
+https://www.youtube.com/watch?v=qJZ1Ez28C-A

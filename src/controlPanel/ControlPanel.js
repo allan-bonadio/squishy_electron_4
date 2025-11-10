@@ -21,7 +21,7 @@ import {interpretCppException, wrapForExc} from '../utils/errors.js';
 import SquishContext from '../sPanel/SquishContext.js';
 
 let traceSetPanels = false;
-let traceStartStop = false;
+let traceStartStop = true;
 let traceContext = false;
 
 // integrations always need specific numbers of steps.  But there's always one
@@ -32,7 +32,7 @@ const N_EXTRA_STEPS = 0.5;
 export class ControlPanel extends React.Component {
 	static propTypes = {
 
-		repaintWholeMainWave: PropTypes.func.isRequired,
+		resetAndRepaintMainWave: PropTypes.func.isRequired,
 		//rerenderWholeMainVoltage: PropTypes.func.isRequired,
 
 		// the integration statistics shown in the Integration tab (there's several more fields)
@@ -68,6 +68,7 @@ export class ControlPanel extends React.Component {
 		// this constructor runs.
 		eSpaceCreatedPromise.then(space => {
 			this.initWithSpace(space);
+			this.grinder.chosenFP = this.chosenFP;
 		})
 		.catch(rex => {
 			let ex = interpretCppException(rex);
@@ -92,17 +93,17 @@ export class ControlPanel extends React.Component {
 			startAnimating: this.startAnimating,
 			stopAnimating: this.stopAnimating,
 			startStop: this.startStop,
-			singleFrame: this.singleFrame,
+			startSingleFrame: this.startSingleFrame,
 		}
 
 		this.props.setCPContext(cp);
 
 		if (traceContext) {
 			const ctx = this.context;
-			console.log(`🎛️  ControlPanel setUpContext context: sbi, ctx.cp, ctx.wv:`,
-				ctx?.shouldBeIntegrating,
-				ctx?.controlPanel,
-				ctx?.waveView);
+			console.log(`🎛️  ControlPanel setUpContext context: `,
+				`  shouldBeIntegrating={ctx?.shouldBeIntegrating}  `,
+				`  controlPanel=`, ctx?.controlPanel,
+				`  waveView=`, ctx?.waveView);
 		}
 	}
 
@@ -145,6 +146,8 @@ export class ControlPanel extends React.Component {
 	// set frame period chosen by the user: set it JUST for the animator and grinder
 	setChosenFP =
 	(period) => {
+		this.setState({chosenFP: storeASetting('frameSettings', 'chosenFP', this.chosenFP)});
+
 		const an = this.props.animator;
 		if (an) {
 			an.chosenFP = period;
@@ -156,7 +159,7 @@ export class ControlPanel extends React.Component {
 			this.grinder.chosenFP = period;
 	}
 
-	// set freq of frame, which is 1, 2, 4, 8, ... some float number of times per
+	// set freq of frame, which is 1, 2, 15, 60, ... some float number of times per
 	// second you want frames. freq is how the CPToolbar UI, handles it, but we
 	// keep the period in the ControlPanel state,
 	setChosenRate =
@@ -166,8 +169,6 @@ export class ControlPanel extends React.Component {
 		if (qeConsts.FASTEST == freq)
 			this.chosenFP = qeConsts.FASTEST;
 
-		// now set it in all 4 places this variable is duplicated... (sorry)
-		this.setState({chosenFP: storeASetting('frameSettings', 'chosenFP', this.chosenFP)});
 		this.setChosenFP(this.chosenFP);  // so squish panel can adjust the heartbeat
 	}
 
@@ -183,7 +184,8 @@ export class ControlPanel extends React.Component {
 	(ev) => {
 		if (!this.space) return;  // too early.  mbbe should gray out the button?
 
-		if (traceStartStop) console.info(`🎛️ startAnimating starts, triggering iteration, `, ev);
+		if (traceStartStop)
+			console.log(`🎛️ startAnimating starts, triggering iteration, `, ev);
 		this.props.setShouldBeIntegrating(true);
 
 		// must do this to start each iteration going in the thread(s)
@@ -195,7 +197,8 @@ export class ControlPanel extends React.Component {
 			+` gr.shouldBeIntegrating=${this.grinder.shouldBeIntegrating}, `
 			+`isIntegrating=${this.grinder.isIntegrating}   `);
 
-			console.log(`🎛️  this.context == props.context? `, this.context == this.props.context);
+			console.log(`🎛️  this.context(${this.context}) == props.context(${this.props.context})? `,
+				this.context == this.props.context);
 		}
 
 	}
@@ -207,8 +210,10 @@ export class ControlPanel extends React.Component {
 
 		// set it false as you store it in store; then set state.  The threads will figure it out next iteration
 		this.props.setShouldBeIntegrating(false);
+		this.props.animator.nFramesToGo = 0;
 		if (traceStartStop) console.log(`🎛️ ControlPanel STOP Animating, `
-			+`shouldBeIntegrating=${this.context.shouldBeIntegrating}, `
+			+`ctx.shouldBeIntegrating=${this.context.shouldBeIntegrating}, `
+			+` gr.shouldBeIntegrating=${this.grinder.shouldBeIntegrating}, `
 			+`grinder.isIntegrating=${this.grinder.isIntegrating}   , `, ev);
 	}
 
@@ -222,19 +227,19 @@ export class ControlPanel extends React.Component {
 			this.startAnimating();
 	}
 
-	// the |> button. ev is optional and only for the trace msg
-	singleFrame =
+	// the |> button.
+	startSingleFrame =
 	(ev) => {
-		console.log(`🎛️ singleFrame starts, `, ev);
+		console.log(`🎛️ startSingleFrame, `, ev);
 
 		let nFrames = 1;
 		// multipleby holding down modifiers.  Alt=bad on Windows, ctrl=bad on Mac
 		if (ev.ctrlKey || ev.altKey) nFrames *= 10;
 		if (ev.shiftKey) nFrames *= 100;
 
-		this.props.animator.singleFrame(nFrames);
+		this.props.animator.startSingleFrame(nFrames);
 
-		if (traceStartStop) console.log(`🎛️ ControlPanel singleFrame,`
+		if (traceStartStop) console.log(`🎛️ ControlPanel startSingleFrame,`
 			+` nFrames=${nFrames}, `
 			+` ctx.shouldBeIntegrating=${this.context.shouldBeIntegrating}, `
 			+` gr.shouldBeIntegrating=${this.grinder.shouldBeIntegrating}, `
@@ -278,8 +283,8 @@ export class ControlPanel extends React.Component {
 		};
 	}
 
-	// pass an object with any or all of the params you want to change.
-	// non-wave params are ignored
+	// SetWave panel, upon a change: pass an object with any or all of the
+	// params you want to change. non-wave params are ignored
 	setWaveParams = (wp) => {
 		const s = this.state;
 		this.setState({
@@ -290,7 +295,7 @@ export class ControlPanel extends React.Component {
 		});
 	}
 
-	// given these params, put it into effect and display it on the wave scene
+	// given these params, put it into effect and display it on the Main Wave scene
 	// This is most of 'Reset Wave'  NOT for regular iteration
 	setAndPaintFamiliarWave = waveParams => {
 		if (!this.space)
@@ -301,7 +306,7 @@ export class ControlPanel extends React.Component {
 		mainFlick.setFamiliarWave(waveParams);  // eSpace does this initially
 
 		//qeFuncs.grinder_copyFromAvatar(this.grinder.pointer, this.mainAvatar.pointer);
-		this.props.repaintWholeMainWave();
+		this.props.resetAndRepaintMainWave();
 	}
 
 	// SetWave button in SetWaveTab: set it from passed in params, and save it
@@ -362,15 +367,6 @@ export class ControlPanel extends React.Component {
 		this.space.updateDrawnVoltagePath();  // visible change on screen
 	}
 
-	// the Set Voltage button on the Set Voltage tab - always a familiar voltage profile
-	// TODO: move this to the end of this section
-	saveMainVoltage = (ev) => {
-		let voltageParams = this.getVoltageParams()
-		this.setVoltageParams(voltageParams);  // to display in volt tab
-		this.setAndRenderFamiliarVoltage(voltageParams);  // for the space, and the WaveView
-		storeAGroup('voltageParams', voltageParams);  // remember from now on
-	}
-
 	// fills in the voltage buffer with familiar voltage most recently set for
 	// stored voltageParams. called when user clicks reset voltage on cptoolbar
 	resetVoltageHandler = (ev) => {
@@ -397,6 +393,14 @@ export class ControlPanel extends React.Component {
 		const sv = ev.target.value;
 		this.setState({showVoltage: sv});
 		this.space.updateShowVoltage(sv);  // on the screen
+	}
+
+	// the Set Voltage button on the Set Voltage tab - always a familiar voltage profile
+	saveMainVoltage = (ev) => {
+		let voltageParams = this.getVoltageParams()
+		this.setVoltageParams(voltageParams);  // to display in volt tab
+		this.setAndRenderFamiliarVoltage(voltageParams);  // for the space, and the WaveView
+		storeAGroup('voltageParams', voltageParams);  // remember from now on
 	}
 
 	/* ********************************************** integration tab */

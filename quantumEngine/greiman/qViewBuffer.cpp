@@ -3,14 +3,12 @@
 ** Copyright (C) 2021-2025 Tactile Interactive, all rights reserved
 */
 
-// TODO merge qViewBuffer into qAvatar
-
 #include <stdexcept>
 
 #include "../hilbert/qSpace.h"
 #include "qAvatar.h"
 #include "../schrodinger/qGrinder.h"
-#include "../debroglie/qWave.h"
+#include "../debroglie/qCavity.h"
 #include "qViewBuffer.h"
 
 // August Ferdinand Möbius invented homogenous coordinates
@@ -66,7 +64,7 @@ void qViewBuffer::dumpViewBuffer(const char *title) {
 }
 
 
-// copy the numbers in our qAvatar's qWave into this vBuffer
+// copy the numbers in our qAvatar's qCavity into this vBuffer
 // one row per vertex, two rows per wave datapoint.
 // each row of 4 floats looks like this:
 //     real   imaginary    voltage    serial
@@ -75,22 +73,22 @@ void qViewBuffer::dumpViewBuffer(const char *title) {
 float qViewBuffer::loadViewBuffer(void) {
 	if (traceViewBuffer) printf("\n📺 qViewBuffer::loadViewBuffer(%s) starts: vBuffer = %p \n",
 		avatar->label, vBuffer);
-	qWave *qwave = avatar->qwave;
-	qCx *wave = qwave->wave;
+	qCavity *qcavity = avatar->qcavity;
+	qCx *wave = qcavity->wave;
 
 	int nPoints = space->nPoints;
 	double highest = 0;
 	double tiny = 1;
 
 	if (traceInDetail) {
-		printf("loadViewBuffer(B): qViewBuffer->avatar->qwave->wave=%p->%p->%p->%p\n",
+		printf("loadViewBuffer(B): qViewBuffer->avatar->qcavity->wave=%p->%p->%p->%p\n",
 			this,
 			avatar,
-			avatar->qwave,
-			avatar->qwave->wave);
+			avatar->qcavity,
+			avatar->qcavity->wave);
 		printf("loadViewBuffer(vb,lqw): qViewBuffer->vBuffer %p\n",
 			vBuffer);
-		qwave->dump("📺 at start of loadViewBuffer()");
+		qcavity->dump("📺 at start of loadViewBuffer()");
 	}
 
 	// this is index into the complex point, which translates to 2 GL points

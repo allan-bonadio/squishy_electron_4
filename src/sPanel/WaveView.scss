@@ -102,7 +102,7 @@
 			//}
 		}
 
-		// object that encloses start/stop/singleframe buttons
+		// object that encloses start/stop/startSingleFrame buttons
 		.StartStopOverlay {
 			left: 2em;
 			bottom: 1em;
@@ -119,7 +119,7 @@
 				outline-offset: 4px;
 
 				&.startStopWidget img { width: 1em; }
-				&.singleFrameWidget img { width: 1.1667em; }
+				&.startSingleFrameWidget img { width: 1.1667em; }
 
 				&:hover {
 					outline: 1px #464 solid;

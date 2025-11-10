@@ -11,7 +11,7 @@ Some Calculation/Grinder terms:
 
 note: ∆t is the user-visible time per frame period, larger.
 dt is actually the individual time increment each time through Schrodinger
-FP means frame period.
+FP means frame period.  This should not be user-visible.  Animation should be seamless, at maybe 20 to 30 frames per second.  With little or no flicker.
 
 a Frame: is an amount of calculation correspoinding to one refresh of
 the video display (or analogous). Doesn't have to be synchronized with the screen
@@ -19,12 +19,13 @@ refreshes, although it often is.  Just the amount of calculation done for it.  T
 hundreds of steps, grinder.stepsPerFrame * 4?  Dynamically adjusted.
 
 a Step: is a calculation to advance the model dt time.  Like, running
-Schrodinger's eq once (although it's more complicated).
+Schrodinger's eq for Real then Imaginary, then again for RK2.  (see vischer alg)
+In the multithreaded code, a Step can apply to only a segment of the cavity.
 
-a Hit: advancement by dt of one of many parts of the calculation.  As of this
-writing, there are four hits to a step: two Vischer real+imag, times two
-Midpoint first+last.  All together, they advance one dt.  (May be for whole
-buffer, or for just one segment)
+a Hit: advancement by dt of some subset of x values of the calculation.  As of
+this writing, there are four hits to a step: two Vischer real+imag, times two
+Midpoint first+last, for the entire length of the cavity.  All together, they
+advance one dt.  (Hits may be for whole buffer, or for just one segment)
 
 a Point is one number in a buffer, one state of the qm system, and/or any
 associated numbers in parallel buffers like voltage.
@@ -47,7 +48,7 @@ struct qStage;
 struct grWorker;
 
 // TODO: I should break up qGrinder: spin off qIterator with the down and dirty
-// stuff that has to be fast.
+// stuff that has to be fast.  or vice versa
 struct qGrinder {
 	qGrinder(qSpace *, int nGrWorkers, const char *label);
 	~qGrinder(void);
@@ -103,7 +104,7 @@ struct qGrinder {
 	void stepMidpoint(qCx *newW, qCx *oldW, qCx *scratch, double dt);
 
 	// measuring divergence
-	void tallyUpKinks(struct qWave *qwave);
+	void tallyUpKinks(struct qCavity *qcavity);
 	void measureDivergence(void);
 
 
@@ -121,9 +122,9 @@ struct qGrinder {
 	// at the end of each frame calculation, quickly copy the latest wave off to
 	// here, and get back to grinding.  Then, a different thread will pick up
 	// this and transcribe it into avatar buffers.
-	qWave *stage;
+	qCavity *stage;
 
-	// a subclass of  qWave, it has multiple waves to do grinding with.
+	// a subclass of  qCavity, it has multiple waves to do grinding with.
 	// this grinder OWNS the qFlick & is responsible for deleting it.
 	struct qFlick *flick;
 
@@ -220,9 +221,10 @@ struct qGrinder {
 	/* ************************* booleans & bytes at end */
 	// for alignment: put the rest of these last
 
-	// true if thread(s) should start a new integration upon next event cycle, false if not
-	// Synchronized with context.shouldBeIntegrating in JS.
-	// Please only set it through startAnimation and stopAnimation in ControlPanel.
+	// true if thread(s) should start a new integration upon next event cycle,
+	// false if not Synchronized with context.shouldBeIntegrating in JS. Please
+	// only set it through setShouldBeIntegrating() in SquishPanel or sub
+	// components.
 	bool shouldBeIntegrating;
 
 	// same as shouldBeIntegrating, except this is synchronized with the

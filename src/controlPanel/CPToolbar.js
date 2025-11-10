@@ -36,9 +36,6 @@ function setPT() {
 		chosenRate: PropTypes.number.isRequired,
 		setChosenRate: PropTypes.func.isRequired,
 
-		// should get rid of this at some point TODO
-		//shouldBeIntegrating: PropTypes.bool.isRequired,
-
 		startOverHandler: PropTypes.func.isRequired,
 		resetVoltageHandler: PropTypes.func.isRequired,
 		//showVoltage: PropTypes.string.isRequired,
@@ -67,8 +64,11 @@ function CPToolbar(props) {
 	let runningClass = props.shouldBeIntegrating ? 'running' : '';
 
 	return <div className='CPToolbar'>
-		<div className='frameRateBox'>
-			frame rate:<br />
+		<div className='toolbarWidget'>
+			frame rate:
+		</div>
+
+		<div className='toolbarWidget'>
 			<select className='rateSelector' name='rateSelector' value={chosenRate}
 					onChange={ev => setChosenRate(ev.currentTarget.value)} >
 				{rateOptions}
@@ -77,25 +77,18 @@ function CPToolbar(props) {
 
 		<span className='toolSpacer' style={{width: '.3em'}}></span>
 
-		<div className='toolbarThing'>
-			<div className='toolbarRow'>
-				<div className='toolbarThing'>
-					resolution {props.N ?? '...'} &nbsp;
-				</div>
+		<div className='toolbarWidget'>
+			resolution {props.N ?? '...'} &nbsp;
+		</div>
 
+		<div className='toolbarWidget'>
 				<button onClick={props.startOverHandler}>Start Over</button>
-				&nbsp;
+		</div>
 
+		<div className='toolbarWidget'>
 				<button onClick={props.resetVoltageHandler}>
 					Reset Voltage
 				</button>
-				&nbsp;
-			</div>
-
-			<div className='toolbarRow'>
-				&nbsp;
-
-			</div>
 		</div>
 	</div>;
 }
@@ -103,26 +96,3 @@ function CPToolbar(props) {
 setPT();
 
 export default CPToolbar;
-
-//<button className={`startStopToggle startStopTool ${runningClass}`}
-//	onClick={ev => {
-//		if (traceCPToolbar)
-//			dbLog(`🧰 CPToolbar startStop -> props=`, props);
-//		props.cPanel.startStop(ev)
-//	}}>
-//	{ props.shouldBeIntegrating
-//		? <span><big>&nbsp;</big>▐▐ <big>&nbsp;</big></span>
-//		: <big>►</big> }
-//</button>
-//
-//<button className={`stepButton startStopTool`}
-//	onClick={ev=>{
-//		if (traceCPToolbar)
-//			dbLog(`🧰 CPToolbar singleFrame -> props=`, props);
-//		props.cPanel.singleFrame(ev);
-//	}}>
-//	<big>►</big> ▌
-//</button>
-//
-//<span className='toolSpacer' style={{width: '.3em'}}></span>
-//

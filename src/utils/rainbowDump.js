@@ -6,9 +6,11 @@
 // not sure about this file; originally used just for testing
 import cx2rygb from '../gl/cx2rygb/cx2rygb.txlated.js';
 
+let traceColors = true;
+
 // Dump a wave buffer as a colored bargraph in the JS console
 // this is also called by C++ so it's easier as a standalone function
-// see also eWave method by same name (but different args)
+// see also eCavity method by same name (but different args)
 export function rainbowDump(wave, start, end, nPoints, title) {
 	let start2 = 2 * start;
 	let end2 = 2 * end;
@@ -30,7 +32,10 @@ export function rainbowDump(wave, start, end, nPoints, title) {
 
 		let color = cx2rygb({x: wave[ix2],y:  wave[ix2 + 1]});
 		color = `rgb(${color[0]*255}, ${color[1]*255}, ${color[2]*255})`;
-		console.log(`%c `, `background-color: ${color}; padding-right: ${mag+5}px; `);
+		let style = `background-color: ${color}; padding-right: ${mag+5}px; `;
+		console.log(`%c `, style);
+		if (traceColors)
+			console.log(`color: ${color}, style=${style}`);
 	}
 }
 window.rainbowDump = rainbowDump;  // so c++ can get to it

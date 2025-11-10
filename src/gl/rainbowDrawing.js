@@ -152,7 +152,7 @@ export class rainbowDrawing extends abstractDrawing {
 		const gl = this.gl;
 		this.setDrawing();
 
-		this.viewVariables.forEach(v => v.reloadVariable());
+		this.drawVariables.forEach(v => v.reloadVariable());
 
 		this.avatar.dumpViewBuffers(5, `avatar for rainbow cx just before draw`);
 

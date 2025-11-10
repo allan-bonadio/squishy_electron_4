@@ -125,12 +125,12 @@ C++ or eSpace in JS.)  Most important parts:
 	either, everything is tossed and reallocated, as the page reloads.
 
 - a 'Wave' is an array of N psi  values, each a complex number (two doubles, class qCx).  There's actually several classes:
-	- `qWave` and `eWave` is a quantum system state; wrapped array of complex nums
-	- `qSpectrum` is an FFT of a `qWave`; wrapped array of complex nums
-	- `qBuffer` is the superclass of the `qWave` and `qSpectrum`
-	- `qFlick` is a `qWave` with multiple wave buffers, used in iteration
+	- `qCavity` and `eCavity` is a quantum system state; wrapped array of complex nums
+	- `qSpectrum` is an FFT of a `qCavity`; wrapped array of complex nums
+	- `qBuffer` is the superclass of the `qCavity` and `qSpectrum`
+	- `qFlick` is a `qCavity` with multiple wave buffers, used in iteration
 
-qWaves usually have an extra point on each end to aid in calculations, so if
+Cavity usually have an extra point on each end to aid in calculations, so if
 N=32, there's 66 double floats in the buffer.  Methods named fixBoundaries()
 automatically implement the details.  For ENDLESS, the ends are each copied from
 the other end of the buffer each iteration to make it work.  For WELL, each is
@@ -161,7 +161,7 @@ JS.  They all have to be "C" functions, see the code.
 Note there's a
 fair amount of JS overhead for each C++ call; trace it in the debugger to see.
 This is why I made the DirectAccess system; see directAccessors.h, and
-classes that use it: e/qWave, e/qGrinder, Avatar
+classes that use it: e/qCavity, e/qGrinder, Avatar
 
 ### node and python
 

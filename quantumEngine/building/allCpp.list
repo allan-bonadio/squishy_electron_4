@@ -1,7 +1,7 @@
 debroglie/qBuffer.cpp
 debroglie/qCx.cpp
 debroglie/qFlick.cpp
-debroglie/qWave.cpp
+debroglie/qCavity.cpp
 fourier/cooleyTukey.FFT.cpp
 fourier/fftMain.cpp
 fourier/qSpectrum.cpp

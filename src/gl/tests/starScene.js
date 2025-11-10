@@ -125,7 +125,7 @@ export class starDrawing extends abstractDrawing {
 
 
 export class starScene extends abstractScene {
-	constructor(sceneName, ambiance) {
+	constructor(sceneName, ambiance, inputInfo, space) {
 		super(sceneName, ambiance);
 
 		if (! this.space) throw  new Error(`starScene: being created without space`);

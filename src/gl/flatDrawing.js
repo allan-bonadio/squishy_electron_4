@@ -13,9 +13,9 @@ let traceViewBufAfterDrawing = false;
 let traceMaxHeight = false;
 let traceFlatDrawing = false;
 let traceViewport = false;
-let traceCounts = false;
+let traceReloadRow = false;
 
-// diagnostic purposes
+// diagnostic purposes; draws more per vertex
 let traceDrawPoints = false;
 let traceDrawLines = false;
 
@@ -88,14 +88,15 @@ void main() {
 export class flatDrawing extends abstractDrawing {
 	constructor(scene) {
 		super(scene, 'flatDrawing');
+
+		// each point in the wave results in two vertices, top and wave.
+		// And each of those is four single floats going to the GPU
 		this.avatar = scene.avatar;
+		this.avatar.attachViewBuffer(0, null, 4, this.space.nPoints * 2, 'flat drawing');
 
 		this.vertexShaderSrc = vertexSrc;
 		this.fragmentShaderSrc = fragmentSrc;
 
-		// each point in the wave results in two vertices, top and wave.
-		// And each of those is four single floats going to the GPU
-		this.avatar.attachViewBuffer(0, null, 4, this.space.nPoints * 2, 'flat drawing');
 		//console.log(`attachViewBuffer on scene ${scene.sceneName}`);
 	}
 
@@ -104,11 +105,12 @@ export class flatDrawing extends abstractDrawing {
 	createVariables() {
 		this.setDrawing();
 		if (traceFlatDrawing)
-			console.log(`♭♭♭ flatDrawing: creatingVariables`);
+			console.log(`♭♭♭ flatDrawing ${this.sceneName}: creatingVariables`);
 
 		// normally autoranging would put the highest peak at the exact bottom.
 		// but we want some extra space.  not much.
-		const vertStretch = 0.7;  // not sure why
+		const vertStretch = 1.0;  // not sure why
+		//const vertStretch = 0.7;  // not sure why
 		const PADDING_ON_BOTTOM = 1.02 * vertStretch;
 
 		this.maxHeightUniform = new drawingUniform('maxHeight', this,
@@ -149,25 +151,24 @@ export class flatDrawing extends abstractDrawing {
 		if (traceFlatDrawing) console.log(`♭♭♭ barWidth= ${barWidth}`);
 
 		this.vertexCount = nPoints * 2;  // nPoints * vertsPerBar
-//this.vertexCount += this.vertexCount;////
 		this.rowFloats = 4;
 		this.rowAttr = new drawingAttribute('row', this, this.rowFloats, () => {
 
-			if (traceCounts) {
-				console.log(`at flatLoader; this.vertexCount=${this.vertexCount} `
+			if (traceReloadRow) {
+				console.log(`at row getFunc() loading to ${this.avatar.label}; `
+					+` this.vertexCount=${this.vertexCount} `
 					+` total floats=${this.vertexCount * this.rowFloats}`);
 			}
-			qeFuncs.avatar_avFlatLoader(this.avatar.pointer, 0, this.space.mainFlick.pointer,
+			//debugger;
+			qeFuncs.avatar_avFlatLoader(this.avatar.pointer, 0, this.scene.inputInfo.pointer,
 					this.vertexCount);
 
-			// old this.avatar.vBuffer.nTuples = this.vertexCount;
 			return this.avatar.getViewBuffer(0);
 		});
 
-		// see  abstractDrawing for bindVertexArray()
 	}
 
-	// called for each image frame on th canvas
+	// called for each image frame on th canvas.  TODO: roll specialInfo into the input Data Arrays
 	draw(width, height, specialInfo) {
 		if (traceFlatDrawing) {
 			console.log(`♭♭♭ flatDrawing  ${this.avatarLabel}: `
@@ -180,19 +181,19 @@ export class flatDrawing extends abstractDrawing {
 		let bw = specialInfo.bumperWidth;
 		gl.viewport(bw, 0, width - 2 * bw, height);
 		if (traceViewport) {
-			console.log(`♭♭♭ flatDrawing set viewport on ${this.avatarLabel}: `
+			console.log(`♭♭♭ flatDrawing set viewport on avatar=${this.avatarLabel}: `
 				+` width-2bw=${width - 2 * bw}, height=${height}  `
 				+` drawing ${this.vertexCount/2} points`);
 		}
-		this.viewVariables.forEach(v => v.reloadVariable());
+		this.drawVariables.forEach(v => v.reloadVariable());
 		gl.drawArrays(gl.TRIANGLE_STRIP, 0, this.vertexCount);
-		// console.log(`just drewArays-flat on avatar ptr=${this.avatar.pointer} `
-		// 	+` this.avatar.label=${this.avatar.label}, buffer label=${this.avatar.bufferNames[0]}`);
+		console.log(`just drewArays-flat on avatar ptr=${this.avatar.pointer} `
+			+` this.avatar.label=${this.avatar.label}, buffer label=${this.avatar.bufferNames[0]}`);
 
 		if (traceDrawLines) {
 			gl.lineWidth(1);  // it's the only option anyway
 
-			gl.drawArrays(gl.LINES, 0, this.vertexCount);
+			gl.drawArrays(gl.GL_LINE_STRIP, 0, this.vertexCount);
 		}
 
 		if (traceDrawPoints)

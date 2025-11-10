@@ -22,6 +22,7 @@ function CxRainbowTab(props) {
 					style={{flex: '0 0 100px', padding: '1em', backgroundColor: 'black'}}>
 				<GLScene
 					sceneClassName='rainbowScene' sceneName='CxRainbow'
+					inputInfo={[]}
 					canvasInnerWidth={RAINBOW_SIZE}
 					canvasInnerHeight={RAINBOW_SIZE}
 					title="Colors show the Complex Phase of the Wave"

@@ -13,18 +13,15 @@ const sqrtTwo = Math.SQRT2.toFixed(6);  // 1.4142...
 //const sqrtHalf = Math.sqrt(1. / 2.);  // 0.707...
 //const sqrtTwo = Math.sqrt(2.);  // 1.4142...
 
-	// wait, I'm thinking that x and y should be -1...1 linearly and abs(x) + abs(y) = 1
-	// ?? TODO
-
-	// in all cases, we start the hues from red and move around, yellow, up,
-	//  to green on the left, then red down to blue and to green
+// in all cases, we start the hues from red and move around, yellow, up,
+//  to green on the left, then cyan down to blue and to green
 
 
 
 // what we're here for.  This is all GLSL.
 // Convert a complex number to an rgb triplet using RYGB mapping.
 export const cx2rygb = `
-#line 114
+#line 24
 
 // take a complex  num and use the octogon alg to figure out the color
 // complex is normalized?  ∑  r**2 + i**2 == 1 maybe
@@ -121,60 +118,6 @@ vec3 cx2rygb(vec2 psi) {
 }
 `;
 
-/*  scraps of code
-
-		#############################################
-
-//            if (0. == psi.x == 0.) {
-//			else {
-//				// magenta -45° to blue -90°
-//				color.r = 1 - psi.x * ${sqrtTwo};
-//				color.b = 1;
-//			}
-//			// green ±180° to blue -90°, with cyan halfway in between
-//			color.g = 1 - psi.y;
-//			color.b = psi.y;
-
-
-
-		no not these
-		else {
-						// green ±180° under to red 0°, with blue halfway in between.
-			if (psi.x > 0) {
-				// blue -90° to red 0°, with magenta halfway in between
-				if (psi.x > 0) {
-					// blue -90° to red 0°, with magenta halfway in between
-					color.g = 1 - psi.y;
-					color.b = psi.y;
-				}
-				else {
-					// blue -90° to red 0°, with magenta halfway in between
-					color.r = 1 - psi.y;
-					color.b = psi.y;
-				}
-			}
-			else {
-				// blue -90° to red 0°, with magenta halfway in between
-				if (psi.x > 0) {
-					// blue -90° to red 0°, with magenta halfway in between
-					color.g = 1 - psi.y;
-					color.b = psi.y;
-				}
-				else {
-					// blue -90° to red 0°, with magenta halfway in between
-					color.r = 1 - psi.y;
-					color.b = psi.y;
-				}
-			}
-			color.r = 1 - psi.y;
-			color.b = psi.y;
-		}
-	}
-
-`;
- */
-
-
 /*
 the octagon:
 √ =  √.5
@@ -186,7 +129,6 @@ green 0,1,0                     red 1,0,0
 								blue 0,0,1
 */
 
-// actual glsl string exported so all webgl code can reuse it
-
+// actual glsl string exported so all webgl code can include it
 export default cx2rygb;
 

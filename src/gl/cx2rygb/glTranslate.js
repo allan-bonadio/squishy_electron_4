@@ -1,15 +1,17 @@
 #!/usr/bin/env node
 /*
 ** glTranslate.js - crude translator for GLSL => JS, just for testing purposes
-** Copyright (C) 2022-2024 Tactile Interactive, all rights reserved
+** Copyright (C) 2022-2025 Tactile Interactive, all rights reserved
 */
 
 import fs from 'fs';
 import cxToColorGlsl from './cx2rygb.glsl.js';
 
-
-
 // This is a nodejs library, imported and run from inside Jest
+// Or, run from the app for rainbowDump()
+
+// to translate to src/gl/cx2rygb/cx2rygb.txlated.js:
+// $ ./glTranslate.js
 
 // This does NOT translate all of glsl; just the stuff used in cx2rygb file.
 // Nor does it detect GLSL syntax errors.  All done by regex.
@@ -26,7 +28,7 @@ function convertFile(text) {
 	//text = text.replace(/return vec3\((.+?)\);/g, 'return [$1];');
 
 	// in the gl, the console.log stmts are commented out
-	text = text.replace(/\/\/trace(\w+)/g, 'if (trace$1) console.info');
+	text = text.replace(/\/\/trace(\w+)/g, 'if (trace$1) console.log');
 
 	// the #line directives I need.  this regex is funny - some bug.  don't mess with it.
 	text = text.replace(/#line.*/g, '');
@@ -66,10 +68,6 @@ const preface = `
 // cx2rygb.txlated.js -- generated from cx2rygb.glsl.js into js
 // mostly for testing purposes.  do not edit!  instead edit cx2rygb.glsl.js & run unit tests
 // this file written ${new Date()}
-
-// TODO: use these someday?
-//let traceQuarter = false;
-//const  _  = (v) => v.toFixed(4);
 
 // needed defs of vec2 (complex only) and vec3 (rgb only)
 const vec2 = (x=0, y=0) => ({x, y});

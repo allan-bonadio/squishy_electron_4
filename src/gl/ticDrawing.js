@@ -164,7 +164,7 @@ export class ticDrawing extends abstractDrawing {
 		this.setDrawing();
 		gl.viewport(0, 0, width, height);
 
-		this.viewVariables.forEach(v => v.reloadVariable());
+		this.drawVariables.forEach(v => v.reloadVariable());
 
 		if (this.vertexCount > BUFFER_MAX_NTICS * VERTICES_PER_TIC)
 			debugger;

@@ -19,7 +19,7 @@ struct qViewBuffer {
 
 	~qViewBuffer();
 
-	// copy the numbers in wave or qwave into this->viewBuffer
+	// copy the numbers in wave or qcavity into this->viewBuffer
 	// also converts from doubles to floats.
 	float loadViewBuffer(void);
 

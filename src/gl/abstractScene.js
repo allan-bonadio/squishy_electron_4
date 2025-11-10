@@ -24,15 +24,14 @@ export class abstractScene {
 	// class name from instance: vu.constructor.name   from class: vuClass.name
 	// A scene is always constructed with args sceneName, ambiance, space
 	// The scene constructor sometimes ignores the space but it's passed anyway.
-	constructor(sceneName, ambiance) {
+	// inputInfo contains arrays to send to webgl; freeform
+	constructor(sceneName, ambiance, inputInfo) {
 		this.sceneName = sceneName;
 		this.canvas = ambiance.canvas;
 		this.gl = ambiance.gl;
 		this.tagObject = ambiance.tagObject;
+		this.inputInfo = inputInfo;
 		if (! this.canvas) throw new Error(`abstractScene: being created without canvas`);
-
-		//this.space = space;  get this after creation, if needed
-		//this.avatar = avatar;
 
 		// all of the drawings in this scene
 		// they get prepared, and drawn, in this same order
@@ -104,7 +103,7 @@ export class abstractScene {
 			// individual uniforms (and others?) can abort drawing if they're like NaN etc
 			drawing.skipDrawing = false;
 			drawing.setDrawing();
-			drawing.viewVariables.forEach(v => v.reloadVariable());
+			drawing.drawVariables.forEach(v => v.reloadVariable());
 
 			if (!drawing.skipDrawing)
 				drawing.draw(width, height, specialInfo);

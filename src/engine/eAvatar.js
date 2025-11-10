@@ -4,12 +4,12 @@
 */
 
 import {cppObjectRegistry, prepForDirectAccessors} from '../utils/directAccessors.js';
-//import eWave from './eWave.js';
+//import eCavity from './eCavity.js';
 import qeFuncs from './qeFuncs.js';
 import qeConsts from './qeConsts.js';
 
-let traceCreation = false;
-let traceHighest = false;
+let traceCreation = true;
+//let traceHighest = false;
 let traceVBuffer = false;
 
 // HOW TO USE     use avatars this way:
@@ -25,7 +25,8 @@ class eAvatar {
 	// create An eAvatar complete with its inner qAvatar.  (zero buffers)
 	// use this if you're doing something other than the original  space's avatars
 	static createAvatar(avatarBreed, label) {
-		console.log(`🚦 createAvatar: avatarBreed=${avatarBreed} lab='${label}'`);
+		if (traceCreation)
+			console.log(`🚦 createAvatar: avatarBreed=${avatarBreed} lab='${label}'`);
 		let qA = qeFuncs.avatar_create(avatarBreed, label);
 		return new eAvatar(qA);
 	}
@@ -33,6 +34,8 @@ class eAvatar {
 	// given a pointer to a qAvatar, return  an eAvatar that wraps it.
 	// Including existing buffers.
 	static adaptAvatar(pointer) {
+		if (traceCreation)
+			console.log(`🚦 adaptAvatar lab='${UTF8ToString(this._label, qeConsts.MAX_LABEL_LEN)}'`);
 		let av = new eAvatar(pointer);
 		av.wrapViewBuffers();
 		return av;
@@ -64,14 +67,14 @@ class eAvatar {
 	// it all
 	liquidate() {
 		throw Error("eAvatar liquidate not yet implemented")
-		//this.ewave.liquidate();
-		//this.space = this.ewave = this.vBuffer = null;
+		//this.cavity.liquidate();
+		//this.space = this.cavity = this.vBuffer = null;
 	}
 
 	// set an element in the typedArray bloc
 	reserveTypedArray(whichBuffer, array) {
 		if (this.typedArrays[whichBuffer])
-			throw Error(`🚦 typed array ${whichBuffer} already reserved`);
+			throw Error(`🚦 typed array ${whichBuffer} already reserved in ${this.label} avatar`);
 		return this.typedArrays[whichBuffer] = array;
 	}
 
@@ -136,9 +139,9 @@ class eAvatar {
 
 	// populate whatever buffers in this avatar, written in C++.
 	// Go ahead and write your own in JS if you want and use that instead.
-	loadViewBuffers(breed) {
-		qeFuncs.avatar_loadViewBuffers(this.pointer, breed);
-	}
+	//loadViewBuffers(breed) {
+	//qeFuncs.avatar_loadViewBuffers(this.pointer, breed);
+	//}
 
 	/* ***************************************** 🥽 Direct Accessors */
 	// see qAvatar.cpp to regenerate this. Note these are all scalars; buffers
@@ -149,7 +152,7 @@ class eAvatar {
 	get avatarBreed() { return this.ints[1]; }
 	set avatarBreed(a) { this.ints[1] = a; }
 	get _space() { return this.ints[3]; }
-	get _qwave() { return this.ints[4]; }
+	get _cavity() { return this.ints[4]; }
 	get i0() { return this.ints[5]; }
 	set i0(a) { this.ints[5] = a; }
 	get i1() { return this.ints[6]; }
@@ -188,22 +191,6 @@ class eAvatar {
 		qeFuncs.avatar_dumpIndex(this.pointer, title);
 		console.groupEnd();
 	}
-
-		// TODO: make this owrk  flatDrawing will use this for tweaking the highest uniform
-//		this.highest = qeFuncs.avatar_loadViewBuffer(this.pointer);
-//		if (!this.smoothHighest)
-//			this.smoothHighest = this.highest;
-//		else
-//			this.smoothHighest = (this.highest + 3*this.smoothHighest) / 4;
-//		if (traceHighest) console.log(`🚦 cti eAvatar ${this.label}: highest=${this.highest}  `+
-//			`smoothHighest=${this.smoothHighest}`);
-//		if (traceVBuffer)
-//			this.dumpViewBuffer(`🚦 afterLoadViewBuffer`);
-
-	// delete the eAvatar and qAvatar and its owned buffers
-//	deleteAvatar() {
-//		qeFuncs.avatar_delete(this.pointer);
-//	}
 }
 
 export default eAvatar;

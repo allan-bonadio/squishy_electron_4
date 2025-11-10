@@ -9,7 +9,7 @@
 //#include "../hilbert/qSpace.h"
 #include "qAvatar.h"
 //#include "../schrodinger/qGrinder.h"
-#include "../debroglie/qWave.h"
+#include "../debroglie/qCavity.h"
 
 static const bool traceViewBuffer = false;  // dumps it
 static const bool traceHighest = false;
@@ -50,26 +50,31 @@ void dumpViewBuffer(qAvatar *avatar, int bufIx, int nPoints, const char *title) 
 }
 
 
-// copy the numbers in our qAvatar's qWave into this fArray
+// copy the numbers in our qAvatar's qCavity into this fArray
 // one row per vertex, two rows per wave datapoint.
 // each row of 4 floats looks like this:
 //     real   imaginary    voltage    serial
 // Two vertices per datapoint: bottom then top, same data.
 // also converts from doubles to floats for GL.
-void avFlatLoader(qAvatar *avatar, int bufIx, qWave *qwave, int nPoints) {
+void avFlatLoader(qAvatar *avatar, int bufIx, qCavity *qcavity, int nPoints) {
+//	int *p = (int *) avatar;
+//	printf("%8lx %8lx %8lx %8lx %8lx %8lx %8lx %8lx ",
+//		p[0], p[1], p[2], p[3], p[4], p[5], p[6], p[7]);
+
+
 	if (traceViewBuffer)
 		printf("\n📺 avFlatLoader to avatar %s starts:\n", avatar->label);
-	qCx *wave = qwave->wave;  // from here
+	qCx *wave = qcavity->wave;  // from here
 	float *fArray = avatar->viewBuffers[bufIx].fArray;  // to here
 
 	double highest = 0;
 
 	if (traceInDetail) {
-		printf("avFlatLoader: avatar %p, qwave->wave=->%p->%p\n",
-			avatar, qwave, qwave->wave);
+		printf("avFlatLoader: avatar %p, qcavity->wave=->%p->%p\n",
+			avatar, qcavity, qcavity->wave);
 		printf("avFlatLoader: avatar[%d]->fArray %p\n",
 			bufIx, fArray);
-		qwave->dump("📺 at start of avFlatLoader()");
+		qcavity->dump("📺 at start of avFlatLoader()");
 	}
 
 	// this is index into the complex point, which translates to 2 GL vertices, eight single floats, 32 bytes
@@ -139,8 +144,8 @@ extern "C" {
 
 	// load up the Avatar's view buffer based on the Avatar's wave buffer
 	// returns the highest height of norm of wave entries
-	void avatar_avFlatLoader(qAvatar *avatar, int bufIx, qWave *qwave, int nPoints) {
-		avFlatLoader(avatar, bufIx, qwave, nPoints);
+	void avatar_avFlatLoader(qAvatar *avatar, int bufIx, qCavity *qcavity, int nPoints) {
+		avFlatLoader(avatar, bufIx, qcavity, nPoints);
 	}
 }
 

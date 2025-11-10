@@ -9,7 +9,7 @@
 #include "../hilbert/qSpace.h"
 #include "../greiman/qAvatar.h"
 #include "../schrodinger/qGrinder.h"
-#include "../debroglie/qWave.h"
+#include "../debroglie/qCavity.h"
 #include "qSpectrum.h"
 #include "fftMain.h"
 
@@ -30,47 +30,47 @@ void qDimension::chooseSpectrumLength(void) {
 }
 
 
-/* ********************************************************* qWave interface */
+/* ********************************************************* qCavity interface */
 
-// Calculate the FFT of this qWave and deposit it in the spectrum.
+// Calculate the FFT of this qCavity and deposit it in the spectrum.
 // must make/free your own qSpectrum *spect = new qSpectrum(origSpace);
-void qSpectrum::generateSpectrum(qWave *inputQWave) {
-	int start = inputQWave->start;
-	int N = inputQWave->end - start;
+void qSpectrum::generateSpectrum(qCavity *inputCavity) {
+	int start = inputCavity->start;
+	int N = inputCavity->end - start;
 	if (traceGenerate) printf("🌈 about to generateSpectrum... start=%d  end-start=%d\n",
 		start, N);
 
-	cooleyTukeyFFT(wave, inputQWave->wave + start, N);
+	cooleyTukeyFFT(wave, inputCavity->wave + start, N);
 }
 
 // do an inverse FFT to reconstruct the wave from generateSpectrum()
-void qSpectrum::generateWave(qWave *outputQWave) {
-	// dumpSpectrum("start of generateWave()", true);
-	// outputQWave->dump("start of generateWave()");
-	if (traceGenerate) printf("🌈 qSpectrum::generateWave  outputQWave=%p\n", outputQWave);
-	int start = outputQWave->start;
-	int N = outputQWave->end - start;
-	if (traceGenerate) printf("🌈 about to generateWave: target wave=%p  start=%d  N=%d\n",
-		outputQWave->wave, start, N);
+void qSpectrum::generateCavity(qCavity *outputCavity) {
+	// dumpSpectrum("start of generateCavity()", true);
+	// outputCavity->dump("start of generateCavity()");
+	if (traceGenerate) printf("🌈 qSpectrum::generateCavity  outputCavity=%p\n", outputCavity);
+	int start = outputCavity->start;
+	int N = outputCavity->end - start;
+	if (traceGenerate) printf("🌈 about to generateCavity: target wave=%p  start=%d  N=%d\n",
+		outputCavity->wave, start, N);
 
-	cooleyTukeyIFFT(outputQWave->wave + start, wave, N);
+	cooleyTukeyIFFT(outputCavity->wave + start, wave, N);
 
-	outputQWave->fixBoundaries();
+	outputCavity->fixBoundaries();
 
-	if (traceGenerate) outputQWave->dump("🌈 generateWave completed\n");
+	if (traceGenerate) outputCavity->dump("🌈 generateCavity completed\n");
 }
 
 
 // take this wave in and FFT it and dump the result to console
-void analyzeWaveFFT(qWave *original, const char *title) {
+void analyzeCavityFFT(qCavity *original, const char *title) {
 	if (!original)
-		throw std::runtime_error("null original in analyzeWaveFFT()");
+		throw std::runtime_error("null original in analyzeCavityFFT()");
 	if (!original->space)
-		throw std::runtime_error("null space in analyzeWaveFFT()");
+		throw std::runtime_error("null space in analyzeCavityFFT()");
 	qSpectrum *spect = new qSpectrum(original->space, NULL);
 	spect->generateSpectrum(original);
 
-	char buf[150];
+	char buf[200];
 	strcpy(buf, "🌈  analyze spectrum: ");
 	strcat(buf, title);
 	spect->dumpSpectrum(buf);

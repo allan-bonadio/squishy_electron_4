@@ -10,7 +10,6 @@ import {scaleLinear} from 'd3-scale';
 
 import GLScene from '../gl/GLScene.js';
 import TextNSlider from '../widgets/TextNSlider.js';
-import {} from '../utils/storeSettings.js';
 import {getAGroup, alternateMinMaxs} from '../utils/storeSettings.js';
 
 import {eSpaceCreatedPromise} from '../engine/eEngine.js';
@@ -20,9 +19,7 @@ import {interpretCppException} from '../utils/errors.js';
 const MINI_WIDTH = 300;
 const MINI_HEIGHT = 150;
 
-
-let traceRegenerate = false;
-
+let traceRegenerate = true;
 
 function setPT() {
 	// variables from on high, and the funcs needed to change them
@@ -30,6 +27,7 @@ function setPT() {
 		// actually sets the one in use by the main wave
 		saveMainWave: PropTypes.func.isRequired,
 
+		// pararams/settings handed in, as stored in control panel's state
 		waveParams: PropTypes.shape({
 			// defaults handed in
 			waveBreed: PropTypes.oneOf(['circular', 'standing', 'gaussian', 'chord', ]),
@@ -44,19 +42,22 @@ function setPT() {
 	};
 }
 
-// a component that renders the Wave tab, to set a new wave
+// a component that renders the Set Wave tab, to set a new wave
 function SetWaveTab(props) {
 	cfpt(SetWaveTab, props);
-	//checkPropTypes(SetWaveTab.propTypes, props, 'prop', 'SetWaveTab');
 	let {saveMainWave, waveParams, setWaveParams, space} = props;
 
-	const minigraphRepaintRef = useRef(null);
+	// must remember our own temp wave for minigraph
 	const minigraphWaveRef = useRef(null);
 	if (!minigraphWaveRef.current)
-		minigraphWaveRef.current = new eWave(props.space);
+		minigraphWaveRef.current = new eCavity(props.space, 'minigraphWave');
 	let minigraphWave = minigraphWaveRef.current;
+
+	// must remember our repaint func
+	const minigraphRepaintRef = useRef(null);
 	let minigraphRepaint = minigraphRepaintRef.current;
 
+	// GLScene ultimately calls this to hand us the minigraph repaint function
 	function setMinigraphRepaint(repaint) {
 		minigraphRepaintRef.current = minigraphRepaint = repaint;
 	}
@@ -64,20 +65,25 @@ function SetWaveTab(props) {
 	// set the captive minGraph wave to the new settings,
 	// after user changed one. this will do a GL draw.
 	function regenerateMiniGraphWave() {
-		if (!minigraphRepaint)
-			return;
-
-		if (traceRegenerate) {
-			console.log(`Regenerating WaveTab minigraph.  params: `,
-					waveParams);
-		}
-
+		// set the minigraphWave even if you can't draw it
 		minigraphWave.setFamiliarWave(waveParams);
-		minigraphRepaint();
+
+		if (traceRegenerate)
+			console.log(`Regenerating WaveTab minigraph.  params: `, waveParams);
+
+		if (minigraphRepaint) {
+			minigraphRepaint();
+			if (traceRegenerate)
+				console.log(`the minigraph wave after setFamiliarWave() & repaint`, minigraphWave);
+		}
+		else {
+			if (traceRegenerate)
+				console.log(` minigraph not painted because no minigraphRepaint()`, minigraphWave);
+		}
 	}
 
 	// set any combination of the wave params, in the Control Panel state.
-	// then repaint it
+	// then repaint the minigraph
 	function setAndRegenerate(wp) {
 		setWaveParams(wp);
 
@@ -104,6 +110,9 @@ function SetWaveTab(props) {
 	const breed = waveParams.waveBreed;
 	const needPulseWidth = breed == 'gaussian' || breed == 'chord';
 	const needOffset = (breed == 'gaussian' || breed == 'chord');
+	const alongThe = (breed == 'gaussian')
+		? 'pulse width'
+		: "whole cavity length"
 
 	// don't let them set a freq to Nyquist or beyond
 	let highestFrequency = space.nStates / 2 - 1;
@@ -118,7 +127,7 @@ function SetWaveTab(props) {
 			max={highestFrequency}
 			step={'standing' == breed ? .5 : 1}
 			handleChange={setWaveFrequency}
-			title="how many times your wave wraps around the rainbow"
+			title={`how many cycles your wave should have, along the ${alongThe}`}
 		/>
 
 		<TextNSlider className='pulseWidth' label='pulse width, %'
@@ -128,7 +137,7 @@ function SetWaveTab(props) {
 			max={alternateMinMaxs.waveParams.pulseWidth.max}
 			step={.1}
 			handleChange={setPulseWidth}
-			title="how fat your  wave packet is"
+			title="how fat your  wave packet should be, percent of whole cavity length"
 		/>
 
 		<TextNSlider className='offset' label='offset, %'
@@ -138,14 +147,15 @@ function SetWaveTab(props) {
 			max={alternateMinMaxs.waveParams.pulseCenter.max}
 			step={2}
 			handleChange={setPulseCenter}
-			title="where do you want the hump to be"
+			title="where do you want the center of the hump to be, from left side"
 		/>
 	</>;
 
 	// the minigraph
 	const glScene = <GLScene
 		space={space}
-		sceneClassName='flatScene' sceneName='setWaveMiniGraph'
+		sceneClassName='flatScene' sceneName='swMiniGraph'
+		inputInfo={minigraphWave}
 		canvasInnerWidth={MINI_WIDTH}
 		canvasInnerHeight={MINI_HEIGHT}
 		setGLRepaint={setMinigraphRepaint}
@@ -181,7 +191,7 @@ function SetWaveTab(props) {
 	</div>;
 
 	return <div className='SetWaveTab  controlPanelPanel'
-			title="This tab will set the main wave, and save it for next time.">
+			title="Use this tab to set the main wave, and save these parameters for next time.">
 		<h3>Design a new Wave</h3>
 		<div className='waveTabCol '>
 			{breedSelector}

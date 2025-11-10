@@ -44,7 +44,7 @@ function testParam(groupName, varName, defaultValue, criterion) {
 			break;
 
 		case 'object':
-			if (traceObj) console.info(`criterion.constructor.name=${criterion.constructor.name}`);
+			if (traceObj) console.log(`criterion.constructor.name=${criterion.constructor.name}`);
 			switch (criterion.constructor.name) {
 
 			// string matching

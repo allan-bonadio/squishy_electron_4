@@ -148,11 +148,11 @@ class App extends React.Component {
 	render() {
 		const s = this.state;
 
-		// until things start up.  Must always have a className theSquishPanel for tooOldTerminate()
+		// until things start up.  Must always have a className SquishPanel for tooOldTerminate()
 		let sqPanel;
 		if (s.cppRunning) {
 			// real squishpanel
-			sqPanel = <SquishPanel id='theSquishPanel' bodyWidth={this.bodyWidth} />;
+			sqPanel = <SquishPanel className='SquishPanel' bodyWidth={this.bodyWidth} />;
 			if (traceResize) {
 				console.log(`🍦 App renders SquishPanel when cppRunning, `
 					+`body.clientWidth=${document.body.clientWidth}  `
@@ -161,7 +161,7 @@ class App extends React.Component {
 		}
 		else {
 			// spinner tells ppl we're working on it
-			sqPanel= <div id='theSquishPanel' >
+			sqPanel= <div className='SquishPanel' >
 				<img className='spinner' alt='spinner' src='/images/eclipseOnTransparent.gif' />
 			</div>;
 			if (traceState) {

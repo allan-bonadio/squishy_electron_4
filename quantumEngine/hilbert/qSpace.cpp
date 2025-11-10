@@ -11,7 +11,7 @@
 #include "qSpace.h"
 #include "../greiman/qAvatar.h"
 #include "../schrodinger/qGrinder.h"
-#include "../debroglie/qWave.h"
+#include "../debroglie/qCavity.h"
 #include "../fourier/fftMain.h"
 #include "../directAccessors.h"
 
@@ -192,8 +192,8 @@ void qSpace::formatDirectOffsets(void) {
 
 	makePointerGetter(mainFlick);
 	makePointerSetter(mainFlick);
-	makePointerGetter(miniGraphWave);
-	makePointerSetter(miniGraphWave);
+//	makePointerGetter(miniGraphWave);
+//	makePointerSetter(miniGraphWave);
 
 	makePointerGetter(grinder);
 	makePointerSetter(grinder);

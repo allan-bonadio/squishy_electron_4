@@ -1,7 +1,7 @@
 
 // cx2rygb.txlated.js -- generated from cx2rygb.glsl.js into js
 // mostly for testing purposes.  do not edit!  instead edit cx2rygb.glsl.js & run unit tests
-// this file written Wed Sep 10 2025 18:08:05 GMT-0700 (Pacific Daylight Time)
+// this file written Wed Oct 22 2025 22:30:32 GMT-0700 (Pacific Daylight Time)
 
 // TODO: use these someday?
 //let traceQuarter = false;
@@ -30,16 +30,10 @@ export function cx2rygb(psi)  {
 	psi.x /= factor;
 	psi.y /= factor;
 
-	// wait, I'm thinking that x and y should be -1...1 linearly and abs(x) + abs(y) = 1
-	// ?? TODO
-
-	// in all cases, we start the hues from red and move around, yellow, up
-	// or down, to green, blue and back to red
-
-
 	// decision tree cases: >0, =0, <0.  Then y (im) is outer, x (re) is inner
 	if (psi.y > 0.) {
 		// red 0°over to green +180°, and yellow 90° half way in between, straight up
+		// it's all different cuz yellow in the middle is NOT a primary color.
 		if (psi.x > 0.) {
 			// red 0° to yellow 90°, and orange 45° half way in between
 			// c'mon, use the sqrt 2!
@@ -73,6 +67,7 @@ export function cx2rygb(psi)  {
 	else {
 		// psi.y < 0.
 		// red 0° under to green ±180°, with blue halfway in between.
+		// it's all different cuz blue in the middle is a primary color.
 		// here we go all the way to the corners, and the x and y are sqrtHalf there
 		if (psi.x > 0.) {
 			// psi.x > 0 red 0° to blue -90° as x descends from 1 and y descends
@@ -97,7 +92,7 @@ export function cx2rygb(psi)  {
 			if (-psi.x < -psi.y) {
 				// blue -90° to cyan -135°
 				color.b = 1.;
-				color.g = -psi.y * 1.414214;
+				color.g = -psi.x * 1.414214;
 			}
 			else {
 				// cyan -135° to green -180°

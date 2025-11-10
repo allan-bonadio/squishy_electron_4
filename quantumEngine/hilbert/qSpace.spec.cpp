@@ -7,7 +7,7 @@
 #include "qSpace.h"
 #include "../greiman/qAvatar.h"
 #include "../schrodinger/qGrinder.h"
-#include "../debroglie/qWave.h"
+#include "../debroglie/qCavity.h"
 
 #include "../testing/testingHelpers.h"
 #include "../testing/cppuMain.h"
@@ -146,9 +146,9 @@ void completeNewSpaceGauntlet(int N) {
 	proveItsMine(space->voltage, nPoints * sizeof(double));
 
 	// and the avatars' waves and vbufs
-	proveItsMine(space->mainAvatar->qwave->wave, nPoints * sizeof(qCx));
+	proveItsMine(space->mainAvatar->qcavity->wave, nPoints * sizeof(qCx));
 	proveItsMine(space->mainAvatar->vBuffer, nPoints * 8 * sizeof(float));
-	proveItsMine(space->miniGraphAvatar->qwave->wave, nPoints * sizeof(qCx));
+	proveItsMine(space->miniGraphAvatar->qcavity->wave, nPoints * sizeof(qCx));
 	proveItsMine(space->miniGraphAvatar->vBuffer, nPoints * 8 * sizeof(float));
 
 	deleteFullSpace(space);
