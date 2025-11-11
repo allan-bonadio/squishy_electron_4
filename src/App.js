@@ -4,12 +4,15 @@
 */
 
 import React from 'react';
-import './App.scss';
 
 import SquishPanel from './sPanel/SquishPanel.js';
 import CommonDialog from './widgets/CommonDialog.js';
 import DocReader from './widgets/DocReader.js';
+import DocMenu from './sPanel/DocMenu.js';
+
 import {eSpaceCreatedPromise} from './engine/eEngine.js';
+import './App.scss';
+
 
 let traceResize = true;
 let traceState = false;
@@ -143,6 +146,7 @@ class App extends React.Component {
 		this.setState({dialogContent, dialogStyle});
 	}
 
+
 	/* ************************************************ App */
 
 	render() {
@@ -173,6 +177,7 @@ class App extends React.Component {
 			<main className="App" ref={el => this.appEl = el}>
 				<h2 className="App-header">
 					{this.renderFontSizer()}
+					<DocMenu />
 					<img className='splatImage' src='/images/splat.png'
 						width='100px' alt='squishy icon'/>
 					&nbsp; &nbsp;

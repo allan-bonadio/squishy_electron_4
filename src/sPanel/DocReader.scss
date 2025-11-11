@@ -5,6 +5,11 @@
 
 @use "../widgets/common.scss";
 
+// small and on left side
+#DocMenu {
+	float: left;
+	font-size: 0.8em;
+}
 
 
 #DocReader {

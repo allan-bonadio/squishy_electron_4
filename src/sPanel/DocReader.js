@@ -73,6 +73,13 @@ class DocReader extends React.Component {
 		}
 	}
 
+	handleError =
+	(ev) => {
+		this.close();
+		let exc = new Error('Sorry, no such topic available.');
+		CommonDialog.openErrorDialog(exc, 'Doc Reader')
+	}
+
 	render() {
 		let s = this.state;
 
@@ -84,7 +91,7 @@ class DocReader extends React.Component {
 			<article id='DocReader' >
 				<button className='x_close_box' onClick={CommonDialog.closeDialog} >×</button>
 				<iframe src={src} name='DocReader' title='about squishy electron'
-					allow='fullscreen' referrerPolicy='no-referrer'
+					allow='fullscreen' referrerPolicy='no-referrer' onError={this.handleError}
 					width={dims.width} height={dims.height} >
 				</iframe>
 			</article>

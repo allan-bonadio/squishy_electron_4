@@ -68,7 +68,7 @@ let exportsSrc  = [
 	// it also makes its own avatars.
 	{name: 'avatar_create', args: ['number', 'string'], retType: 'number'},
 
-	{name: 'avatar_setWaveSpace',
+	{name: 'avatar_setCavitySpace',
 		args: ['number', 'number', 'number'], retType: null},
 
 	// create one buffer in the set
