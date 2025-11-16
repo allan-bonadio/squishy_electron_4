@@ -186,8 +186,9 @@ function GLScene(props) {
 	// Effect.
 	// can't do much first rendering; no canvasNode cuz no canvasRef.current yet.
 	// But, in the effect after the first render, this func will get the canvas node
-	// from the ref and set everything up.	Renders should be infrequent,
-	// only when dimensions of the canvas change or other big change.
+	// from the ref and set everything up.	Renders: should be mostly identical,
+	//     - when dimensions of the canvas change
+	//     - every dam time you start or stop main animation cuz that flag is in the context
 	const effectRepaint = () => {
 		if (!canvasNode) {
 			if (!canvasRef.current)
