@@ -33,6 +33,7 @@ export class abstractDrawing {
 		this.gl = scene.gl;
 		this.sceneName = scene.sceneName;
 		this.tagObject = scene.tagObject;
+		this.glBuffer.__SPECTOR_Metadata = { name: "cubeVerticesColorBuffer" };
 		this.space = scene.space;
 		this.avatar = scene.avatar;
 		this.avatarLabel = scene.avatar?.label ?? 'no avatar';
