@@ -135,9 +135,11 @@ function ccpt(_this, props) {
 }
 
 // a function component.  Crashes if propType isn't installed.    Call this as
-// first call, or shortly after
+// first call, or shortly after.  New Feature: you can pass in propTypes object directly
 function cfpt(func, props) {
-	if (func.propTypes)
+	if ('function' != typeof func)
+		checkPropTypes(func, props, 'prop', func.name);
+	else if (func.propTypes)
 		checkPropTypes(func.propTypes, props, 'prop', func.name);
 	else
 		throw new Error(`no proptypes on comp function ${func.name}`)
