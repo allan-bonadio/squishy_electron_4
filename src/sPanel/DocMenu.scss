@@ -3,6 +3,35 @@
 ** Copyright (C) 2025-2025 Tactile Interactive, all rights reserved
 */
 
+@use "../widgets/common.scss";
 
+
+
+#DocReader {
+	padding: 1em;
+	width: 100%;
+	height: 100%;
+
+	iframe {
+		border: none;
+		background-color: common.$docReaderBackground;
+	}
+}
+
+
+// small and on left side on the splash bar
+select#DocMenu {
+	font-size: .8em;
+	border-color: #fff;
+	border-radius: 0;
+	padding-inline: 0;
+	float: left;
+	font-size: 0.8em;
+	width: 10em;
+	//height: auto;
+
+	margin-top: .3em;
+	margin-left: 1em;
+}
 
 
