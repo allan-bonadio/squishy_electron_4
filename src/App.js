@@ -7,7 +7,7 @@ import React from 'react';
 
 import SquishPanel from './sPanel/SquishPanel.js';
 import CommonDialog from './widgets/CommonDialog.js';
-import DocReader from './widgets/DocReader.js';
+import DocReader from './sPanel/DocReader.js';
 import DocMenu from './sPanel/DocMenu.js';
 
 import {eSpaceCreatedPromise} from './engine/eEngine.js';
@@ -20,6 +20,8 @@ let traceState = false;
 class App extends React.Component {
 	constructor(props) {
 		super(props);
+		if (!props) return;  // dunno why but suddenly this is happening a lot
+
 		App.me = this;
 
 		this.state = {
@@ -34,7 +36,7 @@ class App extends React.Component {
 			cppRunning: false,
 
 			// non-null when dialog is showing
-			dialogContent: null,
+			//dialogContent: null,
 		};
 		if (traceState)
 			console.log(`init App state to:`, this.state);
@@ -63,7 +65,7 @@ class App extends React.Component {
 			console.log(`🍦 widthDidChange: set this.bodyWidth= ${this.bodyWidth}`);
 
 		// the doc reader tries to track the window size
-		DocReader.setDimensions(this.bodyWidth);
+		// not anymore.  these function(s) are commented out.	DocReader.setDimensions(this.bodyWidth);
 	}
 
 	// once at startup, shortly after first render
@@ -187,6 +189,7 @@ class App extends React.Component {
 				{sqPanel}
 
 				<CommonDialog	dialogContent={s.dialogContent} setDialog={this.setDialog} />
+				<DocReader  />
 				<footer>
 					<aside id='traceOnScreen'>
 						<p className='A' />
