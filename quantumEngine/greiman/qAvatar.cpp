@@ -8,12 +8,8 @@
 #include <limits>
 #include <cfenv>
 
-//#include "../hilbert/qSpace.h"
 #include "qAvatar.h"
-//#include "../schrodinger/qGrinder.h"
 //#include "../debroglie/qCavity.h"
-//#include "../fourier/qSpectrum.h"
-//#include "../fourier/fftMain.h"
 #include "../directAccessors.h"
 
 static const bool traceCreation = false;
@@ -68,7 +64,7 @@ viewBufInfo::viewBufInfo(void) {
 // create new avatar, complete with zero viewBuffers
 qAvatar::qAvatar(int breed, const char *lab)
 	: magic('Avat'), avatarBreed(breed), loader(NULL), space(NULL),
-	cavity(NULL), d0(0), d1(0), i0(0), i1(0) {
+	cavity(NULL), double0(0), double1(0), int0(0), int1(0) {
 
 	strncpy(label, lab, MAX_LABEL_LEN);
 	label[MAX_LABEL_LEN-1] = 0;
@@ -137,15 +133,15 @@ void qAvatar::formatDirectOffsets(void) {
 	makePointerSetter(cavity);
 
 	// arguments and return values
-	makeIntGetter(i0);
-	makeIntSetter(i0);
-	makeIntGetter(i1);
-	makeIntSetter(i1);
+	makeIntGetter(int0);
+	makeIntSetter(int0);
+	makeIntGetter(int1);
+	makeIntSetter(int1);
 
-	makeDoubleGetter(d0);
-	makeDoubleSetter(d0);
-	makeDoubleGetter(d1);
-	makeDoubleSetter(d1);
+	makeDoubleGetter(double0);
+	makeDoubleSetter(double0);
+	makeDoubleGetter(double1);
+	makeDoubleSetter(double1);
 
 	makeStringPointer(label);
 
@@ -175,8 +171,8 @@ void qAvatar::dumpMeta(const char *title) {
 	printf("        magic: " MAGIC_FORMAT "     '%s'   \n",
 		magic>>3, magic>>2, magic>>1, magic, label);
 
-	printf("   i0 = %10d   i1 = %10d    d0 = %12.6g   d1 = %12.6g\n",
-		i0, i1, d0, d1);
+	printf("   int0 = %10d   int1 = %10d    double0 = %12.6g   double1 = %12.6g\n",
+		int0, int1, double0, double1);
 
 	printf("        ==== end of qAvatar ====🚥 🚥 \n\n");
 }
@@ -384,9 +380,5 @@ float *avatar_getViewBuffer(qAvatar *avatar, int bufferIx) {
 	return avatar->viewBuffers[bufferIx].fArray;
 }
 
-//void avatar_loadViewBuffers(qAvatar *avatar, int breed) {
-//	printf("avatar_loadViewBuffers avatar=%p  breed passedin=%d  created=%d\n",
-//		avatar, breed, avatar->avatarBreed);
-//	avatar->loadViewBuffers(breed);
-//}
-
+// loading th3e view buffers is done in a drawing-dependent way,
+// usually in JS or C++

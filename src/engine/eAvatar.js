@@ -153,14 +153,14 @@ class eAvatar {
 	set avatarBreed(a) { this.ints[1] = a; }
 	get _space() { return this.ints[3]; }
 	get _cavity() { return this.ints[4]; }
-	get i0() { return this.ints[5]; }
-	set i0(a) { this.ints[5] = a; }
-	get i1() { return this.ints[6]; }
-	set i1(a) { this.ints[6] = a; }
-	get d0() { return this.doubles[4]; }
-	set d0(a) { this.doubles[4] = a; }
-	get d1() { return this.doubles[5]; }
-	set d1(a) { this.doubles[5] = a; }
+	get int0() { return this.ints[5]; }
+	set int0(a) { this.ints[5] = a; }
+	get int1() { return this.ints[6]; }
+	set int1(a) { this.ints[6] = a; }
+	get double0() { return this.doubles[4]; }
+	set double0(a) { this.doubles[4] = a; }
+	get double1() { return this.doubles[5]; }
+	set double1(a) { this.doubles[5] = a; }
 	get _label() { return this.pointer + 48; }
 	get _indexBuffer() { return this.ints[16]; }
 	set _indexBuffer(a) { this.ints[16] = a; }

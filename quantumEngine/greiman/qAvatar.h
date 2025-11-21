@@ -68,7 +68,7 @@ struct qAvatar {
 
 	int magic;
 
-	// set to a loader fucntion in same directory
+	// set to a loader fucntion in same directory.  TODO: remove these two
 	int avatarBreed;  // which loader - kindof obsolete; each drawing has its own loader
 	void (*loader)(qAvatar *);  // actual function pointer
 
@@ -77,10 +77,10 @@ struct qAvatar {
 	struct qCavity *cavity;
 
 	// different drawings might have numbers going in or out; drawing-specific
-	int i0;
-	int i1;
-	double d0;
-	double d1;
+	int int0;
+	int int1;
+	double double0;
+	double double1;
 
 	// mostly for debugging
 	char label[MAX_LABEL_LEN + 1];
@@ -131,6 +131,7 @@ public:
 	qColor3(void) {red = green = blue = 0;}
 };
 
+// ?? see related version in glsl.  not sure if i'm using this anymore TODO
 void complexToRYGB(qCx *cx, qColor3 *color);
 
 /* ************************************************************** C */

@@ -131,8 +131,8 @@ void avFlatLoader(qAvatar *avatar, int bufIx, qCavity *qcavity, int nPoints) {
 		dumpViewBuffer(avatar, bufIx, nPoints, "avFlatLoader done");
 	}
 
-	avatar->d0 = highest;
-	//printf("end of avFlatLoader: d0=%lf  highest=%lf\n", avatar->d0, highest);
+	avatar->double0 = highest;
+	//printf("end of avFlatLoader: double0=%lf  highest=%lf\n", avatar->double0, highest);
 	// all return values returned on the avatar in [di][01]
 }
 
