@@ -60,12 +60,13 @@ function SetWaveTab(props) {
 	// GLScene ultimately calls this to hand us the minigraph repaint function
 	function setMinigraphRepaint(repaint) {
 		minigraphRepaintRef.current = minigraphRepaint = repaint;
+		minigraphRepaint.name = 'mgRepaint';  // for debugging
 	}
 
-	// set the captive minGraph wave to the new settings,
+	// set the captive miniGraph wave to the new settings,
 	// after user changed one. this will do a GL draw.
 	function regenerateMiniGraphWave() {
-		// set the minigraphWave even if you can't draw it
+		// set the minigraphWave even if you can't draw it.  Redundant AGAIN!?!?
 		minigraphWave.setFamiliarWave(waveParams);
 
 		if (traceRegenerate)
@@ -87,7 +88,7 @@ function SetWaveTab(props) {
 	function setAndRegenerate(wp) {
 		setWaveParams(wp);
 
-		// set it in our local copy so it draws the latest
+		// set it in our local copy so it draws the latest.  isn't this redundant with setWaveParams?
 		waveParams = {...waveParams, ...wp};
 		regenerateMiniGraphWave()
 	}
@@ -171,7 +172,7 @@ function SetWaveTab(props) {
 				onChange={ev => setBreed('circular')} />
 		</label>
 
-		<label title='two identical waves traveling in opposite directions'>
+		<label title='two identical waves traveling in opposite directions, superimposed'>
 			standing
 			<input type='radio'  checked={'standing' == breed} name='standing'
 				onChange={ev => setBreed('standing')} />
