@@ -13,7 +13,7 @@ let traceViewBufAfterDrawing = false;
 let traceMaxHeight = false;
 let traceFlatDrawing = false;
 let traceViewport = false;
-let traceReloadRow = false;
+let traceReloadRow = true;
 
 // diagnostic purposes; draws more per vertex
 let traceDrawPoints = false;

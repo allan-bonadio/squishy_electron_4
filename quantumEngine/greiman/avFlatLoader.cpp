@@ -11,7 +11,7 @@
 //#include "../schrodinger/qGrinder.h"
 #include "../debroglie/qCavity.h"
 
-static const bool traceViewBuffer = false;  // dumps it
+static const bool traceViewBuffer = true;  // dumps it
 static const bool traceHighest = true;
 static const bool traceInDetail = true;
 
@@ -81,23 +81,17 @@ void avFlatLoader(qAvatar *avatar, int bufIx, qCavity *qcavity, int nPoints) {
 	// this is index into the complex point, which translates to 2 GL vertices, eight single floats, 32 bytes
 	//printf("avFlatLoader about to do nPoints pts: %d\n", nPoints);
 	for (int pointNum = 0; pointNum < nPoints; pointNum++) {
-		if (traceInDetail) {
-			printf("📺 avFlatLoader fArray %p\n",
-				fArray);
-			printf("📺 avFlatLoader fArray + pointNum * 8=%p\n",
-				fArray + pointNum * 8);
-		}
-
 		float *twoRowPtr = fArray + pointNum * 8;
-		qCx *wavePtr = wave + pointNum;
-		if (traceInDetail) printf("📺 avFlatLoader(pointNum=%d): twoRowPtr =%p and wavePtr=%p\n",
-			pointNum, twoRowPtr, wavePtr);
+		if (traceInDetail)
+			printf("📺 avFlatLoader(pointNum=%d):  fArray base=%p  twoRowPtr=%p\n",
+				pointNum, fArray, twoRowPtr);
 
+		qCx *wavePtr = wave + pointNum;
 		double re = wavePtr->re;
 		double im = wavePtr->im;
 
-		if (traceInDetail) printf("📺 avFlatLoader(pointNum:%d): re=%lf im=%lf\n",
-			pointNum, re, im);
+		if (traceInDetail) printf("                         wavePtr=%p  re=%lf im=%lf\n",
+			wavePtr, re, im);
 
 		twoRowPtr[0] = re;
 		twoRowPtr[1] = im;
@@ -116,7 +110,7 @@ void avFlatLoader(qAvatar *avatar, int bufIx, qCavity *qcavity, int nPoints) {
 			highest = height;
 
 		if (traceInDetail) {
-			printf("📺 avFlatLoader(row %d): %8f %8f %8f %8f    %8f %8f %8f %8f   height=%10lf\n",
+			printf("📺 avFlatLoader(pointNum %d): %8f %8f %8f %8f    %8f %8f %8f %8f   height=%10lf\n",
 				pointNum, twoRowPtr[0], twoRowPtr[1], twoRowPtr[2], twoRowPtr[3],
 				twoRowPtr[4], twoRowPtr[5], twoRowPtr[6], twoRowPtr[7],
 				height);
