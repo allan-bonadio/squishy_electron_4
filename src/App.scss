@@ -36,8 +36,22 @@ big {
 	font-size: 1.25em;  // one step larger
 }
 
-/* **************************************** app outer components */
+/* **************************************** radix-ui components */
 
+// button[id*='radix-'] {
+// 	font-size: 0.5em;
+// }
+//
+// div[data-radix-popper-content-wrapper] {
+// 	font-size: 0.5em;
+// 	color: white;
+// 	z-index: 15;
+// }
+//
+
+
+
+/* **************************************** app outer components */
 h2.App-header {
 	text-align: center;
 	color: black;

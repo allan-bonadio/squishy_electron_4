@@ -306,6 +306,8 @@ export class WaveView extends React.Component {
 	// pass along the vital repaint functions
 	setMainRepaint = (mainRepaint) => {
 		this.mainRepaint ??= mainRepaint;
+		this.mainRepaint.sceneName = 'mainRepaint';  // for debugging
+
 		this.props.setMainRepaint(mainRepaint);
 		this.animator.mainRepaint ??= mainRepaint;
 	};

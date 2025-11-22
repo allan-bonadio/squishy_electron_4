@@ -11,10 +11,9 @@
 //#include "../schrodinger/qGrinder.h"
 #include "../debroglie/qCavity.h"
 
-static const bool traceViewBuffer = false;  // dumps it
-static const bool traceHighest = false;
-static const bool traceInDetail = false;
-static const bool traceWaveDump = false;
+static const bool traceViewBuffer = true;  // dumps it
+static const bool traceHighest = true;
+static const bool traceInDetail = true;
 
 
 void dumpViewBuffer(qAvatar *avatar, int bufIx, int nPoints, const char *title) {
@@ -57,6 +56,7 @@ void dumpViewBuffer(qAvatar *avatar, int bufIx, int nPoints, const char *title) 
 //     real   imaginary    voltage    serial
 // Two vertices per datapoint: bottom then top, same data.
 // also converts from doubles to floats for GL.
+// Also calculates the highest magnitude and leaves it in double0 (overwriting anything previous)
 void avFlatLoader(qAvatar *avatar, int bufIx, qCavity *qcavity, int nPoints) {
 //	int *p = (int *) avatar;
 //	printf("%8lx %8lx %8lx %8lx %8lx %8lx %8lx %8lx ",
@@ -86,21 +86,17 @@ void avFlatLoader(qAvatar *avatar, int bufIx, qCavity *qcavity, int nPoints) {
 	// this is index into the complex point, which translates to 2 GL vertices, eight single floats, 32 bytes
 	//printf("avFlatLoader about to do nPoints pts: %d\n", nPoints);
 	for (int pointNum = 0; pointNum < nPoints; pointNum++) {
-		if (traceInDetail) {
-			printf("📺 avFlatLoader pointNum=%d   fArray %p   +pointNum*8=%p\n",
-				 pointNum, fArray, fArray + pointNum * 8);
-		}
-
 		float *twoRowPtr = fArray + pointNum * 8;
-		qCx *wavePtr = wave + pointNum;
-		if (traceInDetail) printf("📺 avFlatLoader(pointNum=%d): twoRowPtr =%p and wavePtr=%p\n",
-			pointNum, twoRowPtr, wavePtr);
+		if (traceInDetail)
+			printf("📺 avFlatLoader(pointNum=%d):  fArray base=%p  twoRowPtr=%p\n",
+				pointNum, fArray, twoRowPtr);
 
+		qCx *wavePtr = wave + pointNum;
 		double re = wavePtr->re;
 		double im = wavePtr->im;
 
-		if (traceInDetail) printf("📺 avFlatLoader(pointNum:%d): re=%lf im=%lf\n",
-			pointNum, re, im);
+		if (traceInDetail) printf("                         wavePtr=%p  re=%lf im=%lf\n",
+			wavePtr, re, im);
 
 		twoRowPtr[0] = re;
 		twoRowPtr[1] = im;
@@ -113,13 +109,13 @@ void avFlatLoader(qAvatar *avatar, int bufIx, qCavity *qcavity, int nPoints) {
 		twoRowPtr[6] = 0;
 		twoRowPtr[7] = pointNum * 2. + 1.;  // at magnitude, top
 
-		// while we're here, collect the highest point (obsolete i think)
+		// while we're here, collect the highest point
 		double height = re * re + im * im;
 		if (height > highest)
 			highest = height;
 
 		if (traceInDetail) {
-			printf("📺 avFlatLoader(row %d): %8f %8f %8f %8f    %8f %8f %8f %8f   height=%10lf\n",
+			printf("📺 avFlatLoader(pointNum %d): %8f %8f %8f %8f    %8f %8f %8f %8f   height=%10lf\n",
 				pointNum, twoRowPtr[0], twoRowPtr[1], twoRowPtr[2], twoRowPtr[3],
 				twoRowPtr[4], twoRowPtr[5], twoRowPtr[6], twoRowPtr[7],
 				height);
@@ -135,8 +131,8 @@ void avFlatLoader(qAvatar *avatar, int bufIx, qCavity *qcavity, int nPoints) {
 		dumpViewBuffer(avatar, bufIx, nPoints, "avFlatLoader done");
 	}
 
-	avatar->d0 = highest;
-	//printf("end of avFlatLoader: d0=%lf  highest=%lf\n", avatar->d0, highest);
+	avatar->double0 = highest;
+	//printf("end of avFlatLoader: double0=%lf  highest=%lf\n", avatar->double0, highest);
 	// all return values returned on the avatar in [di][01]
 }
 

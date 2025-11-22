@@ -24,6 +24,10 @@ test :
 build :
 	maint/productionBuild.sh
 
+
+	docGen/compileDocs.js --batch || exit 45
+
+
 deploy :
 	maint/deploy.sh
 

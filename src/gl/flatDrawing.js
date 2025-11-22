@@ -13,7 +13,7 @@ let traceViewBufAfterDrawing = false;
 let traceMaxHeight = false;
 let traceFlatDrawing = false;
 let traceViewport = false;
-let traceReloadRow = false;
+let traceReloadRow = true;
 
 // diagnostic purposes; draws more per vertex
 let traceDrawPoints = false;
@@ -117,10 +117,10 @@ export class flatDrawing extends abstractDrawing {
 			() => {
 				// fresh out of the loader, maxHeight wobbles up and down.  Smooth it.
 				if (!this.maxHeight)
-					this.maxHeight = this.avatar.d0;
+					this.maxHeight = this.avatar.double0;
 				else
-					this.maxHeight = (this.maxHeight * 15 + this.avatar.d0) / 16;
-					//this.maxHeight = (this.maxHeight * 255 + this.avatar.d0) / 256;
+					this.maxHeight = (this.maxHeight * 15 + this.avatar.double0) / 16;
+					//this.maxHeight = (this.maxHeight * 255 + this.avatar.double0) / 256;
 
 				if (traceMaxHeight)
 					console.log(`♭♭♭ flatDrawing reloading outer:  `
