@@ -4,7 +4,7 @@
 */
 
 let traceGLCalls = false;
-let traceUniforms = false;
+let traceUniforms = true;
 let traceAttrs = true;  // quick update every reload
 let traceAttributes = false;  // full dumps every reload
 
@@ -89,9 +89,10 @@ export class drawingUniform extends drawingVariable {
 		if (null == value || !isFiniteAr(value) || null == type) {
 			// this means, we won't draw this particular drawing this time around.
 			// better luck next time.
-			//debugger;
-			//throw new Error(`𒐿 uniform variable has no value(${value}) or no type(${type})`);
-			this.drawing.skipDrawing = true;
+			let msg = `uniform variable ${this.varName} has `
+						+`no value(${value}) or no type(${type})`;
+			console.error(`𒐿 ${msg}`);
+			this.drawing.skipDrawingCuzErr = msg;
 			return;
 		}
 
