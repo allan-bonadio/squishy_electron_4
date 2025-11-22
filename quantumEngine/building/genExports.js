@@ -64,11 +64,12 @@ let exportsSrc  = [
 
 	/* ***************************************** avatars */
 	// most accept an integer pointer to the avatar as first argument
-	// except this that creates a new one.  When a space is created,
-	// it also makes its own avatars.
+
+	// except this that creates a new one.
 	{name: 'avatar_create', args: ['number', 'string'], retType: 'number'},
 
-	{name: 'avatar_setWaveSpace',
+	// set avatar's qCavity and qSpace
+	{name: 'avatar_setCavitySpace',
 		args: ['number', 'number', 'number'], retType: null},
 
 	// create one buffer in the set
