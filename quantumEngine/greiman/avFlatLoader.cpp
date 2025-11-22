@@ -12,8 +12,8 @@
 #include "../debroglie/qCavity.h"
 
 static const bool traceViewBuffer = false;  // dumps it
-static const bool traceHighest = false;
-static const bool traceInDetail = false;
+static const bool traceHighest = true;
+static const bool traceInDetail = true;
 
 
 void dumpViewBuffer(qAvatar *avatar, int bufIx, int nPoints, const char *title) {
@@ -56,6 +56,7 @@ void dumpViewBuffer(qAvatar *avatar, int bufIx, int nPoints, const char *title) 
 //     real   imaginary    voltage    serial
 // Two vertices per datapoint: bottom then top, same data.
 // also converts from doubles to floats for GL.
+// Also calculates the highest magnitude and leaves it in double0 (overwriting anything previous)
 void avFlatLoader(qAvatar *avatar, int bufIx, qCavity *qcavity, int nPoints) {
 //	int *p = (int *) avatar;
 //	printf("%8lx %8lx %8lx %8lx %8lx %8lx %8lx %8lx ",
@@ -109,7 +110,7 @@ void avFlatLoader(qAvatar *avatar, int bufIx, qCavity *qcavity, int nPoints) {
 		twoRowPtr[6] = 0;
 		twoRowPtr[7] = pointNum * 2. + 1.;  // at magnitude, top
 
-		// while we're here, collect the highest point (obsolete i think)
+		// while we're here, collect the highest point
 		double height = re * re + im * im;
 		if (height > highest)
 			highest = height;
