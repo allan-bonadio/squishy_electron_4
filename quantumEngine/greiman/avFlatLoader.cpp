@@ -14,6 +14,7 @@
 static const bool traceViewBuffer = false;  // dumps it
 static const bool traceHighest = false;
 static const bool traceInDetail = false;
+static const bool traceWaveDump = false;
 
 
 void dumpViewBuffer(qAvatar *avatar, int bufIx, int nPoints, const char *title) {
@@ -66,25 +67,28 @@ void avFlatLoader(qAvatar *avatar, int bufIx, qCavity *qcavity, int nPoints) {
 		printf("\n📺 avFlatLoader to avatar %s starts:\n", avatar->label);
 	qCx *wave = qcavity->wave;  // from here
 	float *fArray = avatar->viewBuffers[bufIx].fArray;  // to here
-
+	if (traceInDetail) {
+		printf("avFlatLoader avatar=%p, ->viewBuffers=%p vb[ix=%d]->fArray %p\n",
+			avatar, avatar->viewBuffers, bufIx, fArray);
+		printf("       viewBuffers %p %p %p %p\n",
+			avatar->viewBuffers[0].fArray, avatar->viewBuffers[1].fArray,
+			avatar->viewBuffers[2].fArray, avatar->viewBuffers[3].fArray);
+	}
 	double highest = 0;
 
 	if (traceInDetail) {
-		printf("avFlatLoader: avatar %p, qcavity->wave=->%p->%p\n",
-			avatar, qcavity, qcavity->wave);
-		printf("avFlatLoader: avatar[%d]->fArray %p\n",
-			bufIx, fArray);
-		qcavity->dump("📺 at start of avFlatLoader()");
+		printf("avFlatLoader: avatar=%p, qcavity=%p, ->wave=%p avatar[ix=%d]->fArray %p\n",
+			avatar, qcavity, qcavity->wave, bufIx, fArray);
 	}
+	if (traceWaveDump)
+		qcavity->dump("📺 at start of avFlatLoader()");
 
 	// this is index into the complex point, which translates to 2 GL vertices, eight single floats, 32 bytes
 	//printf("avFlatLoader about to do nPoints pts: %d\n", nPoints);
 	for (int pointNum = 0; pointNum < nPoints; pointNum++) {
 		if (traceInDetail) {
-			printf("📺 avFlatLoader fArray %p\n",
-				fArray);
-			printf("📺 avFlatLoader fArray + pointNum * 8=%p\n",
-				fArray + pointNum * 8);
+			printf("📺 avFlatLoader pointNum=%d   fArray %p   +pointNum*8=%p\n",
+				 pointNum, fArray, fArray + pointNum * 8);
 		}
 
 		float *twoRowPtr = fArray + pointNum * 8;

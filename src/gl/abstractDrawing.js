@@ -33,9 +33,9 @@ export class abstractDrawing {
 		this.gl = scene.gl;
 		this.sceneName = scene.sceneName;
 		this.tagObject = scene.tagObject;
-		this.glBuffer.__SPECTOR_Metadata = { name: "cubeVerticesColorBuffer" };
 		this.space = scene.space;
 		this.avatar = scene.avatar;
+		// crashes this.glBuffer.__SPECTOR_Metadata = { name: "cubeVerticesColorBuffer" };
 		this.avatarLabel = scene.avatar?.label ?? 'no avatar';
 		this.shaderTypes = {
 			[this.gl.VERTEX_SHADER]: 'vertex',
