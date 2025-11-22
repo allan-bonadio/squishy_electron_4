@@ -60,7 +60,7 @@ function SetWaveTab(props) {
 	// GLScene ultimately calls this to hand us the minigraph repaint function
 	function setMinigraphRepaint(repaint) {
 		minigraphRepaintRef.current = minigraphRepaint = repaint;
-		minigraphRepaint.name = 'mgRepaint';  // for debugging
+		minigraphRepaint.sceneName = 'mgRepaint';  // for debugging
 	}
 
 	// set the captive miniGraph wave to the new settings,
