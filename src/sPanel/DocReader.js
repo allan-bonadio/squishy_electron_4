@@ -82,8 +82,9 @@ function DocReader(props) {
 	// figure out the size the iframe should be, based on the viewport size.
 	//  iframe needs height and width as attributes.
 	let src = startingUri ? `/doc${startingUri}` : 'about:blank';
+	// this was formerly on the <dialog element    closedBy='any'
 	return (
-		<dialog className='DocReader' closedBy='any' ref={dialogRef}>
+		<dialog className='DocReader' closedby='any' ref={dialogRef}>
 			<button className='x_close_box' onClick={CommonDialog.closeDialog} >×</button>
 			<iframe src={src} name='DocReader' title='about squishy electron'
 				allow='fullscreen' referrerPolicy='no-referrer' onError={handleError}
