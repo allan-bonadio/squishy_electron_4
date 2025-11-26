@@ -19,6 +19,8 @@ int traceCreate = false;
 qCavity::qCavity(qSpace *sp, qCx *useThisBuffer)
 	: qBuffer() {
 
+	magic = 'Cavi';
+
 	if (! sp)
 		throw std::runtime_error("qCavity::qCavity null space");
 	magic = 'Wave';
