@@ -21,7 +21,7 @@ import {interpretCppException, wrapForExc} from '../utils/errors.js';
 import SquishContext from '../sPanel/SquishContext.js';
 
 let traceSetPanels = false;
-let traceStartStop = true;
+let trace.StartStop = false;
 let traceContext = false;
 
 // integrations always need specific numbers of steps.  But there's always one
@@ -283,21 +283,24 @@ export class ControlPanel extends React.Component {
 		};
 	}
 
-	// SetWave panel, upon a change: pass an object with any or all of the
-	// params you want to change. non-wave params are ignored
+	// SetWave panel, upon a change: pass an object with any or all of the wave
+	// params you want to change in the control panel's state. non-wave params are ignored.
+	// Will return a copy of updated waveparams (Just the wave params, not others)
 	setWaveParams = (wp) => {
 		const s = this.state;
-		this.setState({
+		const newParams = {
 			waveBreed: wp.waveBreed ?? s.waveBreed,
 			waveFrequency: wp.waveFrequency ?? s.waveFrequency,
 			pulseWidth: wp.pulseWidth ?? s.pulseWidth,
 			pulseCenter: wp.pulseCenter ?? s.pulseCenter,
-		});
+		};
+		this.setState(newParams);
+		return newParams;
 	}
 
 	// given these params, put it into effect and display it on the Main Wave scene
 	// This is most of 'Reset Wave'  NOT for regular iteration
-	setAndPaintFamiliarWave = waveParams => {
+	setAndPaintMainFamiliarWave = waveParams => {
 		if (!this.space)
 			return;
 
@@ -314,7 +317,7 @@ export class ControlPanel extends React.Component {
 	saveMainWave = waveParams => {
 		this.resetElapsedTime();
 
-		this.setAndPaintFamiliarWave(waveParams);
+		this.setAndPaintMainFamiliarWave(waveParams);
 		storeAGroup('waveParams', waveParams);
 	}
 
@@ -324,7 +327,7 @@ export class ControlPanel extends React.Component {
 		this.resetElapsedTime();
 
 		let waveParams = getAGroup('waveParams');
-		this.setAndPaintFamiliarWave(waveParams);
+		this.setAndPaintMainFamiliarWave(waveParams);
 		this.grinder.hadException = false;
 		this.stopAnimating()
 	}
