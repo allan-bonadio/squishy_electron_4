@@ -14,7 +14,7 @@ import singleStepIcon from './waveViewIcons/singleStep2.png';
 
 
 let traceContext = false;
-let traceStartStop = true;
+let traceStartStop = false;
 
 // no props!  does everything thru context.
 function StartStopOverlay(props) {

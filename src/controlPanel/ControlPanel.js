@@ -21,7 +21,7 @@ import {interpretCppException, wrapForExc} from '../utils/errors.js';
 import SquishContext from '../sPanel/SquishContext.js';
 
 let traceSetPanels = false;
-let trace.StartStop = false;
+let traceStartStop = false;
 let traceContext = false;
 
 // integrations always need specific numbers of steps.  But there's always one

@@ -19,7 +19,7 @@ import {interpretCppException} from '../utils/errors.js';
 const MINI_WIDTH = 300;
 const MINI_HEIGHT = 150;
 
-let trace.Regenerate = false;
+let traceRegenerate = false;
 
 function setPT() {
 	// variables from on high, and the funcs needed to change them

@@ -6,7 +6,7 @@
 // not sure about this file; originally used just for testing
 import cx2rygb from '../gl/cx2rygb/cx2rygb.txlated.js';
 
-let traceColors = true;
+let traceColors = false;
 
 // Dump a wave buffer as a colored bargraph in the JS console
 // this is also called by C++ so it's easier as a standalone function
