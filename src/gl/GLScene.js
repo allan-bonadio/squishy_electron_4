@@ -117,7 +117,9 @@ function GLScene(props) {
 	const glRepaint =
 	() => {
 		// make sure we have this cuz this func gets called from all over
-		const scene = squishScene, node = canvasNode, info=p.specialInfo;
+		const scene = squishScene;
+		const node = canvasNode;
+		const info=p.specialInfo;
 		if (! scene) {
 			if (traceTooEarly)
 				console.log(`🖼 GLScene too early for glRepaint. squishScene=`, scene);
