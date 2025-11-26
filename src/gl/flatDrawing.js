@@ -13,7 +13,7 @@ let traceViewBufAfterDrawing = false;
 let traceMaxHeight = false;
 let traceFlatDrawing = false;
 let traceViewport = false;
-let traceReloadRow = true;
+let traceReloadRow = false;
 
 // diagnostic purposes; draws more per vertex
 let traceDrawPoints = false;
@@ -161,7 +161,7 @@ export class flatDrawing extends abstractDrawing {
 			}
 			//debugger;
 			qeFuncs.avatar_avFlatLoader(this.avatar.pointer, 0, this.scene.inputInfo.pointer,
-					this.vertexCount);
+					nPoints);
 
 			return this.avatar.getViewBuffer(0);
 		});
