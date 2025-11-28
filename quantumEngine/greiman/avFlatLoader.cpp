@@ -14,6 +14,7 @@
 static const bool traceViewBuffer = true;  // dumps it
 static const bool traceHighest = true;
 static const bool traceInDetail = true;
+static const bool traceWaveDump = true;
 
 
 void dumpViewBuffer(qAvatar *avatar, int bufIx, int nPoints, const char *title) {
