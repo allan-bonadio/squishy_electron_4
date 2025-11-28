@@ -346,11 +346,11 @@ export class WaveView extends React.Component {
 			glScene = <GLScene
 				space={s.space} animator={this.animator}
 				sceneClassName={sceneClassName} sceneName={sceneName}
-				inputInfo={this.space.mainFlick}
+				inputInfo={[this.space.mainFlick, this.bumperWidth, null, null]}
+				specialInfo={{bumperWidth: this.bumperWidth}}
 				canvasInnerWidth={this.canvasInnerWidth}
 				canvasInnerHeight={this.canvasInnerHeight}
 				setGLRepaint={this.setMainRepaint}
-				specialInfo={{bumperWidth: this.bumperWidth}}
 			/>;
 		}
 		else {
