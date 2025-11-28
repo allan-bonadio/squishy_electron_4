@@ -68,7 +68,7 @@ qCavity::~qCavity(void) {
 // Paste the output into class eCavity, the class itself, to replace the existing ones
 void qCavity::formatDirectOffsets(void) {
 	// don't need magic
-	printf("🚦 🚦 ----------- starting 🥽 eCavity direct access 🥽 JS getters & setters ----------\n\n");
+	printf("🚦 🚦 ----------- starting    👽   👽    eCavity direct access    👽   👽    JS getters & setters ----------\n\n");
 
 	makePointerGetter(wave);
 
@@ -78,7 +78,7 @@ void qCavity::formatDirectOffsets(void) {
 	makeIntGetter(end);
 	makeIntGetter(continuum);
 
-	printf("\n🚦 🚦 --------------- done with 🥽 eCavity direct access 🥽 --------------\n");
+	printf("\n🚦 🚦 --------------- done with    👽   👽    eCavity direct access    👽   👽    --------------\n");
 }
 
 

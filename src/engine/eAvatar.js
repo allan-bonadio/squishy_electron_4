@@ -137,7 +137,7 @@ class eAvatar {
 		}
 	}
 
-	/* ***************************************** 🥽 Direct Accessors */
+	/* *****************************************    👽   👽    Direct Accessors */
 	// see qAvatar.cpp to regenerate this. Note these are all scalars; buffers
 
 	get _space() { return this.ints[1]; }
@@ -158,7 +158,7 @@ class eAvatar {
 	get _nIndices() { return this.ints[19]; }
 	get _viewBuffers() { return this.pointer + 80; }
 
-	/* **************************** 🥽 end of direct accessors */
+	/* ****************************    👽   👽    end of direct accessors */
 
 	// this just gets the TypedArray, ready to use.  attachViewBuffer() also returns it.
 	getViewBuffer(bufferIx) {

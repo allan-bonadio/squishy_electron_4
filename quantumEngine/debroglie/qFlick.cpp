@@ -74,7 +74,7 @@ qFlick::~qFlick() {
 // there seems to be an extra 128 bits.
 // So, do it over.  All these will have different offsets from the same thing in qCavity.
 void qFlick::formatDirectOffsets(void) {
-	printf("🚦 🚦 --------------- starting 🥽 eFlick direct access 🥽 JS getters & setters --------------\n\n");
+	printf("🚦 🚦 --------------- starting    👽   👽    eFlick direct access    👽   👽    JS getters & setters --------------\n\n");
 
 	makePointerGetter(wave);
 
@@ -84,7 +84,7 @@ void qFlick::formatDirectOffsets(void) {
 	makeIntGetter(end);
 	makeIntGetter(continuum);
 
-	printf("\n🚦 🚦 --------------- done with 🥽 eFlick direct access 🥽 --------------\n");
+	printf("\n🚦 🚦 --------------- done with    👽   👽    eFlick direct access    👽   👽    --------------\n");
 }
 
 

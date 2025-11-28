@@ -126,7 +126,7 @@ qGrinder::~qGrinder(void) {
 // out when it all works.
 void qGrinder::formatDirectOffsets(void) {
 	// don't need magic
-	printf("🪓 🪓 --------------- starting 🥽 eGrinder direct access 🥽 JS getters & setters--------------\n\n");
+	printf("🪓 🪓 --------------- starting    👽   👽    eGrinder direct access    👽   👽    JS getters & setters--------------\n\n");
 	// these can come in any order; the .h file determines the memory layout
 	// but keep in same order as the .h file so I don't go crazy.  Commented ones don't have js accessors.
 
@@ -200,7 +200,7 @@ void qGrinder::formatDirectOffsets(void) {
 	makeByteGetter(sentinel);  // should always be value grSENTINEL_VALUE; only for validation
 	makeByteSetter(sentinel);
 
-	printf("\n🪓 🪓 --------------- done with 🥽 eGrinder direct access 🥽 --------------\n");
+	printf("\n🪓 🪓 --------------- done with    👽   👽    eGrinder direct access    👽   👽    --------------\n");
 }
 
 /* ********************************************************** dumpObj  */

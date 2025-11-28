@@ -46,7 +46,7 @@ class eFlick extends eCavity {
 		this.space = this.wave = null;
 	}
 
-	/* ************************************* 🥽 direct access */
+	/* *************************************    👽   👽    direct access */
 	// these are different offsets from qCavity; therefore all of these
 	// have to override qCavity's versions.  But the constructor for eCavity calls
 	// prepForDirectAccessors() for us, and it works the same.
@@ -58,7 +58,7 @@ class eFlick extends eCavity {
 	get end() { return this.ints[10]; }
 	get continuum() { return this.ints[11]; }
 
-	/* **************************** 🥽 end of direct accessors */
+	/* ****************************    👽   👽    end of direct accessors */
 	// hope everything else works!  All of qCavity's methods work on
 	// buffer zero.
 }

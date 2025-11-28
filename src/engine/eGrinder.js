@@ -48,7 +48,7 @@ class eGrinder {
 		qeFuncs.grinder_delete(this.pointer);
 	}
 
-	/* ***************************** 🥽 Direct Accessors */
+	/* *****************************    👽   👽    Direct Accessors */
 	// see qGrinder.cpp to regenerate this. Note these are all scalars; buffers
 	// are passed by pointer and you need to allocate them in JS (eg see
 	// eGrinder.constructor)

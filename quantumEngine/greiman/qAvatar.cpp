@@ -91,7 +91,7 @@ short *qAvatar::attachIndexBuffer(short *useThisBuffer, int nItems) {
 // Paste the output into class eAvatar, the class itself, to replace the existing ones
 void qAvatar::formatDirectOffsets(void) {
 	// don't need magic
-	printf("🚥 🚥 --------------- starting 🥽 eAvatar direct access 🥽 JS getters & setters--------------\n\n");
+	printf("🚥 🚥 --------------- starting    👽   👽    eAvatar direct access    👽   👽    JS getters & setters--------------\n\n");
 
 	// the view Buffer to be passed to webgl.  Just the buffer
 	makePointerGetter(space);
@@ -119,7 +119,7 @@ void qAvatar::formatDirectOffsets(void) {
 	makeInsidePointer(viewBuffers);
 
 
-	printf("\n🚥  --------- done with 🥽 eAvatar direct access 🥽 ----------\n");
+	printf("\n🚥  --------- done with    👽   👽    eAvatar direct access    👽   👽    ----------\n");
 }
 
 /* ********************************************************** dump  */

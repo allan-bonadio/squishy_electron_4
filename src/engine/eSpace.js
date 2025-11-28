@@ -115,7 +115,7 @@ export class eSpace {
 		}
 	}
 
-	/* ********************************* 🥽 Direct Accessors */
+	/* *********************************    👽   👽    Direct Accessors */
 	// see qSpace.cpp and directAccessors.h to regenerate this.
 
 	get _voltage() { return this.ints[1]; }
@@ -137,7 +137,7 @@ export class eSpace {
 	get _label() { return this.pointer + 224; }
 
 
-	/* **************************** 🥽 end of direct accessors */
+	/* ****************************    👽   👽    end of direct accessors */
 
 	// return me the start, end, etc of this 1d space
 	// call it like this: const {start, end, N, continuum} = space.startEnd;
