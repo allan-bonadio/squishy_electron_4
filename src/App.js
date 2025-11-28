@@ -14,7 +14,7 @@ import {eSpaceCreatedPromise} from './engine/eEngine.js';
 import './App.scss';
 
 
-let traceResize = true;
+let traceResize = false;
 let traceState = false;
 
 class App extends React.Component {

@@ -19,6 +19,7 @@ boss
 captain *
 chief
 commander
+cruncher *
 director
 foreman *
 governor *

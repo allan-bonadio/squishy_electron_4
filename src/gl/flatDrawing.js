@@ -153,15 +153,15 @@ export class flatDrawing extends abstractDrawing {
 		this.vertexCount = nPoints * 2;  // nPoints * vertsPerBar
 		this.rowFloats = 4;
 		this.rowAttr = new drawingAttribute('row', this, this.rowFloats, () => {
+			//debugger;
+			qeFuncs.avatar_avFlatLoader(this.avatar.pointer, 0, this.scene.inputInfo[0].pointer,
+					nPoints);
 
 			if (traceReloadRow) {
-				console.log(`at row getFunc() loading to ${this.avatar.label}; `
-					+` this.vertexCount=${this.vertexCount} `
-					+` total floats=${this.vertexCount * this.rowFloats}`);
+				console.log(`♭♭♭ flatDrawing  ${this.avatarLabel}: at row getViewBuffer() `
+					+` loading to ${this.avatar.label}   this.vertexCount=${this.vertexCount} `
+					+` total floats=${this.vertexCount * this.rowFloats}  double0=this.avatar.double0`);
 			}
-			//debugger;
-			qeFuncs.avatar_avFlatLoader(this.avatar.pointer, 0, this.scene.inputInfo.pointer,
-					this.vertexCount);
 
 			return this.avatar.getViewBuffer(0);
 		});
@@ -171,7 +171,7 @@ export class flatDrawing extends abstractDrawing {
 	// called for each image frame on th canvas.  TODO: roll specialInfo into the input Data Arrays
 	draw(width, height, specialInfo) {
 		if (traceFlatDrawing) {
-			console.log(`♭♭♭ flatDrawing  ${this.avatarLabel}: `
+			console.log(`♭♭♭ flat Drawing  ${this.avatarLabel}: `
 				+` width=${width}, height=${height}  drawing ${this.vertexCount/2} points `
 				+` maxHeight=${this.maxHeight}`);
 		}

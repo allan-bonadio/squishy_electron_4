@@ -16,8 +16,10 @@ cd ..
 
 # -sEMIT_PRODUCERS_SECTION = put info on which compiler/linker/language was
 # built.  Mostly irrelevant.  add it here if you want.
-export DEBUG='-g3 -gsource-map --source-map-base /../quantumEngine/  -DsqDEVEL=1'
-#export DEBUG='-g3 -gsource-map --source-map-base /qEng/ '
+# this one works on Panama
+#export DEBUG='-g3 -gsource-map --source-map-base /../quantumEngine/  -DsqDEVEL=1'
+# this one works on Dnipro
+export DEBUG='-g3 -gsource-map --source-map-base /qEng/   -DsqDEVEL=1'
 export OPTIMIZE='-O0 '
 
 # add -sPTHREADS_DEBUG for blow by blow tracing of quantumEngine.js i think
@@ -44,15 +46,6 @@ export MALLOC=emmalloc-memvalidate
 #		emmalloc-memvalidate=lots of checking
 # LIBRARY_DEBUG = Print out when we enter a library call (library*.js)
 # -sSYSCALL_DEBUG to log system calls
-
-# echo ℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏ compile
-# # https://emscripten.org/docs/tools_reference/emcc.html
-# set -x
-# emcc -o wasm/quantumEngine.js \
-# 	$DEBUG $OPTIMIZE $SAFETY $FEATURES $PROFILING  \
-# 	$EXPORTS $DEFINES  $INCLUDES $WORKERS $MISC $DISABLE_GL \
-# 	main.cpp $allCpp || exit $?
-# set +x
 
 echo ℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏℏ compile
 building/buildCommon.sh || exit 93

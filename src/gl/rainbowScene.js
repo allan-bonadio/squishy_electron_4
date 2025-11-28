@@ -22,7 +22,7 @@ class rainbowScene extends abstractScene {
 		this.gl = ambiance.gl;
 
 		// create avatar but don't add buffers; the drawing does that
-		this.avatar = eAvatar.createAvatar(qeConsts.avRAINBOW, sceneName);
+		this.avatar = eAvatar.createAvatar(sceneName);
 
 		// create relevant drawings.
 		this.drawings = [ new rainbowDrawing(this) ];

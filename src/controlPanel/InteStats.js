@@ -6,7 +6,7 @@
 import SquishContext from '../sPanel/SquishContext.js';
 import {useContext, useRef} from 'react';
 
-// holds all statistics shown on the Integration tab
+// component holds all statistics shown on the Integration tab
 // One per space and SquishPanel.  No props but uses context.
 function InteStats(props) {
 	const context = useContext(SquishContext);

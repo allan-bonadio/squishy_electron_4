@@ -21,36 +21,6 @@ static const bool traceHighest = false;
 
 // see constants in genExports.js
 
-// for C++ calling, just set avatar->avatarBreed or pass it in the constructor directly.  avatarBreed optional.
-// For JS calling C++, need an avatarBreed in commonConstants.h, and must be listed here.
-// You can also load it in JS; write your on function and call it when you can
-//void (*(getBreedLoader(int avatarBreed) ))(qAvatar *) {
-//	printf("getBreedLoader(avatarBreed=%d)\n", avatarBreed);
-//	printf("    loaders: %p   %p   %p\n", loaderFlat, loaderFlatTics, loaderRainbow);
-//	switch (avatarBreed) {
-//	case avNULL:
-//		throw std::runtime_error("Cannot load avNULL");
-//
-//	case avOldFLAT:
-//		throw std::runtime_error("Cannot load oldFlat");  // actual code doesn't relly work
-//
-//	case avFLAT:
-//		return loaderFlat;
-//
-//	case avFLAT_TICS:
-//		return loaderFlatTics;
-//
-//	case avRAINBOW:
-//		return loaderRainbow ;
-//
-//	default:
-//		printf("Cannot load strange avatarBreed=%d\n", avatarBreed);
-//		throw std::runtime_error("Cannot load strange avatarBreed");
-//
-//	}
-//}
-
-
 
 // each viewBuffer is one of these.  to be filled in later.
 viewBufInfo::viewBufInfo(void) {
@@ -62,8 +32,8 @@ viewBufInfo::viewBufInfo(void) {
 /* ******************************************************************* qAvatar */
 
 // create new avatar, complete with zero viewBuffers
-qAvatar::qAvatar(int breed, const char *lab)
-	: magic('Avat'), avatarBreed(breed), loader(NULL), space(NULL),
+qAvatar::qAvatar(const char *lab)
+	: magic('Avat'), space(NULL),
 	cavity(NULL), double0(0), double1(0), int0(0), int1(0) {
 
 	strncpy(label, lab, MAX_LABEL_LEN);
@@ -72,8 +42,8 @@ qAvatar::qAvatar(int breed, const char *lab)
 	printf(" construct avatar.   label: %p      this=%p\n", lab, this );
 	printf("the label passed in is %s\n", lab);
 	if (traceCreation)
-		printf(" 🚥 creating new qAvatar.  ptr=%p breed=%d  label='%s' MAX_LABEL_LEN: %d\n",
-			this, avatarBreed, label, MAX_LABEL_LEN);
+		printf(" 🚥 creating new qAvatar.  ptr=%p  label='%s' MAX_LABEL_LEN: %d\n",
+			this, label, MAX_LABEL_LEN);
 	// crashes!! printf("lab input string: 0x %2x %2x %2x %2x %2x %2x \n", lab[0], lab[1], lab[2], lab[3], lab[4], lab[5] );
 
 	for (int b = 0; b < MAX_N_BUFFERS; b++)
@@ -124,9 +94,6 @@ void qAvatar::formatDirectOffsets(void) {
 	printf("🚥 🚥 --------------- starting 🥽 eAvatar direct access 🥽 JS getters & setters--------------\n\n");
 
 	// the view Buffer to be passed to webgl.  Just the buffer
-	makeIntGetter(avatarBreed);
-	makeIntSetter(avatarBreed);
-
 	makePointerGetter(space);
 	makePointerSetter(space);
 	makePointerGetter(cavity);
@@ -166,10 +133,8 @@ int charsUsed;
 // I don't think anybody uses this
 void qAvatar::dumpMeta(const char *title) {
 	if (!title) title = "no title 🧨 🧨";
-	printf("\n🚥 🚥  ==== '%s' Avatar | avatarBreed=%d  ",
-		title, avatarBreed);
-	printf("        magic: " MAGIC_FORMAT "     '%s'   \n",
-		magic>>3, magic>>2, magic>>1, magic, label);
+	printf("\n🚥 🚥  ==== '%s' Avatar |  magic: " MAGIC_FORMAT "     '%s'   \n",
+		title, magic>>3, magic>>2, magic>>1, magic, label);
 
 	printf("   int0 = %10d   int1 = %10d    double0 = %12.6g   double1 = %12.6g\n",
 		int0, int1, double0, double1);
@@ -338,11 +303,11 @@ void qAvatar::dumpIndex(const char *title) {
 
 // for the JS side
 
-qAvatar *avatar_create(int avatarBreed, char *label) {
+qAvatar *avatar_create(char *label) {
 	if (traceCreation)
-		printf(" 🚥 avatar_create()  breed=%d  label='%s' %p\n",
-			avatarBreed, label, label);
-	return new qAvatar(avatarBreed, label);
+		printf(" 🚥 avatar_create()  label='%s' %p\n",
+			label, label);
+	return new qAvatar(label);
 }
 
 // cavity and space are both optional, pass null for none or just don't call this

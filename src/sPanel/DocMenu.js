@@ -9,8 +9,6 @@
 import React from 'react';
 import PropTypes, {checkPropTypes} from 'prop-types';
 
-import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
-
 import DocReader from './DocReader.js';
 import './DocMenu.scss';
 

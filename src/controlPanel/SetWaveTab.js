@@ -3,7 +3,7 @@
 ** Copyright (C) 2021-2025 Tactile Interactive, all rights reserved
 */
 
-import React, {useRef} from 'react';
+import React, {useRef, useEffect} from 'react';
 import PropTypes, {checkPropTypes} from 'prop-types';
 import {scaleLinear} from 'd3-scale';
 
@@ -19,7 +19,7 @@ import {interpretCppException} from '../utils/errors.js';
 const MINI_WIDTH = 300;
 const MINI_HEIGHT = 150;
 
-let traceRegenerate = true;
+let traceRegenerate = false;
 
 function setPT() {
 	// variables from on high, and the funcs needed to change them
@@ -62,6 +62,7 @@ function SetWaveTab(props) {
 		minigraphRepaintRef.current = minigraphRepaint = repaint;
 		minigraphRepaint.sceneName = 'mgRepaint';  // for debugging
 	}
+
 
 	// set the captive miniGraph wave to the new settings,
 	// after user changed one. this will do a GL draw.
@@ -156,7 +157,7 @@ function SetWaveTab(props) {
 	const glScene = <GLScene
 		space={space}
 		sceneClassName='flatScene' sceneName='swMiniGraph'
-		inputInfo={minigraphWave}
+		inputInfo={[minigraphWave]}
 		canvasInnerWidth={MINI_WIDTH}
 		canvasInnerHeight={MINI_HEIGHT}
 		setGLRepaint={setMinigraphRepaint}
@@ -190,6 +191,12 @@ function SetWaveTab(props) {
 				onChange={ev => setBreed('chord')} />
 		</label>*/}
 	</div>;
+
+	// this will happen after the render
+	useEffect(() => {
+		regenerateMiniGraphWave();
+		return () => {};
+	});
 
 	return <div className='SetWaveTab  controlPanelPanel'
 			title="Use this tab to set the main wave, and save these parameters for next time.">

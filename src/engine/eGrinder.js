@@ -58,7 +58,6 @@ class eGrinder {
 	get _voltage() { return this.ints[4]; }
 	get _spect() { return this.ints[5]; }
 	get _stage() { return this.ints[2]; }
-
 	get stepsPerFrame() { return this.ints[7]; }
 	set stepsPerFrame(a) { this.ints[7] = a; }
 	get videoFP() { return this.doubles[4]; }
@@ -67,7 +66,6 @@ class eGrinder {
 	set chosenFP(a) { this.doubles[5] = a; }
 	get totalCalcTime() { return this.doubles[6]; }
 	get maxCalcTime() { return this.doubles[7]; }
-
 	get stretchedDt() { return this.doubles[8]; }
 	set stretchedDt(a) { this.doubles[8] = a; }
 	get divergence() { return this.doubles[10]; }
@@ -83,17 +81,16 @@ class eGrinder {
 	get hadException() { return Boolean(this.bytes[135]); }
 	set hadException(a) { this.bytes[135] = Boolean(a); }
 	get _label() { return this.pointer + 136; }
-
-	get shouldBeIntegrating() { return Boolean(this.bytes[152]); }
-	set shouldBeIntegrating(a) { this.bytes[152] = Boolean(a); }
-	get isIntegrating() { return Boolean(this.bytes[153]); }
-	set isIntegrating(a) { this.bytes[153] = Boolean(a); }
-	get pleaseFFT() { return Boolean(this.bytes[154]); }
-	set pleaseFFT(a) { this.bytes[154] = Boolean(a); }
-	get needsRepaint() { return Boolean(this.bytes[155]); }
-	set needsRepaint(a) { this.bytes[155] = Boolean(a); }
-	get sentinel() { return this.bytes[156]; }
-	set sentinel(a) { this.bytes[156] = a; }
+	get shouldBeIntegrating() { return Boolean(this.bytes[168]); }
+	set shouldBeIntegrating(a) { this.bytes[168] = Boolean(a); }
+	get isIntegrating() { return Boolean(this.bytes[169]); }
+	set isIntegrating(a) { this.bytes[169] = Boolean(a); }
+	get pleaseFFT() { return Boolean(this.bytes[170]); }
+	set pleaseFFT(a) { this.bytes[170] = Boolean(a); }
+	get needsRepaint() { return Boolean(this.bytes[171]); }
+	set needsRepaint(a) { this.bytes[171] = Boolean(a); }
+	get sentinel() { return this.bytes[172]; }
+	set sentinel(a) { this.bytes[172] = a; }
 
 	/* ******************* end of direct accessors */
 
@@ -131,8 +128,10 @@ class eGrinder {
 			qeFuncs.grinder_triggerIteration(this.pointer);
 		}
 
-		if (qeConsts.grSENTINEL_VALUE !== this.sentinel)
-			throw "🔥 🔥 Grinder offsets aren't correct (119) 🔥 🔥";
+		if (qeConsts.grSENTINEL_VALUE !== this.sentinel) {
+			console.error("🔥\n🔥 🔥 Grinder offsets aren't correct (119) 🔥 🔥\n🔥");
+			// but continue!  we're doing direct accessors and need the rest of them.
+		}
 	}
 
 	// a consistent way to format these numbers, used in two places

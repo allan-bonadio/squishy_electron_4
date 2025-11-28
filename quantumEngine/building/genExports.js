@@ -66,7 +66,7 @@ let exportsSrc  = [
 	// most accept an integer pointer to the avatar as first argument
 
 	// except this that creates a new one.
-	{name: 'avatar_create', args: ['number', 'string'], retType: 'number'},
+	{name: 'avatar_create', args: ['string'], retType: 'number'},
 
 	// set avatar's qCavity and qSpace
 	{name: 'avatar_setCavitySpace',
@@ -143,14 +143,14 @@ let commonConstants = [
 
 	// view buffer generators - all of these fill (one or more) typed arrays,
 	// usually/always floats.  each in its own file.
-	{name: 'avNULL', cppType: 'int', value: 0},
-	{name: 'avOldFLAT', cppType: 'int', value: 1},
-	{name: 'avFLAT', cppType: 'int', value: 2},
-	{name: 'avFLAT_TICS', cppType: 'int', value: 3},
-	{name: 'avRAINBOW', cppType: 'int', value: 4},
+//	{name: 'avNULL', cppType: 'int', value: 0},
+//	{name: 'avOldFLAT', cppType: 'int', value: 1},
+//	{name: 'avFLAT', cppType: 'int', value: 2},
+//	{name: 'avFLAT_TICS', cppType: 'int', value: 3},
+//	{name: 'avRAINBOW', cppType: 'int', value: 4},
 
 	// labels, mostly for debugging, on dumps and objects
-	{name: 'MAX_LABEL_LEN', cppType: 'int', value: 15},
+	{name: 'MAX_LABEL_LEN', cppType: 'int', value: 31},
 
 
 ];

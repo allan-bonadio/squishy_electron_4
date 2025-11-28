@@ -6,7 +6,6 @@
 import abstractScene from './abstractScene.js';
 import flatDrawing from './flatDrawing.js';
 import eAvatar from '../engine/eAvatar.js';
-import qeConsts from '../engine/qeConsts.js';
 // eslint-disable-next-line no-unused-vars
 import ticDrawing from './ticDrawing.js';
 
@@ -19,7 +18,7 @@ class flatScene extends abstractScene {
 		this.inputInfo = inputInfo;
 
 		// create avatar but don't stick buffers; the drawing does that
-		this.avatar = eAvatar.createAvatar(qeConsts.avFLAT, sceneName);
+		this.avatar = eAvatar.createAvatar(sceneName);
 
 		// create relevant drawings.  Do not change this order;
 		// spent a long time on this.

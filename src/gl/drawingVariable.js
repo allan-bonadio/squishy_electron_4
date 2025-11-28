@@ -4,8 +4,8 @@
 */
 
 let traceGLCalls = false;
-let traceUniforms = true;
-let traceAttrs = true;  // quick update every reload
+let traceUniforms = false;
+let traceAttrs = false;  // quick update every reload
 let traceAttributes = false;  // full dumps every reload
 
 // attr arrays and uniforms that can change on every frame.
@@ -171,8 +171,6 @@ export class drawingAttribute extends drawingVariable {
 		this.reloadVariable();
 	}
 
-	diditOnce = false;  // TODO remove this
-
 	// call this when the array's values change, to reload them into the GPU.
 	// getFunc() gets past the previous array (or undefined first time)
 	// must return another Float32Array (or same) with extra JS property 'nTuples'
@@ -189,18 +187,14 @@ export class drawingAttribute extends drawingVariable {
 		}
 		this.nTuples = this.floatArray.nTuples;
 
-		// must do a bufferData() every frame?  I guess not.  O, c'mon, i'll have to put this back someday
-		if (!this.diditOnce) {
-			gl.bindBuffer(gl.ARRAY_BUFFER, this.glBuffer);
-			gl.bufferData(gl.ARRAY_BUFFER, floatArray, gl.DYNAMIC_DRAW);
-		}
+		gl.bindBuffer(gl.ARRAY_BUFFER, this.glBuffer);
+		gl.bufferData(gl.ARRAY_BUFFER, floatArray, gl.DYNAMIC_DRAW);
 
-		if (traceAttrs)
-			console.log(`𒐿 reload drawingAttribute '${this.varName}' in ${this.drawing.sceneName} reloaded`);
+		if (traceAttrs || traceAttributes)
+			console.log(`𒐿 reload drawingAttribute '${this.varName}' in ${this.drawing.sceneName}`
+				+ ` reloaded, ${this.nTuples}  tuples of ${this.tupleWidth} floats each:`);
 
 		if (traceAttributes) {
-			console.log(`𒐿 reload drawingAttribute '${this.varName}' in ${this.drawing.sceneName} reloaded, ${this.nTuples}`
-				+ ` tuples of ${this.tupleWidth} floats each:`);
 			for (let t = 0; t < this.nTuples; t++) {
 				let line = `[${String(t).padStart(4)}]  `;
 				for (let f = 0; f < this.tupleWidth; f++)

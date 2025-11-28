@@ -129,7 +129,7 @@ export class starScene extends abstractScene {
 		super(sceneName, ambiance);
 
 		if (! this.space) throw  new Error(`starScene: being created without space`);
-		this.avatar = eAvatar.createAvatar(qeConsts.avRAINBOW, sceneName);
+		this.avatar = eAvatar.createAvatar(sceneName);
 
 		// create relevant drawings
 		this.drawings = [new starDrawing(this)];

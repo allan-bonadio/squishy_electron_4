@@ -25,7 +25,7 @@ struct viewBufInfo {
 	viewBufInfo(void);
 };
 
-// all of these arguments are optional, depending on which loader/breed.
+// all of these arguments are optional, depending on which loader/drawing.
 // loader func knows how to allocate needed viewBuffers if not done alreadyu
 //typedef  void (*avatarLoader)(struct qAvatar *) ;
 
@@ -34,12 +34,12 @@ struct viewBufInfo {
 // allocates out the viewBuffers needed for this drawing; whatever sizes, etc
 // and does whatever initialization needed.  Note if the word Buffer is plural.
 struct qAvatar {
-	qAvatar(int avatarBreed, const char *label);
+	qAvatar(const char *label);
 	~qAvatar(void);
 	void formatDirectOffsets(void);
 
 	// create another view buffer of floats.  useThisBuffer if you already
-	// allocated the memory in C++ space.
+	// allocated the memory in C++ space.  note nVertices, not nPoints
 	float *attachViewBuffer(int whichBuffer, float *useThisBuffer, int nCoordsPerVertex, int nVertices);
 
 	short *attachIndexBuffer(short *useThisBuffer, int nItems);
@@ -51,26 +51,12 @@ struct qAvatar {
 	void dumpViewBuffers(int bufferMask, const char *title);
 	void dumpIndex(const char *title);
 
-	// populates the viewBuffers; depends on avatarBreed.  You can use your own
-	// independent load function; it's not rocket science.
-	// for WaveView, transcribes the complex double numbers (2x8 = 16by) in qcavity
-	//void loadViewBuffers(int breed);
-
-	// set this so it doesn't have to do it while running.  Pass either breed
-	//integer (from js) or direct func pointer (from C++).  One or the other,
-	//other one null.
-	//do it by hand void setLoader(void (*loaderFunc)(qAvatar *avatar));
-
 	// handy
 	//float *buf(int bufferIx){return viewBuffers[bufferIx].fArray; }
 
 	/* *********************************************** data fields */
 
 	int magic;
-
-	// set to a loader fucntion in same directory.  TODO: remove these two
-	int avatarBreed;  // which loader - kindof obsolete; each drawing has its own loader
-	void (*loader)(qAvatar *);  // actual function pointer
 
 	// args that many loaders need.  Optional but NOT set by the constructor or anything.
 	struct qSpace *space;
@@ -131,14 +117,11 @@ public:
 	qColor3(void) {red = green = blue = 0;}
 };
 
-// ?? see related version in glsl.  not sure if i'm using this anymore TODO
-void complexToRYGB(qCx *cx, qColor3 *color);
-
 /* ************************************************************** C */
 
 // for the JS side.  Note if the word Buffer is plural
 extern "C" {
-	qAvatar *avatar_create(int avatarBreed, char *label);
+	qAvatar *avatar_create(char *label);
 
 	// qcavity and space are both optional, pass null for none or just don't call this
 	void avatar_setCavitySpace(qAvatar *avatar, qCavity *cavity, qSpace *space);
@@ -154,12 +137,5 @@ extern "C" {
 
 	// return one buffer, raw floats.  maybe we don't need this?  cuz JS wants the typed array.
 	float *avatar_getViewBuffer(qAvatar *avatar, int bufferIx);
-
-	// load up all the set's view viewBuffers based on the space's wave buffer (or whatever)
-	// ?? returns the highest height of norm of wave entries.  Flat does.  Should.  Soon.
-	//void avatar_loadViewBuffers(qAvatar *avatar, int breed);
-
-// this is obsolete right>?  cuz the constructor does it.
-//	void avatar_setLoader(qAvatar *avatar, int loaderIx);
 }
 

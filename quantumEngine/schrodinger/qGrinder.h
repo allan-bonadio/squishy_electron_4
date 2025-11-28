@@ -222,8 +222,8 @@ struct qGrinder {
 	// for alignment: put the rest of these last
 
 	// true if thread(s) should start a new integration upon next event cycle,
-	// false if not Synchronized with context.shouldBeIntegrating in JS. Please
-	// only set it through setShouldBeIntegrating() in SquishPanel or sub
+	// false if not. Synchronized with context.shouldBeIntegrating in JS. Please
+	// only set it through setShouldBeIntegrating() in js SquishPanel or sub
 	// components.
 	bool shouldBeIntegrating;
 
