@@ -8,7 +8,7 @@ import {cppObjectRegistry, prepForDirectAccessors} from '../utils/directAccessor
 import qeFuncs from './qeFuncs.js';
 import qeConsts from './qeConsts.js';
 
-let traceCreation = false;
+let traceCreation = true;
 //let traceHighest = false;
 let traceVBuffer = false;
 
@@ -24,10 +24,10 @@ let traceVBuffer = false;
 class eAvatar {
 	// create An eAvatar complete with its inner qAvatar.  (zero buffers)
 	// use this if you're doing something other than the original  space's avatars
-	static createAvatar(avatarBreed, label) {
+	static createAvatar(label) {
 		if (traceCreation)
-			console.log(`🚦 createAvatar: avatarBreed=${avatarBreed} lab='${label}'`);
-		let qA = qeFuncs.avatar_create(avatarBreed, label);
+			console.log(`🚦 createAvatar: lab='${label}'`);
+		let qA = qeFuncs.avatar_create(label);
 		return new eAvatar(qA);
 	}
 
@@ -137,35 +137,26 @@ class eAvatar {
 		}
 	}
 
-	// populate whatever buffers in this avatar, written in C++.
-	// Go ahead and write your own in JS if you want and use that instead.
-	//loadViewBuffers(breed) {
-	//qeFuncs.avatar_loadViewBuffers(this.pointer, breed);
-	//}
-
 	/* ***************************************** 🥽 Direct Accessors */
 	// see qAvatar.cpp to regenerate this. Note these are all scalars; buffers
-	// are passed by pointer ... long story, see code and directAccessors.h
 
-
-
-	get avatarBreed() { return this.ints[1]; }
-	set avatarBreed(a) { this.ints[1] = a; }
-	get _space() { return this.ints[3]; }
-	get _cavity() { return this.ints[4]; }
-	get int0() { return this.ints[5]; }
-	set int0(a) { this.ints[5] = a; }
-	get int1() { return this.ints[6]; }
-	set int1(a) { this.ints[6] = a; }
-	get double0() { return this.doubles[4]; }
-	set double0(a) { this.doubles[4] = a; }
-	get double1() { return this.doubles[5]; }
-	set double1(a) { this.doubles[5] = a; }
-	get _label() { return this.pointer + 48; }
-	get _indexBuffer() { return this.ints[16]; }
-	set _indexBuffer(a) { this.ints[16] = a; }
-	get _nIndices() { return this.ints[17]; }
-	get _viewBuffers() { return this.pointer + 72; }
+	get _space() { return this.ints[1]; }
+	set _space(a) { this.ints[1] = a; }
+	get _cavity() { return this.ints[2]; }
+	set _cavity(a) { this.ints[2] = a; }
+	get int0() { return this.ints[3]; }
+	set int0(a) { this.ints[3] = a; }
+	get int1() { return this.ints[4]; }
+	set int1(a) { this.ints[4] = a; }
+	get double0() { return this.doubles[3]; }
+	set double0(a) { this.doubles[3] = a; }
+	get double1() { return this.doubles[4]; }
+	set double1(a) { this.doubles[4] = a; }
+	get _label() { return this.pointer + 40; }
+	get _indexBuffer() { return this.ints[18]; }
+	set _indexBuffer(a) { this.ints[18] = a; }
+	get _nIndices() { return this.ints[19]; }
+	get _viewBuffers() { return this.pointer + 80; }
 
 	/* **************************** 🥽 end of direct accessors */
 

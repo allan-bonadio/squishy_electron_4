@@ -110,7 +110,7 @@ export class noiseScene extends abstractScene {
 
 		if (! this.space) throw  new Error(`noiseScene: being created without space`);
 
-		this.avatar = eAvatar.createAvatar(qeConsts.avRAINBOW, sceneName);
+		this.avatar = eAvatar.createAvatar(sceneName);
 
 		// create relevant drawings
 		this.drawings = [new noiseDrawing(this)];
