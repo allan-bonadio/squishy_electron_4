@@ -1,7 +1,7 @@
 
 // cx2rygb.txlated.js -- generated from cx2rygb.glsl.js into js
 // mostly for testing purposes.  do not edit!  instead edit cx2rygb.glsl.js & run unit tests
-// this file written Tue Nov 18 2025 16:08:28 GMT-0800 (Pacific Standard Time)
+// this file written Wed Nov 26 2025 18:27:57 GMT-0800 (Pacific Standard Time)
 
 // needed defs of vec2 (complex only) and vec3 (rgb only)
 const vec2 = (x=0, y=0) => ({x, y});

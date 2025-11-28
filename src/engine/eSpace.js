@@ -124,19 +124,17 @@ export class eSpace {
 	get continuum() { return this.ints[3]; }
 	get start() { return this.ints[4]; }
 	get end() { return this.ints[5]; }
-	get nStates() { return this.ints[43]; }
-	get nPoints() { return this.ints[44]; }
+	get nStates() { return this.ints[51]; }
+	get nPoints() { return this.ints[52]; }
 	get dimLength() { return this.doubles[4]; }
-	get dt() { return this.doubles[20]; }
-	get nDimensions() { return this.ints[42]; }
-	get spectrumLength() { return this.ints[45]; }
-	get _mainFlick() { return this.ints[46]; }
-	set _mainFlick(a) { this.ints[46] = a; }
-	get _miniGraphWave() { return this.ints[47]; }
-	set _miniGraphWave(a) { this.ints[47] = a; }
-	get _grinder() { return this.ints[48]; }
-	set _grinder(a) { this.ints[48] = a; }
-	get _label() { return this.pointer + 196; }
+	get dt() { return this.doubles[24]; }
+	get nDimensions() { return this.ints[50]; }
+	get spectrumLength() { return this.ints[53]; }
+	get _mainFlick() { return this.ints[54]; }
+	set _mainFlick(a) { this.ints[54] = a; }
+	get _grinder() { return this.ints[55]; }
+	set _grinder(a) { this.ints[55] = a; }
+	get _label() { return this.pointer + 224; }
 
 
 	/* **************************** 🥽 end of direct accessors */
