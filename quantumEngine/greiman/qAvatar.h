@@ -47,8 +47,10 @@ struct qAvatar {
 	// print metadata
 	void dumpMeta(const char *title);
 
-	// print contents of viewBuffers
-	void dumpViewBuffers(int bufferMask, const char *title);
+	// print contents of viewBuffer 0 as complex with angle etc for flatDrawing
+	void dumpEachViewBuffer(int bufferMask, const char *title);
+	void dumpComplexViewBuffer(int bufIx, int nPoints, const char *title);
+
 	void dumpIndex(const char *title);
 
 	// handy
@@ -132,7 +134,8 @@ extern "C" {
 	short *avatar_attachIndexBuffer(qAvatar *avatar, short *useThisBuffer, int nItems);
 
 	void avatar_dumpMeta(qAvatar *avatar, char *title);
-	void avatar_dumpViewBuffers(qAvatar *avatar, int bufferMask, char *title);
+	void avatar_dumpEachViewBuffer(qAvatar *avatar, int bufferMask, char *title);
+	void avatar_dumpComplexViewBuffer(qAvatar *avatar, int bufIx, int nPoints, const char *title);
 	void avatar_dumpIndex(qAvatar *avatar, char *title);
 
 	// return one buffer, raw floats.  maybe we don't need this?  cuz JS wants the typed array.

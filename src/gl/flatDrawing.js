@@ -201,7 +201,7 @@ export class flatDrawing extends abstractDrawing {
 
 		// i think this is problematic
 		if (traceViewBufAfterDrawing) {
-			this.avatar.dumpViewBuffer(`♭♭♭ finished drawing in flatDrawing.js; drew buf:`);
+			this.avatar.dumpComplexViewBuffer(`♭♭♭ finished drawing in flatDrawing.js; drew buf:`);
 			console.log(`♭♭♭ barWidthUniform=${this.barWidthUniform.getFunc()}    `
 				+`maxHeightUniform=${this.maxHeightUniform.getFunc()}`);
 		}

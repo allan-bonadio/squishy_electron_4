@@ -131,7 +131,7 @@ function GLScene(props) {
 		// copy from latest wave to view buffer (c++) & pick up highest
 		//p.avatar.loadViewBuffer();
 		// if (traceViewBuffer)
-		//	 p.avatar.dumpViewBuffer(`🖼 GLScene ${p.sceneName}: loaded ViewBuffer`);
+		//	 p.avatar.dumpComplexViewBuffer(`🖼 GLScene ${p.sceneName}: loaded ViewBuffer`);
 
 		// draw.  This won't set up an ∞ loop, right?
 		scene.drawAllDrawings(node.width, node.height, info);

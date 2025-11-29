@@ -81,7 +81,8 @@ let exportsSrc  = [
 
 	{name: 'avatar_dumpMeta', args: ['string'], retType: null},
 
-	{name: 'avatar_dumpViewBuffers', args: ['number', 'number', 'string'], retType: null},
+	{name: 'avatar_dumpEachViewBuffer', args: ['number', 'number', 'string'], retType: null},
+	{name: 'avatar_dumpComplexViewBuffer', args: ['number', 'number', 'string'], retType: null},
 
 	{name: 'avatar_dumpIndex', args: ['number', 'string'], retType: null},
 

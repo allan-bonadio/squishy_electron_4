@@ -154,7 +154,7 @@ export class rainbowDrawing extends abstractDrawing {
 
 		this.drawVariables.forEach(v => v.reloadVariable());
 
-		this.avatar.dumpViewBuffers(5, `avatar for rainbow cx just before draw`);
+		this.avatar.dumpEachViewBuffer(5, `avatar for rainbow cx just before draw`);
 
 		//gl.drawArrays(gl.TRIANGLE_STRIP, 0, nVERTS);
 		gl.drawArrays(gl.TRIANGLE_FAN, 0, nVERTS);
@@ -172,7 +172,7 @@ export class rainbowDrawing extends abstractDrawing {
 			gl.drawArrays(gl.POINTS, 0, nVERTS);
 
 		if (traceViewBufAfterDrawing) {
-			this.avatar.dumpViewBuffers(3, `🌈 🌈 finished drawing rainbowDrawing.js; drew buf:`);
+			this.avatar.dumpEachViewBuffer(3, `🌈 🌈 finished drawing rainbowDrawing.js; drew buf:`);
 		}
 	}
 }

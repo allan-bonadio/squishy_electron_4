@@ -146,7 +146,7 @@ void qAvatar::dumpMeta(const char *title) {
 // bitwise OR together: 1=buf 0, 2=buf1, 4=buf2, 8=buf3,
 // bufferMask is a bit-mask: 1=viewbuf[0], 2=viewbuf[1],4=buf2, 8=buf3, etc
 // Always omits buffers that aren't there yet.
-void qAvatar::dumpViewBuffers(int bufferMask, const char *title) {
+void qAvatar::dumpEachViewBuffer(int bufferMask, const char *title) {
 	txt[TXTLEN - 1] = 101;
 	if (!title) title = "no title 🧨 🧨";
 
@@ -177,7 +177,7 @@ void qAvatar::dumpViewBuffers(int bufferMask, const char *title) {
 //			strcpy(txt+charsUsed, (char *) '    ');
 //			charsUsed += 4;
 			if (101 != txt[TXTLEN - 1])
-				throw std::runtime_error("qAvatar::dumpViewBuffers() overflowed txt buffer in hea!!");
+				throw std::runtime_error("qAvatar::dumpEachViewBuffer() overflowed txt buffer in hea!!");
 		}  // end of buffer loop for heading
 		which >>= 1;
 	}
@@ -209,7 +209,7 @@ void qAvatar::dumpViewBuffers(int bufferMask, const char *title) {
 //				strcpy(txt+charsUsed, (char *) '    ');
 //				charsUsed += 4;
 				if (101 != txt[TXTLEN - 1])
-					throw std::runtime_error("qAvatar::dumpViewBuffer() overflowed txt buffer in vex!!");
+					throw std::runtime_error("qAvatar::dumpComplexViewBuffer() overflowed txt buffer in vex!!");
 			}  // end of vb buffer IF stmt
 			//printf("end of coords for buffer bufferix=%d, of while which=0x%x\n", bufferIx, which);
 			which >>= 1;
@@ -219,14 +219,46 @@ void qAvatar::dumpViewBuffers(int bufferMask, const char *title) {
 	}  // end of vb vertexes loop
 
 	if (101 != txt[TXTLEN - 1])
-		throw std::runtime_error("qAvatar::dumpViewBuffer() overflowed txt buffer in ind!!");
+		throw std::runtime_error("qAvatar::dumpEachViewBuffer() overflowed txt buffer in ind!!");
+}
+
+// dump only the first two fields of the bufIx-th vbuf, assuming they're real and inag, exactly as flatDrawing uses it
+void qAvatar::dumpComplexViewBuffer(int bufIx, int nPoints, const char *title) {
+	float *fArray = viewBuffers[bufIx].fArray;  // to here
+	float prevPhase =0;
+	#define FORMAT_BASE      "%6d |  %6.5f  %6.5f  %6.5g  %6.5g"
+	#define FORMAT_SUFFIX  " |  %6.5f  %6.5f  %6.5f  m𝜓/nm\n"
+
+	if (!title) title = "";
+	printf("==== 🚦  dump view buffer Array %p | %s\n", fArray, title);
+	printf("   ix  |    re      im     ---    serial  |      𝜃        d 𝜃      magn\n");
+	for (int i = 0; i < nPoints; i++) {
+
+		// first three should be all zero
+		float *row = fArray + i * 8;
+		printf(FORMAT_BASE "\n",
+			i,
+			row[0], row[1], row[2], row[3]);
+
+		float re = row[4];
+		float im = row[5];
+		float phase = atan2(im, re) * 180 / PI;
+		float dPhase = fmod(phase - prevPhase + 180, 360) - 180;
+		float magn = im * im + re * re;
+		printf(FORMAT_BASE FORMAT_SUFFIX,
+			i,
+			re, im, row[6], row[7],
+			phase, dPhase, magn);
+
+		prevPhase = phase;
+	}
+	printf(" 🚦 at end of dumpComplexViewBuffer avatar=%p  avatar->fArray=%p\n\n",
+			this, fArray);
 }
 
 
-// dump out ALL the vertex buffer data, according to bufferMask.
-// bitwise OR together: 1=buf 0, 2=buf1, 4=buf2, 8=buf3,
-// bufferMask is a bit-mask: 1=viewbuf[0], 2=viewbuf[1],4=buf2, 8=buf3, etc
-// Always omits buffers that aren't there yet.
+// never used
+// dump out the index list, if any
 void qAvatar::dumpIndex(const char *title) {
 	txt[TXTLEN - 1] = 101;
 	if (!title) title = " no title 🧨 🧨";
@@ -257,9 +289,9 @@ void qAvatar::dumpIndex(const char *title) {
 }
 
 
-// SAVE THIS FOR LATER phase on the above dump
+// SAVE THIS FOR LATER phase on the above dump.  No, done by dumpComplexViewBuffer()
 //// dump the view buffer just before it heads off to webgl.
-//static void old_qAvatar__dumpViewBuffers(int bufferMask, const char *title) {
+//static void old_qAvatar__dumpEachViewBuffer(int bufferMask, const char *title) {
 //	float prevPhase = 0;
 //	#define FORMAT_BASE      "%6d |  %8.5f  %8.5f  %6.5g  %6.5g"
 //	#define FORMAT_SUFFIX  " | %6.5f %6.5f  %6.5f m𝜓/nm\n"
@@ -288,7 +320,7 @@ void qAvatar::dumpIndex(const char *title) {
 //
 //		prevPhase = phase;
 //	}
-//	printf("    🚥  qAvatar::at end of dumpViewBuffer vBuffer=%p\n\n",
+//	printf("    🚥  qAvatar::at end of dumpComplexViewBuffer vBuffer=%p\n\n",
 //			vBuffer);
 //}
 
@@ -330,8 +362,12 @@ void avatar_dumpMeta(qAvatar *avatar, char *title) {
 	avatar->dumpMeta(title);
 }
 
-void avatar_dumpViewBuffers(qAvatar *avatar, int bufferMask, char *title) {
-	avatar->dumpViewBuffers(bufferMask, title);
+void avatar_dumpEachViewBuffer(qAvatar *avatar, int bufferMask, char *title) {
+	avatar->dumpEachViewBuffer(bufferMask, title);
+}
+
+void avatar_dumpComplexViewBuffer(qAvatar *avatar, int bufIx, int nPoints, const char *title) {
+	avatar->dumpComplexViewBuffer(bufIx, nPoints, title);
 }
 
 void avatar_dumpIndex(qAvatar *avatar, char *title) {

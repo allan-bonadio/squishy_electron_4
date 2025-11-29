@@ -17,39 +17,6 @@ static const bool traceInDetail = true;
 static const bool traceWaveDump = true;
 
 
-void dumpViewBuffer(qAvatar *avatar, int bufIx, int nPoints, const char *title) {
-	float *fArray = avatar->viewBuffers[bufIx].fArray;  // to here
-	float prevPhase =0;
-	#define FORMAT_BASE      "%6d |  %6.5f  %6.5f  %6.5g  %6.5g"
-	#define FORMAT_SUFFIX  " |  %6.5f  %6.5f  %6.5f  m𝜓/nm\n"
-
-	if (!title) title = "";
-	printf("==== 🚦  dump view buffer Array %p | %s\n", fArray, title);
-	printf("   ix  |    re      im     ---    serial  |      𝜃        d 𝜃      magn\n");
-	for (int i = 0; i < nPoints; i++) {
-
-		// first three should be all zero
-		float *row = fArray + i * 8;
-		printf(FORMAT_BASE "\n",
-			i,
-			row[0], row[1], row[2], row[3]);
-
-		float re = row[4];
-		float im = row[5];
-		float phase = atan2(im, re) * 180 / PI;
-		float dPhase = fmod(phase - prevPhase + 180, 360) - 180;
-		float magn = im * im + re * re;
-		printf(FORMAT_BASE FORMAT_SUFFIX,
-			i,
-			re, im, row[6], row[7],
-			phase, dPhase, magn);
-
-		prevPhase = phase;
-	}
-	printf(" 🚦 at end of dumpViewBuffer avatar=%p  avatar->fArray=%p\n\n",
-			avatar, fArray);
-}
-
 
 // copy the numbers in our qAvatar's cavity into this fArray
 // one row per vertex, two rows per wave datapoint.
@@ -130,7 +97,7 @@ void avFlatLoader(qAvatar *avatar, int bufIx, qCavity *cavity, int nPoints) {
 	}
 
 	if (traceViewBuffer) {
-		dumpViewBuffer(avatar, bufIx, nPoints, "avFlatLoader done");
+		avatar->dumpComplexViewBuffer(bufIx, nPoints, "avFlatLoader done");
 	}
 
 	//printf("end of avFlatLoader: double0=%lf  highest=%lf\n", avatar->double0, highest);
@@ -139,10 +106,6 @@ void avFlatLoader(qAvatar *avatar, int bufIx, qCavity *cavity, int nPoints) {
 
 // for the JS side.  Do I really need these?  this is called only from c++
 extern "C" {
-	void avatar_dumpViewBuffer(qAvatar *avatar, int bufIx, int nPoints, const char *title) {
-		dumpViewBuffer(avatar, bufIx, nPoints, title);
-	}
-
 	// load up the Avatar's view buffer based on the Avatar's wave buffer
 	// returns the highest height of norm of wave entries
 	void avatar_avFlatLoader(qAvatar *avatar, int bufIx, qCavity *cavity, int nPoints) {

@@ -171,9 +171,10 @@ class eAvatar {
 	}
 
 	// 0-15 for vertex bufs, any combo; 128 for index buf
-	dumpViewBuffers(bufferMask, title) {
+	// TODO: need also dumpComplexViewBuffer
+	dumpEachViewBuffer(bufferMask, title) {
 		console.group(title);
-		qeFuncs.avatar_dumpViewBuffers(this.pointer, bufferMask, ' ');
+		qeFuncs.avatar_dumpEachViewBuffer(this.pointer, bufferMask, ' ');
 		console.groupEnd();
 	}
 
