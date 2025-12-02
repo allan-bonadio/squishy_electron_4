@@ -42,8 +42,7 @@ let traceTestSimpleNError = false;
 
 /* *********************************************************** CommonDialog */
 // set prop types
-function setPT() {
-	CommonDialog.propTypes = {
+propTypes = {
 		// stuff that goes inside the <dialog>
 		dialogContent: PropTypes.object,
 
@@ -58,7 +57,7 @@ function setPT() {
 		dialogContent: <div>empty dialog</div>,
 		dialogStyles: {},
 	};
-}
+
 
 
 function clickOnBackdrop(ev, props) {
@@ -84,7 +83,7 @@ const setDialogElement =
 }
 
 function CommonDialog(props) {
-	cfpt(CommonDialog, props);
+	cfpt(propTypes, props);
 	CommonDialog.setDialog = props.setDialog;  // method on App
 
 	// I want to use this someday, nonmodal... CommonDialog.dialogElement.show();
@@ -96,7 +95,6 @@ function CommonDialog(props) {
 		</dialog>
 	);
 }
-setPT();
 
 //CommonDialog.propTypes = {dialogStyles: PropTypes.object, dialogContent: PropTypes.string};
 

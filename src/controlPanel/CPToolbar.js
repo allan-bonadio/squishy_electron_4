@@ -31,21 +31,20 @@ function optionForFreq(rate) {
 	}
 }
 
-function setPT() {
-	CPToolbar.propTypes = {
-		chosenRate: PropTypes.number.isRequired,
-		setChosenRate: PropTypes.func.isRequired,
+const propTypes = {
+	chosenRate: PropTypes.number.isRequired,
+	setChosenRate: PropTypes.func.isRequired,
 
-		startOverHandler: PropTypes.func.isRequired,
-		resetVoltageHandler: PropTypes.func.isRequired,
-		//showVoltage: PropTypes.string.isRequired,
+	startOverHandler: PropTypes.func.isRequired,
+	resetVoltageHandler: PropTypes.func.isRequired,
+	//showVoltage: PropTypes.string.isRequired,
 
-		// these two might be undefined during startup, so get ready to punt
-		N: PropTypes.number,
-		space: PropTypes.instanceOf(eSpace).isRequired,
-		cPanel: PropTypes.object.isRequired,
-	};
-}
+	// these two might be undefined during startup, so get ready to punt
+	N: PropTypes.number,
+	space: PropTypes.instanceOf(eSpace).isRequired,
+	cPanel: PropTypes.object.isRequired,
+};
+
 
 // the frame rate menu
 const menuFreqs = [
@@ -55,7 +54,7 @@ const menuFreqs = [
 const rateOptions = menuFreqs.map(freq => optionForFreq(freq));
 
 function CPToolbar(props) {
-	cfpt(CPToolbar, props);
+	cfpt(propTypes, props);
 	if (traceCPToolbar)
 		dbLog(`🧰 CPToolbar starts.  props=`, props);
 	let {chosenRate, setChosenRate} = props;
@@ -93,6 +92,6 @@ function CPToolbar(props) {
 	</div>;
 }
 
-setPT();
+
 
 export default CPToolbar;

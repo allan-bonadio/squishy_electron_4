@@ -30,41 +30,39 @@ function traceOnScreen(msg) {
 }
 
 
+const propTypes = {
+   sceneClassName: PropTypes.string.isRequired,  // what to draw
+   sceneName: PropTypes.string,  // name for debugging
 
-function setPT() {
-	GLScene.propTypes = {
-		sceneClassName: PropTypes.string.isRequired,  // what to draw
-		sceneName: PropTypes.string,  // name for debugging
-
-		// Array of eCavity(s) or other buffers to draw or any data.  passed blindly to avatar
-		inputInfo: PropTypes.array,
-		// object with specific values needed in drawing; for waveview= {bumperWidth}
-		// TODO: include this in inputInfo and rename.  Oh now included, now need to get rid of specialInfo everywhere
-		specialInfo: PropTypes.object,
+   // Array of eCavity(s) or other buffers to draw or any data.  passed blindly to avatar
+   inputInfo: PropTypes.array,
+   // object with specific values needed in drawing; for waveview= {bumperWidth}
+   // TODO: include this in inputInfo and rename.  Oh now included, now need to get rid of specialInfo everywhere
+   specialInfo: PropTypes.object,
 
 
-		// Our caller gets these from eSpaceCreatedPromise; so it must be resolved by now.
-		// Optional; omit if your scene is not affected by space.
-		space: PropTypes.object,
+   // Our caller gets these from eSpaceCreatedPromise; so it must be resolved by now.
+   // Optional; omit if your scene is not affected by space.
+   space: PropTypes.object,
 
-		// sAnimator - reserved for sAnimator, but I guess you
-		// can make your own. Or, blow it off.  This object will get the
-		// glRepaint function attached. Omit if your GLScene
-		// doesn't animate.
-		animator: PropTypes.object,
+   // sAnimator - reserved for sAnimator, but I guess you
+   // can make your own. Or, blow it off.  This object will get the
+   // glRepaint function attached. Omit if your GLScene
+   // doesn't animate.
+   animator: PropTypes.object,
 
-		// inner width & height of canvas
-		// keep these separate	so any change will trigger render
-		canvasInnerWidth: PropTypes.number.isRequired,
-		canvasInnerHeight: PropTypes.number.isRequired,
+   // inner width & height of canvas
+   // keep these separate	so any change will trigger render
+   canvasInnerWidth: PropTypes.number.isRequired,
+   canvasInnerHeight: PropTypes.number.isRequired,
 
-	  // if the caller needs the repaint function for this canvas, pass a func to pick it up
-		setGLRepaint: PropTypes.func,
+  // if the caller needs the repaint function for this canvas, pass a func to pick it up
+   setGLRepaint: PropTypes.func,
 
-		// a help msg, optional
-		title: PropTypes.string,
-	};
-}
+   // a help msg, optional
+   title: PropTypes.string,
+};
+
 
 // Wraps a DOM canvas to do webgl.	All webgl rectangles should use this.
 // For each GLScene, there's one:
@@ -75,7 +73,7 @@ function setPT() {
 // Can NOT instantiate this until after the space promise has resolved
 // TODO: split this into general gl canvas, and WaveCanvas
 function GLScene(props) {
-	cfpt(GLScene, props);
+	cfpt(propTypes, props);
 	const p = props;
 	//console.log(`starting GLScene(render), sceneName=${p.sceneName}`);
 
@@ -237,6 +235,6 @@ function GLScene(props) {
 	);
 }
 
-setPT();
+
 
 export default GLScene;

@@ -12,8 +12,7 @@ import InteStats from './InteStats.js';
 let traceSliderChanges = false;
 
 // set prop types
-function setPT() {
-	SetIntegrationTab.propTypes = {
+propTypes = {
 		// only present after eSpace promise
 		space: PropTypes.shape({
 			pointer: PropTypes.number,
@@ -27,11 +26,11 @@ function setPT() {
 		//lowPassFilter: PropTypes.number.isRequired,
 		//setLowPassFilter: PropTypes.func.isRequired,
 	};
-}
+
 
 
 function SetIntegrationTab(props) {
-	cfpt(SetIntegrationTab, props);
+	cfpt(propTypes, props);
 	// lowPassFilter, the number setting.  On the JS side, it's a percentage of N/2:
 	// and can range from 200/N (nyquist only) to 75
 	// so when N=16, user can set lowPass to 12.5 ... 75 percents = 1 to 6 freqs
@@ -141,7 +140,6 @@ function SetIntegrationTab(props) {
 
 // 				<tr><td>reload GL variables:     </td><td><span  className='reloadGlInputs'>-</span> ms</td></tr>
 
-setPT();
 
 export default SetIntegrationTab;
 

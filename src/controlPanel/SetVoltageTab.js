@@ -19,8 +19,7 @@ let MINI_HEIGHT = 150;
 
 /* ******************************************************* the tab itself */
 
-function setPT() {
-	SetVoltageTab.propTypes = {
+propTypes = {
 		voltageParams: PropTypes.shape({
 			canyonPower: PropTypes.number.isRequired,  // there's more but not now
 			slotWidth: PropTypes.number.isRequired}),
@@ -35,11 +34,11 @@ function setPT() {
 
 		space: PropTypes.object,
 	};
-}
+
 
 // the tab that user sets voltage buffer with
 function SetVoltageTab(p) {
-	cfpt(SetVoltageTab, p);
+	cfpt(propTypes, p);
 	// these are all the local versions, for use and setting in this Voltage Tab
 	const {voltageParams, setVoltageParams, showVoltage, changeShowVoltage,
 		saveMainVoltage, space} = p;
@@ -289,5 +288,4 @@ function SetVoltageTab(p) {
 	//<div className='divider' />
 }
 
-setPT();
 export default SetVoltageTab;

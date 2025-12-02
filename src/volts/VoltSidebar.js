@@ -18,8 +18,7 @@ import plusIcon from './voltIcons/plusIcon2.png';
 let traceVoltageSidebar = false;
 let traceDragging = false;
 
-function setPT() {
-	VoltSidebar.propTypes = {
+propTypes = {
 		// x coordinate of the right edge or the bumper on the right side
 		drawingRight: PropTypes.number.isRequired,
 		canvasInnerHeight: PropTypes.number.isRequired,
@@ -27,11 +26,11 @@ function setPT() {
 
 		mainVDisp: PropTypes.instanceOf(voltDisplay),
 	}
-}
+
 
 function VoltSidebar(props) {
 	if (!props) return '';  // too early
-	cfpt(VoltSidebar, props);
+	cfpt(propTypes, props);
 	let sidebarWidth = props.width;
 
 	let mVD = props.mainVDisp;
@@ -85,6 +84,5 @@ function VoltSidebar(props) {
 		</aside>
 	);
 }
-setPT();
 
 export default VoltSidebar;

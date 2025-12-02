@@ -11,15 +11,14 @@ import qeConsts from '../engine/qeConsts.js';
 import SquishContext from '../sPanel/SquishContext.js';
 
 
-function setPT() {
-	SetResolutionTab.propTypes = {
-		//grinder: PropTypes.object,
-		space: PropTypes.object,
-	};
-}
+const propTypes = {
+	//grinder: PropTypes.object,
+	space: PropTypes.object,
+};
+
 
 function SetResolutionTab(props) {
-	cfpt(SetResolutionTab, props);
+	cfpt(propTypes, props);
 	const spa = props.space;
 	const context = useContext(SquishContext);
 
@@ -88,7 +87,6 @@ function SetResolutionTab(props) {
 
 	</div>);
 }
-setPT();
 
 
 //      <div style={{float: 'left', marginRight: '1em', width: '10em'}}>

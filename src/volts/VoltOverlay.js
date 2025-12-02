@@ -13,29 +13,28 @@ import {getASetting, storeASetting} from '../utils/storeSettings.js';
 
 let traceGeometry = false;
 
-function setPT() {
-	VoltOverlay.propTypes = {
-		// for first couple of renders, space and idunno are null
-		space: PropTypes.object,
-		mainVDisp: PropTypes.object,
+const propTypes = {
+	// for first couple of renders, space and idunno are null
+	space: PropTypes.object,
+	mainVDisp: PropTypes.object,
 
 
-		// this can be null if stuff isn't ready.
-		canvasInnerWidth: PropTypes.number.isRequired,
-		canvasInnerHeight: PropTypes.number.isRequired,
-		bumperWidth: PropTypes.number.isRequired,
+	// this can be null if stuff isn't ready.
+	canvasInnerWidth: PropTypes.number.isRequired,
+	canvasInnerHeight: PropTypes.number.isRequired,
+	bumperWidth: PropTypes.number.isRequired,
 
-		// this component is always rendered so it retains its state,
-		// but won't draw anything if the checkbox is off
-		////showVoltage: PropTypes.string,
-	};
-}
+	// this component is always rendered so it retains its state,
+	// but won't draw anything if the checkbox is off
+	////showVoltage: PropTypes.string,
+};
+
 
 
 // this has all the interactive state for the voltage stuff as displayed over the wave.
 // Whole thing disappears/appears with mouse hover.
 function VoltOverlay(props) {
-	cfpt(VoltOverlay, props);
+	cfpt(propTypes, props);
 	const p = props;
 	const mVD = p.mainVDisp;
 	if (!mVD)
@@ -127,6 +126,5 @@ function VoltOverlay(props) {
 		/>
 	</section>;
 }
-setPT();
 
 export default VoltOverlay;

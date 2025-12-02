@@ -21,30 +21,28 @@ const MINI_HEIGHT = 150;
 
 let traceRegenerate = false;
 
-function setPT() {
-	// variables from on high, and the funcs needed to change them
-	SetWaveTab.propTypes = {
-		// actually sets the one in use by the main wave
-		saveMainWave: PropTypes.func.isRequired,
+const propTypes = {
+	// actually sets the one in use by the main wave
+	saveMainWave: PropTypes.func.isRequired,
 
-		// pararams/settings handed in, as stored in control panel's state
-		waveParams: PropTypes.shape({
-			// defaults handed in
-			waveBreed: PropTypes.oneOf(['circular', 'standing', 'gaussian', 'chord', ]),
-			waveFrequency: PropTypes.number,
-			pulseWidth: PropTypes.number,
-			pulseCenter: PropTypes.number,
-		}).isRequired,
-		setWaveParams: PropTypes.func,
+	// pararams/settings handed in, as stored in control panel's state
+	waveParams: PropTypes.shape({
+		// defaults handed in
+		waveBreed: PropTypes.oneOf(['circular', 'standing', 'gaussian', 'chord', ]),
+		waveFrequency: PropTypes.number,
+		pulseWidth: PropTypes.number,
+		pulseCenter: PropTypes.number,
+	}).isRequired,
+	setWaveParams: PropTypes.func,
 
-		// no big deal if it's not constructed yet; we fake it
-		space: PropTypes.object,
-	};
-}
+	// no big deal if it's not constructed yet; we fake it
+	space: PropTypes.object,
+};
+
 
 // a component that renders the Set Wave tab, to set a new wave
 function SetWaveTab(props) {
-	cfpt(SetWaveTab, props);
+	cfpt(propTypes, props);
 	let {saveMainWave, waveParams, setWaveParams, space} = props;
 
 	// must remember our own temp wave for minigraph
@@ -221,6 +219,5 @@ function SetWaveTab(props) {
 		</div>
 	</div>;
 }
-setPT();
 
 export default SetWaveTab;

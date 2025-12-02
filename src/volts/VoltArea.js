@@ -30,32 +30,31 @@ let traceScrollStretch = false;
 // to double the scroll or heightVolts
 let DOUBLING_TIME = 2000;
 
-function setPT() {
-	VoltArea.propTypes = {
-		// includes scrollSetting, heightVolts, measuredMinVolts, measuredMaxVolts, xScale, yScale
-		mainVDisp: PropTypes.object,
+const propTypes = {
+	// includes scrollSetting, heightVolts, measuredMinVolts, measuredMaxVolts, xScale, yScale
+	mainVDisp: PropTypes.object,
 
-		//NOT NEEDED.  VoltOverlay shows and hides.  showVoltage: PropTypes.string.isRequired,
+	//NOT NEEDED.  VoltOverlay shows and hides.  showVoltage: PropTypes.string.isRequired,
 
-		// for first couple of renders, space and idunno are null
-		space: PropTypes.object,
+	// for first couple of renders, space and idunno are null
+	space: PropTypes.object,
 
-		// this can be null if stuff isn't ready.  these are now determined by css.
-		// no use canvasInnerDims  height: PropTypes.number,
+	// this can be null if stuff isn't ready.  these are now determined by css.
+	// no use canvasInnerDims  height: PropTypes.number,
 
-		drawingLeft: PropTypes.number.isRequired,
-		drawingWidth: PropTypes.number.isRequired,
-		canvasInnerHeight: PropTypes.number.isRequired,
+	drawingLeft: PropTypes.number.isRequired,
+	drawingWidth: PropTypes.number.isRequired,
+	canvasInnerHeight: PropTypes.number.isRequired,
 
-		// changing a buffer point should only be done thru this func
-		setAPoint: PropTypes.func,
-	};
-}
+	// changing a buffer point should only be done thru this func
+	setAPoint: PropTypes.func,
+};
+
 
 
 // ultimately, this is a <svg node with a <path inside it
 function VoltArea(props) {
-	cfpt(VoltArea, props);
+	cfpt(propTypes, props);
 	const p = props;
 	const mVD = p.mainVDisp;
 	if (traceVoltageArea)
@@ -401,6 +400,5 @@ function VoltArea(props) {
 
 	return vArea;
 }
-setPT();
 
 export default VoltArea;
