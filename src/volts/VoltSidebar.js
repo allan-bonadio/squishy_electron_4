@@ -18,7 +18,7 @@ import plusIcon from './voltIcons/plusIcon2.png';
 let traceVoltageSidebar = false;
 let traceDragging = false;
 
-propTypes = {
+const propTypes = {
 		// x coordinate of the right edge or the bumper on the right side
 		drawingRight: PropTypes.number.isRequired,
 		canvasInnerHeight: PropTypes.number.isRequired,

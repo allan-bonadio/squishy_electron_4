@@ -12,7 +12,7 @@ import InteStats from './InteStats.js';
 let traceSliderChanges = false;
 
 // set prop types
-propTypes = {
+const propTypes = {
 		// only present after eSpace promise
 		space: PropTypes.shape({
 			pointer: PropTypes.number,

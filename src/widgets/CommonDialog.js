@@ -42,7 +42,7 @@ let traceTestSimpleNError = false;
 
 /* *********************************************************** CommonDialog */
 // set prop types
-propTypes = {
+const propTypes = {
 		// stuff that goes inside the <dialog>
 		dialogContent: PropTypes.object,
 

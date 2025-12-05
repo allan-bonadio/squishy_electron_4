@@ -19,7 +19,7 @@ let MINI_HEIGHT = 150;
 
 /* ******************************************************* the tab itself */
 
-propTypes = {
+const propTypes = {
 		voltageParams: PropTypes.shape({
 			canyonPower: PropTypes.number.isRequired,  // there's more but not now
 			slotWidth: PropTypes.number.isRequired}),
