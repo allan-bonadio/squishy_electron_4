@@ -14,7 +14,10 @@
 
 😡- more unit tests!  for js side.  And should work on C++ ones too.
 
-😡- common scss is included multio,e times
+😡- common scss is included multiple times
+
+*- Tooltips are tiny!  need something better.
+
 
 ## Control Panel
 
@@ -38,19 +41,13 @@ Now the offset slider.  JUST the offset slider.  Doing it slowly is OK.
 
 😡- left tic marks rarely draw.
 
-√ 😀 - WELL: last points on ends have no ink so there's this black acute triangle instead of color.  No that's right - i's zero at the ends
 
-- display Garland Spiral in 3d could be easy.
-- Really should use Three.js    NO  !! tried it; totally wrong for what I need.
+- display Garland Spiral in 3d could be easy.  haha
 
 😡- use gl.getError() (I already do in some places)
 
-😡- install that WebGL debugger
+* - should have x axis on the bottom marked in nm
 
-- should have x axis on the bottom marked in nm
-
-😡- the Start and Stop icons are totally bozo on Firefox.  Time to overhaul them.
-not nowl..?
 
 
 ## Voltage
@@ -63,6 +60,9 @@ Needs fixing.
 tab)
 
 😡- Hi and Lo voltage both attract!!
+
+* - width of finger moving voltage with default being maybe 5%
+
 
 ## Space and Integration
 
