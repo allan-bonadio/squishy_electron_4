@@ -1,7 +1,7 @@
 
 2025 Aug 28  =============================================
 
-Ii give up on three.js.  No reference documentation.  It's just as cryptic and unpredictable as raw WebGL, and I already know WebGL.
+I give up on three.js.  No reference documentation.  It's just as cryptic and unpredictable as raw WebGL, and I already know WebGL.
 Fortunately I did it all on a branch.  Unfortunately, I made lots of other changes I want to drag along.  Like the Avatar data structure is good for WebGL buffers.  This'll take some work to get it all back to normal.
 
 2025 Aug 4  =============================================

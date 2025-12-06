@@ -6,38 +6,28 @@
 import PropTypes from 'prop-types';
 
 
-function setPT() {
-	TextNSlider.propTypes = {
-		className: PropTypes.string,
-		label: PropTypes.string,
-		style: PropTypes.object,
+const propTypes = {
+	className: PropTypes.string,
+	label: PropTypes.string,
+	style: PropTypes.object,
 
-		// should be a number, or a string of a number
-		value: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
-		min: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
-		max: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
-		step: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+	// should be a number, or a string of a number
+	value: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
+	min: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
+	max: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
+	step: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
 
-		handleChange: PropTypes.func,
+	handleChange: PropTypes.func,
 
-		// dom ID of <datalist> element
-		list: PropTypes.string,
+	// dom ID of <datalist> element
+	list: PropTypes.string,
 
-		// a help msg, optional
-		title: PropTypes.string,
-	};
-
-	TextNSlider.defaultProps = {
-		className: '',
-		style: {},
-		step: 'any',  // means no step, for if you use list
-
-		handleChange: (ix, power) => {},
-	};
-}
+	// a help msg, optional
+	title: PropTypes.string,
+};
 
 function TextNSlider(props) {
-	cfpt(TextNSlider, props);
+	cfpt(propTypes, props);
 	const p = props;
 
 	const limit =
@@ -47,7 +37,7 @@ function TextNSlider(props) {
 		const el = ev.currentTarget;
 		if (! isFinite(el.value))
 			debugger;
-		p.handleChange(limit(+el.value));
+		p.handleChange?.(limit(+el.value));
 	}
 
 	const handleSlider = handleText;
@@ -80,25 +70,23 @@ function TextNSlider(props) {
 		controls = <>
 			<input type='number' placeholder={p.label || ''} name={p.label}
 					value={value} min={p.min} max={p.max}
-					step={p.step}
+					step={p.step || 'any'}
 					size='7'
 					onChange={handleText} />
 			<input type='range'
 					value={value} min={p.min} max={p.max} name={p.label}
-					step={p.step}
+					step={p.step || 'any'}
 					onChange={handleSlider}/>
 		</>;
 	}
 
-	const label = p.label ? <span>{p.label}</span> : '';
-	return <div className={`TextNSlider ${p.className}`} style={p.style}
+	const label = p.label ? <label>{p.label}</label> : '';
+	return <div className={`TextNSlider ${p.className || ''}`} style={p.style || {}}
 					title={p.title} >
 		{label}
 		{controls}
 	</div>;
 }
-
-setPT();
 
 export default TextNSlider;
 

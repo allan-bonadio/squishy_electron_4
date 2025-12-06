@@ -19,6 +19,19 @@
 		font-size: .8em;
 	}
 
+	.TextNSlider {
+		label {
+			vertical-align: middle;
+		}
+		input[type=range] {
+			vertical-align: top;
+		}
+	}
+
+	input[type=range] {
+		cursor: pointer;
+	}
+
 	/* **************************************** all log sliders */
 
 	/* make the overall any width you want. */
@@ -61,6 +74,14 @@
 		display: inline-block;
 		margin: 0 .5em;
 	}
+
+	button.resolutionBox {
+		margin: 0;
+		padding: 0;
+		border: 0 transparent none;
+
+	}
+
 
 	/* **************************************** toolbar buttons */
 

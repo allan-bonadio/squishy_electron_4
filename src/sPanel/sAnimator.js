@@ -241,7 +241,7 @@ class sAnimator {
 		// throwing in the rAF handler is problematic, but a dialog isn't.
 		CommonDialog.openErrorDialog({message: this.errorMessage},
 			`while integrating Schrodinger's`);
-		grinder.hadException = false;
+		this.grinder.hadException = false;
 	}
 
 	// do the grind for this time around

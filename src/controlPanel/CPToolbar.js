@@ -37,7 +37,7 @@ const propTypes = {
 
 	startOverHandler: PropTypes.func.isRequired,
 	resetVoltageHandler: PropTypes.func.isRequired,
-	//showVoltage: PropTypes.string.isRequired,
+	setShowingTab: PropTypes.func,
 
 	// these two might be undefined during startup, so get ready to punt
 	N: PropTypes.number,
@@ -62,6 +62,11 @@ function CPToolbar(props) {
 	// for the old buttons - obsolete
 	let runningClass = props.shouldBeIntegrating ? 'running' : '';
 
+	// it displays the resolutioin, so it's natural for someone to click on it
+	const clickResolution = ev => {
+		setShowingTab('space');
+	}
+
 	return <div className='CPToolbar'>
 		<div className='toolbarWidget'>
 			frame rate:
@@ -76,9 +81,9 @@ function CPToolbar(props) {
 
 		<span className='toolSpacer' style={{width: '.3em'}}></span>
 
-		<div className='toolbarWidget'>
+		<button className='toolbarWidget resolutionBox' onMouseClick={clickResolution} >
 			resolution {props.N ?? '...'} &nbsp;
-		</div>
+		</button>
 
 		<div className='toolbarWidget'>
 				<button onClick={props.startOverHandler}>Start Over</button>

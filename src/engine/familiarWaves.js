@@ -5,7 +5,7 @@
 
 import qeConsts from './qeConsts.js';
 
-let traceGaussian = false;
+let traceGaussian = true;
 let traceFamiliarResult = true;
 
 const abs = Math.abs;
@@ -125,8 +125,9 @@ const familiarWaves = {
 		const start2 = start * 2;
 		let end2 = end * 2;
 		const wave = this.wave;
+		const oset = -offset + 2*N;  // avoid mod of a negative number problems
 		for (let ix2 = start2, ix = 0; ix2 < end2; ix2 += 2, ix++) {
-			let oix = (ix - offset + N) % N;  // +N to avoid mod of a negative number problems
+			let oix = (ix + oset) % N;
 			wave[ix2] *= gaussian[oix];
 			wave[ix2 + 1] *= gaussian[oix];
 		}
