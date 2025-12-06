@@ -485,6 +485,7 @@ export class ControlPanel extends React.Component {
 			<CPToolbar
 				chosenRate={1000. / s.chosenFP}
 				setChosenRate={this.setChosenRate}
+				setShowingTab={this.setShowingTab}
 
 				shouldBeIntegrating={this.context.shouldBeIntegrating ?? false}
 

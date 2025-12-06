@@ -31,21 +31,20 @@ function optionForFreq(rate) {
 	}
 }
 
-function setPT() {
-	CPToolbar.propTypes = {
-		chosenRate: PropTypes.number.isRequired,
-		setChosenRate: PropTypes.func.isRequired,
+const propTypes = {
+	chosenRate: PropTypes.number.isRequired,
+	setChosenRate: PropTypes.func.isRequired,
 
-		startOverHandler: PropTypes.func.isRequired,
-		resetVoltageHandler: PropTypes.func.isRequired,
-		//showVoltage: PropTypes.string.isRequired,
+	startOverHandler: PropTypes.func.isRequired,
+	resetVoltageHandler: PropTypes.func.isRequired,
+	setShowingTab: PropTypes.func,
 
-		// these two might be undefined during startup, so get ready to punt
-		N: PropTypes.number,
-		space: PropTypes.instanceOf(eSpace).isRequired,
-		cPanel: PropTypes.object.isRequired,
-	};
-}
+	// these two might be undefined during startup, so get ready to punt
+	N: PropTypes.number,
+	space: PropTypes.instanceOf(eSpace).isRequired,
+	cPanel: PropTypes.object.isRequired,
+};
+
 
 // the frame rate menu
 const menuFreqs = [
@@ -55,13 +54,18 @@ const menuFreqs = [
 const rateOptions = menuFreqs.map(freq => optionForFreq(freq));
 
 function CPToolbar(props) {
-	cfpt(CPToolbar, props);
+	cfpt(propTypes, props);
 	if (traceCPToolbar)
 		dbLog(`🧰 CPToolbar starts.  props=`, props);
 	let {chosenRate, setChosenRate} = props;
 
 	// for the old buttons - obsolete
 	let runningClass = props.shouldBeIntegrating ? 'running' : '';
+
+	// it displays the resolutioin, so it's natural for someone to click on it
+	const clickResolution = ev => {
+		setShowingTab('space');
+	}
 
 	return <div className='CPToolbar'>
 		<div className='toolbarWidget'>
@@ -77,9 +81,9 @@ function CPToolbar(props) {
 
 		<span className='toolSpacer' style={{width: '.3em'}}></span>
 
-		<div className='toolbarWidget'>
+		<button className='toolbarWidget resolutionBox' onMouseClick={clickResolution} >
 			resolution {props.N ?? '...'} &nbsp;
-		</div>
+		</button>
 
 		<div className='toolbarWidget'>
 				<button onClick={props.startOverHandler}>Start Over</button>
@@ -93,6 +97,6 @@ function CPToolbar(props) {
 	</div>;
 }
 
-setPT();
+
 
 export default CPToolbar;
