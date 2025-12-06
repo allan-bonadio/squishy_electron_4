@@ -12,7 +12,7 @@
 	- Expo, has it’s own templating language
 	For squish, I don't need a server so I think Vite is best (say veet)
 
-😡- more unit tests!  for js side.  And should work on C++ ones too.
+😡- more unit tests!  for js side.  And should work on C++ ones too.  Get the current ones working again.  at least.
 
 😡- common scss is included multio,e times
 
