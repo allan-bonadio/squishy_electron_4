@@ -198,7 +198,7 @@ export function createStoreSettings() {
 
 	makeParam('waveParams', 'waveBreed', 'gaussian', ['circular', 'standing', 'gaussian', 'chord']);
 	makeParam('waveParams', 'waveFrequency', 6, {min: -100, max: 100, step: 0.5});
-	makeParam('waveParams', 'pulseWidth', 10, {min: 1, max: 100});
+	makeParam('waveParams', 'pulseWidth', 10, {min: 1, max: 20});
 	makeParam('waveParams', 'pulseCenter', 20, {min: 0, max: 100});
 
 	/* ************************************ voltage */
