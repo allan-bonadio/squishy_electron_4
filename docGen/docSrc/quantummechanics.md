@@ -22,7 +22,7 @@ In all of that, mechanics was seen as fundamental bedrock, and electromagnetism 
 Quantum came about from the early days, when it turned out that light (now understood to be individual particles) would only be emitted by an atom at certain energy amounts (colors).  In fact, the atom had a list of energy levels it could be in, and the photons would always have an amount of energy that was the difference between any two levels.  These were not equally spaced, which made it harder to tease out what was really happening.  These levels were not equally spaced, like you might think.  Instead, they were like 1, ¼, ¹⁄₉, ¹⁄₁₆, basically 1/n² where n is 0, 1, 2, ....  So you might have a photon come out that had an energy of ¹⁄₉ – ¹⁄₁₆, which is ⁷⁄₁₄₄.  Not very quantum-like.  But, other quantities were, like the angular momentum of an orbit, at ℏ, 2ℏ, 3ℏ, ....  And, ultimately, when they found ways for electrons to be created and destroyed, that even the number of electrons is a quantum number.  You cannot have 3½ electrons.  Things get more complicated after that.
 
 
-============================================================================
+🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣
 
 A particle wave  only interferes with itself.  (that's my interpretation, what I was taught.)  For instance, if you take two lights, their light can't interfere with each other.  But, if you take one and run it through two slits, the same wave from the same single photon particle, can go through the two slits and interfere with itself on the other side, with that pattern.
 

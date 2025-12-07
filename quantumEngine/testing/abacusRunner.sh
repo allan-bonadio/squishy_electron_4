@@ -34,7 +34,7 @@ g++ -o wasm/abacusLab -Wno-tautological-undefined-compare  \
 	|| exit $?
 set +x
 
-echo ====================== done compiling... start testing ==================================
+echo ➤ ➤ ➤ ➤ ➤ ➤  done compiling... start testing ➤ ➤ ➤ ➤ ➤ ➤ ➤ ➤ ➤ ➤ ➤ =
 echo
 
 debug=false

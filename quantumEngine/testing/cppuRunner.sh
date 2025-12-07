@@ -102,7 +102,7 @@ g++ -o wasm/cppuTestBin -Wno-tautological-undefined-compare  \
 set +x
 # removed schrodinger/abacus.cpp 9-mar-2024
 
-echo =================== done compiling... start testing ===============================
+echo ➤ ➤ ➤ ➤ ➤  done compiling... start testing ➤ ➤ ➤ ➤ ➤ ➤ ➤ ➤ ➤ ➤ =
 echo
 
 debug=false

@@ -1,10 +1,10 @@
 
-2025 Aug 28  =============================================
+🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 2025 Aug 28
 
 I give up on three.js.  No reference documentation.  It's just as cryptic and unpredictable as raw WebGL, and I already know WebGL.
 Fortunately I did it all on a branch.  Unfortunately, I made lots of other changes I want to drag along.  Like the Avatar data structure is good for WebGL buffers.  This'll take some work to get it all back to normal.
 
-2025 Aug 4  =============================================
+🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 2025 Aug 4
 
 While showing it to a friend (Vaughn) I realized I really needed the 3d version.  So I wennt on a hack attack to learn three.js.  Then, I realized I really should have been using three.js all along - its a good way to cut thru the BS of webgl, even for 2D stuff.
 
@@ -12,7 +12,7 @@ The previous approach I had sent the complex values directly to the GPU, and it 
 
 But three.js needs the actual coordinates in xyz and also the actual color gun values.  And their 3d viewer and navigator is already written and debugged.  So it's a natural solution.  Just requires me rewriting way too much code.  All of the coordinates and colors are now calculated in the non-gpu code (although webassy and in soon in a thread).
 
-Now I'm starting to like the name Creola — Creola Katherine Johnson - earned a reputation for mastering complex manual calculations and helped pioneer the use of computers to perform the tasks.  This is more in keeping with the real mover-shaker in an area.
+Now I'm starting to like the name Creola — Creola Katherine Johnson - earned a reputation for mastering complex manual calculations and helped pioneer the use of computers to perform the tasks.  This is more in keeping with the real mover-shaker in an area.  A directory name insside quantumEngine for the down and dirty calculations - split from schrodinger.
 
 Names for new split of Grinder.
 boss
@@ -65,7 +65,7 @@ cadence
 oscillator *
 quiver
 
-2024 Jul 26 ============================================= squishy_electron_4
+2024 Jul 26 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣  squishy_electron_4
 
 Convergence:von Neumann criteria
 
@@ -81,7 +81,7 @@ in our case, α = - ℏ² / 2m_e =
 
 
 
-2024 May 2 ============================================= schrodinger's directory
+2024 May 2 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣  schrodinger's directory
 
 Finalizing the version using pthreads successfully with one thread.
 but now it's busted.  no integration.  OK fixed.
@@ -102,14 +102,14 @@ vaughan:
 schrodinger:
 	should be formulas, vischer.*, hamiltonian,
 
-2023 Feb 22 ============================================= proxy2worker branch
+2023 Feb 22 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣  proxy2worker branch
 
 still trying to make workers work in emscripten.
 AirSim job Mar-Oct that year.
 
 
-2023 Feb 17 ============================================= aWorker branch
-================ web server
+2023 Feb 17 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣  aWorker branch
+🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣  web server
 For top-level documents, two headers need to be set to cross-origin isolate your site:
 Cross-Origin-Opener-Policy with same-origin as value (protects your origin from attackers)
 Cross-Origin-Embedder-Policy with require-corp as value (protects victims from your origin)
@@ -127,7 +127,7 @@ serving Squish:
 
 
 
-2023 Feb 7 ============================================= Release Testing List
+🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣  Release Testing List 2023 Feb 7
 
 prep:
 - delete all localStorage
@@ -167,7 +167,7 @@ set resolution:
 - can set to different resolution, does it
 - space length can be changed
 
-2023 Feb 2 ============================================= Extensions WebGL
+2023 Feb 2 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣  Extensions WebGL
 
 double floats in WebGL
 need this ext with WebGL2:
@@ -180,7 +180,7 @@ OES_element_index_uint
 allows an index for data row in v shader.  Free with webgl2, ext with webgl1
 No, allows a int32 for values in attributes
 
-2023 Feb 2 ============================================= documentation
+2023 Feb 2 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣  documentation
 
 Equation Formatter: MathJax
 https://www.mathjax.org/#demo
@@ -210,7 +210,7 @@ nice to have features:
 Fenced Codeblocks
 
 
-2023 jan 30 ============================================= atomic funcs available
+2023 jan 30 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣  atomic funcs available
 
 typedef enum memory_order {
   memory_order_relaxed = __ATOMIC_RELAXED,
@@ -240,7 +240,7 @@ but I need a way to wait
 
 
 
-2023 jan 18 ============================================= ClickNDrag library
+2023 jan 18 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣  ClickNDrag library
 
 common code should do:
 
@@ -271,7 +271,7 @@ handlers:
 
 
 
-====================================================== the site
+🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣  the site
 
 Notice the use of %PUBLIC_URL% in the tags above.
 It will be replaced with the URL of the `public` folder during the build.
@@ -286,7 +286,7 @@ manifest.json provides metadata used when your web app is installed on a
 user's mobile device or desktop. See https://developers.google.com/web/fundamentals/web-app-manifest/
 
 
-====================================================== Dec 24 2022
+🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣  Dec 24 2022
 
 the potential is Vψ, sortof, must be units of energy.  So that expr says V=units of energy.  1 volt = 1 joule (of work) per 1 coulomb (of charge).  Really it should be eVψ where e=charge of electron.
 
@@ -295,7 +295,7 @@ meaning the charge of an electron is 1.602176634×10−19 coulomb, exactly.
 
 
 
-====================================================== Dec 2022
+🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣  Dec 2022
 
 macro-fu:
 rumor has it these work:
@@ -315,7 +315,7 @@ https://marmelab.com/blog/2021/07/22/cra-webpack-no-eject.html
 
 make a general purpose binary object identifier function
 
-====================================================== Dec 2022
+🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣  Dec 2022
 Browser availability for important features I use:
 
 WebGL 1: most browsers 2010 thru 2016, android maybe 2016
@@ -339,7 +339,7 @@ in general, Android browsers lag the rest, although I'm not sure which browsers 
 
 need to update code for this.
 
-====================================================== Nov 18, 2022
+🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣  Nov 18, 2022
 
 In order to deal properly with units, I have to shift from MKS units to more commensurate units, but I want to stick to SI prefixes.  So, for instance, picoseconds and nanometers.
 
@@ -422,7 +422,7 @@ and potential energy would be in units:
 = 1.602176634e-25 1e24 zeptograms nm^2 / ps^2
 = .1602176634 zeptograms nm^2 / ps^2
 
-====================================================== Oct 2022
+🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣  Oct 2022
 
 other notes:
 webassembly error handling:
@@ -437,17 +437,17 @@ https://developer.mozilla.org/en-US/docs/WebAssembly/JavaScript_interface/Except
 Maybe I should think of waves WRT an atom size.  H atom sized 1Å.
 actually no, maybe 1/4 Å for hydrogen but about 1Å average for most of the elements
 
-====================================================== Sep 2022
+🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣  Sep 2022
 While it's running, try surfing here:
 http://localhost:4444/webpack-dev-server
 
-====================================================== Aug 2022
+🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣  Aug 2022
 original, mid-2021
 
 v3 refers to the previous SquishyElectron project.
 v4 is squishy_electron_4, this project.
 
-====================================================== Mid-2021 notes
+🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣  Mid-2021 notes
 
 v3 refers to this SquishyElectron project.
 
@@ -571,7 +571,7 @@ For one particle in 2D, the potential is a 2d map.
 - small key table indicating phase-color correspondence (see that file... i think in resume directory)
 
 
-================================================================ Dec 2021:
+🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 = Dec 2021:
 
 -------------------------------------------------- icon notes
 

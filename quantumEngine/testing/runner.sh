@@ -39,7 +39,7 @@ emcc -o quantumTest.js -sLLD_REPORT_UNDEFINED -g \
 
 # now run the tests
 echo
-echo ====================== done compiling ==================================
+echo ➤ ➤ ➤ ➤ ➤ ➤  done compiling ➤ ➤ ➤ ➤ ➤ ➤ ➤ ➤ ➤ ➤ ➤ =
 echo
 
 # it's generated from the emcc compile above

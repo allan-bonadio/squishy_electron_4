@@ -22,7 +22,7 @@ If the distances are 1/2 wavelength off, or 3/2 or 5/2 or similar, then crests a
 
 
 
-================================
+🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣
 
 
 When the light comes out of the laser, it's monochromatic, and coherent.  In other words, the photons exist in a momentum eigenstate.  Waves.  This (these) eigenstates are superpositions of all of the location eigenstates.  Wave function of the light is like cos(x) + i sin(x) for all x.  (circularly polarized.... freq and magnitude set to 1 for simplicity.)  So, they seem to us as waves.

@@ -78,9 +78,9 @@ fi
 
 
 # now decompress and activate
-echo "                                     🎁 🎁 🛫 About to decompress and activate ================= nakoda login stuff..."
+echo "                                     🎁 🎁 🛫 About to decompress and activate ➤ ➤ ➤ ➤ ➤ == nakoda login stuff..."
 ssh  $NAKODA_SKEY  allan@nakoda <<WALKING_SPEED
-	echo "                                     🎁 🎁 🛫  ================= ...end of nakoda login stuff"
+	echo "                                     🎁 🎁 🛫  ➤ ➤ ➤ ➤ ==➤  ...end of nakoda login stuff"
 	cd /var/www/squish || exit 1
 	./install.sh
 
