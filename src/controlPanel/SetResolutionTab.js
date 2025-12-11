@@ -42,18 +42,18 @@ function SetResolutionTab(props) {
 	if (qeConsts.contWELL == spa.continuum) {
 		segmentsBetweenEnds = spa.N - 1;
 		continuumBlurb = <span>
-			Your space is a <b>Well</b>, just a box with impenetrable walls on the ends.
-			So, your wave will bounce back and forth off the ends.  Exactly at the ends,
-			your wave will be zero — the voltage is infinite there, so the walls repell the wave.
-			So you have {segmentsBetweenEnds} datapoints in use.
+			Your space is a <b>Well</b>, just a canyon with impenetrable, smooth walls on the ends.
+			It has {segmentsBetweenEnds} datapoints in use.
+			So, your packet will bounce back and forth off the ends.  Exactly at the ends,
+			your wave will be zero — the voltage is infinite there, so the walls reflect the wave back to the center.
 		</span>;
 	}
 	else if (qeConsts.contENDLESS == spa.continuum) {
 		segmentsBetweenEnds = spa.N;
 		continuumBlurb = <span>
 			Your space is <b>Endless</b>, infinite space that cycles around on the ends.
-			So, your wave will crawl along until it gets to the right, and then show up on the left.
-			You have {segmentsBetweenEnds} datapoints in use.
+			You have {segmentsBetweenEnds} datapoints in use,
+			and at the end of the right side, it continues on the left side, and vice versa.
 		</span>;
 	}
 	else
