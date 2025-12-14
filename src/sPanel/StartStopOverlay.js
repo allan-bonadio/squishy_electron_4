@@ -16,6 +16,10 @@ import singleStepIcon from './waveViewIcons/singleStep2.png';
 let traceContext = false;
 let traceStartStop = false;
 
+window.ckSBI = () => {
+
+}
+
 // no props!  does everything thru context.
 function StartStopOverlay(props) {
 	const context = useContext(SquishContext);
@@ -29,31 +33,35 @@ function StartStopOverlay(props) {
 	if (!cp)
 		return null;
 
-	function startStopHandler(ev) {
-		cp.startStop?.(ev);
-	}
-	function startSingleFrameHandler(ev) {
-		cp.startSingleFrame?.(ev);
-	}
+	// function startStopHandler(ev) {
+	// 	cp.startStop?.(ev);
+	// }
+	// function startRunning(ev) {
+	// 	cp.startRunning?.(ev);
+	// }
+	// function stopRunning(ev) {
+	// 	cp.stopRunning?.(ev);
+	// }
+	// function startSingleFrameHandler(ev) {
+	// 	cp.startSingleFrame?.(ev);
+	// }
 	function preventDragAway(ev) {
 		ev.preventDefault();
 	}
 
-	const helpSF = 'only do 1 frame.  Use Option , Alt or Control ^ for 10, Shift for 100) ';
+	const helpRunning = 'Runs while you hold down this button; release to stop.';
 	let ssButton;
 	if (context.shouldBeIntegrating) {
-		if (traceStartStop)
-			console.log(`🛑 was integrating, making stop button`)
+		if (traceStartStop) console.log(`🛑 was integrating, making stop button`);
 		ssButton = <button className='startStopWidget stopButton' onClick={cp.stopAnimating}
-				alt='🛑 stop integrating' title='🛑 stop integrating' >
+					alt='🛑 stop integrating' title='🛑 stop integrating' >
 			<img onMouseDown={preventDragAway} src={stopIcon} />
 		</button>
 	}
 	else {
-		if (traceStartStop)
-			console.log(`🎬 integration is stopped, making start button`)
+		if (traceStartStop) console.log(`🟩 integration is stopped, making start button`);
 		ssButton = <button className='startStopWidget startButton' onClick={cp.startAnimating}
-				alt='🎬 begin integrating'  title='🎬 begin integrating' >
+				alt='🟩 begin integrating'  title='🟩 begin integrating' >
 			<img onMouseDown={preventDragAway} src={startIcon} />
 		</button>
 	}
@@ -64,11 +72,15 @@ function StartStopOverlay(props) {
 
 		<span style={{width: '2em', display: 'inline-block'}} />
 
-		<button className='startSingleFrameWidget' onClick={startSingleFrameHandler}
-				alt={helpSF} title={helpSF} onMouseMove={preventDragAway} >
-			<img onMouseDown={preventDragAway}
-					src={singleStepIcon} />
+		{/* longer running button; runs as long as you hold it down */}
+		<button className='runningWidget'
+				alt={helpRunning} title={helpRunning} onMouseMove={preventDragAway}
+				onMouseDown={cp.startAnimating}
+				onMouseUp={cp.stopAnimating} onMouseLeave={cp.stopAnimating}>
 		</button>
+		<img onMouseDown={cp.startAnimating}
+			onMouseUp={cp.stopAnimating} onMouseLeave={cp.stopAnimating}
+			src={singleStepIcon} />
 
 	</section>;
 }

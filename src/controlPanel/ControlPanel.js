@@ -21,7 +21,7 @@ import {interpretCppException, wrapForExc} from '../utils/errors.js';
 import SquishContext from '../sPanel/SquishContext.js';
 
 let traceSetPanels = false;
-let traceStartStop = false;
+let traceStartStop = true;
 let traceContext = false;
 
 // integrations always need specific numbers of steps.  But there's always one
@@ -67,7 +67,7 @@ export class ControlPanel extends React.Component {
 		// we can't init some stuff till we get the space.  But we also can't until
 		// this constructor runs.
 		eSpaceCreatedPromise.then(space => {
-			this.initWithSpace(space);
+			this.handleSpacePromise(space);
 			this.grinder.chosenFP = this.chosenFP;
 		})
 		.catch(rex => {
@@ -85,7 +85,7 @@ export class ControlPanel extends React.Component {
 			return;
 		}
 		let cp = this.context.controlPanel;
-		if (cp)
+		if (cp && cp.startAnimating)
 			return;  // already done
 
 		// new cp object
@@ -93,7 +93,9 @@ export class ControlPanel extends React.Component {
 			startAnimating: this.startAnimating,
 			stopAnimating: this.stopAnimating,
 			startStop: this.startStop,
-			startSingleFrame: this.startSingleFrame,
+			startRunning: this.startRunning,
+			stopRunning: this.stopRunning,
+			//startSingleFrame: this.startSingleFrame,
 		}
 
 		this.props.setCPContext(cp);
@@ -109,7 +111,7 @@ export class ControlPanel extends React.Component {
 
 	// we need a surprising amount of stuff from the space.  We can't draw much without it.
 	// So this gets called when it's ready.
-	initWithSpace(space) {
+	handleSpacePromise(space) {
 		// not much happens without this info
 		this.space = space;
 		this.N = space.N;
@@ -127,6 +129,7 @@ export class ControlPanel extends React.Component {
 			this.startAnimating();
 
 		if (traceStartStop) {
+			// Note: the state won't kick in until next render
 			console.log(`🎛️ ControlPanel constructor & context initialized with space, `
 			+` ctx.shouldBeIntegrating=${this.context.shouldBeIntegrating}, `
 			+` gr.shouldBeIntegrating=${this.grinder.shouldBeIntegrating}, `
@@ -188,16 +191,13 @@ export class ControlPanel extends React.Component {
 			console.log(`🎛️ startAnimating starts, triggering iteration, `, ev);
 		this.props.setShouldBeIntegrating(true);
 
-		// must do this to start each iteration going in the thread(s)
-		this.grinder.triggerIteration();
-
 		if (traceStartStop) {
 			console.log(`🎛️ ControlPanel startAnimating,`
 			+` ctx.shouldBeIntegrating=${this.context.shouldBeIntegrating}, `
 			+` gr.shouldBeIntegrating=${this.grinder.shouldBeIntegrating}, `
 			+`isIntegrating=${this.grinder.isIntegrating}   `);
 
-			console.log(`🎛️  this.context(${this.context}) == props.context(${this.props.context})? `,
+			console.log(`🎛️  this.context=`, this.context, `  props.context=`, this.props.context, `  equal?`,
 				this.context == this.props.context);
 		}
 
@@ -210,7 +210,7 @@ export class ControlPanel extends React.Component {
 
 		// set it false as you store it in store; then set state.  The threads will figure it out next iteration
 		this.props.setShouldBeIntegrating(false);
-		this.props.animator.nFramesToGo = 0;
+		//this.props.animator.nFramesToGo = 0;
 		if (traceStartStop) console.log(`🎛️ ControlPanel STOP Animating, `
 			+`ctx.shouldBeIntegrating=${this.context.shouldBeIntegrating}, `
 			+` gr.shouldBeIntegrating=${this.grinder.shouldBeIntegrating}, `
@@ -228,23 +228,33 @@ export class ControlPanel extends React.Component {
 	}
 
 	// the |> button.
-	startSingleFrame =
-	(ev) => {
-		console.log(`🎛️ startSingleFrame, `, ev);
-
-		let nFrames = 1;
-		// multipleby holding down modifiers.  Alt=bad on Windows, ctrl=bad on Mac
-		if (ev.ctrlKey || ev.altKey) nFrames *= 10;
-		if (ev.shiftKey) nFrames *= 100;
-
-		this.props.animator.startSingleFrame(nFrames);
-
-		if (traceStartStop) console.log(`🎛️ ControlPanel startSingleFrame,`
-			+` nFrames=${nFrames}, `
-			+` ctx.shouldBeIntegrating=${this.context.shouldBeIntegrating}, `
-			+` gr.shouldBeIntegrating=${this.grinder.shouldBeIntegrating}, `
-			+`isIntegrating=${this.grinder.isIntegrating}   `);
+	startRunning =
+	ev => {
+		startAnimating(ev);
 	}
+
+	stopRunning =
+	ev => {
+		stopAnimating(ev);
+	}
+
+// 	startSingleFrame =
+// 	(ev) => {
+// 		console.log(`🎛️ startSingleFrame, `, ev);
+//
+// 		let nFrames = 1;
+// 		// multipleby holding down modifiers.  Alt=bad on Windows, ctrl=bad on Mac
+// 		if (ev.ctrlKey || ev.altKey) nFrames *= 10;
+// 		if (ev.shiftKey) nFrames *= 100;
+//
+// 		this.props.animator.startSingleFrame(nFrames);
+//
+// 		if (traceStartStop) console.log(`🎛️ ControlPanel startSingleFrame,`
+// 			+` nFrames=${nFrames}, `
+// 			+` ctx.shouldBeIntegrating=${this.context.shouldBeIntegrating}, `
+// 			+` gr.shouldBeIntegrating=${this.grinder.shouldBeIntegrating}, `
+// 			+`isIntegrating=${this.grinder.isIntegrating}   `);
+// 	}
 
 	/* ********************************************** misc */
 
