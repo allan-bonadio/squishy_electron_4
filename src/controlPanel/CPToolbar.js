@@ -81,7 +81,7 @@ function CPToolbar(props) {
 
 		<span className='toolSpacer' style={{width: '.3em'}}></span>
 
-		<button className='toolbarWidget resolutionBox' onMouseClick={clickResolution} >
+		<button className='toolbarWidget resolutionBox' onClick={clickResolution} >
 			resolution {props.N ?? '...'} &nbsp;
 		</button>
 
