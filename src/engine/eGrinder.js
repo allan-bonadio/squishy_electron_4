@@ -142,12 +142,12 @@ class eGrinder {
 		}
 	}
 
-	// Grind one frame - Single Threaded - deprecated sortof
+	// Grind one frame - Single Threaded - deprecated
 	// for testing maybe keep the single threaded way
 	// can throw std::runtime_error("divergence")
-	oneFrame() {
-		qeFuncs.this_oneFrame(this.pointer);
-	}
+	// oneFrame() {
+	// 	qeFuncs.this_oneFrame(this.pointer);
+	// }
 
 	askForFFT() {
 		qeFuncs.this_askForFFT(this.pointer);

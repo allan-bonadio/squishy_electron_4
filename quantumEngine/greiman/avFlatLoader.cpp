@@ -11,10 +11,10 @@
 //#include "../schrodinger/qGrinder.h"
 #include "../debroglie/qCavity.h"
 
-static const bool traceViewBuffer = false;  // dumps it
-static const bool traceHighest = true;
-static const bool traceInDetail = true;
-static const bool traceWaveDump = true;
+static const bool traceViewBuffer = false;
+static const bool traceHighest = false;
+static const bool traceInDetail = false;
+static const bool traceWaveDump = false;  // dumps it; verbose
 
 
 

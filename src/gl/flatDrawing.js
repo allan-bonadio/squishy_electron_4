@@ -13,7 +13,7 @@ let traceViewBufAfterDrawing = false;
 let traceMaxHeight = false;
 let traceFlatDrawing = false;
 let traceViewport = false;
-let traceReloadRow = true;
+let traceReloadRow = false;
 
 // diagnostic purposes; draws more per vertex
 let traceDrawPoints = false;
@@ -187,8 +187,11 @@ export class flatDrawing extends abstractDrawing {
 		}
 		this.drawVariables.forEach(v => v.reloadVariable());
 		gl.drawArrays(gl.TRIANGLE_STRIP, 0, this.vertexCount);
-		console.log(`just drewArays-flat on avatar ptr=${this.avatar.pointer} `
-			+` this.avatar.label=${this.avatar.label}, buffer label=${this.avatar.bufferNames[0]}`);
+		if (traceFlatDrawing) {
+			console.log(`♭♭♭just drewArays-flat on avatar ptr=${this.avatar.pointer} `
+				+` this.avatar.label=${this.avatar.label}, `
+				+` buffer label=${this.avatar.bufferNames[0]}`);
+		}
 
 		if (traceDrawLines) {
 			gl.lineWidth(1);  // it's the only option anyway

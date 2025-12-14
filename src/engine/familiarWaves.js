@@ -5,8 +5,8 @@
 
 import qeConsts from './qeConsts.js';
 
-let traceGaussian = true;
-let traceFamiliarResult = true;
+let traceGaussian = false;
+let traceFamiliarResult = false;
 
 const abs = Math.abs;
 const sqrt = Math.sqrt;
