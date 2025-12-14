@@ -93,7 +93,7 @@ export class WaveView extends React.Component {
 
 	static contextType = SquishContext;
 
-	// set up 2/3 of the context: waveView and engine
+	// set up 1/3 of the context: waveView
 	setUpContext() {
 		// need BOTH context  and the space.  So this is called twice.
 		const context = this.context;
@@ -104,7 +104,7 @@ export class WaveView extends React.Component {
 		}
 
 		let wv = context.waveView;
-		if (wv)
+		if (wv && wv.grinder)
 			return;  // already done
 
 		const space = this.space;
@@ -121,6 +121,7 @@ export class WaveView extends React.Component {
 
 			mainVDisp: space.vDisp,
 		};
+		this.props.setWVContext(wv);
 
 			// make room for the bumpers for WELL continuum (both sides).  Note that
 			// continuum can change only when page reloads.
@@ -131,13 +132,13 @@ export class WaveView extends React.Component {
 		//wv.mainVDisp = space.vDisp;
 
 		if (traceContext) {
+			// Note: the state won't kick in until next render
 			console.log(`🏄 WaveView setUpContext context:`,
 				context.setShouldBeIntegrating,
 				context.controlPanel,
 				context.waveView,
 			);
 		}
-		this.props.setWVContext(wv);
 		return;  // done
 	}
 
