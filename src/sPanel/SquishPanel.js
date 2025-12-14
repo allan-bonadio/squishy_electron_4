@@ -29,23 +29,6 @@ let tracePromises = false;
 let traceSquishPanel = false;
 let traceWidth = false;
 
-//const DEFAULT_SCENE_NAME = 'flatScene';
-
-let me;
-let state2, state3;
-
-window.sbiGrinder = null;
-window.sbiCk = () => {
-	if (sbiGrinder && me ) {
-		console.log(`‹›‹›‹›‹›‹›‹›  st=>${me.state.shouldBeIntegrating}   gr=>${sbiGrinder.shouldBeIntegrating}`);
-		if (me.state.shouldBeIntegrating !== sbiGrinder.shouldBeIntegrating) {
-			console.error(`‹›‹›‹›‹›‹›‹›  state: ${me.state.shouldBeIntegrating}   sbi  grinder: ${sbiGrinder.shouldBeIntegrating}`);
-			debugger;
-		}
-	}
-}
-
-
 /* ************************************************ construction & reconstruction */
 
 class SquishPanel extends React.Component {
@@ -106,12 +89,6 @@ class SquishPanel extends React.Component {
 
 	// this sets grinder.sbi and does the first trigger
 	shouldBeIntegratingUpdate() {
-
-		state2 = this.state;
-		if (me.state !== state2) console.warn(`me.state !== state2 in shouldBeIntegratingUpdate`);
-
-
-
 		// when it really starts integrating
 		if (this.grinder) {
 			const sbi = this.state.shouldBeIntegrating;
@@ -158,7 +135,6 @@ class SquishPanel extends React.Component {
 
 			//this.mainAvatar = space.mainAvatar;
 			this.grinder = space.grinder;
-sbiGrinder=this.grinder;
 			pointerContextMap.register(space.grinder.pointer, this.state);
 			//pointerContextMap.dump();
 			this.animator.grinder = this.grinder;
@@ -235,14 +211,6 @@ sbiGrinder=this.grinder;
 
 		// does NOT alter any react component state but does start integration
 		this.shouldBeIntegratingUpdate();
-
-sbiCk();
-
-state3 = this.state;
-if (me.state !== state3) console.warn(`me.state !== state3 in render`)
-if (state2 !== state3) console.warn(`state2 !== state3 in render`)
-
-
 
 		if (traceWidth)
 			console.log(`👑 SquishPanel render, p.bodyWidth=${p.bodyWidth} = outerWidth `
