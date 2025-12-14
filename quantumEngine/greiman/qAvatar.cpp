@@ -9,7 +9,6 @@
 #include <cfenv>
 
 #include "qAvatar.h"
-//#include "../debroglie/qCavity.h"
 #include "../directAccessors.h"
 
 static const bool traceCreation = false;
@@ -159,7 +158,6 @@ void qAvatar::dumpEachViewBuffer(int bufferMask, const char *title) {
 	int which = bufferMask;
 	charsUsed += snprintf(txt+charsUsed, TXTLEN - charsUsed, "vtex ");
 	for (int bufferIx = 0; (bufferIx < MAX_N_BUFFERS) && which; bufferIx++) {
-		//printf("heading buffer %d\n", bufferIx);
 		if ((which & 1) && viewBuffers[bufferIx].fArray) {
 			int nC = viewBuffers[bufferIx].nCoords;
 			if (nC < 0)
@@ -167,7 +165,7 @@ void qAvatar::dumpEachViewBuffer(int bufferMask, const char *title) {
 
 			// label
 			charsUsed += snprintf(txt+charsUsed, TXTLEN - charsUsed, "   vBuf %2d ", bufferIx);
-			//printf("buffer %d: nCoords=%d  charsUsed=%d\n", bufferIx, nC, charsUsed);
+
 			// spaces for the rest of the heading for this buffer
 			for (int coordIx = 1; coordIx < nC; coordIx++) {
 				charsUsed += snprintf(txt+charsUsed, TXTLEN - charsUsed, "           ");
@@ -197,12 +195,9 @@ void qAvatar::dumpEachViewBuffer(int bufferMask, const char *title) {
 
 			if ((which & 1) && (viewBuffers[bufferIx].fArray)) {
 				int nC = viewBuffers[bufferIx].nCoords;
-				//printf("about to dump vx=%d in buffer=%d, which=0x%x\n", vertexIx, bufferIx, which);
 				float *vertexStart = viewBuffers[bufferIx].fArray + nC * vertexIx;
 
-				//printf("   buffer %d... nCoords=%d\n", bufferIx, nC);
 				for (int coordIx = 0; coordIx < nC; coordIx++) {
-					//printf("   %d bytes left... buf%d  coord=%d of %d\n", TXTLEN - charsUsed, bufferIx, coordIx, nC);
 					charsUsed += snprintf(txt+charsUsed, TXTLEN - charsUsed, " %9.2f ", vertexStart[coordIx]);
 				}
 				charsUsed += snprintf(txt+charsUsed, TXTLEN - charsUsed, "    ");
@@ -211,7 +206,6 @@ void qAvatar::dumpEachViewBuffer(int bufferMask, const char *title) {
 				if (101 != txt[TXTLEN - 1])
 					throw std::runtime_error("qAvatar::dumpComplexViewBuffer() overflowed txt buffer in vex!!");
 			}  // end of vb buffer IF stmt
-			//printf("end of coords for buffer bufferix=%d, of while which=0x%x\n", bufferIx, which);
 			which >>= 1;
 		}  // end of vb buffer loop
 		printf(" %s\n", txt);  // end of one line
@@ -323,13 +317,6 @@ void qAvatar::dumpIndex(const char *title) {
 //	printf("    🚥  qAvatar::at end of dumpComplexViewBuffer vBuffer=%p\n\n",
 //			vBuffer);
 //}
-
-
-	//float *getViewBuffer(int bufferIx);
-
-/* ******************************************************** loading */
-
-// see avFlatLoader
 
 /* ************************************************************** C */
 

@@ -255,14 +255,10 @@ extern "C" {
 
 	void grinder_delete(qGrinder *qgrinder);
 
-	//void grinder_initThreadIntegration(qGrinder *grinder, int threadSerial);
 	void grinder_oneFrame(qGrinder *grinder);
 	void grinder_triggerIteration(qGrinder *grinder);
 
 	void grinder_askForFFT(qGrinder *grinder);
-
-	//void grinder_copyFromAvatar(qGrinder *grinder, qAvatar *avatar);
-	//void grinder_copyToStage(qGrinder *grinder, qAvatar *avatar);
 
 	const char *grinder_getExceptionMessage(qGrinder *grinder);
 }

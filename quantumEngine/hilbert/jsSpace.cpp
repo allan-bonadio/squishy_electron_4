@@ -56,39 +56,6 @@ qSpace *completeNewSpace(qSpace *space, int nGrWorkers) {
 
 	// finish up all the dimensions now that we know them all
 	space->initSpace();
-
-//	qGrinder *grinder = space->grinder
-//		= new qGrinder(space, nGrWorkers, "mainGrinder");
-//	if (traceSpaceCreation) printf("🚀 created Grinder\n");
-
-//	if (traceAvatarDetail) printf("🚀 about to create avatars\n");
-//
-//	qAvatar *mainAvatar = space->mainAvatar = new qAvatar(0, "mainAvatar");
-//	//space, "mainAvatar");
-//	mainAvatar->space = space;
-//	mainAvatar->cavity = (qCavity *) grinder->flick;  // very carefully
-//	mainAvatar->attachViewBuffer(0, NULL, 4, space->nPoints * 2);
-//	if (traceAvatarDetail) printf("🚀 created mainAvatar\n");
-
-//	int *vb = (int *) (mainAvatar->viewBuffers);
-//	printf("viewBuffer ints: ox%x ox%x ox%x ox%x ox%x ox%x and vb itself is %p or %x\n",
-//		vb[0], vb[1], vb[2], vb[3], vb[4], vb[5], vb, (int) vb);
-
-//	space->miniGraphAvatar = new qAvatar(avFLAT, "miniGraph");
-
-	//space->dumpSpace();
-//	if (traceSpaceCreation) printf("   🚀 qSpace created: space=%p  mainAvatar=%p  grinder=%p\n",
-//		space, mainAvatar, qgrinder);
-
-	//qCavity *miniGraphWave = space->miniGraphWave
-	//	= new qCavity(space);
-	//if (traceSpaceCreation)
-	//	printf("miniGraphWave: %p\n", miniGraphWave);
-	//	miniGraphAvatar->space = space;
-	//	miniGraphAvatar->cavity = miniGraphWave;
-	//	space->miniGraphAvatar->attachViewBuffer(0, NULL, 2, space->nPoints * 2);
-
-	//if (traceSpaceCreation) printf("🚀 created miniGraph Wave and Avatar\n");
 	return space;
 }
 

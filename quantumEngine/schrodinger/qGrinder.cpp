@@ -12,7 +12,6 @@
 #include <stdatomic.h>
 
 #include "../hilbert/qSpace.h"
-//#include "../greiman/qAvatar.h"
 #include "qThread.h"
 #include "qGrinder.h"
 #include "grWorker.h"
@@ -233,24 +232,12 @@ qSpectrum *qGrinder::getSpectrum(void) {
 };
 
 void qGrinder::copyFromStage(void) {
-	//throw std::runtime_error("qGrinder::copyFromStage() not implenented)";
 	flick->copyBuffer(flick, stage);  // to buffer zero
 }
 
-// JS interface
-//void grinder_copyFromAvatar(qGrinder *grinder, qAvatar *avatar) {
-//	grinder->copyFromStage(avatar);
-//}
-
 void qGrinder::qGrinder::copyToStage(void) {
-	//throw std::runtime_error("qGrinder::copyFromStage() not implenented");
 	flick->copyBuffer(stage, flick);  // from flick buffer zero
 }
-
-// JS interface
-//void grinder_copyToStage(qGrinder *grinder, qAvatar *avatar) {
-//	grinder->copyToStage(avatar);
-//}
 
 /* *********************************************** divergence & tallying  */
 
@@ -389,7 +376,6 @@ void qGrinder::oneFrame() {
 			wave0[5]);
 	}
 
-	//frameSerial++;
 	qCheckReset();
 }
 

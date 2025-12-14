@@ -226,10 +226,9 @@ qCx qFlick::value(int doubleSerial, int ix) {
 
 
 // calculate the magnitude, re**2 + im**2 kindof, at this point and time
+// when the buffer is visscherated
 // pretty clumsy but accurate, we'll figure out something
 double qFlick::magnitude(int doubleSerial, int ix) {
-	//printf("qFlick::magnitude: doubleSerial[%d]   ix[%d] \n", doubleSerial, ix);
-	// if doubleSerial is 1 or 2, we should end up with it=0
 	const int it = (doubleSerial-1) / 2;
 
 	if (! waves[it]) printf("*** no wave[it] in qf:magnitude!\n");

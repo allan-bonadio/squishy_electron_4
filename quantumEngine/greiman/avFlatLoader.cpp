@@ -6,9 +6,7 @@
 
 #include <stdexcept>
 
-//#include "../hilbert/qSpace.h"
 #include "qAvatar.h"
-//#include "../schrodinger/qGrinder.h"
 #include "../debroglie/qCavity.h"
 
 static const bool traceViewBuffer = false;
@@ -52,7 +50,6 @@ void avFlatLoader(qAvatar *avatar, int bufIx, qCavity *cavity, int nPoints) {
 		cavity->dump("🚦 at start of avFlatLoader()");
 
 	// this is index into the complex point, which translates to 2 GL vertices, eight single floats, 32 bytes
-	//printf("avFlatLoader about to do nPoints pts: %d\n", nPoints);
 	for (int pointNum = 0; pointNum < nPoints; pointNum++) {
 		float *twoRowPtr = fArray + pointNum * 8;
 		if (traceInDetail)
@@ -99,9 +96,6 @@ void avFlatLoader(qAvatar *avatar, int bufIx, qCavity *cavity, int nPoints) {
 	if (traceViewBuffer) {
 		avatar->dumpComplexViewBuffer(bufIx, nPoints, "avFlatLoader done");
 	}
-
-	//printf("end of avFlatLoader: double0=%lf  highest=%lf\n", avatar->double0, highest);
-	// all return values returned on the avatar in [di][01]
 }
 
 // for the JS side.  Do I really need these?  this is called only from c++

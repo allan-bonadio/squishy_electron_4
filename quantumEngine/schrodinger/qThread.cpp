@@ -7,7 +7,6 @@
 #include <pthread.h>
 
 #include "../hilbert/qSpace.h"
-//#include "../debroglie/qCavity.h"
 #include "../greiman/qAvatar.h"
 #include "qGrinder.h"
 #include "qThread.h"

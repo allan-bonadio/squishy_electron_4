@@ -25,10 +25,6 @@ struct viewBufInfo {
 	viewBufInfo(void);
 };
 
-// all of these arguments are optional, depending on which loader/drawing.
-// loader func knows how to allocate needed viewBuffers if not done alreadyu
-//typedef  void (*avatarLoader)(struct qAvatar *) ;
-
 #define MAX_VIEW_BUFFERS  4
 
 // allocates out the viewBuffers needed for this drawing; whatever sizes, etc
@@ -52,9 +48,6 @@ struct qAvatar {
 	void dumpComplexViewBuffer(int bufIx, int nPoints, const char *title);
 
 	void dumpIndex(const char *title);
-
-	// handy
-	//float *buf(int bufferIx){return viewBuffers[bufferIx].fArray; }
 
 	/* *********************************************** data fields */
 

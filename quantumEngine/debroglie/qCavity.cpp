@@ -6,8 +6,6 @@
 #include <stdexcept>
 
 #include "../hilbert/qSpace.h"
-//#include "../greiman/qAvatar.h"
-//#include "../schrodinger/qGrinder.h"
 #include "qCavity.h"
 #include "../directAccessors.h"
 
