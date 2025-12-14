@@ -29,7 +29,22 @@ let tracePromises = false;
 let traceSquishPanel = false;
 let traceWidth = false;
 
-const DEFAULT_SCENE_NAME = 'flatScene';
+//const DEFAULT_SCENE_NAME = 'flatScene';
+
+let me;
+let state2, state3;
+
+window.sbiGrinder = null;
+window.sbiCk = () => {
+	if (sbiGrinder && me ) {
+		console.log(`‹›‹›‹›‹›‹›‹›  st=>${me.state.shouldBeIntegrating}   gr=>${sbiGrinder.shouldBeIntegrating}`);
+		if (me.state.shouldBeIntegrating !== sbiGrinder.shouldBeIntegrating) {
+			console.error(`‹›‹›‹›‹›‹›‹›  state: ${me.state.shouldBeIntegrating}   sbi  grinder: ${sbiGrinder.shouldBeIntegrating}`);
+			debugger;
+		}
+	}
+}
+
 
 /* ************************************************ construction & reconstruction */
 
@@ -47,31 +62,32 @@ class SquishPanel extends React.Component {
 		// during dev, this gets called TWICE
 		SquishPanel.squishPanelConstructed++;
 
-		// make sure the context object doesn't keep getting replaced - it's this one
-		this.contextObj = {
-			name: 'main',
-			shouldBeIntegrating: getASetting('frameSettings', 'shouldBeIntegrating'),
-		};
-
 		// will be set by subcomponents
 		this.mainRepaint = null;
 		this.spectRepaint = null;
 
+		// this becomes the context object - the context sub-objects:
 		this.state = {
-			mainSceneClassName: DEFAULT_SCENE_NAME,
+			name: 'main',  // someday when we have multiple SPs & spaces, this will name each.
 
-			// the space for this SP.
+			// the space for this SP will be set after it is created
 			space: null,
 
-			// the context sub-objects
-			shouldBeIntegrating: this.contextObj.shouldBeIntegrating,
+			shouldBeIntegrating: false,  // will be set when space promise comes in
 			controlPanel: {},
 			waveView: {},
 		};
+		// see above this.#shouldBeIntegrating = false;
+
+	me = this;
+
+////me.state = this.state;
+
+
 
 		// animator will still need grinder, mainRepaint() and context,
 		// which don't exist yet.  Each will be on this.whatever
-		this.animator = new sAnimator(this, this.setShouldBeIntegrating, this.getContext);
+		this.animator = new sAnimator(this, this.getContext);
 
 		if (traceSquishPanel) console.log(`👑 SquishPanel constructor done`);
 	}
@@ -80,22 +96,32 @@ class SquishPanel extends React.Component {
 	static contextType = SquishContext;
 
 	// sbi, the state is kept in this state, the context, and in the grinder
-	// this should be the only way to set sbi.  Note does NOT trigger!
+	// this should be the only way to set sbi.  Note does NOT trigger!  Nor set grinder.
 	setShouldBeIntegrating = (sbi) => {
 		this.setState({shouldBeIntegrating: sbi});
 
 		storeASetting('frameSettings', 'shouldBeIntegrating', sbi);
-		console.trace(`👑 called setShouldBeIntegrating(${sbi})`);
+		console.log(`👑 👑 called setShouldBeIntegrating(${sbi})`);
 	};
 
-	componentDidUpdate() {
+	// this sets grinder.sbi and does the first trigger
+	shouldBeIntegratingUpdate() {
+
+		state2 = this.state;
+		if (me.state !== state2) console.warn(`me.state !== state2 in shouldBeIntegratingUpdate`);
+
+
+
 		// when it really starts integrating
 		if (this.grinder) {
 			const sbi = this.state.shouldBeIntegrating;
 			this.grinder.shouldBeIntegrating = sbi;
 			if (sbi)
 				this.grinder.triggerIteration();
-			console.log(`👑  shouldBeIntegrating ${sbi} and ${this.grinder.shouldBeIntegrating} now in effect\n \n \n \n `);
+			console.log(`👑  shouldBeIntegratingUpdate: shouldBeIntegrating state.sbi=${sbi} and `
+				+` gr.sbi=${this.grinder.shouldBeIntegrating} now in effect & triggered; `
+				+` gr.isIntegrating=${this.grinder.isIntegrating}\n \n`);
+
 		}
 	}
 
@@ -104,17 +130,16 @@ class SquishPanel extends React.Component {
 	setCPContext = (cp) => {
 		this.setState({controlPanel: cp});
 		this.setState({space: cp.space});
-		this.contextObj.controlPanel = cp;
+		//this.stateObj.controlPanel = cp;
 	}
 
 	// called once ONLY in waveView during setup  Either one can set space.
 	setWVContext = (wv) => {
 		this.setState({waveView: wv});
 		this.setState({space: wv.space});
-		this.contextObj.waveView = wv;
 	}
 
-	getContext = () => this.contextObj;
+	getContext = () => this.state;
 
 	/* ****************************************** space & wave creation */
 
@@ -129,15 +154,16 @@ class SquishPanel extends React.Component {
 			// space will end up in the state but meanwhile we need it now
 			this.space = space;
 			this.setState({space});  // maybe i don't need this if it's in the context?
-			pointerContextMap.register(space.pointer, this.context);
+			pointerContextMap.register(space.pointer, this.state);
 
 			//this.mainAvatar = space.mainAvatar;
 			this.grinder = space.grinder;
-			pointerContextMap.register(space.grinder.pointer, this.context);
+sbiGrinder=this.grinder;
+			pointerContextMap.register(space.grinder.pointer, this.state);
 			//pointerContextMap.dump();
 			this.animator.grinder = this.grinder;
 			this.animator.space = this.space;
-			this.animator.context = this.context;
+			this.animator.context = this.state;
 			//debugger;
 
 			// somebody needs to start this going if it was already on last time
@@ -207,19 +233,25 @@ class SquishPanel extends React.Component {
 		const p = this.props;
 		const s = this.state;
 
+		// does NOT alter any react component state but does start integration
+		this.shouldBeIntegratingUpdate();
+
+sbiCk();
+
+state3 = this.state;
+if (me.state !== state3) console.warn(`me.state !== state3 in render`)
+if (state2 !== state3) console.warn(`state2 !== state3 in render`)
+
+
+
 		if (traceWidth)
 			console.log(`👑 SquishPanel render, p.bodyWidth=${p.bodyWidth} = outerWidth `
 				+ ` body.clientWidth=${document.body.clientWidth}`);
-
-		// make sure the context object doesn't keep getting replaced by using the same one every time
-		// this is the crucial time when the contextObj changes and is passed down
-		this.contextObj.shouldBeIntegrating = s.shouldBeIntegrating;
-		this.contextObj.space = s.space;
 		//debugger;
 
 		return (
-			<SquishContext.Provider value={this.contextObj} >
-				<article className={`SquishPanel space` + this.contextObj.name} ref={this.setSPElement}>
+			<SquishContext.Provider value={this.state} >
+				<article className={`SquishPanel space` + s.name} ref={this.setSPElement}>
 					<WaveView
 						outerWidth = {p.bodyWidth}
 						animator={this.animator}

@@ -10,7 +10,7 @@ import SquishContext from './SquishContext.js';
 
 import startIcon from './waveViewIcons/start2.png';
 import stopIcon from './waveViewIcons/stop3.png';
-import singleStepIcon from './waveViewIcons/singleStep2.png';
+import runningIcon from './waveViewIcons/runningIcon.png';
 
 
 let traceContext = false;
@@ -55,14 +55,14 @@ function StartStopOverlay(props) {
 		if (traceStartStop) console.log(`🛑 was integrating, making stop button`);
 		ssButton = <button className='startStopWidget stopButton' onClick={cp.stopAnimating}
 					alt='🛑 stop integrating' title='🛑 stop integrating' >
-			<img onMouseDown={preventDragAway} src={stopIcon} />
+			<img src={stopIcon}  style={{width: '1em'}}/>
 		</button>
 	}
 	else {
 		if (traceStartStop) console.log(`🟩 integration is stopped, making start button`);
 		ssButton = <button className='startStopWidget startButton' onClick={cp.startAnimating}
 				alt='🟩 begin integrating'  title='🟩 begin integrating' >
-			<img onMouseDown={preventDragAway} src={startIcon} />
+			<img src={startIcon}  style={{width: '1em'}} />
 		</button>
 	}
 
@@ -77,10 +77,8 @@ function StartStopOverlay(props) {
 				alt={helpRunning} title={helpRunning} onMouseMove={preventDragAway}
 				onMouseDown={cp.startAnimating}
 				onMouseUp={cp.stopAnimating} onMouseLeave={cp.stopAnimating}>
+			<img	src={runningIcon} style={{width: '2em'}}/>
 		</button>
-		<img onMouseDown={cp.startAnimating}
-			onMouseUp={cp.stopAnimating} onMouseLeave={cp.stopAnimating}
-			src={singleStepIcon} />
 
 	</section>;
 }
