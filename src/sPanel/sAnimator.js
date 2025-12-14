@@ -37,9 +37,8 @@ const abs = Math.abs;
 class sAnimator {
 
 	// sqPanel is SquishPanel actual component obj
-	constructor(sqPanel, setShouldBeIntegrating, getContext) {
+	constructor(sqPanel, getContext) {
 		this.sqPanel = sqPanel;
-		this.setShouldBeIntegrating = setShouldBeIntegrating;
 		this.getContext = getContext;
 
 		// will still need grinder, mainRepaint(), available later in SquishPanel
@@ -233,7 +232,7 @@ class sAnimator {
 
 		// an error (eg divergence) will halt integration.  Start Over will put it back.
 		console.log(`🎥 sAnimator: hadException   will dialog`);
-		this.context.controlPanel.stopAnimating();
+		this.getContext().controlPanel.stopAnimating();
 		this.errorMessage = qeFuncs.grinder_getExceptionMessage(this.grinder.pointer);
 		if (!this.errorMessage) this.errorMessage = 'sorry, no message.  🫦 🥺';
 		console.error(`had Exception!  '${this.errorMessage}'  ex=${this.grinder.hadException} `);
@@ -252,7 +251,7 @@ class sAnimator {
 
 	// do the grind for this time around
 	rAFIntegrate() {
-		if (!this.context.shouldBeIntegrating) return;
+		if (!this.getContext().shouldBeIntegrating) return;
 
 		// do the integration, one  frame = one video frame
 		//this.frameProgress += this.avgVideoFP;
@@ -268,7 +267,7 @@ class sAnimator {
 		// 	// 'single' frames - whatever the count is.  or we just go around again
 		// 	if (0 == this.nFramesToGo--) {
 		// 		// we're done
-		// 		this.context.controlPanel.stopAnimating();
+		// 		this.getContext().controlPanel.stopAnimating();
 		// 		if (traceSingleFrame) console.log(`🎥 stopped single frame 🟥`);
 		// 	}
 		// }
@@ -286,12 +285,12 @@ class sAnimator {
 	// do one frame - one video frame's worth of integration & whatever
 	rAFFrame() {
 		if (traceEachRaf) {
-			console.log(`🎥 another rAF ctx.sbi=${this.context.shouldBeIntegrating}, `
+			console.log(`🎥 another rAF ctx.sbi=${this.getContext().shouldBeIntegrating}, `
 			+` gr.sbi=${this.grinder.shouldBeIntegrating}, `
 			+` gr.isIntegrating=${this.grinder.isIntegrating}`);
 		}
 
-		//this.context = this.getContext();
+		//this.getContext() = this.getContext();
 		if (this.grinder) {
 			this.rAFDivergence();
 			this.rAFExceptions();
