@@ -64,7 +64,7 @@ function CPToolbar(props) {
 
 	// it displays the resolutioin, so it's natural for someone to click on it
 	const clickResolution = ev => {
-		setShowingTab('space');
+		props.setShowingTab('space');
 	}
 
 	return <div className='CPToolbar'>
