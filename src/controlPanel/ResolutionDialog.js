@@ -25,7 +25,9 @@ export default class ResolutionDialog extends React.Component {
 		checkPropTypes(this.constructor.propTypes, props, 'prop', this.constructor.name);
 
 		// this is the state in the dialog; will be used to recreate space upon OK().
+		// It gets it from local storage, spaceParams.
 		// Therefore, initial values set from storage = current settings.
+		// Then, when it restarts, thee params are used to create the space.
 		let N = getASetting('spaceParams', 'N');
 		this.state = {
 			N,
@@ -42,7 +44,7 @@ export default class ResolutionDialog extends React.Component {
 	static me = this;
 
 	// open the Resolution dialog specifically, passing in the callbacks
-	static openResDialog(okCallback, cancelCallback = () => {}) {
+	static openResDialog(okCallback = () => {}, cancelCallback = () => {}) {
 		// no more than 1 resolution dialog open at a time so I can store this stuff here
 		ResolutionDialog.okCallback = okCallback;
 		ResolutionDialog.cancelCallback = cancelCallback;

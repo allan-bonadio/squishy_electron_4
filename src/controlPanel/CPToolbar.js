@@ -8,6 +8,7 @@ import PropTypes from 'prop-types';
 import eSpace from '../engine/eSpace.js';
 //import {ShowVoltageControl} from './SetVoltageTab.js';
 import qeConsts from '../engine/qeConsts.js';
+import ResolutionDialog from './ResolutionDialog.js';
 
 let traceCPToolbar = false;
 
@@ -57,14 +58,20 @@ function CPToolbar(props) {
 	cfpt(propTypes, props);
 	if (traceCPToolbar)
 		dbLog(`🧰 CPToolbar starts.  props=`, props);
-	let {chosenRate, setChosenRate} = props;
+	let {chosenRate, setChosenRate, setShowingTab} = props;
 
 	// for the old buttons - obsolete
 	let runningClass = props.shouldBeIntegrating ? 'running' : '';
 
 	// it displays the resolutioin, so it's natural for someone to click on it
+<<<<<<< HEAD
 	const clickResolution = ev => {
 		props.setShowingTab('space');
+=======
+	const resolutionHandler = ev => {
+		setShowingTab('space');
+		ResolutionDialog.openResolutionDialog();
+>>>>>>> 495c032d5e14767f28dd4c4e736fc35db3a36624
 	}
 
 	return <div className='CPToolbar'>
@@ -81,9 +88,18 @@ function CPToolbar(props) {
 
 		<span className='toolSpacer' style={{width: '.3em'}}></span>
 
+<<<<<<< HEAD
 		<button className='toolbarWidget resolutionBox' onClick={clickResolution} >
 			resolution {props.N ?? '...'} &nbsp;
 		</button>
+=======
+
+		<div className='toolbarWidget'>
+			<button className='toolbarWidget resolutionBox' onClick={resolutionHandler} >
+				resolution {props.N ?? '...'}
+			</button>
+		</div>
+>>>>>>> 495c032d5e14767f28dd4c4e736fc35db3a36624
 
 		<div className='toolbarWidget'>
 				<button onClick={props.startOverHandler}>Start Over</button>
