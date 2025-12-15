@@ -21,7 +21,7 @@ import {interpretCppException, wrapForExc} from '../utils/errors.js';
 import SquishContext from '../sPanel/SquishContext.js';
 
 let traceSetPanels = false;
-let traceStartStop = true;
+let traceBeginFinish = true;
 let traceContext = false;
 
 // integrations always need specific numbers of steps.  But there's always one
@@ -85,13 +85,13 @@ export class ControlPanel extends React.Component {
 			return;
 		}
 		let cp = this.context.controlPanel;
-		if (cp && cp.startAnimating)
+		if (cp && cp.beginAnimating)
 			return;  // already done
 
 		// new cp object
 		cp = {
-			startAnimating: this.startAnimating,
-			stopAnimating: this.stopAnimating,
+			beginAnimating: this.beginAnimating,
+			finishAnimating: this.finishAnimating,
 			startStop: this.startStop,
 			startRunning: this.startRunning,
 			stopRunning: this.stopRunning,
@@ -126,9 +126,9 @@ export class ControlPanel extends React.Component {
 		// context is the RIGHT way to do it, but sometimes the context changes
 		// take until the next cycle (?)
 		if (this.context.shouldBeIntegrating)
-			this.startAnimating();
+			this.beginAnimating();
 
-		if (traceStartStop) {
+		if (traceBeginFinish) {
 			// Note: the state won't kick in until next render
 			console.log(`🎛️ ControlPanel constructor & context initialized with space, `
 			+` ctx.shouldBeIntegrating=${this.context.shouldBeIntegrating}, `
@@ -183,16 +183,16 @@ export class ControlPanel extends React.Component {
 	// calling start/stop animating functions here. the C++ will copy it
 	// to isIntegrating at the right  time
 	// ev is optional and only for the trace msg
-	startAnimating =
+	beginAnimating =
 	(ev) => {
 		if (!this.space) return;  // too early.  mbbe should gray out the button?
 
-		if (traceStartStop)
-			console.log(`🎛️ startAnimating starts, triggering iteration, `, ev);
+		if (traceBeginFinish)
+			console.log(`🎛️ beginAnimating starts, triggering iteration, `, ev);
 		this.props.setShouldBeIntegrating(true);
 
-		if (traceStartStop) {
-			console.log(`🎛️ ControlPanel startAnimating,`
+		if (traceBeginFinish) {
+			console.log(`🎛️ ControlPanel BeginAnimating,`
 			+` ctx.shouldBeIntegrating=${this.context.shouldBeIntegrating}, `
 			+` gr.shouldBeIntegrating=${this.grinder.shouldBeIntegrating}, `
 			+`isIntegrating=${this.grinder.isIntegrating}   `);
@@ -204,14 +204,14 @@ export class ControlPanel extends React.Component {
 	}
 
 	// ev is optional and only for the trace msg
-	stopAnimating =
+	finishAnimating =
 	(ev) => {
 		if (!this.space) return;  // too early.  mbbe should gray out the button?
 
 		// set it false as you store it in store; then set state.  The threads will figure it out next iteration
 		this.props.setShouldBeIntegrating(false);
 		//this.props.animator.nFramesToGo = 0;
-		if (traceStartStop) console.log(`🎛️ ControlPanel STOP Animating, `
+		if (traceBeginFinish) console.log(`🎛️ ControlPanel FINISH Animating, `
 			+`ctx.shouldBeIntegrating=${this.context.shouldBeIntegrating}, `
 			+` gr.shouldBeIntegrating=${this.grinder.shouldBeIntegrating}, `
 			+`grinder.isIntegrating=${this.grinder.isIntegrating}   , `, ev);
@@ -222,20 +222,20 @@ export class ControlPanel extends React.Component {
 	startStop =
 	ev => {
 		if (this.context.shouldBeIntegrating)
-			this.stopAnimating();
+			this.finishAnimating();
 		else
-			this.startAnimating();
+			this.beginAnimating();
 	}
 
 	// the |> button.
 	startRunning =
 	ev => {
-		startAnimating(ev);
+		beginAnimating(ev);
 	}
 
 	stopRunning =
 	ev => {
-		stopAnimating(ev);
+		finishAnimating(ev);
 	}
 
 // 	startSingleFrame =
@@ -249,7 +249,7 @@ export class ControlPanel extends React.Component {
 //
 // 		this.props.animator.startSingleFrame(nFrames);
 //
-// 		if (traceStartStop) console.log(`🎛️ ControlPanel startSingleFrame,`
+// 		if (traceBeginFinish) console.log(`🎛️ ControlPanel startSingleFrame,`
 // 			+` nFrames=${nFrames}, `
 // 			+` ctx.shouldBeIntegrating=${this.context.shouldBeIntegrating}, `
 // 			+` gr.shouldBeIntegrating=${this.grinder.shouldBeIntegrating}, `
@@ -339,7 +339,7 @@ export class ControlPanel extends React.Component {
 		let waveParams = getAGroup('waveParams');
 		this.setAndPaintMainFamiliarWave(waveParams);
 		this.grinder.hadException = false;
-		this.stopAnimating()
+		this.finishAnimating()
 	}
 
 	// setMainWave() called when user clicks SetWave, fills the main wave

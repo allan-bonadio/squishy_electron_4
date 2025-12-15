@@ -232,7 +232,7 @@ class sAnimator {
 
 		// an error (eg divergence) will halt integration.  Start Over will put it back.
 		console.log(`🎥 sAnimator: hadException   will dialog`);
-		this.getContext().controlPanel.stopAnimating();
+		this.getContext().controlPanel.finishAnimating();
 		this.errorMessage = qeFuncs.grinder_getExceptionMessage(this.grinder.pointer);
 		if (!this.errorMessage) this.errorMessage = 'sorry, no message.  🫦 🥺';
 		console.error(`had Exception!  '${this.errorMessage}'  ex=${this.grinder.hadException} `);
@@ -267,7 +267,7 @@ class sAnimator {
 		// 	// 'single' frames - whatever the count is.  or we just go around again
 		// 	if (0 == this.nFramesToGo--) {
 		// 		// we're done
-		// 		this.getContext().controlPanel.stopAnimating();
+		// 		this.getContext().controlPanel.finishAnimating();
 		// 		if (traceSingleFrame) console.log(`🎥 stopped single frame 🟥`);
 		// 	}
 		// }
@@ -350,7 +350,7 @@ class sAnimator {
 		this.runningDiagnosticCycle = true;
 		this.runningCycleStartingTime = this.grinder.elapsedTime;
 		this.runningCycleStartingSerial = this.frameSerial;
-		this.cPanel.startAnimating();
+		this.cPanel.beginAnimating();
 	};
 
 	// manage runningDiagnosticCycle - called each frame
@@ -366,7 +366,7 @@ class sAnimator {
 					// if we were going up, we've gone just 1 step past the peak.  Good time to stop.
 					this.runningDiagnosticCycle = false;
 
-					ControlPanel.stopAnimating();
+					ControlPanel.finishAnimating();
 
 					this.setState({
 						runningCycleElapsedTime: this.mainAvatar.elapsedTime - this.runningCycleStartingTime,

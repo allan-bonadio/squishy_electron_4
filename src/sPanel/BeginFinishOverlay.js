@@ -1,5 +1,5 @@
 /*
-** Start-Stop Overlay -- pause and resume buttons modeled after youtube
+** Begin-Finish Overlay -- pause and resume buttons modeled after youtube
 ** Copyright (C) 2025-2025 Tactile Interactive, all rights reserved
 */
 
@@ -8,23 +8,23 @@ import PropTypes from 'prop-types';
 
 import SquishContext from './SquishContext.js';
 
-import startIcon from './waveViewIcons/start2.png';
-import stopIcon from './waveViewIcons/stop3.png';
+import beginIcon from './waveViewIcons/begin.png';
+import finishIcon from './waveViewIcons/finish.png';
 import runningIcon from './waveViewIcons/runningIcon.png';
 
 
 let traceContext = false;
-let traceStartStop = false;
+let traceBeginFinish = false;
 
 window.ckSBI = () => {
 
 }
 
 // no props!  does everything thru context.
-function StartStopOverlay(props) {
+function BeginFinishOverlay(props) {
 	const context = useContext(SquishContext);
 	if (traceContext) {
-		console.log(`StartStopOverlay starting context:`,
+		console.log(`BeginFinishOverlay begining context:`,
 				context.setShouldBeIntegrating,
 				context.controlPanel,
 				context.waveView);
@@ -33,41 +33,41 @@ function StartStopOverlay(props) {
 	if (!cp)
 		return null;
 
-	// function startStopHandler(ev) {
-	// 	cp.startStop?.(ev);
+	// function beginFinishHandler(ev) {
+	// 	cp.beginFinish?.(ev);
 	// }
-	// function startRunning(ev) {
-	// 	cp.startRunning?.(ev);
+	// function beginRunning(ev) {
+	// 	cp.beginRunning?.(ev);
 	// }
-	// function stopRunning(ev) {
-	// 	cp.stopRunning?.(ev);
+	// function finishRunning(ev) {
+	// 	cp.finishRunning?.(ev);
 	// }
-	// function startSingleFrameHandler(ev) {
-	// 	cp.startSingleFrame?.(ev);
+	// function beginSingleFrameHandler(ev) {
+	// 	cp.beginSingleFrame?.(ev);
 	// }
 	function preventDragAway(ev) {
 		ev.preventDefault();
 	}
 
-	const helpRunning = 'Runs while you hold down this button; release to stop.';
+	const helpRunning = 'Runs while you hold down this button; release to finish.';
 	let ssButton;
 	if (context.shouldBeIntegrating) {
-		if (traceStartStop) console.log(`🛑 was integrating, making stop button`);
-		ssButton = <button className='startStopWidget stopButton' onClick={cp.stopAnimating}
-					alt='🛑 stop integrating' title='🛑 stop integrating' >
-			<img src={stopIcon}  style={{width: '1em'}}/>
+		if (traceBeginFinish) console.log(`🛑 was integrating, making finish button`);
+		ssButton = <button className='beginFinishWidget finishButton' onClick={cp.finishAnimating}
+					alt='🛑 finish integrating' title='🛑 finish integrating' >
+			<img src={finishIcon}  style={{width: '1em'}}/>
 		</button>
 	}
 	else {
-		if (traceStartStop) console.log(`🟩 integration is stopped, making start button`);
-		ssButton = <button className='startStopWidget startButton' onClick={cp.startAnimating}
+		if (traceBeginFinish) console.log(`🟩 integration is finishped, making begin button`);
+		ssButton = <button className='beginFinishWidget beginButton' onClick={cp.beginAnimating}
 				alt='🟩 begin integrating'  title='🟩 begin integrating' >
-			<img src={startIcon}  style={{width: '1em'}} />
+			<img src={beginIcon}  style={{width: '1em'}} />
 		</button>
 	}
 
-	// the start/stop icon toggles depending on state
-	return <section className='StartStopOverlay waveButtonPanel' >
+	// the begin/finish icon toggles depending on state
+	return <section className='BeginFinishOverlay waveButtonPanel' >
 		{ssButton}
 
 		<span style={{width: '2em', display: 'inline-block'}} />
@@ -75,25 +75,13 @@ function StartStopOverlay(props) {
 		{/* longer running button; runs as long as you hold it down */}
 		<button className='runningWidget'
 				alt={helpRunning} title={helpRunning} onMouseMove={preventDragAway}
-				onMouseDown={cp.startAnimating}
-				onMouseUp={cp.stopAnimating} onMouseLeave={cp.stopAnimating}>
+				onMouseDown={cp.beginAnimating}
+				onMouseUp={cp.finishAnimating} onMouseLeave={cp.finishAnimating}>
 			<img	src={runningIcon} style={{width: '2em'}}/>
 		</button>
 
 	</section>;
 }
 
-export default StartStopOverlay;
-
-//		<img className='pauseWidget' src={pauseIcon} alt='pause button'
-//			onMouseClick={this.pauseHandler} />
-//
-//		<img className='upDownWidget' src={upDownIcon} alt='upDown button'
-//			onMouseClick={this.upDownHandler} />
-
-//
-//singleStep2.png
-//pause2.png
-//start2.png
-//upDown2.png
+export default BeginFinishOverlay;
 
