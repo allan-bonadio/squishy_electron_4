@@ -36,10 +36,13 @@ You might think that these things bang violently from one side to another, but, 
 The way we describe these things mathematically is with trig functions: sine and cosine.
 <img src=sinAndCos.png class=one />
 Sine and cosine are a quarter circle apart (or π/2 or 90°).
-You need both of them, for instance, for going in a circle.
-The sine can be up-down, and the cosine can be left-right.
+You need both of them.
 
 <img src=sinCosAll4.png class=one />
+
+, for instance, for going in a circle.
+The sine can be up-down, and the cosine can be left-right
+
 
 
 With a guitar string, some guitar player pulls on a string and then lets go.
