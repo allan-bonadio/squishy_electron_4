@@ -495,6 +495,11 @@ export class ControlPanel extends React.Component {
 			<CPToolbar
 				chosenRate={1000. / s.chosenFP}
 				setChosenRate={this.setChosenRate}
+
+				dtStretch={this.state.dtStretch}
+				setDtStretch={this.setDtStretch}
+
+
 				setShowingTab={this.setShowingTab}
 
 				shouldBeIntegrating={this.context.shouldBeIntegrating ?? false}

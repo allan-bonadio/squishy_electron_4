@@ -35,6 +35,8 @@ function optionForFreq(rate) {
 const propTypes = {
 	chosenRate: PropTypes.number.isRequired,
 	setChosenRate: PropTypes.func.isRequired,
+	dtStretch: PropTypes.number.isRequired,
+	setDtStretch: PropTypes.func.isRequired,
 
 	startOverHandler: PropTypes.func.isRequired,
 	resetVoltageHandler: PropTypes.func.isRequired,
@@ -63,6 +65,22 @@ function CPToolbar(props) {
 	// for the old buttons - obsolete
 	let runningClass = props.shouldBeIntegrating ? 'running' : '';
 
+	// spare icons: 🐌🐢🐎  🐇 🌪️
+
+	// the rabbit and tortoise buttons
+	const speedHandler = ev => {
+		ResolutionDialog.openResolutionDialog();
+	}
+
+	const speedControl = () => <div className='toolbarWidget'>
+		<button className='toolbarWidget speedButton' onClick={speedHandler} >
+			🐢
+		</button>
+		<button className='toolbarWidget speedButton' onClick={speedHandler} >
+			🐇
+		</button>
+	</div>;
+
 	// it displays the resolutioin, so it's natural for someone to click on it
 	const resolutionHandler = ev => {
 		setShowingTab('space');
@@ -70,16 +88,8 @@ function CPToolbar(props) {
 	}
 
 	return <div className='CPToolbar'>
-		<div className='toolbarWidget'>
-			frame rate:
-		</div>
 
-		<div className='toolbarWidget'>
-			<select className='rateSelector' name='rateSelector' value={chosenRate}
-					onChange={ev => setChosenRate(ev.currentTarget.value)} >
-				{rateOptions}
-			</select>
-		</div>
+		{speedControl()}
 
 		<span className='toolSpacer' style={{width: '.3em'}}></span>
 
@@ -104,3 +114,15 @@ function CPToolbar(props) {
 
 
 export default CPToolbar;
+
+//
+//		<div className='toolbarWidget'>
+//			frame rate:
+//		</div>
+//
+//		<div className='toolbarWidget'>
+//			<select className='rateSelector' name='rateSelector' value={chosenRate}
+//					onChange={ev => setChosenRate(ev.currentTarget.value)} >
+//				{rateOptions}
+//			</select>
+//		</div>
