@@ -62,12 +62,6 @@ class SquishPanel extends React.Component {
 		};
 		// see above this.#shouldBeIntegrating = false;
 
-	me = this;
-
-////me.state = this.state;
-
-
-
 		// animator will still need grinder, mainRepaint() and context,
 		// which don't exist yet.  Each will be on this.whatever
 		this.animator = new sAnimator(this, this.getContext);

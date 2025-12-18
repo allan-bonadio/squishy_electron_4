@@ -10,7 +10,7 @@ description: How waves work in nature
 		width: 300px;
 		height: 150px;
 		float: none;
-		margin: 1em;
+		margin-block: 1em;
 	}
 	img.one {
 		margin-inline: auto;

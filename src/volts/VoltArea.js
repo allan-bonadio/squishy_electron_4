@@ -258,7 +258,7 @@ function VoltArea(props) {
 		else {
 			// just a mouse release, not on anything else, can stop animation (but not start it again)
 			if (context.shouldBeIntegrating)
-				context.controlPanel.stopAnimating(ev);
+				context.controlPanel.finishAnimating(ev);
 		}
 	}
 

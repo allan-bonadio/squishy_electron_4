@@ -22,7 +22,7 @@ import {WELL_BUMPER_WIDTH} from '../volts/voltConstants.js';
 import GLScene from '../gl/GLScene.js';
 import {eSpaceCreatedPromise} from '../engine/eEngine.js';
 import SquishContext from './SquishContext.js';
-import StartStopOverlay from './StartStopOverlay.js';
+import BeginFinishOverlay from './BeginFinishOverlay.js';
 import resizeIcon from './waveViewIcons/resize.png';
 
 let traceBumpers = false;
@@ -387,7 +387,7 @@ export class WaveView extends React.Component {
 		return (
 		<div className='WaveView' style={{height: `${s.outerHeight}px`}}
 			onPointerEnter={this.hoverEnter} onPointerLeave={this.hoverLeave}
-			onPointerUp={this.stopIntegration}
+			onPointerUp={this.finishIntegration}
 			ref={this.grabWaveViewEl}>
 
 			{glScene}
@@ -410,7 +410,7 @@ export class WaveView extends React.Component {
 
 				{voltOverlay}
 
-				<StartStopOverlay />
+				<BeginFinishOverlay />
 
 				<img className='sizeBox' src={resizeIcon} alt='size box'
 					onPointerDown={this.resizePointerDown} onPointerUp={this.resizePointerUp}

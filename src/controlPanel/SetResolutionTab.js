@@ -29,12 +29,12 @@ function SetResolutionTab(props) {
 			// freeze the frame while this is going on ... without disturbing the
 			// context or SP state, we'll probably reload the page soon anyway
 			const timeWasAdvancing = context.shouldBeIntegrating;
-			context.controlPanel.stopAnimating();
+			context.controlPanel.finishAnimating();
 
 			ResolutionDialog.openResolutionDialog();
 
 			if (timeWasAdvancing)
-				context.controlPanel.startAnimating();
+				context.controlPanel.beginAnimating();
 		}
 	}
 
