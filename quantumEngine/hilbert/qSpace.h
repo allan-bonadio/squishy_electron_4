@@ -106,8 +106,9 @@ public:
 	// alpha for convergence https://en.wikipedia.org/wiki/FTCS_scheme#Stability
 	double alpha;
 
-	// picoseconds per step (re, im, re, im cycle of steps recommended for convergence
-	double dt;
+	// picoseconds per step (re, im, re, im ) cycle of steps recommended for convergence
+	// actual dt is this times dtFactor
+	double refDt;
 
 	// number of  dimensions actually used, always <= MAX_DIMENSIONS
 	// do not confuse with nStates or nPoints

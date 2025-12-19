@@ -116,14 +116,14 @@ void qSpace::tallyDimensions(void) {
 	for (int dd = nDimensions-1; dd >= 0; dd--) {
 		dimensions[dd].tally(this);
 	}
-	dt = 1 / (2 * alpha);
+	refDt = 1 / (2 * alpha);
 
 	spectrumLength = dimensions[0].spectrumLength;
 
 	if (traceQSpace) {
-		printf("🚀  got past tallyDimensions; nStates=%d  nPoints=%d\n", nStates, nPoints);
-		printf("   d2Coeff=%lf  alpha=%lf /ps  dt=%lf ps\n",
-			dimensions[0].d2Coeff, alpha, dt);
+		printf("🚀  got past tallyDimensions; nStates=%d  nPoints=%d ", nStates, nPoints);
+		printf("   d2Coeff=%lf  alpha=%lf /ps  refDt=%lf\n",
+			dimensions[0].d2Coeff, alpha, refDt);
 	}
 }
 
@@ -180,7 +180,7 @@ void qSpace::formatDirectOffsets(void) {
 
 	/* *********************************************** scalars */
 
-	makeDoubleGetter(dt);
+	makeDoubleGetter(refDt);
 
 	makeIntGetter(nDimensions);
 	makeIntGetter(spectrumLength);
@@ -231,8 +231,8 @@ void qSpace::dumpSpace(void) {
 		dimensions[d].dumpDimension();
 	}
 
-	printf("magic=" MAGIC_FORMAT ", alpha=%lg.4, dt=%lg.4, nStates=%d, nPoints=%d, spectrumLength=%d",
-			MAGIC_ARGS, 	alpha, 	dt, 	nStates, 	nPoints, 	spectrumLength);
+	printf("magic=" MAGIC_FORMAT ", alpha=%lg.4, refDt=%lg.4, nStates=%d, nPoints=%d, spectrumLength=%d",
+			MAGIC_ARGS, 	alpha, 	refDt, 	nStates, 	nPoints, 	spectrumLength);
 
 	printf("qDimension length: %lul   qSpace length: %lul\n", sizeof(qDimension), sizeof(qSpace));
 

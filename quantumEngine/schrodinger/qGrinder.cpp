@@ -210,8 +210,8 @@ void qGrinder::dumpObj(const char *title) {
 	speedyLog("        magic: " MAGIC_FORMAT "   qSpace=%p '%s'   \n",
 		MAGIC_ARGS, space, label);
 
-	speedyLog("        elapsedTime=%lf, frameSerial=%d, dt=%lf, \n",
-		elapsedTime, frameSerial, space->dt);
+	speedyLog("        elapsedTime=%lf, frameSerial=%d, refDt=%lf, \n",
+		elapsedTime, frameSerial, space->refDt);
 
 	speedyLog("        flick=%p, voltage=%p, spect=%p\n",
 		flick, voltage, spect);
@@ -325,6 +325,7 @@ void qGrinder::oneFrame() {
 	qCx *wave1 = flick->waves[1];
 	qCx *wave2 = flick->waves[2];
 
+	// this is the actual dt in use for calculations, refDt * dtFactor
 	double dt = stretchedDt;
 	double dtHalf = dt / 2;
 
@@ -371,8 +372,8 @@ void qGrinder::oneFrame() {
 
 	if (traceIntegration) {
 		speedyLog("🪓 qGrinder::oneFrame() done; shouldBeIntegrating: %hhu   isIntegrating: %hhu \n"
-			"  dt in use=%lf  stretchedDt=%8.6lf stepsPerFrame=%d  wave0[5]=%lf\n",
-			shouldBeIntegrating, isIntegrating, dt, stretchedDt, stepsPerFrame,
+			"  refDt=%lf  stretchedDt=%8.6lf stepsPerFrame=%d  wave0[5]=%lf\n",
+			shouldBeIntegrating, isIntegrating, space->refDt, stretchedDt, stepsPerFrame,
 			wave0[5]);
 	}
 

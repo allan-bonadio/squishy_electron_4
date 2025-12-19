@@ -119,7 +119,7 @@ export class ControlPanel extends React.Component {
 		this.mainFlick = space.mainFlick;
 
 		this.grinder = space.grinder;
-		this.grinder.stretchedDt = this.state.dtStretch * this.space.dt;
+		// no!  per-frame or per-step!  space.refDtthis.grinder.stretchedDt = this.state.dtFactor * this.space.refDt;
 
 		this.setUpContext();
 
@@ -418,18 +418,29 @@ export class ControlPanel extends React.Component {
 
 	/* ********************************************** integration tab */
 
-	// dt is time per step, stretchedDt is stretched, ready to use
-	setDtStretch = dtStretch => {
-		dtStretch = storeASetting('frameSettings', 'dtStretch', dtStretch);
-		this.setState({dtStretch});
-		this.grinder.stretchedDt = dtStretch * this.space.dt;
-		console.log(`🎛️ setDtStretch: dt = ${this.space.dt}   dtStretch= ${dtStretch} stretchedDt=${this.grinder.stretchedDt}`)
+	getQuickDtFactor() {
+		this.quickDtFactor = getASetting('frameSettings', 'dtFactor');
+	}
+
+	// dtFactor we multiply on to get effective dt, ready to use.
+	// This function changes dtFactor quickly,wher3eas
+	setQuickDtFactor = dtFactor => {
+		this.quickDtFactor = dtFactor;
+		this.grinder.stretchedDt = dtFactor * this.space.refDt;
+		console.log(`🎛️ setQuickDtFactor: refDt = ${this.space.refDt}   dtFactor= ${dtFactor} stretchedDt=${this.grinder.stretchedDt}`)
+	}
+
+	// called after the mouseUp event, to save it longer than the speed buttons
+	saveDtFactor() {
+		dtFactor = storeASetting('frameSettings', 'dtFactor', dtFactor);
+		this.setState({dtFactor});
+
 	}
 
 	makeIntegrationTab = () => {
 		return <SetIntegrationTab
-			dtStretch={this.state.dtStretch}
-			setDtStretch={this.setDtStretch}
+			dtFactor={this.state.dtFactor}
+			setDtFactor={this.setDtFactor}
 
 			N={this.N}
 		/>;
@@ -496,8 +507,8 @@ export class ControlPanel extends React.Component {
 				chosenRate={1000. / s.chosenFP}
 				setChosenRate={this.setChosenRate}
 
-				dtStretch={this.state.dtStretch}
-				setDtStretch={this.setDtStretch}
+				dtFactor={this.state.dtFactor}
+				setDtFactor={this.setDtFactor}
 
 
 				setShowingTab={this.setShowingTab}

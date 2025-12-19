@@ -1,5 +1,5 @@
 /*
-** SetIntegrationTab -- tab for adjusting dtStretch, etc
+** SetIntegrationTab -- tab for adjusting dtFactor, etc
 ** Copyright (C) 2022-2025 Tactile Interactive, all rights reserved
 */
 
@@ -19,8 +19,8 @@ const propTypes = {
 			dimensions: PropTypes.arrayOf(PropTypes.object).isRequired,
 		}),
 
-		dtStretch: PropTypes.number.isRequired,
-		setDtStretch: PropTypes.func.isRequired,
+		dtFactor: PropTypes.number.isRequired,
+		setDtFactor: PropTypes.func.isRequired,
 		//stepsPerFrame: PropTypes.number.isRequired,
 		//setStepsPerFrame: PropTypes.func.isRequired,
 		//lowPassFilter: PropTypes.number.isRequired,
@@ -46,8 +46,8 @@ function SetIntegrationTab(props) {
 
 	// Unlike other tabs, all these are instant-update.
 
-	let mini = alternateMinMaxs.frameSettings.dtStretch.min;
-	let maxi = alternateMinMaxs.frameSettings.dtStretch.max;
+	let mini = alternateMinMaxs.frameSettings.dtFactor.min;
+	let maxi = alternateMinMaxs.frameSettings.dtFactor.max;
 
 	return (<div className='SetIntegrationTab controlPanelPanel'>
 		<div className='sliderBlock'>
@@ -65,21 +65,21 @@ function SetIntegrationTab(props) {
 			</p>
 
 			<LogSlider
-				unique='dtStretchSlider'
-				className='dtStretchSlider cpSlider'
+				unique='dtFactorSlider'
+				className='dtFactorSlider cpSlider'
 				label='stretch factor for ∆t'
 				minLabel={mini}
 				maxLabel={maxi}
 
-				current={props.dtStretch}
+				current={props.dtFactor}
 				sliderMin={mini}
 				sliderMax={maxi}
 				stepsPerDecade={6}
 
 				handleChange={(power, ix) => {
 					if (traceSliderChanges)
-						console.log(`🏃🏽 🏃🏽 ch dtStretch ix=${ix}  power=${power}`);
-					props.setDtStretch(power);
+						console.log(`🏃🏽 🏃🏽 ch dtFactor ix=${ix}  power=${power}`);
+					props.setDtFactor(power);
 				}}
 			/>
 

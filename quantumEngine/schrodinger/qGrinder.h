@@ -161,7 +161,7 @@ struct qGrinder {
 
 	/* ************************* grinding & integrating */
 
-	// = dtStretch * space->dt
+	// = dtFactor * space->dt
 	double stretchedDt;
 
 	// this is ℏ / 2 m_e dx², the coefficient on Schrodinger's for the second
