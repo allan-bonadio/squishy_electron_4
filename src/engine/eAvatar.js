@@ -8,7 +8,7 @@ import {cppObjectRegistry, prepForDirectAccessors} from '../utils/directAccessor
 import qeFuncs from './qeFuncs.js';
 import qeConsts from './qeConsts.js';
 
-let traceCreation = true;
+let traceCreation = false;
 //let traceHighest = false;
 let traceVBuffer = false;
 

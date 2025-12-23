@@ -11,12 +11,12 @@
 
 static const bool traceViewBuffer = false;
 static const bool traceHighest = false;
-static const bool traceInDetail = false;
+static const bool traceInDetail = false;  // blow-by-blow, verbose
 static const bool traceWaveDump = false;  // dumps it; verbose
 
 
 
-// copy the numbers in our qAvatar's cavity into this fArray
+// copy the numbers in the qCavity into the  qAvatar's fArray at this buffer index, 0...3 or beyond
 // one row per vertex, two rows per wave datapoint.
 // each row of 4 floats looks like this:
 //     real   imaginary    voltage    serial

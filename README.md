@@ -1,29 +1,27 @@
 Squishy Electron
 ================
 
-This project is at alpha quality.  (I like doing it all myself.)
+This project is at beta quality.  (roughly)
 
 [You can see a running version here](https://squish.tactileint.org)
-
-To see it with the intro, https://127.0.0.1:6600?intro=1 in development mode or https://squish.tactileint.org?intro=1 for production
 
 
 Requirements for Running
 ========================
 
-The most important factor is your browser, and what features it supports.  I've given years rather than version numbers; most modern mainstream browsers should support all of these if they are reasonably up to date.  Older browsers should be able run it:
+The most important factor is your browser, and what features it supports.  I've given years rather than version numbers; most modern mainstream browsers should support all of these if they are reasonably up to date.  Some older browsers should be able to run it:
 - Chrome dated 2017 or later
 - Firefox dated 2017 or later
-- Safari (both) dated 2020-21 or later
+- Safari (MacOS or iOS) dated 2020-21 or later
 - Edge dated 2020-21 or later
 - Android browsers dated 2016-2020, depending on your browser
 
-Should be.  I've only tested it on macos and iPhone.
+Should be.  I've only tested it on macos and iPhone.  Mostly macos in Chrome.  I know.  When people complain, I'll start testing it in the other situations.
 
 Versions
 ========
 
-v3 refers to the previous SquishyElectron project. (obsolete)
+v3 refers to the previous SquishyElectron project. (very obsolete)
 v4 is squishy_electron_4, this project, v0.4 and later.
 
 Files

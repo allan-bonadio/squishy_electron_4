@@ -85,6 +85,8 @@ int usedIx, infrequent = 0;  // trace only
 // future) accesses the points on each side of the point, too.
 
 void qGrinder::pointReal(qCx *newW, qCx *oldW, qCx *hamiltW, double volts, double dt) {
+	// printf("dt=%12.6lf  refDt=%12.6lf\n", dt, space->refDt);
+
 	// second deriv wrt x of psi, multiplied by that coeff
 	double d2𝜓i = (hamiltW[-1].im + hamiltW[+1].im - hamiltW->im * 2) * d2Coeff;
 
@@ -227,7 +229,7 @@ void qGrinder::stepMidpoint(qCx *newW, qCx *oldW, qCx *scratch, double dt) {
 	}
 
 	// and that's the midpoint method
-	if (traceMidpoint) speedyLog("🧶 end of stepMidpoint");
+	if (traceMidpoint) speedyLog("🧶 end of stepMidpoint  dt was %lf", dt);
 
 }
 
