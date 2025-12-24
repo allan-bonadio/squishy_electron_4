@@ -25,7 +25,7 @@ static bool traceSpaceCreation = false;
 // NO waves or buffers will be allocated for you.
 // Use the functions in jsSpace.cpp to do  practical constructions.
 qSpace::qSpace(const char *lab)
-	: magic('Spac'), nDimensions(0), voltage(NULL), nPoints(0), nStates(0) {
+	: magic('Spac'), refDt(1e-20), nDimensions(0), voltage(NULL), nPoints(0), nStates(0) {
 
 	if (traceQSpace) {
 		printf("🚀 🚀 qSpace::qSpace() constructor starts. label:'%s'  this= %p\n",
@@ -181,6 +181,7 @@ void qSpace::formatDirectOffsets(void) {
 	/* *********************************************** scalars */
 
 	makeDoubleGetter(refDt);
+	makeDoubleSetter(refDt);
 
 	makeIntGetter(nDimensions);
 	makeIntGetter(spectrumLength);

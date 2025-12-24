@@ -127,7 +127,8 @@ export class eSpace {
 	get nStates() { return this.ints[51]; }
 	get nPoints() { return this.ints[52]; }
 	get dimLength() { return this.doubles[4]; }
-	get dt() { return this.doubles[24]; }
+	get refDt() { return this.doubles[24]; }
+	set refDt(a) { this.doubles[24] = a; }
 	get nDimensions() { return this.ints[50]; }
 	get spectrumLength() { return this.ints[53]; }
 	get _mainFlick() { return this.ints[54]; }
