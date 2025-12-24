@@ -23,12 +23,13 @@ let pointSize = traceDrawPoints ? `gl_PointSize = 10.;` : '';
 let displayWrapEdges = false;  // soon to be a pref
 
 /* ******************************************************* flat drawing */
+// The glsl sources for webgl drawing
 
 /*
 ** data format of attributes:  four column table of floats
-** 𝜓.re  𝜓.im   (voltage unused)    ...0?...
-** uses gl_VertexID to figure out whether the y should be re^2+im^2  NO! opengl 2 only
-** or zero
+** 𝜓.re  𝜓.im   (unused)   serial.
+** uses gl_VertexID   NO! that's opengl 2 only
+** to figure out whether the y should be re^2+im^2 or zero
 */
 
 // make the line number for the start correspond to this JS file line number - the NEXT line
@@ -124,7 +125,7 @@ export class flatDrawing extends abstractDrawing {
 
 				if (traceMaxHeight)
 					console.log(`♭♭♭ flatDrawing reloading outer:  `
-						+` maxHeight=${this.avatar.maxHeight.toFixed(5)} `);
+						+` maxHeight=${this.avatar.double0.toFixed(5)} `);
 
 				return {value: this.maxHeight * PADDING_ON_BOTTOM, type: '1f'};
 			}
