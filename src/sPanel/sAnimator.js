@@ -17,7 +17,7 @@ let traceHeartbeats = false;
 //let traceFrameProgress = false;
 let traceFrameMenuRates = false;
 let traceSingleFrame = false;
-let traceIntegration = true;
+let traceIntegration = false;
 
 let tracerAFPeriod = false;
 let traceTypicalVideoPeriod = false;
@@ -44,7 +44,7 @@ class sAnimator {
 		// will still need grinder, mainRepaint(), available later in SquishPanel
 
 		//this.frameProgress = 0;  // part of the FP stabilization
-		this.chosenFP = getASetting('frameSettings', 'chosenFP')
+		//this.chosenFP = getASetting('frameSettings', 'chosenFP')
 		//this.nFramesToGo = 0;
 
 		// defaults - will work until set by real life

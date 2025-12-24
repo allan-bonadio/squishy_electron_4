@@ -58,39 +58,41 @@ class eGrinder {
 	get _voltage() { return this.ints[4]; }
 	get _spect() { return this.ints[5]; }
 	get _stage() { return this.ints[2]; }
+
 	get stepsPerFrame() { return this.ints[7]; }
 	set stepsPerFrame(a) { this.ints[7] = a; }
 	get videoFP() { return this.doubles[4]; }
 	set videoFP(a) { this.doubles[4] = a; }
-	get chosenFP() { return this.doubles[5]; }
-	set chosenFP(a) { this.doubles[5] = a; }
-	get totalCalcTime() { return this.doubles[6]; }
-	get maxCalcTime() { return this.doubles[7]; }
-	get stretchedDt() { return this.doubles[8]; }
-	set stretchedDt(a) { this.doubles[8] = a; }
-	get divergence() { return this.doubles[10]; }
-	get elapsedTime() { return this.doubles[11]; }
-	set elapsedTime(a) { this.doubles[11] = a; }
+	get totalCalcTime() { return this.doubles[5]; }
+	get maxCalcTime() { return this.doubles[6]; }
+
+	get stretchedDt() { return this.doubles[7]; }
+	set stretchedDt(a) { this.doubles[7] = a; }
+	get divergence() { return this.doubles[9]; }
+	get elapsedTime() { return this.doubles[10]; }
+	set elapsedTime(a) { this.doubles[10] = a; }
 	get frameSerial() { return this.ints[6]; }
 	set frameSerial(a) { this.ints[6] = a; }
-	get nGrWorkers() { return this.ints[25]; }
-	startAtomicOffset = 26;
-	get startAtomic() { return this.ints[26]; }
+	get nGrWorkers() { return this.ints[23]; }
+	startAtomicOffset = 24;
+	get startAtomic() { return this.ints[24]; }
 
-	get _exceptionCode() { return this.pointer + 120; }
-	get hadException() { return Boolean(this.bytes[135]); }
-	set hadException(a) { this.bytes[135] = Boolean(a); }
-	get _label() { return this.pointer + 136; }
-	get shouldBeIntegrating() { return Boolean(this.bytes[168]); }
-	set shouldBeIntegrating(a) { this.bytes[168] = Boolean(a); }
-	get isIntegrating() { return Boolean(this.bytes[169]); }
-	set isIntegrating(a) { this.bytes[169] = Boolean(a); }
-	get pleaseFFT() { return Boolean(this.bytes[170]); }
-	set pleaseFFT(a) { this.bytes[170] = Boolean(a); }
-	get needsRepaint() { return Boolean(this.bytes[171]); }
-	set needsRepaint(a) { this.bytes[171] = Boolean(a); }
-	get sentinel() { return this.bytes[172]; }
-	set sentinel(a) { this.bytes[172] = a; }
+	get _exceptionCode() { return this.pointer + 112; }
+	get hadException() { return Boolean(this.bytes[127]); }
+	set hadException(a) { this.bytes[127] = Boolean(a); }
+	get _label() { return this.pointer + 128; }
+
+	get shouldBeIntegrating() { return Boolean(this.bytes[160]); }
+	set shouldBeIntegrating(a) { this.bytes[160] = Boolean(a); }
+	get isIntegrating() { return Boolean(this.bytes[161]); }
+	set isIntegrating(a) { this.bytes[161] = Boolean(a); }
+	get pleaseFFT() { return Boolean(this.bytes[162]); }
+	set pleaseFFT(a) { this.bytes[162] = Boolean(a); }
+	get needsRepaint() { return Boolean(this.bytes[163]); }
+	set needsRepaint(a) { this.bytes[163] = Boolean(a); }
+	get sentinel() { return this.bytes[164]; }
+	set sentinel(a) { this.bytes[164] = a; }
+
 
 	/* ******************* end of direct accessors */
 

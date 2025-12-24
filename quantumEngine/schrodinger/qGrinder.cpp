@@ -145,8 +145,8 @@ void qGrinder::formatDirectOffsets(void) {
 
 	makeDoubleGetter(videoFP);
 	makeDoubleSetter(videoFP);
-	makeDoubleGetter(chosenFP);
-	makeDoubleSetter(chosenFP);
+	// makeDoubleGetter(chosenFP);
+	// makeDoubleSetter(chosenFP);
 
 	makeDoubleGetter(totalCalcTime);
 	makeDoubleGetter(maxCalcTime);
@@ -316,8 +316,8 @@ void qGrinder::measureDivergence() {
 void qGrinder::oneFrame() {
 	if (traceIntegration) {
 		speedyLog("qGrinder 🪓 starting oneFrame() "
-			"shouldBeIntegrating: %hhu   isIntegrating: %hhu\n",
-			shouldBeIntegrating, isIntegrating);
+			"shouldBeIntegrating: %hhu   isIntegrating: %hhu   stretchedDt=%lf\n",
+			shouldBeIntegrating, isIntegrating, stretchedDt);
 	}
 	if (traceIntegrationDetailed)
 		qGrinder::dumpObj("qGrinder 🪓 starting oneFrame()");
@@ -433,8 +433,7 @@ void qGrinder::threadsHaveFinished() {
 		isIntegrating = false;
 
 	if (traceIntegration)  {
-		speedyLog("🪓 synch up isIntegrating with shouldBeIntegrating sortof. "
-				"shouldBeIntegrating=%hhu   isIntegrating=%hhu\n",
+		speedyLog("🪓 threadsHaveFinished: shouldBeIntegrating=%hhu   isIntegrating=%hhu\n",
 				shouldBeIntegrating, isIntegrating);
 	}
 

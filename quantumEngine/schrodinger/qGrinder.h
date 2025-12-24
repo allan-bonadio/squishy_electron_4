@@ -37,9 +37,9 @@ Some sortof overlapping terms on timing:
 videoFP: video frame period is the period it takes the screen to do one
 scan.  rAF calls you that often.  Often 16⅔ or 20 ms.  Determined by the screen hardware and maybe some user settings.
 
-chosenFP: period chosen from the 'frame rate' menu, which shows rates
-as FP periods.  So user chooses 20 fps and the chosenFP would be 50ms.
-chosenFP should be an even multiple of videoFP but isn't always.
+obsolete:  // chosenFP: period chosen from the 'frame rate' menu, which shows rates
+// as FP periods.  So user chooses 20 fps and the chosenFP would be 50ms.
+// chosenFP should be an even multiple of videoFP but isn't always.
 
 */
 
@@ -153,7 +153,7 @@ struct qGrinder {
 	// Might not be a multiple of videoFP.  Actually we use this as an indicator
 	// as to whether rate is 'fastest' qeConsts.FASTEST  Otherwise, the JS
 	// triggers a new frame calc based on rAF.
-	double chosenFP;
+	//double chosenFP;
 
 	// how long (thread time) it took to do the latest frame, all threads added together
 	double totalCalcTime;
