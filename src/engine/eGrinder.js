@@ -140,7 +140,7 @@ class eGrinder {
 	formatTimeNFrame() {
 		return {
 			elapsedTimeText: this.elapsedTime.toFixed(3),
-			frameSerialText: thousandsSpaces(this.frameSerial),
+			//frameSerialText: thousandsSpaces(this.frameSerial),
 		}
 	}
 

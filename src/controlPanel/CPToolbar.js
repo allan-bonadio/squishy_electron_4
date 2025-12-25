@@ -11,6 +11,7 @@ import qeConsts from '../engine/qeConsts.js';
 import ResolutionDialog from './ResolutionDialog.js';
 
 let traceCPToolbar = false;
+let traceSlowerFaster = false;
 
 window.dbLog = console.log;
 
@@ -33,10 +34,13 @@ function optionForFreq(rate) {
 }
 
 const propTypes = {
-	chosenRate: PropTypes.number.isRequired,
-	setChosenRate: PropTypes.func.isRequired,
-	dtFactor: PropTypes.number.isRequired,
-	setDtFactor: PropTypes.func.isRequired,
+	// chosenRate: PropTypes.number.isRequired,
+	// setChosenRate: PropTypes.func.isRequired,
+
+	// called rapidly during click and hold of hare and tortoise buttons
+	getQuickDtFactor: PropTypes.func.isRequired,
+	setQuickDtFactor: PropTypes.func.isRequired,
+	saveDtFactor: PropTypes.func.isRequired,
 
 	startOverHandler: PropTypes.func.isRequired,
 	resetVoltageHandler: PropTypes.func.isRequired,
@@ -67,19 +71,18 @@ const SLOWER_NUDGE = 0.99;
 
 function CPToolbar(props) {
 	cfpt(propTypes, props);
+	const p = props;
 	if (traceCPToolbar)
-		dbLog(`🧰 CPToolbar starts.  props=`, props);
-	let {chosenRate, setChosenRate, setShowingTab} = props;
-
-	// for the old buttons - obsolete
-	let runningClass = props.shouldBeIntegrating ? 'running' : '';
+		dbLog(`🧰 CPToolbar starts render.  props=`, props);
+	let {setShowingTab} = props;
+	//let {chosenRate, setChosenRate, setShowingTab} = props;
 
 	/* ************************************************* speed buttons */
 	// spare icons: 🐌🐢🐎  🐇 🌪️
 
 	// the rabbit and tortoise buttons
 	// adjust the speed by this factor
-	const propel = factor => p.setDtFactor(p.dtFactor * factor);
+	const propel = factor => p.setQuickDtFactor(p.getQuickDtFactor() * factor);
 
 	let intervalId, timeoutId;
 	const faster = () => propel(1.01);
@@ -89,40 +92,44 @@ function CPToolbar(props) {
 	const repeatSlower = () => intervalId = setInterval(slower, SPEED_FREQ);
 
 	// user clicks down on either speed button
-	const downHandler =
+	const downSpeedHandler =
 	(ev) => {
-		debugger;
 		// either faster or slower
 		if (ev.target.classList.contains('faster')) {
 			if (traceSlowerFaster)
-				dbLog(`🧰 SlowerFaster Faster starts.  props=`, props);
+				dbLog(`🧰 SlowerFaster Faster starts.  dtFactor=${props.getQuickDtFactor()}  `);
 			propel(FASTER_SPEED);  // speed up by big incr
 			timeoutId = setTimeout(repeatFaster, SPEED_DELAY);  // then slowly accel over time
 		}
 		else {
 			if (traceSlowerFaster)
-				dbLog(`🧰 SlowerFaster SLower starts.  props=`, props);
+				dbLog(`🧰 SlowerFaster SLower starts.  dtFactor=${props.getQuickDtFactor()} `);
 			propel(SLOWER_SPEED);
 			timeoutId = setTimeout(repeatSlower, SPEED_DELAY);
 		}
 	}
 
 	// kill all those delays and repeats
-	const upHandler =
+	const upSpeedHandler =
 	(ev) => {
 		clearTimeout(timeoutId);
 		clearInterval(intervalId);
 		timeoutId = intervalId = 0;
+		p.saveDtFactor();
 	}
 
+	// the slower and faster buttons stop when theyt get mouseUp events.
+	// except sometimes those events get lost, so also leave events
 	const speedControl = () => <div className='toolbarWidget'>
 		<button className='toolbarWidget speedButton slower'
-			onMouseDown={downHandler} onMouseUp={upHandler} >
-			🐢 slower
+			onMouseDown={downSpeedHandler}
+				onMouseUp={upSpeedHandler} onMouseLeave={upSpeedHandler} >
+			<span>🐢 &nbsp;</span> slower
 		</button>
 		<button className='toolbarWidget speedButton faster'
-			onMouseDown={downHandler} onMouseUp={upHandler} >
-			🐇 faster
+			onMouseDown={downSpeedHandler}
+				onMouseUp={upSpeedHandler}  onMouseUp={upSpeedHandler} >
+			<span>🐇 &nbsp;</span> faster
 		</button>
 	</div>;
 
@@ -150,13 +157,15 @@ function CPToolbar(props) {
 
 		{resolutionControl()}
 
+		<span className='toolSpacer' style={{width: '.3em'}}></span>
+
 		<div className='toolbarWidget'>
-				<button onClick={props.startOverHandler}>Start Over</button>
+				<button onClick={props.startOverHandler}>Reset &amp; Start Over</button>
 		</div>
 
 		<div className='toolbarWidget'>
 				<button onClick={props.resetVoltageHandler}>
-					Reset Voltage
+					Reset only Voltage
 				</button>
 		</div>
 	</div>;

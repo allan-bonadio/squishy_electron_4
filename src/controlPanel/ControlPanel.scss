@@ -65,26 +65,35 @@
 		margin-left: .5em;
 	}
 
-	.rateSelector {
-		background-color: #222;
-		color: #eee;
-	}
+	// .rateSelector {
+	// 	background-color: #222;
+	// 	color: #eee;
+	// }
 
 	.toolbarWidget {
 		display: inline-block;
-		margin: 0 .5em;
+		margin: 0 .5em .5em .5em;
 		color: white;
 		background-color: #222;
-	}
 
-	button.resolutionBox {
-		border: 0 transparent none;
+		button {
+			border: 1px transparent solid;
+
+			&:hover {
+				border-color: #666;
+			}
+
+			&:active {
+				border-color: #ccc;
+			}
+
+		}
 	}
 
 	button.speedButton {
-		font-size: 1.5em;
-		border: 0 transparent none;
-		width: 2em;
+		span {
+			font-size: 2em;
+		}
 	}
 
 

@@ -21,7 +21,7 @@ import {interpretCppException, wrapForExc} from '../utils/errors.js';
 import SquishContext from '../sPanel/SquishContext.js';
 
 let traceSetPanels = false;
-let traceBeginFinish = true;
+let traceBeginFinish = false;
 let traceContext = false;
 
 // integrations always need specific numbers of steps.  But there's always one
@@ -49,7 +49,7 @@ export class ControlPanel extends React.Component {
 
 	constructor(props) {
 		super(props);
-		checkPropTypes(this.constructor.propTypes, props, 'prop', this.constructor.name);
+		checkPropTypes(ControlPanel.propTypes, props, 'prop', this.constructor.name);
 		//this.nFramesToGo = -1;
 
 		// most of the state is kept here.  But, also, in the store settings for the next page reload.
@@ -60,15 +60,18 @@ export class ControlPanel extends React.Component {
 			...getAGroup('voltageSettings'),
 			...getAGroup('frameSettings'),
 
+			// official dtFactor here in the state.  quick one on this.
+			dtFactor: getASetting('frameSettings', 'dtFactor'),
 			showingTab: getASetting('miscSettings', 'showingTab'),
 		}
-		this.chosenFP = this.state.chosenFP;
+		//this.chosenFP = this.state.chosenFP;
+		this.quickDtFactor = this.state.dtFactor;
 
 		// we can't init some stuff till we get the space.  But we also can't until
 		// this constructor runs.
 		eSpaceCreatedPromise.then(space => {
 			this.handleSpacePromise(space);
-			this.grinder.chosenFP = this.chosenFP;
+			//this.grinder.chosenFP = this.chosenFP;
 		})
 		.catch(rex => {
 			let ex = interpretCppException(rex);
@@ -128,6 +131,8 @@ export class ControlPanel extends React.Component {
 		if (this.context.shouldBeIntegrating)
 			this.beginAnimating();
 
+		this.setQuickDtFactor(this.state.dtFactor);
+
 		if (traceBeginFinish) {
 			// Note: the state won't kick in until next render
 			console.log(`🎛️ ControlPanel constructor & context initialized with space, `
@@ -140,40 +145,36 @@ export class ControlPanel extends React.Component {
 
 	static contextType = SquishContext;
 
-//	componentDidMount() {
-//		this.setUpContext();
-//	}
-
-
-	/* *********************************************************** frame period/ frequencyu */
+	/* *********************************************************** frame period/ frequency */
+	// this is obsolete?  TODO
 	// set frame period chosen by the user: set it JUST for the animator and grinder
-	setChosenFP =
-	(period) => {
-		this.setState({chosenFP: storeASetting('frameSettings', 'chosenFP', this.chosenFP)});
-
-		const an = this.props.animator;
-		if (an) {
-			an.chosenFP = period;
-			an.frameProgress = 0;
-		}
-
-		// now tell the grinder.  Next chosenFP, it'll go into effect
-		if (this.grinder)
-			this.grinder.chosenFP = period;
-	}
+	// setChosenFP =
+	// (period) => {
+	// 	this.setState({chosenFP: storeASetting('frameSettings', 'chosenFP', this.chosenFP)});
+	//
+	// 	const an = this.props.animator;
+	// 	if (an) {
+	// 		an.chosenFP = period;
+	// 		an.frameProgress = 0;
+	// 	}
+	//
+	// 	// now tell the grinder.  Next chosenFP, it'll go into effect
+	// 	if (this.grinder)
+	// 		this.grinder.chosenFP = period;
+	// }
 
 	// set freq of frame, which is 1, 2, 15, 60, ... some float number of times per
 	// second you want frames. freq is how the CPToolbar UI, handles it, but we
 	// keep the period in the ControlPanel state,
-	setChosenRate =
-	freq =>{
-		// set it in the settings, controlpanel state, and SquishPanel's state, too.
-		this.chosenFP = 1000. / +freq;
-		if (qeConsts.FASTEST == freq)
-			this.chosenFP = qeConsts.FASTEST;
-
-		this.setChosenFP(this.chosenFP);  // so squish panel can adjust the heartbeat
-	}
+// 	setChosenRate =
+// 	freq =>{
+// 		// set it in the settings, controlpanel state, and SquishPanel's state, too.
+// 		this.chosenFP = 1000. / +freq;
+// 		if (qeConsts.FASTEST == freq)
+// 			this.chosenFP = qeConsts.FASTEST;
+//
+// 		this.setChosenFP(this.chosenFP);  // so squish panel can adjust the heartbeat
+// 	}
 
 	/* ************************************************* shouldBeIntegrating */
 	// sbi is kept in the context, AND in the grinder.  Not in this component's state.
@@ -237,6 +238,32 @@ export class ControlPanel extends React.Component {
 	ev => {
 		finishAnimating(ev);
 	}
+
+	// the 'quick' dtFactor is only stored in our this.quickDtFactor,
+	// for the user pushing on tortoise & hare buttons
+	getQuickDtFactor = () => {
+		console.log(`getQuickDtFactor: `, this.quickDtFactor);
+		return this.quickDtFactor;
+	}
+
+	// dtFactor we multiply on to get stretchedDt = effective dt, ready to use.
+	// This function changes dtFactor quickly for interactive feedback, but doesn't store in the state or local storage
+	setQuickDtFactor = (quickDtFactor) => {
+		console.log(`setQuickDtFactor:   old: ${this.quickDtFactor}   new: ${quickDtFactor}`, );
+		this.quickDtFactor = quickDtFactor;
+		this.grinder.stretchedDt = quickDtFactor * this.space.refDt;
+		console.log(`🎛️ setQuickDtFactor: refDt = ${this.space.refDt}   quickDtFactor= ${quickDtFactor} stretchedDt=${this.grinder.stretchedDt}`)
+	}
+
+	// called after the mouseUp event, to save the dtFactor permanently.
+	saveDtFactor = (dtFactor = this.quickDtFactor) => {
+		console.log(`saveDtFactor:   old: ${this.state.dtFactor}   new: ${dtFactor}`, );
+		this.quickDtFactor = dtFactor;
+		this.grinder.stretchedDt = dtFactor * this.space.refDt;
+		storeASetting('frameSettings', 'dtFactor', dtFactor);
+		this.setState({dtFactor});
+	}
+
 
 // 	startSingleFrame =
 // 	(ev) => {
@@ -418,30 +445,10 @@ export class ControlPanel extends React.Component {
 
 	/* ********************************************** integration tab */
 
-	getQuickDtFactor() {
-		this.quickDtFactor = getASetting('frameSettings', 'dtFactor');
-	}
-
-	// dtFactor we multiply on to get effective dt, ready to use.
-	// This function changes dtFactor quickly,wher3eas
-	setQuickDtFactor = dtFactor => {
-		this.quickDtFactor = dtFactor;
-		this.grinder.stretchedDt = dtFactor * this.space.refDt;
-		console.log(`🎛️ setQuickDtFactor: refDt = ${this.space.refDt}   dtFactor= ${dtFactor} stretchedDt=${this.grinder.stretchedDt}`)
-	}
-
-	// called after the mouseUp event, to save it longer than the speed buttons
-	saveDtFactor() {
-		dtFactor = storeASetting('frameSettings', 'dtFactor', dtFactor);
-		this.setState({dtFactor});
-
-	}
-
 	makeIntegrationTab = () => {
 		return <SetIntegrationTab
 			dtFactor={this.state.dtFactor}
 			setDtFactor={this.setDtFactor}
-
 			N={this.N}
 		/>;
 	}
@@ -502,19 +509,20 @@ export class ControlPanel extends React.Component {
 
 		let showingTabHtml = this.createShowingTab();
 
+		// chosenRate={1000. / s.chosenFP}
+		// setChosenRate={this.setChosenRate}
+
 		return <div className='ControlPanel'>
 			<CPToolbar
-				chosenRate={1000. / s.chosenFP}
-				setChosenRate={this.setChosenRate}
-
-				dtFactor={this.state.dtFactor}
-				setDtFactor={this.setDtFactor}
-
+				getQuickDtFactor={this.getQuickDtFactor}
+				setQuickDtFactor={this.setQuickDtFactor}
+				saveDtFactor={this.saveDtFactor}
 
 				setShowingTab={this.setShowingTab}
 
 				shouldBeIntegrating={this.context.shouldBeIntegrating ?? false}
 
+				// startOver button
 				startOverHandler={this.startOverHandler}
 				resetVoltageHandler={this.resetVoltageHandler}
 

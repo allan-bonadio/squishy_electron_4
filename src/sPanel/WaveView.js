@@ -326,8 +326,8 @@ export class WaveView extends React.Component {
 			console.log(`🏄 WaveView Render context:`, this.context);
 		}
 
-		// if c++ isn't initialized yet, we can assume the time and frame serial
-		let tnf = {elapsedTimeText: '0', frameSerialText: '0'};
+		// if c++ isn't initialized yet, we can assume the time
+		let tnf = {elapsedTimeText: '0', };
 		if (this.grinder)
 			tnf = this.grinder.formatTimeNFrame();
 
@@ -402,9 +402,6 @@ export class WaveView extends React.Component {
 					<div className='northWestWrapper'>
 						<span className='voNorthWest'>{tnf.elapsedTimeText}</span> ps
 					</div>
-					<div className='northEastWrapper'>
-						frame <span className='voNorthEast'>{tnf.frameSerialText}</span>
-					</div>
 
 				</section>
 
@@ -429,3 +426,6 @@ export class WaveView extends React.Component {
 
 export default WaveView;
 
+// 					<div className='northEastWrapper'>
+// 						frame <span className='voNorthEast'>{tnf.frameSerialText}</span>
+// 					</div>
