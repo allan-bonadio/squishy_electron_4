@@ -239,7 +239,7 @@ function VoltArea(props) {
 			}
 
 			// remind everybody that this episode is over.  Tune in next week.  next pointerdown.
-			dragging = false;
+			//dragging = false;
 			latestIx = latestVoltage = undefined;
 			//setChangeCounter(changeCounter++);
 
@@ -260,6 +260,7 @@ function VoltArea(props) {
 			if (context.shouldBeIntegrating)
 				context.controlPanel.finishAnimating(ev);
 		}
+		dragging = false;  // only if pointer up, not for leave, so user can drag as far as they want
 	}
 
 	// we only do vertical.  right now.  Moves the voltage line (but not its voltage)
