@@ -14,7 +14,7 @@
 
 😡- more unit tests!  for js side.  And should work on C++ ones too.  Get the current ones working again.  at least.
 
-😡- common scss is included multiple times
+😡- common scss is included multiple times - is this right?
 
 *- Tooltips are tiny!  need something better.
 
@@ -29,7 +29,6 @@ Now the offset slider.  JUST the offset slider.  Doing it slowly is OK.
 
 √ 😀 - Standing wave freq 0 => nans.
 
-√ 😀 - Single frame really doesn'twork.(?)
 
 - need a button to reset ALL params and settings
 
@@ -44,8 +43,6 @@ Now the offset slider.  JUST the offset slider.  Doing it slowly is OK.
 
 - display Garland Spiral in 3d could be easy.  haha
 
-😡- use gl.getError() (I already do in some places)
-
 * - should have x axis on the bottom marked in nm
 
 
@@ -59,9 +56,9 @@ Needs fixing.
 - option to have voltage relax back to zero (or whatever's set in the
 tab)
 
-😡- Hi and Lo voltage both attract!!
+😡- Hi and Lo voltage both attract!! ??
 
-* - width of finger moving voltage with default being maybe 5%
+😡- width of finger moving voltage with default being maybe 5%
 
 
 ## Space and Integration
