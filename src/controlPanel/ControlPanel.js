@@ -23,6 +23,7 @@ import SquishContext from '../sPanel/SquishContext.js';
 let traceSetPanels = false;
 let traceBeginFinish = false;
 let traceContext = false;
+let traceQuickDtFactor = false;
 
 // integrations always need specific numbers of steps.  But there's always one
 // more. maybe this should be defined in the grinder.  Hey, isn't this really
@@ -242,14 +243,14 @@ export class ControlPanel extends React.Component {
 	// the 'quick' dtFactor is only stored in our this.quickDtFactor,
 	// for the user pushing on tortoise & hare buttons
 	getQuickDtFactor = () => {
-		console.log(`getQuickDtFactor: `, this.quickDtFactor);
+		if (traceQuickDtFactor) console.log(`getQuickDtFactor: `, this.quickDtFactor);
 		return this.quickDtFactor;
 	}
 
 	// dtFactor we multiply on to get stretchedDt = effective dt, ready to use.
 	// This function changes dtFactor quickly for interactive feedback, but doesn't store in the state or local storage
 	setQuickDtFactor = (quickDtFactor) => {
-		console.log(`setQuickDtFactor:   old: ${this.quickDtFactor}   new: ${quickDtFactor}`, );
+		if (traceQuickDtFactor) console.log(`setQuickDtFactor:   old: ${this.quickDtFactor}   new: ${quickDtFactor}`, );
 		this.quickDtFactor = quickDtFactor;
 		this.grinder.stretchedDt = quickDtFactor * this.space.refDt;
 		this.setState({quickDtFactor});  // do this so rerenders
@@ -258,7 +259,7 @@ export class ControlPanel extends React.Component {
 
 	// called after the mouseUp event, to save the dtFactor permanently.
 	saveDtFactor = (dtFactor = this.quickDtFactor) => {
-		console.log(`saveDtFactor:   old: ${this.state.dtFactor}   new: ${dtFactor}`, );
+		if (traceQuickDtFactor) console.log(`saveDtFactor:   old: ${this.state.dtFactor}   new: ${dtFactor}`, );
 		this.quickDtFactor = dtFactor;
 		this.grinder.stretchedDt = dtFactor * this.space.refDt;
 		storeASetting('frameSettings', 'dtFactor', dtFactor);
