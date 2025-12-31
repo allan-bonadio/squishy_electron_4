@@ -42,7 +42,7 @@ const propTypes = {
 	setQuickDtFactor: PropTypes.func.isRequired,
 	saveDtFactor: PropTypes.func.isRequired,
 
-	startOverHandler: PropTypes.func.isRequired,
+	resetWaveHandler: PropTypes.func.isRequired,
 	resetVoltageHandler: PropTypes.func.isRequired,
 	setShowingTab: PropTypes.func,
 
@@ -178,13 +178,11 @@ function CPToolbar(props) {
 		<span className='toolSpacer' style={{width: '.3em'}}></span>
 
 		<div className='toolbarWidget'>
-				<button onClick={props.startOverHandler}>Reset &amp; Start Over</button>
+				<button onClick={props.resetWaveHandler}>Reset Wave</button>
 		</div>
 
 		<div className='toolbarWidget'>
-				<button onClick={props.resetVoltageHandler}>
-					Reset only Voltage
-				</button>
+				<button onClick={props.resetVoltageHandler}>Reset Voltage</button>
 		</div>
 	</div>;
 }

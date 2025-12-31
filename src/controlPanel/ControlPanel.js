@@ -352,7 +352,7 @@ export class ControlPanel extends React.Component {
 	}
 
 	// SetWave button in SetWaveTab: set it from passed in params, and save it
-	// in storage and state. opposite of startOverHandler()
+	// in storage and state. opposite of resetWaveHandler()
 	saveMainWave = waveParams => {
 		this.resetElapsedTime();
 
@@ -362,7 +362,7 @@ export class ControlPanel extends React.Component {
 
 	// toolbar: Start Over button.  Display it from wave params from store
 	// opposite of saveMainWave()
-	startOverHandler = () => {
+	resetWaveHandler = () => {
 		this.resetElapsedTime();
 
 		let waveParams = getAGroup('waveParams');
@@ -528,7 +528,7 @@ export class ControlPanel extends React.Component {
 				shouldBeIntegrating={this.context.shouldBeIntegrating ?? false}
 
 				// startOver button
-				startOverHandler={this.startOverHandler}
+				resetWaveHandler={this.resetWaveHandler}
 				resetVoltageHandler={this.resetVoltageHandler}
 
 				N={this.N}
