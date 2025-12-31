@@ -34,10 +34,10 @@ const whatTime =
 whatTime('start of app running');
 
 const markdOptions = {
-	gfm: true,
-	headerIds: true,
-	headerPrefix: 'doc,',
-	smartypants: true,  // i may be asking for trouble
+	gfm: true,  // github flavored markup
+	headerIds: false,  // put IDs on all elements with commas etc
+	//headerPrefix: 'doc,',
+	//smartypants: true,  // curly quotes etc
 };
 
 // see also https://katex.org/docs/options.html
@@ -368,6 +368,11 @@ function processArgv() {
 
 	nFilesTried = nFilesPassedThru = nFilesSymlinked =
 		nMDFilesCompiled = nDirsWalked = 0;
+	if ('--help' == argv[0] || '-h' == argv[0] || '-?' == argv[0]) {
+		// during production build
+		usage();
+		process.exit(0);
+	}
 	if ('--batch' == argv[0]) {
 		// during production build
 		console.log(`build docs for production`);
