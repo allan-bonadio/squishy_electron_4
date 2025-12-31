@@ -1,5 +1,5 @@
 #
-# Makefile -- makefile that just delegates to compiling the C++
+# Makefile -- makefile that compiles the C++ and makes all the other parts
 # Copyright (C) 2022-2022 Tactile Interactive, all rights reserved
 #
 
@@ -24,7 +24,7 @@ test :
 build :
 	maint/productionBuild.sh
 
-
+docs :
 	docGen/compileDocs.js --batch || exit 45
 
 
