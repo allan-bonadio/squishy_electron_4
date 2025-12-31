@@ -3,7 +3,7 @@
 ** Copyright (C) 2021-2025 Tactile Interactive, all rights reserved
 */
 
-import React from 'react';
+import React, {useRef} from 'react';
 import PropTypes from 'prop-types';
 import eSpace from '../engine/eSpace.js';
 //import {ShowVoltageControl} from './SetVoltageTab.js';
@@ -84,12 +84,15 @@ function CPToolbar(props) {
 	// adjust the speed by this factor
 	const propel = factor => p.setQuickDtFactor(p.getQuickDtFactor() * factor);
 
-	let intervalId, timeoutId;
+	let intervalRef = useRef(0);
+	let timeoutRef = useRef(0);
 	const faster = () => propel(1.01);
-	const repeatFaster = () => intervalId = setInterval(faster, SPEED_FREQ);
+	const repeatFaster = () =>
+		intervalRef.current = setInterval(faster, SPEED_FREQ);
 
 	const slower = () => propel(.99);
-	const repeatSlower = () => intervalId = setInterval(slower, SPEED_FREQ);
+	const repeatSlower = () =>
+		intervalRef.current = setInterval(slower, SPEED_FREQ);
 
 	// user clicks down on either speed button
 	const downSpeedHandler =
@@ -99,39 +102,54 @@ function CPToolbar(props) {
 			if (traceSlowerFaster)
 				dbLog(`🧰 SlowerFaster Faster starts.  dtFactor=${props.getQuickDtFactor()}  `);
 			propel(FASTER_SPEED);  // speed up by big incr
-			timeoutId = setTimeout(repeatFaster, SPEED_DELAY);  // then slowly accel over time
+			timeoutRef.current = setTimeout(repeatFaster, SPEED_DELAY);  // then slowly accel over time
 		}
 		else {
 			if (traceSlowerFaster)
 				dbLog(`🧰 SlowerFaster SLower starts.  dtFactor=${props.getQuickDtFactor()} `);
 			propel(SLOWER_SPEED);
-			timeoutId = setTimeout(repeatSlower, SPEED_DELAY);
+			timeoutRef.current = setTimeout(repeatSlower, SPEED_DELAY);
 		}
-	}
+	};
 
 	// kill all those delays and repeats
 	const upSpeedHandler =
 	(ev) => {
-		clearTimeout(timeoutId);
-		clearInterval(intervalId);
-		timeoutId = intervalId = 0;
+		console.log(`🐭 timeoutRef.current=${timeoutRef.current}  intervalRef.current=${intervalRef.current}`);
+		clearTimeout(timeoutRef.current);
+		clearInterval(intervalRef.current);
+		timeoutRef.current = intervalRef.current = 0;
 		p.saveDtFactor();
-	}
+	};
 
-	// the slower and faster buttons stop when theyt get mouseUp events.
-	// except sometimes those events get lost, so also leave events
-	const speedControl = () => <div className='toolbarWidget'>
-		<button className='toolbarWidget speedButton slower'
-			onMouseDown={downSpeedHandler}
-				onMouseUp={upSpeedHandler} onMouseLeave={upSpeedHandler} >
-			<span>🐢 &nbsp;</span> slower
-		</button>
-		<button className='toolbarWidget speedButton faster'
-			onMouseDown={downSpeedHandler}
-				onMouseUp={upSpeedHandler}  onMouseUp={upSpeedHandler} >
-			<span>🐇 &nbsp;</span> faster
-		</button>
-	</div>;
+	// called upon enter, mouse move, and maybe more events, just in case speeding or
+	// slowing is still running but we missed the mouseup event.
+	const maybeStopSpeed =
+	(ev) => {
+		console.log(`maybeStopSpeed ev=`, ev);
+		if (0 == ev.buttons)
+			upSpeedHandler(ev);
+	};
+
+	// the slower and faster buttons should stop when they get mouseUp events.
+	// except sometimes those events get lost, so also leave and move events
+	const speedControl = () => { return <>
+			<div className='toolbarWidget'>
+				<button className='toolbarWidget speedButton slower'
+						onMouseDown={downSpeedHandler}
+						onMouseUp={upSpeedHandler}  onMouseLeave={upSpeedHandler}
+						onMouseEnter={maybeStopSpeed} onMouseMove={maybeStopSpeed}>
+					<span>🐢</span> slower
+				</button>
+				<button className='toolbarWidget speedButton faster'
+						onMouseDown={downSpeedHandler}
+						onMouseUp={upSpeedHandler}  onMouseLeave={upSpeedHandler}
+						onMouseEnter={maybeStopSpeed} onMouseMove={maybeStopSpeed}>
+					<span>🐇</span> faster
+				</button>
+			</div>
+		</>
+	};
 
 	/* ************************************************* resolution dlg buttons */
 

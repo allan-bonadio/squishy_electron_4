@@ -19,8 +19,10 @@ const propTypes = {
 			dimensions: PropTypes.arrayOf(PropTypes.object).isRequired,
 		}),
 
-		dtFactor: PropTypes.number.isRequired,
-		setDtFactor: PropTypes.func.isRequired,
+		getQuickDtFactor: PropTypes.func.isRequired,
+		setQuickDtFactor: PropTypes.func.isRequired,
+		saveDtFactor: PropTypes.func.isRequired,
+		//setDtFactor: PropTypes.func.isRequired,
 		//stepsPerFrame: PropTypes.number.isRequired,
 		//setStepsPerFrame: PropTypes.func.isRequired,
 		//lowPassFilter: PropTypes.number.isRequired,
@@ -44,6 +46,18 @@ function SetIntegrationTab(props) {
 	const nDigits = (N < 150) ? 0 : ((N < 600) ? 1 : 2);
 	// ...Math.max(0, 1 -Math.ceil(Math.log10(lowPassStep)));
 
+	// as user drags slider
+	const handleChange = (power, ix) => {
+		if (traceSliderChanges)
+			console.log(`🏃🏽 🏃🏽 ch dtFactor ix=${ix}  power=${power}`);
+		props.setQuickDtFactor(power);
+	}
+
+	// when user lifts up, they're done (for now) so save it
+	const handlePointerUp = (ev) => {
+		props.saveDtFactor();
+	}
+
 	// Unlike other tabs, all these are instant-update.
 
 	let mini = alternateMinMaxs.frameSettings.dtFactor.min;
@@ -59,7 +73,7 @@ function SetIntegrationTab(props) {
 			In order to guarantee convergence (not exploding),
 			we must use a time increment, <i>∆t</i>, small enough, according to the
 			von Neumann stability criteria.
-			This might lead to a very slow integration experience.
+			This might lead to very slow integration.
 			You can speed this up a bit by bending the rules and
 			stretching <i>∆t</i>, at the risk of diverging.
 			</p>
@@ -67,20 +81,18 @@ function SetIntegrationTab(props) {
 			<LogSlider
 				unique='dtFactorSlider'
 				className='dtFactorSlider cpSlider'
-				label='stretch factor for ∆t'
+				label='stretch factor for time increment'
 				minLabel={mini}
 				maxLabel={maxi}
 
-				current={props.dtFactor}
+				current={props.getQuickDtFactor()}
 				sliderMin={mini}
 				sliderMax={maxi}
 				stepsPerDecade={6}
 
-				handleChange={(power, ix) => {
-					if (traceSliderChanges)
-						console.log(`🏃🏽 🏃🏽 ch dtFactor ix=${ix}  power=${power}`);
-					props.setDtFactor(power);
-				}}
+				handleChange={handleChange}
+
+				handlePointerUp={handlePointerUp}
 			/>
 
 		</div>

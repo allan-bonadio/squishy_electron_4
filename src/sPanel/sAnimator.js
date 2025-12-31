@@ -236,7 +236,6 @@ class sAnimator {
 		this.errorMessage = qeFuncs.grinder_getExceptionMessage(this.grinder.pointer);
 		if (!this.errorMessage) this.errorMessage = 'sorry, no message.  🫦 🥺';
 		console.error(`had Exception!  '${this.errorMessage}'  ex=${this.grinder.hadException} `);
-		debugger;  // won't stop if we're not in the debugger
 		const ex = new Error(this.errorMessage);
 		ex.code  = UTF8ToString(this.grinder._exceptionCode);
 

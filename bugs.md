@@ -77,6 +77,10 @@ certain it doesn't. But now I have FFTs to measure it at least.  If you think ab
 
 😡- Should allow almost any number N, not just powers of 2
 
+😡- really need a nyquist filter, plus maybe higher freqs.  MVP: just a fixed nyquist.
+
+😡- should auto-slow if divergence gets high
+
 
 ## Docs
 

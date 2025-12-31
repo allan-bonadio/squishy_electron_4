@@ -293,8 +293,7 @@ void qGrinder::measureDivergence() {
 			isIntegrating = false;
 
 			// js code intercepts this exact spelling, in sAnimate
-			reportException("Sorry, your wave integration diverged! Try a shorter "
-				"stretch factor for ∆t.  Click Start Over to try again.", "diverged");
+			reportException("Sorry, your wave integration diverged! Try slowing it down.", "diverged");
 		}
 		else {
 			// not bad yet
