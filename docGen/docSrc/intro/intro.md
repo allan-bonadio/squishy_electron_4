@@ -199,9 +199,3 @@ It integrates a version of Schrodinger's equation.
 The graphics are done in WebGL, a blindingly fast graphics rendering system,
 using the computer's GPU chip(s).
 (3D is on the wish list.)
-
-### help allan find a job
-
-[Allan's Portfolio](https://portfolio.tactileint.org)
-
-[Allan's Resume](https://resume.tactileint.org)>
