@@ -126,7 +126,7 @@ function SetVoltageTab(p) {
 	function renderFirstRow(breed, vMinsMaxes) {
 		return <>
 			{/* only shows for canyon, otherwise blank space */}
-			<LogSlider className='canyonPower'
+			<LogSlider className='canyonPower' unique='canyonPower'
 				current={vP.canyonPower}
 				annotation={false}
 				sliderMin={vMinsMaxes.canyonPower.min} sliderMax={vMinsMaxes.canyonPower.max}

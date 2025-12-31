@@ -44,7 +44,7 @@ function VoltSidebar(props) {
 
 	if (traceVoltageSidebar) {
 		console.log(`🍟 V Sidebar rend: width=${sidebarWidth}  heightVolts=${mVD.heightVolts}  `
-			+`${mVD.minBottom} `);
+			+ mVD.minBottom);
 	}
 
 	// Hovering  to show/hide voltage - hovering over the sidebar

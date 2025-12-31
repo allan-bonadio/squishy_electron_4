@@ -34,7 +34,7 @@ Now the offset slider.  JUST the offset slider.  Doing it slowly is OK.
 
 - need a hamburger menu for things like the above.
 
-😡😡- startOverHandler sometimes displays a kinked wave - click a second time and it's ok
+😡😡- resetWaveHandler sometimes displays a kinked wave - click a second time and it's ok
 
 ## GL & WaveView
 
