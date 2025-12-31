@@ -100,9 +100,9 @@ export default class ResolutionDialog extends React.Component {
 			<LogSlider
 				unique='resolutionSliderCore'
 				className='resolutionSliderCore'
-				label='Datapoints'
+				label='Datapoints in Wave'
 				minLabel='faster'
-				maxLabel='more accurate'
+				maxLabel='less divergence'
 
 				current={s.N}
 				original={s.origN}
