@@ -10,6 +10,7 @@ import {stepsPerDecadeStepFactors, indexToPower, powerToIndex} from '../utils/po
 import {thousands} from '../utils/formatNumber.js';
 
 // set a particular 'unique' in this regex to trace its renders and stuff or use the second one to turn off
+// does this work with the trace turned off?  (TODO)
 let traceThisSlider = {test: () => false};
 
 // list of settings that are more better - not that simple!
@@ -36,7 +37,6 @@ class LogSlider extends React.Component {
 		minLabel: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
 		maxLabel: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
 
-
 		substitutes: PropTypes.array,
 
 		// these are powers, not indices
@@ -58,6 +58,7 @@ class LogSlider extends React.Component {
 
 		// handleChange(power, ix)
 		handleChange: PropTypes.func,
+		handlePointerUp: PropTypes.func,
 
 		wholeStyle: PropTypes.object,   // whole  component, like to make it invisible
 		inputStyle: PropTypes.object,  // just the input.range slider
@@ -66,26 +67,13 @@ class LogSlider extends React.Component {
 		title: PropTypes.string,
 	}
 
-	static defaultProps = {
-		unique: 'you should really choose a unique code for this logslider',
-		className: '',
-
-		annotation: true,
-		label: 'how much',
-		minLabel: 'low',
-		maxLabel: 'high',
-
-		willRoundPowers: false,
-
-		handleChange: (power, ix) => {},
-	}
-
 	constructor(props) {
 		super(props);
-		checkPropTypes(this.constructor.propTypes, props, 'prop', this.constructor.name);
+		ccpt(this, props);
 		if (!props)
 			debugger;
 		const p = props;
+
 		if (traceThisSlider.test(p.unique)) console.log(`LogSlider props=`, JSON.stringify(props));
 		this.wasOriginal = p.original ? <small>&nbsp; (was {thousands(p.original)})</small> : '';
 
@@ -102,6 +90,13 @@ class LogSlider extends React.Component {
 		ev.target.setPointerCapture(ev.pointerId);
 	}
 
+	pointerUp =
+	ev => {
+		const p = this.props;
+		if (traceThisSlider.test(p.unique)) console.log(`pointerUp avgValue=`, this.avgValue);
+		p.pointerUp?.(ev);
+	}
+
 	handleSlide =
 	ev => {
 		const p = this.props;
@@ -112,7 +107,7 @@ class LogSlider extends React.Component {
 		const ix = +ev.currentTarget.value;
 		const power = indexToPower(p.willRoundPowers, stepFactors, spd, ix, p.substitutes);
 		if (traceThisSlider.test(p.unique)) console.log(`handleChange  ix=${ix}  power=${power}`);
-		p.handleChange(power, ix);
+		p.handleChange?.(power, ix);
 	}
 
 	render () {
@@ -129,21 +124,21 @@ class LogSlider extends React.Component {
 		if (traceThisSlider.test(p.unique)) console.log(
 			`LogSlider render..  spd=${spd}, p.current=${p.current}   value=${val} props=`, p);
 
-		const annotation = p.annotation
+		// the default for this is annotation true, so undefined means true.
+		const annotation = (p.annotation ?? true)
 			?   <aside>
-					<div className='left'>{p.minLabel}</div>
+					<div className='left'>{p.minLabel ?? 'low'}</div>
 					<div className='middle'>
-						<b>{p.label}</b>: <big>{thousands(cur)}</big>
+						<b>{p.label ?? 'how much'}</b>: <big>{thousands(cur)}</big>
 						{this.wasOriginal}
 					</div>
-					<div className='right'>{p.maxLabel}</div>
-
+					<div className='right'>{p.maxLabel ?? 'high'}</div>
 				</aside>
 
 			: undefined;
 
 		try {
-			return <div className={`${p.className} LogSlider`} style={p.wholeStyle ?? {}}
+			return <div className={`${p.className ?? ''} LogSlider`} style={p.wholeStyle ?? {}}
 				title={p.title}>
 
 				{annotation}
@@ -155,6 +150,7 @@ class LogSlider extends React.Component {
 					list={uniqueId}
 					onInput={this.handleSlide}
 					onPointerDown={this.pointerDown}
+					onPointerUp={this.pointerUp}
 					style={p.inputStyle ?? {}}
 				/>
 				<datalist id={uniqueId} >{createGoodPowers(spd, p.sliderMin, p.sliderMax, p.substitutes)}</datalist>
