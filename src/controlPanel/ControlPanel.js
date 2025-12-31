@@ -252,6 +252,7 @@ export class ControlPanel extends React.Component {
 		console.log(`setQuickDtFactor:   old: ${this.quickDtFactor}   new: ${quickDtFactor}`, );
 		this.quickDtFactor = quickDtFactor;
 		this.grinder.stretchedDt = quickDtFactor * this.space.refDt;
+		this.setState({quickDtFactor});  // do this so rerenders
 		console.log(`🎛️ setQuickDtFactor: refDt = ${this.space.refDt}   quickDtFactor= ${quickDtFactor} stretchedDt=${this.grinder.stretchedDt}`)
 	}
 
@@ -447,6 +448,9 @@ export class ControlPanel extends React.Component {
 
 	makeIntegrationTab = () => {
 		return <SetIntegrationTab
+			getQuickDtFactor={this.getQuickDtFactor}
+			setQuickDtFactor={this.setQuickDtFactor}
+			saveDtFactor={this.saveDtFactor}
 			dtFactor={this.state.dtFactor}
 			setDtFactor={this.setDtFactor}
 			N={this.N}
