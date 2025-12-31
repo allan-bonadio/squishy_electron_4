@@ -10,11 +10,14 @@ import YAML from 'yaml';
 import {marked} from 'marked';
 import markedKatex from 'marked-katex-extension';
 
-let traceControlFlow = false;
+let traceControlFlow = true;
 let traceWhatTime = false;
 let traceFinalDocDir = false;
 let traceFinalPromiseResult = false;
 let traceMetadata = false;
+
+let traceFileNames = true;
+let traceDirNames = true;
 
 // turn this to true to halt before going forward, waiting for you to hit
 // return, before erasing the old files.
@@ -70,10 +73,10 @@ process.chdir(process.env.SQUISH_ROOT +`/docGen`);
 // figure out where this compiled file should go.
 // suffix should NOT have a dot; we'll add one
 function makeOutputPath(inputPath, suffix = '') {
-	let out = inputPath.replace(/docSrc/, '../public/doc');
+	let out = inputPath.replace(/.*docSrc/, '../public/doc');
 	if (suffix)
 		out = out.replace(/\.\w+$/, `.${suffix}`);
-	//console.log(`makeOutputPath(${inputPath}) --> '${out}'`);
+	if (traceFileNames) console.log(`makeOutputPath(${inputPath}) --> '${out}'`);
 	return out;
 }
 
@@ -85,7 +88,6 @@ const readTextFile =
 const catchException =
 (ex, where) => {
 	console.error(`Error ${where}:`, ex.stack ?? ex.message ?? ex);
-	usage();
 	debugger;
 }
 
@@ -236,56 +238,57 @@ function symlinkFile(filePath) {
 
 
 // it's a file, but what kind?  trust the suffix.
-function compileAFile(filePath) {
-	console.log(`compileDocs: compileAFile: ${filePath}`);
-	if (filePath.endsWith('.DS_Store'))
-		return `${filePath} avoided`;
-	let dot = filePath.lastIndexOf('.');
+function compileAFile(inputPath) {
+	if (inputPath.endsWith('.DS_Store'))
+		return `${inputPath} avoided`;
+	if (traceFileNames) console.log(`compileDocs: compileAFile, input: ${inputPath}`);
+	let dot = inputPath.lastIndexOf('.');
 	if (dot < 0)
-		return Promise.reject(`file ${filePath} has no dot in name`);
+		return Promise.reject(`file ${inputPath} has no dot in name`);
 
 	nFilesTried++;
-	switch (filePath.substr(dot+1)) {
+	switch (inputPath.substr(dot+1)) {
 	case 'md':
-		return compileAnMDFile(filePath);
+		return compileAnMDFile(inputPath);
 
 	// maybe someday there will be more file types?
 
 	// copy over image files, video files, ...
 	default:
-		return symlinkFile(filePath);
+		return symlinkFile(inputPath);
 	}
 }
 
 /* ************************************************************* directories */
 
 // without a slash on the front or end of path
-function compileADir(dirPath) {
-	let docPath = makeOutputPath(dirPath);
-	console.log(`compileDocs: compileADir: ${dirPath}`);
+function compileADir(inputPath) {
+	let outputPath = makeOutputPath(inputPath);
+	if (traceDirNames) console.log(`compileDocs: compileADir, input: ${inputPath}`);
 
 	// don't forget to actually CREATE the directory!
 	// "Calling .mkdir() when path exists doesn't error when recursive is true."
-	return fsp.mkdir(docPath, {recursive: true})
-	.then(() => fsp.readdir(dirPath, {withFileTypes: true}))
+	return fsp.mkdir(outputPath, {recursive: true})
+	.then(() => fsp.readdir(inputPath, {withFileTypes: true}))
 	.then(list => {
 		let promz = [];
 		for (let dirent of list) {
 			if (dirent.isDirectory())
-				promz.push(compileADir(`${dirPath}/${dirent.name}`));
+				promz.push(compileADir(`${inputPath}/${dirent.name}`));
 			else if (dirent.isFile())
-				promz.push(compileAFile(`${dirPath}/${dirent.name}`));
-			else //if (dirent.isSymbolicLink())
-				promz.push(Promise.reject(`Sorry, can't deal with a symlink or other
-					kind of file besides a dir or regular file, yet`));
-			// you'll need fsPromises.realpath(path[, options]) to do this right
+				promz.push(compileAFile(`${inputPath}/${dirent.name}`));
+			else {
+				console.error(`Sorry, can't deal with a file besides a dir or regular file, yet`, dirent);
+				promz.push(Promise.reject(`Sorry, can't deal with a file besides a dir or regular file, yet`));
+				// you'll need fsPromises.realpath(path[, options]) to do this right
+			}
 		}
 		nDirsWalked++;
 
 		// might be some errors in here, but keep going
 		return Promise.allSettled(promz);
 	})
-	.catch(ex => catchException(ex, `walking Directory ${dirPath} to compile to ${docPath}:`));
+	.catch(ex => catchException(ex, `walking Directory ${inputPath} to compile to ${outputPath}:`));
 }
 
 // used for files passed as cmd line arguments.
