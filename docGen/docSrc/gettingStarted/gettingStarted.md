@@ -4,7 +4,7 @@ description: Introduction to Squishy Electron
 -->
 <style>
 	img {
-		width: 46em;
+		width: 36em;
 		cursor: pointer;
 	}
 </style>
@@ -13,9 +13,9 @@ description: Introduction to Squishy Electron
 const handleClick = (ev) => {
 	let img = ev.target;
 	switch (img.style.width) {
-		case '90em': img.style.width = '46em'; break;
-		case '70em': img.style.width = '90em'; break;
-		default: img.style.width = '70em';
+		case '72em': img.style.width = '36em'; break;
+		case '48em': img.style.width = '72em'; break;
+		default: img.style.width = '48em';
 	}
 }
 
@@ -32,7 +32,7 @@ window.onload = () => {
 # Getting Started
 
 Squishy Electron simulates an electron, in its microscopic behavior.
-To begin integration, click on the Start button.
+To begin integration, click on the Start button in the lower left corner of the Electron Wave box.
 
 <img src=overallApp.png />
 
