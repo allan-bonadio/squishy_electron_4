@@ -19,23 +19,27 @@ alarmError ( )
 }
 
 
-echo "                                     🎁 🛫 🔨 Install squish on nakoda, this: " `pwd`  `date +%c`  "Now to decompress..."
+echo "                                     🎁 🛫 🔨 Install squish on nakoda " `pwd`  `date +%c %Z`
 ls -lh
 rm -rf build
+
+echo "                                     🎁 🛫 🔨 Now to decompress" `pwd`  `date +%c`
 unzip -oq build.zip || exit 3
-ls -lh *
+echo "build contents:"
+ls -lh build
 echo
 
 timestamp=`date -u +%F,%H.%M`
 echo "                                     🎁 🛫 🔨 rename, this build is $timestamp"
 mv -fv build $timestamp || alarmError
 mv -fv build.zip $timestamp.zip || alarmError
-ls -l
+echo "emplaced directory $timestamp:"
+ls -lh $timestamp
 echo
 
 echo "                                     🎁 🛫 🔨 now the switchover: point 'active' to it"
-ln -sfv $timestamp active || alarmError
-ls -l
-ls -l active
+./useBuild $timestamp || alarmError
+echo "active points to, and contents:"
+ls -l active active/
 
-date
+echo "install and useBuild on server done: " `date %Z`

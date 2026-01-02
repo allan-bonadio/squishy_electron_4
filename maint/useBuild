@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# use this to set the current build to the one given in $1
+# use this ON THE SERVER  to set the current build to the one given in $1
 # run on the server in the /var/www/squish directory
 
 if [ -n "$1" ]

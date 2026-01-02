@@ -19,7 +19,94 @@ _i_ <sup>2</sup> = -1
 
 <h2>history</h2>
 
-Many people think that complex numbers are bogus, partly because of the __imaginary__ numbers, as opposed to the __real__ numbers.  But, numbers, as concepts, have always been evolving.
+
+Real positive numbers are actual concepts everybody can get a sense of.
+But there's so many more numbers, and kinds of numbers out there, depending on your domain.
+And each group took time for people to understand them.
+
+Zero was a stretch to understand for a lot of people before 1000ce.
+Roman Numerals have no way to say zero.
+They tended to have spaces where a zero number would be.
+
+Negative numbers require stretching reality, sometimes, too.
+
+
+
+
+------------------------------  start of the real thing
+
+Many people think that _complex_ and _imaginary_ numbers are bogus, partly because of the names.
+It sounds bad, like they're not there. Especially compared to the __real__ numbers.
+But really they're just poorly chosen names.
+
+
+## Domains
+
+Let's say you have a 5 gallon bucket.
+How much water is in it?
+It's a number between zero and the size of the bucket, 5 gallons.
+The water can't go below zero.  It can't go over 5 gallons.
+But it can be a fraction of any size, like 0.13 or 4.0001 gallons.
+That's the domain of that particular number, the amount of water.
+If you have a 10 gallon bucket, the water can go up to 10.
+If you have an ocean for your bucket, the allowable number of gallons might seem infinite.
+
+Let's say you have a classroom with nine children in it.
+How many children can you have?
+In other words, what is the domain of the number of kids.
+Well, you can only have integer (whole) kids.
+You cannot have 3/8 of a kid.
+You cannot have a negative number of children, but you can have zero.
+What's the maximum number of kids?  That depends on your classroom size.
+
+Let's say you have a bank account with some money in it.
+How much?  What kind of domain does this number have?
+Well, first of all, there's different currencies,
+but in the US there's dollars and cents.
+It can be positive, negative or zero.
+If it goes negative, there could be real-world consequences.
+Prices are usually rounded off to the nearest cent, like $4.46 or $1703.71 .
+So, that's not a smooth continuum, either.  only multiples of 1¢.
+
+Let's say you have a calculator.  Or a computer!
+The numbers you can represent on it is also a domain.
+
+Single Float numbers were pretty common in the 1900s.
+They use 10 bits for an exponent, 53 bits for the mantissa (digits) of the number,
+and one bit for sign, in an adaptation of scientific notation.
+The whole thing is 64 bits; it can represent no more than 18,446,744,073,709,551,616 different possible values.
+Now, that's a lot of numbers, and quite enough for most applications, but it is still a limited domain.
+
+
+
+Double Float numbers are pretty common.
+They use 10 bits for an exponent, 53 bits for the mantissa (digits) of the number,
+and one bit for sign, in an adaptation of scientific notation.
+The whole thing is 64 bits; it can represent no more than 18,446,744,073,709,551,616 different possible values.
+Now, that's a lot of numbers, and quite enough for most applications, but it is still a limited domain.
+
+
+Double Float numbers are pretty common.
+They use 10 bits for an exponent, 53 bits for the mantissa (digits) of the number,
+and one bit for sign, in an adaptation of scientific notation.
+The whole thing is 64 bits; it can represent no more than 18,446,744,073,709,551,616 different possible values.
+Now, that's a lot of numbers, and quite enough for most applications, but it is still a limited domain.
+
+
+
+Gerolamo Cardano, an Italian mathematician,
+is really the European guy who started taking negative numbers seriously in the mid 1500s.
+The Chinese, Indians, and near east were already using negative numbers, eg for money.
+Cardano was trying to solve cubic and quartic equations, up to the third and fourth powers.
+These always have three or four solutions, just like a quadratic always has two solutions.
+But sometimes they're not visible, at least as real numbers.
+
+But he couldn't get his hands around what was going on.
+He finally realized that his numbers needed to go not just forward and backward,
+but sideways.
+
+
+
 
 <a href=https://en.wikipedia.org/wiki/Roman_numerals>Roman numerals</a>
 never had negative numbers, and zero was unheard of in Roman times, but was written out in words like __nulla__ on rare occasions starting in the 500s.

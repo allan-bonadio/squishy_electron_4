@@ -10,14 +10,14 @@ import YAML from 'yaml';
 import {marked} from 'marked';
 import markedKatex from 'marked-katex-extension';
 
-let traceControlFlow = true;
+let traceControlFlow = false;
 let traceWhatTime = false;
 let traceFinalDocDir = false;
 let traceFinalPromiseResult = false;
 let traceMetadata = false;
 
-let traceFileNames = true;
-let traceDirNames = true;
+let traceFileNames = false;
+let traceDirNames = false;
 
 // turn this to true to halt before going forward, waiting for you to hit
 // return, before erasing the old files.

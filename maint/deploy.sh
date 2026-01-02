@@ -2,8 +2,8 @@
 # Deploys built Squish to server.  You must build with productionBuild.sh first.
 # Runs on local side (panama/dnipro)
 
-echo "                                     🎁 🎁 🛫 Deploy Production Squishy Electron" `date +%c`
-echo "                                               run this only After npm run build"
+echo "              🛫 🛫 🛫 Deploy Production Squishy Electron" `date +%c %Z`
+echo "                                               run this only After install.sh"
 cd $SQUISH_ROOT
 if [ ! -d 'quantumEngine' ]
 then
@@ -15,10 +15,11 @@ fi
 echo you can do either make deploy or npm deploy, same
 
 # make sure it's there & compiled
-echo "                                     🎁 🎁 🛫 make sure the build is there"
+echo "                             🛫 🛫 🛫  make sure the build is there"
 WASMFILES="qEng/quantumEngine.js qEng/quantumEngine.wasm "
 IMAGES="images/eclipseOnTransparent.gif images/splat.png logos/logoKetE.png"
-DOCFILES="doc/index.html doc/intro/intro1.html"
+DOCFILES="doc/gettingStarted/gettingStarted.html  doc/digitalWaves/digitalWaves.html \
+doc/naturalWaves/naturalWaves.html"
 OTHERFILES="index.html manifest.json "
 for fn in index.html  $OTHERFILES $WASMFILES $IMAGES $DOCFILES
 do
@@ -32,21 +33,22 @@ do
 done
 
 
-echo "                                     🎁 🎁 🛫 a bit of cleanup:"
+echo "                             🛫 🛫 🛫  a bit of cleanup:"
 xattr -cr build
 rm -f build/.DS_Store build/*/.DS_Store build/*/*/.DS_Store
 
-echo "                                     🎁 🎁 🛫 Contents of build dir:"
-ls -lFa build/
-echo
-du -sh build
-du -sh build/*
+echo "                             🛫 🛫 🛫  Contents of build dir:"
+ls build
+# ls -lFa build/
+# echo
+# du -sh build
+# du -sh build/*
 echo
 
-echo "                                     🎁 🎁 🛫 starting zip compression"
+echo "                             🛫 🛫 🛫  starting zip compression"
 rm -f build.zip
 zip -rq build.zip build
-echo "                                     🎁 🎁 🛫 done with zipping, here it is:"
+echo "                             🛫 🛫 🛫  done with zipping, here it is:"
 ls -lhF build.zip
 echo
 
@@ -54,7 +56,8 @@ echo
 # u must be Allan for this to work
 # https://man.openbsd.org/sftp
 # dest url must always be last
-echo "                                     🎁 🎁 🛫 About to upload zip"
+echo "                             🛫 🛫 🛫  About to upload zip"
+
 # "-b - -N" is batch mode; any failure ends session
 sftp -p $NAKODA_SKEY  -b - -N  allan@nakoda <<PETULANT_OLIGARCHS
 	cd /var/www/squish
@@ -78,22 +81,22 @@ fi
 
 
 # now decompress and activate
-echo "                                     🎁 🎁 🛫 About to decompress and activate ➤ ➤ ➤ ➤ ➤ == nakoda login stuff..."
+echo "                             🛫 🛫 🛫  About to decompress and activate ➤ ➤ ➤ ➤ ➤ == nakoda login stuff..."
 ssh  $NAKODA_SKEY  allan@nakoda <<WALKING_SPEED
-	echo "                                     🎁 🎁 🛫  ➤ ➤ ➤ ➤ ==➤  ...end of nakoda login stuff"
+	echo "                             🛫 🛫 🛫   ➤ ➤ ➤ ➤ ==➤  ...end of nakoda login stuff"
 	cd /var/www/squish || exit 1
 	./install.sh
 
 WALKING_SPEED
-echo "                                     🎁 🎁 🛫 should now be activated"
+echo "                             🛫 🛫 🛫  should now be activated"
 
 
-echo "                                     🎁 🎁 🛫 test to see if files are up there - do a Diff"
+echo "                             🛫 🛫 🛫  test to see if files are up there - do a Diff"
+curl https://squish.tactileint.org > /tmp/actualSquishIndexOnline.html
 sleep 5  # give it time to soak in.  So the diff doesn't screw up.
-curl https://squish.tactileint.org > /tmp/squish.html
-if diff build/index.html /tmp/squish.html
-then echo "                                       🎁 😅 🛫  Deploy Completed, looks good!"  `date +%c`
+if diff build/index.html /tmp/actualSquishIndexOnline.html
+then echo "                               🛫 🛫  😅 😅 😅 Deploy Completed, looks good!"  `date +%c`
 	exit 0
-else echo "the diff didn't compare - hashes are different and that's ok"
+else echo "the diff didn't compare - index.html are different"
 	exit 61
 fi
