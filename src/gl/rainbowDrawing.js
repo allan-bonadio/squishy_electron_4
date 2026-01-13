@@ -1,6 +1,6 @@
 /*
 ** rainbow drawing -- draw a disc for the colors |u| = 1
-** Copyright (C) 2025-2025 Tactile Interactive, all rights reserved
+** Copyright (C) 2025-2026 Tactile Interactive, all rights reserved
 */
 
 

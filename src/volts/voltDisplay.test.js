@@ -1,6 +1,6 @@
 /*
 ** voltDisplay test -- testing hte math for viewing and zooming the voltage in the WaveView
-** Copyright (C) 2022-2025 Tactile Interactive, all rights reserved
+** Copyright (C) 2022-2026 Tactile Interactive, all rights reserved
 */
 
 import {expect, test, jest} from '@jest/globals';

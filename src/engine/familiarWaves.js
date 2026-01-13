@@ -1,6 +1,6 @@
 /*
 ** familiarWaves -- code to generate wave breeds given wave parameters
-** Copyright (C) 2025-2025 Tactile Interactive, all rights reserved
+** Copyright (C) 2025-2026 Tactile Interactive, all rights reserved
 */
 
 import qeConsts from './qeConsts.js';

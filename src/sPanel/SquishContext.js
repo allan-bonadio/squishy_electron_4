@@ -1,6 +1,6 @@
 /*
 ** SquishContext -- a react context shared over a whole squish panel
-** Copyright (C) 2025-2025 Tactile Interactive, all rights reserved
+** Copyright (C) 2025-2026 Tactile Interactive, all rights reserved
 */
 
 import { createContext } from 'react';

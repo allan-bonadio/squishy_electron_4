@@ -1,6 +1,6 @@
 /*
 ** squish panel animator -- real-time simulation and interactivity.
-** Copyright (C) 2023-2025 Tactile Interactive, all rights reserved
+** Copyright (C) 2023-2026 Tactile Interactive, all rights reserved
 */
 
 import ControlPanel from '../controlPanel/ControlPanel.js';

@@ -1,6 +1,6 @@
 /*
 ** directAccessors -- helpers to generate direct accessor funcs for JS
-** Copyright (C) 2022-2025 Tactile Interactive, all rights reserved
+** Copyright (C) 2022-2026 Tactile Interactive, all rights reserved
 */
 
 // thought this would be useful but not so much... TODO get rid of this

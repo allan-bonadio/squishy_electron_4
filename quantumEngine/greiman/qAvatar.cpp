@@ -1,6 +1,6 @@
 /*
 ** qAvatar -- the instance and simulation of a quantum mechanical wave in a space
-** Copyright (C) 2021-2025 Tactile Interactive, all rights reserved
+** Copyright (C) 2021-2026 Tactile Interactive, all rights reserved
 */
 
 #include <string.h>

@@ -1,6 +1,6 @@
 /*
 ** GLScene -- a webgl image for the squish wave.  (not to be confused with other canvas wrappers)
-** Copyright (C) 2021-2025 Tactile Interactive, all rights reserved
+** Copyright (C) 2021-2026 Tactile Interactive, all rights reserved
 */
 
 // TODO: rename this GLScene => GLCanvas after the dust settles

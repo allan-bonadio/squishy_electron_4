@@ -1,6 +1,6 @@
 /*
 ** Doc Menu -- dropdown menu for reading online documentation
-** Copyright (C) 2025-2025 Tactile Interactive, all rights reserved
+** Copyright (C) 2025-2026 Tactile Interactive, all rights reserved
 */
 
 

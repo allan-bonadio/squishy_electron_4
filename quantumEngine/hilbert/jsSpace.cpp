@@ -1,6 +1,6 @@
 /*
 ** js space -- interface to JS for qSpaces
-** Copyright (C) 2021-2025 Tactile Interactive, all rights reserved
+** Copyright (C) 2021-2026 Tactile Interactive, all rights reserved
 */
 
 #include <stdexcept>

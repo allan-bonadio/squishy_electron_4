@@ -1,6 +1,6 @@
 /*
 ** eSpace - the JS representations of the c++ qSpace object
-** Copyright (C) 2021-2025 Tactile Interactive, all rights reserved
+** Copyright (C) 2021-2026 Tactile Interactive, all rights reserved
 */
 import qeFuncs from './qeFuncs.js';
 import InteStats from '../controlPanel/InteStats.js';

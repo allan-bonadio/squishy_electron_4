@@ -1,6 +1,6 @@
 /*
 ** CxRainbow tab -- render the Wave tab on the control panel
-** Copyright (C) 2025-2025 Tactile Interactive, all rights reserved
+** Copyright (C) 2025-2026 Tactile Interactive, all rights reserved
 */
 
 import React from 'react';

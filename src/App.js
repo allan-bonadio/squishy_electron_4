@@ -1,6 +1,6 @@
 /*
 ** App -- top level JS for Squishy Electron
-** Copyright (C) 2021-2025 Tactile Interactive, all rights reserved
+** Copyright (C) 2021-2026 Tactile Interactive, all rights reserved
 */
 
 import React from 'react';

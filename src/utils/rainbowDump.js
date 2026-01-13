@@ -1,6 +1,6 @@
 /*
 ** rainbow dump -- colored bargraph in JS console
-** Copyright (C) 2025-2025 Tactile Interactive, all rights reserved
+** Copyright (C) 2025-2026 Tactile Interactive, all rights reserved
 */
 
 // not sure about this file; originally used just for testing

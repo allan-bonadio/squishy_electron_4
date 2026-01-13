@@ -1,6 +1,6 @@
 /*
 ** cx2rgb -- GLSL code for mapping cx numbers to rainbow colors
-** Copyright (C) 2021-2025 Tactile Interactive, all rights reserved
+** Copyright (C) 2021-2026 Tactile Interactive, all rights reserved
 */
 
 // sorry for the voodoo arithmetic here

@@ -1,6 +1,6 @@
 /*
 ** fftMain - top level for FFT code for Squishy Electron
-** Copyright (C) 2022-2025 Tactile Interactive, all rights reserved
+** Copyright (C) 2022-2026 Tactile Interactive, all rights reserved
 */
 
 #include <string.h>

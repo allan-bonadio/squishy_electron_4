@@ -1,6 +1,6 @@
 /*
 ** voltage constants -- Give me an idea of what's a lot of volts and what's a little
-** Copyright (C) 2022-2025 Tactile Interactive, all rights reserved
+** Copyright (C) 2022-2026 Tactile Interactive, all rights reserved
 */
 
 // An order-of-magnitude guess as to a voltage that would be useful.

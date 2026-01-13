@@ -1,6 +1,6 @@
 /*
 ** WaveView -- a webgl image of the quantum wave (or whatever)
-** Copyright (C) 2021-2025 Tactile Interactive, all rights reserved
+** Copyright (C) 2021-2026 Tactile Interactive, all rights reserved
 */
 
 // WaveView has a 1:1 relationship with a C++ Avatar.

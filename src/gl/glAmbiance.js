@@ -1,6 +1,6 @@
 /*
 ** glAmbiance -- additional code & settings for doing GL drawing and etc
-** Copyright (C) 2023-2025 Tactile Interactive, all rights reserved
+** Copyright (C) 2023-2026 Tactile Interactive, all rights reserved
 */
 
 import {tooOldTerminate} from '../utils/errors.js';

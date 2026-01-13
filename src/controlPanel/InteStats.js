@@ -1,6 +1,6 @@
 /*
 ** Integration Statistics -- component for display of integration stats
-** Copyright (C) 2024-2025 Tactile Interactive, all rights reserved
+** Copyright (C) 2024-2026 Tactile Interactive, all rights reserved
 */
 
 import SquishContext from '../sPanel/SquishContext.js';

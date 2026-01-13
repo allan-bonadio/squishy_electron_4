@@ -1,6 +1,6 @@
 /*
 ** pointerContextMap - map C++ pointers to SquishPanel contexts
-** Copyright (C) 2025-2025 Tactile Interactive, all rights reserved
+** Copyright (C) 2025-2026 Tactile Interactive, all rights reserved
 */
 
 // from C++: how are you going to tell what SquishPanel you're operating under?

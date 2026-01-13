@@ -1,6 +1,6 @@
 /*
 ** Spectrum -- a qBuffer that represents the DFT of a wave
-** Copyright (C) 2022-2025 Tactile Interactive, all rights reserved
+** Copyright (C) 2022-2026 Tactile Interactive, all rights reserved
 */
 
 #include "../debroglie/qBuffer.h"

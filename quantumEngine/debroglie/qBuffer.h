@@ -1,6 +1,6 @@
 /*
 ** quantum buffer -- a buffer of qCx values that represents a qCavity or a qSpectrum
-** Copyright (C) 2022-2025 Tactile Interactive, all rights reserved
+** Copyright (C) 2022-2026 Tactile Interactive, all rights reserved
 */
 
 // a 'wave' is a straight array of qCx, of length space->nPoints.

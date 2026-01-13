@@ -1,6 +1,6 @@
 /*
 ** cppu main -- cppu Unit Test main source, and cppu-specific helpers
-** Copyright (C) 2022-2025 Tactile Interactive, all rights reserved
+** Copyright (C) 2022-2026 Tactile Interactive, all rights reserved
 */
 
 #include <stdexcept>

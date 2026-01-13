@@ -1,6 +1,6 @@
 /*
 ** Doc Reader -- dialog content for reading online documentation
-** Copyright (C) 2023-2025 Tactile Interactive, all rights reserved
+** Copyright (C) 2023-2026 Tactile Interactive, all rights reserved
 */
 
 import React, {useState, useRef} from 'react';

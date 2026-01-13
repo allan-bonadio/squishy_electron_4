@@ -1,6 +1,6 @@
 /*
 ** eGrinder - the JS interface to c++ numbercrunching Schrodinger's equation
-** Copyright (C) 2023-2025 Tactile Interactive, all rights reserved
+** Copyright (C) 2023-2026 Tactile Interactive, all rights reserved
 */
 
 import {prepForDirectAccessors} from '../utils/directAccessors.js';

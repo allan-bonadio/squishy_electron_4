@@ -1,6 +1,6 @@
 /*
 ** grWorker -- one thread that's doing iteration
-** Copyright (C) 2023-2025 Tactile Interactive, all rights reserved
+** Copyright (C) 2023-2026 Tactile Interactive, all rights reserved
 */
 
 

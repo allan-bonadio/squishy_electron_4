@@ -1,6 +1,6 @@
 /*
 ** avatar Flat Loader -- transcribe a complex psi buffer to webGL attribute
-** Copyright (C) 2021-2025 Tactile Interactive, all rights reserved
+** Copyright (C) 2021-2026 Tactile Interactive, all rights reserved
 */
 
 

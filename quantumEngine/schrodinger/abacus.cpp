@@ -1,6 +1,6 @@
 /*
 ** abacus -- a sequence of waves, each representing a step in integration of the PDE
-** Copyright (C) 2023-2025 Tactile Interactive, all rights reserved
+** Copyright (C) 2023-2026 Tactile Interactive, all rights reserved
 */
 
 // abacus: a matrix-like device used for calculation
