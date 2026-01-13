@@ -14,7 +14,7 @@ import runningIcon from './waveViewIcons/runningIcon.png';
 
 
 let traceContext = false;
-let traceBeginFinish = false;
+let traceBeginFinish = true;
 
 window.ckSBI = () => {
 

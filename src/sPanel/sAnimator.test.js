@@ -3,48 +3,48 @@ import qeConsts from '../engine/qeConsts.js';
 import {storeASetting, createStoreSettings} from '../utils/storeSettings.js';
 
 
-describe(`sAnimator recalcFrameMenuRates() `, () => {
-	// this function we're testing.  Answer comes as an object dummySA.frameRateMenuFreqs[]
-	const dummySA = {};
-	const recalcFrameMenuRates = (videoFP) =>
-		sAnimator.prototype.recalcFrameMenuRates.call(dummySA, videoFP);
-
-	test.each([
-		// typical screen in US
-		{videoFP: 1000 / 60, expFirst: 1000 / 60, list: [qeConsts.FASTEST, 16.666666666666668,
-			8, 4, 2, 1, 0.5, 0.2, 0.1, 0.06666666666666667, 0.03333333333333333,
-				0.016666666666666666]},
-
-		// typical screen in Europe, 50hz
-		{videoFP: 1000 / 50, expFirst: 1000 / 50, list: [qeConsts.FASTEST, 20, 10, 5, 2, 1, 0.5, 0.2, 0.1,
-			0.06666666666666667, 0.03333333333333333, 0.016666666666666666]},
-
-		// my LG curved screen can also do this:
-		{videoFP: 1000 / 85,  expFirst: 1000 / 85, list: [ qeConsts.FASTEST, 11.764705882352942,
-			6, 3, 2, 1, 0.5, 0.2, 0.1, 0.06666666666666667, 0.03333333333333333,
-			0.016666666666666666]},
-
-		// something in between
-		{videoFP: 1000 / 59,  expFirst: 1000 / 59, list: [ qeConsts.FASTEST,  16.949152542372882,
-			8, 4, 2, 1, 0.5, 0.2, 0.1, 0.06666666666666667, 0.03333333333333333,
-			0.016666666666666666]},
-
-		{videoFP: 1000 / 73,  expFirst: 1000 / 73, list: [ qeConsts.FASTEST,  13.698630136986301,
-			7, 4, 2, 1, 0.5, 0.2, 0.1, 0.06666666666666667, 0.03333333333333333,
-			0.016666666666666666]},
-
-	])(`testing recalcFrameMenuRates videoFP=%f freq=%f`,
-	({videoFP, expFirst, list}) => {
-		//console.log(`the dummy SA is: `, dummySA);
-		// obsolete
-		//recalcFrameMenuRates(videoFP);
-		//expect(dummySA.frameRateMenuFreqs[0]).toEqual(qeConsts.FASTEST);
-		//expect(dummySA.frameRateMenuFreqs[1]).toEqual(expFirst);
-		//expect(dummySA.frameRateMenuFreqs).toEqual(list);
-	},
-	10_000);
-
-});
+// describe(`sAnimator recalcFrameMenuRates() `, () => {
+// 	// this function we're testing.  Answer comes as an object dummySA.frameRateMenuFreqs[]
+// 	const dummySA = {};
+// 	const recalcFrameMenuRates = (videoFP) =>
+// 		sAnimator.prototype.recalcFrameMenuRates.call(dummySA, videoFP);
+//
+// 	test.each([
+// 		// typical screen in US
+// 		{videoFP: 1000 / 60, expFirst: 1000 / 60, list: [qeConsts.FASTEST, 16.666666666666668,
+// 			8, 4, 2, 1, 0.5, 0.2, 0.1, 0.06666666666666667, 0.03333333333333333,
+// 				0.016666666666666666]},
+//
+// 		// typical screen in Europe, 50hz
+// 		{videoFP: 1000 / 50, expFirst: 1000 / 50, list: [qeConsts.FASTEST, 20, 10, 5, 2, 1, 0.5, 0.2, 0.1,
+// 			0.06666666666666667, 0.03333333333333333, 0.016666666666666666]},
+//
+// 		// my LG curved screen can also do this:
+// 		{videoFP: 1000 / 85,  expFirst: 1000 / 85, list: [ qeConsts.FASTEST, 11.764705882352942,
+// 			6, 3, 2, 1, 0.5, 0.2, 0.1, 0.06666666666666667, 0.03333333333333333,
+// 			0.016666666666666666]},
+//
+// 		// something in between
+// 		{videoFP: 1000 / 59,  expFirst: 1000 / 59, list: [ qeConsts.FASTEST,  16.949152542372882,
+// 			8, 4, 2, 1, 0.5, 0.2, 0.1, 0.06666666666666667, 0.03333333333333333,
+// 			0.016666666666666666]},
+//
+// 		{videoFP: 1000 / 73,  expFirst: 1000 / 73, list: [ qeConsts.FASTEST,  13.698630136986301,
+// 			7, 4, 2, 1, 0.5, 0.2, 0.1, 0.06666666666666667, 0.03333333333333333,
+// 			0.016666666666666666]},
+//
+// 	])(`testing recalcFrameMenuRates videoFP=%f freq=%f`,
+// 	({videoFP, expFirst, list}) => {
+// 		//console.log(`the dummy SA is: `, dummySA);
+// 		// obsolete
+// 		//recalcFrameMenuRates(videoFP);
+// 		//expect(dummySA.frameRateMenuFreqs[0]).toEqual(qeConsts.FASTEST);
+// 		//expect(dummySA.frameRateMenuFreqs[1]).toEqual(expFirst);
+// 		//expect(dummySA.frameRateMenuFreqs).toEqual(list);
+// 	},
+// 	10_000);
+//
+// });
 
 describe(`sAnimator findNearestMenuFreq`, () => {
 	let sAnim;
