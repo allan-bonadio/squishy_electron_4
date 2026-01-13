@@ -21,9 +21,9 @@ import {interpretCppException, wrapForExc} from '../utils/errors.js';
 import SquishContext from '../sPanel/SquishContext.js';
 
 let traceSetPanels = false;
-let traceBeginFinish = false;
+let traceBeginFinish = true;
 let traceContext = false;
-let traceQuickDtFactor = false;
+let traceQuickDtFactor = true;
 
 // integrations always need specific numbers of steps.  But there's always one
 // more. maybe this should be defined in the grinder.  Hey, isn't this really
@@ -59,10 +59,10 @@ export class ControlPanel extends React.Component {
 			...getAGroup('waveParams'),
 			...getAGroup('voltageParams'),
 			...getAGroup('voltageSettings'),
-			...getAGroup('frameSettings'),
+			...getAGroup('lapSettings'),
 
 			// official dtFactor here in the state.  quick one on this.
-			dtFactor: getASetting('frameSettings', 'dtFactor'),
+			dtFactor: getASetting('lapSettings', 'dtFactor'),
 			showingTab: getASetting('miscSettings', 'showingTab'),
 		}
 		//this.chosenFP = this.state.chosenFP;
@@ -139,7 +139,8 @@ export class ControlPanel extends React.Component {
 			console.log(`🎛️ ControlPanel constructor & context initialized with space, `
 			+` ctx.shouldBeIntegrating=${this.context.shouldBeIntegrating}, `
 			+` gr.shouldBeIntegrating=${this.grinder.shouldBeIntegrating}, `
-			+` isIntegrating=${this.grinder.isIntegrating}   ctx.cp:`,
+			+` isIntegrating=${this.grinder.isIntegrating}   ctx.cp: `
+			+ `dtFactor=${this.state.dtFactor} * refDt=${this.space.refDt} `,
 			this.context.controlPanel);
 		}
 	}
@@ -151,7 +152,7 @@ export class ControlPanel extends React.Component {
 	// set frame period chosen by the user: set it JUST for the animator and grinder
 	// setChosenFP =
 	// (period) => {
-	// 	this.setState({chosenFP: storeASetting('frameSettings', 'chosenFP', this.chosenFP)});
+	// 	this.setState({chosenFP: storeASetting('lapSettings', 'chosenFP', this.chosenFP)});
 	//
 	// 	const an = this.props.animator;
 	// 	if (an) {
@@ -250,48 +251,38 @@ export class ControlPanel extends React.Component {
 	// dtFactor we multiply on to get stretchedDt = effective dt, ready to use.
 	// This function changes dtFactor quickly for interactive feedback, but doesn't store in the state or local storage
 	setQuickDtFactor = (quickDtFactor) => {
-		if (traceQuickDtFactor) console.log(`setQuickDtFactor:   old: ${this.quickDtFactor}   new: ${quickDtFactor}`, );
+		if (traceQuickDtFactor)
+			console.log(`🎛️  setQuickDtFactor x 1000 starts:   old: ${this.quickDtFactor * 1000}   new: ${quickDtFactor * 1000}`, );
+		if (this.quickDtFactor == quickDtFactor)
+			return;
 		this.quickDtFactor = quickDtFactor;
 		this.grinder.stretchedDt = quickDtFactor * this.space.refDt;
 		this.setState({quickDtFactor});  // do this so rerenders
-		console.log(`🎛️ setQuickDtFactor: refDt = ${this.space.refDt}   quickDtFactor= ${quickDtFactor} stretchedDt=${this.grinder.stretchedDt}`)
+		if (traceQuickDtFactor)
+			console.log(`🎛️ setQuickDtFacto finishesr: refDt = ${this.space.refDt}   quickDtFactor= ${quickDtFactor} stretchedDt=${this.grinder.stretchedDt}`)
 	}
 
 	// called after the mouseUp event, to save the dtFactor permanently.
+	// arrow function saveDFactor(dtFactor) dtfactor is the arg and quickDtFactor is def
 	saveDtFactor = (dtFactor = this.quickDtFactor) => {
-		if (traceQuickDtFactor) console.log(`saveDtFactor:   old: ${this.state.dtFactor}   new: ${dtFactor}`, );
+		if (traceQuickDtFactor)
+			console.log(`saveDtFactor:   old: ${this.state.dtFactor}   new: ${dtFactor} ± ${dtFactor - this.state.dtFactor}`, );
 		this.quickDtFactor = dtFactor;
+		console.log(`this.grinder = `, this.grinder);
 		this.grinder.stretchedDt = dtFactor * this.space.refDt;
-		storeASetting('frameSettings', 'dtFactor', dtFactor);
+		storeASetting('lapSettings', 'dtFactor', dtFactor);
+		console.log(`dtFactor = ${dtFactor}  this.grinder=`, this.grinder);
 		this.setState({dtFactor});
 	}
 
-
-// 	startSingleFrame =
-// 	(ev) => {
-// 		console.log(`🎛️ startSingleFrame, `, ev);
-//
-// 		let nFrames = 1;
-// 		// multipleby holding down modifiers.  Alt=bad on Windows, ctrl=bad on Mac
-// 		if (ev.ctrlKey || ev.altKey) nFrames *= 10;
-// 		if (ev.shiftKey) nFrames *= 100;
-//
-// 		this.props.animator.startSingleFrame(nFrames);
-//
-// 		if (traceBeginFinish) console.log(`🎛️ ControlPanel startSingleFrame,`
-// 			+` nFrames=${nFrames}, `
-// 			+` ctx.shouldBeIntegrating=${this.context.shouldBeIntegrating}, `
-// 			+` gr.shouldBeIntegrating=${this.grinder.shouldBeIntegrating}, `
-// 			+`isIntegrating=${this.grinder.isIntegrating}   `);
-// 	}
 
 	/* ********************************************** misc */
 
 	resetElapsedTime() {
 		this.grinder.elapsedTime = 0;
-		this.grinder.frameSerial = 0;
+		//this.grinder.frameSerial = 0;
 
-		this.props.animator.showTimeNFrame();
+		this.props.animator.showTime();
 	}
 
 	// generate an FFT of the wave.  In the JS console.

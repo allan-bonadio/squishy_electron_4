@@ -126,12 +126,12 @@ describe('cx2rgb tests', () => {
 
 	testParam('voltageSettings', 'showVoltage', true, [true, false]);  // not really the same as the rest...
 
-	/* ************************************ frameSettings */
-	testParam('frameSettings', 'shouldBeIntegrating', false,  [false, true]);
-	//testParam('frameSettings', 'chosenFP', 50, {min: 16, max: 60_001});
-	testParam('frameSettings', 'dtFactor', 1, {min: .1, max: 10.0, });
-	//testParam('frameSettings', 'stepsPerFrame', 128, {min: 10, max: 1e5});
-	//testParam('frameSettings', 'lowPassFilter', 50, {min: 0, max: 75});
+	/* ************************************ lapSettings */
+	testParam('lapSettings', 'shouldBeIntegrating', false,  [false, true]);
+	//testParam('lapSettings', 'chosenFP', 50, {min: 16, max: 60_001});
+	testParam('lapSettings', 'dtFactor', 1, {min: .1, max: 10.0, });
+	//testParam('lapSettings', 'stepsPerLap', 128, {min: 10, max: 1e5});
+	//testParam('lapSettings', 'lowPassFilter', 50, {min: 0, max: 75});
 
 	/* ************************************miscSettings */
 	testParam('miscSettings', 'showingTab', 'wave', ['wave', 'voltage', 'space', 'integrate']);

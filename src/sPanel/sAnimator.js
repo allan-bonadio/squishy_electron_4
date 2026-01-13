@@ -13,11 +13,8 @@ import qeFuncs from '../engine/qeFuncs.js';
 import qeConsts from '../engine/qeConsts.js';
 
 let traceTheViewBuffer = false;
-let traceHeartbeats = false;
-//let traceFrameProgress = false;
-let traceFrameMenuRates = false;
-let traceSingleFrame = false;
-let traceIntegration = false;
+let traceScreenRefreshes = false;
+let traceIntegration = true;
 
 let tracerAFPeriod = false;
 let traceTypicalVideoPeriod = false;
@@ -42,11 +39,6 @@ class sAnimator {
 		this.getContext = getContext;
 
 		// will still need grinder, mainRepaint(), available later in SquishPanel
-
-		//this.frameProgress = 0;  // part of the FP stabilization
-		//this.chosenFP = getASetting('frameSettings', 'chosenFP')
-		//this.nFramesToGo = 0;
-
 		// defaults - will work until set by real life
 		this.avgVideoFP = 1000 / 60;
 		this.unstableFP = true;
@@ -56,7 +48,7 @@ class sAnimator {
 		this.inteTimes = {totalDrawTime: 0};
 
 		// Start the heartbeat.  on next tic
-		if (traceHeartbeats)
+		if (traceScreenRefreshes)
 			console.log(`🎥 sAnimator: about to kick off rAFHandler`);
 		requestAnimationFrame(this.rAFHandler);
 
@@ -73,24 +65,19 @@ class sAnimator {
 
 	/* ******************************************************* frames */
 
-	// elapsed (virtual) picoseconds and frame count: insert them into
+	// elapsed (virtual) picoseconds: insert them into
 	// the SVG in the HTML.  Faster than react. should move this to like
 	// WaveView
-	showTimeNFrame() {
-		let tnf = this.grinder.formatTimeNFrame();
+	showTime() {
+		let tnf = this.grinder.formatTime();
 		let nw = document.querySelector('.voNorthWest')
 		if (nw)
 			nw.innerHTML = tnf.elapsedTimeText;
-
-		// concept of 'frame' is going away, at least for the user
-		// let ne = document.querySelector('.voNorthEast')
-		// if (ne)
-		// 	ne.innerHTML =  tnf.frameSerialText;
 	}
 
 	// Repaint, with webgl, the latest waveview.  Whether it needs it or not.
 	// Measure how long it takes to paint; update integration statistics.
-	drawLatestFrame() {
+	drawLatestLap() {
 		//if (traceStats) console.log(`🎥 time since last tic: ${performance.now()
 		//		- this.inteTimes.startIntegrationTime}ms`);
 		let startDrawTime = performance.now();
@@ -98,7 +85,7 @@ class sAnimator {
 		this.inteTimes.prevDrawTime = startDrawTime;
 
 		this.mainRepaint?.();   // mainRepaint() func won't be here until GLScene renders
-		this.showTimeNFrame();  // part of the draw time - the picoseconds and frame serial
+		this.showTime();  // part of the draw time - the picoseconds
 
 		// update dom elements in integration tab to latest stats (if it's been shown at least once)
 		this.grinder.displayAllStats?.(this.inteTimes, this.grinder);
@@ -117,7 +104,7 @@ class sAnimator {
 		// needsRepaint is turned on after each frame is ground, in c++.  but only if it's ground.
 		if (!this.grinder.needsRepaint) return;
 
-		this.drawLatestFrame();
+		this.drawLatestLap();
 		this.grinder.needsRepaint = false;
 	}
 
@@ -168,7 +155,7 @@ class sAnimator {
 				const setAnimationFP = () => {
 					// round the FREQUENCY to an int, to get the authoritative FP
 					let videoRate = round(1000 / this.avgVideoFP);
-					videoFP = this.inteTimes.rAFPeriod = 1000 / videoRate;
+					videoFP = this.inteTimes.rAFPeriod = Math.round(1000 / videoRate);
 					this.grinder.videoFP = videoFP;
 				}
 
@@ -180,21 +167,6 @@ class sAnimator {
 			}
 		}
 	}
-
-	/* ********************************************************* single frame */
-
-	// call when human clicks on Single Frame button, with n of frames they asked for
-	// startSingleFrame = (nFrames) => {
-	// 	console.log(`🎥 sAnimator startSingleFrame starts with '${nFrames}'`);
-	// 	this.setShouldBeIntegrating(true);
-	// 	ldkrjfghksdjfhhg this.nFramesToGo = nFrames - 1;
-	//
-	// 	if (traceSingleFrame) console.log(`🎥  sAnimator singleFrame,`
-	// 		+` nFramesToGo=${this.nFramesToGo}, `
-	// 		+` this.shouldBeIntegrating=${this.shouldBeIntegrating}, `
-	// 		+` gr.shouldBeIntegrating=${this.grinder?.shouldBeIntegrating}, `
-	// 		+`isIntegrating=${this.grinder?.isIntegrating}   `);
-	// }
 
 	/* *************************************  divergence */
 	// start to jiggle whole squishPanel if starting to diverge.  Directly, not thru React
@@ -252,32 +224,12 @@ class sAnimator {
 	rAFIntegrate() {
 		if (!this.getContext().shouldBeIntegrating) return;
 
-		// do the integration, one  frame = one video frame
-		//this.frameProgress += this.avgVideoFP;
-
-		// if (traceIntegration)
-		// 	console.log(`🎥 frameProgress (${this.frameProgress}) vs  chosenFP (${this.chosenFP})`);
-
-		// singleFrame - are we at the end?
-		// if (traceSingleFrame)
-		// 	console.log(`🎥 singleFrame - are we at the end?  nFramesToGo=${this.nFramesToGo}`);
-		// if (this.nFramesToGo) {
-		// 	this.grinder.triggerIteration();
-		// 	// 'single' frames - whatever the count is.  or we just go around again
-		// 	if (0 == this.nFramesToGo--) {
-		// 		// we're done
-		// 		this.getContext().controlPanel.finishAnimating();
-		// 		if (traceSingleFrame) console.log(`🎥 stopped single frame 🟥`);
-		// 	}
-		// }
-		// else {
-			// time for another normal iteration.  Trigger the threads.
-			this.grinder.triggerIteration();
-			if (traceIntegration) {
-				console.log(`🎥 another normal integration frame done `
-					+`at ${performance.now() & 16383} arbitrary ms`);
-			}
-		//}
+		// time for another normal iteration.  Trigger the threads.
+		this.grinder.triggerIteration();
+		if (traceIntegration) {
+			console.log(`🎥 another normal integration frame done `
+				+`at ${performance.now() & 16383} arbitrary ms`);
+		}
 
 	}
 
@@ -301,42 +253,13 @@ class sAnimator {
 	rAFHandler =
 	now => {
 		this.measureAndUpdateVideoFP(now);  // must measure  rAF frequency continuously
-
-		//if (this.frameProgress >= this.chosenFP) {
-			// we only get here every chosenFP ms
-
-			// sometimes (debugger) these can pile up on the stack or list of threads or something
-			// so here, if one already started, return quickly from any new ones that get started
-			// this doesn't work
-			// if (this.alreadyRAF) {
-			// 	console.log(`skipping RAF beat`);
-			// 	debugger;  // this doesn't do anything
-			// 	return;
-			// }
-			// this.alreadyRAF = true;
-
-			this.rAFFrame();
-
-			// even if the chosenFP doesn't evenly divide by videoFP,
-			// this'll do it (approximately) right.  Leftovers goes into next period.
-			// you might get like chosen/video = 6 6 5 6 6 6 5 6 6 5 but user won't notice
-			// this.frameProgress -= this.chosenFP
-			// if (traceFrameProgress) {
-			// 	let da = new Date();
-			// 	let time = da.getSeconds() + da.getMilliseconds() / 1e3;
-			// 	console.log(`🎥 after grind frameProgress=${this.frameProgress}  `
-			// 		+ `chosenFP=${this.chosenFP} at :${time.toFixed(3)} `
-			// 		+ `nFramesToGo=${this.nFramesToGo}`);
-			// }
-		//}
-		// this.frameProgress += this.avgVideoFP;
-		// this.alreadyRAF = false;
+		this.rAFFrame();
 		requestAnimationFrame(this.rAFHandler);
 	}
 
 	/* *************************************  runningDiagnosticCycle of circular wave*/
 
-	// special test code.  probably broken
+	// special test code.  From years ago.   probably broken
 
 	// use for benchmarking with a circular wave.  Will start frame, and stop after
 	// the leftmost state is at its peak.  Then display stats.
@@ -348,7 +271,7 @@ class sAnimator {
 		if (!this.allowRunningDiagnosticCycle) return;
 		this.runningDiagnosticCycle = true;
 		this.runningCycleStartingTime = this.grinder.elapsedTime;
-		this.runningCycleStartingSerial = this.frameSerial;
+		//this.runningCycleStartingSerial = this.frameSerial;
 		this.cPanel.beginAnimating();
 	};
 
@@ -369,7 +292,7 @@ class sAnimator {
 
 					this.setState({
 						runningCycleElapsedTime: this.mainAvatar.elapsedTime - this.runningCycleStartingTime,
-						runningCycleIntegrateSerial: this.mainAvatar.frameSerial - this.runningCycleStartingSerial,
+						//runningCycleIntegrateSerial: this.mainAvatar.frameSerial - this.runningCycleStartingSerial,
 					});
 
 					this.goingDown = false;

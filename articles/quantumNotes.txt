@@ -1,3 +1,5 @@
+happy newyears 2026.
+
 
 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 2025 Aug 28
 
@@ -135,9 +137,9 @@ prep:
 - maybe even running.
 
 check:
-- start/stop works.  Single frame works.
+- start/stop works.  running works.
 - Reset Wave
-- frame rate
+- lap rate
 - resolution display
 
 check voltage:
@@ -257,7 +259,7 @@ handlers:
 	body.removeEventListener('mouseup', mouseUp);
 - should only drag while ev.buttons and also isDragging are true
 
-- App specifies intended frame dragging should be allowed in
+- App specifies intended GUI frame dragging should be allowed in
 - but also needs ability to drag outside it eg for voltage area
 - Must nail down all the coords for a variety of uses
 
@@ -477,8 +479,7 @@ Multiprocessing must be done with pThreads and/or web workers, it seems.
 
 - ability to 'stick your finger in' and measure a state variable and thereby change the state
 
-- small key image indicating phase-color correspondence
-- time display, frame,
+
 - some diagnostics for me?
 
 - Fourier transforms with http://www.fftw.org to xform space domain to momentum domain

@@ -59,8 +59,6 @@ class eGrinder {
 	get _spect() { return this.ints[5]; }
 	get _stage() { return this.ints[2]; }
 
-	get stepsPerFrame() { return this.ints[7]; }
-	set stepsPerFrame(a) { this.ints[7] = a; }
 	get videoFP() { return this.doubles[4]; }
 	set videoFP(a) { this.doubles[4] = a; }
 	get totalCalcTime() { return this.doubles[5]; }
@@ -71,8 +69,6 @@ class eGrinder {
 	get divergence() { return this.doubles[9]; }
 	get elapsedTime() { return this.doubles[10]; }
 	set elapsedTime(a) { this.doubles[10] = a; }
-	get frameSerial() { return this.ints[6]; }
-	set frameSerial(a) { this.ints[6] = a; }
 	get nGrWorkers() { return this.ints[23]; }
 	startAtomicOffset = 24;
 	get startAtomic() { return this.ints[24]; }
@@ -137,18 +133,17 @@ class eGrinder {
 	}
 
 	// a consistent way to format these numbers, used in two places
-	formatTimeNFrame() {
+	formatTime() {
 		return {
 			elapsedTimeText: this.elapsedTime.toFixed(3),
-			//frameSerialText: thousandsSpaces(this.frameSerial),
 		}
 	}
 
 	// Grind one frame - Single Threaded - deprecated
 	// for testing maybe keep the single threaded way
 	// can throw std::runtime_error("divergence")
-	// oneFrame() {
-	// 	qeFuncs.this_oneFrame(this.pointer);
+	// oneLap() {
+	// 	qeFuncs.this_oneLap(this.pointer);
 	// }
 
 	askForFFT() {

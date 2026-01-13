@@ -130,6 +130,7 @@ class eCavity {
 	/* ****************************************************    👽   👽    direct access */
 
 	get _wave() { return this.ints[3]; }
+
 	get nPoints() { return this.ints[4]; }
 	get start() { return this.ints[5]; }
 	get end() { return this.ints[6]; }

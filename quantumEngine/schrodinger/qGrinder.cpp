@@ -52,8 +52,8 @@ static std::runtime_error nullException("");
 // created by creation time here, although a few details left  to do.
 qGrinder::qGrinder(qSpace *sp, int nGrWorkers, const char *lab)
 	: magic('Grnd'), space(sp), spect(NULL),
-		stepsPerFrame(48), videoFP(.05), stretchedDt(60),
-		elapsedTime(0), frameSerial(0), nGrWorkers(nGrWorkers),
+		videoFP(.05), stretchedDt(60),
+		elapsedTime(0), nGrWorkers(nGrWorkers),
 		integrationEx(nullException), exceptionCode(""), _zero(0), hadException(false),
 		shouldBeIntegrating(false), isIntegrating(false),
 		pleaseFFT(false), sentinel(grSENTINEL_VALUE) {
@@ -61,7 +61,7 @@ qGrinder::qGrinder(qSpace *sp, int nGrWorkers, const char *lab)
 	// number of waves
 	flick = new qFlick(space, 3);
 
-	// recieves wave after a frame is done; then vbufs generated from that
+	// recieves wave after a lap is done; then vbufs generated from that
 	stage = new qCavity(space, NULL);
 
 	// so wave in the flick points to the zero-th wave
@@ -139,14 +139,8 @@ void qGrinder::formatDirectOffsets(void) {
 	printf("\n");
 
 	/* ************************* timing */
-
-	makeIntGetter(stepsPerFrame);
-	makeIntSetter(stepsPerFrame);
-
 	makeDoubleGetter(videoFP);
 	makeDoubleSetter(videoFP);
-	// makeDoubleGetter(chosenFP);
-	// makeDoubleSetter(chosenFP);
 
 	makeDoubleGetter(totalCalcTime);
 	makeDoubleGetter(maxCalcTime);
@@ -160,8 +154,6 @@ void qGrinder::formatDirectOffsets(void) {
 	makeDoubleGetter(divergence);
 	makeDoubleGetter(elapsedTime);
 	makeDoubleSetter(elapsedTime);
-	makeIntGetter(frameSerial);
-	makeIntSetter(frameSerial);
 	// samplePoint
 	// grWorkers
 	makeIntGetter(nGrWorkers);
@@ -210,8 +202,8 @@ void qGrinder::dumpObj(const char *title) {
 	speedyLog("        magic: " MAGIC_FORMAT "   qSpace=%p '%s'   \n",
 		MAGIC_ARGS, space, label);
 
-	speedyLog("        elapsedTime=%lf, frameSerial=%d, refDt=%lf, \n",
-		elapsedTime, frameSerial, space->refDt);
+	speedyLog("        elapsedTime=%lf, refDt=%lf, \n",
+		elapsedTime, space->refDt);
 
 	speedyLog("        flick=%p, voltage=%p, spect=%p\n",
 		flick, voltage, spect);
@@ -307,19 +299,22 @@ void qGrinder::measureDivergence() {
 
 /* ********************************************************** doing Integration */
 
-// Integrates one Frame, one iteration, on single thread.  Does several
-// visscher steps (eg 10 or 100 or 500). Actually does stepsPerFrame + ½
+// Integrates one lap, one iteration, on single thread.  Does several
+// visscher steps (eg 10 or 100 or 500). Actually does stepsPerLap + ½
 // steps; four half hits, im at start and re at finish, to adapt to
 // Visscher timing, then synchronized timing. Maybe this should be in
 // grWorker?  Multi-threads will have to be done with totally different code.
-void qGrinder::oneFrame() {
+void qGrinder::oneLap() {
 	if (traceIntegration) {
-		speedyLog("qGrinder 🪓 starting oneFrame() "
-			"shouldBeIntegrating: %hhu   isIntegrating: %hhu   stretchedDt=%lf\n",
-			shouldBeIntegrating, isIntegrating, stretchedDt);
+		speedyLog("qGrinder 🪓 starting oneLap() "
+			"shouldBeIntegrating: %hhu   isIntegrating: %hhu   stretchedDt=%lf"
+			"   refDt=%lf    elapsedTime=%lf   \n",
+			shouldBeIntegrating, isIntegrating,
+			stretchedDt, space->refDt, elapsedTime   );
 	}
+	// dtFactor is in controlpanel state  only
 	if (traceIntegrationDetailed)
-		qGrinder::dumpObj("qGrinder 🪓 starting oneFrame()");
+		qGrinder::dumpObj("qGrinder 🪓 starting oneLap()");
 	qCx *wave0 = flick->waves[0];
 	qCx *wave1 = flick->waves[1];
 	qCx *wave2 = flick->waves[2];
@@ -327,6 +322,7 @@ void qGrinder::oneFrame() {
 	// this is the actual dt in use for calculations, refDt * dtFactor
 	double dt = stretchedDt;
 	double dtHalf = dt / 2;
+printf("dt=%lf  dtHalf=%lf\n", dt, dtHalf);
 
 	// half step in beginning to move Im forward dt/2 = dtHalf
 	// cuz outside of here, re and im are synchronized.
@@ -334,11 +330,11 @@ void qGrinder::oneFrame() {
 	hitReal(wave1, wave0, wave0, 0);
 	hitImaginary(wave1, wave0, wave0, dtHalf);
 
-	// do stepsPerFrame steps of  integration.
-	// Note here the latest is in [1]; frame continues this,
+	// do stepsPerLap steps of  integration.
+	// Note here the latest is in [1]; lap continues this,
 	// and the halfwave at the end moves it back to [0]].
 	// midpoint uses [2] in between.
-	for (int step = 0; step < stepsPerFrame; step++) {
+	for (int step = 0; step < stepsPerLap; step++) {
 
 		#ifdef MIDPOINT_METHOD
 		stepMidpoint(wave0, wave1, wave2, dt);
@@ -350,8 +346,9 @@ void qGrinder::oneFrame() {
 	}
 
 	// we
-	elapsedTime += dt * (stepsPerFrame + .5);  // is this right?
-	frameSerial++;
+	printf("elapsed time before %lf  dt=%lf  spl=%i  \n", elapsedTime, dt, stepsPerLap);
+	elapsedTime += dt * (stepsPerLap + .5);  // is this right?  no
+	printf("elapsed time after %lf\n", elapsedTime);
 
 	// half hit at completion to move Re forward dt / 2
 	// and copy back to Main
@@ -362,64 +359,69 @@ void qGrinder::oneFrame() {
 	// normalize it and return the old inner product, see how close to 1.000 it is
 	double iProd = flick->normalize();
 	if (dumpFFHiResSpectums) flick->dumpHiRes("wave END fourierFilter() after normalize");
-	if (traceIProd && ((int) frameSerial & 31) == 0)
-		speedyLog("      🪓 qGrinder frame %d elapsed %4.6lf  iProd= %lf \n",
-			frameSerial, elapsedTime, iProd);
+	if (traceIProd && ((int) lapSerial & 31) == 0)
+		speedyLog("      🪓 qGrinder lap %d elapsed %4.6lf  iProd= %lf \n",
+			lapSerial, elapsedTime, iProd);
 
 	if (traceJustWave)
-		flick->dump("     🪓 qGrinder traceJustWave at end of frame", true);
+		flick->dump("     🪓 qGrinder traceJustWave at end of lap", true);
 
 	if (traceIntegration) {
-		speedyLog("🪓 qGrinder::oneFrame() done; shouldBeIntegrating: %hhu   isIntegrating: %hhu \n"
-			"  refDt=%lf  stretchedDt=%8.6lf stepsPerFrame=%d  wave0[5]=%lf\n",
-			shouldBeIntegrating, isIntegrating, space->refDt, stretchedDt, stepsPerFrame,
+		speedyLog("🪓 qGrinder::oneLap() done; shouldBeIntegrating: %hhu   isIntegrating: %hhu \n"
+			"  refDt=%lf  stretchedDt=%8.6lf   wave0[5]=%lf\n",
+			shouldBeIntegrating, isIntegrating, space->refDt, stretchedDt,
 			wave0[5]);
 	}
 
 	qCheckReset();
 }
 
-void grinder_oneFrame(qGrinder *pointer) { pointer->oneFrame(); }
+void grinder_oneLap(qGrinder *pointer) { pointer->oneLap(); }
 
 
 /* ********************************************************** threaded integration  */
 
-// add up ALL the threads' frameCalcTime and keep a running average
+// add up ALL the threads' lapCalcTime and keep a running average
 void qGrinder::aggregateCalcTime(void) {
 	totalCalcTime = 0;
 	maxCalcTime = 0;
 	for (int ix = 0; ix < nGrWorkers; ix++) {
 		grWorker *sl = grWorkers[ix];
 		if (sl) {
-			totalCalcTime += sl->frameCalcTime;
-			maxCalcTime = fmax(maxCalcTime, sl->frameCalcTime);
+			totalCalcTime += sl->lapCalcTime;
+			maxCalcTime = fmax(maxCalcTime, sl->lapCalcTime);
 		}
 	}
 
-	// now compare it to the screen and adjust so it's just about the frame time.
-	stepsPerFrame += (int) (stepsPerFrame * (videoFP - maxCalcTime)  / maxCalcTime);
+	// now compare it to the screen and adjust so it's just about the lap time.
+	stepsPerLap += (int) (stepsPerLap * (videoFP - maxCalcTime)  / maxCalcTime);
+
+
+
+	speedyLog(" qGrinder 🪓 spl=%d   vFP=%8.3lf\n",
+		stepsPerLap, videoFP, maxCalcTime);
 
 	if (traceAggregate) {
 		speedyLog(" qGrinder 🪓 aggregate time summed: %5.6lf ms, maxed: %5.6lf ms\n",
 			totalCalcTime, maxCalcTime);
-		speedyLog("       videoFP: %5.6lf  new stepsPerFrame: %d time per step: %5.8lf µs\n",
-			videoFP, stepsPerFrame, maxCalcTime/stepsPerFrame * 1e6);
+		speedyLog("       videoFP: %5.6lf  new stepsPerLap: %d    time per step: %5.8lf µs\n",
+			videoFP, stepsPerLap, maxCalcTime/stepsPerLap * 1e6);
 	}
 }
 
 
 // runs in the thread loop, only in the last thread to finish integration in an
-// integration frame.  Eventually I'll have a 'tail' thread, that does this so
+// integration lap.  Eventually I'll have a 'tail' thread, that does this so
 // the worker threads can quickly get back to work.
 void qGrinder::threadsHaveFinished() {
 	double thfTime;
-	if (traceThreadsHaveFinished || (traceTHFBenchmarks && 0 == (frameSerial & 63))) {
+	if (traceThreadsHaveFinished || (traceTHFBenchmarks && 0 == (lapSerial & 63))) {
 		thfTime = getTimeDouble();
 		speedyLog("🪓 qGrinder::threadsHaveFinished() starts\n");
 	}
 	aggregateCalcTime();
 
-	if (traceTHFBenchmarks && 0 == (frameSerial & 63)) {
+	if (traceTHFBenchmarks && 0 == (lapSerial & 63)) {
 		speedyLog("🪓 threadsHaveFinished()— aggregateCalcTime()÷64 at %10.6lf ms - needsRepaint=%hhu"
 			" shouldBeIntegrating=%hhu   isIntegrating=%hhu\n",
 			getTimeDouble() - thfTime, needsRepaint, shouldBeIntegrating, isIntegrating);
@@ -439,14 +441,14 @@ void qGrinder::threadsHaveFinished() {
 	// now, copy it to the stage wave buffer, so it can copy it to
 	// its avatar, so webgl can pick it up.  quick!  No mutexes or anything;
 	// this here runs in thread time.  webgl runs in UI time.  Worst
-	// thing that'll happen is the image will be part one frame and part
+	// thing that'll happen is the image will be part one video frame and part
 	// the next frame.
 	// THis tail thread should also snarf off a copy of the raw wave, and do an FFT on it,
 	// for display on the frequency chart
 	copyToStage();
 	needsRepaint = true;
 
-	if (traceTHFBenchmarks && 0 == (frameSerial & 63)) {
+	if (traceTHFBenchmarks && 0 == (lapSerial & 63)) {
 		speedyLog("🪓 threadsHaveFinished()— copyToStage()÷64 at %10.6lf ms - needsRepaint=%hhu"
 			" shouldBeIntegrating=%hhu   isIntegrating=%hhu\n",
 			getTimeDouble() - thfTime, needsRepaint, shouldBeIntegrating, isIntegrating);
@@ -459,9 +461,9 @@ void qGrinder::threadsHaveFinished() {
 
 	measureDivergence();
 
-	// ready for new frame
+	// ready for new lap
 	// check whether we've stopped and leave it locked or unlocked for the next cycle.
-	// this retriggers every frametime, if the chosenFP is FASTEST.
+	// this retriggers every frametime, if the chosenFP is FASTEST.  NO
 	// if (isIntegrating && FASTEST == chosenFP)
 	// 	emscripten_atomic_store_u32(&startAtomic, 0);  // start next iteration ASAP
 	// else
@@ -469,12 +471,12 @@ void qGrinder::threadsHaveFinished() {
 	// now in grWorker emscripten_atomic_store_u32(&startAtomic, -1);
 	emscripten_atomic_store_u32(&finishAtomic, 0);
 
-	if (traceTHFBenchmarks && 0 == (frameSerial & 63)) {
+	if (traceTHFBenchmarks && 0 == (lapSerial & 63)) {
 		speedyLog("🪓  threadsHaveFinished() finished÷64 at %10.6lf ms; startAtomic=%d finishAtomic=%d "
 			"needsRepaint=%hhu  shouldBeIntegrating=%hhu   isIntegrating=%hhu frSerial=%d\n",
 			getTimeDouble() - thfTime,
 			emscripten_atomic_load_u32(&startAtomic), emscripten_atomic_load_u32(&finishAtomic),
-			needsRepaint, shouldBeIntegrating, isIntegrating, frameSerial);
+			needsRepaint, shouldBeIntegrating, isIntegrating, lapSerial);
 	}
 
 	// only print now after benchmarks have been measured
@@ -482,9 +484,9 @@ void qGrinder::threadsHaveFinished() {
 }
 
 
-// start a new frame calculating by starting each/all gThread threads.
+// start a new lap calculating by starting each/all gThread threads.
 // This can be called from JS, therefore the UI thread.
-// Each frame will trigger the next to continue integration
+// Each lap will trigger the next to continue integration
 // We can do this also from JS with Atomic.store and .notify instead
 void qGrinder::triggerIteration() {
 	if (traceTrigger)  {
@@ -502,7 +504,7 @@ void qGrinder::triggerIteration() {
 }
 
 // start iterating, starting each/all gThread threads. Iteration will
-// trigger the next frame, and so on.  This starts it, and
+// trigger the next lap, and so on.  This starts it, and
 // shouldBeIntegrating should also be true.
 // This is called from JS, therefore the UI thread.  (or alternate: via js atomics)
 void grinder_triggerIteration(qGrinder *grinder) {
@@ -554,7 +556,7 @@ void qGrinder::askForFFT(void) {
 	analyzeCavityFFT(flick, "askForFFT while idle");
 }
 
-// if integrating, FFT as the current frame finishes, before and after fourierFilter().
+// if integrating, FFT as the current lap finishes, before and after fourierFilter().
 // If stopped, fft current wave. now.
 void grinder_askForFFT(qGrinder *pointer) { pointer->askForFFT(); }
 

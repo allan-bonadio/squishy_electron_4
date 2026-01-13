@@ -19,7 +19,7 @@ doAReal(double *aReal) {
 }
 
 
-/* ********************************************************************************* one frame? */
+/* ********************************************************************************* one lap? */
 
 abacus *aba;
 
@@ -36,7 +36,7 @@ static void stepOnSeg(progress *prog) {
 
 
 
-static void doOneFrameMaybe(void) {
+static void doOnelapMaybe(void) {
 	proxyTime = 1
 
 

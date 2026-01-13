@@ -224,14 +224,14 @@ export function createStoreSettings() {
 	//makeParam('voltageSettings', 'minBottom', -.5, extremes);  // soon to be deprecated
 	// always = min + 2 * heightVolts makeParam('voltageSettings', 'maxBottom', 16, {min: -256, max: 256});
 
-	/* ************************************ frameSettings */
+	/* ************************************ lapSettings */
 
 	// set in integration tab
-	makeParam('frameSettings', 'shouldBeIntegrating', false,  [false, true]);
-	//makeParam('frameSettings', 'chosenFP', 50, {min: 16, max: 60_001});
-	makeParam('frameSettings', 'dtFactor', .01, {min: .0001, max: 1, });
-	//makeParam('frameSettings', 'stepsPerFrame', 10, {min: 2, max: 50});
-	//makeParam('frameSettings', 'lowPassFilter', 50, {min: 0, max: 75});
+	makeParam('lapSettings', 'shouldBeIntegrating', false,  [false, true]);
+	//makeParam('lapSettings', 'chosenFP', 50, {min: 16, max: 60_001});
+	makeParam('lapSettings', 'dtFactor', .01, {min: .0001, max: 1, });
+	//makeParam('lapSettings', 'stepsPerLap', 10, {min: 2, max: 50});
+	//makeParam('lapSettings', 'lowPassFilter', 50, {min: 0, max: 75});
 
 	/* ************************************miscSettings */
 	// set by clicking on tab

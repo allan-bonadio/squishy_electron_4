@@ -64,7 +64,7 @@ C) average G+1 and G+2 into G+3.  Can't reuse G+2 cuz neighboring threads need o
 	part C should be exactly same boundaries as part B, should be ready to go (?)
 
 ## etc
-- need to call qFlick::reset upon start of frame
+- need to call qFlick::reset upon start of lap
 - need mechanism to stop threads when they finish their last generation
 - need mechanism to stop a thread if its boundaries shrink the segment to 1 or 0 length,
 	then restart it when others pass it.
@@ -83,7 +83,7 @@ void edge::init(abacus *aba, int ser) {
 	serial = ser;
 }
 
-// before every frame, reset ALL the edges
+// before every lap, reset ALL the edges
 void edge::reset(void) {
 	lock = UNLOCKED;
 	border = UNDECIDED;
@@ -127,7 +127,7 @@ void progress::init(abacus *aba, int ser)  {
 	serial = ser;
 }
 
-// start of every frame, reset all of these, called by abacus::reset()
+// start of every lap, reset all of these, called by abacus::reset()
 // pass the behind and ahead edge for each.
 void progress::reset(edge *b, edge *a) {
 	behind = b;

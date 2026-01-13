@@ -11,7 +11,7 @@ import qeConsts from '../engine/qeConsts.js';
 import ResolutionDialog from './ResolutionDialog.js';
 
 let traceCPToolbar = false;
-let traceSlowerFaster = false;
+let traceSlowerFaster = true;
 
 window.dbLog = console.log;
 
@@ -124,6 +124,7 @@ function CPToolbar(props) {
 
 	// called upon enter, mouse move, and maybe more events, just in case speeding or
 	// slowing is still running but we missed the mouseup event.
+	// cuz it just keeps on getting faster/slower
 	const maybeStopSpeed =
 	(ev) => {
 		console.log(`maybeStopSpeed ev=`, ev);

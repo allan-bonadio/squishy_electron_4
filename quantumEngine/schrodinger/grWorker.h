@@ -26,7 +26,7 @@
 	activation, each grWorker, atomically add one to
 	grinder.startAtomic, and immediately proceed to integration. When
 	startAtomic gets to nGrWorkers, that last thread locks startAtom
-	again, anticipating next frame synch.  Yeah, I think we need this;
+	again, anticipating next lap synch.  Yeah, I think we need this;
 	works fine now cuz there's just one thread.  We also need that extra
 	tail thread to run threadsHaveFinished().]
 
@@ -53,15 +53,15 @@ struct grWorker {
 	// creates all threads, etc
 	static void createGrWorkers(qGrinder *grinder);
 
-	// actually gets called each frame.  Not strictly synchronized inter-thread, but runs from
+	// actually gets called each lap.  Not strictly synchronized inter-thread, but runs from
 	// requestAnimationFrame()
 	void gThreadWork(void);
 
 	void gThreadLoop(void);
 
 	// timing of the most recent integration; startCalc and endCalc sampled when
-	// they're stored, beginning and end of integration frame.  ms.
+	// they're stored, beginning and end of integration lap.  ms.
 	double startCalc;
-	double frameCalcTime;
+	double lapCalcTime;
 };
 

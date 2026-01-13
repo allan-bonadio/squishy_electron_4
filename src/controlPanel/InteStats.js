@@ -29,17 +29,17 @@ function InteStats(props) {
 
 
 		// the stats.  This is also the order they're displayed in.
-		addStat('Divergence'         , 'divergence', '%',
+		addStat('Divergence'     , 'divergence', '%',
 				"How close the integration is to exploding");
-		addStat('Frame Calc Time'    , 'frameCalcTime', 'ms',
-				"How much CPU time it took to calculate a frame");
+		addStat('Frame Calc Time'    , 'lapCalcTime', 'ms',
+				"How much CPU time it took to calculate a lap");
 		addStat('Draw Time'                  , 'totalDrawTime', 'ms',
 				"How much time it took to draw wave on screen");
 		//addStat('Total For Frame'   , 'totalForFrame', 'ms');
 //		addStat('Frame Period'      , 'chosenFP', 'ms');
-//		addStat('Frames Per Sec'   , 'framesPerSec', '/sec');
+//		addStat('Frames Per Sec'   , 'lapsPerSec', '/sec');
 		addStat('rAF Period'   , 'rAFPeriod', 'ms',
-				"How long a frame takes on your screen");
+				"How long a lap takes on your screen");
 	}
 
 	/* ********************************************************* display numbers */
@@ -66,7 +66,7 @@ function InteStats(props) {
 	*/
 
 	// given new value, assimilate it into the running avg, attached on the node itself
-	// and remember this is called every frame so ¼ influence, repeated 10/sec, go quickly
+	// and remember this is called every lap so ¼ influence, repeated 10/sec, go quickly
 	function smoothNumber(stat, value) {
 		// but smooth according to how violently it's changing
 		let smooth = value;  // if the previous wasn't there, start here
@@ -139,7 +139,7 @@ function InteStats(props) {
 				}
 			});
 
-			display(sm.frameCalcTime, grinder.maxCalcTime );
+			display(sm.lapCalcTime, grinder.maxCalcTime );
 		}
 
 
@@ -150,7 +150,7 @@ function InteStats(props) {
 		}
 	}
 
-	// it will be called once an anaimation frame to update stats
+	// it will be called once an anaimation lap to update stats
 	const grinder = context.waveView.space.grinder;
 	grinder.displayAllStats = displayAllStats;
 
@@ -167,7 +167,7 @@ function InteStats(props) {
 			stat.statAvg = 1e-10;  // like zero but you can divide by it
 		}
 
-		// value - will be filled in by raw DOM setting each frame
+		// value - will be filled in by raw DOM setting each lap
 		return <tr key={stat.name + '-row'} title={stat.help} >
 			<td>{stat.label}:</td>
 			<td>

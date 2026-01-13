@@ -99,8 +99,8 @@ let exportsSrc  = [
 	// alternative to the JS atomic triggering
 	{name: 'grinder_triggerIteration', args: ['number'], retType: null},
 
-	// only needed if UI thread does a frame's worth of integration (siingle thread)
-	{name: 'grinder_oneFrame', args: ['number'], retType: null},
+	// only needed if UI thread does a lap's worth of integration (siingle thread)
+	{name: 'grinder_oneLap', args: ['number'], retType: null},
 
 	{name: 'grinder_askForFFT', args: ['number'], retType: null},
 
@@ -134,8 +134,8 @@ let commonConstants = [
 	// these are not really the radius, it's more rectangular, but pretty much the same idea
 	{name: 'ERROR_RADIUS', cppType: 'double', value: 1e-12},
 
-	// out-of-band value that means Fastest on frame speed menu
-	{name: 'FASTEST', cppType: 'double', value: 999_999},
+	// out-of-band value that means Fastest on frame speed menu obsolete
+	//{name: 'FASTEST', cppType: 'double', value: 999_999},
 
 	// phony bool value that marks the end of a qGrinder object
 	{name: 'grSENTINEL_VALUE', cppType: 'byte', value: 123},

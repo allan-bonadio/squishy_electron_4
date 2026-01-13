@@ -329,7 +329,7 @@ export class WaveView extends React.Component {
 		// if c++ isn't initialized yet, we can assume the time
 		let tnf = {elapsedTimeText: '0', };
 		if (this.grinder)
-			tnf = this.grinder.formatTimeNFrame();
+			tnf = this.grinder.formatTime();
 
 		if (traceDimensions) {
 			console.log(`🏄 WaveView render, outerWidth=${this.outerWidth}`
