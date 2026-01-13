@@ -1,21 +1,36 @@
 #!/bin/bash
-# Deploys built Squish to server.  You must build with productionBuild.sh first.
+# Deploys built Squish to server.  RUNS ON LOCAL.
+# You must build with productionBuild.sh first.
 # Runs on local side (panama/dnipro)
 
-echo "              🛫 🛫 🛫 Deploy Production Squishy Electron" `date +%c %Z`
-echo "                                               run this only After install.sh"
-cd $SQUISH_ROOT
+timestamp=`date -u +%F,%H.%M`
+echo "              🛫 🛫 🛫 Deploy Production $timestamp Squishy Electron" `date +%c %Z`
+echo "                                               run this only After build"
+echo "! ! ! not debugged from last deploy ! ! !"
+
+if [ `uname` != 'Darwin' ]
+then
+	echo $'\e[1;31m !! Error: must only run on MacOS \e[0m'
+	exit 49
+fi
+
+if [ ! "$SQUISH_ROOT" ]
+then
+	echo $'\e[1;31m !! Error: SQUISH_ROOT isn\'t defined,\e[0m' "'$SQUISH_ROOT'"
+	exit 43
+fi
+
 if [ ! -d 'quantumEngine' ]
 then
-	echo "Error: SQUISH_ROOT isn't defined right, '$SQUISH_ROOT'"
-	echo "   ... or you need to cd there."
+	echo $'\e[1;31m !! Error: quantumEngine/ isn't there\e[0m'
+	echo $'\e[1;31m   ... or you need to cd to $SQUISH_ROOT .\e[0m'
 	exit 41
 fi
 
 echo you can do either make deploy or npm deploy, same
 
 # make sure it's there & compiled
-echo "                             🛫 🛫 🛫  make sure the build is there"
+echo "                             🛫 🛫 🛫  make sure crucial build files are there"
 WASMFILES="qEng/quantumEngine.js qEng/quantumEngine.wasm "
 IMAGES="images/eclipseOnTransparent.gif images/splat.png logos/logoKetE.png"
 DOCFILES="doc/gettingStarted/gettingStarted.html  doc/digitalWaves/digitalWaves.html \
@@ -25,9 +40,9 @@ for fn in index.html  $OTHERFILES $WASMFILES $IMAGES $DOCFILES
 do
 	if ! [ -f build/$fn ]
 	then
-		echo "build/$fn not there"
+		echo $'\e[1;31m !! file missing.  build/$fn not there\e[0m'
 		ls -lF build/$fn
-		echo "try    npm run build"
+		echo $'\e[1;31m try    npm run build\e[0m'
 		exit 77
 	fi
 done
@@ -75,17 +90,17 @@ sftp -p $NAKODA_SKEY  -b - -N  allan@nakoda <<PETULANT_OLIGARCHS
 PETULANT_OLIGARCHS
 if [ "$?" != "0" ]
 then
-	echo "error in sftp, see above"
+	echo $'\e[1;31m error in sftp, see above\e[0m'
 	exit 71
 fi
 
 
-# now decompress and activate
+# now decompress, on the server
 echo "                             🛫 🛫 🛫  About to decompress and activate ➤ ➤ ➤ ➤ ➤ == nakoda login stuff..."
 ssh  $NAKODA_SKEY  allan@nakoda <<WALKING_SPEED
-	echo "                             🛫 🛫 🛫   ➤ ➤ ➤ ➤ ==➤  ...end of nakoda login stuff"
+	echo "                             🛫 🛫 🛫   ➤ ➤ ➤ ➤ = =➤  ...logged into nakoda"
 	cd /var/www/squish || exit 1
-	./install.sh
+	./install.sh $timestamp
 
 WALKING_SPEED
 echo "                             🛫 🛫 🛫  should now be activated"
@@ -95,8 +110,10 @@ echo "                             🛫 🛫 🛫  test to see if files are up t
 curl https://squish.tactileint.org > /tmp/actualSquishIndexOnline.html
 sleep 5  # give it time to soak in.  So the diff doesn't screw up.
 if diff build/index.html /tmp/actualSquishIndexOnline.html
-then echo "                               🛫 🛫  😅 😅 😅 Deploy Completed, looks good!"  `date +%c`
+then echo "                               🛫 🛫  😅 😅 😅 Deploy Completed, looks good so far!"  `date +%c`
+	echo "To activate the symlink to $timestamp, login to nakoda and   useBuild $timestamp"
+	echo "Remember to tag it,    git tag -a deploy$timestamp   and enter descr "
 	exit 0
-else echo "the diff didn't compare - index.html are different"
+else echo  $'\e[1;31m !! the diff didn't compare - index.html are different\e[0m'
 	exit 61
 fi
