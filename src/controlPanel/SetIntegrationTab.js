@@ -23,8 +23,8 @@ const propTypes = {
 		setQuickDtFactor: PropTypes.func.isRequired,
 		saveDtFactor: PropTypes.func.isRequired,
 		//setDtFactor: PropTypes.func.isRequired,
-		//stepsPerFrame: PropTypes.number.isRequired,
-		//setStepsPerFrame: PropTypes.func.isRequired,
+		//stepsPerLap: PropTypes.number.isRequired,
+		//setStepsPerLap: PropTypes.func.isRequired,
 		//lowPassFilter: PropTypes.number.isRequired,
 		//setLowPassFilter: PropTypes.func.isRequired,
 	};
@@ -60,8 +60,8 @@ function SetIntegrationTab(props) {
 
 	// Unlike other tabs, all these are instant-update.
 
-	let mini = alternateMinMaxs.frameSettings.dtFactor.min;
-	let maxi = alternateMinMaxs.frameSettings.dtFactor.max;
+	let mini = alternateMinMaxs.lapSettings.dtFactor.min;
+	let maxi = alternateMinMaxs.lapSettings.dtFactor.max;
 
 	return (<div className='SetIntegrationTab controlPanelPanel'>
 		<div className='sliderBlock'>
@@ -111,15 +111,15 @@ function SetIntegrationTab(props) {
 
 /*
 			<LogSlider
-				unique='stepsPerFrameSlider'
-				className='stepsPerFrameSlider cpSlider'
+				unique='stepsPerLapSlider'
+				className='stepsPerLapSlider cpSlider'
 				label='steps Per Frame'
 				minLabel='faster'
 				maxLabel='smoother'
 
-				current={props.stepsPerFrame}
-				sliderMin={alternateMinMaxs.frameSettings.stepsPerFrame.min}
-				sliderMax={alternateMinMaxs.frameSettings.stepsPerFrame.max}
+				current={props.stepsPerLap}
+				sliderMin={alternateMinMaxs.lapSettings.stepsPerLap.min}
+				sliderMax={alternateMinMaxs.lapSettings.stepsPerLap.max}
 				stepsPerDecade={6}
 
 				// indices 2, 3 & 4 map to these numbers, next is [5]=8, [6]=10
@@ -128,16 +128,16 @@ function SetIntegrationTab(props) {
 
 				handleChange={(power, ix) => {
 					if (traceSliderChanges)
-						console.log(`🏃🏽 🏃🏽 ch stepsPerFrame::  ix=${ix}  power=${power}`);
-					props.setStepsPerFrame(power);
+						console.log(`🏃🏽 🏃🏽 ch stepsPerLap::  ix=${ix}  power=${power}`);
+					props.setStepsPerLap(power);
 				}}
 			/>
 
 			<TextNSlider className='lowPassFilterSlider '
 				label='Percent of High Frequencies to Filter Out'
 				value={props.lowPassFilter.toFixed(nDigits)}
-				min={alternateMinMaxs.frameSettings.lowPassFilter.min}
-				max={alternateMinMaxs.frameSettings.lowPassFilter.max}
+				min={alternateMinMaxs.lapSettings.lowPassFilter.min}
+				max={alternateMinMaxs.lapSettings.lowPassFilter.max}
 				step={lowPassStep}
 				style={{width: '80%'}}
 				handleChange={newValue => {

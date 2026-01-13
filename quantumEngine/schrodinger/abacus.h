@@ -113,7 +113,7 @@ struct abacus {
 	int waitAllThreds;
 	void triggerIteration(void);
 
-	// set up our edges and progresses to get ready for a new frame
+	// set up our edges and progresses to get ready for a new lap
 	void reset(void);
 
 	// u can plug in your own integrator functions here

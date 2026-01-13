@@ -77,7 +77,7 @@ class SquishPanel extends React.Component {
 	setShouldBeIntegrating = (sbi) => {
 		this.setState({shouldBeIntegrating: sbi});
 
-		storeASetting('frameSettings', 'shouldBeIntegrating', sbi);
+		storeASetting('lapSettings', 'shouldBeIntegrating', sbi);
 		console.log(`👑 👑 called setShouldBeIntegrating(${sbi})`);
 	};
 
@@ -139,7 +139,7 @@ class SquishPanel extends React.Component {
 			// somebody needs to start this going if it was already on last time
 			// but wait till everything is ready.  TODO: should do this in a sync
 			// way; time is hokey
-			if (getASetting('frameSettings', 'shouldBeIntegrating')) {
+			if (getASetting('lapSettings', 'shouldBeIntegrating')) {
 				setTimeout(() => this.setShouldBeIntegrating(true), 500)	;
 			}
 
@@ -180,7 +180,7 @@ class SquishPanel extends React.Component {
 
 		// trigger redrawing of WaveView cuz they're passed in via props
 		grinder.elapsedTime = 0;
-		grinder.frameSerial = 0;
+		//grinder.frameSerial = 0;
 
 		// directly redraw the GL
 		this.mainRepaint();

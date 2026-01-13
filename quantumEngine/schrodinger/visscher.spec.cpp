@@ -16,7 +16,7 @@
 #include "CppUTest/TestHarness.h"
 
 static bool traceOneStep = false;
-static bool traceOneFrame = false;
+static bool traceOneLap = false;
 
 TEST_GROUP(visscher)
 {
@@ -100,7 +100,7 @@ qCx(    0.1766435609,     -0.0068256995),  // 33
 
 
 // everything turns into nans.  dunno what's wrong.
-TEST(visscher, VisscherOneFrame32)
+TEST(visscher, VisscherOneLap32)
 {
 	// simulate the app starting up
 	qSpace *space = makeFullSpace(32);
@@ -110,23 +110,23 @@ TEST(visscher, VisscherOneFrame32)
 	fl->setCircularWave(1.);
 	for (int ix = fl->start; ix < fl->end; ix++) space->voltage[ix] = 0;
 
-	if (traceOneFrame)
-		fl->dump("VisscherOneFrame, before", true);
+	if (traceOneLap)
+		fl->dump("VisscherOneLap, before", true);
 
 	// simulate the app taking one iter = 100 steps
-	// grinder->stepsPerFrame = 100;
+	// grinder->stepsPerLap = 100;
 	// grinder->dt = .01;
 	// grinder->lowPassFilter = 10;  // num freqs to eliminate on each side
 
-	// one frame
-	grinder->oneFrame();
+	// one lap
+	grinder->oneLap();
 
-	if (traceOneFrame)
-		fl->dump("VisscherOneFrame, after", true);
+	if (traceOneLap)
+		fl->dump("VisscherOneLap, after", true);
 
 	// dumps the wave in case you want to paste it back in here
 	// probably you should comment it out for normal use
-	if (traceOneFrame)
+	if (traceOneLap)
 		dumpWaveInitializer("expectedArray", fl->wave, space->nPoints);
 
 	// we'll use this to compare against

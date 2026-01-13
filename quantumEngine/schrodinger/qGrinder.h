@@ -9,17 +9,32 @@
 /*
 Some Calculation/Grinder terms:
 
-note: ∆t is the user-visible time per frame period, larger.
-dt is actually the individual time increment each time through Schrodinger
-FP means frame period.  This should not be user-visible.  Animation should be seamless, at maybe 20 to 30 frames per second.  With little or no flicker.
+videoFP: or FP, video frame period it takes the screen to do one
+scan.  rAF calls you that often.  Often 16⅔ or 20 ms.  Determined by the screen hardware and maybe some user settings.
+a Frame is an exact time.
+With little or no flicker.  Whether integration is slow or fast.
+Animation should be seamless, at maybe 50 to 60 frames per second.
+Duration variable via javascript requestAnimationFrame().  It
+depends on the video scan rate, either inherent to your
+video circuitry, or variable by a control panel.  So for
+instance, if your video is 50 frames per sec then the frame
+duration is 20ms long. Or, 60 fps means 16⅔ms.
+This should not be user-visible.
 
-a Frame: is an amount of calculation correspoinding to one refresh of
-the video display (or analogous). Doesn't have to be synchronized with the screen
-refreshes, although it often is.  Just the amount of calculation done for it.  Typically
-hundreds of steps, grinder.stepsPerFrame * 4?  Dynamically adjusted.
+a Lap: is an amount of calculation approximating one FP elapsed (real time). Doesn't have to be synchronized with the screen
+refreshes, although the lap size is dynamically adjusted to match.
+It's OK if each lap finishes in the middle of a FP, start or end.
+One update to the webgl code per lap.
+Frame rate shouldn't make flicker.
+Just the amount of calculation done for it.  Typically
+hundreds of steps, grinder.stepsPerLap  Dynamically adjusted in JS.
+
+
+dtStretch is  used as dt in integration,  Elapsed time increments by dtStretch each time through Schrodinger.
+dtStretch = refDt * dtFactor, which is user controllable.
 
 a Step: is a calculation to advance the model dt time.  Like, running
-Schrodinger's eq for Real then Imaginary, then again for RK2.  (see vischer alg)
+Schrodinger's eq for Real then Imaginary, then again R & I for RK2.  (see vischer alg)
 In the multithreaded code, a Step can apply to only a segment of the cavity.
 
 a Hit: advancement by dt of some subset of x values of the calculation.  As of
@@ -27,19 +42,8 @@ this writing, there are four hits to a step: two Vischer real+imag, times two
 Midpoint first+last, for the entire length of the cavity.  All together, they
 advance one dt.  (Hits may be for whole buffer, or for just one segment)
 
-a Point is one number in a buffer, one state of the qm system, and/or any
+a Point is one point in a buffer, one complex number, one state of the qm system, and/or any
 associated numbers in parallel buffers like voltage.
-
-A step on a point is a step on a point.  A hit on a point is a hit on a point.
-
-Some sortof overlapping terms on timing:
-
-videoFP: video frame period is the period it takes the screen to do one
-scan.  rAF calls you that often.  Often 16⅔ or 20 ms.  Determined by the screen hardware and maybe some user settings.
-
-obsolete:  // chosenFP: period chosen from the 'frame rate' menu, which shows rates
-// as FP periods.  So user chooses 20 fps and the chosenFP would be 50ms.
-// chosenFP should be an even multiple of videoFP but isn't always.
 
 */
 
@@ -70,26 +74,26 @@ struct qGrinder {
 	// call if/when you need the spectrum buffer.  Only one; kept forever
 	struct qSpectrum *getSpectrum(void);
 
-	// set pleaseFFt from JS (only if in the middle of frame)
+	// set pleaseFFt from JS (only if in the middle of lap)
 	void askForFFT(void);
 
 	/* ************************* threads */
 
-	// called once per frame, at the end after last thread finishes (by last thread).
+	// called once per lap, at the end after last thread finishes (by last thread).
 	// Does several things needed to be done once per cycle.
 	void threadsHaveFinished(void);
 
 	/* ************************* grinding calculations */
 
-	// called by JS to start a frame calc (maybe) now done in JS
+	// called by JS to start a lap calc (maybe) now done in JS
 	void triggerIteration(void);
 
 	// figure out the total elapsed time for each thread, average of all, max of all...
 	void aggregateCalcTime(void);
 
 	// Actually do integration, single thread only.
-	// must maintain stepsPerFrame to match videoFP, but not necessarily sync with it
-	void oneFrame(void);
+	// must maintain stepsPerLap to match videoFP, but not necessarily sync with it
+	void oneLap(void);
 
 	// visscher.  Calculate new from old; use hamiltonian to calculate d𝜓
 	// sometimes oldW and hamiltonianW are the same
@@ -119,7 +123,7 @@ struct qGrinder {
 	/* ************************* pointers  for large blocks */
 	qSpace *space;
 
-	// at the end of each frame calculation, quickly copy the latest wave off to
+	// at the end of each lap calculation, quickly copy the latest wave off to
 	// here, and get back to grinding.  Then, a different thread will pick up
 	// this and transcribe it into avatar buffers.
 	qCavity *stage;
@@ -137,25 +141,19 @@ struct qGrinder {
 
 	/* ************************* timing */
 
-	// total number of times (frames) thru the number cruncher.
-	int frameSerial;
+	// total number of times (laps) thru the number cruncher.
+	int lapSerial;
 
-	// number of integration steps executed for each frame
-	// dynamically adjusted so integration calculation of a frame takes
-	// about as much time as a screen refresh frame, as set by the user.
-	int stepsPerFrame;
+	// number of integration steps executed for each lap
+	// dynamically adjusted so integration calculation of a lap takes
+	// about as much time as a screen refresh lap, as set by the user.
+	int stepsPerLap;
 
-	// scan period of the screen = target rate for a frame of grinding
+	// scan period of the screen = target rate for a lap of grinding
 	// In milliseconds, with fractions.  comes from sAnimator.
 	double videoFP;
 
-	// the frame speed most recently chosen by user, as number of milliseconds.
-	// Might not be a multiple of videoFP.  Actually we use this as an indicator
-	// as to whether rate is 'fastest' qeConsts.FASTEST  Otherwise, the JS
-	// triggers a new frame calc based on rAF.
-	//double chosenFP;
-
-	// how long (thread time) it took to do the latest frame, all threads added together
+	// how long (thread time) it took to do the latest lap, all threads added together
 	double totalCalcTime;
 	double maxCalcTime;  // and max of all threads
 
@@ -228,7 +226,7 @@ struct qGrinder {
 	bool shouldBeIntegrating;
 
 	// same as shouldBeIntegrating, except this is synchronized with the
-	// integration threads. Does not change while integration frame being
+	// integration threads. Does not change while integration lap being
 	// calculated.  So all threads are 'on the same page'.
 	bool isIntegrating;
 
@@ -255,7 +253,7 @@ extern "C" {
 
 	void grinder_delete(qGrinder *qgrinder);
 
-	void grinder_oneFrame(qGrinder *grinder);
+	void grinder_oneLap(qGrinder *grinder);
 	void grinder_triggerIteration(qGrinder *grinder);
 
 	void grinder_askForFFT(qGrinder *grinder);

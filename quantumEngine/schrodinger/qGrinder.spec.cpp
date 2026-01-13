@@ -36,12 +36,12 @@ TEST(qGrinder, CheckGrinderConstructor)
 	POINTERS_EQUAL(avatar, grinder->avatar);
 
 	DOUBLES_EQUAL(0., grinder->elapsedTime, ERROR_RADIUS);
-	DOUBLES_EQUAL(0., grinder->frameSerial, ERROR_RADIUS);
+	DOUBLES_EQUAL(0., grinder->lapSerial, ERROR_RADIUS);
 	DOUBLES_EQUAL(1e-3, grinder->dt, ERROR_RADIUS);
 
 
 	// LONGS_EQUAL(1, grinder->lowPassFilter);
-	// LONGS_EQUAL(100, grinder->stepsPerFrame);
+	// LONGS_EQUAL(100, grinder->stepsPerLap);
 
 	LONGS_EQUAL(space->nPoints, grinder->flick->nPoints);
 	proveItsMine(grinder->flick->waves[0], space->nPoints * sizeof(qCx));

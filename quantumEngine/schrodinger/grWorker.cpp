@@ -8,7 +8,7 @@
 #include "qGrinder.h"
 #include "grWorker.h"
 
-static bool traceStart = false;
+static bool traceBegin = false;
 static bool traceFinish = false;
 static bool traceSync = false;
 static bool traceCreation = false;
@@ -24,9 +24,9 @@ static int occasionally = 0;
 static grWorker *sla[MAX_THREADS];
 grWorker **qGrinder::grWorkers = sla;
 
-// do the work: integration.  One frame, on one thread.
+// do the work: integration.  One lap, on one thread.
 void grWorker::gThreadWork(void) {
-	// traceWork generates a message every Frame.  GADS!
+	// traceWork generates a message every lap.  GADS!
 	// traceWorkOccasionally, maybe every several seconds or less.  Feel free to adjust.
 	if (traceWork || (traceWorkOccasionally && occasionally-- < 0)) {
 		speedyLog("🦫 grWorker working ...shouldBeIntegrating=%hhu  isIntegrating=%hhu "
@@ -36,22 +36,22 @@ void grWorker::gThreadWork(void) {
 		occasionally = 100;
 	}
 
-	// Gonna do an integration frame.  set starting time, under lockf
+	// Gonna do an integration lap.  set starting time, under lockf
 	// wait this doesn't have to be under lock!  it's per-thread.
 	startCalc = getTimeDouble();
 
 	// actually, doing the calculation, single  thread
-	grinder->oneFrame();
+	grinder->oneLap();
 
 	// get endCalc and compare
 	double endCalc = getTimeDouble();
-	frameCalcTime = endCalc - startCalc;
+	lapCalcTime = endCalc - startCalc;
 
 	if (traceWork) {
-		speedyLog("🦫 end of gThreadWork; frame time=%8.4lf ms, "
+		speedyLog("🦫 end of gThreadWork; lap time=%8.4lf ms, "
 				"shouldBeIntegrating=%hhu  isIntegrating=%hhu "
 				"startAtomic=%d  finishAtomic=%d\n",
-				frameCalcTime, grinder->shouldBeIntegrating, grinder->isIntegrating,
+				lapCalcTime, grinder->shouldBeIntegrating, grinder->isIntegrating,
 				grinder->startAtomic, grinder->finishAtomic);
 		}
 }
@@ -114,13 +114,14 @@ void grWorker::gThreadLoop(void) {
 				grinder->finishAtomic);
 			int nFinished = emscripten_atomic_add_u32(&grinder->finishAtomic, 1);
 			nFinished++;
+			printf("traceSync=%hhu traceFinish = %hhu \n", 	traceSync, traceFinish);
 			if (traceSync || traceFinish) {
 					speedyLog("🦫 after increment on finishAtomic=%d (shdbe 1 or more) "
 					"thread %d, nFinished=%d \n",
 					grinder->finishAtomic, serial, nFinished);
 			}
 			if (nFinished >= grinder->nGrWorkers) {
-				// this must be the last thread to finish in this integration frame!
+				// this must be the last thread to finish in this integration lap!
 				grinder->threadsHaveFinished();
 			}
 			speedyFlush();
@@ -139,7 +140,7 @@ void grWorker::gThreadLoop(void) {
 
 // wrapper for pthread to start the thread.  arg is the grWorker ptr.  .
 static void *sStarter(void *st) {
-	if (traceStart)
+	if (traceBegin)
 		speedyLog("🦫 grWorker: starting\n");
 
 	// runs forever. never returns.  catches its exceptions.
