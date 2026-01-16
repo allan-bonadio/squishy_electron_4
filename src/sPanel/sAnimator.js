@@ -85,7 +85,7 @@ class sAnimator {
 		this.inteTimes.prevDrawTime = startDrawTime;
 
 		this.mainRepaint?.();   // mainRepaint() func won't be here until GLScene renders
-		this.showTime();  // part of the draw time - the picoseconds
+		this.showTime();  // part of the draw time - the picoseconds (per lap?)
 
 		// update dom elements in integration tab to latest stats (if it's been shown at least once)
 		this.grinder.displayAllStats?.(this.inteTimes, this.grinder);
@@ -227,7 +227,7 @@ class sAnimator {
 		// time for another normal iteration.  Trigger the threads.
 		this.grinder.triggerIteration();
 		if (traceIntegration) {
-			console.log(`🎥 another normal integration frame done `
+			console.log(`🎥 another normal integration lap done `
 				+`at ${performance.now() & 16383} arbitrary ms`);
 		}
 
