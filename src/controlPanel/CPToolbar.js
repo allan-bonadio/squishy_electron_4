@@ -16,22 +16,22 @@ let traceSlowerFaster = true;
 window.dbLog = console.log;
 
 // frequencies are per second numbers.  We want nice labels.
-function optionForFreq(rate) {
-	if (qeConsts.FASTEST == rate) {
-		return <option value={qeConsts.FASTEST} key={qeConsts.FASTEST}>Fastest</option>;
-	}
-	else if (rate > 1) {
-		// 1 per sec or more - phrase it this way
-		return <option value={rate} key={rate}>{rate} per sec</option>;
-	}
-	else if (rate == 1) {
-		// 1 per sec or more - phrase it this way
-		return <option value={rate} key={rate}>once per sec</option>;
-	}
-	else {
-		return <option value={rate} key={rate}>every {1 / rate} sec</option>;
-	}
-}
+//function optionForFreq(rate) {
+//	if (qeConsts.FASTEST == rate) {
+//		return <option value={qeConsts.FASTEST} key={qeConsts.FASTEST}>Fastest</option>;
+//	}
+//	else if (rate > 1) {
+//		// 1 per sec or more - phrase it this way
+//		return <option value={rate} key={rate}>{rate} per sec</option>;
+//	}
+//	else if (rate == 1) {
+//		// 1 per sec or more - phrase it this way
+//		return <option value={rate} key={rate}>once per sec</option>;
+//	}
+//	else {
+//		return <option value={rate} key={rate}>every {1 / rate} sec</option>;
+//	}
+//}
 
 const propTypes = {
 	// chosenRate: PropTypes.number.isRequired,
@@ -62,13 +62,6 @@ const FASTER_NUDGE = 1.01;
 const SLOWER_SPEED = 0.9;
 const SLOWER_NUDGE = 0.99;
 
-// the frame rate menu
-// const menuFreqs = [
-// 		qeConsts.FASTEST,
-// 		60, 30, 20, 10, 5, 2,
-// 		1, 1/2, 1/5, 1/10, 1/20, 1/30, 1/60];
-// const rateOptions = menuFreqs.map(freq => optionForFreq(freq));
-
 function CPToolbar(props) {
 	cfpt(propTypes, props);
 	const p = props;
@@ -81,8 +74,10 @@ function CPToolbar(props) {
 	// spare icons: 🐌🐢🐎  🐇 🌪️
 
 	// the rabbit and tortoise buttons
-	// adjust the speed by this factor
-	const propel = factor => p.setQuickDtFactor(p.getQuickDtFactor() * factor);
+	// adjust the speed by this factor: dtFactor.  A sortof speed number while
+	// it's integrating.  Multiply it by von Neumann's dt for the same situation.
+	// Here, factor is just an amount to propel the REAL factor, dtFactor.
+	const propel = (factor) => p.setQuickDtFactor(p.getQuickDtFactor() * factor);
 
 	let intervalRef = useRef(0);
 	let timeoutRef = useRef(0);
@@ -94,7 +89,7 @@ function CPToolbar(props) {
 	const repeatSlower = () =>
 		intervalRef.current = setInterval(slower, SPEED_FREQ);
 
-	// user clicks down on either speed button
+	// user clicks/taps down on either speed button
 	const downSpeedHandler =
 	(ev) => {
 		// either faster or slower
@@ -110,9 +105,10 @@ function CPToolbar(props) {
 			propel(SLOWER_SPEED);
 			timeoutRef.current = setTimeout(repeatSlower, SPEED_DELAY);
 		}
+		document.body.querySearch('.speedButtonDisplay').innerHTML = `assign me to innerHTML`;
 	};
 
-	// kill all those delays and repeats
+	// mouse up on these speed buttons
 	const upSpeedHandler =
 	(ev) => {
 		console.log(`🐭 timeoutRef.current=${timeoutRef.current}  intervalRef.current=${intervalRef.current}`);
@@ -132,30 +128,40 @@ function CPToolbar(props) {
 			upSpeedHandler(ev);
 	};
 
+
 	// the slower and faster buttons should stop when they get mouseUp events.
 	// except sometimes those events get lost, so also leave and move events
-	const speedControl = () => { return <>
-			<div className='toolbarWidget'>
-				<button className='toolbarWidget speedButton slower'
-						onMouseDown={downSpeedHandler}
-						onMouseUp={upSpeedHandler}  onMouseLeave={upSpeedHandler}
-						onMouseEnter={maybeStopSpeed} onMouseMove={maybeStopSpeed}>
-					<span>🐢</span> slower
-				</button>
-				<button className='toolbarWidget speedButton faster'
-						onMouseDown={downSpeedHandler}
-						onMouseUp={upSpeedHandler}  onMouseLeave={upSpeedHandler}
-						onMouseEnter={maybeStopSpeed} onMouseMove={maybeStopSpeed}>
-					<span>🐇</span> faster
-				</button>
-			</div>
-		</>
+	const speedControl =
+
+	 <>
+		<button className='toolbarWidget speedButton slower'
+				onMouseDown={downSpeedHandler}
+				onMouseUp={upSpeedHandler}  onMouseLeave={upSpeedHandler}
+				onMouseEnter={maybeStopSpeed} onMouseMove={maybeStopSpeed}>
+			<span>🐢</span> slower
+		</button>
+
+		<span className='toolbarWidget speedButtonDisplay'
+			style={{backgroundColor: '#666', color: '#eee', 'fontSize': '1em'}}>
+			this last
+		</span>
+
+		<button className='toolbarWidget  toolbarWidget speedButton faster'
+				onMouseDown={downSpeedHandler}
+				onMouseUp={upSpeedHandler}  onMouseLeave={upSpeedHandler}
+				onMouseEnter={maybeStopSpeed} onMouseMove={maybeStopSpeed}>
+			<span>🐇</span> faster
+		</button>
+		</>;
+
+
+
 	};
 
 	/* ************************************************* resolution dlg buttons */
 
 	// it displays the resolutioin, so it's natural for someone to click on it
-	const resolutionHandler = ev => {
+	const resolutionHandler = (ev) => {
 		setShowingTab('space');
 		ResolutionDialog.openResolutionDialog();
 	}
@@ -168,25 +174,25 @@ function CPToolbar(props) {
 		</div>
 	</div>;
 
-	return <div className='CPToolbar'>
+//	return <div className='CPToolbar'>
+//
+//		{speedControl()}
+//
+//		<span className='toolSpacer' style={{width: '.3em'}}></span>
+//
+//		{resolutionControl()}
+//
+//		<span className='toolSpacer' style={{width: '.3em'}}></span>
+//
+//		<div className='toolbarWidget'>
+//				<button onClick={props.resetWaveHandler}>Reset Wave</button>
+//		</div>
+//
+//		<div className='toolbarWidget'>
+//				<button onClick={props.resetVoltageHandler}>Reset Voltage</button>
+//		</div>
+//	</div>;
 
-		{speedControl()}
-
-		<span className='toolSpacer' style={{width: '.3em'}}></span>
-
-		{resolutionControl()}
-
-		<span className='toolSpacer' style={{width: '.3em'}}></span>
-
-		<div className='toolbarWidget'>
-				<button onClick={props.resetWaveHandler}>Reset Wave</button>
-		</div>
-
-		<div className='toolbarWidget'>
-				<button onClick={props.resetVoltageHandler}>Reset Voltage</button>
-		</div>
-	</div>;
-}
 
 
 

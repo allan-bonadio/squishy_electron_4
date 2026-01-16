@@ -265,15 +265,34 @@ export class ControlPanel extends React.Component {
 	// called after the mouseUp event, to save the dtFactor permanently.
 	// arrow function saveDFactor(dtFactor) dtfactor is the arg and quickDtFactor is def
 	saveDtFactor = (dtFactor = this.quickDtFactor) => {
-		if (traceQuickDtFactor)
-			console.log(`saveDtFactor:   old: ${this.state.dtFactor}   new: ${dtFactor} ± ${dtFactor - this.state.dtFactor}`, );
 		this.quickDtFactor = dtFactor;
-		console.log(`this.grinder = `, this.grinder);
 		this.grinder.stretchedDt = dtFactor * this.space.refDt;
-		storeASetting('lapSettings', 'dtFactor', dtFactor);
-		console.log(`dtFactor = ${dtFactor}  this.grinder=`, this.grinder);
-		this.setState({dtFactor});
+		if (traceQuickDtFactor) {
+			console.log(`saveDtFactor:   old: ${this.state.dtFactor}   new: ${dtFactor} ± ${dtFactor - this.state.dtFactor}`,
+			` this.grinder = `, this.grinder);
+			storeASetting('lapSettings', 'dtFactor', dtFactor);
+			this.setState({dtFactor});
+		}
+
+		//console.log(`dtFactor = ${dtFactor}  this.grinder=`, this.grinder);
 	}
+
+	// called when dtfactor changes, sortof.  fails silently.  wait, why do other spaces need to know what's happening?!
+	displayDtFactor = (dtFactor) => {
+		//if (!this.quickDtFactor)
+		//	return;
+
+debugger;
+
+		let unaList = document.querySelector('.speedButtonDisplay');
+		for (i = 0; i < unaList.length; i++) {
+			let but = unaList[i];
+			console.log(`speedButtonDisplay all #${i}:`, but);
+			let newLabel = 'whateverNewLabel';
+			but.innerHTML = `whateverInnerHtml   ${newLabel}`;
+		}
+	}
+
 
 
 	/* ********************************************** misc */
@@ -491,6 +510,55 @@ export class ControlPanel extends React.Component {
 	}
 
 
+	/* ********************************************** render pieces */
+
+	cpt() {
+		return 	<CPToolbar
+			getQuickDtFactor={this.getQuickDtFactor}
+			setQuickDtFactor={this.setQuickDtFactor}
+			saveDtFactor={this.saveDtFactor}
+			displayDtFactor={this.displayDtFactor}
+
+			setShowingTab={this.setShowingTab}
+
+			shouldBeIntegrating={this.context.shouldBeIntegrating ?? false}
+
+			// startOver button
+			resetWaveHandler={this.resetWaveHandler}
+			resetVoltageHandler={this.resetVoltageHandler}
+
+			N={this.N}
+			space={this.space}
+			cPanel={this}
+		/>
+}
+
+
+	/* ********************************************** render */
+
+
+//	<CPToolbar
+//		getQuickDtFactor={this.getQuickDtFactor}
+//		setQuickDtFactor={this.setQuickDtFactor}
+//		saveDtFactor={this.saveDtFactor}
+//		displayDtFactor={this.displayDtFactor}
+//
+//		setShowingTab={this.setShowingTab}
+//
+//		shouldBeIntegrating={this.context.shouldBeIntegrating ?? false}
+//
+//		// startOver button
+//		resetWaveHandler={this.resetWaveHandler}
+//		resetVoltageHandler={this.resetVoltageHandler}
+//
+//		N={this.N}
+//		space={this.space}
+//		cPanel={this}
+//	/>
+
+TabBar
+
+
 	/* ********************************************** render */
 
 
@@ -499,33 +567,36 @@ export class ControlPanel extends React.Component {
 		const s = this.state;
 
 
+
+//<CPToolbar
+//		getQuickDtFactor={this.getQuickDtFactor}
+//		setQuickDtFactor={this.setQuickDtFactor}
+//		saveDtFactor={this.saveDtFactor}
+//		displayDtFactor={this.displayDtFactor}
+//
+//		setShowingTab={this.setShowingTab}
+//
+//		shouldBeIntegrating={this.context.shouldBeIntegrating ?? false}
+//
+//		// startOver button
+//		resetWaveHandler={this.resetWaveHandler}
+//		resetVoltageHandler={this.resetVoltageHandler}
+//
+//		N={this.N}
+//		space={this.space}
+//		cPanel={this}
+//	/>
+
 		// before the space exists
 		// why?  this just shows panels and buttons
 		if (!this.space) return '';
 
 		let showingTabHtml = this.createShowingTab();
-
-		// chosenRate={1000. / s.chosenFP}
-		// setChosenRate={this.setChosenRate}
+		console.log(`Creating CPToolbar, displayDtFactor = ${this.displayDtFactor}`);
 
 		return <div className='ControlPanel'>
-			<CPToolbar
-				getQuickDtFactor={this.getQuickDtFactor}
-				setQuickDtFactor={this.setQuickDtFactor}
-				saveDtFactor={this.saveDtFactor}
 
-				setShowingTab={this.setShowingTab}
-
-				shouldBeIntegrating={this.context.shouldBeIntegrating ?? false}
-
-				// startOver button
-				resetWaveHandler={this.resetWaveHandler}
-				resetVoltageHandler={this.resetVoltageHandler}
-
-				N={this.N}
-				space={this.space}
-				cPanel={this}
-			/>
+			{cpt()}
 			<div className='tabsArea'>
 				<ul className='TabBar' >
 					<li className={s.showingTab == 'wave' ? 'selected' : ''} key='wave'

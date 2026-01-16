@@ -204,6 +204,7 @@ export function createStoreSettings() {
 	/* ************************************ voltage */
 	// the voltage controls   volts ≈ canyonScale * x ** canyonPower sortof
 	// where x is centered at voltageCenter% across
+	// again, params are stored until the user does something to fulfill it like clicking on Set Wave
 	makeParam('voltageParams', 'voltageBreed', 'flat', ['flat', 'slot', 'block', 'canyon']);
 	makeParam('voltageParams', 'voltageCenter', 50, {min: 0, max: 100});
 
@@ -213,7 +214,7 @@ export function createStoreSettings() {
 	makeParam('voltageParams', 'canyonPower', 2, {min: 0.1, max: 20});
 	makeParam('voltageParams', 'canyonScale', EFFECTIVE_VOLTS, {min: 0, max: AMPLE_VOLTS});
 
-	// where voltage line shows
+	// sets whether the voltage line shows or not
 	makeParam('voltageSettings', 'showVoltage', 'hover', ['always', 'hover', 'never']);
 
 	// voltage at bottom of wave view, 𝚫voltage of wave view height
@@ -229,7 +230,7 @@ export function createStoreSettings() {
 	// set in integration tab
 	makeParam('lapSettings', 'shouldBeIntegrating', false,  [false, true]);
 	//makeParam('lapSettings', 'chosenFP', 50, {min: 16, max: 60_001});
-	makeParam('lapSettings', 'dtFactor', .01, {min: .0001, max: 1, });
+	makeParam('lapSettings', 'dtFactor', 1e-4, {min: 1e-6, max: 1, });
 	//makeParam('lapSettings', 'stepsPerLap', 10, {min: 2, max: 50});
 	//makeParam('lapSettings', 'lowPassFilter', 50, {min: 0, max: 75});
 

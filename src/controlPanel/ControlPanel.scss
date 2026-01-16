@@ -70,6 +70,7 @@
 	// 	color: #eee;
 	// }
 
+	// this is each of the toolbarWidget in the cpt
 	.toolbarWidget {
 		display: inline-block;
 		margin: 0 .5em .5em .5em;
@@ -87,8 +88,14 @@
 				border-color: #ccc;
 			}
 
+		};
+
+		.speedButtonDisplay {
+			color: white;
+			font-size: .64em;
+			width: 8em;
 		}
-	}
+}
 
 	button.speedButton {
 		span {
