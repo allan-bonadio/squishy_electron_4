@@ -14,6 +14,8 @@ let traceCreation = false;
 let traceIntegration = false;
 let traceTriggerIteration = false;
 
+// Some Calculation/Grinder terms: see qGrinder.h
+
 // a qGrinder manages integration frames of a wave
 class eGrinder {
 	// eSpace we're in , creates its eGrinder

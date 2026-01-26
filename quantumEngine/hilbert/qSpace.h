@@ -117,7 +117,7 @@ public:
 	// totals for all dimensions.  These numbers dominate lots of areas in the code.
 	int nStates;  // active datapoinits
 	int nPoints;  // allocated size
-	int spectrumLength;  // should == nStates
+	int spectrumLength;  // should >= nStates
 
 	struct qCavity *mainFlick;
 

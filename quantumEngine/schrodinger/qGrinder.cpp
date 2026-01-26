@@ -346,9 +346,9 @@ printf("dt=%lf  dtHalf=%lf\n", dt, dtHalf);
 	}
 
 	// we
-	printf("elapsed time before %lf  dt=%lf  spl=%i  \n", elapsedTime, dt, stepsPerLap);
+	printf("elapsed time before adding %lg  dt=%lg  spl=%i  \n", elapsedTime, dt, stepsPerLap);
 	elapsedTime += dt * (stepsPerLap + .5);  // is this right?  no
-	printf("elapsed time after %lf\n", elapsedTime);
+	printf("elapsed time after %lg\n", elapsedTime);
 
 	// half hit at completion to move Re forward dt / 2
 	// and copy back to Main
