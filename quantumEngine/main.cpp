@@ -11,6 +11,7 @@
 
 
 // Emscripten magic: this c++ function will end up executing the JS enclosed.
+// it'll end up in quantumEngine.js
 // call this JS callback so JS knows we're up and ready.
 // Hand it some numbers from the builder script.
 // all these param names must be lower case for some reason.
@@ -18,9 +19,10 @@ EM_JS(int, qeStarted, (int max_dimensions, int n_threads, int sqdevel), {
 	// sometimes these things start in the wrong order
 	let inter = setInterval(() => {
 		if (window.startUpFromCpp) {
+			clearInterval(inter);
+
 			// this function in src/engine/eEngine.js
 			window.startUpFromCpp(max_dimensions, n_threads, sqdevel);
-			clearInterval(inter);
 		}
 		else {
 			console.log(`try again later, see if cpp set up yet`);
