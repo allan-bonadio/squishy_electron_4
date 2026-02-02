@@ -46,13 +46,12 @@ static bool traceTHFBenchmarks = false;
 
 static std::runtime_error nullException("");
 
-
 // create new grinder, complete with its own stage buffers. make sure
 // these values are doable by the sliders' steps. Space is definitely
 // created by creation time here, although a few details left  to do.
 qGrinder::qGrinder(qSpace *sp, int nGrWorkers, const char *lab)
 	: magic('Grnd'), space(sp), spect(NULL),
-		videoFP(.05), stretchedDt(60),
+		videoFP(.05), stretchedDt(1),
 		elapsedTime(0), nGrWorkers(nGrWorkers),
 		integrationEx(nullException), exceptionCode(""), _zero(0), hadException(false),
 		shouldBeIntegrating(false), isIntegrating(false),
@@ -307,14 +306,17 @@ void qGrinder::measureDivergence() {
 void qGrinder::oneLap() {
 	if (traceIntegration) {
 		speedyLog("qGrinder 🪓 starting oneLap() "
-			"shouldBeIntegrating: %hhu   isIntegrating: %hhu   stretchedDt=%lf"
+			"shouldBeIntegrating: %hhu   isIntegrating: %hhu   stretchedDt=%lg"
 			"   refDt=%lf    elapsedTime=%lf   \n",
 			shouldBeIntegrating, isIntegrating,
 			stretchedDt, space->refDt, elapsedTime   );
+		// dtFactor is in controlpanel state  only
 	}
-	// dtFactor is in controlpanel state  only
+	if (0 == stretchedDt)
+		throw std::runtime_error("allocateWave() - stretchedDt is zero");
+
 	if (traceIntegrationDetailed)
-		qGrinder::dumpObj("qGrinder 🪓 starting oneLap()");
+		qGrinder::dumpObj("qGrinder 🪓 dump of oneLap()");
 	qCx *wave0 = flick->waves[0];
 	qCx *wave1 = flick->waves[1];
 	qCx *wave2 = flick->waves[2];
@@ -322,7 +324,7 @@ void qGrinder::oneLap() {
 	// this is the actual dt in use for calculations, refDt * dtFactor
 	double dt = stretchedDt;
 	double dtHalf = dt / 2;
-printf("dt=%lf  dtHalf=%lf\n", dt, dtHalf);
+	speedyLog("early oneLap stretchedDt=dt=%lg  dtHalf=%lg\n", dt, dtHalf);
 
 	// half step in beginning to move Im forward dt/2 = dtHalf
 	// cuz outside of here, re and im are synchronized.
@@ -345,10 +347,7 @@ printf("dt=%lf  dtHalf=%lf\n", dt, dtHalf);
 		#endif
 	}
 
-	// we
-	printf("elapsed time before adding %lg  dt=%lg  spl=%i  \n", elapsedTime, dt, stepsPerLap);
 	elapsedTime += dt * (stepsPerLap + .5);  // is this right?  no
-	printf("elapsed time after %lg\n", elapsedTime);
 
 	// half hit at completion to move Re forward dt / 2
 	// and copy back to Main
@@ -358,7 +357,7 @@ printf("dt=%lf  dtHalf=%lf\n", dt, dtHalf);
 
 	// normalize it and return the old inner product, see how close to 1.000 it is
 	double iProd = flick->normalize();
-	if (dumpFFHiResSpectums) flick->dumpHiRes("wave END fourierFilter() after normalize");
+	if (dumpFFHiResSpectums) flick->dumpHiRes("wave END after normalize");
 	if (traceIProd && ((int) lapSerial & 31) == 0)
 		speedyLog("      🪓 qGrinder lap %d elapsed %4.6lf  iProd= %lf \n",
 			lapSerial, elapsedTime, iProd);
@@ -367,8 +366,8 @@ printf("dt=%lf  dtHalf=%lf\n", dt, dtHalf);
 		flick->dump("     🪓 qGrinder traceJustWave at end of lap", true);
 
 	if (traceIntegration) {
-		speedyLog("🪓 qGrinder::oneLap() done; shouldBeIntegrating: %hhu   isIntegrating: %hhu \n"
-			"  refDt=%lf  stretchedDt=%8.6lf   wave0[5]=%lf\n",
+		speedyLog("🪓 qGrinder::oneLap() done; shouldBeIntegrating: %hhu   isIntegrating: %hhu "
+			"  refDt=%lf  stretchedDt=%lg   wave0[5]=%lf\n",
 			shouldBeIntegrating, isIntegrating, space->refDt, stretchedDt,
 			wave0[5]);
 	}
@@ -398,7 +397,7 @@ void qGrinder::aggregateCalcTime(void) {
 
 
 
-	speedyLog(" qGrinder 🪓 spl=%d   vFP=%8.3lf\n",
+	speedyLog(" qGrinder 🪓 spl after adjustment=%d   videoFP=%8.3lf\n",
 		stepsPerLap, videoFP, maxCalcTime);
 
 	if (traceAggregate) {
@@ -434,8 +433,9 @@ void qGrinder::threadsHaveFinished() {
 		isIntegrating = false;
 
 	if (traceIntegration)  {
-		speedyLog("🪓 threadsHaveFinished: shouldBeIntegrating=%hhu   isIntegrating=%hhu\n",
-				shouldBeIntegrating, isIntegrating);
+		speedyLog("🪓 threadsHaveFinished: shouldBeIntegrating=%hhu   isIntegrating=%hhu "
+			"   stretchedDt=%lg  refDt=%lf    elapsedTime=%lf   \n",
+				shouldBeIntegrating, isIntegrating, stretchedDt, space->refDt, elapsedTime);
 	}
 
 	// now, copy it to the stage wave buffer, so it can copy it to
