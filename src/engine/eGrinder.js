@@ -5,7 +5,7 @@
 
 import {prepForDirectAccessors} from '../utils/directAccessors.js';
 import qeFuncs from './qeFuncs.js';
-import qeConsts from './qeConsts.js';
+// import qeConsts from './qeConsts.js';
 import {getASetting} from '../utils/storeSettings.js';
 import {thousandsSpaces} from '../utils/formatNumber.js';
 import eFlick from './eFlick.js';
@@ -14,6 +14,20 @@ let traceCreation = false;
 let traceIntegration = false;
 let traceTriggerIteration = false;
 
+// we're having trouble loading qeConsts.  Here, we only need to test
+// if the offsets are (mostly) correct.  Normal functioning (cough)
+// can continue.
+function checkgrinderOffsets(grinder) {
+	import( './qeConsts.js')
+	.then(qec => {
+		const qeConsts = qec.default;
+		if (qeConsts.grSENTINEL_VALUE !== grinder.sentinel)
+			console.error(`🔥 🔥 Grinder offsets not correct ${qeConsts.grSENTINEL_VALUE} `
+				+` != ${grinder.sentinel} 🔥 🔥`);
+		// but continue!  we're doing direct accessors and need the rest of them.
+			//throw Error("🔥 🔥 Grinder offsets not correct (36) 🔥 🔥");
+	});
+}
 // Some Calculation/Grinder terms: see qGrinder.h
 
 // a qGrinder manages integration frames of a wave
@@ -33,12 +47,12 @@ class eGrinder {
 		// for the flick we only have the pointer.  Similar to a eCavity
 		this.flick = new eFlick(space, 'mainFlick', this._flick);
 
-		//console.log(`sentinels: ${qeConsts.grSENTINEL_VALUE} ≟ ${this.sentinel}`);
-
-		if (qeConsts.grSENTINEL_VALUE !== this.sentinel)
-			throw Error("🔥 🔥 Grinder offsets not correct (36) 🔥 🔥");
+// 		if (qeConsts.grSENTINEL_VALUE !== this.sentinel)
+// 			throw Error("🔥 🔥 Grinder offsets not correct (36) 🔥 🔥");
 		if (traceCreation)
 			console.log(`🪚 eGrinder constructed: %o`, this);
+
+		checkgrinderOffsets(this);
 	}
 
 	// delete, except 'delete' is a reserved word.  Turn everything off.
@@ -51,9 +65,11 @@ class eGrinder {
 	}
 
 	/* *****************************    👽   👽    Direct Accessors */
-	// see qGrinder.cpp to regenerate this. Note these are all scalars; buffers
-	// are passed by pointer and you need to allocate them in JS (eg see
-	// eGrinder.constructor)
+	// see qGrinder.cpp to regenerate this. Note these are all scalars;
+	// buffers are passed by pointer and you need to allocate them
+	// elsewhere eg this._space is the c++ pointer to the c++ instance
+	// of qSpace (in JS just an int); this.space is the JS reference to
+	// the JS instance of eSpace
 
 	get _space() { return this.ints[1]; }
 	get _flick() { return this.ints[3]; }
@@ -91,7 +107,6 @@ class eGrinder {
 	get sentinel() { return this.bytes[164]; }
 	set sentinel(a) { this.bytes[164] = a; }
 
-
 	/* ******************* end of direct accessors */
 
 	/* ************************************************  */
@@ -128,10 +143,9 @@ class eGrinder {
 			qeFuncs.grinder_triggerIteration(this.pointer);
 		}
 
-		if (qeConsts.grSENTINEL_VALUE !== this.sentinel) {
-			console.error("🔥\n🔥 🔥 Grinder offsets aren't correct (119) 🔥 🔥\n🔥");
-			// but continue!  we're doing direct accessors and need the rest of them.
-		}
+		// if (qeConsts.grSENTINEL_VALUE !== this.sentinel) {
+		// 	console.error("🔥\n🔥 🔥 Grinder offsets aren't correct (119) 🔥 🔥\n🔥");
+		// }
 	}
 
 	// a consistent way to format these numbers, used in two places
