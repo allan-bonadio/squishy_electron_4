@@ -157,9 +157,26 @@ function startUpFromCpp(maxDims, nThreads, sqdevel) {
 
 	})
 	.catch(ex => {
-		excRespond(ex, `eSpaceCreatedPromise catch`);
+		excRespond(ex, `eSpaceCreatedPromise error`);
 		debugger;
 	});
 
 };
+
+let delay = 100;
+function cppStartupRepeater() {
+	if (window.startUpFromCpp) {
+		// this function in src/engine/eEngine.js
+		window.startUpFromCpp(max_dimensions, n_threads, sqdevel);
+	}
+	else {
+		console.log(`try again later, 🐌  delay=${delay}  see if cpp set up yet` + (new Date));
+		delay *= 1.4;
+		setInterval(cppStartupRepeater, delay);
+	}
+}
+window.cppStartupRepeater = cppStartupRepeater;
+
+// so window.startUpFromCpp is also a flag that says that cpp is up?
+// No, just that this sourcefile has executed all the way thru
 window.startUpFromCpp = startUpFromCpp;
