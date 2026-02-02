@@ -25,9 +25,10 @@ EM_JS(int, qeStarted, (int max_dimensions, int n_threads, int sqdevel), {
 			window.startUpFromCpp(max_dimensions, n_threads, sqdevel);
 		}
 		else {
-			console.log(`try again later, see if cpp set up yet`);
+			let tim = new Date();
+			console.log(`try again later, see if cpp set up yet  `, tim.toTimeString());
 		}
-	}, 100);
+	}, 500);
 });
 
 
