@@ -31,7 +31,7 @@ hundreds of steps, grinder.stepsPerLap  Dynamically adjusted in JS.
 
 
 stretchedDt is  used as dt in integration,  Elapsed time increments by stretchedDt each time through Schrodinger.
-stretchedDt = refDt * dtFactor, which is user controllable.  the 'speed'.
+stretchedDt = refDt * dtFactor, dtFactor is user controllable.  the 'speed'.
 
 a Step: is a calculation to advance the model dt time; just one pass, real or im.  Like, running
 Schrodinger's eq for Real then Imaginary, then again R & I for RK2.  that's 4 steps.  (see vischer alg)

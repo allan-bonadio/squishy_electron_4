@@ -38,12 +38,10 @@ qAvatar::qAvatar(const char *lab)
 	strncpy(label, lab, MAX_LABEL_LEN);
 	label[MAX_LABEL_LEN-1] = 0;
 
-	printf(" construct avatar.   label: %p      this=%p\n", lab, this );
-	printf("the label passed in is %s\n", lab);
+	printf(" construct avatar.   label: %s      this=%p\n", lab, this );
 	if (traceCreation)
 		printf(" 🚥 creating new qAvatar.  ptr=%p  label='%s' MAX_LABEL_LEN: %d\n",
 			this, label, MAX_LABEL_LEN);
-	// crashes!! printf("lab input string: 0x %2x %2x %2x %2x %2x %2x \n", lab[0], lab[1], lab[2], lab[3], lab[4], lab[5] );
 
 	for (int b = 0; b < MAX_N_BUFFERS; b++)
 		viewBuffers[b].fArray = NULL;

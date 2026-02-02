@@ -94,7 +94,8 @@ class SquishPanel extends React.Component {
 			if (traceSBIUpdate) {
 				console.log(`👑  shouldBeIntegratingUpdate: shouldBeIntegrating state.sbi=${sbi} and `
 					+` gr.sbi=${this.grinder.shouldBeIntegrating} now in effect & triggered; `
-					+` gr.isIntegrating=${this.grinder.isIntegrating}\n \n`);
+					+` gr.isIntegrating=${this.grinder.isIntegrating}\n `
+					+`gr.stretchedDt=${gr.stretchedDt}\n`);
 			}
 		}
 	}
