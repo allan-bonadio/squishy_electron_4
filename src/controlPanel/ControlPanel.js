@@ -21,7 +21,7 @@ import {interpretCppException, wrapForExc} from '../utils/errors.js';
 import SquishContext from '../sPanel/SquishContext.js';
 
 let traceSetPanels = false;
-let traceBeginFinish = true;
+let traceBeginFinish = false;
 let traceContext = false;
 let traceQuickDtFactor = true;
 
@@ -59,20 +59,19 @@ export class ControlPanel extends React.Component {
 			...getAGroup('waveParams'),
 			...getAGroup('voltageParams'),
 			...getAGroup('voltageSettings'),
-			...getAGroup('lapSettings'),
+			//...getAGroup('lapSettings'),
 
 			// official dtFactor here in the state.  quick one on this.
 			dtFactor: getASetting('lapSettings', 'dtFactor'),
 			showingTab: getASetting('miscSettings', 'showingTab'),
 		}
-		//this.chosenFP = this.state.chosenFP;
+
 		this.quickDtFactor = this.state.dtFactor;
 
 		// we can't init some stuff till we get the space.  But we also can't until
 		// this constructor runs.
 		eSpaceCreatedPromise.then(space => {
 			this.handleSpacePromise(space);
-			//this.grinder.chosenFP = this.chosenFP;
 		})
 		.catch(rex => {
 			let ex = interpretCppException(rex);
@@ -116,14 +115,14 @@ export class ControlPanel extends React.Component {
 	// we need a surprising amount of stuff from the space.  We can't draw much without it.
 	// So this gets called when it's ready.
 	handleSpacePromise(space) {
-		// not much happens without this info
 		this.space = space;
 		this.N = space.N;
-		this.mainAvatar = space.mainAvatar;
+		//this.mainAvatar = space.mainAvatar;
 		this.mainFlick = space.mainFlick;
 
 		this.grinder = space.grinder;
-		// no!  per-frame or per-step!  space.refDtthis.grinder.stretchedDt = this.state.dtFactor * this.space.refDt;
+		this.grinder.stretchedDt = this.state.dtFactor * this.space.refDt;
+
 
 		this.setUpContext();
 
@@ -147,36 +146,7 @@ export class ControlPanel extends React.Component {
 
 	static contextType = SquishContext;
 
-	/* *********************************************************** frame period/ frequency */
-	// this is obsolete?  TODO
-	// set frame period chosen by the user: set it JUST for the animator and grinder
-	// setChosenFP =
-	// (period) => {
-	// 	this.setState({chosenFP: storeASetting('lapSettings', 'chosenFP', this.chosenFP)});
-	//
-	// 	const an = this.props.animator;
-	// 	if (an) {
-	// 		an.chosenFP = period;
-	// 		an.frameProgress = 0;
-	// 	}
-	//
-	// 	// now tell the grinder.  Next chosenFP, it'll go into effect
-	// 	if (this.grinder)
-	// 		this.grinder.chosenFP = period;
-	// }
 
-	// set freq of frame, which is 1, 2, 15, 60, ... some float number of times per
-	// second you want frames. freq is how the CPToolbar UI, handles it, but we
-	// keep the period in the ControlPanel state,
-// 	setChosenRate =
-// 	freq =>{
-// 		// set it in the settings, controlpanel state, and SquishPanel's state, too.
-// 		this.chosenFP = 1000. / +freq;
-// 		if (qeConsts.FASTEST == freq)
-// 			this.chosenFP = qeConsts.FASTEST;
-//
-// 		this.setChosenFP(this.chosenFP);  // so squish panel can adjust the heartbeat
-// 	}
 
 	/* ************************************************* shouldBeIntegrating */
 	// sbi is kept in the context, AND in the grinder.  Not in this component's state.
@@ -241,6 +211,8 @@ export class ControlPanel extends React.Component {
 		finishAnimating(ev);
 	}
 
+	/* ************************************************* dtFactor */
+
 	// the 'quick' dtFactor is only stored in our this.quickDtFactor,
 	// for the user pushing on tortoise & hare buttons
 	getQuickDtFactor = () => {
@@ -252,47 +224,58 @@ export class ControlPanel extends React.Component {
 	// This function changes dtFactor quickly for interactive feedback, but doesn't store in the state or local storage
 	setQuickDtFactor = (quickDtFactor) => {
 		if (traceQuickDtFactor)
-			console.log(`🎛️  setQuickDtFactor x 1000 starts:   old: ${this.quickDtFactor * 1000}   new: ${quickDtFactor * 1000}`, );
+			console.log(`🎛️  setQuickDtFactor*k starts:   old: ${this.quickDtFactor * 1000} `
+				+`  new: ${quickDtFactor * 1000}   stretchedDt=${quickDtFactor * this.space.refDt}`);
 		if (this.quickDtFactor == quickDtFactor)
 			return;
 		this.quickDtFactor = quickDtFactor;
 		this.grinder.stretchedDt = quickDtFactor * this.space.refDt;
-		this.setState({quickDtFactor});  // do this so rerenders
+		this.setState({dtFactor: quickDtFactor});  // do this so rerenders
+		this.displayDtFactor(quickDtFactor);
 		if (traceQuickDtFactor)
-			console.log(`🎛️ setQuickDtFacto finishesr: refDt = ${this.space.refDt}   quickDtFactor= ${quickDtFactor} stretchedDt=${this.grinder.stretchedDt}`)
+			console.log(`🎛️ setQuickDtFactor finishes: `
+				+` refDt = ${this.space.refDt} `
+				+`  quickDtFactor= ${quickDtFactor} `
+				+` stretchedDt=${this.grinder.stretchedDt}`)
 	}
 
 	// called after the mouseUp event, to save the dtFactor permanently.
 	// arrow function saveDFactor(dtFactor) dtfactor is the arg and quickDtFactor is def
-	saveDtFactor = (dtFactor = this.quickDtFactor) => {
+	saveDtFactor = (dtFactor) => {
+		// i'll get it one way or another
+		if (!dtFactor) dtFactor = this?.quickDtFactor || _this?.quickDtFactor;
+		if (!dtFactor) dtFactor = this?.getQuickDtFactor()  || _this?.quickDtFactor;
+
 		this.quickDtFactor = dtFactor;
 		this.grinder.stretchedDt = dtFactor * this.space.refDt;
 		if (traceQuickDtFactor) {
-			console.log(`saveDtFactor:   old: ${this.state.dtFactor}   new: ${dtFactor} ± ${dtFactor - this.state.dtFactor}`,
-			` this.grinder = `, this.grinder);
+			console.log(`saveDtFactor:   old: ${this.state.dtFactor} `
+				+`  new: ${dtFactor} ± ${dtFactor - this.state.dtFactor}`,
+				`stretchedDt=${this.grinder.stretchedDt}`);
 			storeASetting('lapSettings', 'dtFactor', dtFactor);
 			this.setState({dtFactor});
 		}
-
-		//console.log(`dtFactor = ${dtFactor}  this.grinder=`, this.grinder);
 	}
 
-	// called when dtfactor changes, sortof.  fails silently.  wait, why do other spaces need to know what's happening?!
-	displayDtFactor = (dtFactor) => {
-		//if (!this.quickDtFactor)
-		//	return;
+	// how dtFactor is displayed on the speed control.  returns string.
+	formatDtFactor = () => {
+		let vdt = (this.getQuickDtFactor() * 1e3).toFixed(0);
+		console.log(`dtFactor=${this.getQuickDtFactor()}  v:${vdt}`);
+		return vdt;
+	}
 
-debugger;
+	// called when dtfactor changes interactively.  fails silently.
+	displayDtFactor = () => {
+		//dtFactor ??= this.state.dtFactor ?? this?.quickDtFactor;
 
-		let unaList = document.querySelector('.speedButtonDisplay');
-		for (i = 0; i < unaList.length; i++) {
-			let but = unaList[i];
-			console.log(`speedButtonDisplay all #${i}:`, but);
-			let newLabel = 'whateverNewLabel';
-			but.innerHTML = `whateverInnerHtml   ${newLabel}`;
+		let displayNode = document.querySelector('.speedButtonDisplay');
+		if (displayNode) {
+			displayNode.innerHTML = this.formatDtFactor();
 		}
 	}
 
+// props.getQuickDtFactor
+// this.getQuickDtFactor
 
 
 	/* ********************************************** misc */
@@ -320,7 +303,7 @@ debugger;
 		});
 	}
 
-	/* ********************************************** wave tab */
+	/* ********************************************** set wave tab */
 
 	// these are kept individually in the state so any of them triggers a render.
 	//  Kindof inconvenient, so we have getters and setters.
@@ -383,7 +366,7 @@ debugger;
 
 	// setMainWave() called when user clicks SetWave, fills the main wave
 	// waveParams handed in are the defaults as stored in storeSettings
-	makeWaveTab = () => <SetWaveTab
+	renderWaveTab = () => <SetWaveTab
 			saveMainWave={this.saveMainWave}
 			waveParams={this.getWaveParams()}
 			setWaveParams={this.setWaveParams}
@@ -428,7 +411,7 @@ debugger;
 		this.space.updateDrawnVoltagePath();
 	}
 
-	makeVoltageTab = () => {
+	renderVoltageTab = () => {
 		const p = this.props;
 		const s = this.state;
 		return <SetVoltageTab
@@ -457,7 +440,7 @@ debugger;
 
 	/* ********************************************** integration tab */
 
-	makeIntegrationTab = () => {
+	renderIntegrationTab = () => {
 		return <SetIntegrationTab
 			getQuickDtFactor={this.getQuickDtFactor}
 			setQuickDtFactor={this.setQuickDtFactor}
@@ -471,7 +454,7 @@ debugger;
 	/* ********************************************** rainbow tab */
 
 	// Just a display.  No controls, no settings.
-	makeRainbowTab = () => <CxRainbowTab />;
+	renderRainbowTab = () => <CxRainbowTab />;
 
 	/* ********************************************** tabs */
 
@@ -482,27 +465,27 @@ debugger;
 	}
 
 
-	// whichever tab is showing right now
-	createShowingTab() {
+	// whichever tab is showing right now.
+	renderShowingTab() {
 		const s = this.state;
 //		const {waveBreed, waveFrequency, pulseWidth, pulseCenter} = s;
 //		const {canyonPower, canyonScale, slotWidth, slotScale, voltageCenter} = s;
 
 		switch (s.showingTab) {
 		case 'wave':
-			return this.makeWaveTab();
+			return this.renderWaveTab();
 
 		case 'voltage':
-			return this.makeVoltageTab();
+			return this.renderVoltageTab();
 
 		case 'space':
 			return <SetResolutionTab grinder={this.grinder}  space={this.space} />;
 
 		case 'integration':
-			return this.makeIntegrationTab();
+			return this.renderIntegrationTab();
 
 		case 'rainbow':
-			return this.makeRainbowTab();
+			return this.renderRainbowTab();
 
 		default:
 			return `Do not understand showingTab='${s.showingTab}'`;
@@ -510,32 +493,40 @@ debugger;
 	}
 
 
-	/* ********************************************** render pieces */
+	/* ********************************************** render pieces of control panel  */
 
-	cpt() {
-		return 	<CPToolbar
+	// creates CPToolbar as a member func
+	renderToolbar() {
+
+// 		return <div >
+// 			why not big est xt s t ehereh
+// 		</div>
+// 		return;
+
+		//debugger;
+		let toolbarRendered =<CPToolbar
 			getQuickDtFactor={this.getQuickDtFactor}
 			setQuickDtFactor={this.setQuickDtFactor}
 			saveDtFactor={this.saveDtFactor}
-			displayDtFactor={this.displayDtFactor}
+			formatDtFactor={this.formatDtFactor}
 
 			setShowingTab={this.setShowingTab}
 
 			shouldBeIntegrating={this.context.shouldBeIntegrating ?? false}
 
-			// startOver button
+			// startOver buttons
 			resetWaveHandler={this.resetWaveHandler}
 			resetVoltageHandler={this.resetVoltageHandler}
 
 			N={this.N}
 			space={this.space}
 			cPanel={this}
-		/>
+		/>;
+
+		return toolbarRendered;
 	}
 
-
 	/* ********************************************** render */
-
 
 	render() {
 		const p = this.props;
@@ -545,12 +536,14 @@ debugger;
 		// why?  this just shows panels and buttons
 		if (!this.space) return '';
 
-		let showingTabHtml = this.createShowingTab();
-		console.log(`Creating CPToolbar, displayDtFactor = ${this.displayDtFactor}`);
+		let showingTabRender = this.renderShowingTab();
+		console.log(`Rendering CPToolbar, dtFactor = ${this.state.dtFactor}`);
+		let toolbar = this.renderToolbar();
 
 		return <div className='ControlPanel'>
 
-			{cpt()}
+			{toolbar}
+
 			<div className='tabsArea'>
 				<ul className='TabBar' >
 					<li className={s.showingTab == 'wave' ? 'selected' : ''} key='wave'
@@ -565,8 +558,9 @@ debugger;
 						onClick={ev => this.setShowingTab('rainbow')}>Complex</li>
 				</ul>
 				<div className='tabFrame'>
-					{showingTabHtml}
+					{showingTabRender}
 				</div>
+
 			</div>
 		</div>;
 	}

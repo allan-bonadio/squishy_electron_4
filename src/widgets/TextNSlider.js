@@ -80,10 +80,11 @@ function TextNSlider(props) {
 		</>;
 	}
 
-	const label = p.label ? <label>{p.label}</label> : '';
+	//const label = p.label ? <label>{p.label}</label> : '';
+	if (p.label)
+		controls = <label>{p.label}{controls}</label>;
 	return <div className={`TextNSlider ${p.className || ''}`} style={p.style || {}}
 					title={p.title} >
-		{label}
 		{controls}
 	</div>;
 }

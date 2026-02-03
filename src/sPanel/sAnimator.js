@@ -14,9 +14,9 @@ import qeConsts from '../engine/qeConsts.js';
 
 let traceTheViewBuffer = false;
 let traceScreenRefreshes = false;
-let traceIntegration = true;
+let traceIntegration = false;
 
-let tracerAFPeriod = false;
+let traceAFPeriod = false;
 let traceTypicalVideoPeriod = false;
 let traceEachRaf = false;
 
@@ -139,7 +139,7 @@ class sAnimator {
 		// are tolerable while unstableFP is on.
 		if (abs(videoFP - this.avgVideoFP) > 4) {
 			this.unstableFP = true;
-			if (tracerAFPeriod) {
+			if (traceAFPeriod) {
 				console.log(`🎥  aniFP change at ${performance.now().toFixed(4)}ms `
 						+` videoFP=${videoFP.toFixed(4)}  `
 						+ ` this.avgVideoFP = ${this.avgVideoFP.toFixed(4)}  `
@@ -233,7 +233,7 @@ class sAnimator {
 
 	}
 
-	// do one frame - one video frame's worth of integration & whatever
+	// do one frame - one video frame's worth of iink (and calculations)
 	rAFFrame() {
 		if (traceEachRaf) {
 			console.log(`🎥 another rAF ctx.sbi=${this.getContext().shouldBeIntegrating}, `

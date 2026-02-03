@@ -7,13 +7,14 @@ import {isPowerOf2} from './powers.js';
 import qeConsts from '../engine/qeConsts.js';
 import {EFFECTIVE_VOLTS, AMPLE_VOLTS} from '../volts/voltConstants.js';
 
-// what a disaster.   I made this whole subsystem, storeSettings (aka New)
+// TODO: I made this whole subsystem, storeSettings (aka New)
 // but somehow the compiler fucks it up,
 // so I fell back to some lame functions.
 // TURNS OUT, all those fuckups were because there were circular import dependencies.
 // So, something gets loaded before something else, which ends up undefined!
 // Move functions into different files, or rearrange them, to fix.  Should work then.
-// should work now, if I reconstruct it.
+// Actually, make all the data structures into its own file that doesn't import anything.
+
 // Reconstruction: to support both methods, must have code for both.
 // setting: must set both, using either method
 // getting: get either; calling code decides
@@ -230,9 +231,11 @@ export function createStoreSettings() {
 	// set in integration tab
 	makeParam('lapSettings', 'shouldBeIntegrating', false,  [false, true]);
 	//makeParam('lapSettings', 'chosenFP', 50, {min: 16, max: 60_001});
-	makeParam('lapSettings', 'dtFactor', 1e-4, {min: 1e-6, max: 1, });
+	makeParam('lapSettings', 'dtFactor', 1, {min: 1e-6, max: 100, });
 	//makeParam('lapSettings', 'stepsPerLap', 10, {min: 2, max: 50});
 	//makeParam('lapSettings', 'lowPassFilter', 50, {min: 0, max: 75});
+
+	localStorage.removeItem("frameSettings");  // old name for lapSettings
 
 	/* ************************************miscSettings */
 	// set by clicking on tab

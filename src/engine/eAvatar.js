@@ -18,7 +18,7 @@ let traceVBuffer = false;
 
 // OR adapt a qAvatar (eg one on qSpace) with eAvatar.adaptAvatar()
 // the integration engine should usually populate the buffers as part
-// of its cycle, at the end of an integration frame.
+// of its cycle, at the end of an integration lap.
 
 
 class eAvatar {

@@ -51,7 +51,7 @@ where H is hamiltonian, typically ( potential + ∂²/∂x² )
  */
 
 /*
-this is our second derivative wrt x:
+this is our second derivative wrt ix:
 	qCxd2 = wave[ix-1] + wave[ix+1] - wave[ix] * 2;
 
 ix is the integer index into each length dimension.  The actual distance is dx * ix; determined by
@@ -70,7 +70,7 @@ the length (supplied by user) and N, for each dimension of the space.
 // and 1 kg = 5.4888455287888166e+29
 
 See definitionOfUnits in articles directory for latest believable work.
-Here, we use ix as a surrogate for x, x = ix * dx = 𝜉 ix.
+Here, we use ix as a surrogate for ix, ix = ix * dx = 𝜉 ix.
 dx is a field on the qDimension in the qSpace.
 
 */
@@ -80,22 +80,29 @@ dx is a field on the qDimension in the qSpace.
 // ******************************************************** single point methods
 int usedIx, infrequent = 0;  // trace only
 
+const int samplePointsBegin = 10;
+const int samplePointsFinish = 20;
+
+static bool within(int ix) {
+	return ! (ix <samplePointsBegin ||  ix >=samplePointsFinish);
+};
+
 // Thes functions do a single point of a hit.  They are handed pointers
 // to THE point they are to do.  The hamiltonian (to be split off in the
 // future) accesses the points on each side of the point, too.
 
-void qGrinder::pointReal(qCx *newW, qCx *oldW, qCx *hamiltW, double volts, double dt) {
+void qGrinder::pointReal(qCx *newW, qCx *oldW, qCx *hamiltW, double volts, double dt, int ix) {
 	// printf("dt=%12.6lf  refDt=%12.6lf\n", dt, space->refDt);
 
-	// second deriv wrt x of psi, multiplied by that coeff
+	// second deriv wrt ix of psi, multiplied by that coeff
 	double d2𝜓i = (hamiltW[-1].im + hamiltW[+1].im - hamiltW->im * 2) * d2Coeff;
 
-	if (traceRealStep && samplePoint == usedIx) {
+	if (traceRealStep && within(ix)) {
 		speedyLog(
 		"    🧶 pointReal[%d] d2𝜓i=%3.8lf  hamiltW=%5.5lf %5.5lf %5.5lf and d2Coeff %3.8lf\n",
 		usedIx, d2𝜓i, hamiltW[-1].im, hamiltW[+1].im, hamiltW->im, d2Coeff);
 	}
-	if (traceVoltage && samplePoint == usedIx && ((infrequent++ & 1023) == 0)) {
+	if (traceVoltage && within(ix) && ((infrequent++ & 1023) == 0)) {
 //		speedyLog("hiay\n");
 		speedyLog("    🧶 voltage[%d] V=%12.3lf\n", usedIx, volts);
 	}
@@ -104,7 +111,7 @@ void qGrinder::pointReal(qCx *newW, qCx *oldW, qCx *hamiltW, double volts, doubl
 	// just the 𝜓 used to calculate the hamiltonian!)
 	double U𝜓 = volts * hamiltW->re * inverseℏ;
 	double H𝜓 = d2𝜓i + U𝜓;
-	if (traceΔE && samplePoint == usedIx) {
+	if (traceΔE && within(ix)) {
 		printf(" 🧶  viss: real ΔE: kinetic/ℏ=%8.4lf  potential/ℏ=%8.4lf  total/ℏ=%8.4lf  ",
 			d2𝜓i / hamiltW->re, U𝜓/hamiltW->re, H𝜓 / hamiltW->re);
 		printf("   potential U: volts=%8.4lf  inverseℏ=%8.4lf  ",
@@ -115,7 +122,7 @@ void qGrinder::pointReal(qCx *newW, qCx *oldW, qCx *hamiltW, double volts, doubl
 
 	// new = old + 𝛥 dt   note subtraction
 	newW->re = oldW->re - dt * H𝜓;
-	if (traceRealStep && samplePoint == usedIx)
+	if (traceRealStep && within(ix))
 		speedyLog("    🧶 pointReal[%d] oldW->re=%3.8lf  newW->re=%3.8lf  H𝜓=%3.8lf\n",
 		samplePoint, oldW->re, newW->re, H𝜓);
 
@@ -124,14 +131,20 @@ void qGrinder::pointReal(qCx *newW, qCx *oldW, qCx *hamiltW, double volts, doubl
 
 // second step: advance the Imaginaries of 𝜓 one dt, from ½ dt to ³⧸₂ dt
 // given the reals we just generated in hitReal(), but don't change them
-void qGrinder::pointImaginary(qCx *newW, qCx *oldW, qCx *hamiltW, double volts, double dt) {
+void qGrinder::pointImaginary(qCx *newW, qCx *oldW, qCx *hamiltW, double volts, double dt, int ix) {
 	// second deriv d2𝜓.re / dx**2
 	double d2𝜓r = (hamiltW[-1].re + hamiltW[+1].re - hamiltW->re * 2) * d2Coeff;
 	if (traceImaginaryStep) speedyLog("    🧶 pointImaginary\n");
 
+	if (traceImaginaryStep && within(ix)) {
+		speedyLog(
+		"    🧶 pointImaginary[%d] d2𝜓i=%3.8lf  hamiltW=%5.5lf %5.5lf %5.5lf and d2Coeff %3.8lf\n",
+		usedIx, d2𝜓r, hamiltW[-1].im, hamiltW[+1].im, hamiltW->im, d2Coeff);
+	}
+
 	// total hamiltonian
 	double H𝜓 = d2𝜓r + volts * hamiltW->im * inverseℏ;
-	if (traceΔE && samplePoint == usedIx) {
+	if (traceΔE && within(ix)) {
 		printf(" 🧶  viss: imag ΔE: kinetic=%1.4lf  potential=%1.4lf  total=%1.4lf\n",
 			d2𝜓r / hamiltW->im, (H𝜓 - d2𝜓r)/hamiltW->im, H𝜓 / hamiltW->im);
 	}
@@ -164,7 +177,7 @@ void qGrinder::hitReal(qCx *newW, qCx *oldW, qCx *hamiltW, double dt) {
 	// or better, make substitutes for hitReal and stepImag
 	for (int ix = dims->start; ix < dims->end; ix++) {
 		usedIx = ix;
-		pointReal(newW + ix, oldW + ix, hamiltW + ix, voltage[ix], dt);
+		pointReal(newW + ix, oldW + ix, hamiltW + ix, voltage[ix], dt, ix);
 	}
 	flick->fixThoseBoundaries(newW);
 	//elapsedTime += dt/2;  // could be 0 or already dt/2
@@ -184,7 +197,7 @@ void qGrinder::hitImaginary(qCx *newW, qCx *oldW, qCx *hamiltW, double dt) {
 	// someday I should check for dt==0 and do a copyThatWave() instead of this calc
 	for (int ix = dims->start; ix < dims->end; ix++) {
 		usedIx = ix;
-		pointImaginary(newW + ix, oldW + ix, hamiltW + ix, voltage[ix], dt);
+		pointImaginary(newW + ix, oldW + ix, hamiltW + ix, voltage[ix], dt, ix);
 	}
 
 	flick->fixThoseBoundaries(newW);

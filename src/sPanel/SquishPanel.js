@@ -28,6 +28,7 @@ import pointerContextMap from '../engine/pointerContextMap.js';
 let tracePromises = false;
 let traceSquishPanel = false;
 let traceWidth = false;
+let traceSBIUpdate = false;
 
 /* ************************************************ construction & reconstruction */
 
@@ -89,10 +90,13 @@ class SquishPanel extends React.Component {
 			this.grinder.shouldBeIntegrating = sbi;
 			if (sbi)
 				this.grinder.triggerIteration();
-			console.log(`👑  shouldBeIntegratingUpdate: shouldBeIntegrating state.sbi=${sbi} and `
-				+` gr.sbi=${this.grinder.shouldBeIntegrating} now in effect & triggered; `
-				+` gr.isIntegrating=${this.grinder.isIntegrating}\n \n`);
 
+			if (traceSBIUpdate) {
+				console.log(`👑  shouldBeIntegratingUpdate: shouldBeIntegrating state.sbi=${sbi} and `
+					+` gr.sbi=${this.grinder.shouldBeIntegrating} now in effect & triggered; `
+					+` gr.isIntegrating=${this.grinder.isIntegrating}\n `
+					+`gr.stretchedDt=${gr.stretchedDt}\n`);
+			}
 		}
 	}
 

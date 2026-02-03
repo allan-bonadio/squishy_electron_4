@@ -30,11 +30,11 @@ Just the amount of calculation done for it.  Typically
 hundreds of steps, grinder.stepsPerLap  Dynamically adjusted in JS.
 
 
-dtStretch is  used as dt in integration,  Elapsed time increments by dtStretch each time through Schrodinger.
-dtStretch = refDt * dtFactor, which is user controllable.
+stretchedDt is  used as dt in integration,  Elapsed time increments by stretchedDt each time through Schrodinger.
+stretchedDt = refDt * dtFactor, dtFactor is user controllable.  the 'speed'.
 
-a Step: is a calculation to advance the model dt time.  Like, running
-Schrodinger's eq for Real then Imaginary, then again R & I for RK2.  (see vischer alg)
+a Step: is a calculation to advance the model dt time; just one pass, real or im.  Like, running
+Schrodinger's eq for Real then Imaginary, then again R & I for RK2.  that's 4 steps.  (see vischer alg)
 In the multithreaded code, a Step can apply to only a segment of the cavity.
 
 a Hit: advancement by dt of some subset of x values of the calculation.  As of
@@ -97,8 +97,8 @@ struct qGrinder {
 
 	// visscher.  Calculate new from old; use hamiltonian to calculate d𝜓
 	// sometimes oldW and hamiltonianW are the same
-	void pointReal(qCx *newW, qCx *oldW, qCx *hamiltW, double volts, double dt);
-	void pointImaginary(qCx *newW, qCx *oldW, qCx *hamiltW, double volts, double dt);
+	void pointReal(qCx *newW, qCx *oldW, qCx *hamiltW, double volts, double dt, int ix);
+	void pointImaginary(qCx *newW, qCx *oldW, qCx *hamiltW, double volts, double dt, int ix);
 	void hitReal(qCx *newW, qCx *oldW, qCx *hamiltW, double dt);
 	void hitImaginary(qCx *newW, qCx *oldW, qCx *hamiltW, double dt);
 

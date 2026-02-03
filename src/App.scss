@@ -194,15 +194,14 @@ button {
 	border-radius: .5em;
 
 	cursor: pointer;
-	background-color: #fff;
-	color: #004;
+	//background-color: #fff;
+	//color: #004;
 
 	// hint that you can click it
 	&:hover {
-		background-color: #cef;
+		background-color: #225;
 	}
 
-	// kinda reverse video to make an impact
 	&:active {
 		background-color: #048;
 		color: #fff;

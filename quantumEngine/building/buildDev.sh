@@ -16,10 +16,15 @@ cd ..
 
 # -sEMIT_PRODUCERS_SECTION = put info on which compiler/linker/language was
 # built.  Mostly irrelevant.  add it here if you want.
-# this one works on Panama
-#export DEBUG='-g3 -gsource-map --source-map-base /../quantumEngine/  -DsqDEVEL=1'
-# this one works on Dnipro
-export DEBUG='-g3 -gsource-map --source-map-base /qEng/   -DsqDEVEL=1'
+
+if [ 'panama.local' == "$HOSTNAME" ]
+then
+	# this one works on Panama
+	export DEBUG='-g3 -gsource-map --source-map-base /../quantumEngine/  -DsqDEVEL=1'
+else
+	# this one works on Dnipro
+	export DEBUG='-g3 -gsource-map --source-map-base /qEng/   -DsqDEVEL=1'
+fi
 export OPTIMIZE='-O0 '
 
 # add -sPTHREADS_DEBUG for blow by blow tracing of quantumEngine.js i think

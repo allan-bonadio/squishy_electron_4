@@ -17,6 +17,8 @@ static bool traceWork = false;
 static bool traceWorkOccasionally = false;
 static int occasionally = 0;
 
+// Some Calculation/Grinder terms: see qGrinder.h
+
 /* *********************************************** grWorker */
 
 // indexed by thread serial, there may be gaps.

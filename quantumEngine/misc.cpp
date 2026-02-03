@@ -11,6 +11,10 @@
 
 static bool traceExceptions = false;
 
+// of course, tracing it will not be speedy.  Use this if you need everything in order
+bool traceSpeedyLog = false;
+
+
 // return elapsed real time since last page reload, in Milliseconds, just like JS
 // seems like accuracy down to miliseconds or even a bit smaller
 double getTimeDouble(void)
@@ -33,9 +37,6 @@ const double NaN = nan("squish");
 
 /* *********************************************** speedyLogging */
 // for extra-fast logging of timing for these threads.
-
-// of course, tracing it will not be speeding
-bool traceSpeedyLog = false;
 
 #define MAX_BUF_LEN  16000
 #define MAX_ONE_LOG_LEN  400
