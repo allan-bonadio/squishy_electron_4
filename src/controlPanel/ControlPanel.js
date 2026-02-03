@@ -531,32 +531,7 @@ debugger;
 			space={this.space}
 			cPanel={this}
 		/>
-}
-
-
-	/* ********************************************** render */
-
-
-//	<CPToolbar
-//		getQuickDtFactor={this.getQuickDtFactor}
-//		setQuickDtFactor={this.setQuickDtFactor}
-//		saveDtFactor={this.saveDtFactor}
-//		displayDtFactor={this.displayDtFactor}
-//
-//		setShowingTab={this.setShowingTab}
-//
-//		shouldBeIntegrating={this.context.shouldBeIntegrating ?? false}
-//
-//		// startOver button
-//		resetWaveHandler={this.resetWaveHandler}
-//		resetVoltageHandler={this.resetVoltageHandler}
-//
-//		N={this.N}
-//		space={this.space}
-//		cPanel={this}
-//	/>
-
-TabBar
+	}
 
 
 	/* ********************************************** render */
@@ -565,27 +540,6 @@ TabBar
 	render() {
 		const p = this.props;
 		const s = this.state;
-
-
-
-//<CPToolbar
-//		getQuickDtFactor={this.getQuickDtFactor}
-//		setQuickDtFactor={this.setQuickDtFactor}
-//		saveDtFactor={this.saveDtFactor}
-//		displayDtFactor={this.displayDtFactor}
-//
-//		setShowingTab={this.setShowingTab}
-//
-//		shouldBeIntegrating={this.context.shouldBeIntegrating ?? false}
-//
-//		// startOver button
-//		resetWaveHandler={this.resetWaveHandler}
-//		resetVoltageHandler={this.resetVoltageHandler}
-//
-//		N={this.N}
-//		space={this.space}
-//		cPanel={this}
-//	/>
 
 		// before the space exists
 		// why?  this just shows panels and buttons
