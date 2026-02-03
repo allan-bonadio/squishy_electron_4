@@ -231,6 +231,7 @@ export class ControlPanel extends React.Component {
 		this.quickDtFactor = quickDtFactor;
 		this.grinder.stretchedDt = quickDtFactor * this.space.refDt;
 		this.setState({dtFactor: quickDtFactor});  // do this so rerenders
+		this.displayDtFactor(quickDtFactor);
 		if (traceQuickDtFactor)
 			console.log(`🎛️ setQuickDtFactor finishes: `
 				+` refDt = ${this.space.refDt} `
@@ -256,16 +257,20 @@ export class ControlPanel extends React.Component {
 		}
 	}
 
-	// called when dtfactor changes, sortof.  fails silently.
-	displayDtFactor = (dtFactor) => {
-		dtFactor ??= this.state.dtFactor ?? this?.quickDtFactor;
+	// how dtFactor is displayed on the speed control.  returns string.
+	formatDtFactor = () => {
+		let vdt = (this.getQuickDtFactor() * 1e3).toFixed(0);
+		console.log(`dtFactor=${this.getQuickDtFactor()}  v:${vdt}`);
+		return vdt;
+	}
+
+	// called when dtfactor changes interactively.  fails silently.
+	displayDtFactor = () => {
+		//dtFactor ??= this.state.dtFactor ?? this?.quickDtFactor;
 
 		let displayNode = document.querySelector('.speedButtonDisplay');
-		// that should actually have been rel to the SquishPanel?  control panel?
-		if (displayNode && dtFactor) {
-			let vdt = dtFactor * 1e6;
-			console.log(`dtFactor=${dtFactor}  v:${vdt} speedButtonDisplay:`, displayNode);
-			displayNode.innerHTML = (vdt).toFixed(0);
+		if (displayNode) {
+			displayNode.innerHTML = this.formatDtFactor();
 		}
 	}
 
@@ -503,7 +508,7 @@ export class ControlPanel extends React.Component {
 			getQuickDtFactor={this.getQuickDtFactor}
 			setQuickDtFactor={this.setQuickDtFactor}
 			saveDtFactor={this.saveDtFactor}
-			displayDtFactor={this.displayDtFactor}
+			formatDtFactor={this.formatDtFactor}
 
 			setShowingTab={this.setShowingTab}
 

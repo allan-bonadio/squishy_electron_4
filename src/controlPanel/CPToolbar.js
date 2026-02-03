@@ -70,6 +70,7 @@ const propTypes = {
 	getQuickDtFactor: PropTypes.func.isRequired,
 	setQuickDtFactor: PropTypes.func.isRequired,
 	saveDtFactor: PropTypes.func.isRequired,
+	formatDtFactor: PropTypes.func.isRequired,
 
 	resetWaveHandler: PropTypes.func.isRequired,
 	resetVoltageHandler: PropTypes.func.isRequired,
@@ -152,7 +153,7 @@ function CPToolbar(props) {
 			</button>
 
 			<span className='toolbarWidget speedButtonDisplay'>
-				&nbsp;
+				{p.formatDtFactor()}
 			</span>
 
 			<button className='toolbarWidget speedButton faster'
@@ -176,11 +177,11 @@ function CPToolbar(props) {
 		{renderResolutionControl(props.N)}
 		<span className='toolSpacer' style={{width: '.3em'}}></span>
 
-		<div className='toolbarWidget'>
+		<div className='toolbarWidget resetButton wave'>
 				<button onClick={props.resetWaveHandler}>Reset Wave</button>
 		</div>
 
-		<div className='toolbarWidget'>
+		<div className='toolbarWidget resetButton volt'>
 				<button onClick={props.resetVoltageHandler}>Reset Voltage</button>
 		</div>
 	</div>);

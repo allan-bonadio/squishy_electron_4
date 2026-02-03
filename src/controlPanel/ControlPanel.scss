@@ -78,30 +78,35 @@
 		background-color: #222;
 
 		button {
-			border: 1px transparent solid;
+			//border: 1px transparent solid;
+			background-color: #222;
+			color: white;
 
 			&:hover {
-				border-color: #666;
+				//border-color: #666;
+				//background-color: transparent;
 			}
 
 			&:active {
-				border-color: #ccc;
+				//border-color: #ccc;
+				//background-color: transparent;
 			}
 
 		};
+
+		button.speedButton {
+			span {
+				font-size: 1.5625em;
+			}
+		}
 
 		.speedButtonDisplay {
 			color: white;
 			font-size: .64em;
 			width: 8em;
 		}
-}
-
-	button.speedButton {
-		span {
-			font-size: 2em;
-		}
 	}
+
 
 
 	/* **************************************** toolbar buttons */
@@ -225,7 +230,7 @@
 		//padding:  .2em 1em;
 		width: 3em;
 		height: 1.8em;
-		text-align: right;
+		text-align: center;
 	}
 }
 
