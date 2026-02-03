@@ -23,7 +23,7 @@ import SquishContext from '../sPanel/SquishContext.js';
 let traceSetPanels = false;
 let traceBeginFinish = false;
 let traceContext = false;
-let traceQuickDtFactor = true;
+let traceQuickDtFactor = false;
 
 // integrations always need specific numbers of steps.  But there's always one
 // more. maybe this should be defined in the grinder.  Hey, isn't this really
