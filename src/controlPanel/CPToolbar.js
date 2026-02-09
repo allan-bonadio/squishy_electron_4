@@ -149,7 +149,7 @@ function CPToolbar(props) {
 					onMouseUp={upSpeedHandler}
 					onMouseLeave={upSpeedHandler}
 					onMouseEnter={maybeStopSpeed}>
-				<span>🐢</span> slower
+				<span>🐢&nbsp; </span> slower
 			</button>
 
 			<span className='toolbarWidget speedButtonDisplay'>
@@ -161,7 +161,7 @@ function CPToolbar(props) {
 					onMouseUp={upSpeedHandler}
 					onMouseLeave={upSpeedHandler}
 					onMouseEnter={maybeStopSpeed}>
-			<span>🐇</span> faster
+			<span>🐇&nbsp; </span> faster
 		</button>
 	</>);
 

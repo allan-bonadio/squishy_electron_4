@@ -38,9 +38,10 @@ function SetResolutionTab(props) {
 		}
 	}
 
-	let continuumBlurb, segmentsBetweenEnds;
+	let continuumBlurb, continuumName, segmentsBetweenEnds;
 	if (qeConsts.contWELL == spa.continuum) {
 		segmentsBetweenEnds = spa.N - 1;
+		continuumName = 'a Well';
 		continuumBlurb = <span>
 			Your space is a <b>Well</b>, just a canyon with impenetrable, smooth walls on the ends.
 			It has {segmentsBetweenEnds} datapoints in use.
@@ -50,6 +51,7 @@ function SetResolutionTab(props) {
 	}
 	else if (qeConsts.contENDLESS == spa.continuum) {
 		segmentsBetweenEnds = spa.N;
+		continuumName = 'Endless';
 		continuumBlurb = <span>
 			Your space is <b>Endless</b>, infinite space that cycles around on the ends.
 			You have {segmentsBetweenEnds} datapoints in use,
@@ -64,7 +66,7 @@ function SetResolutionTab(props) {
 			Design the Space
 			<span className='statusBar'>
 				<b>{spa.N}</b> datapoints in
-				<b>{spa.continuum ? ' an Endless' : ' a Well'}</b> space.
+				<b> {continuumName}</b> space.
 			</span>
 		</h3>
 		<button className='setResolutionButton'
@@ -87,13 +89,6 @@ function SetResolutionTab(props) {
 
 	</div>);
 }
-
-
-//      <div style={{float: 'left', marginRight: '1em', width: '10em'}}>
-//        <b>{spa.N}</b> datapoints <br/>
-//        <b>{spa.continuum ? 'Endless' : 'Well'}</b>
-//      </div>
-
 
 
 export default SetResolutionTab;
