@@ -304,11 +304,12 @@ dialog#CommonDialog {
 
 }
 
-// add this to the upper right of dialogs
+// add this to the upper right of dialogs.
 .x_close_box {
 	position: absolute;
 	top: 0;
 	right: 0;
+	color: #777;  // works for black or white bgs
 	font-size: 2em;
 	padding: 0;
 	margin: 0;
@@ -317,6 +318,13 @@ dialog#CommonDialog {
 	line-height: .5em;
 	margin: .5em;
 	background-color: transparent;
+
+	&:hover {
+		color: #77c;
+	}
+	&:active {
+		color: #ff7;
+	}
 }
 
 /* ***************************************************************** testing */

@@ -52,17 +52,18 @@ class App extends React.Component {
 		});
 	}
 
+	// get the body width, fresh from the body
 	get bodyWidth() {
 		return document.body.clientWidth;
 	}
 
 	// respond properly whenever width changed (usually user & sizebox).  Cuz canvas
 	// needs to resize itself.  Don't bother passing it in; we'll do the right thing.
+	// TODO: this isn't needed anymore, right?
 	widthDidChange = () => {
-		//this.bodyWidth = document.body.clientWidth;
-		this.setState({bodyWidth: this.bodyWidth});  // triggers rerenders & resizes
+		this.setState({bodyWidth: document.body.clientWidth});  // triggers rerenders & resizes
 		if (traceResize)
-			console.log(`🍦 widthDidChange: set this.bodyWidth= ${this.bodyWidth}`);
+			console.log(`🍦 widthDidChange: bodyWidth= ${document.body.clientWidth}`);
 
 		// the doc reader tries to track the window size
 		// not anymore.  these function(s) are commented out.	DocReader.setDimensions(this.bodyWidth);
@@ -92,6 +93,9 @@ class App extends React.Component {
 
 		});
 
+		// see font sizer, below
+		document.body.style.fontSize = localStorage.fontSize ?? '16px';
+
 		// meanwhile, sometimes the first render starts before the vertical scrollbar kicks in,
 		// cuz there's nothing in the page yet.  This confuses everybody, but give it a kick.
 		// NO somehow if I don't init clientWidth in constructor, this catches and fixes it
@@ -106,18 +110,18 @@ class App extends React.Component {
 		let locArgs = {};
 		if (location.search) {
 			let arArgs = location.search.substr(1).split('&');    // eslint-disable-line no-restricted-globals
-			arArgs.map(txt => txt.split('=')).forEach(pair => locArgs[pair[0]] = pair[1] ?? 'noSquishArg');
+			arArgs.forEach(txt => txt.split('=')).forEach(pair => locArgs[pair[0]] = pair[1] ?? true);
 
-			// if they got the URL with ?intro=anything on the end, open the introduction doc reader
-			if (locArgs.intro) {
-				setTimeout(() => {
-					DocReader.openWithUri('/intro/intro1.html');
-				}, 500);
+			// if they got the URL with ?anything on the end, open the doc reader
+			for (let topic in locArgs) {
+				setTimeout(() => DocReader.openWithUri(topic), 500);
+				break;
 			}
+			// if (locArgs.gettingStarted) {
+			// 	setTimeout(() => DocReader.openWithUri('gettingStarted', 'Getting Started'), 500);
+			// 	break;
+			// }
 		}
-
-		// see font sizer, below
-		document.body.style.fontSize = localStorage.fontSize || '16px';
 	}
 
 	/* ************************************************ Font Sizer */
@@ -158,11 +162,11 @@ class App extends React.Component {
 		let sqPanel;
 		if (s.cppRunning) {
 			// real squishpanel
-			sqPanel = <SquishPanel className='SquishPanel' bodyWidth={this.bodyWidth} />;
+			sqPanel = <SquishPanel className='SquishPanel' bodyWidth={document.body.clientWidth} />;
 			if (traceResize) {
 				console.log(`🍦 App renders SquishPanel when cppRunning, `
 					+`body.clientWidth=${document.body.clientWidth}  `
-					+ `this.bodyWidth=${this.bodyWidth} this.appEl=`, this.appEl);
+					+ `this.bodyWidth=${document.body.clientWidth} this.appEl=`, this.appEl);
 			}
 		}
 		else {
@@ -171,7 +175,7 @@ class App extends React.Component {
 				<img className='spinner' alt='spinner' src='/images/eclipseOnTransparent.gif' />
 			</div>;
 			if (traceState) {
-				console.log(`🍦 render when NOT cppRunning, body.clientWidth=${this.bodyWidth}`);
+				console.log(`🍦 render when NOT cppRunning, body.clientWidth=${document.body.clientWidth}`);
 			}
 		}
 
@@ -179,17 +183,17 @@ class App extends React.Component {
 			<main className="App" ref={el => this.appEl = el}>
 				<h2 className="App-header">
 					{this.renderFontSizer()}
-					<DocMenu />
+					<DocMenu bodyWidth={document.body.clientWidth} />
 					<img className='splatImage' src='/images/splat.png'
 						width='100px' alt='squishy icon'/>
 					&nbsp; &nbsp;
 					Squishy Electron
 				</h2>
+				<DocReader  bodyWidth={document.body.clientWidth} />
 
 				{sqPanel}
 
 				<CommonDialog	dialogContent={s.dialogContent} setDialog={this.setDialog} />
-				<DocReader  />
 				<footer>
 					<aside id='traceOnScreen'>
 						<p className='A' />
