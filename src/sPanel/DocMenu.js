@@ -31,9 +31,10 @@ function DocMenu(props) {
 		let topic = target.value;
 		if ('doc' == topic)
 			return;
+		let title = target.textContent;
 
-		DocReader.openWithUri(`/${topic}/${topic}.html`);
-		target.value = 'docs';
+		DocReader.openWithUri(topic, title);
+		target.value = 'docs';  // otherwise setting sticks
 	}
 
 	return (

@@ -56,9 +56,9 @@ Over time, the position follows a sine wave, back and forth.
 We can call the middle position 0, and each side –1 and +1.
 
 Next, think of the speed that the string is moving sideways.
-It's stopped when it's at the ends, positioins –1 and +1; about to go the other way.
+It's stopped when it's at the ends, positions –1 and +1; about to go the other way.
 It's moving fastest when the string passes the middle the zero position.
-So, this is kind of like the opposite: the speed is -1 or 1 when the position is zero.
+So, this is kind of inside-out: the speed is -1 or 1 when the position is zero.
 The speed is zero when the position is at -1 or 1.
 So, this isn't the sine, it's the cosine, 90° off.
 The derivative, rate of change,of the position is cosine.

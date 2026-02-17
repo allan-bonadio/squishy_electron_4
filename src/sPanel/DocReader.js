@@ -12,7 +12,7 @@ import CommonDialog from '../widgets/CommonDialog.js';
 // This is a module for CommonDialog to read docs in from docGen and public/doc.
 // a 'uri' is a url path relative to /public/doc
 
-let traceReader = false;
+let traceReader = true;
 
 
 
@@ -37,59 +37,58 @@ let traceReader = false;
 // }
 
 
-
 const propTypes = {
-	// for first couple of renders, space and idunno are null
-	docUri: PropTypes.string,
+	bodyWidth: PropTypes.number,
 }
 
+// this is a permanent part of the dom, in hte <App, so no URL
 function DocReader(props) {
 	cfpt(propTypes, props);
 
-	let [startingUri, setStartingUri] = useState(DocReader.startingUri);
-	let [frame, setFrame] = useState([0, 0, (window.innerWidth - 100), (window.innerHeight - 100)]);
+	DocReader.bodyWidth = props.bodyWidth;
+
+	// call this so the doc viewed will be the startingUri.
+	// starting: because of security rules, if the user surfs away, we can't know.
+	let [startingUri, setStartingUri] = useState(null);
+	//let [startingUri, setStartingUri] = useState(DocReader.startingUri);
+	DocReader.setStartingUri = setStartingUri;
+
+	// docHeight set by ... I dunno
+	let [docHeight, setDocHeight] = useState(window.innerHeight / 2);
+
+	// the <dialog element itself, NOT a CommonDialog
 	let dialogRef = useRef();
-	if (traceReader) console.log(`📘 oc reader constructed for '${startingUri}' in `, frame);
-
-	DocReader.openWithUri ??= function openWithUri(uri) {
-		if (!dialogRef.current)
-			return;
-
-		setStartingUri(uri);
-		dialogRef.current.show();
-
-		// // am i doing this right?!?!
-		// if (DocReader.me)
-		// 	DocReader.me.setState({docUri: uri});  // doesn't exist yet
-		// else
-		// 	DocReader.startingUri = uri;
-		// CommonDialog.openDialog(<DocReader/>,
-		// 	{backgroundColor: '#fff', top: '50px', transform: 'none'});
-	};
-
-	DocReader.close ??= function closeDocReader(uri) {
-		dialogRef.current.close();
-	};
+	DocReader.instance = dialogRef.current;
 
 	const handleError =
 	(ev) => {
 		debugger;
-		dialogRef.current.close();
+		DocReader.close();
 		let exc = new Error('Sorry, no such topic available.');
 		CommonDialog.openErrorDialog(exc, 'Doc Reader')
 	}
 
-	// figure out the size the iframe should be, based on the viewport size.
-	//  iframe needs height and width as attributes.
-	let src = startingUri ? `/doc${startingUri}` : 'about:blank';
-	// this was formerly on the <dialog element    closedBy='any'
+	let src = startingUri ? `/doc/${startingUri}` : 'about:blank';
+
+	//  iframe needs height and width as attributes.  Blank if not showing.
+	let content = (
+		<iframe
+			src={src} name='DocReader' title='about squishy electron'
+			allow='fullscreen' referrerPolicy='no-referrer' onError={handleError}
+			width={props.bodyWidth} height={docHeight} >
+		</iframe>
+	);
+
+	if (traceReader) {
+		let blurb = startingUri ? `for '${src}' ` : 'empty';
+		if (traceReader)
+			console.log(`📘 doc reader constructed ${blurb} with bodywidth=`, props.bodyWidth);
+	}
+
 	return (
-		<dialog className='DocReader' closedby='any' ref={dialogRef}>
-			<button className='x_close_box' onClick={CommonDialog.closeDialog} >×</button>
-			<iframe src={src} name='DocReader' title='about squishy electron'
-				allow='fullscreen' referrerPolicy='no-referrer' onError={handleError}
-				width={frame[2]} height={frame[3]} >
-			</iframe>
+		<dialog id='DocReader' ref={dialogRef} >
+			<button className='x_close_box' onClick={DocReader.close} >×</button>
+			{content}
 		</dialog>
 	);
 
@@ -97,10 +96,33 @@ function DocReader(props) {
 	// sandbox='allow-forms allow-modals allow-same-origin allow-scripts allow-storage-access-by-user-activation'
 	// attribute for the iframe
 	// or, maybe doesn't matter, these are security things, and it's all ours
-
-
 }
 
-//export const openWithUri(uri) {
+// There is one and only one docReader component, alive always in the page.
+DocReader.instance = null;
+DocReader.startingUri = null;
+DocReader.bodyWidth = null;
+
+// this uri (part of a URL) could also be a single word.  If no slashes,
+// it's a topic directory with an html file with the same name.
+DocReader.openWithUri = function openWithUri(topic, title) {
+	// if (!DocReader.current)
+	// 	return;
+	let uri = topic;
+	if (!/\//.test(topic))
+		uri = `${topic}/${topic}.html`;
+
+	// title: what happens if the user surfs to a different doc page?
+
+	// change in uri state triggers re-render
+	DocReader.setStartingUri(uri);
+	DocReader.instance?.show();
+};
+
+DocReader.close = function closeDocReader() {
+	DocReader.instance.close();
+};
+
+
 
 export default DocReader;

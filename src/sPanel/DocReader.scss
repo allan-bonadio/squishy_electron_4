@@ -3,3 +3,41 @@
 ** Copyright (C) 2023-2026 Tactile Interactive, all rights reserved
 */
 
+@use "../widgets/common.scss";
+
+#DocReader {
+	position: absolute;
+
+	//padding: 1em;
+	margin: 2em;
+	border: 3px #555 solid;
+	width: 90%;
+	height: 90%;
+	z-index: 200;
+	box-shadow: 1em 1em 1em #0008;
+	border-radius: 1em;
+
+	iframe {
+		border: none;
+		background-color: common.$docReaderBackground;
+		width: 100%;
+		height: 100%;  // overrides attributes
+	}
+}
+
+
+// small and on left side on the splash bar
+#DocMenu {
+	font-size: .8em;
+	border: #aaa 1px solid;
+	border-radius: .5em;
+	padding-inline: 0;
+	float: left;
+	width: 10em;
+	//height: auto;
+
+	margin-top: .3em;
+	margin-left: 1em;
+}
+
+
