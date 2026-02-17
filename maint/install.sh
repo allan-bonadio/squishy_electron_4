@@ -9,7 +9,7 @@ fi
 # runs ON SERVER to decompress and install latest version of squish
 # must run productionBuild.sh and deploy.sh first, on local machine
 timestamp="$1"
-if [ !"timestamp" ]
+if [  ! "$timestamp" ]
 then
 	echo $'\e[1;31m !! You need a timestamp as argument!\e[0m'
 	exit 67
@@ -54,4 +54,4 @@ echo "                                     🎁 🛫 🔨 now the switchover: po
 echo "active points to, and contents:"
 ls -l active active/
 
-echo "install and useBuild on server done: " `date %Z`
+echo "install and useBuild on server done: " `date`

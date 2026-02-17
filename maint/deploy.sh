@@ -97,6 +97,7 @@ fi
 # now decompress, on the server
 echo "                             🛫 🛫 🛫  About to decompress and activate ➤ ➤ ➤ ➤ ➤ == nakoda login stuff..."
 ssh  $NAKODA_SKEY  allan@nakoda <<-WALKING_SPEED
+	set -x
 	echo "                             🛫 🛫 🛫   ➤ ➤ ➤ ➤ = =➤  ...logged into nakoda $timestamp"
 	cd /var/www/squish || exit 1
 	./install.sh "$timestamp"
@@ -110,7 +111,7 @@ curl https://squish.tactileint.org > /tmp/actualSquishIndexOnline.html
 sleep 5  # give it time to soak in.  So the diff doesn't screw up.
 if diff build/index.html /tmp/actualSquishIndexOnline.html
 then echo "                               🛫 🛫  😅 😅 😅 Deploy Completed, looks good so far!"  `date +%c`
-	echo "To activate the symlink to $timestamp, login to nakoda and   useBuild $timestamp"
+	echo "To activate the symlink to $timestamp, login to nakoda and   ./useBuild $timestamp"
 	echo "Remember to tag it,    git tag -a deploy$timestamp   and enter descr "
 	exit 0
 else echo  $'\e[1;31m !! the diff didn,t compare - index.html are different\e[0m'
