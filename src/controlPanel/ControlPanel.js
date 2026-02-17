@@ -260,7 +260,8 @@ export class ControlPanel extends React.Component {
 	// how dtFactor is displayed on the speed control.  returns string.
 	formatDtFactor = () => {
 		let vdt = (this.getQuickDtFactor() * 1e3).toFixed(0);
-		console.log(`dtFactor=${this.getQuickDtFactor()}  v:${vdt}`);
+		if (traceQuickDtFactor)
+			console.log(`dtFactor=${this.getQuickDtFactor()}  v:${vdt}`);
 		return vdt;
 	}
 
@@ -537,7 +538,8 @@ export class ControlPanel extends React.Component {
 		if (!this.space) return '';
 
 		let showingTabRender = this.renderShowingTab();
-		console.log(`Rendering CPToolbar, dtFactor = ${this.state.dtFactor}`);
+		if (traceQuickDtFactor)
+			console.log(`Rendering CPToolbar, dtFactor = ${this.state.dtFactor}`);
 		let toolbar = this.renderToolbar();
 
 		return <div className='ControlPanel'>
