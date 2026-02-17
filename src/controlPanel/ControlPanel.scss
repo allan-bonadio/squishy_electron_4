@@ -302,6 +302,10 @@
 	.miniGraphPanel {
 		//--miniGraphWidth: 200px;
 		//--miniGraphHeight: 150px;
+		grid-template-areas:
+			'canyonPower miniGraph scale'
+			'powerDisplay voltageCenter scaleDisplay'
+			'  .   slotWidth   .  ';
 
 		display: grid;
 		grid-template-columns: auto auto auto;
@@ -309,6 +313,15 @@
 		gap: .5em;
 		width: 450px;
 		float: left;
+
+		.canyonPower {
+				grid-area: canyonPower;
+
+		}
+
+		.slotScale, .canyonScale {
+				grid-area: scale;
+		}
 
 		// "The keyword 'slider-vertical' ... is not standardized..."
 		.slotScale, .canyonScale, .canyonPower {
@@ -321,7 +334,12 @@
 
 		// left-right offset of voltage pattern
 		.voltageCenter {
+			grid-area: voltageCenter;
 			height: 20px;
+		}
+
+		.slotWidth {
+			grid-area: slotWidth;
 		}
 	}
 
