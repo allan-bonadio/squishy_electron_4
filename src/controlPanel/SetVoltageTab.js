@@ -118,11 +118,11 @@ function SetVoltageTab(p) {
 		</svg>;
 	}
 
-	// call this to start pointer capture on whichever range slider
-	const startCapture = (ev) => ev.target.setPointerCapture(ev.pointerId);
+	// call this to start pointer capture on whichever range slider the user clicked on
+	const startCapture =
+	(ev) => ev.target.setPointerCapture(ev.pointerId);
 
-	// draw minigraph, and wrap it with sliders on all sides, depending on
-	// breed.  All comes in three rows.
+	// draw minigraph, with sliders on both sides, depending on breed.
 	function renderFirstRow(breed, vMinsMaxes) {
 		return <>
 			{/* only shows for canyon, otherwise blank space */}
@@ -150,7 +150,7 @@ function SetVoltageTab(p) {
 				title="Voltage of multiplier.  The little graph autoranges so you can't see it so well."
 			/>
 
-			{/* only shows for slot and block - shouldn't this be logarithmic? */}
+			{/* only shows for flat, slot and block - shouldn't this be logarithmic? */}
 			<input type='range' className='slotScale'
 				value={(vP.slotScale)}
 				min={vMinsMaxes.slotScale.min}
@@ -158,15 +158,17 @@ function SetVoltageTab(p) {
 				step='10'
 				onChange={ev => setVoltageParams({slotScale: ev.target.valueAsNumber})}
 				onPointerDown={startCapture}
-				style={{display: ('slot' == breed || 'block' == breed) ? 'inline-block' : 'none'}}
+				style={{display: ('flat' == breed || 'slot' == breed || 'block' == breed) ? 'inline-block' : 'none'}}
 				title="Voltage between upper and lower levels"
 			/>
 
-			{/* only if neither of above */}
-			<div className='sliderSpacer' style={{display:'flat' == breed ? 'inline-block' : 'none' }}
-			/>
 		</>
 	}
+
+//				{/* only if neither of above */}
+//			<div className='sliderSpacer' style={{display:'flat' == breed ? 'inline-block' : 'none' }}
+//			/>
+
 
 	// draw minigraph, and wrap it with sliders on 3 sides, depending on breed
 	function renderSecondRow(breed, vMinsMaxes) {
@@ -195,7 +197,7 @@ function SetVoltageTab(p) {
 
 			{/* only one of these three is displayed */}
 			<div className='slotScaleDisplay'
-					style={{display: ('slot' == breed || 'block' == breed) ? 'inline-block' : 'none'}} >
+					style={{display: ('flat' == breed || 'slot' == breed || 'block' == breed) ? 'inline-block' : 'none'}} >
 				{(slotScaleDisplay / 1000).toFixed(2)} kV
 			</div>
 			<div className='canyonScaleDisplay'
@@ -225,15 +227,14 @@ function SetVoltageTab(p) {
 		</>;
 	}
 
-	// draw minigraph, and wrap it with sliders on 3 sides, depending on breed
+	// draw minigraph, and wrap it with whatever sliders on 3 sides, depending on breed
 	function renderMiniGraphPanel() {
-		let vMinsMaxes = alternateMinMaxs.voltageParams;
+		let vMinsMaxes = {...alternateMinMaxs.voltageParams};
 		let breed = vP.voltageBreed;
 
 				// for vertical sliders, firefox wanted orient=vertical as element attr;
 				// chrome/safari wanted appearance:slider-vertical in css.
 				// chrome/safari  won
-
 
 		return <div className='miniGraphPanel'>
 			{/* this is a grid.  first row: left vert slider, mGraph, right slider

@@ -396,7 +396,8 @@ debugger;
 		// figure out these ixs from percents
 		switch (voltageBreed) {
 		case 'flat':
-			this.fillVoltage(0);
+			this.slotVoltageSetup(voltageParams);
+			this.fillVoltage(slotScale);
 			break;
 
 		case 'slot':
@@ -426,7 +427,7 @@ debugger;
 			console.warn(`setFamiliarVoltage: no breed`, voltageParams);
 		}
 
-		// notice how we cheated  above?  tell react
+		// notice how we cheated  above?  didn't say we changed the data.  tell react
 		this.setAPoint?.(1, this.voltageBuffer[1]);
 
 		if (traceFamiliar)
@@ -444,20 +445,18 @@ debugger;
 
 		switch (voltageParams.voltageBreed) {
 		case 'flat':
+			height = voltageParams.slotScale + 2 * MARGIN;
 			bottom = -MARGIN;
-			height = 2 * MARGIN;
 			break;
 
 		case 'slot':
 			height = voltageParams.slotScale + 2*MARGIN;
-			//height = 5 * sqrt(EFFECTIVE_VOLTS * voltageParams.slotScale ** 2 ) + 2*MARGIN
-			bottom = -height + MARGIN;
+			bottom = -voltageParams.slotScale - MARGIN;
 			break;
 
 		case 'block':
 			height = voltageParams.slotScale + 2*MARGIN
-			//height = 5 * sqrt(EFFECTIVE_VOLTS * voltageParams.slotScale ** 2 ) + 2*MARGIN
-			bottom = - MARGIN;
+			bottom = -MARGIN;
 			break;
 
 		case 'canyon':
@@ -465,9 +464,9 @@ debugger;
 			this.canyonVoltageSetup(voltageParams);
 			let startVal = this.canyonVoltage(this.start, voltageParams);
 			let endVal = this.canyonVoltage(this.end-1, voltageParams);
-			let zeroVal = this.canyonVoltage(this.offset, voltageParams);
-			let highest = max(startVal, endVal, zeroVal);
-			let lowest = min(startVal, endVal, zeroVal);
+			let centerVal = this.canyonVoltage(this.offset, voltageParams);
+			let highest = max(startVal, endVal, centerVal);
+			let lowest = min(startVal, endVal, centerVal);
 
 			// But autoscaling hides changes in scale so do this
 			height =  (highest - lowest);
