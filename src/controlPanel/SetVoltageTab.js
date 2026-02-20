@@ -175,6 +175,7 @@ function SetVoltageTab(p) {
 		let slotScaleDisplay = vP.slotScale.toFixed(0);
 		let canyonScaleDisplay = vP.canyonScale.toFixed(0);
 		// shouldn't be neg if (scaleDisplayN < 0) scaleDisplay = `(${scaleDisplay})`;
+		let minusSign = ('slot' == breed) ? '-' : '';
 
 		return <>
 			{/* xⁿ only shows for canyon, otherwise blank space */}
@@ -198,6 +199,7 @@ function SetVoltageTab(p) {
 			{/* only one of these three is displayed */}
 			<div className='slotScaleDisplay'
 					style={{display: ('flat' == breed || 'slot' == breed || 'block' == breed) ? 'inline-block' : 'none'}} >
+				{minusSign}
 				{(slotScaleDisplay / 1000).toFixed(2)} kV
 			</div>
 			<div className='canyonScaleDisplay'
