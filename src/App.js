@@ -110,7 +110,14 @@ class App extends React.Component {
 		let locArgs = {};
 		if (location.search) {
 			let arArgs = location.search.substr(1).split('&');    // eslint-disable-line no-restricted-globals
-			arArgs.forEach(txt => txt.split('=')).forEach(pair => locArgs[pair[0]] = pair[1] ?? true);
+			// for (let key in arArgs) {
+			// 	locArgs[key] = arArgs[key] ?? true
+			// }
+			//arArgs.forEach(pair =>{
+			arArgs.forEach(pair =>{
+				let [key, val] = pair.split('=');
+				locArgs[key] = val ?? true;
+			});
 
 			// if they got the URL with ?anything on the end, open the doc reader
 			for (let topic in locArgs) {
