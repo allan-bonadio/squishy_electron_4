@@ -123,7 +123,8 @@ function CPToolbar(props) {
 	// cuz it just keeps on getting faster/slower
 	const maybeStopSpeed =
 	(ev) => {
-		console.log(`maybeStopSpeed ev=`, ev);
+		if (traceSlowerFaster)
+			console.log(`maybeStopSpeed ev=`, ev);
 		if (0 == ev.buttons)
 			upSpeedHandler(ev);
 	};

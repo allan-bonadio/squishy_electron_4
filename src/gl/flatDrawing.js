@@ -119,11 +119,13 @@ export class flatDrawing extends abstractDrawing {
 				// fresh out of the loader, maxHeight wobbles up and down.  Smooth it.
 				if (!this.maxHeight)
 					this.maxHeight = this.avatar.double0;
-				else
+				else {
+					// relax changes.  how  quickly?
 					this.maxHeight = this.avatar.double0;
 					//this.maxHeight = (this.maxHeight * 3 + this.avatar.double0) / 4;
 					//this.maxHeight = (this.maxHeight * 15 + this.avatar.double0) / 16;
 					//this.maxHeight = (this.maxHeight * 255 + this.avatar.double0) / 256;
+				}
 
 				if (traceMaxHeight)
 					console.log(`♭♭♭ flatDrawing reloading outer:  `
@@ -208,8 +210,8 @@ export class flatDrawing extends abstractDrawing {
 		// i think this is problematic
 		if (traceViewBufAfterDrawing) {
 			this.avatar.dumpComplexViewBuffer(`♭♭♭ finished drawing in flatDrawing.js; drew buf:`);
-			console.log(`♭♭♭ barWidthUniform=${this.barWidthUniform.getFunc()}    `
-				+`maxHeightUniform=${this.maxHeightUniform.getFunc()}`);
+			console.log(`♭♭♭ barWidthUniform=${this.barWidthUniform.reloadFunc()} `
+				+`maxHeightUniform=${this.maxHeightUniform.reloadFunc()}`);
 		}
 		// ?? this.gl.bindVertexArray(null);
 	}

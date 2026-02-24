@@ -5,7 +5,7 @@
 
 let traceGLCalls = false;
 let traceUniforms = false;
-let traceAttrs = false;  // quick update every reload
+let traceAttrs = true;  // quick update every reload
 let traceAttributes = false;  // full dumps every reload
 
 // attr arrays and uniforms that can change on every frame.
@@ -16,13 +16,13 @@ let traceAttributes = false;  // full dumps every reload
 export class drawingVariable {
 	// the drawing is what it's used in.  Must have a:
 	// gl, drawVariables array, program,
-	// getFunc will AUTOMATICALLY be called before each frame to refresh the value
-	constructor(varName, drawing, getFunc) {
+	// reloadFunc will AUTOMATICALLY be called before each frame to refresh the value
+	constructor(varName, drawing, reloadFunc) {
 		this.drawing = drawing;
 		this.gl = drawing.gl;
 		this.tagObject = drawing.tagObject;
 
-		this.getFunc = getFunc;
+		this.reloadFunc = reloadFunc;
 
 		this.varName = varName;
 		if (! varName || ! drawing)
@@ -63,8 +63,8 @@ function isFiniteAr(value) {
 // uniforms don't vary from one vertex to another
 // create this as many times as you have uniforms as input to either or both shaders
 export class drawingUniform extends drawingVariable {
-	constructor(varName, drawing, getFunc) {
-		super(varName, drawing, getFunc);
+	constructor(varName, drawing, reloadFunc) {
+		super(varName, drawing, reloadFunc);
 
 		// this turns out to be an internal magic object
 		this.uniformLoc = this.gl.getUniformLocation(this.drawing.program, varName);
@@ -80,7 +80,7 @@ export class drawingUniform extends drawingVariable {
 	// actually, calls before each draw, always
 	reloadVariable() {
 		// is passed the previous value
-		const {value, type} =  this.getFunc();
+		const {value, type} =  this.reloadFunc();
 		if (traceUniforms)
 			console.log(`𒐿 re-loading uniform ${this.varName} with value=${value} type ${type}`);
 
@@ -125,12 +125,12 @@ export class drawingUniform extends drawingVariable {
 // coordinates and color for that point
 
 // create this as many times as you have buffers as input to vec shader
-// always float32.  getFunc must return a Float32TypedArray with a non-array property
+// always float32.  reloadFunc() must return a Float32TypedArray with a non-array property
 // 'nTuples' that gives the number of rows or vertices used, each tupleWidth number of floats
 // eg for x & y, tupleWidth=2.  sequence of several tuples gets draw, however.
 export class drawingAttribute extends drawingVariable {
-	constructor(varName, drawing, tupleWidth, getFunc = () => {}) {
-		super(varName, drawing, getFunc);
+	constructor(varName, drawing, tupleWidth, reloadFunc = () => {}) {
+		super(varName, drawing, reloadFunc);
 		const gl = this.gl;
 		this.tupleWidth = tupleWidth;  // num of float32s in each row/tuple
 		this.sceneName = this.drawing.sceneName;
@@ -172,7 +172,7 @@ export class drawingAttribute extends drawingVariable {
 	}
 
 	// call this when the array's values change, to reload them into the GPU.
-	// getFunc() gets past the previous array (or undefined first time)
+	// reloadFunc() gets past the previous array (or undefined first time)
 	// must return another Float32Array (or same) with extra JS property 'nTuples'
 	reloadVariable() {
 		const gl = this.gl;
@@ -181,9 +181,9 @@ export class drawingAttribute extends drawingVariable {
 		// get the latest from the real world.
 		// WebGL2Fundamentals said we don't have to do this if it's the same buffer (w/diff values) every time.
 		// if I understood them correctly.  afraid to try... or maybe misunderstood...
-		let floatArray = this.floatArray = this.getFunc();
+		let floatArray = this.floatArray = this.reloadFunc();
 		if (!floatArray) {
-			throw `getFunc() returned null on var=${varName} scene=${this.drawing.drawingName}`;
+			throw `reloadFunc() returned null on var=${varName} scene=${this.drawing.drawingName}`;
 		}
 		this.nTuples = this.floatArray.nTuples;
 

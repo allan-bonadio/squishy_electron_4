@@ -79,7 +79,8 @@ class SquishPanel extends React.Component {
 		this.setState({shouldBeIntegrating: sbi});
 
 		storeASetting('lapSettings', 'shouldBeIntegrating', sbi);
-		console.log(`👑 👑 called setShouldBeIntegrating(${sbi})`);
+		if (traceSBIUpdate)
+		    console.log(`👑 👑 called setShouldBeIntegrating(${sbi})`);
 	};
 
 	// this sets grinder.sbi and does the first trigger
