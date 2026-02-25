@@ -5,7 +5,7 @@
 
 import qeConsts from '../engine/qeConsts.js';
 import {scaleLinear} from 'd3-scale';
-import {EFFECTIVE_VOLTS, VALLEY_FACTOR, TOO_MANY_VOLTS} from './voltConstants.js';
+import {EFFECTIVE_VOLTS, TOO_MANY_VOLTS} from './voltConstants.js';
 import {getAGroup, storeASetting} from '../utils/storeSettings.js';
 
 let traceFamiliar = false;
@@ -414,8 +414,6 @@ debugger;
 
 		case 'canyon':
 			// the actual formula is like y = x ** p, where 0 <= y <= 1 and -1 <= x <= 1
-			// 	let halfN = (this.end - this.start) / 2;
-			// 	let topVolts = (canyonScale * VALLEY_FACTOR);  // ??
 			this.canyonVoltageSetup(voltageParams);
 
 			for (let ix = this.start; ix < this.end; ix++) {
