@@ -210,7 +210,9 @@ export function createStoreSettings() {
 	makeParam('voltageParams', 'voltageCenter', 50, {min: 0, max: 100});
 
 	makeParam('voltageParams', 'slotWidth', 10, {min: 0, max: 100});  // 0 to 100 despite appearance
+	makeParam('voltageParams', 'flatScale', EFFECTIVE_VOLTS, {min: -AMPLE_VOLTS, max: AMPLE_VOLTS});
 	makeParam('voltageParams', 'slotScale', EFFECTIVE_VOLTS, {min: 0, max: AMPLE_VOLTS});
+	makeParam('voltageParams', 'blockScale', EFFECTIVE_VOLTS, {min: 0, max: AMPLE_VOLTS});
 
 	makeParam('voltageParams', 'canyonPower', 2, {min: 0.1, max: 20});
 	makeParam('voltageParams', 'canyonScale', EFFECTIVE_VOLTS, {min: 0, max: AMPLE_VOLTS});
