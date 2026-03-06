@@ -366,7 +366,7 @@ export class ControlPanel extends React.Component {
 	}
 
 	// setMainWave() called when user clicks SetWave, fills the main wave
-	// waveParams handed in are the defaults as stored in storeSettings
+	// waveParams handed in are the defaults as stored in sSettings
 	renderWaveTab = () => <SetWaveTab
 			saveMainWave={this.saveMainWave}
 			waveParams={this.getWaveParams()}
@@ -380,9 +380,11 @@ export class ControlPanel extends React.Component {
 	// Kindof inconvenient to grab the whole thing, so we have this.
 	getVoltageParams = () => {
 		const s = this.state;
-		return { voltageBreed: s.voltageBreed, voltageCenter: s.voltageCenter,
+		return {
+			voltageBreed: s.voltageBreed, voltageCenter: s.voltageCenter,
 			canyonPower: s.canyonPower, canyonScale: s.canyonScale,
-			slotWidth: s.slotWidth, slotScale: s.slotScale };
+			slotWidth: s.slotWidth, slotScale: s.slotScale,
+			flatScale: s.flatScale, blockScale: s.blockScale};
 	}
 
 	// change the state for the voltage params.  Just this.state

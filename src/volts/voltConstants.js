@@ -10,8 +10,11 @@
 // Adjust this subjectively to fit.
 export let EFFECTIVE_VOLTS = 10000;
 
-// used for default graphical limits
+// used for default graphical limits; must synch with powers.js where spd=10
 export let AMPLE_VOLTS = 4 * EFFECTIVE_VOLTS;
+
+// lower bound of single side volt scale
+export let LOW_VOLTS = 100
 
 // any voltage above this is just too much for us to handle so it may be
 // limited

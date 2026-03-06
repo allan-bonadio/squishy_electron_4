@@ -5,9 +5,11 @@
 
 import {isPowerOf2} from './powers.js';
 import qeConsts from '../engine/qeConsts.js';
-import {EFFECTIVE_VOLTS, AMPLE_VOLTS} from '../volts/voltConstants.js';
+import {EFFECTIVE_VOLTS, AMPLE_VOLTS, LOW_VOLTS}
+	from '../volts/voltConstants.js';
+import sSettings from './sSettings.js';
 
-// TODO: I made this whole subsystem, storeSettings (aka New)
+// TODO: I made this whole subsystem, sSettings (aka New)
 // but somehow the compiler fucks it up,
 // so I fell back to some lame functions.
 // TURNS OUT, all those fuckups were because there were circular import dependencies.
@@ -20,14 +22,14 @@ import {EFFECTIVE_VOLTS, AMPLE_VOLTS} from '../volts/voltConstants.js';
 // getting: get either; calling code decides
 
 
-// group, groupName = which component of storeSettings this is
+// group, groupName = which component of sSettings this is
 // criterion: validator, see constructor
 //     The criterion are fixed and more broad than some other parts of the code,
 //     eg if 1/N is one of the limits, some other part of the code will enforce that, not here.
 //		um... except for lowPassFilter
-// The general interaction between component states and storeSettings is this:
-// component states are initially set from storeSettings.
-// When changed, both the state and storeSettings, and sending
+// The general interaction between component states and sSettings is this:
+// component states are initially set from sSettings.
+// When changed, both the state and sSettings, and sending
 // to C++ if applicable, are changed in parallel in same code.
 // With a function that's general over the particular params group,
 // in the component that holds the state.
@@ -38,16 +40,16 @@ import {EFFECTIVE_VOLTS, AMPLE_VOLTS} from '../volts/voltConstants.js';
 /* ************************************************** creation of groups & params */
 
 // alternate system: these will work
-export let alternateStoreDefaults = {};
-export let alternateStoreVerifiers = {};
-export let alternateMinMaxs = {};
-
-export let alternateStore = {};  // try this again?
-
-// New System: The Root.  All groups are properties of this.
-export const storeSettings = {};
-
-window.storeSettings = storeSettings;
+// export let sSettings.defaults = {};
+// export let sSettings.verifiers = {};
+// export let sSettings.minMaxes = {};
+//
+// export let sSettings = {};  // try this again?
+//
+// // New System: The Root.  All groups are properties of this.
+// export const sSettings = {};
+//
+// window.sSettings = sSettings;
 
 // figure out a function that can validate this param quickly
 function makeCriterionFunction(criterion) {
@@ -98,24 +100,24 @@ function makeCriterionFunction(criterion) {
 
 		default:
 			debugger;
-			throw new Error(`bad storeSettings criterion class ${criterion.constructor.name}`);
+			throw new Error(`bad sSettings criterion class ${criterion.constructor.name}`);
 		}
 
 	default:
 		debugger;
-		throw new Error(`bad storeSettings criterion type ${typeof criterion})`);
+		throw new Error(`bad sSettings criterion type ${typeof criterion})`);
 	}
 }
 
-// make a parameter storeSettings.base.name, part of storeSettings[base]
+// make a parameter sSettings.groupName.name, part of sSettings[groupName]
 // one value that knows what's valid for it, and that's stored in localStore.
 // Undefined is an illegal value; also the default default value if never set.
 function makeParam(groupName, varName, defaultValue, criterion) {
 	const criterionFunction = makeCriterionFunction(criterion);
 
 	// retrieve from localStorage and set this var, or set to default if not there yet.
-//storeSettings[groupName] = storeSettings[groupName] || {};
-//let group = storeSettings[groupName];
+//sSettings[groupName] = sSettings[groupName] || {};
+//let group = sSettings[groupName];
 //let savedGroup = localStorage.getItem(groupName) || '{}';
 //savedGroup = JSON.parse(savedGroup);
 //let value = savedGroup[varName];
@@ -127,19 +129,19 @@ function makeParam(groupName, varName, defaultValue, criterion) {
 //	value = savedGroup[varName];
 //}
 
-	alternateStoreDefaults[groupName] ??= {};
-	alternateStoreDefaults[groupName][varName] = defaultValue;
-	alternateStoreVerifiers[groupName] ??= {};
-	alternateStoreVerifiers[groupName][varName] = criterionFunction;
-	alternateMinMaxs[groupName] ??= {};
+	sSettings.defaults[groupName] ??= {};
+	sSettings.defaults[groupName][varName] = defaultValue;
+	sSettings.verifiers[groupName] ??= {};
+	sSettings.verifiers[groupName][varName] = criterionFunction;
+	sSettings.minMaxes[groupName] ??= {};
 	if (typeof criterion == 'object' && criterion.max !== undefined)
-		alternateMinMaxs[groupName][varName] = criterion;
+		sSettings.minMaxes[groupName][varName] = criterion;
 
 
 	// try again, meekly
-	alternateStore[groupName] ??= {};
-	alternateStore[groupName][varName] ??= {};
-	let vari = alternateStore[groupName][varName];
+	sSettings[groupName] ??= {};
+	sSettings[groupName][varName] ??= {};
+	let vari = sSettings[groupName][varName];
 	vari.default = defaultValue;
 	vari.criterion = criterionFunction;
 	if (criterionFunction.max != undefined) {
@@ -253,23 +255,18 @@ window.dumpSettings = () => {
 	// this name comes from webpack.  Probably changes from time to time.
 	// should not be needed if I watch out for circular dependencies
 	// eslint-disable-next-line no-undef
-	const zz = _utils_storeSettings_js__WEBPACK_IMPORTED_MODULE_3__;
-	console.log(`\n🎛 Settings: alternateStoreDefaults=`,
-		alternateStoreDefaults ?? zz.alternateStoreDefaults);
-	console.log(`🎛 Settings: alternateStoreVerifiers=`,
-		alternateStoreVerifiers ?? zz.alternateStoreVerifiers);
-	console.log(`🎛 Settings: alternateMinMaxs=`,
-		alternateMinMaxs ?? zz.alternateMinMaxs);
-	console.log(`\n🎛 Settings: alternateStore=`,
-		alternateStore ?? zz.alternateStore);
+	console.log(`\n🎛 Settings: sSettings.defaults=`, sSettings.defaults);
+	console.log(`🎛 Settings: sSettings.verifiers=`, sSettings.verifiers);
+	console.log(`🎛 Settings: sSettings.minMaxes=`, sSettings.minMaxes);
+	console.log(`\n🎛 Settings: sSettings=`, sSettings);
 }
 
-/* ********************************************************* Alternate setters/getters */
+/* ************************************************ setters/getters */
 
 // retrieve a whole group, with defaults filled in as needed
 export function getAGroup(groupName) {
 	let gr;
-	if (!alternateStoreVerifiers[groupName])
+	if (!sSettings.verifiers[groupName])
 		throw Error(`No such group ${groupName}`);
 
 	try {
@@ -281,10 +278,10 @@ export function getAGroup(groupName) {
 	}
 
 	// If some are missing in the localStorage, from an old version, fill those in.
-	let group = {...alternateStoreDefaults[groupName], ...gr};
+	let group = {...sSettings.defaults[groupName], ...gr};
 
 	// if some old vars are left over from a previous version, remove them
-	const asg = alternateStoreVerifiers[groupName];  // true only for vars that are supported
+	const asg = sSettings.verifiers[groupName];  // true only for vars that are supported
 	for (let varName in group) {
 		if (!asg[varName])
 		  delete group[varName];
@@ -299,7 +296,7 @@ export function getAGroup(groupName) {
 export function storeAGroup(groupName, newGroup) {
 	// only set those that are official!  don't overwrite zeroes or empty strings.
 	let toSet = {};
-	const asg = alternateStore[groupName];
+	const asg = sSettings[groupName];
 	for (let varName in asg) {
 		if (newGroup[varName] == undefined)
 			toSet[varName] = asg[varName].default;
@@ -312,18 +309,18 @@ export function storeAGroup(groupName, newGroup) {
 
 // store an individual value
 export function storeASetting(groupName, varName, newValue) {
-	if (!alternateStoreVerifiers
-	|| !alternateStoreVerifiers[groupName]
-	|| !alternateStoreVerifiers[groupName][varName]) debugger;
+	if (!sSettings.verifiers
+	|| !sSettings.verifiers[groupName]
+	|| !sSettings.verifiers[groupName][varName]) debugger;
 
 	// if bad value, just set to default.
 	// Should clamp continuum variables to min or max!  should eliminate variables no longer part of the group!
 // not sure what went wrong here but i fixed it...
 //console.log(`groupName=${groupName}   varName=${varName}`);
-//console.log(`alternateStoreVerifiers=`, alternateStoreVerifiers);
-//console.log(`alternateStoreVerifiers[${groupName}]=`, alternateStoreVerifiers?.[groupName]);
-//console.log(`alternateStoreVerifi...[${varName}]=`, alternateStoreVerifiers?.[groupName]?.[varName]);
-//console.log(`alternateStoreVerif[...](newValue)=`, alternateStoreVerifiers?.[groupName]?.[varName]?.(newValue));
+//console.log(`sSettings.verifiers=`, sSettings.verifiers);
+//console.log(`sSettings.verifiers[${groupName}]=`, sSettings.verifiers?.[groupName]);
+//console.log(`sSettingsVerifi...[${varName}]=`, sSettings.verifiers?.[groupName]?.[varName]);
+//console.log(`sSettingsVerif[...](newValue)=`, sSettings.verifiers?.[groupName]?.[varName]?.(newValue));
 
 	let savedGroup = getAGroup(groupName);
 	savedGroup[varName] = newValue;
@@ -335,15 +332,17 @@ export function storeASetting(groupName, varName, newValue) {
 
 export function getASetting(groupName, varName) {
 	let setting = getAGroup(groupName)[varName];
-	if (!alternateStoreVerifiers?.[groupName]?.[varName]) debugger;
+	if (!sSettings.verifiers?.[groupName]?.[varName]) debugger;
 
 	// this can still return undefined if the groupName or varName isn't there
 	if (setting === undefined
-			|| !alternateStoreVerifiers?.[groupName]?.[varName]?.(setting)) {
-		return alternateStoreDefaults?.[groupName]?.[varName];
+			|| !sSettings.verifiers?.[groupName]?.[varName]?.(setting)) {
+		return sSettings.defaults?.[groupName]?.[varName];
 	}
 	return setting;
 }
 
+// in case you want only one exported name.  Kindof defeats the purpose huh?
+export const storeSettings = {createStoreSettings, getAGroup, storeAGroup, storeASetting, getASetting, };
 export default storeSettings;
 

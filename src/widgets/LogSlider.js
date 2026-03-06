@@ -12,8 +12,16 @@ import {thousands} from '../utils/formatNumber.js';
 // set a particular 'unique' in this regex to trace its renders and stuff or use the second one to turn off
 // does this work with the trace turned off?  (TODO)
 let traceThisSlider = {test: () => false};
+let traceTwoSided = true;
 
-// list of settings that are more better - not that simple!
+// twoSided results in a two-sided scale, going through positives,
+// negatives, and zero.  It's symmetric so absolute highest is
+// negative of absolute lowest.  So if the one-sided slider has 7
+// indices, the twoSided slider has 15: 7 on the positive side, 7 on
+// the negative side, and zero.  sliderMin and sliderMax describe the
+// positive side; the negative side is the same in reverse order.
+
+// list of settings that are more better - not that simple!  just one sided
 function createGoodPowers(spd, mini, maxi, substitutes) {
 	const minIx = powerToIndex(spd, mini, substitutes);
 	const maxIx = powerToIndex(spd, maxi, substitutes);
@@ -42,8 +50,9 @@ class LogSlider extends React.Component {
 		// these are powers, not indices
 		current: PropTypes.number.isRequired,
 		original: PropTypes.number,
-		sliderMin: PropTypes.number.isRequired,
-		sliderMax: PropTypes.number.isRequired,
+		sliderMin: PropTypes.number.isRequired,  // if twoSided, inner min closest to zero
+		sliderMax: PropTypes.number.isRequired,  // if twoSided, absolute min is -max
+		twoSided: PropTypes.bool,  // true to also handle negative numbers and zeros
 
 		stepsPerDecade: PropTypes.number.isRequired,
 
@@ -77,35 +86,46 @@ class LogSlider extends React.Component {
 		if (traceThisSlider.test(p.unique)) console.log(`LogSlider props=`, JSON.stringify(props));
 		this.wasOriginal = p.original ? <small>&nbsp; (was {thousands(p.original)})</small> : '';
 
-		// these don't change dynamically i promise
-		this.minIndex = powerToIndex(p.stepsPerDecade, p.sliderMin, p.substitutes);
-		this.maxIndex = powerToIndex(p.stepsPerDecade, p.sliderMax, p.substitutes);
+		// these don't change dynamically.  Min/max for single sided positive pts
+		this.minIndex = this.minSingleIndex = powerToIndex(p.stepsPerDecade, p.sliderMin, p.substitutes);
+		this.maxIndex = this.maxSingleIndex = powerToIndex(p.stepsPerDecade, p.sliderMax, p.substitutes);
+
+		if (p.twoSided) {
+			// the renumbered indices go both directions from zero
+			this.singleWidth = this.maxSingleIndex - this.minSingleIndex;
+			let twoWidth = 2 * this.singleWidth + 1;
+			this.minIndex = - this.singleWidth;
+			this.maxIndex = this.singleWidth;
+		}
 	}
+
+
 
 	pointerDown =
 	ev => {
 		const p = this.props;
-		if (traceThisSlider.test(p.unique)) console.log(`pointerDown avgValue=`, this.avgValue);
-		this.avgValue = +ev.currentTarget.value;
+		this.currentIx = +ev.currentTarget.value;
+		if (traceThisSlider.test(p.unique)) console.log(`pointerDown down Ix=`, this.currentIx);
 		ev.target.setPointerCapture(ev.pointerId);
 	}
 
 	pointerUp =
 	ev => {
 		const p = this.props;
-		if (traceThisSlider.test(p.unique)) console.log(`pointerUp avgValue=`, this.avgValue);
+		if (traceThisSlider.test(p.unique)) console.log(`pointerUp up Ix=`, this.currentIx);
 		p.pointerUp?.(ev);
 	}
 
+	// are these line mouse move?
 	handleSlide =
 	ev => {
 		const p = this.props;
 		const spd = p.stepsPerDecade;
-		const stepFactors = stepsPerDecadeStepFactors[spd];
+		//const stepFactors = stepsPerDecadeStepFactors[spd];
 
 		if (traceThisSlider.test(p.unique)) console.log(`handleChange ev=`, ev);
 		const ix = +ev.currentTarget.value;
-		const power = indexToPower(p.willRoundPowers, stepFactors, spd, ix, p.substitutes);
+		const power = indexToPower(p.willRoundPowers, spd, ix, p.substitutes);
 		if (traceThisSlider.test(p.unique)) console.log(`handleChange  ix=${ix}  power=${power}`);
 		p.handleChange?.(power, ix);
 	}
@@ -115,7 +135,7 @@ class LogSlider extends React.Component {
 		const spd = p.stepsPerDecade;
 		const cur = p.current;
 
-		// the actual css ID used for the datalist
+		// the actual css ID used for the datalist.  doesn't include class?
 		const uniqueId = `LogSliderDataList-${p.unique.replace(/\W+/, '_')}`;
 
 		// right on the edge of transition, it can vibrate!  average this out. so it slides gently

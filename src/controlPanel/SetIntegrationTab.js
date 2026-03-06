@@ -6,7 +6,8 @@
 import PropTypes from 'prop-types';
 import LogSlider from '../widgets/LogSlider.js';
 import TextNSlider from '../widgets/TextNSlider.js';
-import {getASetting, alternateMinMaxs} from '../utils/storeSettings.js';
+import {getASetting} from '../utils/storeSettings.js';
+import sSettings from '../utils/sSettings.js';
 import InteStats from './InteStats.js';
 
 let traceSliderChanges = false;
@@ -60,8 +61,8 @@ function SetIntegrationTab(props) {
 
 	// Unlike other tabs, all these are instant-update.
 
-	let mini = alternateMinMaxs.lapSettings.dtFactor.min;
-	let maxi = alternateMinMaxs.lapSettings.dtFactor.max;
+	let mini = sSettings.minMaxes.lapSettings.dtFactor.min;
+	let maxi = sSettings.minMaxes.lapSettings.dtFactor.max;
 
 	return (<div className='SetIntegrationTab controlPanelPanel'>
 		<div className='sliderBlock'>
@@ -101,57 +102,6 @@ function SetIntegrationTab(props) {
 
 	</div>);
 }
-
-
-
-// leftover scraps - delete this soon jun'25
-//{
-//	<InteStats />
-//}
-
-/*
-			<LogSlider
-				unique='stepsPerLapSlider'
-				className='stepsPerLapSlider cpSlider'
-				label='steps Per Frame'
-				minLabel='faster'
-				maxLabel='smoother'
-
-				current={props.stepsPerLap}
-				sliderMin={alternateMinMaxs.lapSettings.stepsPerLap.min}
-				sliderMax={alternateMinMaxs.lapSettings.stepsPerLap.max}
-				stepsPerDecade={6}
-
-				// indices 2, 3 & 4 map to these numbers, next is [5]=8, [6]=10
-				// then we skip to [7]=14 instead of 15
-				substitutes={[ , , 2, 4, 6, , , 14]}
-
-				handleChange={(power, ix) => {
-					if (traceSliderChanges)
-						console.log(`🏃🏽 🏃🏽 ch stepsPerLap::  ix=${ix}  power=${power}`);
-					props.setStepsPerLap(power);
-				}}
-			/>
-
-			<TextNSlider className='lowPassFilterSlider '
-				label='Percent of High Frequencies to Filter Out'
-				value={props.lowPassFilter.toFixed(nDigits)}
-				min={alternateMinMaxs.lapSettings.lowPassFilter.min}
-				max={alternateMinMaxs.lapSettings.lowPassFilter.max}
-				step={lowPassStep}
-				style={{width: '80%'}}
-				handleChange={newValue => {
-						if (traceSliderChanges)
-							console.log(`🏃🏽 🏃🏽 ch Low Pass Filter:: ${newValue}  `);
-						props.setLowPassFilter(+newValue);
-					}}
-			/>
-
-*/
-
-
-// 				<tr><td>reload GL variables:     </td><td><span  className='reloadGlInputs'>-</span> ms</td></tr>
-
 
 export default SetIntegrationTab;
 
