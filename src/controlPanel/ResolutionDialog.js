@@ -160,7 +160,6 @@ export default class ResolutionDialog extends React.Component {
 		</section>;
 	}
 
-
 	renderSpaceLength() {
 		return <section className='dimLength'>
 			<label className='spaceLengthLabel'>

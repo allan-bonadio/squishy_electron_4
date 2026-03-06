@@ -299,7 +299,7 @@
 	//}
 
 	// the panel with the minigraph, and all the sliders
-	.miniGraphPanel {
+	.graphNSliders {
 		//--miniGraphWidth: 200px;
 		//--miniGraphHeight: 150px;
 		grid-template-areas:
@@ -343,7 +343,7 @@
 		}
 	}
 
-	.miniGraphPanel {
+	.graphNSliders {
 		// thing that looks like x^2.5 only for canyon
 		.powerDisplay {
 			width: 2.5em;
@@ -368,7 +368,7 @@
 
 	}
 
-	.miniGraphPanel {
+	.graphNSliders {
 		// menu showing in some places: always, hover, never
 		.ShowVoltageControl {
 			display: block;
