@@ -36,9 +36,11 @@ export const stepsPerDecadeStepFactors = {
 	3: [1, 2, 5],
 	// 4: [1, 2, 3, 6],
 	// 5: [1, 1.5, 2.5, 4, 6],
-	6: [1, 1.5, 2, 3, 5, 8],
+	//6: [1, 1.47, 2.15, 3.16, 4.64, 6.81],
+	6: [1, 1.5, 2, 3, 5, 7],
 	// 8: [1, 1.3, 2.4, 3.2, 4.2, 5.6, 7.5]
-	10: [1, 1.25, 1.5,     2, 2.50, 3,     4, 5, 6,     8],
+	//	10: [1, 1.26, 1.58,     2, 2.51, 3.16,     4, 5, 6.3,     7.9],
+	10: [1, 1.26, 1.6,     2, 2.5, 3,     4, 5, 6,     8],
 
 	// 16 = base 2 only, all the way up. Implemented as base 16 now; fix it later
 	16: [1, 2, 4, 8],
@@ -59,25 +61,26 @@ export const stepsPerDecadeStepFactors = {
 // willRoundPowers = boolean, true if all values should be integers (for small powers)
 // stepFactors = element of stepsPerDecadeStepFactors
 // ix = actual index to convert to a power
-// su stgitutes = array or obj mapping indexes to powers for exceptional cases
-export function indexToPower(willRoundPowers, stepFactors, spd, ix, substitutes) {
-	let whichDecade, decadePower, factor;
-
+// substitutes = array or obj mapping indexes to powers for exceptional cases
+export function indexToPower(willRoundPowers, spd, ix, substitutes) {
+	let wholePower, factor;
+	const stepFactors = stepsPerDecadeStepFactors[spd];
 	if (substitutes && substitutes[ix]) return substitutes[ix];
 
 	if (spd != 16) {
-		whichDecade = Math.floor(ix/spd);
-		decadePower = 10 ** whichDecade;
+		let whichDecade = Math.floor(ix/spd);
+		wholePower = 10 ** whichDecade;
+		// console.log(`🙃 spd${spd} ix${ix} wd${whichDecade} ${wholePower} `)
 		factor = stepFactors[ix - whichDecade * spd];
+		//console.log(`🙃 spd${spd} ix${ix} wd${whichDecade} ${wholePower} f${factor} p${factor * wholePower} `)
 	}
 	else {
-		// remember, there's still decades, but of 16x each, and 4 settings in each one
-		// no, redo these before implementing!
-		whichDecade = Math.floor(ix/4);
-		decadePower =  16 ** whichDecade;
-		factor = stepFactors[ix - whichDecade * 4];
+		// remember, there's still "decades", but of 16x each, and 4 settings in each one
+		let whichHexade = Math.floor(ix/4);
+		wholePower =  16 ** whichHexade;
+		factor = stepFactors[ix - whichHexade * 4];
 	}
-	let power = factor * decadePower;
+	let power = factor * wholePower;
 	if (willRoundPowers) power = Math.round(power) ;
 	return power;
 }
@@ -85,6 +88,9 @@ export function indexToPower(willRoundPowers, stepFactors, spd, ix, substitutes)
 // convert eg 100, 125, 300, 1000 into 20, 21, 25, 30
 export function powerToIndex(spd, searchPower, substitutes) {
 	let logOf;
+
+	if (searchPower <= 0 || !isFinite(searchPower))
+		throw `bad powerToIndex power ${searchPower}`;
 
 	if (substitutes) {
 		logOf = substitutes.findIndex(pw => pw && (Math.abs(pw - searchPower) / (pw + searchPower) < 1e-8));
@@ -117,4 +123,111 @@ export function isPowerOf2(n) {
 		n = n >> 1;
 	}
 	return true;
+}
+
+
+/* ******************************************** twoSided */
+
+// a single-sided log scale ix goes from min...max, all integers.
+// Actual power value is 10^ix for multiples of spd, and close for integers in between.
+
+// a two-sided one goes from a negative to a positive index.  The
+// single-sided ix is slid down to range from 1 to singleWidth for
+// powers > 0, to zero for zero, and from -1 to -singleWidth for
+// negatives.  So complicated, hence this object to keep track.
+
+export class twoSidedInfo {
+
+	// pass in the singleindices as if single (as above), and we'll set it up
+	// will use example in comments: spd = 3, so powers 1, 2, 5, 10...
+	// single minix = -6 power=.01, single maxix = 9 for 1000
+	constructor(spd, minSingleIndex, maxSingleIndex) {
+		this.stepsPerDecade = spd;
+		this.minSingleIndex = minSingleIndex;
+		this.maxSingleIndex = maxSingleIndex;
+
+		// the renumbered indices go both directions from zero, to singleWidth+1?
+		// eg singleWidth = 16, twowidth=33, twoindices range -16...+16
+		this.singleWidth = maxSingleIndex - minSingleIndex + 1;
+		let twoWidth = 2 * this.singleWidth + 1;  // do i need this?
+
+		// outer limits, representing ±maxSingleIndex
+		this.minIndex = - this.singleWidth - 1;
+		this.maxIndex = this.singleWidth + 1;
+
+		// use these for return arguments, sometimes
+		this.neg = this.zero = false;
+		this.singleIx = NaN;
+	}
+
+
+	// convert a single-sided index to a twoSide index, but only if
+	// twoSided, otherwise just return ix.  Note with single sided,
+	// zero and negative have no loggable valid meanings, hence the booleans to
+	// indicate.
+	indexToTwoIndex(ix, zero, neg) {
+		// the zero pt
+		if (zero) return 0;
+
+		// single min means twoIndex of 1
+		let twoIndex = ix - this.minSingleIndex + 1;
+
+		if (neg)
+			return -twoIndex;
+		return twoIndex;
+
+	}
+
+	// convert the twoIndex (minIndex ... maxIndex) to a singleIndex plus flags
+	// return nothing but sets this.fields: {zero: bool, neg: bool, singleIndex}
+	twoIndexToIndex(twoIx) {
+		// if (!twoSided)
+		// 	return twoIx;
+
+		this.neg = this.zero = false;
+		if (twoIx == 0)
+			return this.zero = true;
+
+		this.singleIx = Math.abs(twoIx)  - 1 + this.minSingleIndex;
+		this.neg = twoIx < 0;
+	}
+
+	// convert singleIx and neg and zero (in this) to a twoIndex
+	//  (minIndex ... maxIndex)
+	// return the twoIndex
+	indexToTwoIndex() {
+		if (this.zero) return 0;
+		let twoIndex = this.singleIx - this.minSingleIndex + 1;
+		if (this.neg)
+			twoIndex = -twoIndex;
+	}
+
+	twoIndexToPower(twoIndex) {
+		if (twoIndex == 0)
+			return 0;
+
+		this.twoIndexToIndex(twoIndex);
+		let power = indexToPower(false, this.stepsPerDecade, this.singleIx);
+		if (this.neg)
+			power = -power;
+		console.log(`🙃 spd${this.stepsPerDecade} twoIndex${twoIndex} singleIx${this.singleIx} p${power}`)
+		return power;
+	}
+
+	powerToTwoIndex(twoPower) {
+		if (twoPower == 0)
+			return 0;
+
+		power = Math.abs(twoPower);
+		let neg = twoPower < 0;
+		let singleIndex = powerToIndex(spd, power);
+
+
+
+
+		twoIndex = this.indexToTwoIndex(singleIndex, false, neg);
+		if (neg)
+			twoIndex = -twoIndex;
+		return twoIndex;
+	}
 }
