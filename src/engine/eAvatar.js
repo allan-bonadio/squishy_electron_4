@@ -105,7 +105,7 @@ class eAvatar {
 		return this.reserveTypedArray(whichBuffer, tArray);
 	}
 
-	// allocate the index buf bloc in C++, then wrap it in a typed array in JS
+	// allocate the index buf bloc in C++, then wrap it in a typed array in JS.  Unused as of this writing.
 	attachIndexBuffer(useThisMemory, nItems) {
 
 		if (this.indexBuffer)

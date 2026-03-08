@@ -110,14 +110,15 @@ export class flatDrawing extends abstractDrawing {
 
 		// normally autoranging would put the highest peak at the exact bottom.
 		// but we want some extra space.  not much.
-		const vertStretch = 1.0;  // not sure why
+		//const vertStretch = 1.0;  // not sure why
 		//const vertStretch = 0.7;  // not sure why
-		const PADDING_ON_BOTTOM = 1.02 * vertStretch;
+		const PADDING_ON_BOTTOM = 1.02;
+		//const PADDING_ON_BOTTOM = 1.02 * vertStretch;
 
 		this.maxHeightUniform = new drawingUniform('maxHeight', this,
 			() => {
 				// fresh out of the loader, maxHeight wobbles up and down.  Smooth it.
-				if (!this.maxHeight)
+				if (!this.maxHeight)  // ??
 					this.maxHeight = this.avatar.double0;
 				else {
 					// relax changes.  how  quickly?
