@@ -171,7 +171,9 @@ class sAnimator {
 	/* *************************************  divergence */
 	// start to jiggle whole squishPanel if starting to diverge.  Directly, not thru React
 	divergenceJiggle(divergence)  {
-		let sps = this.sqPanel.squishPanelEl.style;
+		let sps = this.sqPanel?.squishPanelEl?.style;
+		if (!sps) return;
+
 		if (divergence < MAX_DIVERGENCE) {
 			sps.marginLeft = sps.marginRight = sps.marginTop = sps.marginBottom = '0';
 			return;
