@@ -116,7 +116,7 @@ void grWorker::gThreadLoop(void) {
 				grinder->finishAtomic);
 			int nFinished = emscripten_atomic_add_u32(&grinder->finishAtomic, 1);
 			nFinished++;
-			printf("traceSync=%hhu traceFinish = %hhu \n", 	traceSync, traceFinish);
+			//printf("traceSync=%hhu traceFinish = %hhu \n", 	traceSync, traceFinish);
 			if (traceSync || traceFinish) {
 					speedyLog("🦫 after increment on finishAtomic=%d (shdbe 1 or more) "
 					"thread %d, nFinished=%d \n",

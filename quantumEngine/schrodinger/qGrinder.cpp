@@ -324,7 +324,7 @@ void qGrinder::oneLap() {
 	// this is the actual dt in use for calculations, refDt * dtFactor
 	double dt = stretchedDt;
 	double dtHalf = dt / 2;
-	speedyLog("early oneLap stretchedDt=dt=%lg  dtHalf=%lg\n", dt, dtHalf);
+	//speedyLog("early oneLap stretchedDt=dt=%lg  dtHalf=%lg\n", dt, dtHalf);
 
 	// half step in beginning to move Im forward dt/2 = dtHalf
 	// cuz outside of here, re and im are synchronized.
@@ -397,8 +397,8 @@ void qGrinder::aggregateCalcTime(void) {
 
 
 
-	speedyLog(" qGrinder 🪓 spl after adjustment=%d   videoFP=%8.3lf\n",
-		stepsPerLap, videoFP, maxCalcTime);
+	// speedyLog(" qGrinder 🪓 spl after adjustment=%d   videoFP=%8.3lf\n",
+	// 	stepsPerLap, videoFP, maxCalcTime);
 
 	if (traceAggregate) {
 		speedyLog(" qGrinder 🪓 aggregate time summed: %5.6lf ms, maxed: %5.6lf ms\n",
