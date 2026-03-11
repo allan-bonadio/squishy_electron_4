@@ -86,9 +86,9 @@ function SetIntegrationTab(props) {
 				minLabel={mini}
 				maxLabel={maxi}
 
-				current={props.getQuickDtFactor()}
-				sliderMin={mini}
-				sliderMax={maxi}
+				currentPower={props.getQuickDtFactor()}
+				sliderPowerMin={mini}
+				sliderPowerMax={maxi}
 				stepsPerDecade={6}
 
 				handleChange={handleChange}

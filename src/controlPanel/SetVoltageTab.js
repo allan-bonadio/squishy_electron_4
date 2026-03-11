@@ -45,15 +45,13 @@ function SetVoltageTab(p) {
 		saveMainVoltage, space} = p;
 	const vP = voltageParams;
 	const setVP = setVoltageParams;
-	// breed
-	// vMinsMaxes
 
 	// we'll hang on to these so I don't have to reallocate the buffer or voltDisplay all the time
 	let mgVarsRef = useRef(null);
-	let mgVars = mgVarsRef.current;
+	let mgVars = mgVarsRef.currentPower;
 	if (!mgVars) {
 		// only the first time this is run
-		mgVars = mgVarsRef.current = {};
+		mgVars = mgVarsRef.currentPower = {};
 		mgVars.miniGraphBuffer = new Float64Array(space.nPoints);
 		voltDisplay.copyVolts(mgVars.miniGraphBuffer, space.voltageBuffer);
 
@@ -101,11 +99,6 @@ function SetVoltageTab(p) {
 
 	// the minigraph is all in svg; no gl
 	function renderMiniGraph() {
-		// even if you can't draw it, at least reserve the space
-		//if (!vDisp)
-		//	return <svg width={MINI_WIDTH} height={MINI_HEIGHT} />;
-		//debugger;
-
 		vDisp.setAppropriateRange(vP);
 		vDisp.setVoltScales(0, MINI_WIDTH, MINI_HEIGHT);
 
@@ -123,67 +116,31 @@ function SetVoltageTab(p) {
 
 	// call this to start pointer capture on whichever range slider the user clicked on
 	const startCapture =
-	(ev) => ev.target.setPointerCapture(ev.pointerId);
-
-	// make a scale slider for either slots, blocks, canyons or flats
-// 	function scaleSliderOld() {
-// 				{/* only shows for canyon - shouldn't this be logarithmic?  */}
-// 			<input type='range' className='canyonScale'
-// 				value={(vP.canyonScale)}
-// 				min={vMinsMaxes.canyonScale.min}
-// 				max={vMinsMaxes.canyonScale.max}
-// 				step='10'
-// 				onChange={ev => setVoltageParams({canyonScale: ev.target.valueAsNumber})}
-// 				onPointerDown={startCapture}
-// 				style={{display: 'canyon' == breed ? 'inline-block' : 'none'}}
-// 				title="Voltage of multiplier.  The little graph autoranges so you can't see it so well."
-// 			/>
-// 	}
+		(ev) => ev.target.setPointerCapture(ev.pointerId);
 
 	// make a logarithmic scale slider for either slots, blocks, canyons or flats
-	// according to breed.  val=current value; minMax has min and max limits to value
-	function makeScaleSlider(breed, val, minMax) {
-		//let scaleName = breed + 'Scale';
-
-// 				style={{display: ('flat' == breed || 'slot' == breed || 'block' == breed)
-// 					? 'inline-block' : 'none'}}
-// 				style={{display: 'canyon' == breed ? 'inline-block' : 'none'}}
-
+	// according to breed.  singlePowerWidth=currentPower value; minMax has min and max limits to value
+	function makeScaleSlider(breed, powerVal, minMax) {
 		const breedScale = breed + 'Scale';
+		//console.log(`😎  svt props.voltageParams: `, p.voltageParams);
+
+		// this goes -minMax.max...-100  0  +100...+minMax.max
 		return <LogSlider className={breedScale} unique={breedScale}
 			twoSided={true}
-			current={val}
+			currentPower={powerVal}
 			annotation={false}
-			sliderMin={minMax.min}
-			sliderMax={minMax.max}
+			vertical={true}
+			sliderPowerMax={minMax.max}
+			sliderPowerMin={100}
 			stepsPerDecade={10}
 			handleChange={scale => setVoltageParams({[breedScale]: scale})}
 			wholeStyle={{visibility: 'visible'}}
 			title='choose what power for the curve'
 		/>
-// 		return <input type='range' className={breedScale}
-// 			value={(val)}
-// 			min={minMax.min}
-// 			max={minMax.max}
-// 			step='10'
-// 			onChange={ev => setVoltageParams({[breedScale]: ev.target.valueAsNumber})}
-// 			onPointerDown={startCapture}
-// 			style={{display: 'inline-block'}}
-// 			title="Overall Magnitude"
-// 		/>;
 	}
-	// make the scale slider, always on the right side of the minigraph
 
 	const breed = vP.voltageBreed;
 	const breedScale = breed + 'Scale';
-// 	makeScaleSlider(breed, vP[breedScale],
-// 		sSettings.minMaxes.voltageParams[breedScale])}
-	// {('slot' == breed) && makeScaleSlider('slot', vP.slotScale,
-	// 	sSettings.minMaxes.voltageParams.slotScale)}
-	// {('block' == breed) && makeScaleSlider('block', vP.blockScale,
-	// 	sSettings.minMaxes.voltageParams.blockScale)}
-	// {('canyon' == breed) && makeScaleSlider('canyon', vP.canyonScale,
-	// 	sSettings.minMaxes.voltageParams.canyonScale)}
 
 	// draw minigraph, with sliders on both sides, depending on breed.
 	function renderFirstRow(breed) {
@@ -191,10 +148,11 @@ function SetVoltageTab(p) {
 		return <>
 			{/* only shows for canyon, otherwise blank space */}
 			<LogSlider className='canyonPower' unique='canyonPower'
-				current={vP.canyonPower}
+				currentPower={vP.canyonPower}
 				annotation={false}
-				sliderMin={sSettings.minMaxes.voltageParams.canyonPower.min}
-				sliderMax={sSettings.minMaxes.voltageParams.canyonPower.max}
+				vertical={true}
+				sliderPowerMin={sSettings.minMaxes.voltageParams.canyonPower.min}
+				sliderPowerMax={sSettings.minMaxes.voltageParams.canyonPower.max}
 				stepsPerDecade={10}
 				handleChange={power => setVoltageParams({canyonPower: power})}
 				wholeStyle={{visibility: 'canyon' == breed ? 'visible' : 'hidden'}}
@@ -209,40 +167,6 @@ function SetVoltageTab(p) {
 	}
 
 
-
-
-
-	// 		{/* only shows for canyon - shouldn't this be logarithmic?  */}
-// 			<input type='range' className={`${breed}Scale`}
-// 				value={(vP.canyonScale)}
-// 				min={sSettings.minMaxes.voltageParams.canyonScale.min}
-// 				max={sSettings.minMaxes.voltageParams.canyonScale.max}
-// 				step='10'
-// 				onChange={ev => setVoltageParams({canyonScale: ev.target.valueAsNumber})}
-// 				onPointerDown={startCapture}
-// 				style={{display: 'canyon' == breed ? 'inline-block' : 'none'}}
-// 				title="Voltage of multiplier.  The little graph autoranges so you can't see it so well."
-// 			/>
-//
-// 			{/* only shows for flat, slot and block - shouldn't this be logarithmic? */}
-// 			<input type='range' className='slotScale'
-// 				value={(vP.slotScale)}
-// 				min={sSettings.minMaxes.voltageParams.slotScale.min}
-// 				max={sSettings.minMaxes.voltageParams.slotScale.max}
-// 				step='10'
-// 				onChange={ev => setVoltageParams({slotScale: ev.target.valueAsNumber})}
-// 				onPointerDown={startCapture}
-// 				style={{display: ('flat' == breed || 'slot' == breed || 'block' == breed) ? 'inline-block' : 'none'}}
-// 				title="Voltage between upper and lower levels"
-// 			/>
-
-
-
-//				{/* only if neither of above */}
-//			<div className='sliderSpacer' style={{display:'flat' == breed ? 'inline-block' : 'none' }}
-//			/>
-
-
 	// draw minigraph, and wrap it with sliders on 3 sides, depending on breed
 	function renderSecondRow(breed) {
 		// let slotScaleDisplay = vP.slotScale.toFixed(0);
@@ -252,10 +176,10 @@ function SetVoltageTab(p) {
 
 		return <>
 			{/* xⁿ only shows for canyon, otherwise blank space */}
-			<div className='powerDisplay'
+			<label className='powerDisplay'
 					style={{visibility: 'canyon' == breed ? 'visible' : 'hidden'}}>
 				<var>x</var><sup> {(vP.canyonPower).toFixed(1)}</sup>
-			</div>
+			</label>
 
 			{/* voltage slide for offset, all except flag.  0% to 100%.  */}
 			<input type='range' className='voltageCenter'
@@ -269,19 +193,12 @@ function SetVoltageTab(p) {
 				title="move the voltage profile left and right"
 			/>
 
-			<div className='scaleDisplay' style={{display: 'inline-block'}} >
+			<label className='scaleDisplay' style={{display: 'inline-block'}} >
 				{minusSign}
 				{(vP[`${breed}Scale`] / 1000).toFixed(2)} kV
-			</div>
+			</label>
 		</>;
 	}
-
-// 			<div className='canyonScaleDisplay'
-// 					style={{display: 'canyon' == breed ? 'inline-block' : 'none'}}>
-// 				{(canyonScaleDisplay/1000).toFixed(2)} kV ∙ <var>x</var><sup>n</sup>
-// 			</div>
-// 			<div style={{display: 'flat' == breed ? 'inline-block' : 'none'}} />
-
 
 	// only the slot/black width, otherwise blank space
 	function renderThirdRow(breed) {
@@ -306,10 +223,6 @@ function SetVoltageTab(p) {
 	function renderGraphNSliders() {
 		let vMinsMaxes = {...sSettings.minMaxes.voltageParams};
 		let breed = vP.voltageBreed;
-
-				// for vertical sliders, firefox wanted orient=vertical as element attr;
-				// chrome/safari wanted appearance:slider-vertical in css.
-				// chrome/safari  won
 
 		return <div className='graphNSliders'>
 			{/* this is a grid.  first row: left vert slider, mGraph, right slider

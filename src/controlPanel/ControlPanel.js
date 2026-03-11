@@ -61,10 +61,12 @@ export class ControlPanel extends React.Component {
 			...getAGroup('voltageSettings'),
 			//...getAGroup('lapSettings'),
 
-			// official dtFactor here in the state.  quick one on this.
+			// official dtFactor here in the state.  quick one on this.quickDtFactor
 			dtFactor: getASetting('lapSettings', 'dtFactor'),
 			showingTab: getASetting('miscSettings', 'showingTab'),
 		}
+
+console.log(`😎  state: `, this.state);
 
 		this.quickDtFactor = this.state.dtFactor;
 
@@ -306,6 +308,12 @@ export class ControlPanel extends React.Component {
 
 	/* ********************************************** set wave tab */
 
+	// TODO: what a mess.  I decided that each param had to be toplevel
+	// on the ControlPanel state so it would all redraw upon every
+	// change.  But they all intermix and it's a big hassle.  Probably
+	// each of the subpanels should have their own hooks state
+	// (useResolver or something) and then this file won't be as long.
+
 	// these are kept individually in the state so any of them triggers a render.
 	//  Kindof inconvenient, so we have getters and setters.
 	getWaveParams = () => {
@@ -394,9 +402,11 @@ export class ControlPanel extends React.Component {
 		this.setState({ voltageBreed: vP.voltageBreed ?? s.voltageBreed,
 			voltageCenter: vP.voltageCenter ?? s.voltageCenter,
 			canyonPower: vP.canyonPower ?? s.canyonPower,
-			canyonScale: vP.canyonScale ?? s.canyonScale,
 			slotWidth: vP.slotWidth ?? s.slotWidth,
-			slotScale: vP.slotScale ?? s.slotScale }
+			flatScale: vP.flatScale ?? s.flatScale,
+			slotScale: vP.slotScale ?? s.slotScale,
+			blockScale: vP.blockScale ?? s.blockScale,
+			canyonScale: vP.canyonScale ?? s.canyonScale }
 		);
 	}
 

@@ -212,12 +212,12 @@ export function createStoreSettings() {
 	makeParam('voltageParams', 'voltageCenter', 50, {min: 0, max: 100});
 
 	makeParam('voltageParams', 'slotWidth', 10, {min: 0, max: 100});  // 0 to 100 despite appearance
-	makeParam('voltageParams', 'flatScale', EFFECTIVE_VOLTS, {min: -AMPLE_VOLTS, max: AMPLE_VOLTS});
-	makeParam('voltageParams', 'slotScale', EFFECTIVE_VOLTS, {min: 0, max: AMPLE_VOLTS});
+	makeParam('voltageParams', 'flatScale', 0, {min: -AMPLE_VOLTS, max: AMPLE_VOLTS});
+	makeParam('voltageParams', 'slotScale', -EFFECTIVE_VOLTS, {min: 0, max: AMPLE_VOLTS});
 	makeParam('voltageParams', 'blockScale', EFFECTIVE_VOLTS, {min: 0, max: AMPLE_VOLTS});
 
 	makeParam('voltageParams', 'canyonPower', 2, {min: 0.1, max: 20});
-	makeParam('voltageParams', 'canyonScale', EFFECTIVE_VOLTS, {min: 0, max: AMPLE_VOLTS});
+	makeParam('voltageParams', 'canyonScale', 0, {min: 0, max: AMPLE_VOLTS});
 
 	// sets whether the voltage line shows or not
 	makeParam('voltageSettings', 'showVoltage', 'hover', ['always', 'hover', 'never']);
@@ -282,11 +282,13 @@ export function getAGroup(groupName) {
 
 	// if some old vars are left over from a previous version, remove them
 	const asg = sSettings.verifiers[groupName];  // true only for vars that are supported
-	for (let varName in group) {
+	let varName;
+	for (varName in group) {
 		if (!asg[varName])
 		  delete group[varName];
 	}
 
+	//console.log(`😎  group: `, group);
 	return group;
 }
 

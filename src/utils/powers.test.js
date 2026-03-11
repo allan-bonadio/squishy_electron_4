@@ -196,7 +196,7 @@ describe(`single sided powerToIndex `, () => {
 
 describe(`twoSide indexToPower `,
 	() => {
-		const info = new twoSidedInfo(10, 20, 56);
+		const info = new twoSidedInfo(10, 100, 40_000);
 
 		test.each([
 			[0, 0],
