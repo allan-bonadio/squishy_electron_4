@@ -220,11 +220,11 @@ function SetVoltageTab(p) {
 	}
 
 	// draw minigraph, and wrap it with whatever sliders on 3 sides, depending on breed
-	function renderGraphNSliders() {
+	function renderVoltageGraphNSliders() {
 		let vMinsMaxes = {...sSettings.minMaxes.voltageParams};
 		let breed = vP.voltageBreed;
 
-		return <div className='graphNSliders'>
+		return <div className='voltageGraphNSliders'>
 			{/* this is a grid.  first row: left vert slider, mGraph, right slider
 				left vert slider is power for canyon, or blank space otherwise */}
 			{renderFirstRow(breed)}
@@ -267,7 +267,7 @@ function SetVoltageTab(p) {
 		 	</button>
 		</div>
 
-		{renderGraphNSliders()}
+		{renderVoltageGraphNSliders()}
 
 		{renderShowVoltage()}
 	</div>;

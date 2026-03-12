@@ -12,7 +12,7 @@ import CommonDialog from '../widgets/CommonDialog.js';
 // This is a module for CommonDialog to read docs in from docGen and public/doc.
 // a 'uri' is a url path relative to /public/doc
 
-let traceReader = true;
+let traceReader = false;
 
 
 
