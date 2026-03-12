@@ -9,6 +9,7 @@ import {EFFECTIVE_VOLTS, TOO_MANY_VOLTS} from './voltConstants.js';
 import {getAGroup, storeASetting} from '../utils/storeSettings.js';
 
 let traceFamiliar = false;
+let traceScales = false;
 let tracePathAttribute = false;
 let tracePathIndividualPoints = false;
 
@@ -164,6 +165,8 @@ export class voltDisplay {
 		isOK(drawingLeft); isOK(drawingWidth); isOK(canvasHeight);
 
 		// these are used to draw the voltage path line in VoltArea
+		if (traceScales)
+			console.log(`bottomVolts=${this.bottomVolts} heightVolts=${this.heightVolts}   canvasHeight=${canvasHeight}`);
 		this.yScale = scaleLinear(
 			[this.bottomVolts, this.bottomVolts + this.heightVolts],
 			[0, canvasHeight]);
@@ -204,10 +207,14 @@ export class voltDisplay {
 		let end = this.end;
 		if (tracePathAttribute)
 			console.log(`⚡️voltDisplay.makePathAttribute(${start}, ${end})`);
+		if (tracePathIndividualPoints)
+			console.group(`makeVoltagePathAttribute pts`)
 
 		// for tracing.  long decimal numbers are depresssing
-		const tpip = (x, y, title = '') => {if (tracePathIndividualPoints)
-			console.log(`    ⚡️${title} x=${x}  y=${y}`)};
+		const tpip = (x, y, title = '') => {
+			if (tracePathIndividualPoints)
+				console.log(`    ⚡️${title} x=${x}  y=${y}`)
+			};
 
 		// yawn too early?
 		if (! usedYScale) {
@@ -217,6 +224,7 @@ export class voltDisplay {
 		}
 
 		const voltageBuffer = this.voltageBuffer;
+		//this.dumpVoltage('vb, pathcons');
 
 		// array to collect small snippets of text like '371,226' or
 		// 'L371,226'.  Avoid recreating array.
@@ -304,6 +312,8 @@ export class voltDisplay {
 		let final = points.join(' ');
 		if (tracePathAttribute)
 			console.log(`final path attribute`, final);
+		if (tracePathIndividualPoints)
+			console.groupEnd(`makeVoltagePathAttribute pts`)
 		return final;
 	}
 
@@ -443,17 +453,17 @@ debugger;
 
 		switch (voltageParams.voltageBreed) {
 		case 'flat':
-			height = voltageParams.slotScale + 2 * MARGIN;
+			height = abs(voltageParams.flatScale) + 2 * MARGIN;
 			bottom = -MARGIN;
 			break;
 
 		case 'slot':
-			height = voltageParams.slotScale + 2*MARGIN;
-			bottom = -voltageParams.slotScale - MARGIN;
+			height = abs(voltageParams.slotScale) + 2*MARGIN;
+			bottom = -abs(voltageParams.slotScale) - MARGIN;
 			break;
 
 		case 'block':
-			height = voltageParams.slotScale + 2*MARGIN
+			height = abs(voltageParams.blockScale) + 2*MARGIN
 			bottom = -MARGIN;
 			break;
 
