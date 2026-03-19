@@ -6,12 +6,13 @@
 
 import React, {useRef, useState, useReducer} from 'react';
 import PropTypes from 'prop-types';
+//import * as d3 from "d3";
 
 import VoltArea from '../volts/VoltArea.js';
 import VoltSidebar from '../volts/VoltSidebar.js';
 import {getASetting, storeASetting} from '../utils/storeSettings.js';
 
-let traceGeometry = false;
+let traceGeometry = true;
 
 const propTypes = {
 	// for first couple of renders, space and idunno are null

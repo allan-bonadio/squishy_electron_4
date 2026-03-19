@@ -16,7 +16,7 @@ import sSettings from '../utils/sSettings.js';
 import {eSpaceCreatedPromise} from '../engine/eEngine.js';
 import {interpretCppException} from '../utils/errors.js';
 
-// fixed size GLScene at start
+// fixed size GLScene at start.  TODO: also in setVoltageTab
 const MINI_WIDTH = 300;
 const MINI_HEIGHT = 150;
 
