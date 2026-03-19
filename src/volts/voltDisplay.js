@@ -4,12 +4,13 @@
 */
 
 import qeConsts from '../engine/qeConsts.js';
-import {scaleLinear} from 'd3-scale';
-import {EFFECTIVE_VOLTS, TOO_MANY_VOLTS} from './voltConstants.js';
+//import {scaleLinear} from 'd3-scale';
+import {EFFECTIVE_VOLTS, TOO_MANY_VOLTS, LOW_VOLTS} from './voltConstants.js';
 import {getAGroup, storeASetting} from '../utils/storeSettings.js';
+import * as d3 from "d3";
 
-let traceFamiliar = false;
-let traceScales = false;
+let traceFamiliar = true;
+let traceScales = true;
 let tracePathAttribute = false;
 let tracePathIndividualPoints = false;
 
@@ -19,7 +20,7 @@ let traceScrolling = false;
 let traceZooming = false;
 
 
-const {min, max, abs, round, sqrt, cbrt} = Math;
+const {min, max, abs, round, sqrt, cbrt, log10} = Math;
 
 // zooming in or out, changes the heightVolts by this factor either way.
 const zoomFactor = Math.sqrt(2);
@@ -66,7 +67,7 @@ export class voltDisplay {
 
 	// create a voltDisplay the way the space needs it
 	static newForSpace(space) {
-		let vDisp = new voltDisplay('space',
+		let vDisp = new voltDisplay('mainWave',
 			space.start, space.end, space.continuum,
 //			space.start, space.end, space.continuum,
 			space.voltageBuffer,
@@ -111,7 +112,7 @@ export class voltDisplay {
 		console.log(txt.join(''));
 	}
 
-	/* ******************************************************* height and bottom calculations */
+	/* ************************************* height and bottom calculations */
 
 	// actually measure the current voltage signal, get min & max
 	findVoltExtremes() {
@@ -125,16 +126,40 @@ export class voltDisplay {
 		this.measuredMaxVolts = maxi;
 	}
 
+	// THIS IS PERFECT, don't change it!!
 	// Adjust bottomVolts and heightVolts to the existing potential numbers, so it looks nice.
-	// call this after loading these settings from somewhere, if you're not confident about them.
+	// call this after changing the volts buffer, by the familiar settings.
 	decideBottomHeightVolts() {
 		// make sure some part of the current voltage is visible somewhere - adjust bottomVolts if needed
 		this.findVoltExtremes();
 
+		// if this doesn't include zero, include it
+		let mini = min(this.measuredMinVolts, 0);
+		let maxi = max(this.measuredMaxVolts, 0);
+		// toss in some arbitrary padding that won't be zero
+		mini -= LOW_VOLTS * 5;
+		maxi += LOW_VOLTS * 5;
+
+		// and that's it!
+		this.bottomVolts = mini;
+		this.heightVolts = maxi - mini;
+		return;
+
+		// **************************** old
+		// but if the range is Always the max....min, the appearance doesn't change.
+		// So adjust.  Come up with inflated height
+		let measuredHeight = abs(this.measuredMaxVolts - this.measuredMinVolts);
+		let inflatedHeight = this.measuredHeight / (0.5 + 0.1 * log10(this.height));
+
+		// and scale that to the graph top...bottom
+		let padding = (inflatedHeight - measuredHeight) / 2;
+		let bottom = this.measuredMinVolts - padding;
+		let top = this.measuredMaxVolts + padding;
+
+
 		// first, decide a heightVolts.  Potential might be zero
 		// everywhere, therefore zero difference.  Potential might have
 		// some range to it, if so, enclose that.
-		let measuredHeight = abs(this.measuredMaxVolts - this.measuredMinVolts);
 
 		if (measuredHeight > 1e-10) {
 			this.heightVolts = measuredHeight * 1.1;
@@ -155,22 +180,30 @@ export class voltDisplay {
 		}
 	}
 
-	/* ***************************************************************** Rendering */
+	/* **************************************************** Rendering */
+
+	setGraphSize(drawingLeft, drawingWidth, canvasHeight) {
+		isOK(drawingLeft); isOK(drawingWidth); isOK(canvasHeight);
+
+		this.drawingLeft = drawingLeft;
+		this.drawingWidth = drawingWidth;
+		this.drawingHeight = canvasHeight;
+	}
 
  	// set our xScale and yScale according to the numbers passed in, and our own settings
 	// used by VoltArea to plot potential.  X in units of dx, Y in units of volts
 	// I think I call this too many times (?)
 	setVoltScales(drawingLeft, drawingWidth, canvasHeight) {
 		isOK(this.bottomVolts); isOK(this.heightVolts);
-		isOK(drawingLeft); isOK(drawingWidth); isOK(canvasHeight);
+		this.setGraphSize(drawingLeft, drawingWidth, canvasHeight);
 
 		// these are used to draw the voltage path line in VoltArea
 		if (traceScales)
-			console.log(`bottomVolts=${this.bottomVolts} heightVolts=${this.heightVolts}   canvasHeight=${canvasHeight}`);
-		this.yScale = scaleLinear(
+			console.log(`${this.label}: bottomVolts=${this.bottomVolts} heightVolts=${this.heightVolts}   canvasHeight=${canvasHeight}`);
+		this.yScale = d3.scaleLinear(
 			[this.bottomVolts, this.bottomVolts + this.heightVolts],
 			[0, canvasHeight]);
-		this.yUpsideDown = scaleLinear(
+		this.yUpsideDown = d3.scaleLinear(
 			[this.bottomVolts, this.bottomVolts + this.heightVolts],
 			[canvasHeight, 0]);
 		this.canvasHeight = canvasHeight;
@@ -185,7 +218,7 @@ export class voltDisplay {
 		// no that's not  right....
 		let most = this.end;
 		//let most = (qeConsts.contENDLESS == this.continuum) ? this.end :  this.start + this.end;
-		this.xScale = scaleLinear(
+		this.xScale = d3.scaleLinear(
 			[0, most],
 			[drawingLeft, drawingLeft + drawingWidth]);
 
@@ -202,6 +235,7 @@ export class voltDisplay {
 	// make the value for the 'd' attribute on an svg <path element
 	// from start to end, on your space, using std volts array from WaveView
 	// usedYScale is either yScale or yUpsideDown; your choice
+	// want the syntax to be easy to debug
 	makeVoltagePathAttribute(usedYScale) {
 		let start = this.start;
 		let end = this.end;
@@ -317,7 +351,7 @@ export class voltDisplay {
 		return final;
 	}
 
-	/* ******************************************************************* interaction */
+	/* ************************************************* interaction */
 
 	// called when user scrolls up or down.
 	// frac = fraction of a height, 1=scrolled to top, one click.  -1=scrolled toward bottom, one click.
@@ -347,7 +381,7 @@ export class voltDisplay {
 	}
 
 
-	/* ******************************************************************* familiar voltage filling */
+	/* ********************************************** familiar voltage filling */
 
 	// fill the buffer with a constant from A to B
 	fillVoltage(fillWith, start = this.start, end = this.end) {
@@ -355,27 +389,32 @@ export class voltDisplay {
 			this.voltageBuffer[ix] = fillWith;
 	}
 
-	// pre-calc variables needed for evaluating the voltage familiarly
-	slotVoltageSetup(voltageParams) {
-		const {voltageCenter, slotWidth} = voltageParams;
+	// pre-calc X horiz variables needed for evaluating the voltage familiarly
+	preCalcFamiliarWidth(voltageParams) {
+		const {voltageCenter, blockWidth} = voltageParams;
 		const toIx = (this.end - this.start) / 100;  // converts 0...100 across to  0...N
 		this.offset = voltageCenter * toIx;
+		this.halfN = (this.end - this.start) / 2;
 
-		const halfSlotWidth = slotWidth * toIx / 2;
-		this.edgeStart = round(this.offset - halfSlotWidth);
-		this.edgeEnd = round(this.offset + halfSlotWidth);
+		if ('block' == voltageParams.voltageBreed) {
+			const halfBlockWidth = blockWidth * toIx / 2;
+			// edgeStart/End only used with block breed!
+			this.edgeStart = round(this.offset - halfBlockWidth);
+			this.edgeEnd = round(this.offset + halfBlockWidth);
+		}
 	}
 
 	// pre-calc variables needed for evaluating the voltage familiarly
 	// isn't this different for the well?
-	canyonVoltageSetup(voltageParams) {
-		const toIx = (this.end - this.start) / 100;  // how big is 1% of domain
-		this.offset = voltageParams.voltageCenter * toIx;  // convert center to ix units
-		this.halfN = (this.end - this.start) / 2;
-	}
+	// canyonVoltageSetup(voltageParams) {
+	// 	const toIx = (this.end - this.start) / 100;  // how big is 1% of domain
+	// 	this.offset = voltageParams.voltageCenter * toIx;  // convert center to ix units
+	// 	this.halfN = (this.end - this.start) / 2;
+	// }
 
 	canyonVoltage(ix, voltageParams) {
-		let xm1_1 = (ix - this.offset) / this.halfN;  // x value to raise to the power for this ix value
+		// x value to raise to the power for this ix value
+		let xm1_1 = (ix - this.offset) / this.halfN;
 		let y0_1 = Math.pow(abs(xm1_1), voltageParams.canyonPower);  // 0 ... +1
 
 		if (!isFinite(y0_1)) {
@@ -391,40 +430,46 @@ export class voltDisplay {
 	}
 
 	// generate a canyon, flat etc voltage potential in the given array, according to params.
+	// And set the height and bottom.  I don't think this works well.  Avoid.
 	setFamiliarVoltage(voltageParams) {
 		let {voltageCenter, voltageBreed, canyonPower, canyonScale,
-			slotScale, slotWidth} = voltageParams;
-		if (canyonPower == undefined || canyonScale == undefined || slotScale == undefined
-			|| voltageCenter == undefined) {
-debugger;
-			throw `bad Voltage params: slotScale=${slotScale}, canyonPower=${canyonPower},`
+			blockScale, flatScale, blockWidth} = voltageParams;
+		if (canyonPower == undefined || canyonScale == undefined || blockScale == undefined
+				|| flatScale == undefined || voltageCenter == undefined) {
+			debugger;
+			throw `bad Voltage params: blockScale=${blockScale}, canyonPower=${canyonPower},`
 			+`canyonScale=${canyonScale}, voltageCenter=${voltageCenter}`;}
 
 		if (traceFamiliar)
 			console.log(`⚡️ starting setFamiliarVoltage(`, voltageParams);
 
-		// figure out these ixs from percents
+		// prep the x variables
+		this.preCalcFamiliarWidth(voltageParams);
+
+		// fill the buffer according to the params.
 		switch (voltageBreed) {
 		case 'flat':
-			this.slotVoltageSetup(voltageParams);
-			this.fillVoltage(slotScale);
+			//this.preCalcFamiliarWidth(voltageParams);
+			this.fillVoltage(flatScale);
+			//this.setFamiliarDomain(voltageParams, 0, flatScale);
 			break;
 
-		case 'slot':
-			this.slotVoltageSetup(voltageParams);
-			this.fillVoltage(0);
-			this.fillVoltage(-slotScale, this.edgeStart, this.edgeEnd)
-			break;
+		// case 'slot':
+		// 	this.preCalcFamiliarWidth(voltageParams);
+		// 	this.fillVoltage(0);
+		// 	this.fillVoltage(-slotScale, this.edgeStart, this.edgeEnd)
+		// 	this.setFamiliarDomain(voltageParams);
+		// 	break;
 
 		case 'block':
-			this.slotVoltageSetup(voltageParams);
+			//this.preCalcFamiliarWidth(voltageParams);
 			this.fillVoltage(0);
-			this.fillVoltage(slotScale, this.edgeStart, this.edgeEnd)
+			this.fillVoltage(blockScale, this.edgeStart, this.edgeEnd)
 			break;
 
 		case 'canyon':
 			// the actual formula is like y = x ** p, where 0 <= y <= 1 and -1 <= x <= 1
-			this.canyonVoltageSetup(voltageParams);
+			//this.preCalcFamiliarWidth(voltageParams);
 
 			for (let ix = this.start; ix < this.end; ix++) {
 				this.voltageBuffer[ix] = this.canyonVoltage(ix, voltageParams);
@@ -442,11 +487,12 @@ debugger;
 			this.dumpVoltage(`done with setFamiliarVoltage()`);
 	}
 
-	// set bottomVolts and heightVolts to see the results of setFamiliarVolts()
-	setAppropriateRange(voltageParams) {
+	// set bottomVolts and heightVolts to the results of setFamiliarVolts()
+	// and adjust scales.  Not sure if this is useful...
+	setFamiliarDomain(voltageParams, vWidth, vHeight) {
 
 		if (traceFamiliar)
-			console.log(`⚡️ starting setAppropriateRange(`, voltageParams);
+			console.log(`⚡️ starting setFamiliarDomain(`, voltageParams);
 
 		const MARGIN = EFFECTIVE_VOLTS / 2;
 		let bottom, height;
@@ -457,10 +503,10 @@ debugger;
 			bottom = -MARGIN;
 			break;
 
-		case 'slot':
-			height = abs(voltageParams.slotScale) + 2*MARGIN;
-			bottom = -abs(voltageParams.slotScale) - MARGIN;
-			break;
+		// case 'slot':
+		// 	height = abs(voltageParams.slotScale) + 2*MARGIN;
+		// 	bottom = -abs(voltageParams.slotScale) - MARGIN;
+		// 	break;
 
 		case 'block':
 			height = abs(voltageParams.blockScale) + 2*MARGIN
@@ -489,16 +535,25 @@ debugger;
 			break;
 
 		default:
-			console.warn(`setAppropriateRange: no breed`, voltageParams);
+			console.warn(`setFamiliarDomain: no breed`, voltageParams);
 		}
 
 		this.bottomVolts = bottom;
 		this.heightVolts = height;
+		this.setVoltScales(0, vWidth, vHeight);
 		if (traceFamiliar)
-			this.dumpVoltDisplay(`setAppropriateRange(): `);
+			this.dumpVoltDisplay(`end of setFamiliarDomain(): `);
 	}
 
+	// measure voltage buffer and set volt scales to accommodate.  Use
+	// after any non-familiar change to volts. and adjust scales.  Must
+	// have already set drawingWidth, drawingLeft and canvasHeight from
+	// setVoltScales()
+	setAutoRange() {
+		this.decideBottomHeightVolts();
 
+		this.setVoltScales(this.drawingLeft, this.drawingWidth, this.canvasHeight);
+	}
 }
 
 export default voltDisplay;

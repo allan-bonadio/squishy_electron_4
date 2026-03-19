@@ -3,8 +3,9 @@
 ** Copyright (C) 2021-2026 Tactile Interactive, all rights reserved
 */
 
-import {useState, useRef, useReducer} from 'react';
+import {useState, useRef, useReducer, useEffect} from 'react';
 import PropTypes from 'prop-types';
+import * as d3 from "d3";
 
 import voltDisplay from '../volts/voltDisplay.js';
 import {EFFECTIVE_VOLTS, TOO_MANY_VOLTS} from '../volts/voltConstants.js';
@@ -13,7 +14,7 @@ import sSettings from '../utils/sSettings.js';
 import {eSpaceCreatedPromise} from '../engine/eEngine.js';
 import LogSlider from '../widgets/LogSlider.js';
 
-// miniGraph: always fixed size
+// miniGraph: always fixed size.    TODO: also in setWaveTab
 let MINI_WIDTH = 300;
 let MINI_HEIGHT = 150;
 
@@ -23,7 +24,7 @@ let MINI_HEIGHT = 150;
 const propTypes = {
 	voltageParams: PropTypes.shape({
 		canyonPower: PropTypes.number.isRequired,  // there's more but not now
-		slotWidth: PropTypes.number.isRequired}),
+		blockWidth: PropTypes.number.isRequired}),
 	setVoltageParams: PropTypes.func.isRequired,
 
 	// showVoltage is a separate Setting (not param) for showing/hiding voltage over canvas
@@ -46,21 +47,27 @@ function SetVoltageTab(p) {
 	const vP = voltageParams;
 	const setVP = setVoltageParams;
 
+	const yAxisRef = useRef(null);
+	let pathRef= useRef(null);
+
+
 	// we'll hang on to these so I don't have to reallocate the buffer or voltDisplay all the time
 	let mgVarsRef = useRef(null);
-	let mgVars = mgVarsRef.currentPower;
+	let mgVars = mgVarsRef.current;
 	if (!mgVars) {
+
 		// only the first time this is run
-		mgVars = mgVarsRef.currentPower = {};
+		mgVars = mgVarsRef.current = {};
 		mgVars.miniGraphBuffer = new Float64Array(space.nPoints);
 		voltDisplay.copyVolts(mgVars.miniGraphBuffer, space.voltageBuffer);
 
 		// each voltDisplay manages a voltage context; this one does the minigraph one
-		mgVars.miniVolts = new voltDisplay('miniVolts',
+		mgVars.miniVoltDisplay = new voltDisplay('miniVoltDisplay',
 			space.start, space.end, space.continuum,
 			mgVars.miniGraphBuffer, getAGroup('voltageSettings'));
+		mgVars.miniVoltDisplay.setVoltScales(0, MINI_WIDTH, MINI_HEIGHT);
 	}
-	const vDisp = mgVars.miniVolts;
+	const vDisp = mgVars.miniVoltDisplay;
 
 	/* ***************************************************** rendering for the Tab */
 
@@ -76,13 +83,7 @@ function SetVoltageTab(p) {
 					onChange={ev => setVoltageParams({voltageBreed: 'flat'}) }/>
 			</label>
 			<label title="sides will look diagonal if you have low resolution">
-				<big> ⨆</big> Slot
-				<input type='radio' className='slotBreed' name='breed'
-					checked={'slot' == breed}
-					onChange={ev => setVoltageParams({voltageBreed: 'slot'})}/>
-			</label>
-			<label title="sides will look diagonal if you have low resolution">
-				<big> ⨅</big> Block
+				<big> ⨅ ⨆</big> Block / Slot
 				<input type='radio' className='blockBreed' name='breed'
 					checked={'block' == breed}
 					onChange={ev => setVoltageParams({voltageBreed: 'block'})}/>
@@ -96,25 +97,85 @@ function SetVoltageTab(p) {
 		</div>;
 	}
 
+	// <label title="sides will look diagonal if you have low resolution">
+	// 	<big> </big>
+	// 	<input type='radio' className='slotBreed' name='breed'
+	// 		checked={'slot' == breed}
+	// 		onChange={ev => setVoltageParams({voltageBreed: 'slot'})}/>
+	// </label>
+
+	// an effect.  runs when <svg is there
+	const makeAxis = () => {
+		// If the scale has changed, call the axis component a second time to update.
+		// For smooth animations, you can call it on a transition.
+		if (yAxisRef.current) {
+			yAxisRef.current.transition()
+				.duration(200)
+				.call(d3.axisLeft(vDisp.yUpsideDown).ticks(2, "s"));
+			return;
+		}
+
+		// multiple squish panels: must be more specific
+		let svg = d3.select(".miniGraph");
+
+		// i shoulda used d3 for most of it...  except the path TODO
+		yAxisRef.current = svg.append("g")
+			.attr("transform", `translate(${MINI_WIDTH}, 0)`)
+			.call(d3.axisLeft(vDisp.yUpsideDown).ticks(2, "s"));
+	}
+
+	function updateAxis() {
+		if (yAxisRef.current) {
+			yAxisRef.current.transition()
+				.duration(750)
+				.call(d3.axisLeft(vDisp.yUpsideDown).ticks(2, "s"));
+			return;
+		}
+
+	}
 
 	// the minigraph is all in svg; no gl
 	function renderMiniGraph() {
-		vDisp.setAppropriateRange(vP);
-		vDisp.setVoltScales(0, MINI_WIDTH, MINI_HEIGHT);
+		vDisp.setFamiliarVoltage(vP);  // fill my buffer
+		//vDisp.setVoltScales(0, MINI_WIDTH, MINI_HEIGHT);
 
 		// fill the voltage buffer
-		vDisp.setFamiliarVoltage(vP);
+		vDisp.setAutoRange();
 
 		let path = vDisp.makeVoltagePathAttribute(vDisp.yUpsideDown);
+
+		useEffect(makeAxis);
 
 		// black background, path in cream white
 		return <svg className='miniGraph' width={MINI_WIDTH} height={MINI_HEIGHT}  >
 			<rect x={0} y={0} width={MINI_WIDTH} height={MINI_HEIGHT} fill='#000' />
-			<path d={path} />
+			<path ref={pathRef} d={path} />
 		</svg>;
 	}
 
-	// call this to start pointer capture on whichever range slider the user clicked on
+	// call whenever somehing changes that affects the minigraph.
+	// Somehow setState() on the ControlPanel doesn't do it.
+	function updateMiniGraph(change) {
+
+
+
+		//vDisp.setFamiliarVoltage(vP);  // don't need this cuz setAutoRange()?  TODO
+		//vDisp.setVoltScales(0, MINI_WIDTH, MINI_HEIGHT);
+
+		// new range to autorange for new params
+		vDisp.setAutoRange();
+
+		// new path
+		if (pathRef.current) {
+			let path = vDisp.makeVoltagePathAttribute(vDisp.yUpsideDown);
+			pathRef.current.setAttribute('d', path);
+		}
+
+		// new axis params
+		updateAxis();
+	}
+
+	// call this on mousedown to start pointer capture on whichever range slider the user clicked on
 	const startCapture =
 		(ev) => ev.target.setPointerCapture(ev.pointerId);
 
@@ -172,7 +233,6 @@ function SetVoltageTab(p) {
 		// let slotScaleDisplay = vP.slotScale.toFixed(0);
 		// let canyonScaleDisplay = vP.canyonScale.toFixed(0);
 		// shouldn't be neg if (scaleDisplayN < 0) scaleDisplay = `(${scaleDisplay})`;
-		let minusSign = ('slot' == breed) ? '-' : '';
 
 		return <>
 			{/* xⁿ only shows for canyon, otherwise blank space */}
@@ -194,7 +254,6 @@ function SetVoltageTab(p) {
 			/>
 
 			<label className='scaleDisplay' style={{display: 'inline-block'}} >
-				{minusSign}
 				{(vP[`${breed}Scale`] / 1000).toFixed(2)} kV
 			</label>
 		</>;
@@ -204,12 +263,12 @@ function SetVoltageTab(p) {
 	function renderThirdRow(breed) {
 		return <>
 			<div />
-			<input type='range' className='slotWidth'
-				value={vP.slotWidth}
+			<input type='range' className='blockWidth'
+				value={vP.blockWidth}
 				min={sSettings.minMaxes.voltageParams.voltageCenter.min}
 				max={sSettings.minMaxes.voltageParams.voltageCenter.max}
 				step={.1}
-				onChange={ev => setVoltageParams({slotWidth: ev.target.valueAsNumber})}
+				onChange={ev => setVoltageParams({blockWidth: ev.target.valueAsNumber})}
 				onPointerDown={startCapture}
 				style={{visibility: ('slot' == breed || 'block' == breed) ? 'visible' : 'hidden',
 					width: '50%'}}

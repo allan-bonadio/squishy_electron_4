@@ -211,9 +211,9 @@ export function createStoreSettings() {
 	makeParam('voltageParams', 'voltageBreed', 'flat', ['flat', 'slot', 'block', 'canyon']);
 	makeParam('voltageParams', 'voltageCenter', 50, {min: 0, max: 100});
 
-	makeParam('voltageParams', 'slotWidth', 10, {min: 0, max: 100});  // 0 to 100 despite appearance
+	makeParam('voltageParams', 'blockWidth', 10, {min: 0, max: 100});  // 0 to 100 despite appearance
 	makeParam('voltageParams', 'flatScale', 0, {min: -AMPLE_VOLTS, max: AMPLE_VOLTS});
-	makeParam('voltageParams', 'slotScale', -EFFECTIVE_VOLTS, {min: 0, max: AMPLE_VOLTS});
+	//makeParam('voltageParams', 'slotScale', -EFFECTIVE_VOLTS, {min: 0, max: AMPLE_VOLTS});
 	makeParam('voltageParams', 'blockScale', EFFECTIVE_VOLTS, {min: 0, max: AMPLE_VOLTS});
 
 	makeParam('voltageParams', 'canyonPower', 2, {min: 0.1, max: 20});
@@ -299,7 +299,8 @@ export function storeAGroup(groupName, newGroup) {
 	// only set those that are official!  don't overwrite zeroes or empty strings.
 	let toSet = {};
 	const asg = sSettings[groupName];
-	for (let varName in asg) {
+	let varName;
+	for (varName in asg) {
 		if (newGroup[varName] == undefined)
 			toSet[varName] = asg[varName].default;
 		else

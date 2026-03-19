@@ -311,7 +311,7 @@
 		grid-template-areas:
 			'canyonPower miniGraph scale'  // row 1
 			'powerDisplay voltageCenter scaleDisplay'  // row 2
-			'  .   slotWidth   .  ';  // row 3
+			'  .   blockWidth   .  ';  // row 3
 
 		// row 1: left to right
 		.canyonPower {
@@ -327,7 +327,7 @@
 			background-color: #444;
 		}
 
-		.flatScale, .blockScale, .slotScale, .canyonScale {
+		.flatScale, .blockScale, .canyonScale {
 				grid-area: scale;
 				width: 9em;
 				textAlign: 'right';
@@ -351,14 +351,14 @@
 		// looks like 2.50 • x...
 		.scaleDisplay {
 			grid-area: scaleDisplay;
-			width: 7em;
+			width: 2.5em;
 			text-align: center;
-			font-size: .7em;
+			font-size: .64em;
 		}
 
 		// row 3: left to right (just one thing)
-		.slotWidth {
-			grid-area: slotWidth;
+		.blockWidth {
+			grid-area: blockWidth;
 			height: 20px;
 		}
 	}

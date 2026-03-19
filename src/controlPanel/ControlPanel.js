@@ -391,7 +391,7 @@ console.log(`😎  state: `, this.state);
 		return {
 			voltageBreed: s.voltageBreed, voltageCenter: s.voltageCenter,
 			canyonPower: s.canyonPower, canyonScale: s.canyonScale,
-			slotWidth: s.slotWidth, slotScale: s.slotScale,
+			blockWidth: s.blockWidth,
 			flatScale: s.flatScale, blockScale: s.blockScale};
 	}
 
@@ -402,16 +402,15 @@ console.log(`😎  state: `, this.state);
 		this.setState({ voltageBreed: vP.voltageBreed ?? s.voltageBreed,
 			voltageCenter: vP.voltageCenter ?? s.voltageCenter,
 			canyonPower: vP.canyonPower ?? s.canyonPower,
-			slotWidth: vP.slotWidth ?? s.slotWidth,
+			blockWidth: vP.blockWidth ?? s.blockWidth,
 			flatScale: vP.flatScale ?? s.flatScale,
-			slotScale: vP.slotScale ?? s.slotScale,
 			blockScale: vP.blockScale ?? s.blockScale,
 			canyonScale: vP.canyonScale ?? s.canyonScale }
 		);
 	}
 
 	setAndRenderFamiliarVoltage(vP) {
-		this.space.vDisp.setFamiliarVoltage(vP);
+		this.space.vDisp.setAutoRange(vP);
 		this.space.updateDrawnVoltagePath();  // visible change on screen
 	}
 
@@ -420,7 +419,7 @@ console.log(`😎  state: `, this.state);
 	resetVoltageHandler = (ev) => {
 		const voltageParams = getAGroup('voltageParams');
 		this.setVoltageParams(voltageParams);
-		this.space.vDisp.setFamiliarVoltage(voltageParams);
+		this.space.vDisp.setAutoRange(voltageParams);
 		this.space.updateDrawnVoltagePath();
 	}
 
@@ -482,7 +481,7 @@ console.log(`😎  state: `, this.state);
 	renderShowingTab() {
 		const s = this.state;
 //		const {waveBreed, waveFrequency, pulseWidth, pulseCenter} = s;
-//		const {canyonPower, canyonScale, slotWidth, slotScale, voltageCenter} = s;
+//		const {canyonPower, canyonScale, blockWidth, voltageCenter} = s;
 
 		switch (s.showingTab) {
 		case 'wave':
