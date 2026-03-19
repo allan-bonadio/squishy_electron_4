@@ -5,6 +5,7 @@
 
 import React from 'react';
 import PropTypes from 'prop-types';
+import * as d3 from "d3";
 
 import voltDisplay from './voltDisplay.js';
 //import {VOLT_SIDEBAR_WIDTH} from './voltConstants.js';
@@ -31,9 +32,10 @@ const propTypes = {
 function VoltSidebar(props) {
 	if (!props) return '';  // too early
 	cfpt(propTypes, props);
-	let sidebarWidth = props.width;
+	let sidebarWidth = props.width ?? 200;  // ?? why is this undeffined?  nothing passed in.
 
-	let mVD = props.mainVDisp;
+	let mVD;
+	mVD = props.mainVDisp;
 	if (!mVD) return '';  // too early or first render
 
 	if (!mVD.heightVolts  || mVD.heightVolts <= 0)
