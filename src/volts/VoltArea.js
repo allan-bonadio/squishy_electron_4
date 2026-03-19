@@ -259,8 +259,9 @@ function VoltArea(props) {
 			// just a mouse release, not on anything else, can stop animation (but not start it again)
 			if (context.shouldBeIntegrating)
 				context.controlPanel.finishAnimating(ev);
-			else
-				context.controlPanel.beginAnimating(ev);
+				// this starts up upom frontclicks; very annoying
+				// else
+				// 	context.controlPanel.beginAnimating(ev);
 		}
 		dragging = false;  // only if pointer up, not for leave, so user can drag as far as they want
 	}
