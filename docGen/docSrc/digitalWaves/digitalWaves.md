@@ -73,11 +73,13 @@ In fact, you can add 8 to the frequency, subtact 8, or any multple of 8, and the
 <img src=Digital_Waves,sin_-19.png class=multiple alt=' -19 '>
 <br clear=left />
 
-Notice how the brown kinks (the digital version of the waves) are all the same.  How the heck does that come about?  In this graph, I've circled the crossing points between the digital wave and the natural wave.
+Notice, in the graph below, how the brown kinks (the digital version of the waves) are all the same.  How the heck does that come about?  In this graph, I've circled the crossing points between the digital wave and the natural wave.  It turns out that you can add or subtract the frequency 8 and the digital interpretation is the same; modulus 8 in this case.  If your buffer is a different resolution, use that for modulus.
 
 <img src=Digital_Waves,sin_5crossings.png class=single alt=' frequency 5 crossings '>
 
 It's kindof like, the natural wave gets measured only at those circled points.  If you look at the natural wave between the circles, you can see that it has time to go through the better part of a halfwave before it gets to the next circle.  The digital wave just isn't fast enough to keep up.
+
+But notice how each crossing point is exactly at the data point in the cavity.
 
 So, if you have a resolution of 8 points, that means you can have 8 different frequencies mixed into your wave.  No more.  This includes:
 * three positive frequencies 1, 2, 3
@@ -93,9 +95,9 @@ The way to deal with this cruddy resolution problem is to use a higher resolutio
 
 So, you might wonder, why do we have to limit ourselves to integer frequencies?  We use 2 and 3, but not 3.5 or 3.1 or even π.  Here's why.   If you try to use a different frequency, for instance, π, you get a wave like this:
 
-<img src=Digital_Waves,sin_pi.png class=multiple alt=' 45 '>
+<img src=Digital_Waves,sin_3.14159.png class=multiple alt=' frequency π '>
 
-So you can immediately see the problem.  At the end of the wave, it really needs to go back to where it started.  So it doesn't have to jerk around when it's startingh up.
+So you can immediately see the problem.  At the end of the wave, it really needs to go back to where it started.  So it doesn't have to jerk around when it's starting up.
 
 
 
