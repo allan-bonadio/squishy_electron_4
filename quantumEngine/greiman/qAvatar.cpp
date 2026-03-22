@@ -38,7 +38,6 @@ qAvatar::qAvatar(const char *lab)
 	strncpy(label, lab, MAX_LABEL_LEN);
 	label[MAX_LABEL_LEN-1] = 0;
 
-	printf(" construct avatar.   label: %s      this=%p\n", lab, this );
 	if (traceCreation)
 		printf(" 🚥 creating new qAvatar.  ptr=%p  label='%s' MAX_LABEL_LEN: %d\n",
 			this, label, MAX_LABEL_LEN);

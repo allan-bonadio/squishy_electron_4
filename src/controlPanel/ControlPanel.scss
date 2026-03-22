@@ -299,14 +299,8 @@
 	//}
 
 	// the panel with the minigraph, and all the sliders
-	.miniGraphPanel {
-		//--miniGraphWidth: 200px;
-		//--miniGraphHeight: 150px;
-		grid-template-areas:
-			'canyonPower miniGraph scale'
-			'powerDisplay voltageCenter scaleDisplay'
-			'  .   slotWidth   .  ';
-
+	// "The keyword 'slider-vertical' ... is not standardized..." warnings all over.  sorry.
+	.voltageGraphNSliders {
 		display: grid;
 		grid-template-columns: auto auto auto;
 		grid-template-rows: auto auto auto;
@@ -314,47 +308,14 @@
 		width: 450px;
 		float: left;
 
+		grid-template-areas:
+			'canyonPower miniGraph scale'  // row 1
+			'powerDisplay voltageCenter scaleDisplay'  // row 2
+			'  .   blockWidth   .  ';  // row 3
+
+		// row 1: left to right
 		.canyonPower {
 				grid-area: canyonPower;
-
-		}
-
-		.slotScale, .canyonScale {
-				grid-area: scale;
-		}
-
-		// "The keyword 'slider-vertical' ... is not standardized..."
-		.slotScale, .canyonScale, .canyonPower {
-			//appearance: slider-vertical;
-			writing-mode: vertical-lr;  // new standard? feb 2024  use direction: rtl; to invert
-			direction: rtl;
-			width: 2.5em;
-
-		}
-
-		// left-right offset of voltage pattern
-		.voltageCenter {
-			grid-area: voltageCenter;
-			height: 20px;
-		}
-
-		.slotWidth {
-			grid-area: slotWidth;
-		}
-	}
-
-	.miniGraphPanel {
-		// thing that looks like x^2.5 only for canyon
-		.powerDisplay {
-			width: 2.5em;
-			text-align: center;
-		}
-
-		// for block, slot or canyon.  looks like 2.50 • x...
-		.scaleDisplay {
-			width: 7em;
-			text-align: center;
-			font-size: .7em;
 		}
 
 		.miniGraph {
@@ -366,24 +327,48 @@
 			background-color: #444;
 		}
 
-	}
+		.flatScale, .blockScale, .canyonScale {
+				grid-area: scale;
+				width: 9em;
+				textAlign: 'right';
+		}
 
-	.miniGraphPanel {
-		// menu showing in some places: always, hover, never
-		.ShowVoltageControl {
-			display: block;
-			float: left;
-			padding: 1em;
-			margin-left: 1em;
+		// the scales and canyon power now handled in the js code
+
+		// row 2: left to right, canyon only
+		// thing that looks like x^2.5 only for canyon
+		.powerDisplay {
+			grid-area: powerDisplay;
+			width: 2.5em;
+			text-align: center;
+		}
+
+		.voltageCenter {
+			grid-area: voltageCenter;
+			height: 20px;
+		}
+
+		// looks like 2.50 • x...
+		.scaleDisplay {
+			grid-area: scaleDisplay;
+			width: 2.5em;
+			text-align: center;
+			font-size: .64em;
+		}
+
+		// row 3: left to right (just one thing)
+		.blockWidth {
+			grid-area: blockWidth;
+			height: 20px;
 		}
 	}
 
-	.canyonScaleDisplay {
-		width: 9em;
-	}
-	.slotScaleDisplay {
-		width: 9em;
-		textAlign: 'right';
+	// no longer voltageGraphNSliders: menu showing in some places: always, hover, never
+	.ShowVoltageControl {
+		display: block;
+		float: left;
+		padding: 1em;
+		margin-left: 1em;
 	}
 }
 

@@ -11,6 +11,7 @@
 
 import React, {useContext} from 'react';
 import PropTypes, {checkPropTypes} from 'prop-types';
+//import * as d3 from "d3";
 
 import eSpace from '../engine/eSpace.js';
 import qeConsts from '../engine/qeConsts.js';
@@ -388,6 +389,7 @@ export class WaveView extends React.Component {
 		<div className='WaveView' style={{height: `${s.outerHeight}px`}}
 			onPointerEnter={this.hoverEnter} onPointerLeave={this.hoverLeave}
 			onPointerUp={this.finishIntegration}
+			onFocus={ev => console.log(`focus ON`)}
 			ref={this.grabWaveViewEl}>
 
 			{glScene}

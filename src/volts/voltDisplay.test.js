@@ -46,6 +46,7 @@ describe(`findVoltExtremes() method`, () => {
 		// TODO: should also test well continuum!
 		vDisp = new voltDisplay('test findVoltExtremes', 0, 16, qeConsts.contENDLESS, volts16,
 			{showVoltage: 'always', heightVolts: 0, bottomVolts: 0,});
+		// maybe someday vDispSize.setGraphSize(0, MINI_WIDTH, MINI_HEIGHT);
 
 	})
 
@@ -118,6 +119,7 @@ describe(`voltage creation & consistency`, () => {
 		mungeFunc?.();
 		vDisp = new voltDisplay('test created', 0, 16, qeConsts.contENDLESS, volts16,
 			{showVoltage: 'always', ...settings});
+		// maybe someday vDispSize.setGraphSize(0, MINI_WIDTH, MINI_HEIGHT);
 		tryOutConsistency(vDisp);
 
 		// expect(vDisp.minBottom).toBeCloseTo(expected.minBottom);
@@ -134,6 +136,7 @@ describe(`voltDisplay Zoom`, () => {
 	beforeAll(() => {
 		volts16 = new Float64Array(16);  // all zeroes, right?
 		vDisp = new voltDisplay('test Zoom', 0, 16, qeConsts.contENDLESS, volts16);
+		// maybe someday vDispSize.setGraphSize(0, MINI_WIDTH, MINI_HEIGHT);
 	});
 
 	// these numbers have been rounded to make it all shorter.

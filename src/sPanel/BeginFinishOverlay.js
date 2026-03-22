@@ -59,7 +59,7 @@ function BeginFinishOverlay(props) {
 		</button>
 	}
 	else {
-		if (traceBeginFinish) console.log(`🟩 integration is finishped, making begin button`);
+		if (traceBeginFinish) console.log(`🟩 integration is finished, making begin button`);
 		ssButton = <button className='beginFinishWidget beginButton' onClick={cp.beginAnimating}
 				alt='🟩 begin integrating'  title='🟩 begin integrating' >
 			<img src={beginIcon}  style={{width: '1em'}} />
@@ -74,9 +74,10 @@ function BeginFinishOverlay(props) {
 
 		{/* longer running button; runs as long as you hold it down */}
 		<button className='runningWidget'
-				alt={helpRunning} title={helpRunning} onMouseMove={preventDragAway}
+				alt={helpRunning} title={helpRunning}
+				onMouseMove={preventDragAway}
 				onMouseDown={cp.beginAnimating}
-				onMouseUp={cp.finishAnimating} onMouseLeave={cp.finishAnimating}>
+				onMouseUp={cp.finishAnimating} >
 			<img	src={runningIcon} style={{width: '2em'}}/>
 		</button>
 

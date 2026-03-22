@@ -57,7 +57,7 @@ export class eSpace {
 				this._voltage, this.nPoints);
 		this.vDisp = voltDisplay.newForSpace(this);
 		let voltageParams = getAGroup('voltageParams');
-		this.vDisp.setFamiliarVoltage(voltageParams);
+		// not yet!  don't have display size this.vDisp.setAutoRange();  //(voltageParams);
 
 		// the avatars create their vbufs and waves, and we make a copy for ourselves
 		// no, done by scene this.mainAvatar = eAvatar.adaptAvatar(this._mainAvatar);

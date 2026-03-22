@@ -104,10 +104,10 @@ export default class ResolutionDialog extends React.Component {
 				minLabel='faster'
 				maxLabel='less divergence'
 
-				current={s.N}
-				original={s.origN}
-				sliderMin={window.isDevel ? 4 : 16 /* evaluate now to make sure isDevel defined */}
-				sliderMax={256}
+				currentPower={s.N}
+				originalPower={s.origN}
+				sliderPowerMin={window.isDevel ? 4 : 16}
+				sliderPowerMax={256}
 
 				stepsPerDecade={16}
 				willRoundPowers={true}
@@ -159,7 +159,6 @@ export default class ResolutionDialog extends React.Component {
 			</label>
 		</section>;
 	}
-
 
 	renderSpaceLength() {
 		return <section className='dimLength'>

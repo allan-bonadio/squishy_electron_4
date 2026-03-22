@@ -10,12 +10,13 @@ import {scaleLinear} from 'd3-scale';
 
 import GLScene from '../gl/GLScene.js';
 import TextNSlider from '../widgets/TextNSlider.js';
-import {getAGroup, alternateMinMaxs} from '../utils/storeSettings.js';
+import {getAGroup} from '../utils/storeSettings.js';
+import sSettings from '../utils/sSettings.js';
 
 import {eSpaceCreatedPromise} from '../engine/eEngine.js';
 import {interpretCppException} from '../utils/errors.js';
 
-// fixed size GLScene at start
+// fixed size GLScene at start.  TODO: also in setVoltageTab
 const MINI_WIDTH = 300;
 const MINI_HEIGHT = 150;
 
@@ -117,7 +118,7 @@ function SetWaveTab(props) {
 	// don't let them set a freq to Nyquist or beyond
 	let highestFrequency = space.nStates / 2 - 1;
 	highestFrequency = Math.min(
-		alternateMinMaxs.waveParams.waveFrequency.max, highestFrequency);
+		sSettings.minMaxes.waveParams.waveFrequency.max, highestFrequency);
 
 	// sliders for each param besides breed
 	const waveParamSliders = <>
@@ -133,8 +134,8 @@ function SetWaveTab(props) {
 		<TextNSlider className='pulseWidth' label='pulse width, %'
 			style={{display: needPulseWidth ? 'block' :  'none'}}
 			value={+waveParams.pulseWidth}
-			min={alternateMinMaxs.waveParams.pulseWidth.min}
-			max={alternateMinMaxs.waveParams.pulseWidth.max}
+			min={sSettings.minMaxes.waveParams.pulseWidth.min}
+			max={sSettings.minMaxes.waveParams.pulseWidth.max}
 			step={.1}
 			handleChange={setPulseWidth}
 			title="how fat your  wave packet should be, percent of whole cavity length"
@@ -143,8 +144,8 @@ function SetWaveTab(props) {
 		<TextNSlider className='offset' label='offset, %'
 			style={{display: needOffset ? 'block' :  'none'}}
 			value={+waveParams.pulseCenter}
-			min={alternateMinMaxs.waveParams.pulseCenter.min}
-			max={alternateMinMaxs.waveParams.pulseCenter.max}
+			min={sSettings.minMaxes.waveParams.pulseCenter.min}
+			max={sSettings.minMaxes.waveParams.pulseCenter.max}
 			step={2}
 			handleChange={setPulseCenter}
 			title="where do you want the center of the hump to be, from left side"

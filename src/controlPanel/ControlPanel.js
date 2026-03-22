@@ -61,10 +61,12 @@ export class ControlPanel extends React.Component {
 			...getAGroup('voltageSettings'),
 			//...getAGroup('lapSettings'),
 
-			// official dtFactor here in the state.  quick one on this.
+			// official dtFactor here in the state.  quick one on this.quickDtFactor
 			dtFactor: getASetting('lapSettings', 'dtFactor'),
 			showingTab: getASetting('miscSettings', 'showingTab'),
 		}
+
+console.log(`😎  state: `, this.state);
 
 		this.quickDtFactor = this.state.dtFactor;
 
@@ -306,6 +308,12 @@ export class ControlPanel extends React.Component {
 
 	/* ********************************************** set wave tab */
 
+	// TODO: what a mess.  I decided that each param had to be toplevel
+	// on the ControlPanel state so it would all redraw upon every
+	// change.  But they all intermix and it's a big hassle.  Probably
+	// each of the subpanels should have their own hooks state
+	// (useResolver or something) and then this file won't be as long.
+
 	// these are kept individually in the state so any of them triggers a render.
 	//  Kindof inconvenient, so we have getters and setters.
 	getWaveParams = () => {
@@ -366,7 +374,7 @@ export class ControlPanel extends React.Component {
 	}
 
 	// setMainWave() called when user clicks SetWave, fills the main wave
-	// waveParams handed in are the defaults as stored in storeSettings
+	// waveParams handed in are the defaults as stored in sSettings
 	renderWaveTab = () => <SetWaveTab
 			saveMainWave={this.saveMainWave}
 			waveParams={this.getWaveParams()}
@@ -380,9 +388,11 @@ export class ControlPanel extends React.Component {
 	// Kindof inconvenient to grab the whole thing, so we have this.
 	getVoltageParams = () => {
 		const s = this.state;
-		return { voltageBreed: s.voltageBreed, voltageCenter: s.voltageCenter,
+		return {
+			voltageBreed: s.voltageBreed, voltageCenter: s.voltageCenter,
 			canyonPower: s.canyonPower, canyonScale: s.canyonScale,
-			slotWidth: s.slotWidth, slotScale: s.slotScale };
+			blockWidth: s.blockWidth,
+			flatScale: s.flatScale, blockScale: s.blockScale};
 	}
 
 	// change the state for the voltage params.  Just this.state
@@ -392,14 +402,15 @@ export class ControlPanel extends React.Component {
 		this.setState({ voltageBreed: vP.voltageBreed ?? s.voltageBreed,
 			voltageCenter: vP.voltageCenter ?? s.voltageCenter,
 			canyonPower: vP.canyonPower ?? s.canyonPower,
-			canyonScale: vP.canyonScale ?? s.canyonScale,
-			slotWidth: vP.slotWidth ?? s.slotWidth,
-			slotScale: vP.slotScale ?? s.slotScale }
+			blockWidth: vP.blockWidth ?? s.blockWidth,
+			flatScale: vP.flatScale ?? s.flatScale,
+			blockScale: vP.blockScale ?? s.blockScale,
+			canyonScale: vP.canyonScale ?? s.canyonScale }
 		);
 	}
 
 	setAndRenderFamiliarVoltage(vP) {
-		this.space.vDisp.setFamiliarVoltage(vP);
+		this.space.vDisp.setAutoRange(vP);
 		this.space.updateDrawnVoltagePath();  // visible change on screen
 	}
 
@@ -408,7 +419,7 @@ export class ControlPanel extends React.Component {
 	resetVoltageHandler = (ev) => {
 		const voltageParams = getAGroup('voltageParams');
 		this.setVoltageParams(voltageParams);
-		this.space.vDisp.setFamiliarVoltage(voltageParams);
+		this.space.vDisp.setAutoRange(voltageParams);
 		this.space.updateDrawnVoltagePath();
 	}
 
@@ -470,7 +481,7 @@ export class ControlPanel extends React.Component {
 	renderShowingTab() {
 		const s = this.state;
 //		const {waveBreed, waveFrequency, pulseWidth, pulseCenter} = s;
-//		const {canyonPower, canyonScale, slotWidth, slotScale, voltageCenter} = s;
+//		const {canyonPower, canyonScale, blockWidth, voltageCenter} = s;
 
 		switch (s.showingTab) {
 		case 'wave':
