@@ -127,7 +127,7 @@ function SetVoltageTab(p) {
 	function updateAxis() {
 		if (yAxisRef.current) {
 			yAxisRef.current.transition()
-				.duration(750)
+				//.duration(200)
 				.call(d3.axisLeft(vDisp.yUpsideDown).ticks(2, "s"));
 			return;
 		}
