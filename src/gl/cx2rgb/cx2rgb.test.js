@@ -161,11 +161,3 @@ describe('cx2rgb tests', () => {
 
 });
 
-
-//}
-
-// uncomment this to run test under node, then run like this:
-// $ sed s/export.*$
-// cx2rgb.glsl.js | node
-//if ( 'object' == typeof module)
-//	testCxToColorGlsl();
