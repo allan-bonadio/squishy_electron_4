@@ -259,8 +259,6 @@ void qGrinder::tallyUpKinks(qCavity *qcavity) {
 		b = c;
 	}
 
-	// NO!  percent is higher for smaller buffers.  I think number of kinks is better
-	//double percent = 100.0 * tally / N / 2.;
 	// figure rate.  ÷2 for real, imag
 	int N = qcavity->end - qcavity->start;
 	divergence = tally/2;
@@ -324,7 +322,6 @@ void qGrinder::oneLap() {
 	// this is the actual dt in use for calculations, refDt * dtFactor
 	double dt = stretchedDt;
 	double dtHalf = dt / 2;
-	//speedyLog("early oneLap stretchedDt=dt=%lg  dtHalf=%lg\n", dt, dtHalf);
 
 	// half step in beginning to move Im forward dt/2 = dtHalf
 	// cuz outside of here, re and im are synchronized.

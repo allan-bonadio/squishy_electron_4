@@ -234,8 +234,6 @@ void qBuffer::rainbowDump(const char *title) {
 		let titleJS = UTF8ToString($4);
 
 		rainbowDump(waveJS, $1, $2, $3, titleJS);
-
-		//	$1, $2, $3, $4);
 	}, wave, start, end, nPoints, title);
 	#endif
 	printf("done with rainbowDump EM_ASM\n\n");

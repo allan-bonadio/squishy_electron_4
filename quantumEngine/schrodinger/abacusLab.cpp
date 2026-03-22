@@ -3,6 +3,9 @@
 ** Copyright (C) 2023-2026 Tactile Interactive, all rights reserved
 */
 
+NOT CURRENT.  For a future expansion to multiple threads
+// Do not attempt to understand.
+
 #include "../hilbert/qSpace.h"
 #include "../debroglie/qFlick.h"
 #include "qGrinder.h"

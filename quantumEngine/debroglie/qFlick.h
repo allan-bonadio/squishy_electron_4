@@ -23,7 +23,7 @@ struct qFlick : public qCavity {
 	double dumpRow(char *buf, int doubleSerial, int ix, double *pPrevPhase, bool withExtras);
 	void dumpOneSerial(const char *title, int doubleSerial, bool withExtras);
 	void dumpLatest(const char *titleIn, bool withExtras);
-	void dumpAllWaves(const char *title);
+	//void dumpAllWaves(const char *title);
 	void dumpOverview(const char *title);
 	void dumpEdges(int start = 0, int end = 1e9);
 	void dumpTProgress(void);

@@ -170,8 +170,6 @@ void qAvatar::dumpEachViewBuffer(int bufferMask, const char *title) {
 			}
 			// between buffers on line
 			charsUsed += snprintf(txt+charsUsed, TXTLEN - charsUsed, "    ");
-//			strcpy(txt+charsUsed, (char *) '    ');
-//			charsUsed += 4;
 			if (101 != txt[TXTLEN - 1])
 				throw std::runtime_error("qAvatar::dumpEachViewBuffer() overflowed txt buffer in hea!!");
 		}  // end of buffer loop for heading
@@ -183,8 +181,6 @@ void qAvatar::dumpEachViewBuffer(int bufferMask, const char *title) {
 	// Actual Buffer Data.  one ROW PER VERTEX... so a bit convoluted
 	// TODO: handle buffers with different lengths
 	for (int vertexIx = 0; vertexIx < viewBuffers[0].nVertices; vertexIx++) {
-
-		//printf("vertex %d:\n", vertexIx);
 		// on this line: do which viewBuffers at vertexIx, and each of their coordinates
 			// row heading
 		charsUsed += snprintf(txt+charsUsed, TXTLEN - charsUsed, "%4d ", vertexIx);
@@ -199,8 +195,6 @@ void qAvatar::dumpEachViewBuffer(int bufferMask, const char *title) {
 					charsUsed += snprintf(txt+charsUsed, TXTLEN - charsUsed, " %9.2f ", vertexStart[coordIx]);
 				}
 				charsUsed += snprintf(txt+charsUsed, TXTLEN - charsUsed, "    ");
-//				strcpy(txt+charsUsed, (char *) '    ');
-//				charsUsed += 4;
 				if (101 != txt[TXTLEN - 1])
 					throw std::runtime_error("qAvatar::dumpComplexViewBuffer() overflowed txt buffer in vex!!");
 			}  // end of vb buffer IF stmt
@@ -280,41 +274,6 @@ void qAvatar::dumpIndex(const char *title) {
 		throw std::runtime_error(" qAvatar::dumpIndex() overflowed txt buffer in ind!!");
 }
 
-
-// SAVE THIS FOR LATER phase on the above dump.  No, done by dumpComplexViewBuffer()
-//// dump the view buffer just before it heads off to webgl.
-//static void old_qAvatar__dumpEachViewBuffer(int bufferMask, const char *title) {
-//	float prevPhase = 0;
-//	#define FORMAT_BASE      "%6d |  %8.5f  %8.5f  %6.5g  %6.5g"
-//	#define FORMAT_SUFFIX  " | %6.5f %6.5f  %6.5f m𝜓/nm\n"
-//
-//	if (!title) title = "no title 🧨 🧨";
-//	printf("==== 🚥 dump avatar %p ➔ buffer %p | '%s'\n", this, vBuffer, title);
-//	printf("   ix  |    re      im     ---    serial  |      𝜃        d 𝜃      magn\n");
-//	for (int i = 0; i < space->nPoints; i++) {
-//
-//		// first three should be all zero
-//		float *row = vBuffer + i * 8;
-//		printf(FORMAT_BASE "\n",
-//			i,
-//			row[0], row[1], row[2], row[3]);
-//
-//
-//		float re = row[4];
-//		float im = row[5];
-//		float phase = atan2(im, re) * 180 / PI;
-//		float dPhase = fmod(phase - prevPhase + 180, 360) - 180;
-//		float magn = im * im + re * re;
-//		printf(FORMAT_BASE FORMAT_SUFFIX,
-//			i,
-//			re, im, row[6], row[7],
-//			phase, dPhase, magn);
-//
-//		prevPhase = phase;
-//	}
-//	printf("    🚥  qAvatar::at end of dumpComplexViewBuffer vBuffer=%p\n\n",
-//			vBuffer);
-//}
 
 /* ************************************************************** C */
 

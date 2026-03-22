@@ -140,14 +140,6 @@ let commonConstants = [
 	// phony bool value that marks the end of a qGrinder object
 	{name: 'grSENTINEL_VALUE', cppType: 'byte', value: 123},
 
-	// view buffer generators - all of these fill (one or more) typed arrays,
-	// usually/always floats.  each in its own file.
-//	{name: 'avNULL', cppType: 'int', value: 0},
-//	{name: 'avOldFLAT', cppType: 'int', value: 1},
-//	{name: 'avFLAT', cppType: 'int', value: 2},
-//	{name: 'avFLAT_TICS', cppType: 'int', value: 3},
-//	{name: 'avRAINBOW', cppType: 'int', value: 4},
-
 	// labels, mostly for debugging, on dumps and objects
 	{name: 'MAX_LABEL_LEN', cppType: 'int', value: 31},
 

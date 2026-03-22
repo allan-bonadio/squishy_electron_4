@@ -184,15 +184,15 @@ void qFlick::dumpLatest(const char *titleIn, bool withExtras) {
 }
 
 // a raw dump of the waves here
-void qFlick::dumpAllWaves(const char *title) {
-	printf("==== FlickAll | %s\n", title);
-	for (int i = 0; i < nWaves; i++) {
-		//printf("wave %d -- ", i);
-		//dumpThatWave(waves[i], true);
-		//printf("      inner products: %lf\n", );
-	}
-	printf("==== FlickAll End ====\n");
-}
+//void qFlick::dumpAllWaves(const char *title) {
+//	printf("==== FlickAll | %s\n", title);
+//	for (int i = 0; i < nWaves; i++) {
+//		//printf("wave %d -- ", i);
+//		//dumpThatWave(waves[i], true);
+//		//printf("      inner products: %lf\n", );
+//	}
+//	printf("==== FlickAll End ====\n");
+//}
 
 void qFlick::dumpOverview(const char *title) {
 	printf("==== Flick Overview | %s\n", title);

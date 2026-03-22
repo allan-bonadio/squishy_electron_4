@@ -4,6 +4,7 @@
 */
 
 // abacus: a matrix-like device used for calculation
+NOT CURRENT.  For a future expansion to multiple threads
 
 #include <atomic>
 
@@ -254,19 +255,6 @@ abacus::~abacus() {
 	// the joys of continuous block allocation
 	delete[] edges;
 	delete[] progresses;
-
-	// we'll have to do this eventually when we allocate real/imag buffers.
-	//for (int i = 0; i < nWaves; i++) {
-	//	freeWave(waves[i]);
-	//	waves[i] = NULL;
-	//}
-	//delete waves;
-	//if (traceConstruction)
-	//	printf("    freed the wave buffers...\n");
-	//
-	//waves = NULL;
-	//if (traceConstruction)
-	//	printf("    freed waves array..done with abacus destructor..\n");
 }
 
 /* ************************************************************ integration on the flick */

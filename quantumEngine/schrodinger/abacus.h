@@ -3,6 +3,9 @@
 ** Copyright (C) 2023-2026 Tactile Interactive, all rights reserved
 */
 
+NOT CURRENT.  For a future expansion to multiple threads
+// Do not attempt to understand.
+
 #define UNLOCKED  255
 #define MAX_THREADS 254
 //#define UNDECIDED -1

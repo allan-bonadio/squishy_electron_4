@@ -180,7 +180,6 @@ void qGrinder::hitReal(qCx *newW, qCx *oldW, qCx *hamiltW, double dt) {
 		pointReal(newW + ix, oldW + ix, hamiltW + ix, voltage[ix], dt, ix);
 	}
 	flick->fixThoseBoundaries(newW);
-	//elapsedTime += dt/2;  // could be 0 or already dt/2
 
 	if (traceVischerBench) speedyLog("      hitReal, done: time=%lf ms\n",
 		getTimeDouble());
@@ -201,7 +200,6 @@ void qGrinder::hitImaginary(qCx *newW, qCx *oldW, qCx *hamiltW, double dt) {
 	}
 
 	flick->fixThoseBoundaries(newW);
-	//elapsedTime += dt/2;  // could be 0 or already dt/2
 
 	if (traceVischerBench) speedyLog("      hitImaginary done: time=%lf ms\n",
 		getTimeDouble());

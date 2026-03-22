@@ -3,6 +3,8 @@
 ** Copyright (C) 2021-2026 Tactile Interactive, all rights reserved
 */
 
+NOT CURRENT.  For a future expansion to multiple threads
+// Do not attempt to understand.
 
 #include "../hilbert/qSpace.h"
 #include "../greiman/qAvatar.h"
@@ -37,8 +39,8 @@ struct {
 	int rowOffset = Im pointer - Re pointer for same point
 	double dFactor = ℏ^2 / 2m_e, with a conversion factor because of the dx not really being 1
 	double vFactor is multipled onto V 𝜓, I guess primarily 1 / ℏ
-	//oh yeah, that ℏ on the d𝜓/dt has to be divided out of both factors
-	//yeah, also dt, would be nice if that was handy
+	// oh yeah, that ℏ on the d𝜓/dt has to be divided out of both factors
+	// yeah, also dt, would be nice if that was handy
 
 	//double *buf0;
 	//double *buf1;

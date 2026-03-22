@@ -82,7 +82,6 @@ TEST(fft, SpectrumFFT32_1) { tryOutFFT(32, 1); }
 TEST(fft, SpectrumFFT32__8) { tryOutFFT(32, -8); }
 
 TEST(fft, SpectrumFFT64_2) { tryOutFFT(64., 2); }
-//TEST(fft, SpectrumFFT1024) { tryOutFFT(1024); }
 
 /* ********************************************************************** Square Wave */
 
