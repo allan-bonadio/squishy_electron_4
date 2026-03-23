@@ -12,6 +12,138 @@ A handy reference to which functions are where on what kind of object
 --------- common ------------ common ------------ common ------------ common ---------
 
 
+
+	create() {
+	clone(a) {
+	fromValues(x, y) {
+	copy(out, a) {
+	set(out, x, y) {
+	add(out, a, b) {
+	subtract(out, a, b) {
+	multiply(out, a, b) {
+	divide(out, a, b) {
+	ceil(out, a) {
+	floor(out, a) {
+	min(out, a, b) {
+	max(out, a, b) {
+	round(out, a) {
+	scale(out, a, b) {
+	scaleAndAdd(out, a, b, scale) {
+	distance(a, b) {
+	squaredDistance(a, b) {
+	length(a) {
+	squaredLength(a) {
+	negate(out, a) {
+	inverse(out, a) {
+	normalize(out, a) {
+	dot(a, b) {
+	cross(out, a, b) {
+	lerp(out, a, b, t) {
+	random(out, scale) {
+	transformMat2(out, a, m) {
+	transformMat2d(out, a, m) {
+	transformMat3(out, a, m) {
+	transformMat4(out, a, m) {
+	rotate(out, a, b, rad) {
+	angle(a, b) {
+	signedAngle(a, b) {
+	zero(out) {
+	str(a) {
+	exactEquals(a, b) {
+	equals(a, b) {
+  var forEach = function () {
+    return function (a, stride, offset, count, fn, arg) {
+--------- vec2 ------------ vec2 ------------ vec2 ------------ vec2 ---------
+
+
+
+
+
+	create$4() {
+	clone$4(a) {
+	length$4(a) {
+	fromValues$4(x, y, z) {
+	copy$4(out, a) {
+	set$4(out, x, y, z) {
+	add$4(out, a, b) {
+	subtract$2(out, a, b) {
+	multiply$4(out, a, b) {
+	divide$2(out, a, b) {
+	ceil$2(out, a) {
+	floor$2(out, a) {
+	min$2(out, a, b) {
+	max$2(out, a, b) {
+	round$2(out, a) {
+	scale$4(out, a, b) {
+	scaleAndAdd$2(out, a, b, scale) {
+	distance$2(a, b) {
+	squaredDistance$2(a, b) {
+	squaredLength$4(a) {
+	negate$2(out, a) {
+	inverse$2(out, a) {
+	normalize$4(out, a) {
+	dot$4(a, b) {
+	cross$2(out, a, b) {
+	lerp$4(out, a, b, t) {
+	slerp$1(out, a, b, t) {
+	hermite(out, a, b, c, d, t) {
+	bezier(out, a, b, c, d, t) {
+	random$3(out, scale) {
+	transformMat4$2(out, a, m) {
+	transformMat3$1(out, a, m) {
+	transformQuat$1(out, a, q) {
+	rotateX$2(out, a, b, rad) {
+	rotateY$2(out, a, b, rad) {
+	rotateZ$2(out, a, b, rad) {
+	angle$1(a, b) {
+	zero$2(out) {
+	str$4(a) {
+	exactEquals$4(a, b) {
+	equals$4(a, b) {
+  var forEach$2 = function () {
+    return function (a, stride, offset, count, fn, arg) {
+--------- vec3 ------------ vec3 ------------ vec3 ------------ vec3 ---------
+
+
+	create$3() {
+	clone$3(a) {
+	fromValues$3(x, y, z, w) {
+	copy$3(out, a) {
+	set$3(out, x, y, z, w) {
+	add$3(out, a, b) {
+	subtract$1(out, a, b) {
+	multiply$3(out, a, b) {
+	divide$1(out, a, b) {
+	ceil$1(out, a) {
+	floor$1(out, a) {
+	min$1(out, a, b) {
+	max$1(out, a, b) {
+	round$1(out, a) {
+	scale$3(out, a, b) {
+	scaleAndAdd$1(out, a, b, scale) {
+	distance$1(a, b) {
+	squaredDistance$1(a, b) {
+	length$3(a) {
+	squaredLength$3(a) {
+	negate$1(out, a) {
+	inverse$1(out, a) {
+	normalize$3(out, a) {
+	dot$3(a, b) {
+	cross$1(out, u, v, w) {
+	lerp$3(out, a, b, t) {
+	random$2(out, scale) {
+	transformMat4$1(out, a, m) {
+	transformQuat(out, a, q) {
+	zero$1(out) {
+	str$3(a) {
+	exactEquals$3(a, b) {
+	equals$3(a, b) {
+  var forEach$1 = function () {
+    return function (a, stride, offset, count, fn, arg) {
+--------- vec4 ------------ vec4 ------------ vec4 ------------ vec4 ---------
+
+
+
 	create$8() {
 	clone$8(a) {
 	copy$8(out, a) {
@@ -149,88 +281,6 @@ A handy reference to which functions are where on what kind of object
 --------- mat4 ------------ mat4 ------------ mat4 ------------ mat4 ---------
 
 
-	create$4() {
-	clone$4(a) {
-	length$4(a) {
-	fromValues$4(x, y, z) {
-	copy$4(out, a) {
-	set$4(out, x, y, z) {
-	add$4(out, a, b) {
-	subtract$2(out, a, b) {
-	multiply$4(out, a, b) {
-	divide$2(out, a, b) {
-	ceil$2(out, a) {
-	floor$2(out, a) {
-	min$2(out, a, b) {
-	max$2(out, a, b) {
-	round$2(out, a) {
-	scale$4(out, a, b) {
-	scaleAndAdd$2(out, a, b, scale) {
-	distance$2(a, b) {
-	squaredDistance$2(a, b) {
-	squaredLength$4(a) {
-	negate$2(out, a) {
-	inverse$2(out, a) {
-	normalize$4(out, a) {
-	dot$4(a, b) {
-	cross$2(out, a, b) {
-	lerp$4(out, a, b, t) {
-	slerp$1(out, a, b, t) {
-	hermite(out, a, b, c, d, t) {
-	bezier(out, a, b, c, d, t) {
-	random$3(out, scale) {
-	transformMat4$2(out, a, m) {
-	transformMat3$1(out, a, m) {
-	transformQuat$1(out, a, q) {
-	rotateX$2(out, a, b, rad) {
-	rotateY$2(out, a, b, rad) {
-	rotateZ$2(out, a, b, rad) {
-	angle$1(a, b) {
-	zero$2(out) {
-	str$4(a) {
-	exactEquals$4(a, b) {
-	equals$4(a, b) {
-  var forEach$2 = function () {
-    return function (a, stride, offset, count, fn, arg) {
---------- vec3 ------------ vec3 ------------ vec3 ------------ vec3 ---------
-
-
-	create$3() {
-	clone$3(a) {
-	fromValues$3(x, y, z, w) {
-	copy$3(out, a) {
-	set$3(out, x, y, z, w) {
-	add$3(out, a, b) {
-	subtract$1(out, a, b) {
-	multiply$3(out, a, b) {
-	divide$1(out, a, b) {
-	ceil$1(out, a) {
-	floor$1(out, a) {
-	min$1(out, a, b) {
-	max$1(out, a, b) {
-	round$1(out, a) {
-	scale$3(out, a, b) {
-	scaleAndAdd$1(out, a, b, scale) {
-	distance$1(a, b) {
-	squaredDistance$1(a, b) {
-	length$3(a) {
-	squaredLength$3(a) {
-	negate$1(out, a) {
-	inverse$1(out, a) {
-	normalize$3(out, a) {
-	dot$3(a, b) {
-	cross$1(out, u, v, w) {
-	lerp$3(out, a, b, t) {
-	random$2(out, scale) {
-	transformMat4$1(out, a, m) {
-	transformQuat(out, a, q) {
-	zero$1(out) {
-	str$3(a) {
-	exactEquals$3(a, b) {
-	equals$3(a, b) {
-  var forEach$1 = function () {
-    return function (a, stride, offset, count, fn, arg) {
---------- vec4 ------------ vec4 ------------ vec4 ------------ vec4 ---------
 
 
 	create$2() {
@@ -299,48 +349,5 @@ A handy reference to which functions are where on what kind of object
 	exactEquals$1(a, b) {
 	equals$1(a, b) {
 --------- quat2 ------------ quat2 ------------ quat2 ------------ quat2 ---------
-
-
-	create() {
-	clone(a) {
-	fromValues(x, y) {
-	copy(out, a) {
-	set(out, x, y) {
-	add(out, a, b) {
-	subtract(out, a, b) {
-	multiply(out, a, b) {
-	divide(out, a, b) {
-	ceil(out, a) {
-	floor(out, a) {
-	min(out, a, b) {
-	max(out, a, b) {
-	round(out, a) {
-	scale(out, a, b) {
-	scaleAndAdd(out, a, b, scale) {
-	distance(a, b) {
-	squaredDistance(a, b) {
-	length(a) {
-	squaredLength(a) {
-	negate(out, a) {
-	inverse(out, a) {
-	normalize(out, a) {
-	dot(a, b) {
-	cross(out, a, b) {
-	lerp(out, a, b, t) {
-	random(out, scale) {
-	transformMat2(out, a, m) {
-	transformMat2d(out, a, m) {
-	transformMat3(out, a, m) {
-	transformMat4(out, a, m) {
-	rotate(out, a, b, rad) {
-	angle(a, b) {
-	signedAngle(a, b) {
-	zero(out) {
-	str(a) {
-	exactEquals(a, b) {
-	equals(a, b) {
-  var forEach = function () {
-    return function (a, stride, offset, count, fn, arg) {
---------- vec2 ------------ vec2 ------------ vec2 ------------ vec2 ---------
 
 

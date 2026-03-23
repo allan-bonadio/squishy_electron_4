@@ -3,6 +3,8 @@
 ** Copyright (C) 2021-2026 Tactile Interactive, all rights reserved
 */
 
+import math3d from 'math3d.js';
+
 let traceGLCalls = false;
 let traceUniforms = false;
 let traceAttrs = true;  // quick update every reload

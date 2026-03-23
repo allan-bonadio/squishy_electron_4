@@ -6,6 +6,10 @@
 
 let tracePowerToIndex = false;
 
+// neat trick i wish i'd thought of:
+// function isPowerOf2(value) {
+//   return (value & (value - 1)) === 0;
+// }
 
 /*
 This is all so we can have logarithmic controls using the usual linear UI
