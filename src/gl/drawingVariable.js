@@ -3,7 +3,7 @@
 ** Copyright (C) 2021-2026 Tactile Interactive, all rights reserved
 */
 
-import math3d from 'math3d.js';
+// import math3d from './math3d.js';
 
 let traceGLCalls = false;
 let traceUniforms = false;
@@ -208,3 +208,4 @@ export class drawingAttribute extends drawingVariable {
 }
 
 
+// new math3d();

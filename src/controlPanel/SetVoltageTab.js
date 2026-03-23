@@ -83,7 +83,7 @@ function SetVoltageTab(p) {
 					onChange={ev => setVoltageParams({voltageBreed: 'flat'}) }/>
 			</label>
 			<label title="sides will look diagonal if you have low resolution">
-				<big> ⨅ ⨆</big> Block / Slot
+				<big> ⨅ ⨆</big> Block
 				<input type='radio' className='blockBreed' name='breed'
 					checked={'block' == breed}
 					onChange={ev => setVoltageParams({voltageBreed: 'block'})}/>
