@@ -66,7 +66,7 @@ export class ControlPanel extends React.Component {
 			showingTab: getASetting('miscSettings', 'showingTab'),
 		}
 
-console.log(`😎  state: `, this.state);
+		//console.log(`😎  state: `, this.state);
 
 		this.quickDtFactor = this.state.dtFactor;
 

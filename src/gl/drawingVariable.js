@@ -3,6 +3,11 @@
 ** Copyright (C) 2021-2026 Tactile Interactive, all rights reserved
 */
 
+<<<<<<< HEAD
+=======
+// import math3d from './math3d.js';
+
+>>>>>>> 0343abe... trivial/cleanup/comments/traces/linting/etc
 let traceGLCalls = false;
 let traceUniforms = false;
 let traceAttrs = true;  // quick update every reload
@@ -206,3 +211,4 @@ export class drawingAttribute extends drawingVariable {
 }
 
 
+// new math3d();
