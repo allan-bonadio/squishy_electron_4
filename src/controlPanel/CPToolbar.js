@@ -13,7 +13,7 @@ import ResolutionDialog from './ResolutionDialog.js';
 let traceCPToolbar = false;
 let traceSlowerFaster = false;
 
-window.dbLog = console.log;
+//window.dblog = console.log;
 
 
 // ms delay after pressing speed button before it starts repeating
@@ -86,7 +86,7 @@ function CPToolbar(props) {
 	cfpt(propTypes, props);
 	const p = props;
 	if (traceCPToolbar)
-		dbLog(`🧰 CPToolbar starts render.  props=`, props);
+		dblog(`🧰 CPToolbar starts render.  props=`, props);
 
 	/* ********************************************* speed buttons */
 	// user clicks/taps down on either the slower or faster speed button
@@ -95,13 +95,13 @@ function CPToolbar(props) {
 		// either faster or slower
 		if (ev.target.classList.contains('faster')) {
 			if (traceSlowerFaster)
-				dbLog(`🧰 SlowerFaster Faster starts.   `);
+				dblog(`🧰 SlowerFaster Faster starts.   `);
 			propel(FASTER_BOOST);  // speed up by big incr
 			timeoutId = setTimeout(repeatFaster, SPEED_DELAY);  // then slowly accel over time
 		}
 		else {
 			if (traceSlowerFaster)
-				dbLog(`🧰 SlowerFaster SLower starts.  `);
+				dblog(`🧰 SlowerFaster SLower starts.  `);
 			propel(SLOWER_BOOST);
 			timeoutId = setTimeout(repeatSlower, SPEED_DELAY);
 		}
