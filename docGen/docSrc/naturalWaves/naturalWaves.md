@@ -32,7 +32,7 @@ description: How waves work in nature
 ## Waves in Nature
 
 Many things in nature vibrate.  Many other things go in a circle.
-You might think that these things bang violently from one side to another, but, really, they follow a gentle sine wave.
+You might think that these things bang violently from one side to another, but, usually, they follow a gentle sine wave.
 The way we describe these things mathematically is with trig functions: sine and cosine.
 <img src=sinAndCos.png class=one />
 Sine and cosine are a quarter circle apart (or π/2 or 90°).
@@ -48,7 +48,7 @@ The sine can be up-down, and the cosine can be left-right
 With a guitar string, some guitar player pulls on a string and then lets go.
 When they let go, the string is coasting through the air, and it's following the laws of nature.
 
-<img src=plucking.jpg class=one />
+<img src=guitar.jpg class=one />
 
 So, first, think about the position of the string; where it is sideways, how far from its middle position.
 Of course, it's vibrating back and forth.
