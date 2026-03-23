@@ -1,0 +1,245 @@
+/*
+** eGarlandDrawing -- main scene for 3d quantum in endless space
+** Copyright (C) 2026-2026 Tactile Interactive, all rights reserved
+*/
+
+import abstractDrawing from './abstractDrawing.js';
+import {drawingUniform, drawingAttribute} from './drawingVariable.js';
+import cx2rygb from './cx2rygb/cx2rygb.glsl.js';
+import qeFuncs from '../engine/qeFuncs.js';
+import qeConsts from '../engine/qeConsts.js';
+
+let traceViewBufAfterDrawing = false;
+let traceMaxHeight = false;
+let traceGarlandDrawing = false;
+let traceViewport = false;
+let traceReloadRow = false;
+
+// diagnostic purposes; draws more per vertex
+let traceDrawPoints = false;
+let traceDrawLines = false;
+
+let pointSize = traceDrawPoints ? `gl_PointSize = 10.;` : '';
+let displayWrapEdges = false;  // soon to be a pref
+
+/* ******************************************************* garland drawing */
+// The glsl sources for webgl drawing
+
+/*
+** data format of attributes:  four column table of floats
+** 𝜓.re  𝜓.im   (unused)   serial.
+** uses gl_VertexID   NO! that's opengl 2 only
+** to figure out whether the radius should be re^2+im^2 or zero
+*/
+
+/* Draws blades - quadrilatterals in a spiral pattern.  Each blade has a quadrilatteral on each side, each is two triangles.  Hopefully there's a little bit of thickness in the middle.  Colored by vertex just like the flat drawing.
+
+The data and avatar loading is similar to with flat drawing - real and imag parts of wave become the y (vertical) and z (backward) coordinates of the garland point.  We then have to duplicate it all, rearranged?, to paint the other side of each blade.
+*/
+
+// how much raw psi values should be multipled to be equivalent to x
+// values that go from 0 to N.  Adjust to taste or to N
+const PSI_MAG = 100;
+
+// make the line number for the start correspond to this JS file line number - the NEXT line
+const vertexSrc = `${cx2rygb}
+#line 38
+varying highp vec4 vColor;
+attribute vec4 row;
+uniform float barWidth;
+uniform float maxHeight;
+
+void main() {
+	int vertexSerial = int(row.w);  // use gl_VertexID & 1 with webgl2
+	bool odd = int(vertexSerial) / 2 * 2 < vertexSerial;
+
+	// figure out radius of garland at each point
+	// float radius;
+	// if (odd) {
+	// 	radius = (row.x * row.x + row.y * row.y) / maxHeight;
+	// }
+	// else {
+	// 	radius = 0.;  // top of the screen
+	// }
+	// radius *= ${PSI_MAG};
+	//radius = 1. - 2. * radius;
+
+	// figure out x, basically the point index; map to -1...+1
+
+	// The science coordinates are imag and real parts of psi, and the ix index times nm per cell.
+
+
+
+	// The Volume coordinates are what look like 3d coords in the view.  The unit is 1 cell in the x direction, and PSI_MAG times psi in the real and imag directions; hopefully those numbers are about 0.5 thru 5 or so.  The camera is located anywhere in an arc, along the side of the wave.
+
+	// x is integers, 0...N-1 or whatever.  y and z are the imag and real parts of psi.
+	// each psi datapoint maps to TWO rows in the avatar
+	// yeah a bit confusing but these are in 3d space user is looking into
+	float x, y, z;
+	x = float(int(vertexSerial) / 2);
+	y = row.y;
+	z = row.x;
+
+
+	gl_Position = vec4(x, radius, 0., 1.);
+
+	//  for the color, convert the complex values via this algorithm
+	vColor.rgb = cx2rygb(row.xy);
+	//vColor.rgb = cx2rygb(vec2(row.x, row.y));
+	vColor.a = 1.;
+	//vColor = vec4(cx2rygb(vec2(row.x, row.y)), 1.);
+
+	// make the colors darker toward zero (top)
+	if (!odd)
+		vColor = vec4(vColor.r/2., vColor.g/2., vColor.b/2., vColor.a);
+
+	// dot size, in pixels not clip units.  actually a square.
+	${pointSize}
+}
+`;
+
+const fragmentSrc = `
+#line 80
+precision highp float;
+varying highp vec4 vColor;
+
+void main() {
+	gl_FragColor = vColor;
+}
+`;
+
+// the original display that's worth watching: garland upside down hump graph
+export class garlandDrawing extends abstractDrawing {
+	constructor(scene) {
+		super(scene, 'garlandDrawing');
+
+		// each point in the wave results in two vertices, top and wave.
+		// And each of those is four single floats going to the GPU
+		this.avatar = scene.avatar;
+		this.avatar.attachViewBuffer(0, null, 4, this.space.nPoints * 2, 'garland drawing');
+
+		this.vertexShaderSrc = vertexSrc;
+		this.fragmentShaderSrc = fragmentSrc;
+
+		//console.log(`attachViewBuffer on scene ${scene.sceneName}`);
+	}
+
+	// loads view buffer from corresponding wave, calculates highest norm.
+	// one time set up of variables for this drawing, every time canvas and scene is recreated
+	createVariables() {
+		this.setDrawing();
+		if (traceGarlandDrawing)
+			console.log(`♭♭♭ garlandDrawing ${this.sceneName}: creatingVariables`);
+
+		// normally autoranging would put the highest peak at the exact bottom.
+		// but we want some extra space.  not much.
+		//const vertStretch = 1.0;  // not sure why
+		//const vertStretch = 0.7;  // not sure why
+		const PADDING_ON_BOTTOM = 1.02;
+		//const PADDING_ON_BOTTOM = 1.02 * vertStretch;
+
+		this.maxHeightUniform = new drawingUniform('maxHeight', this,
+			() => {
+				// fresh out of the loader, maxHeight wobbles up and down.  Smooth it.
+				if (!this.maxHeight)  // ??
+					this.maxHeight = this.avatar.double0;
+				else {
+					// relax changes.  how  quickly?
+					this.maxHeight = this.avatar.double0;
+					//this.maxHeight = (this.maxHeight * 3 + this.avatar.double0) / 4;
+					//this.maxHeight = (this.maxHeight * 15 + this.avatar.double0) / 16;
+					//this.maxHeight = (this.maxHeight * 255 + this.avatar.double0) / 256;
+				}
+
+				if (traceMaxHeight)
+					console.log(`♭♭♭ garlandDrawing reloading outer:  `
+						+` maxHeight=${this.avatar.double0.toFixed(5)} `);
+
+				return {value: this.maxHeight * PADDING_ON_BOTTOM, type: '1f'};
+			}
+		);
+
+
+		// WELL continuum:  potential at the ends of the well are infinite; so
+		// psi on the border points is zero. These are the boundary datapoints,
+		// so for N=8, 10 edges between 9 bars, 7 between and 2 on ends.
+
+		// for ENDLESS, we wrap around one bar, so if N=8, there's two border bar at 0 and 8.
+		// there's 7 bars between.  9 bars total, 10 edges, matching the 10 = nPoints
+		// So, the same for WELL and ENDLESS
+
+		// barWidth: width of each bargraph bar
+		let nPoints = this.nPoints = this.space.nPoints;
+		let barWidth;
+		this.barWidthUniform = new drawingUniform('barWidth', this,
+			() => {
+				barWidth = 1 / (nPoints - 1)
+				return { value: barWidth, type: '1f' };
+			}
+		);
+		if (traceGarlandDrawing) console.log(`♭♭♭ barWidth= ${barWidth}`);
+
+		this.vertexCount = nPoints * 2;  // nPoints * vertsPerBar
+		this.rowFloats = 4;
+		this.rowAttr = new drawingAttribute('row', this, this.rowFloats, () => {
+			//debugger;
+			qeFuncs.avatar_avFlatLoader(this.avatar.pointer, 0, this.scene.inputInfo[0].pointer,
+					nPoints);
+
+			if (traceReloadRow) {
+				console.log(`♭♭♭ garlandDrawing  ${this.avatarLabel}: at row getViewBuffer() `
+					+` loading to ${this.avatar.label}   this.vertexCount=${this.vertexCount} `
+					+` total floats=${this.vertexCount * this.rowFloats}  double0=this.avatar.double0`);
+			}
+
+			return this.avatar.getViewBuffer(0);
+		});
+
+	}
+
+	// called for each image frame on th canvas.  TODO: roll specialInfo into the input Data Arrays
+	draw(width, height, specialInfo) {
+		if (traceGarlandDrawing) {
+			console.log(`♭♭♭ garland Drawing  ${this.avatarLabel}: `
+				+` width=${width}, height=${height}  drawing ${this.vertexCount/2} points `
+				+` maxHeight=${this.maxHeight}`);
+		}
+		const gl = this.gl;
+		this.setDrawing();
+
+		let bw = specialInfo.bumperWidth;
+		gl.viewport(bw, 0, width - 2 * bw, height);
+		if (traceViewport) {
+			console.log(`♭♭♭ garlandDrawing set viewport on avatar=${this.avatarLabel}: `
+				+` width-2bw=${width - 2 * bw}, height=${height}  `
+				+` drawing ${this.vertexCount/2} points`);
+		}
+		this.drawVariables.forEach(v => v.reloadVariable());
+		gl.drawArrays(gl.TRIANGLE_STRIP, 0, this.vertexCount);
+		if (traceGarlandDrawing) {
+			console.log(`♭♭♭just drewArays-garland on avatar ptr=${this.avatar.pointer} `
+				+` this.avatar.label=${this.avatar.label}, `
+				+` buffer label=${this.avatar.bufferNames[0]}`);
+		}
+
+		if (traceDrawLines) {
+			gl.lineWidth(1);  // it's the only option anyway
+
+			gl.drawArrays(gl.GL_LINE_STRIP, 0, this.vertexCount);
+		}
+
+		if (traceDrawPoints)
+			gl.drawArrays(gl.POINTS, 0, this.vertexCount);
+
+		// i think this is problematic
+		if (traceViewBufAfterDrawing) {
+			this.avatar.dumpComplexViewBuffer(`♭♭♭ finished drawing in garlandDrawing.js; drew buf:`);
+			console.log(`♭♭♭ barWidthUniform=${this.barWidthUniform.reloadFunc()} `
+				+`maxHeightUniform=${this.maxHeightUniform.reloadFunc()}`);
+		}
+		// ?? this.gl.bindVertexArray(null);
+	}
+}
+
+export default eGarlandDrawing;
+

@@ -1,0 +1,346 @@
+A handy reference to which functions are where on what kind of object
+
+
+(function (global, factory) {
+  typeof define === 'function' && define.amd ? define(['exports'], factory) :
+})(this, (function (exports) { 'use strict';
+	round$3(a) {
+	setMatrixArrayType(type) {
+	toRadian(a) {
+	toDegree(a) {
+	equals$9(a, b) {
+--------- common ------------ common ------------ common ------------ common ---------
+
+
+	create$8() {
+	clone$8(a) {
+	copy$8(out, a) {
+	identity$5(out) {
+	fromValues$8(m00, m01, m10, m11) {
+	set$8(out, m00, m01, m10, m11) {
+	transpose$2(out, a) {
+	invert$5(out, a) {
+	adjoint$2(out, a) {
+	determinant$3(a) {
+	multiply$8(out, a, b) {
+	rotate$4(out, a, rad) {
+	scale$8(out, a, v) {
+	fromRotation$4(out, rad) {
+	fromScaling$3(out, v) {
+	str$8(a) {
+	frob$3(a) {
+	LDU(L, D, U, a) {
+	add$8(out, a, b) {
+	subtract$6(out, a, b) {
+	exactEquals$8(a, b) {
+	equals$8(a, b) {
+	multiplyScalar$3(out, a, b) {
+	multiplyScalarAndAdd$3(out, a, b, scale) {
+--------- mat2 ------------ mat2 ------------ mat2 ------------ mat2 ---------
+
+
+	create$7() {
+	clone$7(a) {
+	copy$7(out, a) {
+	identity$4(out) {
+	fromValues$7(a, b, c, d, tx, ty) {
+	set$7(out, a, b, c, d, tx, ty) {
+	invert$4(out, a) {
+	determinant$2(a) {
+	multiply$7(out, a, b) {
+	rotate$3(out, a, rad) {
+	scale$7(out, a, v) {
+	translate$3(out, a, v) {
+	fromRotation$3(out, rad) {
+	fromScaling$2(out, v) {
+	fromTranslation$3(out, v) {
+	str$7(a) {
+	frob$2(a) {
+	add$7(out, a, b) {
+	subtract$5(out, a, b) {
+	multiplyScalar$2(out, a, b) {
+	multiplyScalarAndAdd$2(out, a, b, scale) {
+	exactEquals$7(a, b) {
+	equals$7(a, b) {
+--------- mat2d ------------ mat2d ------------ mat2d ------------ mat2d ---------
+
+
+	create$6() {
+	fromMat4$1(out, a) {
+	clone$6(a) {
+	copy$6(out, a) {
+	fromValues$6(m00, m01, m02, m10, m11, m12, m20, m21, m22) {
+	set$6(out, m00, m01, m02, m10, m11, m12, m20, m21, m22) {
+	identity$3(out) {
+	transpose$1(out, a) {
+	invert$3(out, a) {
+	adjoint$1(out, a) {
+	determinant$1(a) {
+	multiply$6(out, a, b) {
+	translate$2(out, a, v) {
+	rotate$2(out, a, rad) {
+	scale$6(out, a, v) {
+	fromTranslation$2(out, v) {
+	fromRotation$2(out, rad) {
+	fromScaling$1(out, v) {
+	fromMat2d(out, a) {
+	fromQuat$1(out, q) {
+	normalFromMat4(out, a) {
+	projection(out, width, height) {
+	str$6(a) {
+	frob$1(a) {
+	add$6(out, a, b) {
+	subtract$4(out, a, b) {
+	multiplyScalar$1(out, a, b) {
+	multiplyScalarAndAdd$1(out, a, b, scale) {
+	exactEquals$6(a, b) {
+	equals$6(a, b) {
+--------- mat3 ------------ mat3 ------------ mat3 ------------ mat3 ---------
+
+
+	create$5() {
+	clone$5(a) {
+	copy$5(out, a) {
+	fromValues$5(m00, m01, m02, m03, m10, m11, m12, m13, m20, m21, m22, m23, m30, m31, m32, m33) {
+	set$5(out, m00, m01, m02, m03, m10, m11, m12, m13, m20, m21, m22, m23, m30, m31, m32, m33) {
+	identity$2(out) {
+	transpose(out, a) {
+	invert$2(out, a) {
+	adjoint(out, a) {
+	determinant(a) {
+	multiply$5(out, a, b) {
+	translate$1(out, a, v) {
+	scale$5(out, a, v) {
+	rotate$1(out, a, rad, axis) {
+	rotateX$3(out, a, rad) {
+	rotateY$3(out, a, rad) {
+	rotateZ$3(out, a, rad) {
+	fromTranslation$1(out, v) {
+	fromScaling(out, v) {
+	fromRotation$1(out, rad, axis) {
+	fromXRotation(out, rad) {
+	fromYRotation(out, rad) {
+	fromZRotation(out, rad) {
+	fromRotationTranslation$1(out, q, v) {
+	fromQuat2(out, a) {
+	getTranslation$1(out, mat) {
+	getScaling(out, mat) {
+	getRotation(out, mat) {
+	decompose(out_r, out_t, out_s, mat) {
+	fromRotationTranslationScale(out, q, v, s) {
+	fromRotationTranslationScaleOrigin(out, q, v, s, o) {
+	fromQuat(out, q) {
+	frustum(out, left, right, bottom, top, near, far) {
+	perspectiveNO(out, fovy, aspect, near, far) {
+	perspectiveZO(out, fovy, aspect, near, far) {
+	perspectiveFromFieldOfView(out, fov, near, far) {
+	orthoNO(out, left, right, bottom, top, near, far) {
+	orthoZO(out, left, right, bottom, top, near, far) {
+	lookAt(out, eye, center, up) {
+	targetTo(out, eye, target, up) {
+	str$5(a) {
+	frob(a) {
+	add$5(out, a, b) {
+	subtract$3(out, a, b) {
+	multiplyScalar(out, a, b) {
+	multiplyScalarAndAdd(out, a, b, scale) {
+	exactEquals$5(a, b) {
+	equals$5(a, b) {
+--------- mat4 ------------ mat4 ------------ mat4 ------------ mat4 ---------
+
+
+	create$4() {
+	clone$4(a) {
+	length$4(a) {
+	fromValues$4(x, y, z) {
+	copy$4(out, a) {
+	set$4(out, x, y, z) {
+	add$4(out, a, b) {
+	subtract$2(out, a, b) {
+	multiply$4(out, a, b) {
+	divide$2(out, a, b) {
+	ceil$2(out, a) {
+	floor$2(out, a) {
+	min$2(out, a, b) {
+	max$2(out, a, b) {
+	round$2(out, a) {
+	scale$4(out, a, b) {
+	scaleAndAdd$2(out, a, b, scale) {
+	distance$2(a, b) {
+	squaredDistance$2(a, b) {
+	squaredLength$4(a) {
+	negate$2(out, a) {
+	inverse$2(out, a) {
+	normalize$4(out, a) {
+	dot$4(a, b) {
+	cross$2(out, a, b) {
+	lerp$4(out, a, b, t) {
+	slerp$1(out, a, b, t) {
+	hermite(out, a, b, c, d, t) {
+	bezier(out, a, b, c, d, t) {
+	random$3(out, scale) {
+	transformMat4$2(out, a, m) {
+	transformMat3$1(out, a, m) {
+	transformQuat$1(out, a, q) {
+	rotateX$2(out, a, b, rad) {
+	rotateY$2(out, a, b, rad) {
+	rotateZ$2(out, a, b, rad) {
+	angle$1(a, b) {
+	zero$2(out) {
+	str$4(a) {
+	exactEquals$4(a, b) {
+	equals$4(a, b) {
+  var forEach$2 = function () {
+    return function (a, stride, offset, count, fn, arg) {
+--------- vec3 ------------ vec3 ------------ vec3 ------------ vec3 ---------
+
+
+	create$3() {
+	clone$3(a) {
+	fromValues$3(x, y, z, w) {
+	copy$3(out, a) {
+	set$3(out, x, y, z, w) {
+	add$3(out, a, b) {
+	subtract$1(out, a, b) {
+	multiply$3(out, a, b) {
+	divide$1(out, a, b) {
+	ceil$1(out, a) {
+	floor$1(out, a) {
+	min$1(out, a, b) {
+	max$1(out, a, b) {
+	round$1(out, a) {
+	scale$3(out, a, b) {
+	scaleAndAdd$1(out, a, b, scale) {
+	distance$1(a, b) {
+	squaredDistance$1(a, b) {
+	length$3(a) {
+	squaredLength$3(a) {
+	negate$1(out, a) {
+	inverse$1(out, a) {
+	normalize$3(out, a) {
+	dot$3(a, b) {
+	cross$1(out, u, v, w) {
+	lerp$3(out, a, b, t) {
+	random$2(out, scale) {
+	transformMat4$1(out, a, m) {
+	transformQuat(out, a, q) {
+	zero$1(out) {
+	str$3(a) {
+	exactEquals$3(a, b) {
+	equals$3(a, b) {
+  var forEach$1 = function () {
+    return function (a, stride, offset, count, fn, arg) {
+--------- vec4 ------------ vec4 ------------ vec4 ------------ vec4 ---------
+
+
+	create$2() {
+	identity$1(out) {
+	setAxisAngle(out, axis, rad) {
+   *  OR functionally equivalent values.
+	getAxisAngle(out_axis, q) {
+	getAngle(a, b) {
+	multiply$2(out, a, b) {
+	rotateX$1(out, a, rad) {
+	rotateY$1(out, a, rad) {
+	rotateZ$1(out, a, rad) {
+	calculateW(out, a) {
+	exp(out, a) {
+	ln(out, a) {
+	pow(out, a, b) {
+	slerp(out, a, b, t) {
+	random$1(out) {
+	invert$1(out, a) {
+   * If the quaternion is normalized, this function is faster than quat.inverse and produces the same result.
+	conjugate$1(out, a) {
+	fromMat3(out, m) {
+	fromEuler(out, x, y, z) {
+	str$2(a) {
+	equals$2(a, b) {
+  var rotationTo = function () {
+    return function (out, a, b) {
+  var sqlerp = function () {
+    return function (out, a, b, c, d, t) {
+  var setAxes = function () {
+    return function (out, view, right, up) {
+--------- quat ------------ quat ------------ quat ------------ quat ---------
+
+
+   * Make sure to have normalized dual quaternions, otherwise the functions may not work as intended.<br>
+	create$1() {
+	clone$1(a) {
+	fromValues$1(x1, y1, z1, w1, x2, y2, z2, w2) {
+	fromRotationTranslationValues(x1, y1, z1, w1, x2, y2, z2) {
+	fromRotationTranslation(out, q, t) {
+	fromTranslation(out, t) {
+	fromRotation(out, q) {
+	fromMat4(out, a) {
+	copy$1(out, a) {
+	identity(out) {
+	set$1(out, x1, y1, z1, w1, x2, y2, z2, w2) {
+	getDual(out, a) {
+	setDual(out, q) {
+	getTranslation(out, a) {
+	translate(out, a, v) {
+	rotateX(out, a, rad) {
+	rotateY(out, a, rad) {
+	rotateZ(out, a, rad) {
+	rotateByQuatAppend(out, a, q) {
+	rotateByQuatPrepend(out, q, a) {
+	rotateAroundAxis(out, a, axis, rad) {
+	add$1(out, a, b) {
+	multiply$1(out, a, b) {
+	scale$1(out, a, b) {
+	lerp$1(out, a, b, t) {
+	invert(out, a) {
+   * If the dual quaternion is normalized, this function is faster than quat2.inverse and produces the same result.
+	conjugate(out, a) {
+	normalize$1(out, a) {
+	str$1(a) {
+	exactEquals$1(a, b) {
+	equals$1(a, b) {
+--------- quat2 ------------ quat2 ------------ quat2 ------------ quat2 ---------
+
+
+	create() {
+	clone(a) {
+	fromValues(x, y) {
+	copy(out, a) {
+	set(out, x, y) {
+	add(out, a, b) {
+	subtract(out, a, b) {
+	multiply(out, a, b) {
+	divide(out, a, b) {
+	ceil(out, a) {
+	floor(out, a) {
+	min(out, a, b) {
+	max(out, a, b) {
+	round(out, a) {
+	scale(out, a, b) {
+	scaleAndAdd(out, a, b, scale) {
+	distance(a, b) {
+	squaredDistance(a, b) {
+	length(a) {
+	squaredLength(a) {
+	negate(out, a) {
+	inverse(out, a) {
+	normalize(out, a) {
+	dot(a, b) {
+	cross(out, a, b) {
+	lerp(out, a, b, t) {
+	random(out, scale) {
+	transformMat2(out, a, m) {
+	transformMat2d(out, a, m) {
+	transformMat3(out, a, m) {
+	transformMat4(out, a, m) {
+	rotate(out, a, b, rad) {
+	angle(a, b) {
+	signedAngle(a, b) {
+	zero(out) {
+	str(a) {
+	exactEquals(a, b) {
+	equals(a, b) {
+  var forEach = function () {
+    return function (a, stride, offset, count, fn, arg) {
+--------- vec2 ------------ vec2 ------------ vec2 ------------ vec2 ---------
+
+
