@@ -73,7 +73,7 @@ export class ticDrawing extends abstractDrawing {
 
 		debugger;
 		this.avatar = scene.avatar;
-		this.coordBuffer = this.avata.attachViewBuffer(BUFFER_ID, null,
+		this.coordBuffer = this.avatar.attachViewBuffer(BUFFER_ID, null,
 			2, BUFFER_MAX_NTICS * FLOATS_PER_TIC, 'flat tics');
 		//this.coordBuffer = new Float32Array(BUFFER_MAX_NTICS * FLOATS_PER_TIC);
 
