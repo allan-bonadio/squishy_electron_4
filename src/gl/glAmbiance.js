@@ -80,9 +80,9 @@ class glAmbiance {
 
 	// try to set up GL1, return falsy if it can't.  Also shims if any
 	setupGL1() {
-		let gl = this.canvas.getContext("webgl");  // gl.VERSION: 7938
+		let gl = this.canvas.getContext('webgl', {preserveDrawingBuffer: true});  // gl.VERSION: 7938
 		if (! gl)
-			gl = this.canvas.getContext("experimental-webgl");  // really old
+			gl = this.canvas.getContext('experimental-webgl');  // really old
 		if (!gl)
 			return null;
 		this.gl = gl;
@@ -95,7 +95,7 @@ class glAmbiance {
 
 	// try to set up GL2, return falsy if it can't
 	setupGL2() {
-		const gl = this.canvas.getContext("webgl2");
+		const gl = this.canvas.getContext('webgl2', {preserveDrawingBuffer: true});
 		if (!gl)
 			return null;
 		this.gl = gl;
