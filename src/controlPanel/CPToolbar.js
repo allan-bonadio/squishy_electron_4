@@ -3,17 +3,15 @@
 ** Copyright (C) 2021-2026 Tactile Interactive, all rights reserved
 */
 
-import React, {useRef} from 'react';
+import React, {useContext} from 'react';
 import PropTypes from 'prop-types';
 import eSpace from '../engine/eSpace.js';
-//import {ShowVoltageControl} from './SetVoltageTab.js';
 import qeConsts from '../engine/qeConsts.js';
 import ResolutionDialog from './ResolutionDialog.js';
+import SquishContext from '../sPanel/SquishContext.js';
 
 let traceCPToolbar = false;
 let traceSlowerFaster = false;
-
-//window.dblog = console.log;
 
 
 // ms delay after pressing speed button before it starts repeating
@@ -37,11 +35,10 @@ const resolutionHandler = (ev) => {
 
 // the actual button they click.  The number doesn't change within a reset
 const renderResolutionControl = (N) => <div className='toolbarWidget'>
-	<div className='toolbarWidget'>
-		<button className='toolbarWidget resolutionBox' onClick={resolutionHandler} >
-			resolution {N}
-		</button>
-	</div>
+	<button className='toolbarWidget resolutionBox'
+					onClick={resolutionHandler} >
+		resolution {N}
+	</button>
 </div>;
 
 
@@ -74,7 +71,9 @@ const propTypes = {
 
 	resetWaveHandler: PropTypes.func.isRequired,
 	resetVoltageHandler: PropTypes.func.isRequired,
-	//setShowingTab: PropTypes.func,
+
+	to2D: PropTypes.func.isRequired,
+	to3D: PropTypes.func.isRequired,
 
 	// these two might be undefined during startup, so get ready to punt
 	N: PropTypes.number,
@@ -170,6 +169,7 @@ function CPToolbar(props) {
 					{onMouseMove={maybeStopSpeed}> */
 
 /* *************************************************** render */
+	const context = useContext(SquishContext);
 
 	return (<div className='CPToolbar'>
 
@@ -184,6 +184,13 @@ function CPToolbar(props) {
 
 		<div className='toolbarWidget resetButton volt'>
 				<button onClick={props.resetVoltageHandler}>Reset Voltage</button>
+		</div>
+
+		<div className='toolbarWidget '>
+				<button className={'twoD3D '+ (context.show2D ? 'butOn' : 'butOff')}
+						onClick={p.to2D}>2d</button>
+				<button className={'twoD3D '+(context.show3D ? 'butOn' : 'butOff')}
+						onClick={p.to3D}>3d</button>
 		</div>
 	</div>);
 }

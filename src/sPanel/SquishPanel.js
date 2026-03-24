@@ -58,8 +58,13 @@ class SquishPanel extends React.Component {
 			space: null,
 
 			shouldBeIntegrating: false,  // will be set when space promise comes in
+			show2D: getASetting('miscSettings', 'show2D'),
+			show3D: getASetting('miscSettings', 'show3D'),
+
 			controlPanel: {},
 			waveView: {},
+
+			fakeChange: 1,
 		};
 		// see above this.#shouldBeIntegrating = false;
 
@@ -100,6 +105,10 @@ class SquishPanel extends React.Component {
 			}
 		}
 	}
+
+	// these are the functions that change the 2d/3d setting.  Get at the state in the context.  These functions get passed down.
+	to2D = () => this.setState({show2D: true, show3D: false});
+	to3D = () => this.setState({show2D: false, show3D: true});
 
 	// these functions are passed in props to lower levels mostly for initialization.
 	// called once ONLY in control panel during setup.  Either one can set space.
@@ -234,6 +243,8 @@ class SquishPanel extends React.Component {
 						iStats={this.iStats}
 						animator={this.animator}
 						setCPContext={this.setCPContext}
+						to2D={this.to2D}
+						to3D={this.to3D}
 						setShouldBeIntegrating={this.setShouldBeIntegrating}
 						sPanel={this}
 					/>

@@ -31,7 +31,7 @@ class garlandScene extends abstractScene {
 					new eGarlandDrawing(this, space),
 				];
 		}
-		else ('well') {
+		else if ('well' == inputInfo.continuum) {
 				this.drawings = [
 					new wGarlandDrawing(this, space),
 				];

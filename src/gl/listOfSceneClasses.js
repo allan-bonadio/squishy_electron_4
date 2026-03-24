@@ -5,6 +5,7 @@
 
 import {abstractScene} from './abstractScene.js';
 import flatScene from './flatScene.js';
+import garlandScene from './garlandScene.js';
 import rainbowScene from './rainbowScene.js';
 
 let traceSceneClasses = false;
@@ -17,6 +18,7 @@ export const listOfSceneClasses = {
 	//starScene,  // simple for testinig ... makes its own inputs
 
 	flatScene,
+	garlandScene,
 	rainbowScene,
 };
 

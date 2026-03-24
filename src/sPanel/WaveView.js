@@ -55,6 +55,9 @@ export class WaveView extends React.Component {
 		setShouldBeIntegrating: PropTypes.func.isRequired,
 		sPanel: PropTypes.object.isRequired,
 
+		show2D: PropTypes.bool,
+		show3D: PropTypes.bool,
+
 		setMainRepaint: PropTypes.func,
 		setSpectRepaint: PropTypes.func,
 	};
@@ -112,7 +115,10 @@ export class WaveView extends React.Component {
 		wv = {
 			space: space,
 			grinder: space.grinder,
-			//mainAvatar: space.mainAvatar,
+
+			// somebody's going to want to see both at once.  someday...
+			show2D: getASetting('miscSettings', 'show2D'),
+			show3D: getASetting('miscSettings', 'show3D'),
 
 			// make room for the bumpers for WELL continuum (both sides).  Note that
 			// continuum can change only when page reloads.
@@ -339,20 +345,32 @@ export class WaveView extends React.Component {
 		}
 
 		// can't make a real GLScene until we have the space!
-		let glScene;
+		let glScene2d, glScene3d;
 		if (this.space) {
 			// this is the main wave, always
 			let sceneClassName = 'flatScene';
 			let sceneName = 'mainWave';
 
-			glScene = <GLScene
+			glScene2d = <GLScene
 				space={s.space} animator={this.animator}
-				sceneClassName={sceneClassName} sceneName={sceneName}
+				sceneClassName={'flatScene'} sceneName={sceneName +'2d'}
 				inputInfo={[this.space.mainFlick, this.bumperWidth, null, null]}
 				specialInfo={{bumperWidth: this.bumperWidth}}
 				canvasInnerWidth={this.canvasInnerWidth}
 				canvasInnerHeight={this.canvasInnerHeight}
 				setGLRepaint={this.setMainRepaint}
+				show={this.context.show2D}
+			/>;
+
+			glScene3d = <GLScene
+				space={s.space} animator={this.animator}
+				sceneClassName={'garlandScene'} sceneName={sceneName + '3d'}
+				inputInfo={[this.space.mainFlick, this.bumperWidth, null, null]}
+				specialInfo={{bumperWidth: this.bumperWidth}}
+				canvasInnerWidth={this.canvasInnerWidth}
+				canvasInnerHeight={this.canvasInnerHeight}
+				setGLRepaint={this.setMainRepaint}
+				show={this.context.show3D}
 			/>;
 		}
 		else {
@@ -392,7 +410,8 @@ export class WaveView extends React.Component {
 			onFocus={ev => console.log(`focus ON`)}
 			ref={this.grabWaveViewEl}>
 
-			{glScene}
+			{glScene2d}
+			{glScene3d}
 
 			<div className='bumper left' key='left'
 				style={{flexBasis: this.bumperWidth +'px', height: this.canvasInnerHeight}} />

@@ -525,6 +525,8 @@ export class ControlPanel extends React.Component {
 			setShowingTab={this.setShowingTab}
 
 			shouldBeIntegrating={this.context.shouldBeIntegrating ?? false}
+			to2D={this.props.to2D}
+			to3D={this.props.to3D}
 
 			// startOver buttons
 			resetWaveHandler={this.resetWaveHandler}

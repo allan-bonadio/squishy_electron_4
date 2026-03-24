@@ -9,6 +9,7 @@ import cx2rygb from './cx2rygb/cx2rygb.glsl.js';
 import qeFuncs from '../engine/qeFuncs.js';
 import qeConsts from '../engine/qeConsts.js';
 
+
 let traceViewBufAfterDrawing = false;
 let traceMaxHeight = false;
 let traceGarlandDrawing = false;
@@ -109,7 +110,7 @@ void main() {
 `;
 
 // the original display that's worth watching: garland upside down hump graph
-export class garlandDrawing extends abstractDrawing {
+export class eGarlandDrawing extends abstractDrawing {
 	constructor(scene) {
 		super(scene, 'garlandDrawing');
 
