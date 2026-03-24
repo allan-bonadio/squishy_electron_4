@@ -9,8 +9,8 @@ import {EFFECTIVE_VOLTS, TOO_MANY_VOLTS, LOW_VOLTS} from './voltConstants.js';
 import {getAGroup, storeASetting} from '../utils/storeSettings.js';
 import * as d3 from "d3";
 
-let traceFamiliar = true;
-let traceScales = true;
+let traceFamiliar = false;
+let traceScales = false;
 let tracePathAttribute = false;
 let tracePathIndividualPoints = false;
 

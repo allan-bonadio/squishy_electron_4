@@ -3,17 +3,18 @@
 ** Copyright (C) 2026-2026 Tactile Interactive, all rights reserved
 */
 
+import {mat4} from 'gl-matrix';
+//import glMatrix from 'gl_matrix/gl-matrix.js';
+//import {mat4} from 'gl_matrix';
+
 import abstractScene from './abstractScene.js';
 import eGarlandDrawing from './eGarlandDrawing.js';
 import wGarlandDrawing from './wGarlandDrawing.js';
 import eAvatar from '../engine/eAvatar.js';
 
-
-import glMatrix from 'gl_matrix';
-
 class math3d {
 	constructor() {
-		let avec3 =
+		//let avec3 =
 
 
 
@@ -25,22 +26,22 @@ class math3d {
 		// that is used to simulate the distortion of perspective in a camera.
 		// our field of view is 45 degre4s, with a width/height ratio
 		// that matches the display size of the canvas.
-		// also, we only wnat to see objects between 0.1 units
+		// also, we only what to see objects between 0.1 units
 		// and 100 units away from the camera.
 
 		const fieldOfView = (45 * Math.PI) / 180; // in radians
-		const aspect = gl.canvas.clientWidth / gl.canvas.clientHeight;
+		const aspect = 700 / 500;
 		const zNear = 0.1;
 		const zFar = 100.0;
 		const projectionMatrix = mat4.create();
 
-		//   note: glmatrix.js always has the first argument as teh destination to recieve result.
+		//   note: glmatrix.js always has the first argument as the destination to recieve result.
 		mat4.perspective(projectionMatrix, fieldOfView, aspect, zNear, zFar);
 
 
 
 
-
+dblog(`math 3d`)
 
 
 
@@ -49,6 +50,7 @@ class math3d {
 		const modelViewMatrix = mat4.create();
 
 		//   Move the drawing position a bit to where I want to start the square
+let cubeRotation=1;
 
 		mat4.translate(
 			modelViewMatrix, // destination matrix
@@ -112,20 +114,20 @@ void main(void) {
 `;
 
 
-  const programInfo = {
-    program: shaderProgram,
-    attribLocations: {
-      vertexPosition: gl.getAttribLocation(shaderProgram, "aVertexPosition"),
-      vertexColor: gl.getAttribLocation(shaderProgram, "aVertexColor")
-    },
-    uniformLocations: {
-      projectionMatrix: gl.getUniformLocation(
-        shaderProgram,
-        "uProjectionMatrix"
-      ),
-      modelViewMatrix: gl.getUniformLocation(shaderProgram, "uModelViewMatrix")
-    }
-  };
+//   const programInfo = {
+//     program: shaderProgram,
+//     attribLocations: {
+//       vertexPosition: gl.getAttribLocation(shaderProgram, "aVertexPosition"),
+//       vertexColor: gl.getAttribLocation(shaderProgram, "aVertexColor")
+//     },
+//     uniformLocations: {
+//       projectionMatrix: gl.getUniformLocation(
+//         shaderProgram,
+//         "uProjectionMatrix"
+//       ),
+//       modelViewMatrix: gl.getUniformLocation(shaderProgram, "uModelViewMatrix")
+//     }
+//   };
 
 
 

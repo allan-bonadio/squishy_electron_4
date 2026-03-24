@@ -11,11 +11,11 @@ import {thousands} from '../utils/formatNumber.js';
 
 // set a particular 'unique' in this regex to trace its renders and stuff or use the second one to turn off
 // does this work with the trace turned off?  (TODO)
-//let traceThisSlider = {test: () => false};
-let traceThisSlider = {test: (uniq) => /Scale$/.test(uniq)};
+let traceThisSlider = {test: () => false};
+//let traceThisSlider = {test: (uniq) => /Scale$/.test(uniq)};
 
 
-let traceTwoSided = true;
+let traceTwoSided = false;
 
 // twoSided results in a two-sided scale, going through positives,
 // negatives, and zero.  It's symmetric so absolute highest is

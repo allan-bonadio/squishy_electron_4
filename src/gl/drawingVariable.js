@@ -7,7 +7,7 @@
 
 let traceGLCalls = false;
 let traceUniforms = false;
-let traceAttrs = true;  // quick update every reload
+let traceAttrs = false;  // quick update every reload
 let traceAttributes = false;  // full dumps every reload
 
 // attr arrays and uniforms that can change on every frame.
