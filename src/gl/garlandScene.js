@@ -42,37 +42,26 @@ class garlandScene extends abstractScene {
 		const aspect = ambiance.canvas.width / ambiance.canvas.height;
 		const zNear = 0.1;
 		const zFar = 100.0;
-		const projectionMatrix = mat4.create();
-		mat4.perspective(projectionMatrix, fieldOfView, aspect, zNear, zFar);
+		const proj = mat4.create();
+		mat4.perspective(proj, fieldOfView, aspect, zNear, zFar);
 
 
-		// set drawing position to 'identity' point, the center of the scene
-		const modelViewMatrix = mat4.create();
-
-		//   Move the drawing position a bit to where I want to start the square
-let cubeRotation=1;
+		// the original matrix.  The glsl will multiply on the rotation matrix.
+		const origMatrix = mat4.create();
 
 		mat4.translate(
-			modelViewMatrix, // destination matrix
-			modelViewMatrix, // matrix to translate
-			[-0.0, 0.0, -6.0]
-		); // amout to translate
-
+			origMatrix, // destination
+			origMatrix, //to translate
+			[-0.0, 0.0, -6.0]);
 		mat4.rotate(
-			modelViewMatrix, //destination matrix
-			modelViewMatrix, //matrix to rotate
-			cubeRotation, //amount to rotate in radians
-			[0, 0, 1]
-		); //axis to rotate around (z)
+			origMatrix,
+			origMatrix,
+			yRotation * 0.7, //amount to rotate in radians
+			[0, 1, 0]);
 
-		mat4.rotate(
-			modelViewMatrix, //destination matrix
-			modelViewMatrix, //matrix to rotate
-			cubeRotation * 0.7, //amount to rotate in radians
-			[0, 1, 0]
-		); //axis to rotate around (x)
+        mat4.multiply(origMatrix, origMatrix, proj);
 
-
+        this.origMatrix = origMatrix;
 	}
 }
 

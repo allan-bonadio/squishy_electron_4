@@ -21,74 +21,74 @@ let traceDrawPoints = false;
 let traceDrawLines = false;
 
 let pointSize = traceDrawPoints ? `gl_PointSize = 10.;` : '';
-let displayWrapEdges = false;  // soon to be a pref
 
 /* ******************************************************* garland drawing */
 // The glsl sources for webgl drawing
 
 /*
-** data format of attributes:  four column table of floats
-** 𝜓.re  𝜓.im   (unused)   serial.
-** uses gl_VertexID   NO! that's opengl 2 only
-** to figure out whether the radius should be re^2+im^2 or zero
+ data format of attributes:  four column table of floats
+ 𝜓.re  𝜓.im  (unused)   serial.
+ uses gl_VertexID   NO! that's opengl 2 only
+ use serial to figure out whether it's innie or outie:to figure
+out whether the radius should be full or less
 */
 
-/* Draws blades - quadrilatterals in a spiral pattern.  Each blade has a quadrilatteral on each side, each is two triangles.  Hopefully there's a little bit of thickness in the middle.  Colored by vertex just like the flat drawing.
+/* Draws blades - quadrilatterals in a spiral pattern.  Each blade has a
+/quadrilatteral on each side, each is two triangles.  Hopefully there's a little
+/bit of thickness in the middle.  Colored by vertex just like the flat drawing.
 
-The data and avatar loading is similar to with flat drawing - real and imag parts of wave become the y (vertical) and z (backward) coordinates of the garland point.  We then have to duplicate it all, rearranged?, to paint the other side of each blade.
-*/
+The data and avatar loading is similar to with flat drawing - real and imag
+parts of wave become the y (vertical) and z (backward) coordinates of the
+garland point.  We then have to duplicate it all, rearranged?, to paint the
+other side of each blade.
 
-// how much raw psi values should be multipled to be equivalent to x
-// values that go from 0 to N.  Adjust to taste or to N
-const PSI_MAG = 100;
+The Volume coordinates are what look like 3d coords in the view.  The unit is 1
+cell in the x direction, and OUTER_FACTOR times psi in the real and imag
+directions; hopefully those numbers are about 0.5 thru 5 or so.  The camera is
+located at the origin?.
+The points in the outer edge of the spiral follow this:
+x = ix
+y = OUTER_FACTOR * 𝜓_real
+z = OUTER_FACTOR * 𝜓_imag
+These are done in the GLSL code.
+
+Use INNER_FACTOR for the inner edge of the spiral, or zero.  So (frst try) each
+blade is two triangles */
+
+// how much raw psi values should be multipled to be equivalent to x in volume
+// space values that go from 0 to N.  Adjust to taste or to N.  These are
+// inserted as numbers into the vert shader code.
+const OUTER_FACTOR = 100;
+const INNER_FACTOR = 50;
 
 // make the line number for the start correspond to this JS file line number - the NEXT line
 const vertexSrc = `${cx2rygb}
 #line 38
+// this does all the atransformation we need.  precalculated for each repaint.
+uniform mat4 matrix;
+
+// the V shader calculates the color to use, and sets this so the frag shader can get it.
 varying highp vec4 vColor;
+
+// the one list of numbers input
 attribute vec4 row;
-uniform float barWidth;
-uniform float maxHeight;
 
 void main() {
 	int vertexSerial = int(row.w);  // use gl_VertexID & 1 with webgl2
-	bool odd = int(vertexSerial) / 2 * 2 < vertexSerial;
+	int ix = int(vertexSerial) / 2;
+	bool odd = ix * 2 < vertexSerial;
 
-	// figure out radius of garland at each point
-	// float radius;
-	// if (odd) {
-	// 	radius = (row.x * row.x + row.y * row.y) / maxHeight;
-	// }
-	// else {
-	// 	radius = 0.;  // top of the screen
-	// }
-	// radius *= ${PSI_MAG};
-	//radius = 1. - 2. * radius;
+	vec4 point;
+	point.yz = row.xy;
+	point *= odd ? ${INNER_FACTOR} : ${OUTER_FACTOR} :
+    point.x = ix;
+    point.w = 1.;
 
-	// figure out x, basically the point index; map to -1...+1
-
-	// The science coordinates are imag and real parts of psi, and the ix index times nm per cell.
-
-
-
-	// The Volume coordinates are what look like 3d coords in the view.  The unit is 1 cell in the x direction, and PSI_MAG times psi in the real and imag directions; hopefully those numbers are about 0.5 thru 5 or so.  The camera is located anywhere in an arc, along the side of the wave.
-
-	// x is integers, 0...N-1 or whatever.  y and z are the imag and real parts of psi.
-	// each psi datapoint maps to TWO rows in the avatar
-	// yeah a bit confusing but these are in 3d space user is looking into
-	float x, y, z;
-	x = float(int(vertexSerial) / 2);
-	y = row.y;
-	z = row.x;
-
-
-	gl_Position = vec4(x, radius, 0., 1.);
+    gl_Position = point;
 
 	//  for the color, convert the complex values via this algorithm
 	vColor.rgb = cx2rygb(row.xy);
-	//vColor.rgb = cx2rygb(vec2(row.x, row.y));
 	vColor.a = 1.;
-	//vColor = vec4(cx2rygb(vec2(row.x, row.y)), 1.);
 
 	// make the colors darker toward zero (top)
 	if (!odd)
@@ -130,33 +130,25 @@ export class eGarlandDrawing extends abstractDrawing {
 	createVariables() {
 		this.setDrawing();
 		if (traceGarlandDrawing)
-			console.log(`♭♭♭ garlandDrawing ${this.sceneName}: creatingVariables`);
+			console.log(`🌀🌀🌀 garlandDrawing ${this.sceneName}: creatingVariables`);
 
-		// normally autoranging would put the highest peak at the exact bottom.
-		// but we want some extra space.  not much.
-		//const vertStretch = 1.0;  // not sure why
-		//const vertStretch = 0.7;  // not sure why
-		const PADDING_ON_BOTTOM = 1.02;
-		//const PADDING_ON_BOTTOM = 1.02 * vertStretch;
-
-		this.maxHeightUniform = new drawingUniform('maxHeight', this,
+		this.matrixUniform = new drawingUniform('matrix', this,
 			() => {
-				// fresh out of the loader, maxHeight wobbles up and down.  Smooth it.
-				if (!this.maxHeight)  // ??
-					this.maxHeight = this.avatar.double0;
+				if (!this.matrix)  // ??
+					this.matrix = this.avatar.double0;
 				else {
 					// relax changes.  how  quickly?
-					this.maxHeight = this.avatar.double0;
-					//this.maxHeight = (this.maxHeight * 3 + this.avatar.double0) / 4;
-					//this.maxHeight = (this.maxHeight * 15 + this.avatar.double0) / 16;
-					//this.maxHeight = (this.maxHeight * 255 + this.avatar.double0) / 256;
+					this.matrix = this.avatar.double0;
+					//this.matrix = (this.matrix * 3 + this.avatar.double0) / 4;
+					//this.matrix = (this.matrix * 15 + this.avatar.double0) / 16;
+					//this.matrix = (this.matrix * 255 + this.avatar.double0) / 256;
 				}
 
 				if (traceMaxHeight)
-					console.log(`♭♭♭ garlandDrawing reloading outer:  `
-						+` maxHeight=${this.avatar.double0.toFixed(5)} `);
+					console.log(`🌀🌀🌀 garlandDrawing reloading outer:  `
+						+` matrix=${this.avatar.double0.toFixed(5)} `);
 
-				return {value: this.maxHeight * PADDING_ON_BOTTOM, type: '1f'};
+				return {value: this.matrix * PADDING_ON_BOTTOM, type: '1f'};
 			}
 		);
 
@@ -178,7 +170,7 @@ export class eGarlandDrawing extends abstractDrawing {
 				return { value: barWidth, type: '1f' };
 			}
 		);
-		if (traceGarlandDrawing) console.log(`♭♭♭ barWidth= ${barWidth}`);
+		if (traceGarlandDrawing) console.log(`🌀🌀🌀 barWidth= ${barWidth}`);
 
 		this.vertexCount = nPoints * 2;  // nPoints * vertsPerBar
 		this.rowFloats = 4;
@@ -188,7 +180,7 @@ export class eGarlandDrawing extends abstractDrawing {
 					nPoints);
 
 			if (traceReloadRow) {
-				console.log(`♭♭♭ garlandDrawing  ${this.avatarLabel}: at row getViewBuffer() `
+				console.log(`🌀🌀🌀 garlandDrawing  ${this.avatarLabel}: at row getViewBuffer() `
 					+` loading to ${this.avatar.label}   this.vertexCount=${this.vertexCount} `
 					+` total floats=${this.vertexCount * this.rowFloats}  double0=this.avatar.double0`);
 			}
@@ -201,9 +193,9 @@ export class eGarlandDrawing extends abstractDrawing {
 	// called for each image frame on th canvas.  TODO: roll specialInfo into the input Data Arrays
 	draw(width, height, specialInfo) {
 		if (traceGarlandDrawing) {
-			console.log(`♭♭♭ garland Drawing  ${this.avatarLabel}: `
+			console.log(`🌀🌀🌀 garland Drawing  ${this.avatarLabel}: `
 				+` width=${width}, height=${height}  drawing ${this.vertexCount/2} points `
-				+` maxHeight=${this.maxHeight}`);
+				+` matrix=${this.matrix}`);
 		}
 		const gl = this.gl;
 		this.setDrawing();
@@ -211,21 +203,20 @@ export class eGarlandDrawing extends abstractDrawing {
 		let bw = specialInfo.bumperWidth;
 		gl.viewport(bw, 0, width - 2 * bw, height);
 		if (traceViewport) {
-			console.log(`♭♭♭ garlandDrawing set viewport on avatar=${this.avatarLabel}: `
+			console.log(`🌀🌀🌀 garlandDrawing set viewport on avatar=${this.avatarLabel}: `
 				+` width-2bw=${width - 2 * bw}, height=${height}  `
 				+` drawing ${this.vertexCount/2} points`);
 		}
 		this.drawVariables.forEach(v => v.reloadVariable());
 		gl.drawArrays(gl.TRIANGLE_STRIP, 0, this.vertexCount);
 		if (traceGarlandDrawing) {
-			console.log(`♭♭♭just drewArays-garland on avatar ptr=${this.avatar.pointer} `
+			console.log(`🌀🌀🌀just drewArays-garland on avatar ptr=${this.avatar.pointer} `
 				+` this.avatar.label=${this.avatar.label}, `
 				+` buffer label=${this.avatar.bufferNames[0]}`);
 		}
 
 		if (traceDrawLines) {
 			gl.lineWidth(1);  // it's the only option anyway
-
 			gl.drawArrays(gl.GL_LINE_STRIP, 0, this.vertexCount);
 		}
 
@@ -234,11 +225,10 @@ export class eGarlandDrawing extends abstractDrawing {
 
 		// i think this is problematic
 		if (traceViewBufAfterDrawing) {
-			this.avatar.dumpComplexViewBuffer(`♭♭♭ finished drawing in garlandDrawing.js; drew buf:`);
-			console.log(`♭♭♭ barWidthUniform=${this.barWidthUniform.reloadFunc()} `
-				+`maxHeightUniform=${this.maxHeightUniform.reloadFunc()}`);
+			this.avatar.dumpComplexViewBuffer(`🌀🌀🌀 finished drawing in garlandDrawing.js; drew buf:`);
+			console.log(`🌀🌀🌀 barWidthUniform=${this.barWidthUniform.reloadFunc()} `
+				+`matrixUniform=${this.matrixUniform.reloadFunc()}`);
 		}
-		// ?? this.gl.bindVertexArray(null);
 	}
 }
 
