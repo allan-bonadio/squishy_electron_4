@@ -7,12 +7,12 @@ import {abstractDrawing} from './abstractDrawing.js';
 // eslint-disable-next-line no-unused-vars
 import {drawingUniform, drawingAttribute} from './drawingVariable.js';
 
-let traceDumpVertices = true;
-let traceTicDrawing = true;
-let traceHighest = true;
+let traceDumpVertices = false;
+let traceTicDrawing = false;
+let traceHighest = false;
 
 // diagnostic purposes
-let traceDrawPoints = true;
+let traceDrawPoints = false;
 
 // buffer size starts at this
 const BUFFER_MAX_NTICS = 100;
@@ -71,7 +71,7 @@ export class ticDrawing extends abstractDrawing {
 	constructor(scene, space) {
 		super(scene, 'ticDrawing');
 
-		debugger;
+		//debugger;
 		this.avatar = scene.avatar;
 		this.coordBuffer = this.avatar.attachViewBuffer(BUFFER_ID, null,
 			2, BUFFER_MAX_NTICS * FLOATS_PER_TIC, 'flat tics');
@@ -83,7 +83,7 @@ export class ticDrawing extends abstractDrawing {
 
 	// one time set up of variables for this drawing, every time canvas and scene is recreated
 	createVariables() {
-		debugger;
+		//debugger;
 		this.setDrawing();
 		if (traceTicDrawing)
 			console.log(`➤ ➤ ➤ ticDrawing ${this.sceneName}: creatingVariables`);
@@ -115,7 +115,7 @@ export class ticDrawing extends abstractDrawing {
 			console.log(`➤ ➤ ➤ ticDrawing ${this.sceneName}, ${this.avatarLabel}:`+
 				` highest is ${this.avatar.highest?.toFixed(6)}`);
 
-		debugger;
+		//debugger;
 		// number of tics on left side, comes from the flatDrawing scale but handle it if it isn't drawing
 		let avgψ = 1 /  this.space.nStates;
 		// if smooth highest isn't calculated yet, just use average ψ
@@ -162,7 +162,7 @@ export class ticDrawing extends abstractDrawing {
 		if (this.vertexCount <= 0)
 			return;
 
-		debugger;
+		//debugger;
 		const gl = this.gl;
 		this.setDrawing();
 		gl.viewport(0, 0, width, height);
@@ -170,7 +170,7 @@ export class ticDrawing extends abstractDrawing {
 		this.drawVariables.forEach(v => v.reloadVariable());
 
 		if (this.vertexCount > BUFFER_MAX_NTICS * VERTICES_PER_TIC)
-			debugger;
+			//debugger;
 		gl.drawArrays(gl.LINES, 0, this.vertexCount);
 
 		if (traceDrawPoints)
