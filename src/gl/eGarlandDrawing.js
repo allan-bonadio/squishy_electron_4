@@ -3,6 +3,8 @@
 ** Copyright (C) 2026-2026 Tactile Interactive, all rights reserved
 */
 
+import {mat4} from 'gl-matrix';
+
 import abstractDrawing from './abstractDrawing.js';
 import {drawingUniform, drawingAttribute} from './drawingVariable.js';
 import cx2rygb from './cx2rygb/cx2rygb.glsl.js';

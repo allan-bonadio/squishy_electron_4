@@ -3,6 +3,8 @@
 ** Copyright (C) 2026-2026 Tactile Interactive, all rights reserved
 */
 
+import {mat4} from 'gl-matrix';
+
 import abstractScene from './abstractScene.js';
 import eGarlandDrawing from './eGarlandDrawing.js';
 import wGarlandDrawing from './wGarlandDrawing.js';
@@ -53,6 +55,8 @@ class garlandScene extends abstractScene {
 			origMatrix, // destination
 			origMatrix, //to translate
 			[-0.0, 0.0, -6.0]);
+
+		let yRotation = .2;
 		mat4.rotate(
 			origMatrix,
 			origMatrix,
