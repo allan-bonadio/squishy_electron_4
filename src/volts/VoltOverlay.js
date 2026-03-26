@@ -12,7 +12,7 @@ import VoltArea from '../volts/VoltArea.js';
 import VoltSidebar from '../volts/VoltSidebar.js';
 import {getASetting, storeASetting} from '../utils/storeSettings.js';
 
-let traceGeometry = true;
+let traceGeometry = false;
 
 const propTypes = {
 	// for first couple of renders, space and idunno are null

@@ -8,7 +8,7 @@ import {mat4} from 'gl-matrix';
 //import {mat4} from 'gl_matrix';
 
 import abstractScene from './abstractScene.js';
-import eGarlandDrawing from './eGarlandDrawing.js';
+import garlandDrawing from './garlandDrawing.js';
 import wGarlandDrawing from './wGarlandDrawing.js';
 import eAvatar from '../engine/eAvatar.js';
 
