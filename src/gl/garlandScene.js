@@ -6,7 +6,7 @@
 import {mat4} from 'gl-matrix';
 
 import abstractScene from './abstractScene.js';
-import eGarlandDrawing from './eGarlandDrawing.js';
+import garlandDrawing from './garlandDrawing.js';
 import wGarlandDrawing from './wGarlandDrawing.js';
 import eAvatar from '../engine/eAvatar.js';
 // eslint-disable-next-line no-unused-vars
@@ -28,12 +28,12 @@ class garlandScene extends abstractScene {
 
 		// create relevant drawings.  Do not change this order;
 		// spent a long time on this.
-		if ('endless' == inputInfo.continuum) {
+		if ('endless' == this.space.continuum) {
 				this.drawings = [
-					new eGarlandDrawing(this, space),
+					new garlandDrawing(this, space),
 				];
 		}
-		else if ('well' == inputInfo.continuum) {
+		else if ('well' == this.space.continuum) {
 				this.drawings = [
 					new wGarlandDrawing(this, space),
 				];

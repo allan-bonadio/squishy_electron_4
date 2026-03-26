@@ -1,5 +1,5 @@
 /*
-** eGarlandDrawing -- main scene for 3d quantum in endless space
+** garlandDrawing -- main scene for 3d quantum in endless space
 ** Copyright (C) 2026-2026 Tactile Interactive, all rights reserved
 */
 
@@ -112,7 +112,7 @@ void main() {
 `;
 
 // the original display that's worth watching: garland upside down hump graph
-export class eGarlandDrawing extends abstractDrawing {
+export class garlandDrawing extends abstractDrawing {
 	constructor(scene) {
 		super(scene, 'garlandDrawing');
 
@@ -136,43 +136,17 @@ export class eGarlandDrawing extends abstractDrawing {
 
 		this.matrixUniform = new drawingUniform('matrix', this,
 			() => {
-				if (!this.matrix)  // ??
-					this.matrix = this.avatar.double0;
-				else {
-					// relax changes.  how  quickly?
-					this.matrix = this.avatar.double0;
-					//this.matrix = (this.matrix * 3 + this.avatar.double0) / 4;
-					//this.matrix = (this.matrix * 15 + this.avatar.double0) / 16;
-					//this.matrix = (this.matrix * 255 + this.avatar.double0) / 256;
-				}
+			    this.matrix = m4.create();
+			    m4.rotate(this.matrix, this.scene.origMatrix, 0, [0, 1, 0]);
 
-				if (traceMaxHeight)
-					console.log(`🌀🌀🌀 garlandDrawing reloading outer:  `
-						+` matrix=${this.avatar.double0.toFixed(5)} `);
+				if (traceMatrix)
+					console.log(`🌀🌀🌀 garlandDrawing reloading outer:  `,
+						this.matrix);
 
-				return {value: this.matrix * PADDING_ON_BOTTOM, type: '1f'};
+				return {value: this.matrix, type: 'Matrix4fv'};
 			}
 		);
 
-
-		// WELL continuum:  potential at the ends of the well are infinite; so
-		// psi on the border points is zero. These are the boundary datapoints,
-		// so for N=8, 10 edges between 9 bars, 7 between and 2 on ends.
-
-		// for ENDLESS, we wrap around one bar, so if N=8, there's two border bar at 0 and 8.
-		// there's 7 bars between.  9 bars total, 10 edges, matching the 10 = nPoints
-		// So, the same for WELL and ENDLESS
-
-		// barWidth: width of each bargraph bar
-		let nPoints = this.nPoints = this.space.nPoints;
-		let barWidth;
-		this.barWidthUniform = new drawingUniform('barWidth', this,
-			() => {
-				barWidth = 1 / (nPoints - 1)
-				return { value: barWidth, type: '1f' };
-			}
-		);
-		if (traceGarlandDrawing) console.log(`🌀🌀🌀 barWidth= ${barWidth}`);
 
 		this.vertexCount = nPoints * 2;  // nPoints * vertsPerBar
 		this.rowFloats = 4;
@@ -234,5 +208,5 @@ export class eGarlandDrawing extends abstractDrawing {
 	}
 }
 
-export default eGarlandDrawing;
+export default garlandDrawing;
 

@@ -161,6 +161,7 @@ function SetWaveTab(props) {
 		canvasInnerHeight={MINI_HEIGHT}
 		setGLRepaint={setMinigraphRepaint}
 		specialInfo={{bumperWidth: 0}}
+		show={true}
 		title="preview of what your wave will look like after clicking Set Wave"
 	/>;
 
