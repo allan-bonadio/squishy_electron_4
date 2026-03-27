@@ -52,7 +52,7 @@ A handy reference to which functions are where on what kind of object
 	exactEquals(a, b) {
 	equals(a, b) {
   var forEach = function () {
-    return function (a, stride, offset, count, fn, arg) {
+	return function (a, stride, offset, count, fn, arg) {
 --------- vec2 ------------ vec2 ------------ vec2 ------------ vec2 ---------
 
 
@@ -101,7 +101,7 @@ A handy reference to which functions are where on what kind of object
 	exactEquals$4(a, b) {
 	equals$4(a, b) {
   var forEach$2 = function () {
-    return function (a, stride, offset, count, fn, arg) {
+	return function (a, stride, offset, count, fn, arg) {
 --------- vec3 ------------ vec3 ------------ vec3 ------------ vec3 ---------
 
 
@@ -139,7 +139,7 @@ A handy reference to which functions are where on what kind of object
 	exactEquals$3(a, b) {
 	equals$3(a, b) {
   var forEach$1 = function () {
-    return function (a, stride, offset, count, fn, arg) {
+	return function (a, stride, offset, count, fn, arg) {
 --------- vec4 ------------ vec4 ------------ vec4 ------------ vec4 ---------
 
 
@@ -307,11 +307,11 @@ A handy reference to which functions are where on what kind of object
 	str$2(a) {
 	equals$2(a, b) {
   var rotationTo = function () {
-    return function (out, a, b) {
+	return function (out, a, b) {
   var sqlerp = function () {
-    return function (out, a, b, c, d, t) {
+	return function (out, a, b, c, d, t) {
   var setAxes = function () {
-    return function (out, view, right, up) {
+	return function (out, view, right, up) {
 --------- quat ------------ quat ------------ quat ------------ quat ---------
 
 

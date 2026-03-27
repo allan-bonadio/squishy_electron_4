@@ -137,14 +137,14 @@ export class garlandDrawing extends abstractDrawing {
 
 		this.matrixUniform = new drawingUniform('matrix', this,
 			() => {
-			    this.matrix = mat4.create();
-			    mat4.rotate(this.matrix, this.scene.origMatrix, 0, [0, 1, 0]);
+				this.matrix = mat4.create();
+				mat4.rotate(this.matrix, this.scene.origMatrix, 0, [0, 1, 0]);
 
 				if (traceMatrix) {
 					console.log(`🌀🌀🌀 garlandDrawing reloading matrix:  `,
 						this.matrix);
-	                dump4x4(this.matrix, 'matrix as sent to GL');
-	            }
+					dump4x4(this.matrix, 'matrix as sent to GL');
+				}
 				return {value: this.matrix, type: 'Matrix4fv'};
 			}
 		);
@@ -178,13 +178,13 @@ export class garlandDrawing extends abstractDrawing {
 		const gl = this.gl;
 		this.setDrawing();
 
-	    //let bw = specialInfo.bumperWidth;
-	    //gl.viewport(bw, 0, width - 2 * bw, height);
-	    //if (traceViewport) {
-	    //    console.log(`🌀🌀🌀 garlandDrawing set viewport on avatar=${this.avatarLabel}: `
-	    //        +` width-2bw=${width - 2 * bw}, height=${height}  `
-	    //        +` drawing ${this.vertexCount/2} points`);
-	    //}
+		//let bw = specialInfo.bumperWidth;
+		//gl.viewport(bw, 0, width - 2 * bw, height);
+		//if (traceViewport) {
+		//    console.log(`🌀🌀🌀 garlandDrawing set viewport on avatar=${this.avatarLabel}: `
+		//        +` width-2bw=${width - 2 * bw}, height=${height}  `
+		//        +` drawing ${this.vertexCount/2} points`);
+		//}
 		this.drawVariables.forEach(v => v.reloadVariable());
 		gl.drawArrays(gl.TRIANGLE_STRIP, 0, this.vertexCount);
 		if (traceDrawing) {
@@ -204,7 +204,7 @@ export class garlandDrawing extends abstractDrawing {
 		// i think this is problematic
 		if (traceAvatarAfterDrawing) {
 			this.avatar.dumpComplexViewBuffer(0, this.nPoints,
-			    `🌀🌀🌀 finished drawing in garlandDrawing.js; drew buf:`);
+				`🌀🌀🌀 finished drawing in garlandDrawing.js; drew buf:`);
 			console.log(`🌀🌀🌀  matrixUniform=`, this.matrixUniform.reloadFunc());
 		}
 	}

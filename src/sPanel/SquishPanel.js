@@ -85,7 +85,7 @@ class SquishPanel extends React.Component {
 
 		storeASetting('lapSettings', 'shouldBeIntegrating', sbi);
 		if (traceSBIUpdate)
-		    console.log(`👑 👑 called setShouldBeIntegrating(${sbi})`);
+			console.log(`👑 👑 called setShouldBeIntegrating(${sbi})`);
 	};
 
 	// this sets grinder.sbi and does the first trigger
@@ -108,14 +108,14 @@ class SquishPanel extends React.Component {
 
 	// these are the functions that change the 2d/3d setting.  Get at the state in the context.  These functions get passed down.
 	to2D = () => {
-	    this.setState({show2D: true, show3D: false});
-	    storeASetting('miscSettings', 'show2D', true);
-	    storeASetting('miscSettings', 'show3D', false);
+		this.setState({show2D: true, show3D: false});
+		storeASetting('miscSettings', 'show2D', true);
+		storeASetting('miscSettings', 'show3D', false);
 	};
 	to3D = () => {
-	    this.setState({show2D: false, show3D: true});
-	    storeASetting('miscSettings', 'show2D', false);
-	    storeASetting('miscSettings', 'show3D', true);
+		this.setState({show2D: false, show3D: true});
+		storeASetting('miscSettings', 'show2D', false);
+		storeASetting('miscSettings', 'show3D', true);
 	};
 
 	// these functions are passed in props to lower levels mostly for initialization.

@@ -44,7 +44,7 @@ export function dump4x4(matrix, title) {
 
 
 
-	    //dblog(`math 3d`)
+		//dblog(`math 3d`)
 
 
 

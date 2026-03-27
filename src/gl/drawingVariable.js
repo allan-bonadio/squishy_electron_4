@@ -72,9 +72,9 @@ export class drawingUniform extends drawingVariable {
 		this.uniformLoc = this.gl.getUniformLocation(this.drawing.program, varName);
 		if (!this.uniformLoc)
 			throw new Error(`Cannot find uniform loc for uniform variable ${varName} `
-			    +` in ${this.drawing.program.$qLabel}`);
+				+` in ${this.drawing.program.$qLabel}`);
 		if (traceUniforms) console.log(`🍯 created drawingUniform '${varName}'  in `
-                        +` ${this.drawing.program.$qLabel}`);
+		                +` ${this.drawing.program.$qLabel}`);
 
 		this.reloadVariable();
 	}

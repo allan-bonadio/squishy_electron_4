@@ -24,9 +24,9 @@ class garlandScene extends abstractScene {
 
 		// create relevant drawings.  Do not change this order;
 		// spent a long time on this.
-	    this.drawings = [
-	        new garlandDrawing(this, space),
-	    ];
+		this.drawings = [
+			new garlandDrawing(this, space),
+		];
 
 		// make the projection matrix
 		const fieldOfView = (45 * Math.PI) / 180; // in radians
@@ -52,11 +52,11 @@ class garlandScene extends abstractScene {
 			yRotation * 0, //amount to rotate in radians
 			[0, 1, 0]);
 
-	    mat4.multiply(origMatrix, origMatrix, proj);
+		mat4.multiply(origMatrix, origMatrix, proj);
 
-	    dump4x4(origMatrix, `orig matrix from scene`);
+		dump4x4(origMatrix, `orig matrix from scene`);
 
-	    this.origMatrix = origMatrix;
+		this.origMatrix = origMatrix;
 	}
 }
 
