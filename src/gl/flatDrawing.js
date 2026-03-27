@@ -9,7 +9,7 @@ import cx2rygb from './cx2rygb/cx2rygb.glsl.js';
 import qeFuncs from '../engine/qeFuncs.js';
 import qeConsts from '../engine/qeConsts.js';
 
-let traceViewBufAfterDrawing = false;
+let traceAvatarAfterDrawing = true;
 let traceMaxHeight = false;
 let traceFlatDrawing = false;
 let traceViewport = false;
@@ -19,7 +19,6 @@ let traceReloadRow = false;
 let traceDrawPoints = false;
 let traceDrawLines = false;
 
-let pointSize = traceDrawPoints ? `gl_PointSize = 10.;` : '';
 let displayWrapEdges = false;  // soon to be a pref
 
 /* ******************************************************* flat drawing */
@@ -70,8 +69,8 @@ void main() {
 	if (!odd)
 		vColor = vec4(vColor.r/2., vColor.g/2., vColor.b/2., vColor.a);
 
-	// dot size, in pixels not clip units.  actually a square.
-	${pointSize}
+	// dot size, in pixels not clip units.  actually a fuzzy square.
+	gl_PointSize = 10.;
 }
 `;
 
@@ -110,10 +109,7 @@ export class flatDrawing extends abstractDrawing {
 
 		// normally autoranging would put the highest peak at the exact bottom.
 		// but we want some extra space.  not much.
-		//const vertStretch = 1.0;  // not sure why
-		//const vertStretch = 0.7;  // not sure why
 		const PADDING_ON_BOTTOM = 1.02;
-		//const PADDING_ON_BOTTOM = 1.02 * vertStretch;
 
 		this.maxHeightUniform = new drawingUniform('maxHeight', this,
 			() => {
@@ -124,8 +120,6 @@ export class flatDrawing extends abstractDrawing {
 					// relax changes.  how  quickly?
 					this.maxHeight = this.avatar.double0;
 					//this.maxHeight = (this.maxHeight * 3 + this.avatar.double0) / 4;
-					//this.maxHeight = (this.maxHeight * 15 + this.avatar.double0) / 16;
-					//this.maxHeight = (this.maxHeight * 255 + this.avatar.double0) / 256;
 				}
 
 				if (traceMaxHeight)
@@ -209,12 +203,12 @@ export class flatDrawing extends abstractDrawing {
 			gl.drawArrays(gl.POINTS, 0, this.vertexCount);
 
 		// i think this is problematic
-		if (traceViewBufAfterDrawing) {
-			this.avatar.dumpComplexViewBuffer(`♭♭♭ finished drawing in flatDrawing.js; drew buf:`);
-			console.log(`♭♭♭ barWidthUniform=${this.barWidthUniform.reloadFunc()} `
-				+`maxHeightUniform=${this.maxHeightUniform.reloadFunc()}`);
+		if (traceAvatarAfterDrawing) {
+			this.avatar.dumpComplexViewBuffer(0, this.nPoints,
+					`♭♭♭ finished drawing in flatDrawing.js`);
+			console.log(`♭♭♭ barWidthUniform=`, this.barWidthUniform.reloadFunc(),
+				+` maxHeightUniform=`, this.maxHeightUniform.reloadFunc());
 		}
-		// ?? this.gl.bindVertexArray(null);
 	}
 }
 

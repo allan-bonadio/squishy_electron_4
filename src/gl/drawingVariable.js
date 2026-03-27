@@ -71,8 +71,10 @@ export class drawingUniform extends drawingVariable {
 		// this turns out to be an internal magic object
 		this.uniformLoc = this.gl.getUniformLocation(this.drawing.program, varName);
 		if (!this.uniformLoc)
-			throw new Error(`Cannot find uniform loc for uniform variable ${varName}`);
-		if (traceUniforms) console.log(`🍯 created drawingUniform '${varName}'`);
+			throw new Error(`Cannot find uniform loc for uniform variable ${varName} `
+			    +` in ${this.drawing.program.$qLabel}`);
+		if (traceUniforms) console.log(`🍯 created drawingUniform '${varName}'  in `
+                        +` ${this.drawing.program.$qLabel}`);
 
 		this.reloadVariable();
 	}
@@ -81,7 +83,9 @@ export class drawingUniform extends drawingVariable {
 	// call this when the uniform's value changes, to reload it into the GPU
 	// actually, calls before each draw, always
 	reloadVariable() {
-		// is passed the previous value
+		// value might be a JS float, vector or matrix typically 4 or 4x4.
+		// type is typically Matrix4fv, 1fv, or others; see
+		// https://developer.mozilla.org - WebGLRenderingContext
 		const {value, type} =  this.reloadFunc();
 		if (traceUniforms)
 			console.log(`🍯🍯 re-loading uniform ${this.varName} with value=${value} type ${type}`);
@@ -103,13 +107,12 @@ export class drawingUniform extends drawingVariable {
 
 		const method = `uniform${type}`;
 
-		// the matrix variations have this extra argument right in the middle
 		const args = [this.uniformLoc];
 		if (/^Matrix/.test(type))
-			args.push(false);
+			args.push(false);  // do not transpose
 		args.push(value);
 
-		// like gl.uniform4f(this.uniformLoc, value)
+		// like gl.uniformMatrix4f(this.uniformLoc, value)
 		gl[method].apply(gl, args);
 
 		if (traceUniforms) {
