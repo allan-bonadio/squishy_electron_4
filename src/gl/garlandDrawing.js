@@ -1,5 +1,5 @@
 /*
-** eGarlandDrawing -- main scene for 3d quantum in endless space
+** garlandDrawing -- main scene for 3d quantum in endless space
 ** Copyright (C) 2026-2026 Tactile Interactive, all rights reserved
 */
 
@@ -10,17 +10,18 @@ import {drawingUniform, drawingAttribute} from './drawingVariable.js';
 import cx2rygb from './cx2rygb/cx2rygb.glsl.js';
 import qeFuncs from '../engine/qeFuncs.js';
 import qeConsts from '../engine/qeConsts.js';
+import {dump4x4} from './math3d.js';
 
 
-let traceViewBufAfterDrawing = false;
-let traceMaxHeight = false;
-let traceGarlandDrawing = false;
-let traceViewport = false;
-let traceReloadRow = false;
+let traceAvatarAfterDrawing = true;
+let traceDrawing = true;
+let traceViewport = true;
+let traceReloadRow = true;
+let traceMatrix = true;
 
 // diagnostic purposes; draws more per vertex
-let traceDrawPoints = false;
-let traceDrawLines = false;
+let traceDrawPoints = true;
+let traceDrawLines = true;
 
 let pointSize = traceDrawPoints ? `gl_PointSize = 10.;` : '';
 
@@ -60,13 +61,14 @@ blade is two triangles */
 // how much raw psi values should be multipled to be equivalent to x in volume
 // space values that go from 0 to N.  Adjust to taste or to N.  These are
 // inserted as numbers into the vert shader code.
-const OUTER_FACTOR = 100;
-const INNER_FACTOR = 50;
+const OUTER_FACTOR = '100.';
+const INNER_FACTOR = '50.';
 
 // make the line number for the start correspond to this JS file line number - the NEXT line
-const vertexSrc = `${cx2rygb}
-#line 38
-// this does all the atransformation we need.  precalculated for each repaint.
+const vertexSrc = `// garlandDrawing vertex
+${cx2rygb}
+#line 68
+// this does all the transformation we need.  precalculated for each repaint.
 uniform mat4 matrix;
 
 // the V shader calculates the color to use, and sets this so the frag shader can get it.
@@ -82,27 +84,27 @@ void main() {
 
 	vec4 point;
 	point.yz = row.xy;
-	point *= odd ? ${INNER_FACTOR} : ${OUTER_FACTOR} :
-    point.x = ix;
-    point.w = 1.;
+	point *= odd ? ${INNER_FACTOR} : ${OUTER_FACTOR};
+	point.x = float(ix);
+	point.w = 1.;
 
-    gl_Position = point;
+	gl_Position = point * matrix;
 
 	//  for the color, convert the complex values via this algorithm
 	vColor.rgb = cx2rygb(row.xy);
 	vColor.a = 1.;
 
 	// make the colors darker toward zero (top)
-	if (!odd)
-		vColor = vec4(vColor.r/2., vColor.g/2., vColor.b/2., vColor.a);
+//	if (!odd)
+//		vColor = vec4(vColor.r/2., vColor.g/2., vColor.b/2., vColor.a);
 
-	// dot size, in pixels not clip units.  actually a square.
-	${pointSize}
+	// dot size, in pixels not clip units.  actually a fuzzy square.
+	gl_PointSize = 10.;
 }
 `;
 
-const fragmentSrc = `
-#line 80
+const fragmentSrc = `// garlandDrawing frag
+#line 105
 precision highp float;
 varying highp vec4 vColor;
 
@@ -112,7 +114,7 @@ void main() {
 `;
 
 // the original display that's worth watching: garland upside down hump graph
-export class eGarlandDrawing extends abstractDrawing {
+export class garlandDrawing extends abstractDrawing {
 	constructor(scene) {
 		super(scene, 'garlandDrawing');
 
@@ -131,49 +133,24 @@ export class eGarlandDrawing extends abstractDrawing {
 	// one time set up of variables for this drawing, every time canvas and scene is recreated
 	createVariables() {
 		this.setDrawing();
-		if (traceGarlandDrawing)
+		if (traceDrawing)
 			console.log(`🌀🌀🌀 garlandDrawing ${this.sceneName}: creatingVariables`);
 
 		this.matrixUniform = new drawingUniform('matrix', this,
 			() => {
-				if (!this.matrix)  // ??
-					this.matrix = this.avatar.double0;
-				else {
-					// relax changes.  how  quickly?
-					this.matrix = this.avatar.double0;
-					//this.matrix = (this.matrix * 3 + this.avatar.double0) / 4;
-					//this.matrix = (this.matrix * 15 + this.avatar.double0) / 16;
-					//this.matrix = (this.matrix * 255 + this.avatar.double0) / 256;
+				this.matrix = mat4.create();
+				mat4.rotate(this.matrix, this.scene.origMatrix, 0, [0, 1, 0]);
+
+				if (traceMatrix) {
+					console.log(`🌀🌀🌀 garlandDrawing reloading matrix:  `,
+						this.matrix);
+					dump4x4(this.matrix, 'matrix as sent to GL');
 				}
-
-				if (traceMaxHeight)
-					console.log(`🌀🌀🌀 garlandDrawing reloading outer:  `
-						+` matrix=${this.avatar.double0.toFixed(5)} `);
-
-				return {value: this.matrix * PADDING_ON_BOTTOM, type: '1f'};
+				return {value: this.matrix, type: 'Matrix4fv'};
 			}
 		);
 
-
-		// WELL continuum:  potential at the ends of the well are infinite; so
-		// psi on the border points is zero. These are the boundary datapoints,
-		// so for N=8, 10 edges between 9 bars, 7 between and 2 on ends.
-
-		// for ENDLESS, we wrap around one bar, so if N=8, there's two border bar at 0 and 8.
-		// there's 7 bars between.  9 bars total, 10 edges, matching the 10 = nPoints
-		// So, the same for WELL and ENDLESS
-
-		// barWidth: width of each bargraph bar
 		let nPoints = this.nPoints = this.space.nPoints;
-		let barWidth;
-		this.barWidthUniform = new drawingUniform('barWidth', this,
-			() => {
-				barWidth = 1 / (nPoints - 1)
-				return { value: barWidth, type: '1f' };
-			}
-		);
-		if (traceGarlandDrawing) console.log(`🌀🌀🌀 barWidth= ${barWidth}`);
-
 		this.vertexCount = nPoints * 2;  // nPoints * vertsPerBar
 		this.rowFloats = 4;
 		this.rowAttr = new drawingAttribute('row', this, this.rowFloats, () => {
@@ -194,7 +171,7 @@ export class eGarlandDrawing extends abstractDrawing {
 
 	// called for each image frame on th canvas.  TODO: roll specialInfo into the input Data Arrays
 	draw(width, height, specialInfo) {
-		if (traceGarlandDrawing) {
+		if (traceDrawing) {
 			console.log(`🌀🌀🌀 garland Drawing  ${this.avatarLabel}: `
 				+` width=${width}, height=${height}  drawing ${this.vertexCount/2} points `
 				+` matrix=${this.matrix}`);
@@ -202,16 +179,16 @@ export class eGarlandDrawing extends abstractDrawing {
 		const gl = this.gl;
 		this.setDrawing();
 
-		let bw = specialInfo.bumperWidth;
-		gl.viewport(bw, 0, width - 2 * bw, height);
-		if (traceViewport) {
-			console.log(`🌀🌀🌀 garlandDrawing set viewport on avatar=${this.avatarLabel}: `
-				+` width-2bw=${width - 2 * bw}, height=${height}  `
-				+` drawing ${this.vertexCount/2} points`);
-		}
+		//let bw = specialInfo.bumperWidth;
+		//gl.viewport(bw, 0, width - 2 * bw, height);
+		//if (traceViewport) {
+		//    console.log(`🌀🌀🌀 garlandDrawing set viewport on avatar=${this.avatarLabel}: `
+		//        +` width-2bw=${width - 2 * bw}, height=${height}  `
+		//        +` drawing ${this.vertexCount/2} points`);
+		//}
 		this.drawVariables.forEach(v => v.reloadVariable());
 		gl.drawArrays(gl.TRIANGLE_STRIP, 0, this.vertexCount);
-		if (traceGarlandDrawing) {
+		if (traceDrawing) {
 			console.log(`🌀🌀🌀just drewArays-garland on avatar ptr=${this.avatar.pointer} `
 				+` this.avatar.label=${this.avatar.label}, `
 				+` buffer label=${this.avatar.bufferNames[0]}`);
@@ -226,13 +203,13 @@ export class eGarlandDrawing extends abstractDrawing {
 			gl.drawArrays(gl.POINTS, 0, this.vertexCount);
 
 		// i think this is problematic
-		if (traceViewBufAfterDrawing) {
-			this.avatar.dumpComplexViewBuffer(`🌀🌀🌀 finished drawing in garlandDrawing.js; drew buf:`);
-			console.log(`🌀🌀🌀 barWidthUniform=${this.barWidthUniform.reloadFunc()} `
-				+`matrixUniform=${this.matrixUniform.reloadFunc()}`);
+		if (traceAvatarAfterDrawing) {
+			this.avatar.dumpComplexViewBuffer(0, this.nPoints,
+				`🌀🌀🌀 finished drawing in garlandDrawing.js; drew buf:`);
+			console.log(`🌀🌀🌀  matrixUniform=`, this.matrixUniform.reloadFunc());
 		}
 	}
 }
 
-export default eGarlandDrawing;
+export default garlandDrawing;
 

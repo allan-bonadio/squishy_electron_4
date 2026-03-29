@@ -184,8 +184,8 @@ You have to build the C++ and the JS parts.
 For development, go into quantumEngine and do a **make**.
 
 Otherwise, this is a CRA app; go to the root and do
-    npm install
-    npm start
+	npm install
+	npm start
 As of this writing, it's set to port 6600; see `.env.development` for the current port number, and other stuff
 
 ### prod building

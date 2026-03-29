@@ -24,7 +24,7 @@ class flatScene extends abstractScene {
 		// spent a long time on this.
 		this.drawings = [
 
-			new ticDrawing(this, space),
+			// needs work new ticDrawing(this, space),
 			new flatDrawing(this, space),
 		];
 

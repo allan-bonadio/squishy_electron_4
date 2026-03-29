@@ -147,7 +147,7 @@ void qAvatar::dumpEachViewBuffer(int bufferMask, const char *title) {
 	if (!title) title = "no title 🧨 🧨";
 
 	printf(" 🚥 %s avatar ✈️ %d vertices (bufferMask: %x)\n",
-		title, viewBuffers[0].nVertices, bufferMask);    // WRONG only for buf zero
+		title, viewBuffers[0].nVertices, bufferMask);    // WRONG nVertices only for buf zero
 
 	// HEADING row.  Pay careful attention to chars across so rows line up,
 	// and line up with headings.  Right just.
@@ -207,21 +207,21 @@ void qAvatar::dumpEachViewBuffer(int bufferMask, const char *title) {
 		throw std::runtime_error("qAvatar::dumpEachViewBuffer() overflowed txt buffer in ind!!");
 }
 
-// dump only the first two fields of the bufIx-th vbuf, assuming they're real and inag, exactly as flatDrawing uses it
+// dump rows of the vbuf, assuming they're [0]=real and [1]=imag, exactly as flatDrawing uses it
+// notice you pass it nPoints, not n rows or n vertices.
 void qAvatar::dumpComplexViewBuffer(int bufIx, int nPoints, const char *title) {
 	float *fArray = viewBuffers[bufIx].fArray;  // to here
 	float prevPhase =0;
-	#define FORMAT_BASE      "%6d |  %6.5f  %6.5f  %6.5g  %6.5g"
-	#define FORMAT_SUFFIX  " |  %6.5f  %6.5f  %6.5f  m𝜓/nm\n"
+	#define REAL_IMAG_SERIAL      "%5d |  %8.4f  %8.4f  %4.0f  %7.0f |"
+	#define PHASE_MAGNITUDE  "  %9.3f  %9.3f  %9.3f  m𝜓/nm\n"
 
 	if (!title) title = "";
-	printf("==== 🚦  dump view buffer Array %p | %s\n", fArray, title);
-	printf("   ix  |    re      im     ---    serial  |      𝜃        d 𝜃      magn\n");
+	printf("==== 🚦  dump cx view buffer Array %p len %d | %s\n", fArray, nPoints, title);
+	printf("   ix |     re        im       ---  serial |        𝜃           d𝜃         magn\n");
 	for (int i = 0; i < nPoints; i++) {
-
-		// first three should be all zero
+		// two rows at a time, only the second one has phase & mag info
 		float *row = fArray + i * 8;
-		printf(FORMAT_BASE "\n",
+		printf(REAL_IMAG_SERIAL "\n",
 			i,
 			row[0], row[1], row[2], row[3]);
 
@@ -230,14 +230,14 @@ void qAvatar::dumpComplexViewBuffer(int bufIx, int nPoints, const char *title) {
 		float phase = atan2(im, re) * 180 / PI;
 		float dPhase = fmod(phase - prevPhase + 180, 360) - 180;
 		float magn = im * im + re * re;
-		printf(FORMAT_BASE FORMAT_SUFFIX,
+		printf(REAL_IMAG_SERIAL PHASE_MAGNITUDE,
 			i,
 			re, im, row[6], row[7],
 			phase, dPhase, magn);
 
 		prevPhase = phase;
 	}
-	printf(" 🚦 at end of dumpComplexViewBuffer avatar=%p  avatar->fArray=%p\n\n",
+	printf("==== 🚦 end of dumpComplexViewBuffer avatar=%p  avatar->fArray=%p\n\n",
 			this, fArray);
 }
 

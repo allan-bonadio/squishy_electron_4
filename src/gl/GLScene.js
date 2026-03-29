@@ -18,6 +18,10 @@ import glAmbiance from './glAmbiance.js';
 let traceSetup = false;
 let traceGeometry = false;
 
+// turn this off by setting it to '' or just turn off the booleans above; automated resetting won't touch it
+// but that turns off all the tracing... hmmm...
+let traceOnlyScene = 'mainWave3d';
+
 // this one dumps large buffers
 let traceTooEarly = false;
 let traceViewBuffer = false;
@@ -106,8 +110,8 @@ function GLScene(props) {
 
 		squishScene.glRepaint = glRepaint;
 
-		if (traceSetup) console.log(`🖼 GLScene ${p.sceneName}: `
-			+` done with initSceneClass`);
+		if (traceSetup && traceOnlyScene == p.sceneName)
+			console.log(`🖼 GLScene ${p.sceneName}:  done with initSceneClass`);
 	};
 
 	// repaint whole GL image.	this is repainting a canvas with GL.
@@ -115,10 +119,14 @@ function GLScene(props) {
 	// and this function redraws on the canvas (with gl).
 	const glRepaint =
 	() => {
+		// if not showing, nothing to paint.  Still needs to render the canvas, even though disp none
+		if (!p.show)
+			return;
+
 		// make sure we have this cuz this func gets called from all over
 		const scene = squishScene;
 		const node = canvasNode;
-		const info=p.specialInfo;
+		const info = p.specialInfo;
 		if (! scene) {
 			if (traceTooEarly)
 				console.log(`🖼 GLScene too early for glRepaint. squishScene=`, scene);
@@ -127,15 +135,10 @@ function GLScene(props) {
 		// if (traceViewBuffer)
 		// p.avatar.cavity.dump(`🖼 GLScene ${p.sceneName}: got the cavity right here`);
 
-		// copy from latest wave to view buffer (c++) & pick up highest
-		//p.avatar.loadViewBuffer();
-		// if (traceViewBuffer)
-		//	 p.avatar.dumpComplexViewBuffer(`🖼 GLScene ${p.sceneName}: loaded ViewBuffer`);
-
 		// draw.  This won't set up an ∞ loop, right?
 		scene.drawAllDrawings(node.width, node.height, info);
 		//scene.drawAllDrawings(p.canvasInnerWidth, p.canvasInnerHeight, info);
-		if (traceGeometry) {
+		if (traceGeometry && traceOnlyScene == p.sceneName) {
 			console.log(`🖼 GLScene finished glRepaint() ${p.sceneName}:	\n`
 					+`canvasInnerWidth=${p.canvasInnerWidth}, canvasInnerHeight=${p.canvasInnerHeight}, `
 					+`specialInfo=`, info);
@@ -178,7 +181,7 @@ function GLScene(props) {
 			if (props.animator)
 				props.animator.glRepaint = glRepaint;
 
-			if (traceSetup)
+			if (traceSetup && traceOnlyScene == p.sceneName)
 				console.log(`🖼 GLScene ${p.sceneName}: canvas ${canvasNode?.className}, gl, view&drawing done`);
 		});
 	}
@@ -206,7 +209,7 @@ function GLScene(props) {
 
 		glRepaint();
 
-		if (traceSetup) {
+		if (traceSetup && traceOnlyScene == p.sceneName) {
 			console.log(`🖼 GLScene ${p.sceneName}: effectRepaint(): completed, canvasNode=`,
 				canvasNode);
 		}
@@ -230,7 +233,7 @@ function GLScene(props) {
 			width={cWidth}
 			height={cHeight}
 			style={{width: cWidth + 'px', height: cHeight + 'px',
-			      display: p.show ? 'block' : 'none'}}
+					display: p.show ? 'block' : 'none'}}
 			ref={canvasRef}
 			title={p.title}
 		/>
@@ -247,7 +250,7 @@ from MDN:
 
 HTMLCanvasElement: toBlob() method
 Baseline Widely available
-The HTMLCanvasElement.toBlob() method creates a Blob object representing the image contained in the canvas. This file may be cached on the disk or stored in memory at the discretion of the user agent.
+The HTMLCanvasElement.toBlob() method creates a Blob object representing the image contained in the canvas [png or other formats]. This file may be cached on the disk or stored in memory at the discretion of the user agent.
 
 The desired file format and image quality may be specified. If the file format is not specified, or if the given format is not supported, then the data will be exported as image/png. Browsers are required to support image/png; many will support additional formats including image/jpeg and image/webp.
 

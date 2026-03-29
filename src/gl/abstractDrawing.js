@@ -35,7 +35,6 @@ export class abstractDrawing {
 		this.tagObject = scene.tagObject;
 		this.space = scene.space;
 		this.avatar = scene.avatar;
-		// crashes this.glBuffer.__SPECTOR_Metadata = { name: "cubeVerticesColorBuffer" };
 		this.avatarLabel = scene.avatar?.label ?? 'no avatar';
 		this.shaderTypes = {
 			[this.gl.VERTEX_SHADER]: 'vertex',
@@ -61,6 +60,11 @@ export class abstractDrawing {
 		const shType = this.shaderTypes[type];
 
 		let shader = gl.createShader(type);
+
+		let label = `${this.sceneName}-${this.drawingName}-${type}`;
+		this.tagObject(shader, label);
+		shader.$qLabel = label;
+		shader.__SPECTOR_Metadata = { name: label};
 
 		gl.shaderSource(shader, srcString);
 		gl.compileShader(shader);
@@ -88,21 +92,22 @@ export class abstractDrawing {
 		const program = gl.createProgram();
 		let label = program.$qLabel = `${this.sceneName}-${this.drawingName}-program`;
 		this.tagObject(program, label);
+		program.__SPECTOR_Metadata = { name: label};
 
 
 		const vertexShader = this.compileShader(gl.VERTEX_SHADER,
 			this.vertexShaderSrc);
 		gl.attachShader(program, vertexShader);
 		this.vertexShader = vertexShader;
-		label = vertexShader.$qLabel = `${this.sceneName}-${this.drawingName}-vshader`;
-		this.tagObject(vertexShader, label);
+        //label = vertexShader.$qLabel = `${this.sceneName}-${this.drawingName}-vshader`;
+        //this.tagObject(vertexShader, label);
 
 		const fragmentShader = this.compileShader(gl.FRAGMENT_SHADER,
 			this.fragmentShaderSrc);
 		gl.attachShader(program, fragmentShader);
 		this.fragmentShader = fragmentShader;
-		label = fragmentShader.$qLabel = `${this.sceneName}-${this.drawingName}-fshader`;
-		this.tagObject(fragmentShader, label);
+        //label = fragmentShader.$qLabel = `${this.sceneName}-${this.drawingName}-fshader`;
+        //this.tagObject(fragmentShader, label);
 
 		gl.linkProgram(program);
 		if (gl.getProgramParameter(program, gl.LINK_STATUS)) {

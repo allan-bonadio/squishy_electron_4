@@ -38,7 +38,7 @@ let pointSize = traceDrawPoints ? `gl_PointSize = 5.;` : '';
 
 // make the line number for the start correspond to this JS file line number - the NEXT line
 // gets out of sync so easily!
-const vertexSrc = `
+const vertexSrc = `// ticDrawing vertex
 #line 41
 attribute vec2 endPoint;
 uniform float maxHeight;
@@ -56,7 +56,7 @@ void main() {
 }
 `;
 
-const fragmentSrc = `
+const fragmentSrc = `// ticDrawing frag
 #line 59
 precision highp float;
 varying highp vec4 vColor;
