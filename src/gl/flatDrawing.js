@@ -32,7 +32,8 @@ let displayWrapEdges = false;  // soon to be a pref
 */
 
 // make the line number for the start correspond to this JS file line number - the NEXT line
-const vertexSrc = `${cx2rygb}
+const vertexSrc = `// flat drawing vertex
+${cx2rygb}
 #line 32
 varying highp vec4 vColor;
 attribute vec4 row;
@@ -74,7 +75,7 @@ void main() {
 }
 `;
 
-const fragmentSrc = `
+const fragmentSrc = `// flat drawing frag
 #line 69
 precision highp float;
 varying highp vec4 vColor;

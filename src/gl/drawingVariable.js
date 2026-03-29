@@ -158,7 +158,7 @@ export class drawingAttribute extends drawingVariable {
 		let label = `${drawing.avatarLabel}-${drawing.drawingName}-${varName}-glbuf`;
 		this.tagObject(this.glBuffer, label);
 		this.glBuffer.$qLabel = label;
-		this.glBuffer.__SPECTOR_Metadata = { name: "cubeVerticesColorBuffer" };
+		this.glBuffer.__SPECTOR_Metadata = {name: label};
 
 		// connect  ARRAY_BUFFER to glBuffer.
 		// do I have to do this if I'm not (yet) attaching the JS-space array with bufferData?

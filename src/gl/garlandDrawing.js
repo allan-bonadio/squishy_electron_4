@@ -65,7 +65,8 @@ const OUTER_FACTOR = '100.';
 const INNER_FACTOR = '50.';
 
 // make the line number for the start correspond to this JS file line number - the NEXT line
-const vertexSrc = `${cx2rygb}
+const vertexSrc = `// garlandDrawing vertex
+${cx2rygb}
 #line 68
 // this does all the transformation we need.  precalculated for each repaint.
 uniform mat4 matrix;
@@ -102,7 +103,7 @@ void main() {
 }
 `;
 
-const fragmentSrc = `
+const fragmentSrc = `// garlandDrawing frag
 #line 105
 precision highp float;
 varying highp vec4 vColor;
