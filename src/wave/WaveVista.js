@@ -17,7 +17,7 @@ import {getASetting, storeASetting} from '../utils/storeSettings.js';
 //import {waitForSpaceCreatedPromise} from './waveContext.js';
 import waveAux from './waveAux.js';
 
-// import VoltOverlay from '../volts/VoltOverlay.js';
+import PivotOverlay from './PivotOverlay.js';
 // import {WELL_BUMPER_WIDTH} from '../volts/voltConstants.js';
 import GLScene from '../gl/GLScene.js';
 import {eSpaceCreatedPromise} from '../engine/eEngine.js';
@@ -73,7 +73,7 @@ export class WaveVista extends React.Component {
 		this.state = {
 			// height of just the canvas + DOUBLE_THICKNESSpx, as set by user with size box
 			// integer pixels
-			outerHeight: round(getASetting('miscSettings', 'WaveVistaHeight')),
+			outerHeight: round(getASetting('miscSettings', 'vistaHeight')),
 		}
 
 		this.createInnerDims();
@@ -87,7 +87,7 @@ export class WaveVista extends React.Component {
 
 		//this.animator = this.props.animator;
 
-		handleSpaceCreatedPromiseAndShit()
+		//createInnerDims()
 		// eSpaceCreatedPromise.then(
 		// 	this.handleSpacePromise,  // call this with (space)
 		//
@@ -274,7 +274,7 @@ export class WaveVista extends React.Component {
 	// 	const vHeight = round(ev.pageY + this.yOffset);
 	// 	if (this.state.outerHeight != vHeight)
 	// 		this.setState({outerHeight: vHeight});
-	// 	storeASetting('miscSettings', 'WaveVistaHeight', vHeight);
+	// 	storeASetting('miscSettings', 'vistaHeight', vHeight);
 	// 	if (traceDragCanvasHeight)
 	// 	console.log(`🏄 resizePointer drag ${ev.pageX} ${ev.pageY}  newheight=${ev.pageY + this.yOffset}`);
 	//
@@ -346,33 +346,23 @@ export class WaveVista extends React.Component {
 
 		if (traceDimensions) {
 			console.log(`🏄 WaveVista render, outerWidth=${this.outerWidth}`
-				+` bumperWidth=${this.bumperWidth}, canvasInnerWidth=${this.canvasInnerWidth} `
+				+`canvasInnerWidth=${this.canvasInnerWidth} `
 				+`canvasInnerHeight=${this.canvasInnerHeight}`);
 		}
 
+		const pivotOverlay = <PivotOverlay />;
+
 		// can't make a real GLScene until we have the space!
-		let glScene2d, glScene3d;
+		let glScene3d;
 		if (this.space) {
 			// this is the main wave, always
-			let sceneClassName = 'flatScene';
-			let sceneName = 'mainWave';
-
-			glScene2d = <GLScene
-				space={s.space} animator={this.animator}
-				sceneClassName={'flatScene'} sceneName={sceneName +'2d'}
-				inputInfo={[this.space.mainFlick, this.bumperWidth, null, null]}
-				specialInfo={{bumperWidth: this.bumperWidth}}
-				canvasInnerWidth={this.canvasInnerWidth}
-				canvasInnerHeight={this.canvasInnerHeight}
-				setGLRepaint={this.setMainRepaint}
-				show={this.context.show2D}
-			/>;
+			let sceneClassName = 'garlandScene';
+			let sceneName = 'mainWave3D';
 
 			glScene3d = <GLScene
 				space={s.space} animator={this.animator}
 				sceneClassName={'garlandScene'} sceneName={sceneName + '3d'}
-				inputInfo={[this.space.mainFlick, this.bumperWidth, null, null]}
-				specialInfo={{bumperWidth: this.bumperWidth}}
+				inputInfo={[this.space.mainFlick, null, null, null]}
 				canvasInnerWidth={this.canvasInnerWidth}
 				canvasInnerHeight={this.canvasInnerHeight}
 				setGLRepaint={this.setMainRepaint}
@@ -392,22 +382,6 @@ export class WaveVista extends React.Component {
 			</div>;
 		}
 
-		// if there's no vDisp yet (cuz no space yet), the voltOverlay gets all
-		// mucked up.  So just avoid it.
-		let voltOverlay = '';
-		if (this.mainVDisp){
-			voltOverlay = <VoltOverlay
-				space={this.space}
-				canvasInnerWidth={this.canvasInnerWidth}
-				canvasInnerHeight={this.canvasInnerHeight}
-				mainVDisp={this.mainVDisp}
-				bumperWidth={this.bumperWidth}
-			/>;
-		}
-		// now kept in VoltOverlay and Control Panel showVoltage={p.showVoltage}
-
-		let betweenBumpers = this.canvasInnerWidth - 2 * this.bumperWidth;
-
 		// the glScene is one layer.  Over that is the widget area  Bumpers are outside.
 		return (
 		<div className='WaveVista' style={{height: `${s.outerHeight}px`}}
@@ -416,13 +390,10 @@ export class WaveVista extends React.Component {
 			onFocus={ev => console.log(`focus ON`)}
 			ref={this.grabWaveVistaEl}>
 
-			{glScene2d}
 			{glScene3d}
 
-			<div className='bumper left' key='left'
-				style={{flexBasis: this.bumperWidth +'px', height: this.canvasInnerHeight}} />
 			<div className='widgetArea' key='widgetArea'
-						style={{flexBasis: betweenBumpers +'px', height: this.canvasInnerHeight}}>
+						style={{flexBasis: this.canvasInnerWidth +'px', height: this.canvasInnerHeight + 'px'}}>
 
 				<section className='timeOverlay'
 					style={{maxWidth: this.canvasInnerWidth +'px'}}>
@@ -432,7 +403,7 @@ export class WaveVista extends React.Component {
 
 				</section>
 
-				{voltOverlay}
+				{pivotOverlay}
 
 				<BeginFinishOverlay />
 
@@ -442,8 +413,6 @@ export class WaveVista extends React.Component {
 					title="To adjust the height, drag this up or down"
 					style={{width: `2em`, height: `2em`}} />
 			</div>
-			<div className='bumper right' key='right'
-				style={{flexBasis: this.bumperWidth +'px', height: this.canvasInnerHeight}} />
 
 		</div>
 		);

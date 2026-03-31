@@ -25,12 +25,13 @@ export class abstractScene {
 	// A scene is always constructed with args sceneName, ambiance, space
 	// The scene constructor sometimes ignores the space but it's passed anyway.
 	// inputInfo contains arrays to send to webgl; freeform
-	constructor(sceneName, ambiance, inputInfo) {
+	constructor(sceneName, ambiance, inputInfo, space) {
 		this.sceneName = sceneName;
 		this.canvas = ambiance.canvas;
 		this.gl = ambiance.gl;
 		this.tagObject = ambiance.tagObject;
-		this.inputInfo = inputInfo;
+		this.inputInfo = inputInfo;  // might be undef
+		this.space = space;  // might be undef
 		if (! this.canvas) throw new Error(`abstractScene: being created without canvas`);
 
 		// all of the drawings in this scene
@@ -40,7 +41,7 @@ export class abstractScene {
 
 	// the final call to set it up does all sceneClassName-specific stuff
 	// other subclassers override what they want
-	completeScene(specialInfo) {
+	completeScene(inputInfo) {
 		this.compileShadersOnDrawings();
 		this.createVariablesOnDrawings();
 
@@ -51,7 +52,7 @@ export class abstractScene {
 		if (tracePaint)
 			console.log(`🦊 abs completeScene() width=${this.canvas.width}, height=${this.canvas.height},`);
 
-		this.drawAllDrawings(this.canvas.width, this.canvas.height, specialInfo);
+		this.drawAllDrawings(this.canvas.width, this.canvas.height, inputInfo);
 	}
 
 	/* ****************************************** Shader s */
@@ -91,7 +92,7 @@ export class abstractScene {
 		gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 	}
 
-	drawAllDrawings(width, height, specialInfo) {
+	drawAllDrawings(width, height) {
 		if (tracePaint) console.log(`🦊 abs drawAllDr width=${width}, height=${height},`);
 		if (!width || !height) debugger;
 
@@ -105,7 +106,7 @@ export class abstractScene {
 			drawing.drawVariables.forEach(v => v.reloadVariable());
 
 			if (!drawing.skipDrawingCuzErr)
-				drawing.draw(width, height, specialInfo);
+				drawing.draw(width, height, this.inputInfo);
 		});
 	}
 }

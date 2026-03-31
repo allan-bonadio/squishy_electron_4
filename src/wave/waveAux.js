@@ -105,7 +105,7 @@ export const waveAux = {
 		const vHeight = Math.round(ev.pageY + this.yOffset);
 		if (this.state.outerHeight != vHeight)
 			this.setState({outerHeight: vHeight});
-		storeASetting('miscSettings', 'WaveVistaHeight', vHeight);
+		storeASetting('miscSettings', 'vistaHeight', vHeight);
 		if (traceDragCanvasHeight)
 		console.log(`🏄 resizePointer drag ${ev.pageX} ${ev.pageY}  newheight=${ev.pageY + this.yOffset}`);
 

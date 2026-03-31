@@ -75,8 +75,8 @@ void main() {
 
 export class starDrawing extends abstractDrawing {
 
-	constructor(viewDef) {
-		super(viewDef, 'starDrawing');
+	constructor(scene) {
+		super(scene, 'starDrawing');
 
 		this.vertexShaderSrc = vertexSrc;
 		this.fragmentShaderSrc = fragmentSrc;
@@ -100,7 +100,7 @@ export class starDrawing extends abstractDrawing {
 		//this.cornerAttr.attachArray(corners, 2);
 	}
 
-	draw(width, height, specialInfo) {
+	draw(width, height, inputInfo) {
 		const gl = this.gl;
 		this.setDrawing();
 		//debugger;
@@ -121,14 +121,13 @@ export class starDrawing extends abstractDrawing {
 
 }
 
-/* **************************************************************** Star View Def */
+/* ********************************************* Star View Def */
 
 
 export class starScene extends abstractScene {
 	constructor(sceneName, ambiance, inputInfo, space) {
-		super(sceneName, ambiance);
+		super(sceneName, ambiance, inputInfo, space);
 
-		if (! this.space) throw  new Error(`starScene: being created without space`);
 		this.avatar = eAvatar.createAvatar(sceneName);
 
 		// create relevant drawings

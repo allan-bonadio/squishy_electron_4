@@ -39,11 +39,7 @@ const propTypes = {
    sceneName: PropTypes.string,  // name for debugging
 
    // Array of eCavity(s) or other buffers to draw or any data.  passed blindly to avatar
-   inputInfo: PropTypes.array,
-   // object with specific values needed in drawing; for waveview= {bumperWidth}
-   // TODO: include this in inputInfo and rename.  Oh now included, now need to get rid of specialInfo everywhere
-   specialInfo: PropTypes.object,
-
+   inputInfo: PropTypes.array.isRequired,
 
    // Our caller gets these from eSpaceCreatedPromise; so it must be resolved by now.
    // Optional; omit if your scene is not affected by space.
@@ -106,7 +102,7 @@ function GLScene(props) {
 		//effSceneRef.current = squishScene;
 
 		squishScene.space = p.space;
-		squishScene.completeScene(p.specialInfo);
+		squishScene.completeScene(p.inputInfo);
 
 		squishScene.glRepaint = glRepaint;
 
@@ -126,7 +122,7 @@ function GLScene(props) {
 		// make sure we have this cuz this func gets called from all over
 		const scene = squishScene;
 		const node = canvasNode;
-		const info = p.specialInfo;
+		const inputInfo = p.inputInfo;
 		if (! scene) {
 			if (traceTooEarly)
 				console.log(`🖼 GLScene too early for glRepaint. squishScene=`, scene);
@@ -136,12 +132,12 @@ function GLScene(props) {
 		// p.avatar.cavity.dump(`🖼 GLScene ${p.sceneName}: got the cavity right here`);
 
 		// draw.  This won't set up an ∞ loop, right?
-		scene.drawAllDrawings(node.width, node.height, info);
+		scene.drawAllDrawings(node.width, node.height, inputInfo);
 		//scene.drawAllDrawings(p.canvasInnerWidth, p.canvasInnerHeight, info);
 		if (traceGeometry && traceOnlyScene == p.sceneName) {
 			console.log(`🖼 GLScene finished glRepaint() ${p.sceneName}:	\n`
 					+`canvasInnerWidth=${p.canvasInnerWidth}, canvasInnerHeight=${p.canvasInnerHeight}, `
-					+`specialInfo=`, info);
+					+`inputInfo=`, inputInfo);
 		}
 		return;
 	}

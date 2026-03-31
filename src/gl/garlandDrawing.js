@@ -170,7 +170,7 @@ export class garlandDrawing extends abstractDrawing {
 	}
 
 	// called for each image frame on th canvas.  TODO: roll specialInfo into the input Data Arrays
-	draw(width, height, specialInfo) {
+	draw(width, height, inputInfo) {
 		if (traceDrawing) {
 			console.log(`🌀🌀🌀 garland Drawing  ${this.avatarLabel}: `
 				+` width=${width}, height=${height}  drawing ${this.vertexCount/2} points `
@@ -179,7 +179,7 @@ export class garlandDrawing extends abstractDrawing {
 		const gl = this.gl;
 		this.setDrawing();
 
-		//let bw = specialInfo.bumperWidth;
+		//let bw = inputInfo[1];
 		//gl.viewport(bw, 0, width - 2 * bw, height);
 		//if (traceViewport) {
 		//    console.log(`🌀🌀🌀 garlandDrawing set viewport on avatar=${this.avatarLabel}: `

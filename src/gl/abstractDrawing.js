@@ -127,7 +127,7 @@ export class abstractDrawing {
 			${this.sceneName} ${this.drawingName}: ${msg}`);
 	}
 
-	draw(width, height, specialInfo) {
+	draw(width, height, inputInfo) {
 		throw new Error(`cannot draw abstract drawing scene ${this.sceneName} `
 			+` drawing ${this.drawingName}`);
 	}

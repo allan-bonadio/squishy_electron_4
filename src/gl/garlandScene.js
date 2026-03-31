@@ -12,9 +12,8 @@ import eAvatar from '../engine/eAvatar.js';
 
 
 class garlandScene extends abstractScene {
-	// inputInfo.continuum = 'endless' or 'well'
 	constructor(sceneName, ambiance, inputInfo, space) {
-		super(sceneName, ambiance);
+		super(sceneName, ambiance, inputInfo, space);
 
 		this.space = space;
 		this.inputInfo = inputInfo;

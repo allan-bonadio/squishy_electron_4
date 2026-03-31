@@ -65,8 +65,8 @@ void main() {
 
 export class noiseDrawing extends abstractDrawing {
 
-	constructor(sceneName, ambiance, inputInfo, space) {
-		super(sceneName, ambiance, inputInfo, space);
+	constructor(scene) {
+		super(scene);
 
 		this.vertexShaderSrc = vertexSrc;
 		this.fragmentShaderSrc = fragmentSrc;
@@ -87,7 +87,7 @@ export class noiseDrawing extends abstractDrawing {
 		this.colorsAttr = new drawingAttribute('colors', this, 2, () => {return {value: colors, type: 'vec2'}});
 	}
 
-	draw(width, height, specialInfo) {
+	draw(width, height, inputInfo) {
 		const gl = this.gl;
 		this.setDrawing();
 		debugger;
@@ -105,10 +105,9 @@ export class noiseDrawing extends abstractDrawing {
 
 
 export class noiseScene extends abstractScene {
-	constructor(sceneName, ambiance) {
-		super(sceneName, ambiance);
-
-		if (! this.space) throw  new Error(`noiseScene: being created without space`);
+	// doesn't need space
+	constructor(sceneName, ambiance, inputInfo, space) {
+		super(sceneName, ambiance, inputInfo, space);
 
 		this.avatar = eAvatar.createAvatar(sceneName);
 

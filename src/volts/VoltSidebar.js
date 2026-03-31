@@ -25,7 +25,7 @@ const propTypes = {
 		canvasInnerHeight: PropTypes.number.isRequired,
 		bumperWidth: PropTypes.number,
 
-		mainVDisp: PropTypes.instanceOf(voltDisplay),
+		space: PropTypes.object.isRequired,
 	}
 
 
@@ -35,7 +35,7 @@ function VoltSidebar(props) {
 	let sidebarWidth = props.width ?? 200;  // ?? why is this undeffined?  nothing passed in.
 
 	let mVD;
-	mVD = props.mainVDisp;
+	mVD = props.space.vDisp;
 	if (!mVD) return '';  // too early or first render
 
 	if (!mVD.heightVolts  || mVD.heightVolts <= 0)

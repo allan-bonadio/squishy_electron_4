@@ -135,6 +135,6 @@ describe('cx2rgb tests', () => {
 
 	/* ************************************miscSettings */
 	testParam('miscSettings', 'showingTab', 'wave', ['wave', 'voltage', 'space', 'integrate']);
-	testParam('miscSettings', 'waveViewHeight', 400, {min: 50, max: 1e4});
+	testParam('miscSettings', 'viewHeight', 400, {min: 50, max: 1e4});
 });
 

@@ -140,7 +140,7 @@ export class rainbowDrawing extends abstractDrawing {
 	}
 
 	// called for each image frame on th canvas
-	draw(width, height, specialInfo) {
+	draw(width, height, inputInfo) {
 		// diagnostic purposes
 		let traceDrawPoints = false;
 		let traceDrawLines = false;

@@ -10,12 +10,11 @@ import eAvatar from '../engine/eAvatar.js';
 import ticDrawing from './ticDrawing.js';
 
 class flatScene extends abstractScene {
-	// must assign space after constructor??
 	constructor(sceneName, ambiance, inputInfo, space) {
-		super(sceneName, ambiance);
+		super(sceneName, ambiance, inputInfo, space);
 
-		this.space = space;
-		this.inputInfo = inputInfo;
+		// this.space = space;
+		//this.inputInfo = inputInfo; done in abstract scene
 
 		// create avatar but don't stick buffers; the drawing does that
 		this.avatar = eAvatar.createAvatar(sceneName);

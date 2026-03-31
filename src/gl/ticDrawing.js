@@ -68,7 +68,7 @@ void main() {
 
 // the original display that's worth watching: tic upside down hump graph
 export class ticDrawing extends abstractDrawing {
-	constructor(scene, space) {
+	constructor(scene) {
 		super(scene, 'ticDrawing');
 
 		//debugger;
@@ -155,7 +155,7 @@ export class ticDrawing extends abstractDrawing {
 		return cb;
 	}
 
-	draw(width, height, specialInfo) {
+	draw(width, height, inputInfo) {
 		if (traceTicDrawing)
 			console.log(`➤ ➤ ➤ ticDrawing drawing ${this.sceneName}, ${this.avatarLabel}: `+
 				` start draw ${this.vertexCount/2} tics`);

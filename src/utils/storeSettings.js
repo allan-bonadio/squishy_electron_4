@@ -247,7 +247,8 @@ export function createStoreSettings() {
 		['wave', 'voltage', 'space', 'integration', 'rainbow']);
 
 	// set by size box on main view
-	makeParam('miscSettings', 'waveViewHeight', 402, {min: 50, max: 1e4});
+	makeParam('miscSettings', 'viewHeight', 402, {min: 50, max: 1e4});
+	makeParam('miscSettings', 'vistaHeight', 402, {min: 50, max: 1e4});
 
 	makeParam('miscSettings', 'show2D', true,  [false, true]);
 	makeParam('miscSettings', 'show3D', false,  [false, true]);

@@ -156,11 +156,11 @@ function SetWaveTab(props) {
 	const glScene = <GLScene
 		space={space}
 		sceneClassName='flatScene' sceneName='swMiniGraph'
-		inputInfo={[minigraphWave]}
+		inputInfo={[minigraphWave, 0]}
 		canvasInnerWidth={MINI_WIDTH}
 		canvasInnerHeight={MINI_HEIGHT}
 		setGLRepaint={setMinigraphRepaint}
-		specialInfo={{bumperWidth: 0}}
+		inputInfo={[minigraphWave, 0]}
 		show={true}
 		title="preview of what your wave will look like after clicking Set Wave"
 	/>;

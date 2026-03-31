@@ -90,6 +90,8 @@ export class flatDrawing extends abstractDrawing {
 	constructor(scene) {
 		super(scene, 'flatDrawing');
 
+		//this.space = space;
+
 		// each point in the wave results in two vertices, top and wave.
 		// And each of those is four single floats going to the GPU
 		this.avatar = scene.avatar;
@@ -169,8 +171,7 @@ export class flatDrawing extends abstractDrawing {
 
 	}
 
-	// called for each image frame on th canvas.  TODO: roll specialInfo into the input Data Arrays
-	draw(width, height, specialInfo) {
+	draw(width, height) {
 		if (traceFlatDrawing) {
 			console.log(`♭♭♭ flat Drawing  ${this.avatarLabel}: `
 				+` width=${width}, height=${height}  drawing ${this.vertexCount/2} points `
@@ -179,7 +180,7 @@ export class flatDrawing extends abstractDrawing {
 		const gl = this.gl;
 		this.setDrawing();
 
-		let bw = specialInfo.bumperWidth;
+		let bw = this.scene.inputInfo[1];
 		gl.viewport(bw, 0, width - 2 * bw, height);
 		if (traceViewport) {
 			console.log(`♭♭♭ flatDrawing set viewport on avatar=${this.avatarLabel}: `

@@ -79,7 +79,7 @@ export class WaveView extends React.Component {
 		this.state = {
 			// height of just the canvas + DOUBLE_THICKNESSpx, as set by user with size box
 			// integer pixels
-			outerHeight: round(getASetting('miscSettings', 'waveViewHeight')),
+			outerHeight: round(getASetting('miscSettings', 'viewHeight')),
 		}
 
 		this.createInnerDims();
@@ -281,7 +281,7 @@ export class WaveView extends React.Component {
 // 		const vHeight = round(ev.pageY + this.yOffset);
 // 		if (this.state.outerHeight != vHeight)
 // 			this.setState({outerHeight: vHeight});
-// 		storeASetting('miscSettings', 'waveViewHeight', vHeight);
+// 		storeASetting('miscSettings', 'viewHeight', vHeight);
 // 		if (traceDragCanvasHeight)
 // 		console.log(`🏄 resizePointer drag ${ev.pageX} ${ev.pageY}  newheight=${ev.pageY + this.yOffset}`);
 //
@@ -349,6 +349,12 @@ export class WaveView extends React.Component {
 		if (this.grinder)
 			tnf = this.grinder.formatTime();
 
+		// make room for the bumpers for WELL continuum (both sides).  Note that
+		// continuum can change only when page reloads.
+		this.bumperWidth = (qeConsts.contWELL == this.space?.continuum)
+				? WELL_BUMPER_WIDTH
+				: 0;
+
 		if (traceDimensions) {
 			console.log(`🏄 WaveView render, outerWidth=${this.outerWidth}`
 				+` bumperWidth=${this.bumperWidth}, canvasInnerWidth=${this.canvasInnerWidth} `
@@ -356,33 +362,23 @@ export class WaveView extends React.Component {
 		}
 
 		// can't make a real GLScene until we have the space!
-		let glScene2d, glScene3d;
+		let glScene2d;
 		if (this.space) {
 			// this is the main wave, always
 			let sceneClassName = 'flatScene';
-			let sceneName = 'mainWave';
+			let sceneName = 'mainWave2D';
 
+			debugger;
 			glScene2d = <GLScene
 				space={s.space} animator={this.animator}
 				sceneClassName={'flatScene'} sceneName={sceneName +'2d'}
 				inputInfo={[this.space.mainFlick, this.bumperWidth, null, null]}
-				specialInfo={{bumperWidth: this.bumperWidth}}
 				canvasInnerWidth={this.canvasInnerWidth}
 				canvasInnerHeight={this.canvasInnerHeight}
 				setGLRepaint={this.setMainRepaint}
 				show={this.context.show2D}
 			/>;
 
-			glScene3d = <GLScene
-				space={s.space} animator={this.animator}
-				sceneClassName={'garlandScene'} sceneName={sceneName + '3d'}
-				inputInfo={[this.space.mainFlick, this.bumperWidth, null, null]}
-				specialInfo={{bumperWidth: this.bumperWidth}}
-				canvasInnerWidth={this.canvasInnerWidth}
-				canvasInnerHeight={this.canvasInnerHeight}
-				setGLRepaint={this.setMainRepaint}
-				show={this.context.show3D}
-			/>;
 		}
 		else {
 			// until then, show spinner, not actually a GLScene
@@ -422,7 +418,6 @@ export class WaveView extends React.Component {
 			ref={this.grabWaveViewEl}>
 
 			{glScene2d}
-			{glScene3d}
 
 			<div className='bumper left' key='left'
 				style={{flexBasis: this.bumperWidth +'px', height: this.canvasInnerHeight}} />
