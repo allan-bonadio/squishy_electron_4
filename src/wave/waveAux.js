@@ -13,14 +13,23 @@
 // the instances of WaveViews and WaveVistas.  So nobody 'constructs'
 // this; it's compiled right here ready to use
 
+const CANVAS_BORDER_THICKNESS = 1;
+const DOUBLE_THICKNESS = 2 * CANVAS_BORDER_THICKNESS;
+
+let traceDimensions = false;
+
 export const waveAux = {
+
+	CANVAS_BORDER_THICKNESS,
+	DOUBLE_THICKNESS,
+
 	// set this.canvasInner* from the right places
 	updateInnerDims() {
 		// on the off chance this is not yet an integer, keep our rounded version of the number
 		this.outerWidth = Math.round(this.props.outerWidth);
 
-		this.canvasInnerWidth = Math.round(this.outerWidth - DOUBLE_THICKNESS);
-		this.canvasInnerHeight = Math.round(this.state.outerHeight - DOUBLE_THICKNESS);
+		this.canvasInnerWidth = Math.round(this.outerWidth - this.DOUBLE_THICKNESS);
+		this.canvasInnerHeight = Math.round(this.state.outerHeight - this.DOUBLE_THICKNESS);
 		if (traceDimensions)
 			console.log(`🏄 canvas updateInner: w=${this.canvasInnerWidth} h=${this.canvasInnerHeight}`);
 	},

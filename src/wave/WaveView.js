@@ -24,7 +24,7 @@ import {eSpaceCreatedPromise} from '../engine/eEngine.js';
 import SquishContext from '../sPanel/SquishContext.js';
 import BeginFinishOverlay from './BeginFinishOverlay.js';
 import resizeIcon from './waveViewIcons/resize.png';
-// import {waitForSpaceCreatedPromise} from './waveContext.js';
+//import {waitForSpaceCreatedPromise} from './waveContext.js';
 
 import {waveAux} from './waveAux.js';
 
@@ -34,8 +34,8 @@ let traceDragCanvasHeight = false;
 let traceHover = false;
 let traceContext = true;
 
-const CANVAS_BORDER_THICKNESS = 1;
-const DOUBLE_THICKNESS = 2 * CANVAS_BORDER_THICKNESS;
+// const CANVAS_BORDER_THICKNESS = 1;
+// const DOUBLE_THICKNESS = 2 * this.CANVAS_BORDER_THICKNESS;
 
 const round = (n) => Math.round(n, 1);
 
@@ -73,7 +73,7 @@ export class WaveView extends React.Component {
 		// 		this.constructor.name);
 
 		// extra methods handling screen geometry
-		debugger;
+		//debugger;
 		Object.assign(this, waveAux);
 
 		this.state = {
@@ -93,7 +93,7 @@ export class WaveView extends React.Component {
 		//
 		// this.animator = this.props.animator;
 
-		waitForSpaceCreatedPromise(animator, context, this.props.setWVContext);
+		//waitForSpaceCreatedPromise(animator, context, this.props.setWVContext);
 
 		// eSpaceCreatedPromise.then(
 		// 	this.handleSpacePromise,  // call this with (space)
@@ -391,8 +391,8 @@ export class WaveView extends React.Component {
 				: <img className='spinner' alt='spinner'
 					src='/images/eclipseOnTransparent.gif' />
 			let glScene = <div className='spinnerBox'
-						style={{width: this.outerWidth - CANVAS_BORDER_THICKNESS ,
-							height: s.outerHeight - DOUBLE_THICKNESS}} >
+						style={{width: this.outerWidth - this.CANVAS_BORDER_THICKNESS ,
+							height: s.outerHeight - this.DOUBLE_THICKNESS}} >
 				{spinner}
 			</div>;
 		}

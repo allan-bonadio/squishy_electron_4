@@ -14,6 +14,7 @@ import eSpace from '../engine/eSpace.js';
 import qeConsts from '../engine/qeConsts.js';
 import './WaveVista.scss';
 import {getASetting, storeASetting} from '../utils/storeSettings.js';
+//import {waitForSpaceCreatedPromise} from './waveContext.js';
 import waveAux from './waveAux.js';
 
 // import VoltOverlay from '../volts/VoltOverlay.js';
@@ -31,9 +32,6 @@ let traceDimensions = false;
 let traceDragCanvasHeight = false;
 let traceHover = false;
 let traceContext = false;
-
-const CANVAS_BORDER_THICKNESS = 1;
-const DOUBLE_THICKNESS = 2 * CANVAS_BORDER_THICKNESS;
 
 const round = (n) => Math.round(n, 1);
 
@@ -69,7 +67,7 @@ export class WaveVista extends React.Component {
 		// 		this.constructor.name);
 
 		// extra methods handling screen geometry
-		debugger;
+		//debugger;
 		Object.assign(this, waveAux);
 
 		this.state = {
@@ -78,7 +76,7 @@ export class WaveVista extends React.Component {
 			outerHeight: round(getASetting('miscSettings', 'WaveVistaHeight')),
 		}
 
-		updateInnerDimsEtc()
+		this.createInnerDims();
 		// 	this.updateInnerDims();  // after outerWidth done
 		//
 		// 	this.formerWidth = this.outerWidth;
@@ -388,8 +386,8 @@ export class WaveVista extends React.Component {
 				: <img className='spinner' alt='spinner'
 					src='/images/eclipseOnTransparent.gif' />
 			let glScene = <div className='spinnerBox'
-						style={{width: this.outerWidth - CANVAS_BORDER_THICKNESS ,
-							height: s.outerHeight - DOUBLE_THICKNESS}} >
+						style={{width: this.outerWidth - this.CANVAS_BORDER_THICKNESS ,
+							height: s.outerHeight - this.DOUBLE_THICKNESS}} >
 				{spinner}
 			</div>;
 		}

@@ -337,7 +337,10 @@ export function storeASetting(groupName, varName, newValue) {
 
 export function getASetting(groupName, varName) {
 	let setting = getAGroup(groupName)[varName];
-	if (!sSettings.verifiers?.[groupName]?.[varName]) debugger;
+	if (!sSettings.verifiers?.[groupName]?.[varName]) {
+		console.error(`setting not found: ${groupName} , ${varName} = `)
+		debugger;
+	}
 
 	// this can still return undefined if the groupName or varName isn't there
 	if (setting === undefined
