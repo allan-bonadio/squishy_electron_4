@@ -73,8 +73,10 @@ export class drawingUniform extends drawingVariable {
 		if (!this.uniformLoc)
 			throw new Error(`Cannot find uniform loc for uniform variable ${varName} `
 				+` in ${this.drawing.program.$qLabel}`);
-		if (traceUniforms) console.log(`🍯 created drawingUniform '${varName}'  in `
+		if (traceUniforms) {
+			console.log(`🍯 created drawingUniform '${varName}'  in `
 		                +` ${this.drawing.program.$qLabel}`);
+		}
 
 		this.reloadVariable();
 	}

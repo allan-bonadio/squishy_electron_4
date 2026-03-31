@@ -1,5 +1,5 @@
 /*
-** WaveView -- a webgl image of the quantum wave (or whatever)
+** WaveView -- a webgl 2d image of the quantum wave
 ** Copyright (C) 2021-2026 Tactile Interactive, all rights reserved
 */
 
@@ -25,12 +25,14 @@ import {eSpaceCreatedPromise} from '../engine/eEngine.js';
 import SquishContext from './SquishContext.js';
 import BeginFinishOverlay from './BeginFinishOverlay.js';
 import resizeIcon from './waveViewIcons/resize.png';
+// import {waitForSpaceCreatedPromise} from './waveContext.js';
+import waveBox from '../wave/waveBox.js';
 
 let traceBumpers = false;
-let traceDimensions = false;
+let traceDimensions = true;
 let traceDragCanvasHeight = false;
 let traceHover = false;
-let traceContext = false;
+let traceContext = true;
 
 const CANVAS_BORDER_THICKNESS = 1;
 const DOUBLE_THICKNESS = 2 * CANVAS_BORDER_THICKNESS;
@@ -51,6 +53,7 @@ export class WaveView extends React.Component {
 
 		// sAnimator
 		animator: PropTypes.object,
+		setWVContext: PropTypes.func,
 
 		setShouldBeIntegrating: PropTypes.func.isRequired,
 		sPanel: PropTypes.object.isRequired,
@@ -58,8 +61,11 @@ export class WaveView extends React.Component {
 		show2D: PropTypes.bool,
 		show3D: PropTypes.bool,
 
+		// GL funcs
 		setMainRepaint: PropTypes.func,
 		setSpectRepaint: PropTypes.func,
+
+		box: PropTypes.object.isRequired,
 	};
 
 	constructor(props) {
@@ -68,227 +74,234 @@ export class WaveView extends React.Component {
 		// checkPropTypes(this.constructor.propTypes, props, 'prop',
 		// 		this.constructor.name);
 
+		// extra methods handling screen geometry
+		debugger;
+		Object.assign(this, waveBox);
+
 		this.state = {
 			// height of just the canvas + DOUBLE_THICKNESSpx, as set by user with size box
 			// integer pixels
 			outerHeight: round(getASetting('miscSettings', 'waveViewHeight')),
 		}
 
-		this.updateInnerDims();  // after outerWidth done
+		this.createInnerDims();
+		// this.updateInnerDims();  // after outerWidth done
+		//
+		// this.formerWidth = this.outerWidth;
+		// this.formerHeight = round(this.state.outerHeight);
+		//
+		// // make the proptypes shuddup about it being undefined
+		// //this.mainVDisp = null;
+		//
+		// this.animator = this.props.animator;
 
-		this.formerWidth = this.outerWidth;
-		this.formerHeight = round(this.state.outerHeight);
+		waitForSpaceCreatedPromise(animator, context, this.props.setWVContext);
 
-		// make the proptypes shuddup about it being undefined
-		this.mainVDisp = null;
-
-		this.animator = this.props.animator;
-
-		eSpaceCreatedPromise.then(
-			this.handleSpacePromise,  // call this with (space)
-
-			// catch
-			ex => {
-				console.error(`eSpaceCreatedPromise failed:`, ex.stack ?? ex.message ?? ex);
-				debugger;
-			}
-		);
+		// eSpaceCreatedPromise.then(
+		// 	this.handleSpacePromise,  // call this with (space)
+		//
+		// 	// catch
+		// 	ex => {
+		// 		console.error(`eSpaceCreatedPromise failed:`, ex.stack ?? ex.message ?? ex);
+		// 		debugger;
+		// 	}
+		// );
 	}
 
 	static contextType = SquishContext;
 
-	// set up 1/3 of the context: waveView
-	setUpContext() {
-		// need BOTH context  and the space.  So this is called twice.
-		const context = this.context;
-		if (!context) {
-			// not ready yet so try again
-			setTimeout(this.setUpContext, 100);
-			return;
-		}
-
-		let wv = context.waveView;
-		if (wv && wv.grinder)
-			return;  // already done
-
-		const space = this.space;
-		wv = {
-			space: space,
-			grinder: space.grinder,
-
-			// somebody's going to want to see both at once.  someday...
-			show2D: getASetting('miscSettings', 'show2D'),
-			show3D: getASetting('miscSettings', 'show3D'),
-
-			// make room for the bumpers for WELL continuum (both sides).  Note that
-			// continuum can change only when page reloads.
-			bumperWidth: (qeConsts.contWELL == space.continuum)
-					? WELL_BUMPER_WIDTH
-					: 0,
-
-			mainVDisp: space.vDisp,
-		};
-		this.props.setWVContext(wv);
-
-			// make room for the bumpers for WELL continuum (both sides).  Note that
-			// continuum can change only when page reloads.
-		//wv.bumperWidth = (qeConsts.contWELL == space.continuum)
-		//	? WELL_BUMPER_WIDTH
-		//	: 0;
-
-		//wv.mainVDisp = space.vDisp;
-
-		if (traceContext) {
-			// Note: the state won't kick in until next render
-			console.log(`🏄 WaveView setUpContext context:`,
-				context.setShouldBeIntegrating,
-				context.controlPanel,
-				context.waveView,
-			);
-		}
-		return;  // done
-	}
-
-	// set up 2/3 of the context: waveView and engine
-	handleSpacePromise = (space) => {
-		// this will kick off a render, now that the avatar is in place
-		this.setState({space});
-		this.space = space;  // for immediate access
-
-		this.grinder = space.grinder;
-
-		const ani = this.props.animator;
-		if (ani && !ani.grinder)
-			ani.grinder = this.grinder;
-
-		// make room for the bumpers for WELL continuum (both sides).  Note that
-		// continuum can change only when page reloads.
-		this.bumperWidth = (qeConsts.contWELL == space.continuum)
-			? WELL_BUMPER_WIDTH
-			: 0;
-
-		this.mainVDisp = space.vDisp;
-
-		this.setUpContext();
-	}
-
-	// set this.canvasInnerDims from the right places
-	updateInnerDims() {
-		// on the off chance this is not yet an integer, keep our rounded version of the number
-		this.outerWidth = round(this.props.outerWidth);
-
-		this.canvasInnerWidth = round(this.outerWidth - DOUBLE_THICKNESS);
-		this.canvasInnerHeight = round(this.state.outerHeight - DOUBLE_THICKNESS);
-		if (traceDimensions)
-			console.log(`🏄 canvas updateInner: w=${this.canvasInnerWidth} h=${this.canvasInnerHeight}`);
-	}
-
-// 	// we finally have a canvas; give me a reference so I can save it.
-// 	// (this is repeatedly called right after each render.)
-// 	static setGlCanvas = (gl, canvas) => {
-// 		if (!gl)
-// 			throw `no gl value`;
-// 		if (!this.gl) {
-// 			this.gl = gl;
-// 			this.canvasNode = canvas;
-// 		}
-// 		else if (this.gl !== gl)
-// 			throw `this.gl ≠ gl !`;
+// set up 1/3 of the context: waveView
+// function setUpContext() {
+// 	// need BOTH context  and the space.  So this is called twice.
+// 	const context = this.context;
+// 	if (!context) {
+// 		// not ready yet so try again
+// 		setTimeout(this.setUpContext, 100);
+// 		return;
+// 	}
 //
-// 		// might be available a few renders later
-// 		if (this.canvasNode && this.canvasNode.glRepaint) {
-// 			const glRepaint = this.canvasNode.glRepaint;
-// 			this.glRepaint = glRepaint;
-// 			if (this.props.animator)
-// 				this.props.animator.glRepaint = glRepaint;
-// 			else
-// 				throw `no glRepaint() on animator`;
+// 	let wv = context.waveView;
+// 	if (wv && wv.grinder)
+// 		return;  // already done
+//
+// 	const space = this.space;
+// 	wv = {
+// 		space: space,
+// 		grinder: space.grinder,
+//
+// 		// somebody's going to want to see both at once.  someday...
+// 		show2D: getASetting('miscSettings', 'show2D'),
+// 		show3D: getASetting('miscSettings', 'show3D'),
+//
+// 		// make room for the bumpers for WELL continuum (both sides).  Note that
+// 		// continuum can change only when page reloads.
+// 		bumperWidth: (qeConsts.contWELL == space.continuum)
+// 				? WELL_BUMPER_WIDTH
+// 				: 0,
+//
+// 		mainVDisp: space.vDisp,
+// 	};
+// 	this.props.setWVContext(wv, space, );
+//
+// 		// make room for the bumpers for WELL continuum (both sides).  Note that
+// 		// continuum can change only when page reloads.
+// 	//wv.bumperWidth = (qeConsts.contWELL == space.continuum)
+// 	//	? WELL_BUMPER_WIDTH
+// 	//	: 0;
+//
+// 	//wv.mainVDisp = space.vDisp;
+//
+// 	if (traceContext) {
+// 		// Note: the state won't kick in until next render
+// 		console.log(`🏄 WaveView setUpContext context:`,
+// 			context.setShouldBeIntegrating,
+// 			context.controlPanel,
+// 			context.waveView,
+// 		);
+// 	}
+// 	return;  // done
+// }
+//
+// 	// set up 2/3 of the context: waveView and engine
+// 	handleSpacePromise = (space) => {
+// 		// this will kick off a render, now that the avatar is in place
+// 		this.setState({space});
+// 		this.space = space;  // for immediate access
+//
+// 		this.grinder = space.grinder;
+//
+// 		const ani = this.props.animator;
+// 		if (ani && !ani.grinder)
+// 			ani.grinder = this.grinder;
+//
+// 		// make room for the bumpers for WELL continuum (both sides).  Note that
+// 		// continuum can change only when page reloads.
+// 		this.bumperWidth = (qeConsts.contWELL == space.continuum)
+// 			? WELL_BUMPER_WIDTH
+// 			: 0;
+//
+// 		this.mainVDisp = space.vDisp;
+//
+// 		this.setUpContext();
+// 	}
+//
+// 	// set this.canvasInnerDims from the right places
+// 	updateInnerDims() {
+// 		// on the off chance this is not yet an integer, keep our rounded version of the number
+// 		this.outerWidth = round(this.props.outerWidth);
+//
+// 		this.canvasInnerWidth = round(this.outerWidth - DOUBLE_THICKNESS);
+// 		this.canvasInnerHeight = round(this.state.outerHeight - DOUBLE_THICKNESS);
+// 		if (traceDimensions)
+// 			console.log(`🏄 canvas updateInner: w=${this.canvasInnerWidth} h=${this.canvasInnerHeight}`);
+// 	}
+//
+// // 	// we finally have a canvas; give me a reference so I can save it.
+// // 	// (this is repeatedly called right after each render.)
+// // 	static setGlCanvas = (gl, canvas) => {
+// // 		if (!gl)
+// // 			throw `no gl value`;
+// // 		if (!this.gl) {
+// // 			this.gl = gl;
+// // 			this.canvasNode = canvas;
+// // 		}
+// // 		else if (this.gl !== gl)
+// // 			throw `this.gl ≠ gl !`;
+// //
+// // 		// might be available a few renders later
+// // 		if (this.canvasNode && this.canvasNode.glRepaint) {
+// // 			const glRepaint = this.canvasNode.glRepaint;
+// // 			this.glRepaint = glRepaint;
+// // 			if (this.props.animator)
+// // 				this.props.animator.glRepaint = glRepaint;
+// // 			else
+// // 				throw `no glRepaint() on animator`;
+// // 		}
+// // 	}
+//
+// 	//componentDidMount() {
+// 	//	let wv = this.context?.waveView;
+// 	//	if (!wv || wv.space)
+// 	//		return;
+// 	//
+// 	//	//this.setUpContext();
+// 	//	//wv.space = {};
+// 	//	console.log(`🏄  WaveView componentDidMount context: `, this.context);
+// 	//}
+//
+// 	componentDidUpdate() {
+// 		const p = this.props;
+// 		const s = this.state;
+// 		this.updateInnerDims();
+//
+// 		// only need this when the WaveView outer dims change, either a user
+// 		// change height or window change width.  On that occasion, we have to adjust
+// 		// a lot, including resizing the canvas.
+// 		if ((this.formerWidth != this.outerWidth || this.formerHeight != s.outerHeight) ) {
+// 			//this.updateInnerDims();
+//
+// 			// Size of window & canvas changed!  (or, will change soon)
+// 			if (traceDimensions) {
+// 				console.log(`🏄 wv Resizing  👀
+// 					formerWidth=${this.formerWidth} ≟➔ outerWidth=${this.outerWidth}
+// 					formerHeight=${this.formerHeight} ≟➔ outerHeight=${s.outerHeight}
+// 					btw props.outerWidth=${this.props.outerWidth}`);
+// 			}
+//
+// 			// trigger a render
+// 			this.setState({outerHeight: s.outerHeight});
+//
+// 			// the formers are OUTER sizes.  All these should be integers by now.
+// 			this.formerWidth = this.outerWidth;
+// 			this.formerHeight = s.outerHeight;
+// 			if (traceDimensions) {
+// 				console.log(`🏄 WaveView canvasInner width is ${this.canvasInnerWidth};  `
+// 					+ `now outer width = ${this.outerWidth}`);
+// 			}
 // 		}
 // 	}
-
-	//componentDidMount() {
-	//	let wv = this.context?.waveView;
-	//	if (!wv || wv.space)
-	//		return;
-	//
-	//	//this.setUpContext();
-	//	//wv.space = {};
-	//	console.log(`🏄  WaveView componentDidMount context: `, this.context);
-	//}
-
-	componentDidUpdate() {
-		const p = this.props;
-		const s = this.state;
-		this.updateInnerDims();
-
-		// only need this when the WaveView outer dims change, either a user
-		// change height or window change width.  On that occasion, we have to adjust
-		// a lot, including resizing the canvas.
-		if ((this.formerWidth != this.outerWidth || this.formerHeight != s.outerHeight) ) {
-			//this.updateInnerDims();
-
-			// Size of window & canvas changed!  (or, will change soon)
-			if (traceDimensions) {
-				console.log(`🏄 wv Resizing  👀
-					formerWidth=${this.formerWidth} ≟➔ outerWidth=${this.outerWidth}
-					formerHeight=${this.formerHeight} ≟➔ outerHeight=${s.outerHeight}
-					btw props.outerWidth=${this.props.outerWidth}`);
-			}
-
-			// trigger a render
-			this.setState({outerHeight: s.outerHeight});
-
-			// the formers are OUTER sizes.  All these should be integers by now.
-			this.formerWidth = this.outerWidth;
-			this.formerHeight = s.outerHeight;
-			if (traceDimensions) {
-				console.log(`🏄 WaveView canvasInner width is ${this.canvasInnerWidth};  `
-					+ `now outer width = ${this.outerWidth}`);
-			}
-		}
-	}
-
+//
 	/* ******************************************************** resizing */
 
-	// these are for resizing the WaveView ONLY with the size box
-	resizePointerDown =
-	ev => {
-		this.resizing = true;
-		this.yOffset = round(this.state.outerHeight - ev.pageY);
-		if (traceDragCanvasHeight)
-			console.log(`🏄 resizePointer down ${ev.pageX} ${ev.pageY} offset=${this.yOffset}`);
-		ev.target.setPointerCapture(ev.pointerId);
-		ev.preventDefault();
-		ev.stopPropagation();
-	}
-
-	resizePointerMove =
-	ev => {
-		if (!this.resizing)
-			return;
-
-		const vHeight = round(ev.pageY + this.yOffset);
-		if (this.state.outerHeight != vHeight)
-			this.setState({outerHeight: vHeight});
-		storeASetting('miscSettings', 'waveViewHeight', vHeight);
-		if (traceDragCanvasHeight)
-		console.log(`🏄 resizePointer drag ${ev.pageX} ${ev.pageY}  newheight=${ev.pageY + this.yOffset}`);
-
-		ev.preventDefault();
-		ev.stopPropagation();
-	}
-
-	// usually I send pointerLeave events here, but now with pointerCapture, maybe it doesn't matter.
-	// I do get pointerLeave events, but only after pointerUp, if the pointer is out of the size box.
-	resizePointerUp =
-	ev => {
-		if (traceDragCanvasHeight)
-		console.log(`🏄 resizePointer up ${ev.pageX} ${ev.pageY}`);
-		this.resizing = false;
-		ev.preventDefault();
-		ev.stopPropagation();
-	}
-
+// 	// these are for resizing the WaveView ONLY with the size box
+// 	resizePointerDown =
+// 	ev => {
+// 		this.resizing = true;
+// 		this.yOffset = round(this.state.outerHeight - ev.pageY);
+// 		if (traceDragCanvasHeight)
+// 			console.log(`🏄 resizePointer down ${ev.pageX} ${ev.pageY} offset=${this.yOffset}`);
+// 		ev.target.setPointerCapture(ev.pointerId);
+// 		ev.preventDefault();
+// 		ev.stopPropagation();
+// 	}
+//
+// 	resizePointerMove =
+// 	ev => {
+// 		if (!this.resizing)
+// 			return;
+//
+// 		const vHeight = round(ev.pageY + this.yOffset);
+// 		if (this.state.outerHeight != vHeight)
+// 			this.setState({outerHeight: vHeight});
+// 		storeASetting('miscSettings', 'waveViewHeight', vHeight);
+// 		if (traceDragCanvasHeight)
+// 		console.log(`🏄 resizePointer drag ${ev.pageX} ${ev.pageY}  newheight=${ev.pageY + this.yOffset}`);
+//
+// 		ev.preventDefault();
+// 		ev.stopPropagation();
+// 	}
+//
+// 	// usually I send pointerLeave events here, but now with pointerCapture, maybe it doesn't matter.
+// 	// I do get pointerLeave events, but only after pointerUp, if the pointer is out of the size box.
+// 	resizePointerUp =
+// 	ev => {
+// 		if (traceDragCanvasHeight)
+// 		console.log(`🏄 resizePointer up ${ev.pageX} ${ev.pageY}`);
+// 		this.resizing = false;
+// 		ev.preventDefault();
+// 		ev.stopPropagation();
+// 	}
+//
 	/* ********************************************************* hover */
 	// I'm done trying to get the css :hover to do this right.  Enter and Leave events
 	// now turn on/off the voltage display.
@@ -444,6 +457,7 @@ export class WaveView extends React.Component {
 	}
 
 }
+
 
 export default WaveView;
 
