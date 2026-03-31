@@ -3,10 +3,9 @@
 ** Copyright (C) 2021-2026 Tactile Interactive, all rights reserved
 */
 
-// WaveView has a 1:1 relationship with a C++ Avatar.
-// Each wraps a canvas for display.  Via webgl.
-// You can have many in a squishPanel, each subscribing to the same space.
-// One is the main view, displaying current simulation.  Others are used in the
+// Each wraps a canvas for display.  Via webgl.  along with svg doohickeys and what not.
+// You can have many in a squishPanel?, each subscribing to the same space.
+// One is the main view, displaying current simulation in 2d.  Others communicate with
 // control panel tabs to display proposed settings before effecting them.
 
 import React, {useContext} from 'react';
@@ -15,7 +14,7 @@ import PropTypes, {checkPropTypes} from 'prop-types';
 
 import eSpace from '../engine/eSpace.js';
 import qeConsts from '../engine/qeConsts.js';
-import './WaveView.scss';
+import '../wave/WaveView.scss';
 import {getASetting, storeASetting} from '../utils/storeSettings.js';
 
 import VoltOverlay from '../volts/VoltOverlay.js';
@@ -64,8 +63,6 @@ export class WaveView extends React.Component {
 		// GL funcs
 		setMainRepaint: PropTypes.func,
 		setSpectRepaint: PropTypes.func,
-
-		box: PropTypes.object.isRequired,
 	};
 
 	constructor(props) {

@@ -15,18 +15,22 @@ import ControlPanel from '../controlPanel/ControlPanel.js';
 import {eSpaceCreatedPromise} from '../engine/eEngine.js';
 
 import {interpretCppException} from '../utils/errors.js';
-import WaveView from './WaveView.js';
+import WaveView from '../wave/WaveView.js';
+import WaveVista from '../wave/WaveVista.js';
 import sAnimator from './sAnimator.js';
 
 import {getASetting, storeASetting} from '../utils/storeSettings.js';
 import {tooOldTerminate} from '../utils/errors.js';
 
 import SquishContext from './SquishContext.js';
-import pointerContextMap from '../engine/pointerContextMap.js';
+import pointerContextMap from '../engine/pointerContextMap.js';  // TODO: get rid of this
+import {waitForSpaceCreatedPromise} from '../wave/waveContext.js';
+//import waveBox from '../wave/waveBox.js';
+
 
 // runtime debugging flags - you can change in the debugger or here
-let tracePromises = false;
-let traceSquishPanel = false;
+let tracePromises = true;
+let traceSquishPanel = true;
 let traceWidth = false;
 let traceSBIUpdate = false;
 
@@ -34,7 +38,7 @@ let traceSBIUpdate = false;
 
 class SquishPanel extends React.Component {
 	static propTypes = {
-		bodyWidth: PropTypes.number.isRequired,
+		bodyWidth: PropTypes.number.isRequired,  // width of window which dictates view and vista width
 	};
 
 	static squishPanelConstructed = 0;
@@ -45,6 +49,8 @@ class SquishPanel extends React.Component {
 
 		// during dev, this gets called TWICE
 		SquishPanel.squishPanelConstructed++;
+
+		//this.box = new waveBox();
 
 		// will be set by subcomponents
 		this.mainRepaint = null;
@@ -71,6 +77,8 @@ class SquishPanel extends React.Component {
 		// animator will still need grinder, mainRepaint() and context,
 		// which don't exist yet.  Each will be on this.whatever
 		this.animator = new sAnimator(this, this.getContext);
+
+		waitForSpaceCreatedPromise(this.animator, this.context, this.setWVContext);
 
 		if (traceSquishPanel) console.log(`👑 SquishPanel constructor done`);
 	}
@@ -127,9 +135,8 @@ class SquishPanel extends React.Component {
 	}
 
 	// called once ONLY in waveView during setup  Either one can set space.
-	setWVContext = (wv) => {
-		this.setState({waveView: wv});
-		this.setState({space: wv.space});
+	setWVContext = (wv, space) => {
+		this.setState({waveView: wv, space});
 	}
 
 	getContext = () => this.state;
@@ -237,6 +244,15 @@ class SquishPanel extends React.Component {
 			<SquishContext.Provider value={this.state} >
 				<article className={`SquishPanel space` + s.name} ref={this.setSPElement}>
 					<WaveView
+						outerWidth = {p.bodyWidth}
+						animator={this.animator}
+						setWVContext={this.setWVContext}
+						setShouldBeIntegrating={this.setShouldBeIntegrating}
+						setMainRepaint={this.setMainRepaint}
+						setSpectRepaint={this.setSpectRepaint}
+						sPanel={this}
+					/>
+					<WaveVista
 						outerWidth = {p.bodyWidth}
 						animator={this.animator}
 						setWVContext={this.setWVContext}
