@@ -16,6 +16,8 @@ window.stopMe = () => {debugger};
 // this is global so we can use it anywhere in JS
 window.isDevel = ('development' == process.env.NODE_ENV);
 
+// handy!  start using this.
+window.dblog = console.log;
 
 export function dumpJsStack(where = 'somewhere') {
 	let tb = (new Error()).stack
@@ -25,6 +27,7 @@ export function dumpJsStack(where = 'somewhere') {
 	console.log(`\n${where} traceback: ${tb}`);
 }
 window.dumpJsStack = dumpJsStack;
+
 
 /* ************************************** error/exception handling from C++ */
 

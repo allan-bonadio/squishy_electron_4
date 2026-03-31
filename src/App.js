@@ -18,9 +18,6 @@ let traceResize = false;
 let traceState = false;
 
 
-// handy!  start using this.
-window.dblog = console.log;
-
 class App extends React.Component {
 	constructor(props) {
 		super(props);
