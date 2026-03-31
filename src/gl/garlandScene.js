@@ -22,34 +22,53 @@ class garlandScene extends abstractScene {
 		// create avatar but don't stick buffers; the drawing does that
 		this.avatar = eAvatar.createAvatar(sceneName);
 
-		// create relevant drawings.  Do not change this order;
-		// spent a long time on this.
+		// create relevant drawings.
 		this.drawings = [
 			new garlandDrawing(this, space),
 		];
 
-		// make the projection matrix
+		const N = this.space.nStates;
+
+		// make the projection matrix.. never changes
 		const fieldOfView = (45 * Math.PI) / 180; // in radians
-		const aspect = ambiance.canvas.width / ambiance.canvas.height;
+		const aspect = ambiance.canvas.clientWidth / ambiance.canvas.clientHeight;
 		const zNear = 0.1;
-		const zFar = 100.0;
+		const zFar = N * 3;
 		const proj = mat4.create();
 		mat4.perspective(proj, fieldOfView, aspect, zNear, zFar);
 
 
 		// the original matrix.  The glsl will multiply on the rotation matrix.
 		const origMatrix = mat4.create();
-
 		mat4.translate(
 			origMatrix, // destination
 			origMatrix, //to translate
-			[-0.0, 0.0, -6.0]);
+			[0.0, 0.0, -N]);
 
-		let yRotation = 0;
+		let to = 5.30;
+		let bo = 5.19;
+		let zRotation = (to-bo) * Math.random() + bo;
+		//let zRotation = 5.30
+		dblog(`☕️ zRotation: ${zRotation}`)
+
+		mat4.rotate(
+			origMatrix, //destination matrix
+			origMatrix, //matrix to rotate
+			zRotation, //amount to rotate in radians
+			[0, 0, 1]
+		); //axis to rotate around (z)
+
+
+		let top = 5.20;
+		let bot = 4.33;
+		let yRotation = (top-bot) * Math.random() + bot;
+		//let yRotation = 5.7;
+		//dblog(`☕️ yRotation: ${yRotation}`)
+
 		mat4.rotate(
 			origMatrix,
 			origMatrix,
-			yRotation * 0, //amount to rotate in radians
+			yRotation, //amount to rotate in radians
 			[0, 1, 0]);
 
 		mat4.multiply(origMatrix, origMatrix, proj);
