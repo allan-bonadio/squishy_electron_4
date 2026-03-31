@@ -6,7 +6,7 @@
 import React, {useRef, useState, useReducer, useContext} from 'react';
 import PropTypes from 'prop-types';
 
-import SquishContext from './SquishContext.js';
+import SquishContext from '../sPanel/SquishContext.js';
 
 import beginIcon from './waveViewIcons/begin.png';
 import finishIcon from './waveViewIcons/finish.png';

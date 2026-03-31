@@ -21,11 +21,11 @@ import VoltOverlay from '../volts/VoltOverlay.js';
 import {WELL_BUMPER_WIDTH} from '../volts/voltConstants.js';
 import GLScene from '../gl/GLScene.js';
 import {eSpaceCreatedPromise} from '../engine/eEngine.js';
-import SquishContext from './SquishContext.js';
+import SquishContext from '../sPanel/SquishContext.js';
 import BeginFinishOverlay from './BeginFinishOverlay.js';
 import resizeIcon from './waveViewIcons/resize.png';
 // import {waitForSpaceCreatedPromise} from './waveContext.js';
-import waveBox from '../wave/waveBox.js';
+import {waveBox} from './waveBox.js';
 
 let traceBumpers = false;
 let traceDimensions = true;

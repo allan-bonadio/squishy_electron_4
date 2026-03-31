@@ -20,9 +20,9 @@ import waveBox from './waveBox.js';
 // import {WELL_BUMPER_WIDTH} from '../volts/voltConstants.js';
 import GLScene from '../gl/GLScene.js';
 import {eSpaceCreatedPromise} from '../engine/eEngine.js';
-import SquishContext from './SquishContext.js';
+import SquishContext from '../sPanel/SquishContext.js';
 import BeginFinishOverlay from './BeginFinishOverlay.js';
-import resizeIcon from './WaveVistaIcons/resize.png';
+import resizeIcon from './waveViewIcons/resize.png';
 
 
 // OLD 2d STUFF

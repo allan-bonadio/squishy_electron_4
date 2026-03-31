@@ -13,7 +13,7 @@
 // the instances of WaveViews and WaveVistas.  So nobody 'constructs'
 // this; it's compiled right here ready to use
 
-const waveBox = {
+export const waveBox = {
 	// set this.canvasInner* from the right places
 	updateInnerDims() {
 		// on the off chance this is not yet an integer, keep our rounded version of the number
