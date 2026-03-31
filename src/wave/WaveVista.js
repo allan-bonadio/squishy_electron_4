@@ -14,7 +14,7 @@ import eSpace from '../engine/eSpace.js';
 import qeConsts from '../engine/qeConsts.js';
 import './WaveVista.scss';
 import {getASetting, storeASetting} from '../utils/storeSettings.js';
-import waveBox from './waveBox.js';
+import waveAux from './waveAux.js';
 
 // import VoltOverlay from '../volts/VoltOverlay.js';
 // import {WELL_BUMPER_WIDTH} from '../volts/voltConstants.js';
@@ -70,7 +70,7 @@ export class WaveVista extends React.Component {
 
 		// extra methods handling screen geometry
 		debugger;
-		Object.assign(this, waveBox);
+		Object.assign(this, waveAux);
 
 		this.state = {
 			// height of just the canvas + DOUBLE_THICKNESSpx, as set by user with size box
@@ -453,7 +453,7 @@ export class WaveVista extends React.Component {
 
 }
 
-//Object.assign(WaveVista.prototype, waveBox);
+//Object.assign(WaveVista.prototype, waveAux);
 
 export default WaveVista;
 

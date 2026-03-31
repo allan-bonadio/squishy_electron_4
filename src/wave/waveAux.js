@@ -1,11 +1,11 @@
 /*
-** waveBox -- managing the wave component width and height
+** waveAux -- managing the wave component width and height
 ** Copyright (C) 2026-2026 Tactile Interactive, all rights reserved
 */
 
 // common code between the wavevista and waveview
-// methods spliced onto the two components from the waveBox.
-// So, remember, 'this' is the WaveView or WaveVista, not the waveBox
+// methods spliced onto the two components from the waveAux.
+// So, remember, 'this' is the WaveView or WaveVista, not the waveAux
 // Same for this.props
 // the width is shared. oof, but the height is not!
 
@@ -13,14 +13,14 @@
 // the instances of WaveViews and WaveVistas.  So nobody 'constructs'
 // this; it's compiled right here ready to use
 
-export const waveBox = {
+export const waveAux = {
 	// set this.canvasInner* from the right places
 	updateInnerDims() {
 		// on the off chance this is not yet an integer, keep our rounded version of the number
-		this.outerWidth = round(this.props.outerWidth);
+		this.outerWidth = Math.round(this.props.outerWidth);
 
-		this.canvasInnerWidth = round(this.outerWidth - DOUBLE_THICKNESS);
-		this.canvasInnerHeight = round(this.state.outerHeight - DOUBLE_THICKNESS);
+		this.canvasInnerWidth = Math.round(this.outerWidth - DOUBLE_THICKNESS);
+		this.canvasInnerHeight = Math.round(this.state.outerHeight - DOUBLE_THICKNESS);
 		if (traceDimensions)
 			console.log(`🏄 canvas updateInner: w=${this.canvasInnerWidth} h=${this.canvasInnerHeight}`);
 	},
@@ -30,7 +30,7 @@ export const waveBox = {
 			this.updateInnerDims();  // after outerWidth done
 
 			this.formerWidth = this.outerWidth;
-			this.formerHeight = round(this.state.outerHeight);
+			this.formerHeight = Math.round(this.state.outerHeight);
 
 			this.animator = this.props.animator;
 
@@ -80,7 +80,7 @@ export const waveBox = {
 	resizePointerDown:
 	ev => {
 		this.resizing = true;
-		this.yOffset = round(this.state.outerHeight - ev.pageY);
+		this.yOffset = Math.round(this.state.outerHeight - ev.pageY);
 		if (traceDragCanvasHeight)
 			console.log(`🏄 resizePointer down ${ev.pageX} ${ev.pageY} offset=${this.yOffset}`);
 		ev.target.setPointerCapture(ev.pointerId);
@@ -93,7 +93,7 @@ export const waveBox = {
 		if (!this.resizing)
 			return;
 
-		const vHeight = round(ev.pageY + this.yOffset);
+		const vHeight = Math.round(ev.pageY + this.yOffset);
 		if (this.state.outerHeight != vHeight)
 			this.setState({outerHeight: vHeight});
 		storeASetting('miscSettings', 'WaveVistaHeight', vHeight);
@@ -117,6 +117,6 @@ export const waveBox = {
 }
 
 
-export default waveBox;
+export default waveAux;
 
 

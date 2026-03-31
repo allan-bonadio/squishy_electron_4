@@ -25,7 +25,8 @@ import SquishContext from '../sPanel/SquishContext.js';
 import BeginFinishOverlay from './BeginFinishOverlay.js';
 import resizeIcon from './waveViewIcons/resize.png';
 // import {waitForSpaceCreatedPromise} from './waveContext.js';
-import {waveBox} from './waveBox.js';
+
+import {waveAux} from './waveAux.js';
 
 let traceBumpers = false;
 let traceDimensions = true;
@@ -73,7 +74,7 @@ export class WaveView extends React.Component {
 
 		// extra methods handling screen geometry
 		debugger;
-		Object.assign(this, waveBox);
+		Object.assign(this, waveAux);
 
 		this.state = {
 			// height of just the canvas + DOUBLE_THICKNESSpx, as set by user with size box

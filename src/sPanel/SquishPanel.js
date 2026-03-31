@@ -25,7 +25,7 @@ import {tooOldTerminate} from '../utils/errors.js';
 import SquishContext from './SquishContext.js';
 import pointerContextMap from '../engine/pointerContextMap.js';  // TODO: get rid of this
 import {waitForSpaceCreatedPromise} from '../wave/waveContext.js';
-//import waveBox from '../wave/waveBox.js';
+//import waveAux from '../wave/waveAux.js';
 
 
 // runtime debugging flags - you can change in the debugger or here
@@ -50,7 +50,7 @@ class SquishPanel extends React.Component {
 		// during dev, this gets called TWICE
 		SquishPanel.squishPanelConstructed++;
 
-		//this.box = new waveBox();
+		//this.box = new waveAux();
 
 		// will be set by subcomponents
 		this.mainRepaint = null;
