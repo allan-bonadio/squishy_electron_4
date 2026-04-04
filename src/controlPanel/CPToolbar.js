@@ -72,8 +72,8 @@ const propTypes = {
 	resetWaveHandler: PropTypes.func.isRequired,
 	resetVoltageHandler: PropTypes.func.isRequired,
 
-	to2D: PropTypes.func.isRequired,
-	to3D: PropTypes.func.isRequired,
+	activate2D: PropTypes.func.isRequired,
+	activate3D: PropTypes.func.isRequired,
 
 	// these two might be undefined during startup, so get ready to punt
 	N: PropTypes.number,
@@ -188,9 +188,9 @@ function CPToolbar(props) {
 
 		<div className='toolbarWidget '>
 				<button className={'twoD3D '+ (context.show2D ? 'butOn' : 'butOff')}
-						onClick={p.to2D}>2d</button>
+						onClick={p.activate2D}>2d</button>
 				<button className={'twoD3D '+(context.show3D ? 'butOn' : 'butOff')}
-						onClick={p.to3D}>3d</button>
+						onClick={p.activate3D}>3d</button>
 		</div>
 	</div>);
 }

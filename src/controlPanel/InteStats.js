@@ -151,7 +151,7 @@ function InteStats(props) {
 	}
 
 	// it will be called once an anaimation lap to update stats
-	const grinder = context.waveView.space.grinder;
+	const grinder = context.space.grinder;
 	grinder.displayAllStats = displayAllStats;
 
 	/* ********************************************************* render table */

@@ -13,7 +13,7 @@ import TextNSlider from '../widgets/TextNSlider.js';
 import {getAGroup} from '../utils/storeSettings.js';
 import sSettings from '../utils/sSettings.js';
 
-import {eSpaceCreatedPromise} from '../engine/eEngine.js';
+//import {eSpaceCreatedPromise} from '../engine/eEngine.js';
 import {interpretCppException} from '../utils/errors.js';
 
 // fixed size GLScene at start.  TODO: also in setVoltageTab
@@ -161,7 +161,6 @@ function SetWaveTab(props) {
 		canvasInnerHeight={MINI_HEIGHT}
 		setGLRepaint={setMinigraphRepaint}
 		inputInfo={[minigraphWave, 0]}
-		show={true}
 		title="preview of what your wave will look like after clicking Set Wave"
 	/>;
 

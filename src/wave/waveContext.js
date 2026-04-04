@@ -1,14 +1,13 @@
 /*
-** waveContext -- info shared between the vista and view
+** waveContext -- info shared between the vista and view in yhr vonyrcy
 ** Copyright (C) 2026-2026 Tactile Interactive, all rights reserved
 */
 
 import {eSpaceCreatedPromise} from '../engine/eEngine.js';
 
 
-
-	// this should only run once, indirectly called by the squish panel
-	// set up 1/3 of the context: WaveVista
+// this should only run once, indirectly called by the squish panel
+// set up part of the context: WaveVista
 function setUpContext(space, context, setWVContext) {
 	// need BOTH context  and the space.  So this is called twice.
 	if (!context) {
@@ -21,9 +20,12 @@ function setUpContext(space, context, setWVContext) {
 	if (wv && wv.grinder)
 		return;  // already done
 
+
 	wv = {
 		space: space,
 		grinder: space.grinder,
+
+
 
 		// somebody's going to want to see both at once.  someday...
 		show2D: getASetting('miscSettings', 'show2D'),
@@ -31,6 +33,9 @@ function setUpContext(space, context, setWVContext) {
 
 		mainVDisp: space.vDisp,
 	};
+
+
+
 	setWVContext(wv, space, );
 
 		// make room for the bumpers for WELL continuum (both sides).  Note that
@@ -74,7 +79,7 @@ export function waitForSpaceCreatedPromise(animator, context, setWVContext) {
 	// this triggers after C++ is up, and results in the FIRST space
 	// being created.  All other spaces who .then() it can go and
 	// construct
-	eSpaceCreatedPromise.then(
+	context.spacePromise.then(
 		space => {
 			handleSpacePromise(space, animator, context, setWVContext);
 			//debugger;
@@ -82,7 +87,7 @@ export function waitForSpaceCreatedPromise(animator, context, setWVContext) {
 
 		// catch
 		ex => {
-			console.error(`eSpaceCreatedPromise failed:`, ex.stack ?? ex.message ?? ex);
+			console.error(`spaceCreatedProm failed:`, ex.stack ?? ex.message ?? ex);
 			debugger;
 		}
 	);

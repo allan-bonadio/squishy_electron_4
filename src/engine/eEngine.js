@@ -16,62 +16,73 @@ import eSpace from './eSpace.js';
 let traceStartup = false;
 let tracePromises = false;
 
-/* ****************************************************** app startup */
+/* ****************************************************** app startup (old) */
 
 // c++ main() calls us to tell us that it's up, and to pass some fundamental sizes
 export let MAX_DIMENSIONS, N_THREADS;
 
 // this promise resolves when the main space is created.
+// this is too much mechanism TODO
 // Create the promise tout de suite when app starts, so everybody can get at it.
-let eSpaceCreatedSucceed, eSpaceCreatedFail;
-function resetSpaceCreatedPromise() {
-	let prom = new Promise((succeed, fail) => {
-		eSpaceCreatedSucceed = succeed;
-		eSpaceCreatedFail = fail;
-		if (tracePromises)
-			console.log(`🐥 eSpaceCreatedPromise (re)created:`, succeed, fail);
-	});
-	if (traceStartup)
-		console.log(`spaceCreatedPromise 🐣 ... created but NOT YET RESOLVED`);
-	return prom;
-}
+// 	let eSpaceCreatedSucceed, eSpaceCreatedFail;
+// 	function resetSpaceCreatedPromise() {
+// 		let prom = new Promise((succeed, fail) => {
+// 			eSpaceCreatedSucceed = succeed;
+// 			eSpaceCreatedFail = fail;
+// 			if (tracePromises)
+// 				console.log(`🐥 eSpaceCreatedPromise (re)created:`, succeed, fail);
+// 		});
+// 		if (traceStartup)
+// 			console.log(`spaceCreatedPromise 🐣 ... returned`);
+// 		return prom;
+// 	}
+//
+// 	// for the first time when app starts up.  Because eSpaceCreatedPromise is an
+// 	// exported variable, that means there can only be one of them.  Therefore, only
+// 	// one space, and only one SquishPanel.  I was hoping to be able to have more
+// 	// than one SquishPanel.  Maybe if they all share the same space... or if I pass
+// 	// down yet another variable down multiple layers of components...
+// 	export let eSpaceCreatedPromise = resetSpaceCreatedPromise();
 
-// for the first time when app starts up.  Because eSpaceCreatedPromise is an
-// exported variable, that means there can only be one of them.  Therefore, only
-// one space, and only one SquishPanel.  I was hoping to be able to have more
-// than one SquishPanel.  Maybe if they all share the same space... or if I pass
-// down yet another variable down multiple layers of components...
-export let eSpaceCreatedPromise = resetSpaceCreatedPromise();
+/* ************************************************* cppActivePromise (new) */
 
-// the Space for the SquishPanel
-//let theSpace;
+
+// so this promise triggers when C++ is up and running.
+// Making a space comes later.  So, this just does the first
+export let cppActivePromise = new Promise((fulfiller, rejector) => {
+	window.cppFulfiller = fulfiller;
+	window.cppRejector = rejector;
+});
+
+
+/* *********************************************** creating the first space */
+//  which snouldn't be special for the first space/panel
 
 // called during startup, to create the space.  (Change Resolution reloads app - easier)
-// spaceParams is {N, continuum, dimLength, label: 'x'}
-// label=label for this dimension, not the whole space
-export function create1DMainSpace(spaceParams) {
-	try {
-		if (traceStartup)
-			console.log(`space 🐣  before creation, spaceParams=`, spaceParams);
-
-		// eSpace expects an array of param sets, one for each dimension
-		let space = new eSpace([spaceParams], 'main');
-		if (traceStartup)
-			console.log(`space 🐣  created, spaceParams=`, spaceParams);
-
-		// wakes up stuff all over the JS, and gives them the space,
-		// that they've been waiting for
-		eSpaceCreatedSucceed(space);
-		if (traceStartup)
-			console.log(`eSpaceCreatedPromise 🐣  resolved`);
-	} catch (ex) {
-		// this is called from eSpaceCreatedPromise so trigger its fail
-		// eslint-disable-next-line no-ex-assign
-		const iex = interpretCppException(ex);
-		debugger;
-		eSpaceCreatedFail(iex);
-	}
-}
+// // spaceParams is {N, continuum, dimLength, label: 'x'}
+// // label=label for this dimension, not the whole space
+// export function create1DMainSpace(spaceParams) {
+// 	try {
+// 		// eSpace expects an array of param sets, one for each dimension
+// 		// N, continuum, etc
+// 		let space = new eSpace([spaceParams], 'main');
+// 		if (traceStartup)
+// 			console.log(`space 🐣  created, `);
+//
+// 		// wakes up stuff all over the JS, and gives them the space,
+// 		// that they've been waiting for
+// 		eSpaceCreatedSucceed(space);
+//
+// 		if (traceStartup)
+// 			console.log(`eSpaceCreatedPromise 🐣  resolved`);
+// 	} catch (ex) {
+// 		// this is called from eSpaceCreatedPromise so trigger its fail
+// 		// eslint-disable-next-line no-ex-assign
+// 		const iex = interpretCppException(ex);
+// 		debugger;
+// 		eSpaceCreatedFail(iex);
+// 	}
+// }
 
 
 // create (almost) everything we know will be in production
@@ -83,20 +94,25 @@ function startUpEverything() {
 	defineQEngineFuncs();
 	if (traceStartup) console.log(`QEngineFuncs 🐣  defined`);
 
+	window.cppFulfiller('c++ started');
+	// pay careful attention to what isn't defined at this time, see below
+
 	// create the system for storing prefs and settings
 	// must come After defineQEngineFuncs() cuz it uses continuum constants on qeConsts
 	createStoreSettings();
 	if (traceStartup) console.log(`StoreSettings 🐣  created`);
 
+
 	// Create The Space.  Asynchronous, then triggers the eSpaceCreatedPromise.
 	// This can't happen until we have the storeSettings and QEngine funcs, and...
-	create1DMainSpace({
-		N: getASetting('spaceParams', 'N'),
-		continuum: getASetting('spaceParams', 'continuum'),
-		dimLength: getASetting('spaceParams', 'dimLength'),
-		label: 'main'});
-
-	if (traceStartup) console.log(`main space 🐣  created`);
+//MOVED TO squish panel for when that gets created
+// 	create1DMainSpace({
+// 		N: getASetting('spaceParams', 'N'),
+// 		continuum: getASetting('spaceParams', 'continuum'),
+// 		dimLength: getASetting('spaceParams', 'dimLength'),
+// 		label: 'main'});
+//
+// 	if (traceStartup) console.log(`main space 🐣  created`);
 }
 
 /* ********************************************************** Main Startup */
@@ -117,11 +133,12 @@ document.addEventListener('DOMContentLoaded', ev => {
 });
 
 
-// trigger when the C++ runtime is up.  (threads may or may not exist yet)
+// trigger when the C++ runtime is up, in main.cpp.  (threads may or may not exist yet)
 window.cppRuntimeInitialized =
 ev => {
 	if (traceStartup) console.log(`🐣 cppRuntimeInitialized`);
 	cppInitialized = true;
+
 	if (domContentLoaded)
 		startUpEverything();
 };
@@ -144,22 +161,25 @@ function startUpFromCpp(maxDims, nThreads, sqdevel) {
 	window.cppRuntimeInitialized();
 	if (traceStartup) console.log(`threads 🐣  created`);
 
+
 	// startup threads need, like everything else, the space
 	// I guess we're starting up with threads anyway
-	eSpaceCreatedPromise
-	.then(space => {
-		// what this doesn't do anything?  I guess all the other thens do stuff.
-		if (traceStartup) console.log(`threads 🐣  created`);
-		if (tracePromises) {
-			console.log(
-				`🐥 startUpFromCpp:  space created and resolving eSpaceCreatedPromise`);
-		}
 
-	})
-	.catch(ex => {
-		excRespond(ex, `eSpaceCreatedPromise error`);
-		debugger;
-	});
+	// thisd does nothing.
+// 	context.spaceCreatedProm  // wait... where do I get context heree?!?!?!
+// 	.then(space => {
+// 		// SpaceCreated.
+// 		if (traceStartup) console.log(`threads 🐣  created`);
+// 		if (tracePromises) {
+// 			console.log(
+// 				`🐥 startUpFromCpp:  space created and resolving eSpaceCreatedPromise`);
+// 		}
+//
+// 	})
+// 	.catch(ex => {
+// 		excRespond(ex, `spaceCreatedProm error`);
+// 		debugger;
+// 	});
 
 };
 

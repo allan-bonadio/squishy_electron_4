@@ -11,7 +11,7 @@ import voltDisplay from '../volts/voltDisplay.js';
 import {EFFECTIVE_VOLTS, TOO_MANY_VOLTS} from '../volts/voltConstants.js';
 import {getAGroup, storeAGroup, storeASetting} from '../utils/storeSettings.js';
 import sSettings from '../utils/sSettings.js';
-import {eSpaceCreatedPromise} from '../engine/eEngine.js';
+//import {eSpaceCreatedPromise} from '../engine/eEngine.js';
 import LogSlider from '../widgets/LogSlider.js';
 
 // miniGraph: always fixed size.    TODO: also in setWaveTab

@@ -10,7 +10,7 @@ import CommonDialog from './widgets/CommonDialog.js';
 import DocReader from './sPanel/DocReader.js';
 import DocMenu from './sPanel/DocMenu.js';
 
-import {eSpaceCreatedPromise} from './engine/eEngine.js';
+import {cppActivePromise} from './engine/eEngine.js';
 import './App.scss';
 
 
@@ -42,7 +42,7 @@ class App extends React.Component {
 		if (traceState)
 			console.log(`init App state to:`, this.state);
 
-		eSpaceCreatedPromise.then(space =>{
+		cppActivePromise.then(space =>{
 			// there's lots of thens on this promise, so cppRunning
 			// won't be on for many of them
 			this.setState({cppRunning: true})
@@ -62,6 +62,7 @@ class App extends React.Component {
 	// needs to resize itself.  Don't bother passing it in; we'll do the right thing.
 	// TODO: this isn't needed anymore, right?
 	widthDidChange = () => {
+		debugger;
 		this.setState({bodyWidth: document.body.clientWidth});  // triggers rerenders & resizes
 		if (traceResize)
 			console.log(`🍦 widthDidChange: bodyWidth= ${document.body.clientWidth}`);

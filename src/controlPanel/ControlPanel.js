@@ -14,7 +14,7 @@ import SetResolutionTab from './SetResolutionTab.js';
 import SetIntegrationTab from './SetIntegrationTab.js';
 import CxRainbowTab from './CxRainbowTab.js';
 import {getASetting, storeASetting, getAGroup, storeAGroup} from '../utils/storeSettings.js';
-import {eSpaceCreatedPromise} from '../engine/eEngine.js';
+//import {eSpaceCreatedPromise} from '../engine/eEngine.js';
 import qeFuncs from '../engine/qeFuncs.js';
 import qeConsts from '../engine/qeConsts.js';
 import {interpretCppException, wrapForExc} from '../utils/errors.js';
@@ -46,6 +46,8 @@ export class ControlPanel extends React.Component {
 		animator: PropTypes.object,
 
 		setShouldBeIntegrating: PropTypes.func.isRequired,
+
+		spaceCreatedProm: PropTypes.object.isRequired,
 	}
 
 	constructor(props) {
@@ -72,14 +74,8 @@ export class ControlPanel extends React.Component {
 
 		// we can't init some stuff till we get the space.  But we also can't until
 		// this constructor runs.
-		eSpaceCreatedPromise.then(space => {
-			this.handleSpacePromise(space);
-		})
-		.catch(rex => {
-			let ex = interpretCppException(rex);
-			console.error(ex.stack ?? ex.message ?? ex);
-			debugger;
-		});
+		// nothing draws until this.space is filled in
+		props.spaceCreatedProm.then(this.handleSpacePromise);
 	}
 
 	setUpContext() {
@@ -93,7 +89,7 @@ export class ControlPanel extends React.Component {
 		if (cp && cp.beginAnimating)
 			return;  // already done
 
-		// new cp object
+		// new cp object to go into context
 		cp = {
 			beginAnimating: this.beginAnimating,
 			finishAnimating: this.finishAnimating,
@@ -525,8 +521,8 @@ export class ControlPanel extends React.Component {
 			setShowingTab={this.setShowingTab}
 
 			shouldBeIntegrating={this.context.shouldBeIntegrating ?? false}
-			to2D={this.props.to2D}
-			to3D={this.props.to3D}
+			activate2D={this.props.activate2D}
+			activate3D={this.props.activate3D}
 
 			// startOver buttons
 			resetWaveHandler={this.resetWaveHandler}

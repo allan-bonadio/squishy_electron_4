@@ -12,19 +12,19 @@ import PropTypes, {checkPropTypes} from 'prop-types';
 
 import ControlPanel from '../controlPanel/ControlPanel.js';
 
-import {eSpaceCreatedPromise} from '../engine/eEngine.js';
-
 import {interpretCppException} from '../utils/errors.js';
 import WaveView from '../wave/WaveView.js';
 import WaveVista from '../wave/WaveVista.js';
 import sAnimator from './sAnimator.js';
+import eSpace from '../engine/eSpace.js';
 
-import {getASetting, storeASetting} from '../utils/storeSettings.js';
+import {getASetting, storeASetting, getAGroup} from '../utils/storeSettings.js';
 import {tooOldTerminate} from '../utils/errors.js';
+import {cppActivePromise} from '../engine/eEngine.js';
 
 import SquishContext from './SquishContext.js';
 import pointerContextMap from '../engine/pointerContextMap.js';  // TODO: get rid of this
-import {waitForSpaceCreatedPromise} from '../wave/waveContext.js';
+import {waitForSpaceCreatedPromise} from '../wave/waveContext.js';  // TODO: get rid of this
 //import waveAux from '../wave/waveAux.js';
 
 
@@ -33,15 +33,19 @@ let tracePromises = true;
 let traceSquishPanel = true;
 let traceWidth = false;
 let traceSBIUpdate = false;
+let traceNewSpace = true;
 
 /* ************************************************ construction & reconstruction */
+
+
+
+
+
 
 class SquishPanel extends React.Component {
 	static propTypes = {
 		bodyWidth: PropTypes.number.isRequired,  // width of window which dictates view and vista width
 	};
-
-	static squishPanelConstructed = 0;
 
 	constructor(props) {
 		super(props);
@@ -71,16 +75,47 @@ class SquishPanel extends React.Component {
 			waveView: {},
 
 			fakeChange: 1,
+
+			// loopyt spaceReady: new Promise(this.spaceNowReady, this.spaceCreationError)
 		};
 		// see above this.#shouldBeIntegrating = false;
+
+		// this will end up in everybody's context.  Unfortunately, the
+		// context isn't always there on creation.  This is why we pass
+		// the space down the props
+		this.state.spaceCreatedProm = new Promise((succeed, fail) => {
+			this.spaceSucceed = succeed;
+			this.spaceFail = fail;
+			if (tracePromises)
+				dblog(`🐥 wv.spaceCreatedProm (re)created:`, succeed, fail);
+		});
+
+		cppActivePromise.then(() => {
+			let params = getAGroup('spaceParams');
+			params.label = 'x';  // the x coordinate, the only dimension of the space
+			this.create1DMainSpace(params);
+		});
 
 		// animator will still need grinder, mainRepaint() and context,
 		// which don't exist yet.  Each will be on this.whatever
 		this.animator = new sAnimator(this, this.getContext);
 
-		waitForSpaceCreatedPromise(this.animator, this.context, this.setWVContext);
+		if (traceSquishPanel) dblog(`👑 SquishPanel constructor done`);
+	}
 
-		if (traceSquishPanel) console.log(`👑 SquishPanel constructor done`);
+	// called when spaceReady promise results.
+	// spaceNowReady = (space) => {
+	//
+	// }
+
+	// space creation got an error, sorry.
+	spaceCreationError = (ex) => {
+		console.error(`Error creating the space: `, ex.stack ?? ex.message ?? ex);
+		alert(`Sorry, but we could not create the space for the Squishy Electron.\n` + ex.message);
+		open(`https://www.youtube.com/watch?v=JP9KP-fwFhk`,
+			`Quantum4Dummies`, '')
+
+
 	}
 
 	/* ****************************************** context */
@@ -93,7 +128,7 @@ class SquishPanel extends React.Component {
 
 		storeASetting('lapSettings', 'shouldBeIntegrating', sbi);
 		if (traceSBIUpdate)
-			console.log(`👑 👑 called setShouldBeIntegrating(${sbi})`);
+			dblog(`👑 👑 called setShouldBeIntegrating(${sbi})`);
 	};
 
 	// this sets grinder.sbi and does the first trigger
@@ -106,7 +141,7 @@ class SquishPanel extends React.Component {
 				this.grinder.triggerIteration();
 
 			if (traceSBIUpdate) {
-				console.log(`👑  shouldBeIntegratingUpdate: shouldBeIntegrating state.sbi=${sbi} and `
+				dblog(`👑  shouldBeIntegratingUpdate: shouldBeIntegrating state.sbi=${sbi} and `
 					+` gr.sbi=${this.grinder.shouldBeIntegrating} now in effect & triggered; `
 					+` gr.isIntegrating=${this.grinder.isIntegrating}\n `
 					+`gr.stretchedDt=${gr.stretchedDt}\n`);
@@ -114,16 +149,29 @@ class SquishPanel extends React.Component {
 		}
 	}
 
+	activateX(showX, whetherTo) {
+		this.setState({[showX]: whetherTo});
+		storeASetting('miscSettings', showX, whetherTo);
+	}
+
 	// these are the functions that change the 2d/3d setting.  Get at the state in the context.  These functions get passed down.
-	to2D = () => {
-		this.setState({show2D: true, show3D: false});
-		storeASetting('miscSettings', 'show2D', true);
-		storeASetting('miscSettings', 'show3D', false);
+	activate2D = () => {
+		// if turning off 2d, make sure 3d is on
+		this.activateX('show2D', ! this.state.show2D) ;
+		this.activateX('show3D', this.state.show2D || this.state.show3D) ;
+// 		this.setState({show2D: true, show3D: false});
+// 		this.setState({show2D: true, show3D: false});
+// 		storeASetting('miscSettings', 'show2D', true);
+// 		storeASetting('miscSettings', 'show3D', false);
 	};
-	to3D = () => {
-		this.setState({show2D: false, show3D: true});
-		storeASetting('miscSettings', 'show2D', false);
-		storeASetting('miscSettings', 'show3D', true);
+	activate3D = () => {
+		// if turning off 2d, make sure 3d is on
+		this.activateX('show3D', ! this.state.show3D) ;
+		this.activateX('show2D', this.state.show2D || this.state.show3D) ;
+// 		this.setState({show2D: false});
+// 		this.setState({show3D: true});
+// 		storeASetting('miscSettings', 'show2D', false);
+// 		storeASetting('miscSettings', 'show3D', true);
 	};
 
 	// these functions are passed in props to lower levels mostly for initialization.
@@ -143,13 +191,43 @@ class SquishPanel extends React.Component {
 
 	/* ****************************************** space & wave creation */
 
+	// spaceParams is {N, continuum, dimLength, label: 'x'}
+	// label=label for this dimension, not the whole space
+	create1DMainSpace(spaceParams) {
+		try {
+			// eSpace expects an array of param sets, one for each dimension
+			// N, continuum, etc
+			if (traceNewSpace)
+				dblog(`space 🐣 creating, `);
+			this.space = new eSpace([spaceParams], 'main');
+			if (traceNewSpace)
+				dblog(`space 🐣 has been created, `);
+
+			// wakes up stuff all over the JS, and gives them the space,
+			// that they've been waiting for
+			//eSpaceCreatedSucceed(space);
+			this.spaceSucceed(this.space);
+
+			if (traceNewSpace)
+				dblog(`spaceCreatedProm 🐣  resolved`);
+		} catch (ex) {
+			// this is called from spaceCreatedProm so trigger its fail
+			// eslint-disable-next-line no-ex-assign
+			const iex = interpretCppException(ex);
+			debugger;
+			if (traceNewSpace)
+				dblog(`🎇 🐣 🎇 space Created failed!  `);
+			//eSpaceCreatedFail(iex);
+		}
+	}
+
 	componentDidMount() {
 		// upon startup, after C++ says it's ready.
 		// why do this in DidMount and not in constructor?  dunno...
-		eSpaceCreatedPromise
+		this.state.spaceCreatedProm
 		.then((space) => {
 			//const s = this.state;
-			if (tracePromises) console.log(`👑 SquishPanel.compDidMount about to set state`);
+			if (tracePromises) dblog(`👑 SquishPanel.compDidMount about to set state`);
 
 			// space will end up in the state but meanwhile we need it now
 			this.space = space;
@@ -172,20 +250,14 @@ class SquishPanel extends React.Component {
 				setTimeout(() => this.setShouldBeIntegrating(true), 500)	;
 			}
 
-			if (tracePromises) console.log(`👑 SquishPanel.compDidMount done`);
+			if (tracePromises) dblog(`👑 SquishPanel.compDidMount done`);
 		})
 		.catch(ex => {
 			// eslint-disable-next-line no-ex-assign
 			ex = interpretCppException(ex);
 			if (typeof ex == 'string')
 				ex = new Error(ex);
-			//if ('creating second space' == ex.message) {
-			//	// obnoxious hot reloading; let me reload the right way
-			//	debugger;
-			//	location = location;  // eslint-disable-line no-restricted-globals
-			//	// never gets here
-			//}
-			console.error(`eSpaceCreatedPromise threw: `, ex.stack ?? ex.message ?? ex);
+			console.error(`spaceCreatedProm threw: `, ex.stack ?? ex.message ?? ex);
 			debugger;
 			throw ex;
 		});
@@ -236,41 +308,52 @@ class SquishPanel extends React.Component {
 		this.shouldBeIntegratingUpdate();
 
 		if (traceWidth)
-			console.log(`👑 SquishPanel render, p.bodyWidth=${p.bodyWidth} = outerWidth `
+			dblog(`👑 SquishPanel render, p.bodyWidth=${p.bodyWidth} = outerWidth `
 				+ ` body.clientWidth=${document.body.clientWidth}`);
 		//debugger;
+
+		let wView = <WaveView
+						outerWidth = {p.bodyWidth}
+						animator={this.animator}
+						setWVContext={this.setWVContext}
+						setShouldBeIntegrating={this.setShouldBeIntegrating}
+						setMainRepaint={this.setMainRepaint}
+						setSpectRepaint={this.setSpectRepaint}
+						spaceCreatedProm={this.state.spaceCreatedProm}
+						sPanel={this}
+						show2D={s.show2D}
+					/>;
+		let wVista = <WaveVista
+						outerWidth = {p.bodyWidth}
+						animator={this.animator}
+						setWVContext={this.setWVContext}
+						setShouldBeIntegrating={this.setShouldBeIntegrating}
+						setMainRepaint={this.setMainRepaint}
+						setSpectRepaint={this.setSpectRepaint}
+						spaceCreatedProm={this.state.spaceCreatedProm}
+						sPanel={this}
+						show3D={s.show3D}
+					/>;
+
 
 		return (
 			<SquishContext.Provider value={this.state} >
 				<article className={`SquishPanel space` + s.name} ref={this.setSPElement}>
-					<WaveView
-						outerWidth = {p.bodyWidth}
-						animator={this.animator}
-						setWVContext={this.setWVContext}
-						setShouldBeIntegrating={this.setShouldBeIntegrating}
-						setMainRepaint={this.setMainRepaint}
-						setSpectRepaint={this.setSpectRepaint}
-						sPanel={this}
-					/>
-					<WaveVista
-						outerWidth = {p.bodyWidth}
-						animator={this.animator}
-						setWVContext={this.setWVContext}
-						setShouldBeIntegrating={this.setShouldBeIntegrating}
-						setMainRepaint={this.setMainRepaint}
-						setSpectRepaint={this.setSpectRepaint}
-						sPanel={this}
-					/>
+
+					{wVista}
+					{wView}
+
 					<ControlPanel
 						resetAndRepaintMainWave={this.resetAndRepaintMainWave}
 
 						iStats={this.iStats}
 						animator={this.animator}
 						setCPContext={this.setCPContext}
-						to2D={this.to2D}
-						to3D={this.to3D}
+						activate2D={this.activate2D}
+						activate3D={this.activate3D}
 						setShouldBeIntegrating={this.setShouldBeIntegrating}
 						sPanel={this}
+						spaceCreatedProm={this.state.spaceCreatedProm}
 					/>
 				</article>
 			</SquishContext.Provider>

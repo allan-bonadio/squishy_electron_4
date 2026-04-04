@@ -156,9 +156,9 @@ class sAnimator {
 					// round the FREQUENCY to an int, to get the authoritative FP
 					let videoRate = round(1000 / this.avgVideoFP);
 					videoFP = this.inteTimes.rAFPeriod = Math.round(1000 / videoRate);
-					this.grinder.videoFP = videoFP;
+					if (this.grinder)
+						this.grinder.videoFP = videoFP;
 				}
-
 				setAnimationFP();
 
 				// and soon, even more accurate.  After this, it's usually
