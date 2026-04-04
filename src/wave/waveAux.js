@@ -26,8 +26,10 @@ export const waveAux = {
 	// set this.canvasInner* from the right places
 	updateInnerDims() {
 		// on the off chance this is not yet an integer, keep our rounded version of the number
+		// this is like the edge of the widow/document
 		this.outerWidth = Math.round(this.props.outerWidth);
 
+		// then this is inside the border around the canvases
 		this.canvasInnerWidth = Math.round(this.outerWidth - this.DOUBLE_THICKNESS);
 		this.canvasInnerHeight = Math.round(this.state.outerHeight - this.DOUBLE_THICKNESS);
 		if (traceDimensions)
@@ -78,6 +80,19 @@ export const waveAux = {
 		}
 	},
 
+// setMySpace = () => {
+// 	if (!this.context)
+// 		return false;
+// 	if (!this.context.spaceCreatedProm)
+// 		return false;
+// 	this.context.spaceCreatedProm(
+// 			space => this.space = this.context.space)}
+//
+// 	setTimeout(this.setMySpace, 100);
+// }
+
+// toix =
+// clearTimeout(toix);
 
 
 
