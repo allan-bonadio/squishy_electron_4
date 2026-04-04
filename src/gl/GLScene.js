@@ -41,7 +41,6 @@ const propTypes = {
    // Array of eCavity(s) or other buffers to draw or any data.  passed blindly to avatar
    inputInfo: PropTypes.array.isRequired,
 
-   // Our caller gets these from eSpaceCreatedPromise; so it must be resolved by now.
    // Optional; omit if your scene is not affected by space.
    space: PropTypes.object,
 
@@ -55,7 +54,6 @@ const propTypes = {
    // keep these separate	so any change will trigger render
    canvasInnerWidth: PropTypes.number.isRequired,
    canvasInnerHeight: PropTypes.number.isRequired,
-   show: PropTypes.bool.isRequired,
 
   // if the caller needs the repaint function for this canvas, pass a func to pick it up
    setGLRepaint: PropTypes.func,
@@ -115,10 +113,6 @@ function GLScene(props) {
 	// and this function redraws on the canvas (with gl).
 	const glRepaint =
 	() => {
-		// if not showing, nothing to paint.  Still needs to render the canvas, even though disp none
-		if (!p.show)
-			return;
-
 		// make sure we have this cuz this func gets called from all over
 		const scene = squishScene;
 		const node = canvasNode;
@@ -228,8 +222,7 @@ function GLScene(props) {
 		<canvas className={`GLScene ${p.sceneName}`}
 			width={cWidth}
 			height={cHeight}
-			style={{width: cWidth + 'px', height: cHeight + 'px',
-					display: p.show ? 'block' : 'none'}}
+			style={{width: cWidth + 'px', height: cHeight + 'px'}}
 			ref={canvasRef}
 			title={p.title}
 		/>
