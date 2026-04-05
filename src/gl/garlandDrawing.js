@@ -10,7 +10,7 @@ import {drawingUniform, drawingAttribute} from './drawingVariable.js';
 import cx2rygb from './cx2rygb/cx2rygb.glsl.js';
 import qeFuncs from '../engine/qeFuncs.js';
 import qeConsts from '../engine/qeConsts.js';
-import {dump4x4} from './math3d.js';
+import {dump4x4} from './helpers3D.js';
 
 
 let traceAvatarAfterDrawing = true;

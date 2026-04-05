@@ -7,7 +7,7 @@ import {mat4} from 'gl-matrix';
 
 import abstractScene from './abstractScene.js';
 import garlandDrawing from './garlandDrawing.js';
-import {dump4x4} from './math3d.js';
+import {dump4x4} from './helpers3D.js';
 import eAvatar from '../engine/eAvatar.js';
 
 
@@ -30,7 +30,7 @@ class garlandScene extends abstractScene {
 
 		// make the projection matrix.. never changes
 		const fieldOfView = (45 * Math.PI) / 180; // in radians
-		const aspect = ambiance.canvas.clientWidth / ambiance.canvas.clientHeight;
+		const aspect = ambiance.canvas.width / ambiance.canvas.height;
 		const zNear = 0.1;
 		const zFar = N * 3;
 		const proj = mat4.create();
@@ -76,6 +76,7 @@ class garlandScene extends abstractScene {
 
 		this.origMatrix = origMatrix;
 	}
+
 }
 
 export default garlandScene;

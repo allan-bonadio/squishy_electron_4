@@ -3,14 +3,15 @@
 ** Copyright (C) 2026-2026 Tactile Interactive, all rights reserved
 */
 
-import {mat4} from 'gl-matrix';
+//import {mat4} from 'gl-matrix';
 
-import abstractScene from './abstractScene.js';
-import garlandDrawing from './garlandDrawing.js';
-import wGarlandDrawing from './wGarlandDrawing.js';
-import eAvatar from '../engine/eAvatar.js';
+// import abstractScene from './abstractScene.js';
+// import garlandDrawing from './garlandDrawing.js';
+// import wGarlandDrawing from './wGarlandDrawing.js';
+// import eAvatar from '../engine/eAvatar.js';
 
 const _ = (n) => (n.toFixed(4).padStart(9, ' '));
+
 
 export function dump4x4(matrix, title) {
 	dblog(`dump of matrix: `+ title);
