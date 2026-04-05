@@ -60,9 +60,7 @@ class App extends React.Component {
 
 	// respond properly whenever width changed (usually user & sizebox).  Cuz canvas
 	// needs to resize itself.  Don't bother passing it in; we'll do the right thing.
-	// TODO: this isn't needed anymore, right?
 	widthDidChange = () => {
-		debugger;
 		this.setState({bodyWidth: document.body.clientWidth});  // triggers rerenders & resizes
 		if (traceResize)
 			console.log(`🍦 widthDidChange: bodyWidth= ${document.body.clientWidth}`);

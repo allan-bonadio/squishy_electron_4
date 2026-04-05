@@ -22,7 +22,7 @@ import SquishContext from '../sPanel/SquishContext.js';
 
 let traceSetPanels = false;
 let traceBeginFinish = false;
-let traceContext = false;
+let traceContext = true;
 let traceQuickDtFactor = false;
 
 // integrations always need specific numbers of steps.  But there's always one
@@ -112,7 +112,7 @@ export class ControlPanel extends React.Component {
 
 	// we need a surprising amount of stuff from the space.  We can't draw much without it.
 	// So this gets called when it's ready.
-	handleSpacePromise(space) {
+	handleSpacePromise = (space) => {
 		this.space = space;
 		this.N = space.N;
 		//this.mainAvatar = space.mainAvatar;
