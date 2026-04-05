@@ -34,19 +34,19 @@ function VoltSidebar(props) {
 	cfpt(propTypes, props);
 	let sidebarWidth = props.width ?? 200;  // ?? why is this undeffined?  nothing passed in.
 
-	let mVD;
-	mVD = props.space.vDisp;
-	if (!mVD) return '';  // too early or first render
+	let mainVDisp;
+	mainVDisp = props.space.vDisp;
+	if (!mainVDisp) return '';  // too early or first render
 
-	if (!mVD.heightVolts  || mVD.heightVolts <= 0)
-		throw `bad heightVolts ${mVD.heightVolts}`
+	if (!mainVDisp.heightVolts  || mainVDisp.heightVolts <= 0)
+		throw `bad heightVolts ${mainVDisp.heightVolts}`
 
 	// so how far down is the thumb from top of rail in pix?
-	//thumbY = thumbFreedom * (1 - (mVD.bottomVolts - mVD.minBottom) / mVD.heightVolts)
+	//thumbY = thumbFreedom * (1 - (mainVDisp.bottomVolts - mainVDisp.minBottom) / mainVDisp.heightVolts)
 
 	if (traceVoltageSidebar) {
-		console.log(`🍟 V Sidebar rend: width=${sidebarWidth}  heightVolts=${mVD.heightVolts}  `
-			+ mVD.minBottom);
+		console.log(`🍟 V Sidebar rend: width=${sidebarWidth}  heightVolts=${mainVDisp.heightVolts}  `
+			+ mainVDisp.minBottom);
 	}
 
 	// Hovering  to show/hide voltage - hovering over the sidebar
@@ -67,19 +67,19 @@ function VoltSidebar(props) {
 		<aside className='VoltSidebar waveButtonPanel'
 				onPointerEnter={pointerEnter} onPointerLeave={pointerLeave} >
 
-			<button className='scrollUp' onClick={ev => mVD.scrollVoltHandler(+1)}>
+			<button className='scrollUp' onClick={ev => mainVDisp.scrollVoltHandler(+1)}>
 				<img src={upIcon} height='1em' />
 			</button>
 
-			<button className='zoomIn' onClick={ev => mVD.zoomVoltHandler(-1)}>
+			<button className='zoomIn' onClick={ev => mainVDisp.zoomVoltHandler(-1)}>
 				<img src={plusIcon} height='1em' />
 			</button>
 
-			<button className='zoomOut' onClick={ev => mVD.zoomVoltHandler(+1)}>
+			<button className='zoomOut' onClick={ev => mainVDisp.zoomVoltHandler(+1)}>
 				<img src={minusIcon} height='1em' />
 			</button>
 
-			<button className='scrollDown' onClick={ev => mVD.scrollVoltHandler(-1)}>
+			<button className='scrollDown' onClick={ev => mainVDisp.scrollVoltHandler(-1)}>
 				<img src={downIcon} height='1em' />
 			</button>
 

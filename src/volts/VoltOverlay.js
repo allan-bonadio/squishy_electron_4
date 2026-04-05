@@ -37,8 +37,8 @@ const propTypes = {
 function VoltOverlay(props) {
 	cfpt(propTypes, props);
 	const p = props;
-	const mVD = p.mainVDisp;
-	if (!mVD)
+	const mainVDisp = p.mainVDisp;
+	if (!mainVDisp)
 		throw `props.mainVDisp has no voltDisplay`;
 
 	/* ************************************************************************ state */
@@ -55,31 +55,31 @@ function VoltOverlay(props) {
 	let [showVoltage, setShowVoltage] = useState(getASetting('voltageSettings', 'showVoltage'));
 
 	// see reducer above
-	const [vState, voltDispatch] = useReducer(voltReducer, mVD.voltageBuffer);
+	const [vState, voltDispatch] = useReducer(voltReducer, mainVDisp.voltageBuffer);
 
 	// use this function to actually set a point in the voltage buffer, instead of just a regular assignment
 	const setAPoint =
 	(ix, volts) => voltDispatch({ix, volts});
 
 	// these are in our state, but ALSO in the mainVDisp, and settings, so keep them synched.
-	const [bottomVolts, _setBottomVolts] = useState(mVD.bottomVolts);
-	mVD.bottomVolts = bottomVolts;
+	const [bottomVolts, _setBottomVolts] = useState(mainVDisp.bottomVolts);
+	mainVDisp.bottomVolts = bottomVolts;
 	if (getASetting('voltageSettings', 'bottomVolts') != bottomVolts)
 			storeASetting('voltageSettings', 'bottomVolts', bottomVolts);
 
-	const [heightVolts, _setHeightVolts] = useState(mVD.heightVolts);
-	mVD.heightVolts = heightVolts;
+	const [heightVolts, _setHeightVolts] = useState(mainVDisp.heightVolts);
+	mainVDisp.heightVolts = heightVolts;
 	if (getASetting('voltageSettings', 'heightVolts') != heightVolts)
 			storeASetting('voltageSettings', 'heightVolts', heightVolts);
 
 	// practically speaking, use these functions whenever you set stuff.
 	// They set state, so  immediately after, changes will not be apparent.
-	mVD.setAPoint = setAPoint;
-	mVD.setBottomVolts = (bv) => {
+	mainVDisp.setAPoint = setAPoint;
+	mainVDisp.setBottomVolts = (bv) => {
 		_setBottomVolts(bv);
 		storeASetting('voltageSettings', 'bottomVolts', bv);
 	}
-	mVD.setHeightVolts = (hv) => {
+	mainVDisp.setHeightVolts = (hv) => {
 		_setHeightVolts(hv);
 		storeASetting('voltageSettings', 'heightVolts', hv);
 	}
@@ -114,8 +114,9 @@ function VoltOverlay(props) {
 			drawingRight={p.canvasInnerWidth - p.bumperWidth}
 			bumperWidth={p.bumperWidth}
 			canvasInnerHeight={p.canvasInnerHeight}
-			scrollVoltHandler={mVD.setBottomVolts}
-			zoomVoltHandler={mVD.zoomVoltHandler}
+			scrollVoltHandler={mainVDisp.setBottomVolts}
+			zoomVoltHandler={mainVDisp.zoomVoltHandler}
+			space={p.space}
 		/>
 		<VoltArea
 			mainVDisp={p.mainVDisp}
