@@ -178,7 +178,7 @@ class SquishPanel extends React.Component {
 	// called once ONLY in control panel during setup.  Either one can set space.
 	setCPContext = (cp) => {
 		this.setState({controlPanel: cp});
-		this.setState({space: cp.space});
+		// not there anyway this.setState({space: cp.space});
 		//this.stateObj.controlPanel = cp;
 	}
 
