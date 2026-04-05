@@ -18,6 +18,7 @@ import {getASetting, storeASetting} from '../utils/storeSettings.js';
 import waveAux from './waveAux.js';
 
 import PivotOverlay from './PivotOverlay.js';
+import Orient3D from './Orient3D.js';
 // import {WELL_BUMPER_WIDTH} from '../volts/voltConstants.js';
 import GLScene from '../gl/GLScene.js';
 import Spinner from '../widgets/Spinner.js';
@@ -27,11 +28,10 @@ import BeginFinishOverlay from './BeginFinishOverlay.js';
 import resizeIcon from './waveViewIcons/resize.png';
 
 
-// OLD 2d STUFF
-let traceBumpers = false;
 let traceDimensions = false;
+// OLD 2d STUFF
 let traceDragCanvasHeight = false;
-let traceHover = false;
+//let traceHover = false;
 let traceContext = false;
 
 const round = (n) => Math.round(n, 1);
@@ -129,6 +129,32 @@ export class WaveVista extends React.Component {
 	// not sure I need this in the vista
 	grabWaveVistaEl = el => this.WaveVistaEl = el;
 
+	makeVista() {
+		// can't make a real GLScene until we have the space!
+		let vista;
+		const s = this.state;
+
+		if (this.space) {
+			let sceneClassName = 'garlandScene';
+			let sceneName = 'mainWave3D';
+
+			vista = <GLScene
+				space={this.space} animator={this.animator}
+				sceneClassName={'garlandScene'} sceneName={sceneName + '3d'}
+				inputInfo={[this.space.mainFlick, null, null, null]}
+				canvasInnerWidth={this.canvasInnerWidth}
+				canvasInnerHeight={this.canvasInnerHeight}
+				setGLRepaint={this.setMainRepaint}
+			/>;
+		}
+		else {
+			vista = <Spinner
+				width={this.outerWidth - this.CANVAS_BORDER_THICKNESS}
+				height={s.outerHeight - this.DOUBLE_THICKNESS} />
+		}
+		return vista;
+	}
+
 	render() {
 		const p = this.props;
 		const s = this.state;
@@ -148,42 +174,16 @@ export class WaveVista extends React.Component {
 				+`canvasInnerHeight=${this.canvasInnerHeight}`);
 		}
 
-		const pivotOverlay = <PivotOverlay />;
+		let pOverlay;
+		//pOverlay = <PivotOverlay />;  // production
+		pOverlay = <Orient3D orientation={***}  setOrientation=/>;  // testing
 
-		// can't make a real GLScene until we have the space!
-		let vista;
-		if (this.space) {
-			let sceneClassName = 'garlandScene';
-			let sceneName = 'mainWave3D';
-
-			vista = <GLScene
-				space={this.space} animator={this.animator}
-				sceneClassName={'garlandScene'} sceneName={sceneName + '3d'}
-				inputInfo={[this.space.mainFlick, null, null, null]}
-				canvasInnerWidth={this.canvasInnerWidth}
-				canvasInnerHeight={this.canvasInnerHeight}
-				setGLRepaint={this.setMainRepaint}
-			/>;
-		}
-		else {
-			vista = <Spinner
-				width={this.outerWidth - this.CANVAS_BORDER_THICKNESS}
-				height={s.outerHeight - this.DOUBLE_THICKNESS} />
-
-			// debugger;
-			// until then, show spinner, not actually a GLScene
-			// let vista = <div className='spinnerBox'
-			// 			style={{width: this.outerWidth - this.CANVAS_BORDER_THICKNESS ,
-			// 				height: s.outerHeight - this.DOUBLE_THICKNESS}} >
-			// 	<img className='spinner' alt='spinner'
-			// 		src='/images/eclipseOnTransparent.gif' />
-			// </div>;
-		}
+		let vista = this.makeVista();
 
 		// the glScene is one layer.  Over that is the widget area  Bumpers are outside.
 		return (
 		<div className='WaveVista'
-			style={{height: `${s.outerHeight}px`, display: (p.show3D ? 'block' : 'none')}}
+			style={{height: `${s.outerHeight}px`, display: (p.show3D ? 'flex' : 'none')}}
 			onPointerUp={this.finishIntegration}
 			onFocus={ev => console.log(`focus ON`)}
 			ref={this.grabWaveVistaEl}>
@@ -201,7 +201,7 @@ export class WaveVista extends React.Component {
 
 				</section>
 
-				{pivotOverlay}
+				{pOverlay}
 
 				<BeginFinishOverlay />
 

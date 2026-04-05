@@ -135,6 +135,33 @@ export class WaveView extends React.Component {
 
 	grabWaveViewEl = el => this.waveViewEl = el;
 
+	makeView() {
+		// can't make a real GLScene until we have the space!
+		const s = this.state;
+		let view;
+
+		if (this.space) {
+			let sceneClassName = 'flatScene';
+			let sceneName = 'mainWave2D';
+
+			view = <GLScene
+				space={this.space} animator={this.animator}
+				sceneClassName={'flatScene'} sceneName={sceneName +'2d'}
+				inputInfo={[this.space.mainFlick, this.bumperWidth, null, null]}
+				canvasInnerWidth={this.canvasInnerWidth}
+				canvasInnerHeight={this.canvasInnerHeight}
+				setGLRepaint={this.setMainRepaint}
+			/>;
+
+		}
+		else {
+			view = <Spinner
+				width={this.outerWidth - this.CANVAS_BORDER_THICKNESS}
+				height={s.outerHeight - this.DOUBLE_THICKNESS} />
+		}
+		return view;
+	}
+
 	render() {
 		const p = this.props;
 		const s = this.state;
@@ -161,36 +188,7 @@ export class WaveView extends React.Component {
 				+`canvasInnerHeight=${this.canvasInnerHeight}`);
 		}
 
-		// can't make a real GLScene until we have the space!
-		let view;
-		if (this.space) {
-			let sceneClassName = 'flatScene';
-			let sceneName = 'mainWave2D';
-
-			view = <GLScene
-				space={this.space} animator={this.animator}
-				sceneClassName={'flatScene'} sceneName={sceneName +'2d'}
-				inputInfo={[this.space.mainFlick, this.bumperWidth, null, null]}
-				canvasInnerWidth={this.canvasInnerWidth}
-				canvasInnerHeight={this.canvasInnerHeight}
-				setGLRepaint={this.setMainRepaint}
-			/>;
-
-		}
-		else {
-			view = <Spinner
-				width={this.outerWidth - this.CANVAS_BORDER_THICKNESS}
-				height={s.outerHeight - this.DOUBLE_THICKNESS} />
-
-			//debugger;
-			// until then, show spinner, not actually a GLScene
-			// view = <div className='spinnerBox'
-			// 			style={{width: this.outerWidth - this.CANVAS_BORDER_THICKNESS,
-			// 				height: s.outerHeight - this.DOUBLE_THICKNESS}} >
-			// 	<img className='spinner' alt='spinner'
-			// 		src='/images/eclipseOnTransparent.gif' />
-			// </div>;
-		}
+		let view = this.makeView();
 
 		// if there's no vDisp yet (cuz no space yet), the voltOverlay gets all
 		// mucked up.  So just avoid it.
@@ -200,7 +198,7 @@ export class WaveView extends React.Component {
 				space={this.space}
 				canvasInnerWidth={this.canvasInnerWidth}
 				canvasInnerHeight={this.canvasInnerHeight}
-				mainVDisp={this.space.mainVDisp}
+				mainVDisp={this.space.vDisp}
 				bumperWidth={this.bumperWidth}
 			/>;
 		}
@@ -211,16 +209,17 @@ export class WaveView extends React.Component {
 		// the glScene is one layer.  Over that is the widget area  Bumpers are outside.
 		return (
 		<div className='WaveView'
-			style={{height: `${s.outerHeight}px`, display: (p.show2D ? 'block' : 'none')}}
+			style={{height: `${s.outerHeight}px`, display: (p.show2D ? 'flex' : 'none')}}
 			onPointerEnter={this.hoverEnter} onPointerLeave={this.hoverLeave}
 			onPointerUp={this.finishIntegration}
 			onFocus={ev => console.log(`WaveView focus ON`)}
 			ref={this.grabWaveViewEl}>
 
-			{view}
-
 			<div className='bumper left' key='left'
 				style={{flexBasis: this.bumperWidth +'px', height: this.canvasInnerHeight}} />
+
+			{view}
+
 			<div className='widgetArea' key='widgetArea'
 						style={{flexBasis: betweenBumpers +'px',
 								height: this.canvasInnerHeight+'px'}}>
