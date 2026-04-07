@@ -54,7 +54,7 @@
 		// overlay with frame count, virtual time and other stuff, on top of canvas
 		.timeOverlay {
 			position: absolute;
-			//pointer-events: none;  // need to click through for voltage
+			pointer-events: none;  // need to click through for voltage
 			z-index: 30;
 			width: 100%;
 			height: 100%;
@@ -157,4 +157,33 @@
 
 .errorView {
 	color: #f80;
+}
+
+.Orient3D {
+	position: absolute;
+	display: flex;
+	flex-direction: column;
+
+
+	width: 400px;
+	height: 100px;
+	right: 0;
+	bottom: 0;
+	padding: 5px;
+	border: 1px #666 solid;
+	margin: 5px;
+
+	div {
+		flex: 0 0 30px;
+
+		input {
+			width: 320px;
+		}
+
+		label {
+			width: 50px;
+			text-align: right;
+			margin-right: 10px;
+		}
+	}
 }
