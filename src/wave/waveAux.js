@@ -17,6 +17,7 @@ const CANVAS_BORDER_THICKNESS = 1;
 const DOUBLE_THICKNESS = 2 * CANVAS_BORDER_THICKNESS;
 
 let traceDimensions = false;
+let traceDragCanvasHeight = false;
 
 export const waveAux = {
 
@@ -47,7 +48,7 @@ export const waveAux = {
 
 	},
 
-// the actual componentDidUpdate for WaveView.
+	// the actual componentDidUpdate for WaveView or Vista.
 	componentDidUpdate() {
 		const p = this.props;
 		const s = this.state;
@@ -67,7 +68,10 @@ export const waveAux = {
 					btw props.outerWidth=${this.props.outerWidth}`);
 			}
 
-			// trigger a render
+			if (this.canvasResized)
+				this.canvasResized();  // vista only
+
+			// trigger a render.  But only if they actually changed!  potential for ∞ loop.
 			this.setState({outerHeight: s.outerHeight});
 
 			// the formers are OUTER sizes.  All these should be integers by now.
@@ -80,29 +84,16 @@ export const waveAux = {
 		}
 	},
 
-// setMySpace = () => {
-// 	if (!this.context)
-// 		return false;
-// 	if (!this.context.spaceCreatedProm)
-// 		return false;
-// 	this.context.spaceCreatedProm(
-// 			space => this.space = this.context.space)}
-//
-// 	setTimeout(this.setMySpace, 100);
-// }
-
-// toix =
-// clearTimeout(toix);
-
-
 
 
 /* ************************************* resize box */
 	// with the size box that can be different between vista and view
 
-	// these are for resizing the WaveVista ONLY with the size box
-	resizePointerDown:
-	ev => {
+	// these are for resizing the WaveView/Vista ONLY with the size box. usually
+	// event handlers are arrow functions, but in this case there is no 'this'
+	// that they're being compiled under, so we have to use Function functions.
+
+	resizePointerDown(ev) {
 		this.resizing = true;
 		this.yOffset = Math.round(this.state.outerHeight - ev.pageY);
 		if (traceDragCanvasHeight)
@@ -112,8 +103,7 @@ export const waveAux = {
 		ev.stopPropagation();
 	},
 
-	resizePointerMove:
-	ev => {
+	resizePointerMove(ev) {
 		if (!this.resizing)
 			return;
 
@@ -122,7 +112,8 @@ export const waveAux = {
 			this.setState({outerHeight: vHeight});
 		storeASetting('miscSettings', 'vistaHeight', vHeight);
 		if (traceDragCanvasHeight)
-		console.log(`🏄 resizePointer drag ${ev.pageX} ${ev.pageY}  newheight=${ev.pageY + this.yOffset}`);
+			console.log(`🏄 resizePointer drag ${ev.pageX} ${ev.pageY} `
+					+`  newheight=${ev.pageY + this.yOffset}`);
 
 		ev.preventDefault();
 		ev.stopPropagation();
@@ -130,10 +121,9 @@ export const waveAux = {
 
 	// usually I send pointerLeave events here, but now with pointerCapture, maybe it doesn't matter.
 	// I do get pointerLeave events, but only after pointerUp, if the pointer is out of the size box.
-	resizePointerUp:
-	ev => {
+	resizePointerUp(ev) {
 		if (traceDragCanvasHeight)
-		console.log(`🏄 resizePointer up ${ev.pageX} ${ev.pageY}`);
+			console.log(`🏄 resizePointer up ${ev.pageX} ${ev.pageY}`);
 		this.resizing = false;
 		ev.preventDefault();
 		ev.stopPropagation();
