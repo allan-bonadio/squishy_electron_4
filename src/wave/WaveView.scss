@@ -8,6 +8,7 @@
 // top of the WaveView where the graphics goes.  Height dictated by where the
 // user last dragged the resize box in the corner, in WaveView state.  Width
 // comes from the window width.  hmmm...
+// TODO: unify this with WaveVista.scss
 .WaveView {
 	position: relative;
 	display: flex;
