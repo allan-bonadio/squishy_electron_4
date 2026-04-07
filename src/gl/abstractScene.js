@@ -24,7 +24,9 @@ export class abstractScene {
 	// class name from instance: vu.constructor.name   from class: vuClass.name
 	// A scene is always constructed with args sceneName, ambiance, space
 	// The scene constructor sometimes ignores the space but it's passed anyway.
-	// inputInfo contains arrays to send to webgl; freeform
+	// inputInfo contains arrays to send to webgl; freeform.
+	// TODO: inputInfo is wrong for vistas, maybe eliminate this argument and on
+	// complete, and formulate a more realtimme protocol
 	constructor(sceneName, ambiance, inputInfo, space) {
 		this.sceneName = sceneName;
 		this.canvas = ambiance.canvas;
