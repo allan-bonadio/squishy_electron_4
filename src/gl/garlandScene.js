@@ -26,55 +26,40 @@ class garlandScene extends abstractScene {
 			new garlandDrawing(this, space),
 		];
 
-		const N = this.space.nStates;
-
-		// make the projection matrix.. never changes
-		const fieldOfView = (45 * Math.PI) / 180; // in radians
-		const aspect = ambiance.canvas.width / ambiance.canvas.height;
-		const zNear = 0.1;
-		const zFar = N * 3;
-		const proj = mat4.create();
-		mat4.perspective(proj, fieldOfView, aspect, zNear, zFar);
-
-
-		// the original matrix.  The glsl will multiply on the rotation matrix.
-		const origMatrix = mat4.create();
-		mat4.translate(
-			origMatrix, // destination
-			origMatrix, //to translate
-			[0.0, 0.0, -N]);
-
-		let to = 5.30;
-		let bo = 5.19;
-		let zRotation = (to-bo) * Math.random() + bo;
-		//let zRotation = 5.30
-		dblog(`☕️ zRotation: ${zRotation}`)
-
-		mat4.rotate(
-			origMatrix, //destination matrix
-			origMatrix, //matrix to rotate
-			zRotation, //amount to rotate in radians
-			[0, 0, 1]
-		); //axis to rotate around (z)
-
-
-		let top = 5.20;
-		let bot = 4.33;
-		let yRotation = (top-bot) * Math.random() + bot;
-		//let yRotation = 5.7;
-		//dblog(`☕️ yRotation: ${yRotation}`)
-
-		mat4.rotate(
-			origMatrix,
-			origMatrix,
-			yRotation, //amount to rotate in radians
-			[0, 1, 0]);
-
-		mat4.multiply(origMatrix, origMatrix, proj);
-
-		dump4x4(origMatrix, `orig matrix from scene`);
-
-		this.origMatrix = origMatrix;
+        // code moved to waveVista and waveAux
+//		const N = this.space.nPoints;
+//
+//		let to = 5.30;
+//		let bo = 5.19;
+//		let zRotation = (to-bo) * Math.random() + bo;
+//		//let zRotation = 5.30
+//		dblog(`☕️ zRotation: ${zRotation}`)
+//
+//		mat4.rotate(
+//			origMatrix, //destination matrix
+//			origMatrix, //matrix to rotate
+//			zRotation, //amount to rotate in radians
+//			[0, 0, 1]
+//		); //axis to rotate around (z)
+//
+//
+//		let top = 5.20;
+//		let bot = 4.33;
+//		let yRotation = (top-bot) * Math.random() + bot;
+//		//let yRotation = 5.7;
+//		//dblog(`☕️ yRotation: ${yRotation}`)
+//
+//		mat4.rotate(
+//			origMatrix,
+//			origMatrix,
+//			yRotation, //amount to rotate in radians
+//			[0, 1, 0]);
+//
+//		mat4.multiply(origMatrix, origMatrix, proj);
+//
+//		dump4x4(origMatrix, `orig matrix from scene`);
+//
+//		this.origMatrix = origMatrix;
 	}
 
 }

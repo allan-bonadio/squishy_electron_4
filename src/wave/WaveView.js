@@ -21,7 +21,6 @@ import VoltOverlay from '../volts/VoltOverlay.js';
 import {WELL_BUMPER_WIDTH} from '../volts/voltConstants.js';
 import GLScene from '../gl/GLScene.js';
 import Spinner from '../widgets/Spinner.js';
-//import {eSpaceCreatedPromise} from '../engine/eEngine.js';
 import SquishContext from '../sPanel/SquishContext.js';
 import BeginFinishOverlay from './BeginFinishOverlay.js';
 import resizeIcon from './waveViewIcons/resize.png';
@@ -31,7 +30,6 @@ import {waveAux} from './waveAux.js';
 
 let traceBumpers = false;
 let traceDimensions = true;
-let traceDragCanvasHeight = false;
 let traceHover = false;
 let traceContext = true;
 
@@ -62,7 +60,7 @@ export class WaveView extends React.Component {
 		show2D: PropTypes.bool.isRequired,
 
 		// GL funcs
-		setMainRepaint: PropTypes.func,
+		setMainViewRepaint: PropTypes.func,
 		setSpectRepaint: PropTypes.func,
 
 		spaceCreatedProm: PropTypes.object.isRequired,
@@ -120,12 +118,12 @@ export class WaveView extends React.Component {
 	/* ********************************************************* render */
 
 	// pass along the vital repaint functions
-	setMainRepaint = (mainRepaint) => {
-		this.mainRepaint ??= mainRepaint;
-		this.mainRepaint.sceneName = 'mainRepaint';  // for debugging
+	setMainViewRepaint = (mainViewRepaint) => {
+		this.mainViewRepaint ??= mainViewRepaint;
+		this.mainViewRepaint.sceneName = 'mainViewRepaint';  // for debugging
 
-		this.props.setMainRepaint(mainRepaint);
-		this.animator.mainRepaint ??= mainRepaint;
+		this.props.setMainViewRepaint(mainViewRepaint);
+		this.animator.mainViewRepaint ??= mainViewRepaint;
 	};
 	setSpectRepaint = (spectRepaint) => {
 		this.spectRepaint ??= spectRepaint;
@@ -150,7 +148,7 @@ export class WaveView extends React.Component {
 				inputInfo={[this.space.mainFlick, this.bumperWidth, null, null]}
 				canvasInnerWidth={this.canvasInnerWidth}
 				canvasInnerHeight={this.canvasInnerHeight}
-				setGLRepaint={this.setMainRepaint}
+				setGLRepaint={this.setMainViewRepaint}
 			/>;
 
 		}

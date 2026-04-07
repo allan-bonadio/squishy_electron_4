@@ -13,10 +13,9 @@ import qeConsts from '../engine/qeConsts.js';
 import {dump4x4} from './helpers3D.js';
 
 
-let traceAvatarAfterDrawing = true;
-let traceDrawing = true;
-let traceViewport = true;
-let traceReloadRow = true;
+let traceAvatarAfterDrawing = false;
+let traceDrawing = false;
+let traceReloadRow = false;
 let traceMatrix = true;
 
 // diagnostic purposes; draws more per vertex
@@ -138,15 +137,12 @@ export class garlandDrawing extends abstractDrawing {
 
 		this.matrixUniform = new drawingUniform('matrix', this,
 			() => {
-				this.matrix = mat4.create();
-				mat4.rotate(this.matrix, this.scene.origMatrix, 0, [0, 1, 0]);
+				let matrix = this.scene.inputInfo[1];
 
 				if (traceMatrix) {
-					console.log(`🌀🌀🌀 garlandDrawing reloading matrix:  `,
-						this.matrix);
-					dump4x4(this.matrix, 'matrix as sent to GL');
+					dump4x4(matrix, '🌀🌀🌀 garlandDrawing reloading');
 				}
-				return {value: this.matrix, type: 'Matrix4fv'};
+				return {value: matrix, type: 'Matrix4fv'};
 			}
 		);
 
