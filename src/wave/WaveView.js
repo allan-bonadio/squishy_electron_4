@@ -98,6 +98,9 @@ export class WaveView extends React.Component {
 
 	static contextType = SquishContext;
 
+	setHeight(height) {
+		this.setState({outerHeight: height});
+	}
 
 	/* ********************************************************* hover */
 	// I'm done trying to get the css :hover to do this right.  Enter and Leave events
