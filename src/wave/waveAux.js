@@ -100,44 +100,44 @@ export const waveAux = {
 /* ************************************* resize box */
 	// with the size box that can be different between vista and view
 
-	// these are for resizing the WaveVista ONLY with the size box
-	resizePointerDown:
-	ev => {
-		this.resizing = true;
-		this.yOffset = Math.round(this.state.outerHeight - ev.pageY);
-		if (traceDragCanvasHeight)
-			console.log(`🏄 resizePointer down ${ev.pageX} ${ev.pageY} offset=${this.yOffset}`);
-		ev.target.setPointerCapture(ev.pointerId);
-		ev.preventDefault();
-		ev.stopPropagation();
-	},
-
-	resizePointerMove:
-	ev => {
-		if (!this.resizing)
-			return;
-
-		const vHeight = Math.round(ev.pageY + this.yOffset);
-		if (this.state.outerHeight != vHeight)
-			this.setState({outerHeight: vHeight});
-		storeASetting('miscSettings', 'vistaHeight', vHeight);
-		if (traceDragCanvasHeight)
-		console.log(`🏄 resizePointer drag ${ev.pageX} ${ev.pageY}  newheight=${ev.pageY + this.yOffset}`);
-
-		ev.preventDefault();
-		ev.stopPropagation();
-	},
-
-	// usually I send pointerLeave events here, but now with pointerCapture, maybe it doesn't matter.
-	// I do get pointerLeave events, but only after pointerUp, if the pointer is out of the size box.
-	resizePointerUp:
-	ev => {
-		if (traceDragCanvasHeight)
-		console.log(`🏄 resizePointer up ${ev.pageX} ${ev.pageY}`);
-		this.resizing = false;
-		ev.preventDefault();
-		ev.stopPropagation();
-	}
+// 	// these are for resizing the WaveVista ONLY with the size box
+// 	resizePointerDown:
+// 	ev => {
+// 		this.resizing = true;
+// 		this.yOffset = Math.round(this.state.outerHeight - ev.pageY);
+// 		if (traceDragCanvasHeight)
+// 			console.log(`🏄 resizePointer down ${ev.pageX} ${ev.pageY} offset=${this.yOffset}`);
+// 		ev.target.setPointerCapture(ev.pointerId);
+// 		ev.preventDefault();
+// 		ev.stopPropagation();
+// 	},
+//
+// 	resizePointerMove:
+// 	ev => {
+// 		if (!this.resizing)
+// 			return;
+//
+// 		const vHeight = Math.round(ev.pageY + this.yOffset);
+// 		if (this.state.outerHeight != vHeight)
+// 			this.setState({outerHeight: vHeight});
+// 		storeASetting('miscSettings', 'vistaHeight', vHeight);
+// 		if (traceDragCanvasHeight)
+// 		console.log(`🏄 resizePointer drag ${ev.pageX} ${ev.pageY}  newheight=${ev.pageY + this.yOffset}`);
+//
+// 		ev.preventDefault();
+// 		ev.stopPropagation();
+// 	},
+//
+// 	// usually I send pointerLeave events here, but now with pointerCapture, maybe it doesn't matter.
+// 	// I do get pointerLeave events, but only after pointerUp, if the pointer is out of the size box.
+// 	resizePointerUp:
+// 	ev => {
+// 		if (traceDragCanvasHeight)
+// 		console.log(`🏄 resizePointer up ${ev.pageX} ${ev.pageY}`);
+// 		this.resizing = false;
+// 		ev.preventDefault();
+// 		ev.stopPropagation();
+// 	}
 }
 
 
