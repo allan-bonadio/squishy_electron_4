@@ -26,9 +26,6 @@
 	}
 
 
-		// object that encloses start/stop/running buttons, lower left
-	}  // end of widgetArea
-
 	.sizeBox {
 		position: absolute;
 		pointer-events: auto;
@@ -56,6 +53,7 @@
 	color: #f80;
 }
 
+<<<<<<< HEAD
 // for both vista and view
 .BeginFinishOverlay {
 	left: 2em;
@@ -81,6 +79,37 @@
 		img {
 			height: 1em;
 			pointer-events: none;
+		}
+	}
+}
+
+
+
+.Orient3D {
+	position: absolute;
+	display: flex;
+	flex-direction: column;
+
+
+	width: 400px;
+	height: 100px;
+	right: 0;
+	bottom: 0;
+	padding: 5px;
+	border: 1px #666 solid;
+	margin: 5px;
+
+	div {
+		flex: 0 0 30px;
+
+		input {
+			width: 320px;
+		}
+
+		label {
+			width: 50px;
+			text-align: right;
+			margin-right: 10px;
 		}
 	}
 }

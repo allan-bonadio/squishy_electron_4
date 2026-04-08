@@ -135,6 +135,7 @@ function GLScene(props) {
 		}
 		return;
 	}
+	// this is how our caller might get the repaint function
 	props.setGLRepaint?.(glRepaint);
 
 //	if (canvasNode) {

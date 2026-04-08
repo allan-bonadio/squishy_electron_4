@@ -241,6 +241,14 @@ export function createStoreSettings() {
 
 	localStorage.removeItem("frameSettings");  // old name for lapSettings
 
+	/* ************************************ orient for 3D */
+
+	// set in Orient3D or PivotOverlay
+	makeParam('orientSettings', 'x', 0,  {min: -360, max: +360});
+	makeParam('orientSettings', 'y', 0,  {min: -360, max: +360});
+	makeParam('orientSettings', 'z', 0,  {min: -360, max: +360});
+
+
 	/* ************************************miscSettings */
 	// set by clicking on tab
 	makeParam('miscSettings', 'showingTab', 'wave',

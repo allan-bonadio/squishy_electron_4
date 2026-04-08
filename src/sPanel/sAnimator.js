@@ -38,7 +38,7 @@ class sAnimator {
 		this.sqPanel = sqPanel;
 		this.getContext = getContext;
 
-		// will still need grinder, mainRepaint(), available later in SquishPanel
+		// will still need grinder, mainViewRepaint(), available later in SquishPanel
 		// defaults - will work until set by real life
 		this.avgVideoFP = 1000 / 60;
 		this.unstableFP = true;
@@ -84,7 +84,9 @@ class sAnimator {
 		this.inteTimes.frameDrawPeriod = startDrawTime - this.inteTimes.prevDrawTime;
 		this.inteTimes.prevDrawTime = startDrawTime;
 
-		this.mainRepaint?.();   // mainRepaint() func won't be here until GLScene renders
+		this.mainViewRepaint?.();   // mainViewRepaint() func won't be here until GLScene renders
+		this.mainVistaRepaint?.();   // mainViewRepaint() func won't be here until GLScene renders
+		this.mainSpectrumRepaint?.();   // mainViewRepaint() func won't be here until GLScene renders
 		this.showTime();  // part of the draw time - the picoseconds (per lap?)
 
 		// update dom elements in integration tab to latest stats (if it's been shown at least once)

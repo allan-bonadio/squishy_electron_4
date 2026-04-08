@@ -57,7 +57,7 @@ class SquishPanel extends React.Component {
 		//this.box = new waveAux();
 
 		// will be set by subcomponents
-		this.mainRepaint = null;
+		this.mainViewRepaint = null;
 		this.spectRepaint = null;
 
 		// this becomes the context object - the context sub-objects:
@@ -96,7 +96,7 @@ class SquishPanel extends React.Component {
 			this.create1DMainSpace(params);
 		});
 
-		// animator will still need grinder, mainRepaint() and context,
+		// animator will still need grinder, mainViewRepaint() and context,
 		// which don't exist yet.  Each will be on this.whatever
 		this.animator = new sAnimator(this, this.getContext);
 
@@ -284,14 +284,20 @@ class SquishPanel extends React.Component {
 		//grinder.frameSerial = 0;
 
 		// directly redraw the GL
-		this.mainRepaint();
+		this.mainViewRepaint?.();
+		this.mainVistaRepaint?.();
+		this.spectRepaint?.();
 	}
 
 	// we need the repaint func for the main canvas, and (someday) the spectrum canvas
 	// GLScene will pass that up when they get rendered
-	setMainRepaint = (mainRepaint) => {
-		if (this.mainRepaint) return;
-		this.mainRepaint = this.animator.mainRepaint = mainRepaint;
+	setMainViewRepaint = (mainViewRepaint) => {
+		if (this.mainViewRepaint) return;
+		this.mainViewRepaint = this.animator.mainViewRepaint = mainViewRepaint;
+	};
+	setMainVistaRepaint = (mainVistaRepaint) => {
+		if (this.mainVistaRepaint) return;
+		this.mainVistaRepaint = this.animator.mainVistaRepaint = mainVistaRepaint;
 	};
 	setSpectRepaint = (spectRepaint) => {
 		if (this.spectRepaint) return;
@@ -317,7 +323,7 @@ class SquishPanel extends React.Component {
 						animator={this.animator}
 						setWVContext={this.setWVContext}
 						setShouldBeIntegrating={this.setShouldBeIntegrating}
-						setMainRepaint={this.setMainRepaint}
+						setMainViewRepaint={this.setMainViewRepaint}
 						setSpectRepaint={this.setSpectRepaint}
 						spaceCreatedProm={this.state.spaceCreatedProm}
 						sPanel={this}
@@ -328,7 +334,7 @@ class SquishPanel extends React.Component {
 						animator={this.animator}
 						setWVContext={this.setWVContext}
 						setShouldBeIntegrating={this.setShouldBeIntegrating}
-						setMainRepaint={this.setMainRepaint}
+						setMainVistaRepaint={this.setMainVistaRepaint}
 						setSpectRepaint={this.setSpectRepaint}
 						spaceCreatedProm={this.state.spaceCreatedProm}
 						sPanel={this}
