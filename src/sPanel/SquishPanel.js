@@ -155,19 +155,21 @@ class SquishPanel extends React.Component {
 	}
 
 	// these are the functions that change the 2d/3d setting.  Get at the state in the context.  These functions get passed down.
-	activate2D = () => {
-		// if turning off 2d, make sure 3d is on
+	activate2D = (ev) => {
+		// if turning off 2d, make sure 3d is on.  but leave it alone if shift is down.
 		this.activateX('show2D', ! this.state.show2D) ;
-		this.activateX('show3D', this.state.show2D || this.state.show3D) ;
+		if (!ev.shiftKey)
+		    this.activateX('show3D', this.state.show2D || this.state.show3D) ;
 // 		this.setState({show2D: true, show3D: false});
 // 		this.setState({show2D: true, show3D: false});
 // 		storeASetting('miscSettings', 'show2D', true);
 // 		storeASetting('miscSettings', 'show3D', false);
 	};
-	activate3D = () => {
+	activate3D = (ev) => {
 		// if turning off 2d, make sure 3d is on
 		this.activateX('show3D', ! this.state.show3D) ;
-		this.activateX('show2D', this.state.show2D || this.state.show3D) ;
+		if (!ev.shiftKey)
+			this.activateX('show2D', this.state.show2D || this.state.show3D) ;
 // 		this.setState({show2D: false});
 // 		this.setState({show3D: true});
 // 		storeASetting('miscSettings', 'show2D', false);
