@@ -3,40 +3,26 @@
 ** Copyright (C) 2026-2026 Tactile Interactive, all rights reserved
 */
 
-import React, {useContext} from 'react';
+import React, {useState, useRef} from 'react';
 import PropTypes, {checkPropTypes} from 'prop-types';
-import resizeIcon from './waveViewIcons/resize.png';
 
+import resizeIcon from './waveViewIcons/resize.png';
+import {storeASetting} from '../utils/storeSettings.js';
+
+let traceDragCanvasHeight = true;
 
 const propTypes = {
-
 	// our caller, the wave, gets new height
-	sendNewHeight: PropTypes.func,
-	which: PropTypes.string,  // either View or Vista
-
-
-
-	// sAnimator
-	animator: PropTypes.object,
-	setWVContext: PropTypes.func,
-
-	setShouldBeIntegrating: PropTypes.func.isRequired,
-	sPanel: PropTypes.object.isRequired,
-
-	show2D: PropTypes.bool.isRequired,
-
-	// GL funcs
-	setMainRepaint: PropTypes.func,
-	setSpectRepaint: PropTypes.func,
-
-	spaceCreatedProm: PropTypes.object.isRequired,
+	setHeight: PropTypes.func.isRequired,
+	which: PropTypes.string.isRequired,  // either "View" or "Vista"
+	initialHeight: PropTypes.number.isRequired,
 };
 
 
 function SizeBox(props) {
-	cfpt(this, props);
+	cfpt(propTypes, props);
 
-	let [height, setHeight] = useState(0);
+	let [height, setHeight] = useState(props.initialHeight);
 	let stuffRef = useRef({});
 	let stuff = stuffRef.current;  // little details we need to keep
 
@@ -44,7 +30,7 @@ function SizeBox(props) {
 		if (newHeight == height) return;
 		setHeight(newHeight);  // for next time around
 		height = newHeight;  // for this time
-		props.sendNewHeight(newHeight);  // for the wave box
+		props.setHeight(newHeight);  // for the wave box
 		storeASetting('miscSettings', props.which + 'Height', newHeight);
 	}
 
@@ -58,7 +44,7 @@ function SizeBox(props) {
 		// the small distance from the mousedown to the bottom of the size box
 		stuff.yOffset = Math.round(height - ev.pageY);
 		if (traceDragCanvasHeight)
-			console.log(`🏄 resizePointer down ${ev.pageX} ${ev.pageY} offset=${this.yOffset}`);
+			console.log(`🏄 resizePointer down ${ev.pageX} ${ev.pageY} offset=${stuff.yOffset}`);
 		ev.target.setPointerCapture(ev.pointerId);
 
 		// now it's ours so don't let it click through
@@ -95,15 +81,16 @@ function SizeBox(props) {
 		ev.stopPropagation();
 	};
 
-
-
-
-	return <img className='sizeBox' src={resizeIcon} alt='size box'
-					onPointerEnter={resizePointerDown}
-					onPointerDown={resizePointerDown}
-					onPointerUp={resizePointerUp}
-					onPointerLeave={resizePointerUp}
-					onPointerMove={resizePointerMove}
-					title="To adjust the height, drag this up or down"
-					style={{width: `2em`, height: `2em`}} />
+	return <div className='sizeBox'
+				onPointerEnter={resizePointerDown}
+				onPointerDown={resizePointerDown}
+				onPointerUp={resizePointerUp}
+				onPointerLeave={resizePointerUp}
+				onPointerMove={resizePointerMove}
+				title="To adjust the height, drag this up or down">
+			<img src={resizeIcon} alt='size box' />
+		</div>
 }
+
+
+export default SizeBox;

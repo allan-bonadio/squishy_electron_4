@@ -14,7 +14,8 @@ import PropTypes, {checkPropTypes} from 'prop-types';
 
 import eSpace from '../engine/eSpace.js';
 import qeConsts from '../engine/qeConsts.js';
-import '../wave/WaveView.scss';
+import '../wave/wave.scss';
+//import '../wave/WaveView.scss';
 import {getASetting, storeASetting} from '../utils/storeSettings.js';
 
 import VoltOverlay from '../volts/VoltOverlay.js';
@@ -24,6 +25,7 @@ import Spinner from '../widgets/Spinner.js';
 import SquishContext from '../sPanel/SquishContext.js';
 import BeginFinishOverlay from './BeginFinishOverlay.js';
 import resizeIcon from './waveViewIcons/resize.png';
+import SizeBox from './SizeBox.js';
 //import {waitForSpaceCreatedPromise} from './waveContext.js';
 
 import {waveAux} from './waveAux.js';
@@ -96,8 +98,9 @@ export class WaveView extends React.Component {
 
 	static contextType = SquishContext;
 
-	setHeight(height) {
+	setHeight = (height) => {
 		this.setState({outerHeight: height});
+		storeASetting('miscSettings', 'viewHeight', height);
 	}
 
 	/* ********************************************************* hover */
@@ -237,11 +240,13 @@ export class WaveView extends React.Component {
 
 				<BeginFinishOverlay />
 
-				<img className='sizeBox' src={resizeIcon} alt='size box'
-					onPointerDown={this.resizePointerDown} onPointerUp={this.resizePointerUp}
-					onPointerMove={this.resizePointerMove} onPointerLeave={this.resizePointerUp}
-					title="To adjust the height, drag this up or down"
-					style={{width: `2em`, height: `2em`}} />
+
+
+
+				<SizeBox which='View' setHeight={this.setHeight}
+						initialHeight={s.outerHeight} />
+
+
 			</div>
 			<div className='bumper right' key='right'
 				style={{flexBasis: this.bumperWidth +'px', height: this.canvasInnerHeight}} />
@@ -258,3 +263,10 @@ export default WaveView;
 // 					<div className='northEastWrapper'>
 // 						frame <span className='voNorthEast'>{tnf.frameSerialText}</span>
 // 					</div>
+
+
+// 				<img className='sizeBox' src={resizeIcon} alt='size box'
+// 					onPointerDown={this.resizePointerDown} onPointerUp={this.resizePointerUp}
+// 					onPointerMove={this.resizePointerMove} onPointerLeave={this.resizePointerUp}
+// 					title="To adjust the height, drag this up or down"
+// 					style={{width: `2em`, height: `2em`}} />

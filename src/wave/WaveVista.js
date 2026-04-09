@@ -14,10 +14,12 @@ import {mat4} from 'gl-matrix';
 
 import eSpace from '../engine/eSpace.js';
 import qeConsts from '../engine/qeConsts.js';
-import './WaveVista.scss';
+import './wave.scss';
+//import './WaveVista.scss';
 import {getASetting, storeASetting, getAGroup} from '../utils/storeSettings.js';
 //import {waitForSpaceCreatedPromise} from './waveContext.js';
 import waveAux from './waveAux.js';
+import SizeBox from './SizeBox.js';
 
 import PivotOverlay from './PivotOverlay.js';
 import Orient3D from './Orient3D.js';
@@ -94,12 +96,13 @@ export class WaveVista extends React.Component {
 
 	static contextType = SquishContext;
 
-	setHeight(height) {
+	setHeight = (height) => {
 		this.setState({outerHeight: height});
+		storeASetting('miscSettings', 'vistaHeight', height);
 	}
 
 
-	/* ********************************************************* orient & matrix  */
+	/* ******************************************* orient & matrix  */
 
 	// recalculate the perspective matrix, given changed canvas geometry.
 	// Must have canvasInnerWidth/Height from updateInnerDims() already calculated.
@@ -261,11 +264,9 @@ export class WaveVista extends React.Component {
 
 				<BeginFinishOverlay />
 
-				<img className='sizeBox' src={resizeIcon} alt='size box'
-					onPointerDown={this.resizePointerDown} onPointerUp={this.resizePointerUp}
-					onPointerMove={this.resizePointerMove} onPointerLeave={this.resizePointerUp}
-					title="To adjust the height, drag this up or down"
-					style={{width: `2em`, height: `2em`}} />
+			<SizeBox which='Vista' setHeight={this.setHeight}
+					initialHeight={s.outerHeight} />
+ />
 			</div>
 
 		</div>
@@ -278,3 +279,8 @@ export class WaveVista extends React.Component {
 
 export default WaveVista;
 
+			// 	<img className='sizeBox' src={resizeIcon} alt='size box'
+// 					onPointerDown={this.resizePointerDown} onPointerUp={this.resizePointerUp}
+// 					onPointerMove={this.resizePointerMove} onPointerLeave={this.resizePointerUp}
+// 					title="To adjust the height, drag this up or down"
+// 					style={{width: `2em`, height: `2em`}} />
