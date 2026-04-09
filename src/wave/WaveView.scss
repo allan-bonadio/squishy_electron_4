@@ -8,7 +8,7 @@
 // top of the WaveView where the graphics goes.  Height dictated by where the
 // user last dragged the resize box in the corner, in WaveView state.  Width
 // comes from the window width.  hmmm...
-// TODO: unify this with WaveVista.scss
+// TODO: unify this  with WaveVista.scss
 .WaveView {
 	position: relative;
 	display: flex;
@@ -25,16 +25,8 @@
 		z-index: 10;
 	}
 
-	// bumpers only show in WELL continuum.
-	.bumper {
-		// width set by JS either zero or bumper width
-		height: 100%;
-		flex: 0 0;  // no growing/shrinking, but style attr sets flex-basis
-		z-index: 20;
 
-		background-color: common.$voltageColor;
-		//background-color: #0f06;  // for testing
-	}
+
 
 	// widget area, containing most of the widgets that float above (in front of) the canvas
 	// overlaying the wave drawing are here, like the voltage line, voltage axis, buttons, grow box....
@@ -150,12 +142,3 @@
 	}
 }
 
-.spinner {
-	position: absolute;
-	left: calc(50% - 100px);
-	top: 20%;
-}
-
-.errorView {
-	color: #f80;
-}
