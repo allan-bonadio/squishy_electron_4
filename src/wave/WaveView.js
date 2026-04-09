@@ -31,9 +31,9 @@ import SizeBox from './SizeBox.js';
 import {waveAux} from './waveAux.js';
 
 let traceBumpers = false;
-let traceDimensions = true;
+let traceDimensions = false;
 let traceHover = false;
-let traceContext = true;
+let traceContext = false;
 
 // const CANVAS_BORDER_THICKNESS = 1;
 // const DOUBLE_THICKNESS = 2 * this.CANVAS_BORDER_THICKNESS;
@@ -243,7 +243,7 @@ export class WaveView extends React.Component {
 
 
 
-				<SizeBox which='View' setHeight={this.setHeight}
+				<SizeBox which='view' setHeight={this.setHeight}
 						initialHeight={s.outerHeight} />
 
 

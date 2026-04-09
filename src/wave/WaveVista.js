@@ -122,7 +122,9 @@ export class WaveVista extends React.Component {
 	// set up the matrices once when wave vista created
 	// the original matrix that rotations get appended onto.
 	initOrigMatrix() {
-		const origMatrix = mat4.create();
+		this.canvasResized();
+		let origMatrix = mat4.clone(this.projMatrix)
+		// const origMatrix = mat4.create();
 		mat4.translate(origMatrix, origMatrix, [0.0, 0.0, -this.space.nPoints * 5]);
 		this.origMatrix = this.matrix = origMatrix;
 	}
@@ -264,7 +266,7 @@ export class WaveVista extends React.Component {
 
 				<BeginFinishOverlay />
 
-			<SizeBox which='Vista' setHeight={this.setHeight}
+			<SizeBox which='vista' setHeight={this.setHeight}
 					initialHeight={s.outerHeight} />
  />
 			</div>
