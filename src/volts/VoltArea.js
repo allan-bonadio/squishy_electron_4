@@ -25,6 +25,7 @@ let traceTweening = false;
 let traceWheel = false;
 
 let traceScrollStretch = false;
+let traceViewBox = false;
 
 // how long it takes, in milliseconds, dragging outside of the main voltage area,
 // to double the scroll or heightVolts
@@ -383,7 +384,10 @@ function VoltArea(props) {
 	// NO!  this is done in VoltOverlay  let vClass = p.showVoltage +'ShowVoltage';
 	// so the whole assembly shows and hides incl sidebar
 
-	dblog(`📦📦 about to use viewBox ${p.drawingLeft} 0 ${p.drawingWidth} ${p.canvasInnerHeight}`);
+	if (traceViewBox) {
+	    dblog(`⚡️  about to use viewBox ${p.drawingLeft} 0 `
+	        +` ${p.drawingWidth} ${p.canvasInnerHeight}`);
+	}
 	let vArea = (
 		<svg className='VoltArea'
 			viewBox={`${p.drawingLeft} 0 ${p.drawingWidth} ${p.canvasInnerHeight}`}

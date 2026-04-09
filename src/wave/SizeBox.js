@@ -9,12 +9,12 @@ import PropTypes, {checkPropTypes} from 'prop-types';
 import resizeIcon from './waveViewIcons/resize.png';
 import {storeASetting} from '../utils/storeSettings.js';
 
-let traceDragCanvasHeight = true;
+let traceDragCanvasHeight = false;
 
 const propTypes = {
 	// our caller, the wave, gets new height
 	setHeight: PropTypes.func.isRequired,
-	which: PropTypes.string.isRequired,  // either "View" or "Vista"
+	which: PropTypes.string.isRequired,  // either "view" or "vista"
 	initialHeight: PropTypes.number.isRequired,
 };
 
@@ -44,7 +44,7 @@ function SizeBox(props) {
 		// the small distance from the mousedown to the bottom of the size box
 		stuff.yOffset = Math.round(height - ev.pageY);
 		if (traceDragCanvasHeight)
-			console.log(`🏄 resizePointer down ${ev.pageX} ${ev.pageY} offset=${stuff.yOffset}`);
+			console.log(`📦📦 resizePointer down ${ev.pageX} ${ev.pageY} offset=${stuff.yOffset}`);
 		ev.target.setPointerCapture(ev.pointerId);
 
 		// now it's ours so don't let it click through
@@ -61,7 +61,7 @@ function SizeBox(props) {
 		const vHeight = Math.round(ev.pageY + stuff.yOffset);
 		setWaveHeight(vHeight);
 		if (traceDragCanvasHeight) {
-			console.log(`🏄 resizePointer drag ${ev.pageX} ${ev.pageY}  newheight=${ev.pageY + stuff.yOffset}`);
+			console.log(`📦📦 resizePointer drag ${ev.pageX} ${ev.pageY}  newheight=${ev.pageY + stuff.yOffset}`);
 		}
 
 		ev.preventDefault();
@@ -74,7 +74,7 @@ function SizeBox(props) {
 		if (!(ev.buttons & 1)) return;
 
 		if (traceDragCanvasHeight)
-			console.log(`🏄 resizePointer up ${ev.pageX} ${ev.pageY}`);
+			console.log(`📦📦 resizePointer up ${ev.pageX} ${ev.pageY}`);
 		stuff.resizing = false;
 
 		ev.preventDefault();
