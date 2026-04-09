@@ -177,9 +177,9 @@ function makeParam(groupName, varName, defaultValue, criterion) {
 // when referring to both, I use them interchangeably.
 // To reset them all, just delete all the local storage for this app.  I should make a button...
 
-// somewhere you have to record the defaults and criterion for each setting, so here they are
-// these also define the controls mins and maxes
-// unit tests want to recreate these from scratch
+// somewhere you have to record the defaults and criterion for each
+// setting, so here they are these also define the controls mins and
+// maxes unit tests want to recreate these from scratch
 export function createStoreSettings() {
 
 	/* ************************************ spaceParams */
@@ -321,20 +321,16 @@ export function storeAGroup(groupName, newGroup) {
 	return toSet;
 }
 
+
+
+
+
+
 // store an individual value
 export function storeASetting(groupName, varName, newValue) {
 	if (!sSettings.verifiers
 	|| !sSettings.verifiers[groupName]
 	|| !sSettings.verifiers[groupName][varName]) debugger;
-
-	// if bad value, just set to default.
-	// Should clamp continuum variables to min or max!  should eliminate variables no longer part of the group!
-// not sure what went wrong here but i fixed it...
-//console.log(`groupName=${groupName}   varName=${varName}`);
-//console.log(`sSettings.verifiers=`, sSettings.verifiers);
-//console.log(`sSettings.verifiers[${groupName}]=`, sSettings.verifiers?.[groupName]);
-//console.log(`sSettingsVerifi...[${varName}]=`, sSettings.verifiers?.[groupName]?.[varName]);
-//console.log(`sSettingsVerif[...](newValue)=`, sSettings.verifiers?.[groupName]?.[varName]?.(newValue));
 
 	let savedGroup = getAGroup(groupName);
 	savedGroup[varName] = newValue;

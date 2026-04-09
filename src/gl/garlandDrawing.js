@@ -16,7 +16,7 @@ import {dump4x4} from './helpers3D.js';
 let traceAvatarAfterDrawing = false;
 let traceDrawing = false;
 let traceReloadRow = false;
-let traceMatrix = true;
+let traceMatrix = false;
 
 // diagnostic purposes; draws more per vertex
 let traceDrawPoints = true;
