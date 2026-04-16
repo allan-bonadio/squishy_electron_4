@@ -361,7 +361,12 @@ export function getASetting(groupName, varName) {
 	return setting;
 }
 
+export function getDefaultSetting(groupName, varName) {
+    return sSettings.defaults[groupName][varName]
+}
+
 // in case you want only one exported name.  Kindof defeats the purpose huh?
-export const storeSettings = {createStoreSettings, getAGroup, storeAGroup, storeASetting, getASetting, };
+export const storeSettings = {createStoreSettings, getAGroup, storeAGroup,
+    storeASetting, getASetting, getDefaultSetting};
 export default storeSettings;
 
