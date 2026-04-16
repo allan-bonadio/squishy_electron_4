@@ -38,3 +38,19 @@ So all these states are superpositions of eigenstates.  You can choose your basi
 
 Quantum states, though, are ∞-dimensional vectors, with complex numbers in each slot.  Similar math, vastly different concept.  Each component represents the wave function component for an eigenstate you chose (you did choose one, right?).  Since there's an ∞ number of location eigenstates, even between two locations, we use complex-valued functions, like 𝜓(x) instead of matrices or vectors.  This is the wave function, and, at each point, you can find the probability of finding the alpha particle there, with 𝜓*⋅𝜓, you multiply 𝜓 with its complex conjugate, same as the absolute value squared.
 
+
+🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 angle polarizers
+
+From https://www.researchgate.net/figure/a-The-waggle-dance-of-a-bee-The-angle-of-the-waggle-with-respect-to-the-vertical_fig2_316635407
+
+cross-polarize demo:
+https://www.youtube.com/watch?v=5SIxEiL8ujA
+"Three polarizing filters: a simple demo of a creepy quantum effect"
+
+
+
+https://dsimanek.vialattea.net/14/polaroid.htm yielded:
+polcir.gif
+polcls3.gif
+
+🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣
