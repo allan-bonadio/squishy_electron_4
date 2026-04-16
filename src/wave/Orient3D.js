@@ -49,7 +49,9 @@ function Orient3D(props) {
 
     let [foView, setFOView] = useState(getASetting('orientSettings', 'foView'));
 
-    const setters = {x: setX, y: setY, z: setZ,   xPos: setXPos, yPos: setYPos, zPos: setZPos,   foView: setFOView};
+    const setters = {x: setX, y: setY, z: setZ,
+        xPos: setXPos, yPos: setYPos, zPos: setZPos,
+        foView: setFOView};
 
     // actions are like {y: 44.2} usually only changing one at a time
     // doing this so that this particular component renders.
@@ -72,15 +74,16 @@ function Orient3D(props) {
 		setters[which](ev.target.valueAsNumber);  // set in this components state
 
         // pass the latest matrix into the repainter and paint it
-       repaintRecreate();
+       props.repaintRecreate();
 	}
 
     // rotate all origin.* to zzero
 	function resetOrientation() {
-		props.setOrient('multi', {x: 0, y: 0, z:0,   xPos: 0, yPos: 0, zPos:ZPOS_DEFAULT, foView: 45});
-	    setX(0); setY(0); setZ(0);
-        setXPos(0); setYPos(0); setZPos(0);
-        setFOView(45);
+        const sdo = sSettings.defaults.orientSettings;
+		props.setOrient('multi', { ...sdo});
+	    setX(sdo.x); setY(sdo.y); setZ(sdo.z);
+        setXPos(sdo.xPos); setYPos(sdo.yPos); setZPos(sdo.zPos);
+        setFOView(sdo.foView);
 
         props.repaintOrient();
 	}
