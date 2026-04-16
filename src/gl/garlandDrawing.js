@@ -3,24 +3,24 @@
 ** Copyright (C) 2026-2026 Tactile Interactive, all rights reserved
 */
 
-import {mat4} from 'gl-matrix';
-
 import abstractDrawing from './abstractDrawing.js';
 import {drawingUniform, drawingAttribute} from './drawingVariable.js';
 import cx2rygb from './cx2rygb/cx2rygb.glsl.js';
 import qeFuncs from '../engine/qeFuncs.js';
 import qeConsts from '../engine/qeConsts.js';
 import {dump4x4} from './helpers3D.js';
+import {vec4, mat4} from 'gl-matrix';
 
 
 let traceAvatarAfterDrawing = false;
+let traceGLAfterDrawing = true;
 let traceDrawing = false;
 let traceReloadRow = false;
 let traceMatrix = false;
 
 // diagnostic purposes; draws more per vertex
 let traceDrawPoints = true;
-let traceDrawLines = true;
+let traceDrawLines = false;
 
 let pointSize = traceDrawPoints ? `gl_PointSize = 10.;` : '';
 
@@ -36,13 +36,13 @@ out whether the radius should be full or less
 */
 
 /* Draws blades - quadrilatterals in a spiral pattern.  Each blade has a
-/quadrilatteral on each side, each is two triangles.  Hopefully there's a little
-/bit of thickness in the middle.  Colored by vertex just like the flat drawing.
+quadrilatteral on each side, each is two triangles.  Hopefully there's a little
+bit of thickness in the middle.  Colored by vertex just like the flat drawing.
 
 The data and avatar loading is similar to with flat drawing - real and imag
-parts of wave become the y (vertical) and z (backward) coordinates of the
-garland point.  We then have to duplicate it all, rearranged?, to paint the
-other side of each blade.
+parts of wave become the y (vertical) and z (forward) coordinates of the
+garland point.  (We then have to duplicate it all, rearranged?, to paint the
+other side of each blade.  not yet.)
 
 The Volume coordinates are what look like 3d coords in the view.  The unit is 1
 cell in the x direction, and OUTER_FACTOR times psi in the real and imag
@@ -93,10 +93,6 @@ void main() {
 	vColor.rgb = cx2rygb(row.xy);
 	vColor.a = 1.;
 
-	// make the colors darker toward zero (top)
-//	if (!odd)
-//		vColor = vec4(vColor.r/2., vColor.g/2., vColor.b/2., vColor.a);
-
 	// dot size, in pixels not clip units.  actually a fuzzy square.
 	gl_PointSize = 10.;
 }
@@ -137,7 +133,7 @@ export class garlandDrawing extends abstractDrawing {
 
 		this.matrixUniform = new drawingUniform('matrix', this,
 			() => {
-				let matrix = this.scene.inputInfo[1];
+				let matrix = this.scene.paintingNeeds.rotMatrix;
 
 				if (traceMatrix) {
 					dump4x4(matrix, '🌀🌀🌀 garlandDrawing reloading');
@@ -147,12 +143,14 @@ export class garlandDrawing extends abstractDrawing {
 		);
 
 		let nPoints = this.nPoints = this.space.nPoints;
-		this.vertexCount = nPoints * 2;  // nPoints * vertsPerBar
+		let nStates = this.nStates = this.space.nStates;
+		this.vertexCount = nStates * 2;  // nStates * vertsPerState
 		this.rowFloats = 4;
 		this.rowAttr = new drawingAttribute('row', this, this.rowFloats, () => {
-			//debugger;
-			qeFuncs.avatar_avFlatLoader(this.avatar.pointer, 0, this.scene.inputInfo[0].pointer,
-					nPoints);
+		    //debugger;
+			// retrieve GL rows from the cavity, including the bounds
+			qeFuncs.avatar_avFlatLoader(this.avatar.pointer, 0,
+			        this.scene.paintingNeeds.cavity.pointer, nPoints);
 
 			if (traceReloadRow) {
 				console.log(`🌀🌀🌀 garlandDrawing  ${this.avatarLabel}: at row getViewBuffer() `
@@ -166,7 +164,7 @@ export class garlandDrawing extends abstractDrawing {
 	}
 
 	// called for each image frame on th canvas.  TODO: roll specialInfo into the input Data Arrays
-	draw(width, height, inputInfo) {
+	draw(width, height, paintingNeeds) {
 		if (traceDrawing) {
 			console.log(`🌀🌀🌀 garland Drawing  ${this.avatarLabel}: `
 				+` width=${width}, height=${height}  drawing ${this.vertexCount/2} points `
@@ -175,7 +173,7 @@ export class garlandDrawing extends abstractDrawing {
 		const gl = this.gl;
 		this.setDrawing();
 
-		//let bw = inputInfo[1];
+		//let bw = paintingNeeds[1];
 		//gl.viewport(bw, 0, width - 2 * bw, height);
 		//if (traceViewport) {
 		//    console.log(`🌀🌀🌀 garlandDrawing set viewport on avatar=${this.avatarLabel}: `
@@ -183,7 +181,11 @@ export class garlandDrawing extends abstractDrawing {
 		//        +` drawing ${this.vertexCount/2} points`);
 		//}
 		this.drawVariables.forEach(v => v.reloadVariable());
-		gl.drawArrays(gl.TRIANGLE_STRIP, 0, this.vertexCount);
+
+		let startEnd2 = this.space.startEnd2;
+		let first = startEnd2.start2;
+		let count = startEnd2.end2 - startEnd2.start2;
+		gl.drawArrays(gl.TRIANGLE_STRIP, first, count);
 		if (traceDrawing) {
 			console.log(`🌀🌀🌀just drewArays-garland on avatar ptr=${this.avatar.pointer} `
 				+` this.avatar.label=${this.avatar.label}, `
@@ -192,11 +194,11 @@ export class garlandDrawing extends abstractDrawing {
 
 		if (traceDrawLines) {
 			gl.lineWidth(1);  // it's the only option anyway
-			gl.drawArrays(gl.GL_LINE_STRIP, 0, this.vertexCount);
+			gl.drawArrays(gl.GL_LINE_STRIP, first, count);
 		}
 
 		if (traceDrawPoints)
-			gl.drawArrays(gl.POINTS, 0, this.vertexCount);
+			gl.drawArrays(gl.POINTS, first, count);
 
 		// i think this is problematic
 		if (traceAvatarAfterDrawing) {
@@ -204,7 +206,42 @@ export class garlandDrawing extends abstractDrawing {
 				`🌀🌀🌀 finished drawing in garlandDrawing.js; drew buf:`);
 			console.log(`🌀🌀🌀  matrixUniform=`, this.matrixUniform.reloadFunc());
 		}
+		if (traceGLAfterDrawing) {
+			this.dumpGL(0, this.nPoints,
+				`🌀🌀🌀 finished drawing in garlandDrawing.js; drew buf:`);
+			console.log(`🌀🌀🌀  matrixUniform=`, this.matrixUniform.reloadFunc());
+		}
 	}
+
+    // calculate what the GPU would calculate, and dump that.  give or take fidelity of the below.
+    dumpGL(vBuf) {
+        dblog(` 🌀🌀 what the GPU calculates:`);
+        let startEnd2 = this.space.startEnd2;
+        let first = startEnd2.start;
+        let vertexSerial, ix, point, odd, factor, row;
+        let rows = this.avatar.getViewBuffer(0);
+
+        for (vertexSerial = startEnd2.start2; vertexSerial < startEnd2.end2; vertexSerial++) {
+            let rs = vertexSerial * 4;
+            row = vec4.fromValues(rows[rs], rows[rs+1], rows[rs+2], rows[rs+3]);
+            ix = Math.floor(vertexSerial / 2);
+            point = vec4.fromValues();
+            odd = (ix & 1);
+            factor = odd ? INNER_FACTOR : OUTER_FACTOR;
+            point[1] = row[1] * factor;
+            point[2] = row[2] * factor;
+            point[0] = (ix);
+            point[3] = 1.;
+
+            // point * matrix;
+            let gl_Position = vec4.create();
+            mat4.multiply(gl_Position, point, this.scene.paintingNeeds.rotMatrix);
+            dblog(` 🌀🌀${gl_Position[0].toFixed(4)}   ${gl_Position[1].toFixed(4)}  `
+                +` ${gl_Position[2].toFixed(4)}   ${gl_Position[3].toFixed(4)}  `);
+        }
+        dblog(`  🌀🌀 `);
+    }
+
 }
 
 export default garlandDrawing;
