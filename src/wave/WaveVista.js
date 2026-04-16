@@ -198,7 +198,7 @@ export class WaveVista extends React.Component {
 		this.mainVistaRepaint(this.paintingNeeds);
 	}
 
-	// repaint, accomocating all changes
+	// repaint, effecting all changes
 	repaintRecreate = () => {
 		this.makeProjMatrix();
 		this.makeOrigMatrix();
