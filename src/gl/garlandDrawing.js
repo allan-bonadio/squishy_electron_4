@@ -220,24 +220,27 @@ export class garlandDrawing extends abstractDrawing {
         let first = startEnd2.start;
         let vertexSerial, ix, point, odd, factor, row;
         let rows = this.avatar.getViewBuffer(0);
+        let gl_Position = vec4.create();
+
+        const _ = c => (gl_Position[c] / gl_Position[3]).toFixed(2).padStart(9);
+        //const _ = c => (gl_Position[c]).toFixed(1).padStart(9);
 
         for (vertexSerial = startEnd2.start2; vertexSerial < startEnd2.end2; vertexSerial++) {
             let rs = vertexSerial * 4;
             row = vec4.fromValues(rows[rs], rows[rs+1], rows[rs+2], rows[rs+3]);
             ix = Math.floor(vertexSerial / 2);
-            point = vec4.fromValues();
+            point = vec4.create();
             odd = (ix & 1);
             factor = odd ? INNER_FACTOR : OUTER_FACTOR;
+            point[0] = row[0] * factor;
             point[1] = row[1] * factor;
-            point[2] = row[2] * factor;
-            point[0] = (ix);
-            point[3] = 1.;
+            point[2] = 0;
+            point[3] = vertexSerial;
 
             // point * matrix;
-            let gl_Position = vec4.create();
-            mat4.multiply(gl_Position, point, this.scene.paintingNeeds.rotMatrix);
-            dblog(` 🌀🌀${gl_Position[0].toFixed(4)}   ${gl_Position[1].toFixed(4)}  `
-                +` ${gl_Position[2].toFixed(4)}   ${gl_Position[3].toFixed(4)}  `);
+            vec4.transformMat4(gl_Position, point, this.scene.paintingNeeds.rotMatrix);
+            dblog(` 🌀🌀${_(0)}   ${_(1)}   ${_(2)}  `);
+            //dblog(` 🌀🌀${_(0)}   ${_(1)}   ${_(2)}   ${_(3)}  `);
         }
         dblog(`  🌀🌀 `);
     }
