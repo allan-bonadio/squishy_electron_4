@@ -15,6 +15,8 @@ import PropTypes from 'prop-types';
 import {listOfSceneClasses} from './listOfSceneClasses.js';
 import glAmbiance from './glAmbiance.js';
 
+import {dump4x4} from '../gl/helpers3D.js';
+
 let traceSetup = false;
 let traceGeometry = false;
 
@@ -25,6 +27,7 @@ let traceOnlyScene = 'mainWave3d';
 // this one dumps large buffers
 let traceTooEarly = false;
 let traceViewBuffer = false;
+let traceMatrix = false;
 
 
 function traceOnScreen(msg) {
@@ -39,7 +42,7 @@ const propTypes = {
    sceneName: PropTypes.string,  // name for debugging
 
    // Array of eCavity(s) or other buffers to draw or any data.  passed blindly to avatar
-   inputInfo: PropTypes.array.isRequired,
+   paintingNeeds: PropTypes.object.isRequired,
 
    // Optional; omit if your scene is not affected by space.
    space: PropTypes.object,
@@ -76,6 +79,9 @@ function GLScene(props) {
 	const p = props;
 	//console.log(`starting GLScene(render), sceneName=${p.sceneName}`);
 
+    if (traceMatrix && p.paintingNeeds.rotMatrix)
+        dump4x4(p.paintingNeeds.rotMatrix, '🖼  GLScene  starts with matrix');
+
 	// we have to keep the canvas node, to get a gl context.
 	// we need it in the state, to trigger rerender, once we've got one (2nd render)
 	let [canvasNode2, setCanvasNode] = useState(null);
@@ -95,12 +101,12 @@ function GLScene(props) {
 		let sClass = listOfSceneClasses[p.sceneClassName];
 
 		// for this situation, needs the space!	 if they passed it to us
-		squishScene = new sClass(p.sceneName, ambiance, p.inputInfo, p.space);
+		squishScene = new sClass(p.sceneName, ambiance, p.paintingNeeds, p.space);
 		setSquishScene(squishScene);
 		//effSceneRef.current = squishScene;
 
 		squishScene.space = p.space;
-		squishScene.completeScene(p.inputInfo);
+		squishScene.completeScene();
 
 		squishScene.glRepaint = glRepaint;
 
@@ -112,26 +118,28 @@ function GLScene(props) {
 	// This is not 'render' as in React; react places the canvas element
 	// and this function redraws on the canvas (with gl).
 	const glRepaint =
-	() => {
+	(paintingNeeds) => {
 		// make sure we have this cuz this func gets called from all over
 		const scene = squishScene;
 		const node = canvasNode;
-		const inputInfo = p.inputInfo;
+		paintingNeeds ??= p.paintingNeeds;
 		if (! scene) {
 			if (traceTooEarly)
 				console.log(`🖼 GLScene too early for glRepaint. squishScene=`, scene);
-			return null;  // too early
+			return;  // too early
 		}
 		// if (traceViewBuffer)
 		// p.avatar.cavity.dump(`🖼 GLScene ${p.sceneName}: got the cavity right here`);
+		if (traceMatrix && paintingNeeds.rotMatrix)
+            dump4x4(paintingNeeds.rotMatrix, '🖼  GLScene  glRepaint gets matrix, passes to drawAllDrawings()');
 
 		// draw.  This won't set up an ∞ loop, right?
-		scene.drawAllDrawings(node.width, node.height, inputInfo);
+		scene.drawAllDrawings(node.width, node.height, paintingNeeds);
 		//scene.drawAllDrawings(p.canvasInnerWidth, p.canvasInnerHeight, info);
 		if (traceGeometry && traceOnlyScene == p.sceneName) {
 			console.log(`🖼 GLScene finished glRepaint() ${p.sceneName}:	\n`
 					+`canvasInnerWidth=${p.canvasInnerWidth}, canvasInnerHeight=${p.canvasInnerHeight}, `
-					+`inputInfo=`, inputInfo);
+					+`paintingNeeds=`, paintingNeeds);
 		}
 		return;
 	}
@@ -198,7 +206,7 @@ function GLScene(props) {
 		if (canvasRef.current && canvasNode && canvasRef.current !== canvasNode)
 			throw new Error('canvasRef.current !== canvasNode');
 
-		glRepaint();
+		glRepaint(p.paintingNeeds);
 
 		if (traceSetup && traceOnlyScene == p.sceneName) {
 			console.log(`🖼 GLScene ${p.sceneName}: effectRepaint(): completed, canvasNode=`,

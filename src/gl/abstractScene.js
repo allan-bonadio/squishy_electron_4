@@ -19,20 +19,20 @@ let tracePaint = false;
 export class abstractScene {
 
 	/* ************************************************** construction */
-	// sceneName: personal name for the scene instance, for error msgs
-	// canvas: real <canvas> DOM element, after it's been created by React
-	// class name from instance: vu.constructor.name   from class: vuClass.name
 	// A scene is always constructed with args sceneName, ambiance, space
 	// The scene constructor sometimes ignores the space but it's passed anyway.
-	// inputInfo contains arrays to send to webgl; freeform.
-	// TODO: inputInfo is wrong for vistas, maybe eliminate this argument and on
-	// complete, and formulate a more realtimme protocol
-	constructor(sceneName, ambiance, inputInfo, space) {
+	// paintingNeeds contains stuff to send to webgl; object freeform.
+
+	// sceneName: personal name for the scene instance, for error msgs
+	// ambiance.canvas and .gl: real <canvas> DOM element, after it's been created by React
+	// paintingNeeds: on WaveView, WaveViista, or similar hi-level component
+	// passed down thru props to drawingScene then ultimately draw
+	constructor(sceneName, ambiance, paintingNeeds, space) {
 		this.sceneName = sceneName;
 		this.canvas = ambiance.canvas;
 		this.gl = ambiance.gl;
 		this.tagObject = ambiance.tagObject;
-		this.inputInfo = inputInfo;  // might be undef
+		this.paintingNeeds = paintingNeeds;  // might be undef
 		this.space = space;  // might be undef
 		if (! this.canvas) throw new Error(`abstractScene: being created without canvas`);
 
@@ -43,7 +43,7 @@ export class abstractScene {
 
 	// the final call to set it up does all sceneClassName-specific stuff
 	// other subclassers override what they want
-	completeScene(inputInfo) {
+	completeScene() {
 		this.compileShadersOnDrawings();
 		this.createVariablesOnDrawings();
 
@@ -54,7 +54,7 @@ export class abstractScene {
 		if (tracePaint)
 			console.log(`🦊 abs completeScene() width=${this.canvas.width}, height=${this.canvas.height},`);
 
-		this.drawAllDrawings(this.canvas.width, this.canvas.height, inputInfo);
+		this.drawAllDrawings(this.canvas.width, this.canvas.height, this.paintingNeeds);
 	}
 
 	/* ****************************************** Shader s */
@@ -108,7 +108,7 @@ export class abstractScene {
 			drawing.drawVariables.forEach(v => v.reloadVariable());
 
 			if (!drawing.skipDrawingCuzErr)
-				drawing.draw(width, height, this.inputInfo);
+				drawing.draw(width, height);
 		});
 	}
 }

@@ -155,7 +155,7 @@ export class ticDrawing extends abstractDrawing {
 		return cb;
 	}
 
-	draw(width, height, inputInfo) {
+	draw(width, height, paintingNeeds) {
 		if (traceTicDrawing)
 			console.log(`➤ ➤ ➤ ticDrawing drawing ${this.sceneName}, ${this.avatarLabel}: `+
 				` start draw ${this.vertexCount/2} tics`);

@@ -3,7 +3,7 @@
 ** Copyright (C) 2021-2026 Tactile Interactive, all rights reserved
 */
 
-// Each wraps a canvas for display.  Via webgl.  along with svg doohickeys and what not.
+// Each wraps a canvas for display.	 Via webgl.	 along with svg doohickeys and what not.
 // You can have many in a squishPanel?, each subscribing to the same space.
 // One is the main view, displaying current simulation in 2d.  Others communicate with
 // control panel tabs to display proposed settings before effecting them.
@@ -45,10 +45,10 @@ export class WaveView extends React.Component {
 		// the title of the view
 		sceneName: PropTypes.string,
 
-		// no!  handed in by promise space: PropTypes.instanceOf(eSpace),
+		// no!	handed in by promise space: PropTypes.instanceOf(eSpace),
 
 		// handed in, pixels.  Width of whole waveview, including sidebar,
-		// bumpers and border.  Canvas is CANVAS_BORDER_THICKNESS pixel smaller
+		// bumpers and border.	Canvas is CANVAS_BORDER_THICKNESS pixel smaller
 		// all around for border.
 		outerWidth: PropTypes.number.isRequired,
 
@@ -72,7 +72,7 @@ export class WaveView extends React.Component {
 		super(props);
 		ccpt(this, props);
 		// checkPropTypes(this.constructor.propTypes, props, 'prop',
-		// 		this.constructor.name);
+		//		this.constructor.name);
 
 		// extra methods handling screen geometry
 		//debugger;
@@ -87,13 +87,16 @@ export class WaveView extends React.Component {
 
 		// whenever...
 		// if (this.context) {
-		// 	this.context.spaceCreatedProm(
-		// 		space => this.space = this.context.space)}
+		//	this.context.spaceCreatedProm(
+		//		space => this.space = this.context.space)}
 
 		this.createInnerDims();
 
 		// nothing draws until this.space is filled in
-		props.spaceCreatedProm.then(space => this.space = space)
+		props.spaceCreatedProm.then(space => {
+			this.space = space;
+			this.paintingNeeds = {cavity: this.space.mainFlick, bumperWidth: this.bumperWidth}
+		});
 	}
 
 	static contextType = SquishContext;
@@ -104,7 +107,7 @@ export class WaveView extends React.Component {
 	}
 
 	/* ********************************************************* hover */
-	// I'm done trying to get the css :hover to do this right.  Enter and Leave events
+	// I'm done trying to get the css :hover to do this right.	Enter and Leave events
 	// now turn on/off the voltage display.
 
 	hoverEnter = ev => {
@@ -126,11 +129,12 @@ export class WaveView extends React.Component {
 	// pass along the vital repaint functions
 	setMainViewRepaint = (mainViewRepaint) => {
 		this.mainViewRepaint ??= mainViewRepaint;
-		this.mainViewRepaint.sceneName = 'mainViewRepaint';  // for debugging
+		this.mainViewRepaint.sceneName = 'mainViewRepaint';	 // for debugging
 
 		this.props.setMainViewRepaint(mainViewRepaint);
 		this.animator.mainViewRepaint ??= mainViewRepaint;
 	};
+	// ??? there'a another one of these in View
 	setSpectRepaint = (spectRepaint) => {
 		this.spectRepaint ??= spectRepaint;
 		this.props.setSpectRepaint(spectRepaint);
@@ -146,12 +150,12 @@ export class WaveView extends React.Component {
 
 		if (this.space) {
 			let sceneClassName = 'flatScene';
-			let sceneName = 'mainWave2D';
+			let sceneName = 'mainView';
 
 			view = <GLScene
 				space={this.space} animator={this.animator}
-				sceneClassName={'flatScene'} sceneName={sceneName +'2d'}
-				inputInfo={[this.space.mainFlick, this.bumperWidth, null, null]}
+				sceneClassName={'flatScene'} sceneName={sceneName}
+				paintingNeeds={this.paintingNeeds}
 				canvasInnerWidth={this.canvasInnerWidth}
 				canvasInnerHeight={this.canvasInnerHeight}
 				setGLRepaint={this.setMainViewRepaint}
@@ -210,7 +214,7 @@ export class WaveView extends React.Component {
 
 		let betweenBumpers = this.canvasInnerWidth - 2 * this.bumperWidth;
 
-		// the glScene is one layer.  Over that is the widget area  Bumpers are outside.
+		// the glScene is one layer.  Over that is the widget area	Bumpers are outside.
 		return (
 		<div className='WaveView'
 			style={{height: `${s.outerHeight}px`, display: (p.show2D ? 'flex' : 'none')}}
@@ -260,13 +264,13 @@ export class WaveView extends React.Component {
 
 export default WaveView;
 
-// 					<div className='northEastWrapper'>
-// 						frame <span className='voNorthEast'>{tnf.frameSerialText}</span>
-// 					</div>
+//					<div className='northEastWrapper'>
+//						frame <span className='voNorthEast'>{tnf.frameSerialText}</span>
+//					</div>
 
 
-// 				<img className='sizeBox' src={resizeIcon} alt='size box'
-// 					onPointerDown={this.resizePointerDown} onPointerUp={this.resizePointerUp}
-// 					onPointerMove={this.resizePointerMove} onPointerLeave={this.resizePointerUp}
-// 					title="To adjust the height, drag this up or down"
-// 					style={{width: `2em`, height: `2em`}} />
+//				<img className='sizeBox' src={resizeIcon} alt='size box'
+//					onPointerDown={this.resizePointerDown} onPointerUp={this.resizePointerUp}
+//					onPointerMove={this.resizePointerMove} onPointerLeave={this.resizePointerUp}
+//					title="To adjust the height, drag this up or down"
+//					style={{width: `2em`, height: `2em`}} />

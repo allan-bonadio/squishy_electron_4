@@ -1,6 +1,6 @@
 /*
 ** squish panel -- like a self-contained quantum system, including space,
-** 				waves, and drawings and interactivity.
+**				waves, and drawings and interactivity.
 ** Copyright (C) 2021-2026 Tactile Interactive, all rights reserved
 */
 
@@ -23,17 +23,17 @@ import {tooOldTerminate} from '../utils/errors.js';
 import {cppActivePromise} from '../engine/eEngine.js';
 
 import SquishContext from './SquishContext.js';
-import pointerContextMap from '../engine/pointerContextMap.js';  // TODO: get rid of this
-import {waitForSpaceCreatedPromise} from '../wave/waveContext.js';  // TODO: get rid of this
+import pointerContextMap from '../engine/pointerContextMap.js';	 // TODO: get rid of this
+import {waitForSpaceCreatedPromise} from '../wave/waveContext.js';	// TODO: get rid of this
 //import waveAux from '../wave/waveAux.js';
 
 
 // runtime debugging flags - you can change in the debugger or here
-let tracePromises = true;
-let traceSquishPanel = true;
+let tracePromises = false;
+let traceSquishPanel = false;
 let traceWidth = false;
 let traceSBIUpdate = false;
-let traceNewSpace = true;
+let traceNewSpace = false;
 
 /* ************************************************ construction & reconstruction */
 
@@ -44,7 +44,7 @@ let traceNewSpace = true;
 
 class SquishPanel extends React.Component {
 	static propTypes = {
-		bodyWidth: PropTypes.number.isRequired,  // width of window which dictates view and vista width
+		bodyWidth: PropTypes.number.isRequired,	 // width of window which dictates view and vista width
 	};
 
 	constructor(props) {
@@ -58,6 +58,7 @@ class SquishPanel extends React.Component {
 
 		// will be set by subcomponents
 		this.mainViewRepaint = null;
+		this.mainVistaRepaint = null;
 		this.spectRepaint = null;
 
 		// this becomes the context object - the context sub-objects:
@@ -67,7 +68,7 @@ class SquishPanel extends React.Component {
 			// the space for this SP will be set after it is created
 			space: null,
 
-			shouldBeIntegrating: false,  // will be set when space promise comes in
+			shouldBeIntegrating: false,	 // will be set when space promise comes in
 			show2D: getASetting('miscSettings', 'show2D'),
 			show3D: getASetting('miscSettings', 'show3D'),
 
@@ -80,8 +81,8 @@ class SquishPanel extends React.Component {
 		};
 		// see above this.#shouldBeIntegrating = false;
 
-		// this will end up in everybody's context.  Unfortunately, the
-		// context isn't always there on creation.  This is why we pass
+		// this will end up in everybody's context.	 Unfortunately, the
+		// context isn't always there on creation.	This is why we pass
 		// the space down the props
 		this.state.spaceCreatedProm = new Promise((succeed, fail) => {
 			this.spaceSucceed = succeed;
@@ -92,7 +93,7 @@ class SquishPanel extends React.Component {
 
 		cppActivePromise.then(() => {
 			let params = getAGroup('spaceParams');
-			params.label = 'x';  // the x coordinate, the only dimension of the space
+			params.label = 'x';	 // the x coordinate, the only dimension of the space
 			this.create1DMainSpace(params);
 		});
 
@@ -122,7 +123,7 @@ class SquishPanel extends React.Component {
 	static contextType = SquishContext;
 
 	// sbi, the state is kept in this state, the context, and in the grinder
-	// this should be the only way to set sbi.  Note does NOT trigger!  Nor set grinder.
+	// this should be the only way to set sbi.	Note does NOT trigger!	Nor set grinder.
 	setShouldBeIntegrating = (sbi) => {
 		this.setState({shouldBeIntegrating: sbi});
 
@@ -154,30 +155,30 @@ class SquishPanel extends React.Component {
 		storeASetting('miscSettings', showX, whetherTo);
 	}
 
-	// these are the functions that change the 2d/3d setting.  Get at the state in the context.  These functions get passed down.
+	// these are the functions that change the 2d/3d setting.  Get at the state in the context.	 These functions get passed down.
 	activate2D = (ev) => {
 		// if turning off 2d, make sure 3d is on.  but leave it alone if shift is down.
 		this.activateX('show2D', ! this.state.show2D) ;
 		if (!ev.shiftKey)
-		    this.activateX('show3D', this.state.show2D || this.state.show3D) ;
-// 		this.setState({show2D: true, show3D: false});
-// 		this.setState({show2D: true, show3D: false});
-// 		storeASetting('miscSettings', 'show2D', true);
-// 		storeASetting('miscSettings', 'show3D', false);
+			this.activateX('show3D', this.state.show2D || this.state.show3D) ;
+//		this.setState({show2D: true, show3D: false});
+//		this.setState({show2D: true, show3D: false});
+//		storeASetting('miscSettings', 'show2D', true);
+//		storeASetting('miscSettings', 'show3D', false);
 	};
 	activate3D = (ev) => {
 		// if turning off 2d, make sure 3d is on
 		this.activateX('show3D', ! this.state.show3D) ;
 		if (!ev.shiftKey)
 			this.activateX('show2D', this.state.show2D || this.state.show3D) ;
-// 		this.setState({show2D: false});
-// 		this.setState({show3D: true});
-// 		storeASetting('miscSettings', 'show2D', false);
-// 		storeASetting('miscSettings', 'show3D', true);
+//		this.setState({show2D: false});
+//		this.setState({show3D: true});
+//		storeASetting('miscSettings', 'show2D', false);
+//		storeASetting('miscSettings', 'show3D', true);
 	};
 
 	// these functions are passed in props to lower levels mostly for initialization.
-	// called once ONLY in control panel during setup.  Either one can set space.
+	// called once ONLY in control panel during setup.	Either one can set space.
 	setCPContext = (cp) => {
 		this.setState({controlPanel: cp});
 		// not there anyway this.setState({space: cp.space});
@@ -211,7 +212,7 @@ class SquishPanel extends React.Component {
 			this.spaceSucceed(this.space);
 
 			if (traceNewSpace)
-				dblog(`spaceCreatedProm 🐣  resolved`);
+				dblog(`spaceCreatedProm 🐣	resolved`);
 		} catch (ex) {
 			// this is called from spaceCreatedProm so trigger its fail
 			// eslint-disable-next-line no-ex-assign
@@ -225,7 +226,7 @@ class SquishPanel extends React.Component {
 
 	componentDidMount() {
 		// upon startup, after C++ says it's ready.
-		// why do this in DidMount and not in constructor?  dunno...
+		// why do this in DidMount and not in constructor?	dunno...
 		this.state.spaceCreatedProm
 		.then((space) => {
 			//const s = this.state;
@@ -233,7 +234,7 @@ class SquishPanel extends React.Component {
 
 			// space will end up in the state but meanwhile we need it now
 			this.space = space;
-			this.setState({space});  // maybe i don't need this if it's in the context?
+			this.setState({space});	 // maybe i don't need this if it's in the context?
 			pointerContextMap.register(space.pointer, this.state);
 
 			//this.mainAvatar = space.mainAvatar;
@@ -264,7 +265,7 @@ class SquishPanel extends React.Component {
 			throw ex;
 		});
 
-		// check for obsolescence.  Do this after HTML stuff appears.
+		// check for obsolescence.	Do this after HTML stuff appears.
 		if (!window.WebAssembly)
 			tooOldTerminate('WebAssembly');
 		if (!window.Worker)
@@ -362,6 +363,7 @@ class SquishPanel extends React.Component {
 						setShouldBeIntegrating={this.setShouldBeIntegrating}
 						sPanel={this}
 						spaceCreatedProm={this.state.spaceCreatedProm}
+						paintingNeeds={this.paintingNeeds}
 					/>
 				</article>
 			</SquishContext.Provider>

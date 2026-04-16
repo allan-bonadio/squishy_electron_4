@@ -157,8 +157,8 @@ export class flatDrawing extends abstractDrawing {
 		this.rowFloats = 4;
 		this.rowAttr = new drawingAttribute('row', this, this.rowFloats, () => {
 			//debugger;
-			qeFuncs.avatar_avFlatLoader(this.avatar.pointer, 0, this.scene.inputInfo[0].pointer,
-					nPoints);
+			qeFuncs.avatar_avFlatLoader(this.avatar.pointer, 0,
+					this.scene.paintingNeeds.cavity.pointer, nPoints);
 
 			if (traceReloadRow) {
 				console.log(`♭♭♭ flatDrawing  ${this.avatarLabel}: at row getViewBuffer() `
@@ -180,7 +180,7 @@ export class flatDrawing extends abstractDrawing {
 		const gl = this.gl;
 		this.setDrawing();
 
-		let bw = this.scene.inputInfo[1];
+		let bw = this.scene.paintingNeeds.bumperWidth;
 		gl.viewport(bw, 0, width - 2 * bw, height);
 		if (traceViewport) {
 			console.log(`♭♭♭ flatDrawing set viewport on avatar=${this.avatarLabel}: `

@@ -87,7 +87,7 @@ export class noiseDrawing extends abstractDrawing {
 		this.colorsAttr = new drawingAttribute('colors', this, 2, () => {return {value: colors, type: 'vec2'}});
 	}
 
-	draw(width, height, inputInfo) {
+	draw(width, height, paintingNeeds) {
 		const gl = this.gl;
 		this.setDrawing();
 		debugger;
@@ -106,8 +106,8 @@ export class noiseDrawing extends abstractDrawing {
 
 export class noiseScene extends abstractScene {
 	// doesn't need space
-	constructor(sceneName, ambiance, inputInfo, space) {
-		super(sceneName, ambiance, inputInfo, space);
+	constructor(sceneName, ambiance, paintingNeeds, space) {
+		super(sceneName, ambiance, paintingNeeds, space);
 
 		this.avatar = eAvatar.createAvatar(sceneName);
 

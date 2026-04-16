@@ -99,7 +99,7 @@ export class drawingUniform extends drawingVariable {
 			// better luck next time.
 			let msg = `uniform variable ${this.varName} has `
 						+`a problematic value(${value}) or no type(${type})`;
-			console.warn(`🍯 ${msg}`);
+			console.trace(`🍯 ${msg}`);
 			this.drawing.skipDrawingCuzErr = msg;
 			return;
 		}

@@ -47,10 +47,11 @@ function SetWaveTab(props) {
 	let {saveMainWave, waveParams, setWaveParams, space} = props;
 
 	// must remember our own temp wave for minigraph
-	const minigraphWaveRef = useRef(null);
-	if (!minigraphWaveRef.current)
-		minigraphWaveRef.current = new eCavity(props.space, 'minigraphWave');
-	let minigraphWave = minigraphWaveRef.current;
+	const minigraphWaveRef = useRef(new eCavity(props.space, 'minigraphWave'));
+    const minigraphWave = minigraphWaveRef.current
+
+	const paintingNeedsRef = useRef({cavity: minigraphWave})
+	const paintingNeeds = paintingNeedsRef.current;
 
 	// must remember our repaint func
 	const minigraphRepaintRef = useRef(null);
@@ -62,7 +63,6 @@ function SetWaveTab(props) {
 		minigraphRepaint.sceneName = 'mgRepaint';  // for debugging
 	}
 
-
 	// set the captive miniGraph wave to the new settings,
 	// after user changed one. this will do a GL draw.
 	function regenerateMiniGraphWave() {
@@ -73,7 +73,7 @@ function SetWaveTab(props) {
 			console.log(`Regenerating WaveTab minigraph.  params: `, waveParams);
 
 		if (minigraphRepaint) {
-			minigraphRepaint();
+			minigraphRepaint(paintingNeeds);
 			if (traceRegenerate)
 				console.log(`the minigraph wave after setFamiliarWave() & repaint`, minigraphWave);
 		}
@@ -156,11 +156,10 @@ function SetWaveTab(props) {
 	const glScene = <GLScene
 		space={space}
 		sceneClassName='flatScene' sceneName='swMiniGraph'
-		inputInfo={[minigraphWave, 0]}
 		canvasInnerWidth={MINI_WIDTH}
 		canvasInnerHeight={MINI_HEIGHT}
 		setGLRepaint={setMinigraphRepaint}
-		inputInfo={[minigraphWave, 0]}
+		paintingNeeds={paintingNeeds}
 		title="preview of what your wave will look like after clicking Set Wave"
 	/>;
 

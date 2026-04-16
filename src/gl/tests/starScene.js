@@ -100,7 +100,7 @@ export class starDrawing extends abstractDrawing {
 		//this.cornerAttr.attachArray(corners, 2);
 	}
 
-	draw(width, height, inputInfo) {
+	draw(width, height, paintingNeeds) {
 		const gl = this.gl;
 		this.setDrawing();
 		//debugger;
@@ -125,8 +125,8 @@ export class starDrawing extends abstractDrawing {
 
 
 export class starScene extends abstractScene {
-	constructor(sceneName, ambiance, inputInfo, space) {
-		super(sceneName, ambiance, inputInfo, space);
+	constructor(sceneName, ambiance, paintingNeeds, space) {
+		super(sceneName, ambiance, paintingNeeds, space);
 
 		this.avatar = eAvatar.createAvatar(sceneName);
 
