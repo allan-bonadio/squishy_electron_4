@@ -188,9 +188,9 @@ function CPToolbar(props) {
 
 		<div className='toolbarWidget '>
 				<button className={'twoD3D '+ (context.show2D ? 'butOn' : 'butOff')}
-						onClick={p.activate2D}>2d</button>
+						onClick={p.activate2D}>2D</button>
 				<button className={'twoD3D '+(context.show3D ? 'butOn' : 'butOff')}
-						onClick={p.activate3D}>3d</button>
+						onClick={p.activate3D}>3D</button>
 		</div>
 	</div>);
 }

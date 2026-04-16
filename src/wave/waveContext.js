@@ -3,7 +3,7 @@
 ** Copyright (C) 2026-2026 Tactile Interactive, all rights reserved
 */
 
-import {eSpaceCreatedPromise} from '../engine/eEngine.js';
+// TODO: rename this from Context to Shared, everywhere
 
 
 // this should only run once, indirectly called by the squish panel
@@ -58,7 +58,7 @@ function setUpContext(space, context, setWVContext) {
 }
 
 
-	// set up 2/3 of the context: WaveVista and engine
+	// set up  WaveVista and engine
 function handleSpacePromise(space, animator, context, setWVContext) {
 	//debugger;
 	// this will kick off a render, now that the avatar is in place
@@ -81,6 +81,7 @@ export function waitForSpaceCreatedPromise(animator, context, setWVContext) {
 	// construct
 	context.spacePromise.then(
 		space => {
+		    dblog(`yes context.spacePromise is being thenned`)
 			handleSpacePromise(space, animator, context, setWVContext);
 			//debugger;
 		},

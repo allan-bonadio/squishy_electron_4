@@ -22,7 +22,7 @@ import SquishContext from '../sPanel/SquishContext.js';
 
 let traceSetPanels = false;
 let traceBeginFinish = false;
-let traceContext = true;
+let traceContext = false;
 let traceQuickDtFactor = false;
 
 // integrations always need specific numbers of steps.  But there's always one
@@ -78,6 +78,7 @@ export class ControlPanel extends React.Component {
 		props.spaceCreatedProm.then(this.handleSpacePromise);
 	}
 
+    // set up the cp part of the context
 	setUpContext() {
 		if (!this.context) {
 			// not ready yet so try again

@@ -37,11 +37,11 @@ const sceneClassNamez = {
 gonna have to rewrite this as a function
 export class mockGLScene {
 	proptypes: {
-		inputInfo: PropTypes.object,
+		paintingNeeds: PropTypes.object,
 	}
 
 yeah i think this has to change too
-	constructor(sceneName, ambiance, inputInfo) {
+	constructor(sceneName, ambiance, paintingNeeds) {
 		this.state = {canvas: null};
 		this.space = mockSpace;
 		this.avatar = mockAvatar;
@@ -92,7 +92,7 @@ yeah i think this has to change too
 		this.testSceneClasses[this.sceneClassName] =
 			this.effectiveView =
 			new sClass(this.sceneClassName, this, mockSpace, mockAvatar);
-		this.effectiveView.completeScene(inputInfo);
+		this.effectiveView.completeScene(paintingNeeds);
 		this.avatar.glRepaint = this.glRepaint;
 
 	}
@@ -101,7 +101,7 @@ yeah i think this has to change too
 	glRepaint() {
 		console.log('glRepaint');
 		mockAvatar.loadViewBuffer();
-		this.effectiveView.drawAllDrawings(width, height, p.inputInfo);
+		this.effectiveView.drawAllDrawings(width, height, p.paintingNeeds);
 	}
 
 };
