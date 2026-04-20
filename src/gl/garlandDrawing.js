@@ -60,8 +60,8 @@ blade is two triangles */
 // how much raw psi values should be multipled to be equivalent to x in volume
 // space values that go from 0 to N.  Adjust to taste or to N.  These are
 // inserted as numbers into the vert shader code.
-const OUTER_FACTOR = '100.';
-const INNER_FACTOR = '50.';
+const OUTER_FACTOR = '1.0';
+const INNER_FACTOR = '.5';
 
 // make the line number for the start correspond to this JS file line number - the NEXT line
 const vertexSrc = `// garlandDrawing vertex
