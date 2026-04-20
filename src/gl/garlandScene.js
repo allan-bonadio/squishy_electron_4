@@ -7,7 +7,8 @@ import {mat4} from 'gl-matrix';
 
 import abstractScene from './abstractScene.js';
 import garlandDrawing from './garlandDrawing.js';
-import {dump4x4} from './helpers3D.js';
+import rgbVaneDrawing from './rgbVaneDrawing.js';
+//import {dump4x4} from './helpers3D.js';
 import eAvatar from '../engine/eAvatar.js';
 
 
@@ -24,6 +25,7 @@ class garlandScene extends abstractScene {
 		// create relevant drawings.
 		this.drawings = [
 			new garlandDrawing(this, space),
+			// cant get it too work dont care  new rgbVaneDrawing(this, space),
 		];
 
 	}
