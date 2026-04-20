@@ -7,12 +7,14 @@
 
 
 // this should only run once, indirectly called by the squish panel
-// set up part of the context: WaveVista
+// set up part of the context: waveView also covers waveVista
+// shared between View and Vista somehow
 function setUpContext(space, context, setWVContext) {
+	debugger;  // this is never called, right?  apr 2026 TODO
 	// need BOTH context  and the space.  So this is called twice.
 	if (!context) {
 		// not ready yet so try again
-		setTimeout(setUpContext, 100);
+		setTimeout(setUpContext, 100, space, context, setWVContext);
 		return;
 	}
 
@@ -24,8 +26,6 @@ function setUpContext(space, context, setWVContext) {
 	wv = {
 		space: space,
 		grinder: space.grinder,
-
-
 
 		// somebody's going to want to see both at once.  someday...
 		show2D: getASetting('miscSettings', 'show2D'),
