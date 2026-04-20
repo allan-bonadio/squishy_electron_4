@@ -220,7 +220,10 @@ class LogSlider extends React.Component {
 					style={this.inputStyle ?? {}}
 					orient={p.vertical ? 'vertical' : 'horizontal'}
 				/>
-				<datalist id={uniqueId} >{createGoodPowers(spd, p.sliderPowerMin, p.sliderPowerMax, p.substitutes)}</datalist>
+				<datalist id={uniqueId} >
+					{createGoodPowers(spd, p.sliderPowerMin, p.sliderPowerMax,
+							p.substitutes)}
+				</datalist>
 			</div>;
 		} catch (ex) {
 			console.error(`LogSlider.render() Crash: `, ex.stack ?? ex.message ?? ex);
