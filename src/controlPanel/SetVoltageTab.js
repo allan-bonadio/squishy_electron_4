@@ -223,7 +223,7 @@ function SetVoltageTab(p) {
 			{renderMiniGraph()}
 
 			{makeScaleSlider(breed, vP[breedScale],
-				sSettings.minMaxes.voltageParams[breedScale])} }
+				sSettings.minMaxes.voltageParams[breedScale]) }
 		</>
 	}
 
@@ -256,7 +256,7 @@ function SetVoltageTab(p) {
 			<label className='scaleDisplay' style={{display: 'inline-block'}} >
 				{(vP[`${breed}Scale`] / 1000).toFixed(2)} kV
 			</label>
-		</>;
+		</>
 	}
 
 	// only the slot/black width, otherwise blank space
