@@ -13,7 +13,7 @@ import {vec4, mat4} from 'gl-matrix';
 
 
 let traceAvatarAfterDrawing = false;
-let traceGLAfterDrawing = true;
+let traceGLAfterDrawing = false;
 let traceDrawing = false;
 let traceReloadRow = false;
 let traceMatrix = false;
@@ -173,13 +173,6 @@ export class garlandDrawing extends abstractDrawing {
 		const gl = this.gl;
 		this.setDrawing();
 
-		//let bw = paintingNeeds[1];
-		//gl.viewport(bw, 0, width - 2 * bw, height);
-		//if (traceViewport) {
-		//    console.log(`🌀🌀🌀 garlandDrawing set viewport on avatar=${this.avatarLabel}: `
-		//        +` width-2bw=${width - 2 * bw}, height=${height}  `
-		//        +` drawing ${this.vertexCount/2} points`);
-		//}
 		this.drawVariables.forEach(v => v.reloadVariable());
 
 		let startEnd2 = this.space.startEnd2;
@@ -213,19 +206,25 @@ export class garlandDrawing extends abstractDrawing {
 		}
 	}
 
-    // calculate what the GPU would calculate, and dump that.  give or take fidelity of the below.
+    // simulate and calculate what WebGL would calculate, and dump that.
+    // give or take fidelity of the below.
     dumpGL(vBuf) {
-        dblog(` 🌀🌀 what the GPU calculates:`);
         let startEnd2 = this.space.startEnd2;
-        let first = startEnd2.start;
+		let first = startEnd2.start2;
+		let count = startEnd2.end2 - startEnd2.start2;
         let vertexSerial, ix, point, odd, factor, row;
         let rows = this.avatar.getViewBuffer(0);
         let gl_Position = vec4.create();
 
-        const _ = c => (gl_Position[c] / gl_Position[3]).toFixed(2).padStart(9);
+        const _ = c => (gl_Position[c] / gl_Position[3]).toFixed(4).padStart(7);
         //const _ = c => (gl_Position[c]).toFixed(1).padStart(9);
 
-        for (vertexSerial = startEnd2.start2; vertexSerial < startEnd2.end2; vertexSerial++) {
+		'';  // collect these otherwise the console merges dup lines
+        let text = ` 🌀🌀 what the GPU calculates, only the `
+			+`${count} vertices, not the points:`;
+
+        for (let i = 0; i < count; i++) {
+        	vertexSerial = first + i;
             let rs = vertexSerial * 4;
             row = vec4.fromValues(rows[rs], rows[rs+1], rows[rs+2], rows[rs+3]);
             ix = Math.floor(vertexSerial / 2);
@@ -239,10 +238,11 @@ export class garlandDrawing extends abstractDrawing {
 
             // point * matrix;
             vec4.transformMat4(gl_Position, point, this.scene.paintingNeeds.rotMatrix);
-            dblog(` 🌀🌀${_(0)}   ${_(1)}   ${_(2)}  `);
+            text += ` 🌀🌀${(ix + '').padStart(3)} `
+				+` ${_(0)}   ${_(1)}   ${_(2)}  \n`;
             //dblog(` 🌀🌀${_(0)}   ${_(1)}   ${_(2)}   ${_(3)}  `);
         }
-        dblog(`  🌀🌀 `);
+        dblog(text + `  🌀🌀 `);
     }
 
 }
