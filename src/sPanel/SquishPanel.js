@@ -69,9 +69,6 @@ class SquishPanel extends React.Component {
 			space: null,
 
 			shouldBeIntegrating: false,	 // will be set when space promise comes in
-			show2D: getASetting('miscSettings', 'show2D'),
-			show3D: getASetting('miscSettings', 'show3D'),
-
 			controlPanel: {},
 			waveView: {},
 
@@ -79,7 +76,16 @@ class SquishPanel extends React.Component {
 
 			// loopyt spaceReady: new Promise(this.spaceNowReady, this.spaceCreationError)
 		};
-		// see above this.#shouldBeIntegrating = false;
+
+		// for now, 3d is turned off for public use.  Append ?3d to use it.
+		if (window.enable3D) {
+			this.state.show2D = getASetting('miscSettings', 'show2D');
+			this.state.show3D = getASetting('miscSettings', 'show3D');
+		}
+		else {
+			this.state.show2D = true;
+			this.state.show3D = false;
+		}
 
 		// this will end up in everybody's context.	 Unfortunately, the
 		// context isn't always there on creation.	This is why we pass
@@ -161,20 +167,12 @@ class SquishPanel extends React.Component {
 		this.activateX('show2D', ! this.state.show2D) ;
 		if (!ev.shiftKey)
 			this.activateX('show3D', this.state.show2D || this.state.show3D) ;
-//		this.setState({show2D: true, show3D: false});
-//		this.setState({show2D: true, show3D: false});
-//		storeASetting('miscSettings', 'show2D', true);
-//		storeASetting('miscSettings', 'show3D', false);
 	};
 	activate3D = (ev) => {
 		// if turning off 2d, make sure 3d is on
 		this.activateX('show3D', ! this.state.show3D) ;
 		if (!ev.shiftKey)
 			this.activateX('show2D', this.state.show2D || this.state.show3D) ;
-//		this.setState({show2D: false});
-//		this.setState({show3D: true});
-//		storeASetting('miscSettings', 'show2D', false);
-//		storeASetting('miscSettings', 'show3D', true);
 	};
 
 	// these functions are passed in props to lower levels mostly for initialization.

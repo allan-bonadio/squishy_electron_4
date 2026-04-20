@@ -82,6 +82,8 @@ const propTypes = {
 };
 
 function CPToolbar(props) {
+	if (!props) return '';  // wtf was this?
+
 	cfpt(propTypes, props);
 	const p = props;
 	if (traceCPToolbar)
@@ -168,6 +170,20 @@ function CPToolbar(props) {
 	/* 			onMouseMove={maybeStopSpeed}>
 					{onMouseMove={maybeStopSpeed}> */
 
+	const render2D3D = () => {
+		// this is set in App.js from url box
+		if (window.enable3D) {
+			return <div className='toolbarWidget '>
+				<button className={'twoD3D '+ (context.show2D ? 'butOn' : 'butOff')}
+						onClick={p.activate2D}>2D</button>
+				<button className={'twoD3D '+(context.show3D ? 'butOn' : 'butOff')}
+						onClick={p.activate3D}>3D</button>
+			</div>
+		}
+		else
+			return '';
+	}
+
 /* *************************************************** render */
 	const context = useContext(SquishContext);
 
@@ -186,14 +202,15 @@ function CPToolbar(props) {
 				<button onClick={props.resetVoltageHandler}>Reset Voltage</button>
 		</div>
 
-		<div className='toolbarWidget '>
-				<button className={'twoD3D '+ (context.show2D ? 'butOn' : 'butOff')}
-						onClick={p.activate2D}>2D</button>
-				<button className={'twoD3D '+(context.show3D ? 'butOn' : 'butOff')}
-						onClick={p.activate3D}>3D</button>
-		</div>
+		{render2D3D()}
 	</div>);
 }
 
 export default CPToolbar;
 
+// 		<div className='toolbarWidget '>
+// 				<button className={'twoD3D '+ (context.show2D ? 'butOn' : 'butOff')}
+// 						onClick={p.activate2D}>2D</button>
+// 				<button className={'twoD3D '+(context.show3D ? 'butOn' : 'butOff')}
+// 						onClick={p.activate3D}>3D</button>
+// 		</div>
