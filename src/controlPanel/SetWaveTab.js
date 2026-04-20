@@ -20,7 +20,10 @@ import {interpretCppException} from '../utils/errors.js';
 const MINI_WIDTH = 300;
 const MINI_HEIGHT = 150;
 
-let traceRegenerate = false;
+let traceRegenerate = true;
+let traceInteract = true;
+let traceEffect = true;
+let traceSetRepaint = true;
 
 const propTypes = {
 	// actually sets the one in use by the main wave
@@ -50,7 +53,7 @@ function SetWaveTab(props) {
 	const minigraphWaveRef = useRef(new eCavity(props.space, 'minigraphWave'));
     const minigraphWave = minigraphWaveRef.current
 
-	const paintingNeedsRef = useRef({cavity: minigraphWave})
+	const paintingNeedsRef = useRef({cavity: minigraphWave, bumperWidth: 0})
 	const paintingNeeds = paintingNeedsRef.current;
 
 	// must remember our repaint func
@@ -59,6 +62,8 @@ function SetWaveTab(props) {
 
 	// GLScene ultimately calls this to hand us the minigraph repaint function
 	function setMinigraphRepaint(repaint) {
+		if (traceSetRepaint)
+			dblog(`🎨 set mg repaint: `, repaint);
 		minigraphRepaintRef.current = minigraphRepaint = repaint;
 		minigraphRepaint.sceneName = 'mgRepaint';  // for debugging
 	}
@@ -70,22 +75,24 @@ function SetWaveTab(props) {
 		minigraphWave.setFamiliarWave(waveParams);
 
 		if (traceRegenerate)
-			console.log(`Regenerating WaveTab minigraph.  params: `, waveParams);
+			dblog(`🎨 Regenerating WaveTab minigraph.  params: `, waveParams);
 
 		if (minigraphRepaint) {
 			minigraphRepaint(paintingNeeds);
 			if (traceRegenerate)
-				console.log(`the minigraph wave after setFamiliarWave() & repaint`, minigraphWave);
+				dblog(`🎨 the minigraph wave after setFamiliarWave() & repaint`, minigraphWave);
 		}
 		else {
 			if (traceRegenerate)
-				console.log(` minigraph not painted because no minigraphRepaint()`, minigraphWave);
+				dblog(`🎨  minigraph not painted because no minigraphRepaint()`, minigraphWave);
 		}
 	}
 
 	// set any combination of the wave params, in the Control Panel state.
 	// then repaint the minigraph
 	function setAndRegenerate(wp) {
+		if (traceInteract)
+			dblog(`🎨  user interacts: `, wp);
 		setWaveParams(wp);
 
 		// set it in our local copy so it draws the latest.  isn't this redundant with setWaveParams?
@@ -192,6 +199,8 @@ function SetWaveTab(props) {
 
 	// this will happen after the render
 	useEffect(() => {
+		if (traceEffect)
+			dblog(`🎨 useEffect triggers regen of gl`);
 		regenerateMiniGraphWave();
 		return () => {};
 	});
