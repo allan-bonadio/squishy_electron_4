@@ -7,8 +7,7 @@ import {mat4} from 'gl-matrix';
 
 import abstractScene from './abstractScene.js';
 import garlandDrawing from './garlandDrawing.js';
-import rgbVaneDrawing from './rgbVaneDrawing.js';
-//import {dump4x4} from './helpers3D.js';
+//import rgbVaneDrawing from './rgbVaneDrawing.js';
 import eAvatar from '../engine/eAvatar.js';
 
 
