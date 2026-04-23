@@ -77,7 +77,7 @@ export class WaveView extends React.Component {
 		// extra methods handling screen geometry
 		//debugger;
 		Object.assign(this, waveAux);
-		this.space = props.space;
+		// no!this.space = props.space;
 
 		this.state = {
 			// height of just the canvas + DOUBLE_THICKNESSpx, as set by user with size box
@@ -95,6 +95,7 @@ export class WaveView extends React.Component {
 		// nothing draws until this.space is filled in
 		props.spaceCreatedProm.then(space => {
 			this.space = space;
+			this.setState({space});  // please render cuz nothing renders without space
 			this.paintingNeeds = {cavity: this.space.mainFlick, bumperWidth: this.bumperWidth}
 		});
 	}
