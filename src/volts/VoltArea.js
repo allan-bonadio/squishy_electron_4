@@ -4,7 +4,7 @@
 ** Copyright (C) 2021-2026 Tactile Interactive, all rights reserved
 */
 
-import React, {useRef, useState, useReducer, useContext} from 'react';
+import React, {useRef, useState, useReducer, useContext, useEffect} from 'react';
 
 import PropTypes from 'prop-types';
 
@@ -73,12 +73,16 @@ function VoltArea(props) {
 	const visibleRef = useRef();
 	let visibleEl = visibleRef.current;
 	const svgRef = useRef();
-	let svgEl = svgRef.current;
-	let svgRect = svgEl?.getBoundingClientRect();
+	let svgEl, svgRect;
+	function setSvgEl() {
+		if (!svgRef.current)
+			return;
+		svgEl = svgRef.current;
+		svgRect = svgEl?.getBoundingClientRect();
+	}
+	setSvgEl();  // might be already set
+	useEffect(setSvgEl);  // otherwise this will set it
 	//const dragCountRef = useRef(0);
-
-	// phony state variable that changes when buffer changes.  I tried using the whole buffer for this; no.
- 	//let [changeCounter, setChangeCounter] = useState(0);
 
 	// variables while dragging
 	let dragging = false;
