@@ -308,6 +308,8 @@ function SetVoltageTab(p) {
 				<option value='hover'>only while hovering</option>
 				<option value='never'>Never</option>
 			</select>
+			<br/>
+			<small>2D only</small>
 		</label>;
 	}
 
