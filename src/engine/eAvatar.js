@@ -17,6 +17,7 @@ let traceVBuffer = false;
 // use attachViewBuffer() to attach each of your buffers (max 4)
 
 // OR adapt a qAvatar (eg one on qSpace) with eAvatar.adaptAvatar()
+
 // the integration engine should usually populate the buffers as part
 // of its cycle, at the end of an integration lap.
 

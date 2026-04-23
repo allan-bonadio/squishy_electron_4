@@ -1,5 +1,5 @@
 /*
-** waveContext -- info shared between the vista and view in yhr vonyrcy
+** waveContext -- code shared between the vista and view in yhr vonyrcy
 ** Copyright (C) 2026-2026 Tactile Interactive, all rights reserved
 */
 

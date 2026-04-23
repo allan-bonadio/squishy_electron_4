@@ -122,7 +122,7 @@ function Orient3D(props) {
 	    <div>
 	        <label>z {zPos} c</label>
 			<input type='range' className='zPos' value={zPos}
-				min={-100} max={1} step={1} onChange={setOneOrient} />
+				min={-300} max={1} step={1} onChange={setOneOrient} />
 		</div>
 
 	    <div>

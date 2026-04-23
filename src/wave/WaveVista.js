@@ -81,7 +81,7 @@ export class WaveVista extends React.Component {
 
 		//debugger;
 		Object.assign(this, waveAux);
-		this.space = props.space;
+		// no!  see promise then() below  this.space = props.space;
 
 		this.state = {
 			// height of just the canvas + DOUBLE_THICKNESSpx, as set by user with size box
@@ -98,6 +98,7 @@ export class WaveVista extends React.Component {
 		// nothing draws until this.space is filled in
 		props.spaceCreatedProm.then(space => {
 			this.space = space;
+			this.setState({space});  // please render cuz nothing renders without space
 			this.makeProjMatrix()
 			this.makeOrigMatrix();
 			this.makeRotMatrix();

@@ -319,29 +319,34 @@ class SquishPanel extends React.Component {
 				+ ` body.clientWidth=${document.body.clientWidth}`);
 		//debugger;
 
-		let wView = <WaveView
-						outerWidth = {p.bodyWidth}
-						animator={this.animator}
-						setWVContext={this.setWVContext}
-						setShouldBeIntegrating={this.setShouldBeIntegrating}
-						setMainViewRepaint={this.setMainViewRepaint}
-						setSpectRepaint={this.setSpectRepaint}
-						spaceCreatedProm={this.state.spaceCreatedProm}
-						sPanel={this}
-						show2D={s.show2D}
-					/>;
-		let wVista = <WaveVista
-						outerWidth = {p.bodyWidth}
-						animator={this.animator}
-						setWVContext={this.setWVContext}
-						setShouldBeIntegrating={this.setShouldBeIntegrating}
-						setMainVistaRepaint={this.setMainVistaRepaint}
-						setSpectRepaint={this.setSpectRepaint}
-						spaceCreatedProm={this.state.spaceCreatedProm}
-						sPanel={this}
-						show3D={s.show3D}
-					/>;
-
+		let wView = '';
+		if (s.show2D) {
+			wView = <WaveView
+					outerWidth = {p.bodyWidth}
+					animator={this.animator}
+					setWVContext={this.setWVContext}
+					setShouldBeIntegrating={this.setShouldBeIntegrating}
+					setMainViewRepaint={this.setMainViewRepaint}
+					setSpectRepaint={this.setSpectRepaint}
+					spaceCreatedProm={this.state.spaceCreatedProm}
+					sPanel={this}
+					show2D={s.show2D}
+			/>;
+		}
+		let wVista = '';
+		if (s.show3D) {
+			wVista = <WaveVista
+					outerWidth = {p.bodyWidth}
+					animator={this.animator}
+					setWVContext={this.setWVContext}
+					setShouldBeIntegrating={this.setShouldBeIntegrating}
+					setMainVistaRepaint={this.setMainVistaRepaint}
+					setSpectRepaint={this.setSpectRepaint}
+					spaceCreatedProm={this.state.spaceCreatedProm}
+					sPanel={this}
+					show3D={s.show3D}
+			/>;
+		}
 
 		return (
 			<SquishContext.Provider value={this.state} >
