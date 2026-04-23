@@ -38,6 +38,7 @@ let traceDimensions = false;
 let traceContext = false;
 let traceOrientation= false;
 let traceRotMatrix = false;
+let traceOrient = false;
 
 const round = (n) => Math.round(n, 1);
 
@@ -114,7 +115,7 @@ export class WaveVista extends React.Component {
 	}
 
 
-	/* ******************************************* orient & matrix	*/
+	/* ******************************************* orientation matrix	*/
 
 	// recalculate the perspective matrix, given changed canvas geometry.
 	// Must have canvasInnerWidth/Height from updateInnerDims() already calculated.
@@ -124,9 +125,12 @@ export class WaveVista extends React.Component {
 		// make the projection matrix.. never changes.	Well, maybe in the future...
 		const fieldOfView = deg2rad(this.orient.foView); // in radians
 		//const fieldOfView = (45 * Math.PI) / 180; // in radians
+
+		// choose one of the three here.  I can't figure it out.
 		//const aspect = this.canvasInnerHeight / this.canvasInnerWidth;
 		const aspect = this.canvasInnerWidth / this.canvasInnerHeight;
 		//const aspect = 1;	 // this.canvasInnerWidth / this.canvasInnerHeight;
+
 		const zNear = .1;
 		const zFar = this.space.nPoints;
 		this.projMatrix = mat4.create();
@@ -176,11 +180,13 @@ export class WaveVista extends React.Component {
 		return matrix;
 	}
 
+	/* ******************************************* orientation 	*/
+
 	// called when user tries to rotate it, whether pivot or orient
 	// coord = x y z strings or 'multi'	  newVal is new angle around that axis or orient obj
 	// pass an object, with one, two or all three
 	setOrient = (coord, newVal) => {
-		dblog(`️🏔️ setOrient(${coord}, `, newVal, `) `);
+		if (traceOrient) dblog(`️🏔️ setOrient(${coord}, `, newVal, `) `);
 		if ('multi' == coord) {
 			// same object
 			Object.assign(this.orient, newVal);
@@ -198,7 +204,7 @@ export class WaveVista extends React.Component {
 		this.mainVistaRepaint(this.paintingNeeds);
 	}
 
-	// repaint, effecting all changes
+	// repaint, effecting all changes.  Do this when canvas areas need to repaint & resize
 	repaintRecreate = () => {
 		this.makeProjMatrix();
 		this.makeOrigMatrix();
