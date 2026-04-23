@@ -7,19 +7,19 @@ import {abstractDrawing} from './abstractDrawing.js';
 // eslint-disable-next-line no-unused-vars
 import {drawingUniform, drawingAttribute} from './drawingVariable.js';
 
-let traceDumpVertices = false;
-let traceTicDrawing = false;
-let traceHighest = false;
+let traceDumpVertices = true;
+let traceTicDrawing = true;
+let traceHighest = true;
 
 // diagnostic purposes
-let traceDrawPoints = false;
+let traceDrawPoints = true;
 
 // buffer size starts at this
 const BUFFER_MAX_NTICS = 100;
 
 // buffer: x & y, * 3 vertices per tic
-const FLOATS_PER_VERTEX = 2;
-const VERTICES_PER_TIC = 2;
+const FLOATS_PER_VERTEX = 2;  // 2D
+const VERTICES_PER_TIC = 2;  // left end, then right end
 const FLOATS_PER_TIC = FLOATS_PER_VERTEX * VERTICES_PER_TIC;
 
 // AVG_ψ is 1/N, the height of a circular wave
@@ -33,7 +33,7 @@ let pointSize = traceDrawPoints ? `gl_PointSize = 5.;` : '';
 
 /*
 ** data format of attributes:  2 column table of floats
-** x and y coords x 4 pairs in sequence, each a tiny rectangle
+** x and y coords, 2 pairs in sequence, each a line segment unconnected
 */
 
 // make the line number for the start correspond to this JS file line number - the NEXT line
@@ -81,7 +81,8 @@ export class ticDrawing extends abstractDrawing {
 		this.fragmentShaderSrc = fragmentSrc;
 	}
 
-	// one time set up of variables for this drawing, every time canvas and scene is recreated
+	// one time set up of variables for this drawing, every time canvas
+	// and scene is recreated
 	createVariables() {
 		//debugger;
 		this.setDrawing();
@@ -95,28 +96,31 @@ export class ticDrawing extends abstractDrawing {
 					console.log(`ticDrawing reloading ${this.sceneName}: `+
 						` highest=${this.avatar.double0?.toFixed(5)}`);
 
-				let h = this.avatar?.double0 ?? 1 /  this.space.nStates;
+				// don't use measured highest if zero or undefined
+				let h = this.avatar?.double0 || 1 /  this.space.nStates;
 				return {value: h * this.scene.PADDING_ON_BOTTOM,
 					type: '1f'};
 			}
 		);
 
-		this.endPointAttr = new drawingAttribute('endPoint', this, FLOATS_PER_VERTEX,
-			() => this.generateTics());
+		this.endPointAttr = new drawingAttribute('endPoint', this,
+			FLOATS_PER_VERTEX, () => this.generateTics());
 	}
 
 	// generate the current tics, for the attribute's reloadFunc
 	generateTics() {
 		// x, in clip coords.  Width is really length of tic
-		let ticWidth = 20 / this.gl.drawingBufferWidth;  // ?? very small
+		let ticWidth = 200 / this.gl.drawingBufferWidth;  // ?? very small
+		//let ticWidth = 20 / this.gl.drawingBufferWidth;  // ?? very small
 		let ticOrigin = -1;
 
 		if (traceHighest)
 			console.log(`➤ ➤ ➤ ticDrawing ${this.sceneName}, ${this.avatarLabel}:`+
-				` highest is ${this.avatar.highest?.toFixed(6)}`);
+				` highest is ${this.avatar.highest?.toFixed(6)}  ticWidth=${ticWidth}`);
 
 		//debugger;
-		// number of tics on left side, comes from the flatDrawing scale but handle it if it isn't drawing
+		// number of tics on left side, comes from the flatDrawing scale
+		// but workaround if it isn't drawing
 		let avgψ = 1 /  this.space.nStates;
 		// if smooth highest isn't calculated yet, just use average ψ
 		let highest = this.avatar?.double0 || avgψ;
@@ -128,11 +132,10 @@ export class ticDrawing extends abstractDrawing {
 
 		// now fill it in.  avoid tic 0 cuz it's always at the edge.  Buffer starts at tic 1.
 		let cb = this.coordBuffer;
-		let heightPerTic =  avgψ / (TICS_PER_AVG_ψ );
+		let separationPerTic =  avgψ / (TICS_PER_AVG_ψ );
 		for (let t = 1; t <= nTics; t++) {
-			let y = t * heightPerTic;
-			// for maj and minor tics let extraWidth = t % TICS_PER_AVG_ψ == 0 ? ticWidth : 0;
-
+			let y = t * separationPerTic;
+			// fill in two vertices at once
 			cb.set([
 				ticOrigin, y,
 				ticOrigin + ticWidth, y,
