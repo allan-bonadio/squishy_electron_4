@@ -13,6 +13,8 @@ class flatScene extends abstractScene {
 	constructor(sceneName, ambiance, paintingNeeds, space) {
 		super(sceneName, ambiance, paintingNeeds, space);
 
+		this.PADDING_ON_BOTTOM = 1.02;
+
 		// this.space = space;
 		//this.paintingNeeds = paintingNeeds; done in abstract scene
 

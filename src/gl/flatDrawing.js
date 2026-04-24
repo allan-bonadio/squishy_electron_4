@@ -110,10 +110,6 @@ export class flatDrawing extends abstractDrawing {
 		if (traceFlatDrawing)
 			console.log(`♭♭♭ flatDrawing ${this.sceneName}: creatingVariables`);
 
-		// normally autoranging would put the highest peak at the exact bottom.
-		// but we want some extra space.  not much.
-		const PADDING_ON_BOTTOM = 1.02;
-
 		this.maxHeightUniform = new drawingUniform('maxHeight', this,
 			() => {
 				// fresh out of the loader, maxHeight wobbles up and down.  Smooth it.
@@ -129,7 +125,7 @@ export class flatDrawing extends abstractDrawing {
 					console.log(`♭♭♭ flatDrawing reloading outer:  `
 						+` maxHeight=${this.avatar.double0.toFixed(5)} `);
 
-				return {value: this.maxHeight * PADDING_ON_BOTTOM, type: '1f'};
+				return {value: this.maxHeight * this.scene.PADDING_ON_BOTTOM, type: '1f'};
 			}
 		);
 
