@@ -23,7 +23,7 @@ const VERTICES_PER_TIC = 2;  // left end, then right end
 const FLOATS_PER_TIC = FLOATS_PER_VERTEX * VERTICES_PER_TIC;
 
 // AVG_ψ is 1/N, the height of a circular wave
-const TICS_PER_AVG_ψ  = 2;  // testing
+const TICS_PER_AVG_PSI  = 2;  // testing
 
 const BUFFER_ID = 1;
 
@@ -97,7 +97,7 @@ export class ticDrawing extends abstractDrawing {
 						` highest=${this.avatar.double0?.toFixed(5)}`);
 
 				// don't use measured highest if zero or undefined
-				let h = this.avatar?.double0 || 1 /  this.space.nStates;
+				let h = this.avatar.double0 || 1 /  this.space.nStates;
 				return {value: h * this.scene.PADDING_ON_BOTTOM,
 					type: '1f'};
 			}
@@ -110,13 +110,16 @@ export class ticDrawing extends abstractDrawing {
 	// generate the current tics, for the attribute's reloadFunc
 	generateTics() {
 		// x, in clip coords.  Width is really length of tic
-		let ticWidth = 200 / this.gl.drawingBufferWidth;  // ?? very small
-		//let ticWidth = 20 / this.gl.drawingBufferWidth;  // ?? very small
+		let ticWidth = 200;
+
+		//let ticWidth = 2000 / this.gl.drawingBufferWidth;
+		//let ticWidth = 200 / this.gl.drawingBufferWidth;
+		//let ticWidth = 20 / this.gl.drawingBufferWidth;
 		let ticOrigin = -1;
 
 		if (traceHighest)
 			console.log(`➤ ➤ ➤ ticDrawing ${this.sceneName}, ${this.avatarLabel}:`+
-				` highest is ${this.avatar.highest?.toFixed(6)}  ticWidth=${ticWidth}`);
+				` highest is ${this.avatar.double0?.toFixed(6)}  ticWidth=${ticWidth}`);
 
 		//debugger;
 		// number of tics on left side, comes from the flatDrawing scale
@@ -124,15 +127,15 @@ export class ticDrawing extends abstractDrawing {
 		let avgψ = 1 /  this.space.nStates;
 		// if smooth highest isn't calculated yet, just use average ψ
 		let highest = this.avatar?.double0 || avgψ;
-		let highestInAvgψs = highest / avgψ;
+		let highestPerAvgPsi = highest / avgψ;
 
 		// this is number of tics should be, except we skip the one at zero
-		let nTics = Math.floor(TICS_PER_AVG_ψ * highestInAvgψs - .1);
+		let nTics = Math.floor(TICS_PER_AVG_PSI * highestPerAvgPsi - .1);
 		nTics = this.nTics = Math.min(nTics, BUFFER_MAX_NTICS) - 1;
 
 		// now fill it in.  avoid tic 0 cuz it's always at the edge.  Buffer starts at tic 1.
 		let cb = this.coordBuffer;
-		let separationPerTic =  avgψ / (TICS_PER_AVG_ψ );
+		let separationPerTic =  avgψ / (TICS_PER_AVG_PSI );
 		for (let t = 1; t <= nTics; t++) {
 			let y = t * separationPerTic;
 			// fill in two vertices at once
@@ -145,12 +148,12 @@ export class ticDrawing extends abstractDrawing {
 		this.vertexCount = nTics * VERTICES_PER_TIC;
 		if (traceDumpVertices) {
 			console.log(`➤ ➤ ➤ generateTics ${this.sceneName}, ${this.avatarLabel}:`+
-				` created ${this.vertexCount} vertices for ${nTics} tics`);
+				` creating ${this.vertexCount} vertices for ${nTics} tics`);
 			for (let t = 0; t < nTics; t++) {
 				let f = t * FLOATS_PER_TIC;
 				let dump = ` ➤ ➤ ➤ tic [${t}] `;
 				for (let j = 0; j < FLOATS_PER_TIC; j += 2)
-					dump += `   ${cb[f + j].toFixed(4)} @ ${cb[f + j + 1].toFixed(4)}`;
+					dump += `   x=${cb[f + j].toFixed(4)}   y=${cb[f + j + 1].toFixed(4)}`;
 				console.log(dump);
 			}
 		}
@@ -172,8 +175,8 @@ export class ticDrawing extends abstractDrawing {
 
 		this.drawVariables.forEach(v => v.reloadVariable());
 
-		if (this.vertexCount > BUFFER_MAX_NTICS * VERTICES_PER_TIC)
-			//debugger;
+		// if (this.vertexCount > BUFFER_MAX_NTICS * VERTICES_PER_TIC)
+		// 	debugger;
 		gl.drawArrays(gl.LINES, 0, this.vertexCount);
 
 		if (traceDrawPoints)
