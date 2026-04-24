@@ -78,7 +78,7 @@ export const waveAux = {
 			this.formerWidth = this.outerWidth;
 			this.formerHeight = s.outerHeight;
 			if (traceDimensions) {
-				console.log(`🏄 WaveVista canvasInner width is ${this.canvasInnerWidth};  `
+				console.log(`🏄 WaveVi* canvasInner width is ${this.canvasInnerWidth};  `
 					+ `now outer width = ${this.outerWidth}`);
 			}
 		}

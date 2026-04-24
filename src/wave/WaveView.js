@@ -71,24 +71,15 @@ export class WaveView extends React.Component {
 	constructor(props) {
 		super(props);
 		ccpt(this, props);
-		// checkPropTypes(this.constructor.propTypes, props, 'prop',
-		//		this.constructor.name);
 
 		// extra methods handling screen geometry
-		//debugger;
 		Object.assign(this, waveAux);
-		// no!this.space = props.space;
 
 		this.state = {
 			// height of just the canvas + DOUBLE_THICKNESSpx, as set by user with size box
 			// integer pixels
 			outerHeight: round(getASetting('miscSettings', 'viewHeight')),
 		}
-
-		// whenever...
-		// if (this.context) {
-		//	this.context.spaceCreatedProm(
-		//		space => this.space = this.context.space)}
 
 		this.createInnerDims();
 
@@ -135,7 +126,7 @@ export class WaveView extends React.Component {
 		this.props.setMainViewRepaint(mainViewRepaint);
 		this.animator.mainViewRepaint ??= mainViewRepaint;
 	};
-	// ??? there'a another one of these in View
+	// not used.  will require whole nother file like this ??? there'a another one of these in View
 	setSpectRepaint = (spectRepaint) => {
 		this.spectRepaint ??= spectRepaint;
 		this.props.setSpectRepaint(spectRepaint);

@@ -76,8 +76,6 @@ export class WaveVista extends React.Component {
 	constructor(props) {
 		super(props);
 		ccpt(this, props);
-		// checkPropTypes(this.constructor.propTypes, props, 'prop',
-		//		this.constructor.name);
 
 		//debugger;
 		Object.assign(this, waveAux);
@@ -180,6 +178,13 @@ export class WaveVista extends React.Component {
 		this.rotMatrix = matrix;
 		return matrix;
 	}
+
+	// doesn't do anything
+	// canvasResized() {
+	// 	this.makeProjMatrix()
+	// 	this.makeOrigMatrix();
+	// 	this.makeRotMatrix();
+	// }
 
 	/* ******************************************* orientation 	*/
 

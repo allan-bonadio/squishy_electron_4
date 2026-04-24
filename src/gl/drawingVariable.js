@@ -198,8 +198,8 @@ export class drawingAttribute extends drawingVariable {
 		gl.bufferData(gl.ARRAY_BUFFER, floatArray, gl.DYNAMIC_DRAW);
 
 		if (traceAttrs || traceAttributes)
-			console.log(`🍯 reload drawingAttribute '${this.varName}' in ${this.drawing.sceneName}`
-				+ ` reloaded, ${this.nTuples}  tuples of ${this.tupleWidth} floats each:`);
+			console.log(`🍯 reload drawingAttribute '${this.varName}' in ${this.drawing.drawingName}`
+				+ ` reloaded, ${this.nTuples}  tuples of ${this.tupleWidth} floats each`);
 
 		if (traceAttributes) {
 			for (let t = 0; t < this.nTuples; t++) {
