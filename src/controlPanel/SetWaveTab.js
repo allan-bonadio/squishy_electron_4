@@ -20,10 +20,10 @@ import {interpretCppException} from '../utils/errors.js';
 const MINI_WIDTH = 300;
 const MINI_HEIGHT = 150;
 
-let traceRegenerate = true;
-let traceInteract = true;
-let traceEffect = true;
-let traceSetRepaint = true;
+let traceRegenerate = false;
+let traceInteract = false;
+let traceEffect = false;
+let traceSetRepaint = false;
 
 const propTypes = {
 	// actually sets the one in use by the main wave
