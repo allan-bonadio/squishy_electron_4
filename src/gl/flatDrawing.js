@@ -177,7 +177,7 @@ export class flatDrawing extends abstractDrawing {
 		this.setDrawing();
 
 		let bw = this.scene.paintingNeeds.bumperWidth;
-		gl.viewport(bw, 0, width - 2 * bw, height);
+		//gl.viewport(bw, 0, width - 2 * bw, height);
 		if (traceViewport) {
 			console.log(`♭♭♭ flatDrawing set viewport on avatar=${this.avatarLabel}: `
 				+` width-2bw=${width - 2 * bw}, height=${height}  `

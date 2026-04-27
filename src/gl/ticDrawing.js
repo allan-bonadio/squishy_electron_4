@@ -10,8 +10,6 @@ import {drawingUniform, drawingAttribute} from './drawingVariable.js';
 let traceDumpVertices = true;
 let traceTicDrawing = true;
 let traceHighest = true;
-
-// diagnostic purposes
 let traceDrawPoints = true;
 
 // buffer size starts at this
@@ -33,23 +31,26 @@ let pointSize = traceDrawPoints ? `gl_PointSize = 5.;` : '';
 
 /*
 ** data format of attributes:  2 column table of floats
-** x and y coords, 2 pairs in sequence, each a line segment unconnected
+** x and y coords, 2 pairs in sequence, each a line segment unconnected.
+** Y coord is same units as flat display; x unit is native WebGL -1...+1
 */
 
-// make the line number for the start correspond to this JS file line number - the NEXT line
+// make the line number for GLSL at the start correspond to the JS file line number - the NEXT line
 // gets out of sync so easily!
+
+// all this really has to do is shovel out the points.  The LINE drawing mode alternates line endings
 const vertexSrc = `// ticDrawing vertex
-#line 41
+#line 42
 attribute vec2 endPoint;
 uniform float maxHeight;
-varying highp vec4 vColor;
+//varying highp vec4 vColor;
 
 void main() {
 	float y = endPoint.y / maxHeight;
 	y = 1. - 2. * y;
 	gl_Position = vec4(endPoint.x, y, 0., 1.);
 
-	vColor = vec4(.5, 1., 1., 1.);
+	//vColor = vec4(.5, 1., 1., 1.);
 
 	// dot size, in pixels not clip units
 	${pointSize}
@@ -57,16 +58,16 @@ void main() {
 `;
 
 const fragmentSrc = `// ticDrawing frag
-#line 59
+#line 60
 precision highp float;
-varying highp vec4 vColor;
+//varying highp vec4 vColor;
 
 void main() {
-	gl_FragColor = vColor;
+	gl_FragColor = vec4(0.5, 1., 0.5, 1.);
 }
 `;
 
-// the original display that's worth watching: tic upside down hump graph
+// tics in green along left side
 export class ticDrawing extends abstractDrawing {
 	constructor(scene) {
 		super(scene, 'ticDrawing');
@@ -74,7 +75,7 @@ export class ticDrawing extends abstractDrawing {
 		//debugger;
 		this.avatar = scene.avatar;
 		this.coordBuffer = this.avatar.attachViewBuffer(BUFFER_ID, null,
-			2, BUFFER_MAX_NTICS * FLOATS_PER_TIC, 'flat tics');
+			2, BUFFER_MAX_NTICS * FLOATS_PER_TIC, '2D Tics');
 		//this.coordBuffer = new Float32Array(BUFFER_MAX_NTICS * FLOATS_PER_TIC);
 
 		this.vertexShaderSrc = vertexSrc;
@@ -110,12 +111,14 @@ export class ticDrawing extends abstractDrawing {
 	// generate the current tics, for the attribute's reloadFunc
 	generateTics() {
 		// x, in clip coords.  Width is really length of tic
-		let ticWidth = 200;
-
+		let ticWidth = 0.1;
 		//let ticWidth = 2000 / this.gl.drawingBufferWidth;
 		//let ticWidth = 200 / this.gl.drawingBufferWidth;
 		//let ticWidth = 20 / this.gl.drawingBufferWidth;
-		let ticOrigin = -1;
+
+		let ticOrigin = -50;
+		//let ticOrigin = -0.5;
+		//let ticOrigin = -1;
 
 		if (traceHighest)
 			console.log(`➤ ➤ ➤ ticDrawing ${this.sceneName}, ${this.avatarLabel}:`+
@@ -139,10 +142,11 @@ export class ticDrawing extends abstractDrawing {
 		for (let t = 1; t <= nTics; t++) {
 			let y = t * separationPerTic;
 			// fill in two vertices at once
-			cb.set([
-				ticOrigin, y,
-				ticOrigin + ticWidth, y,
-			],  (t-1) * FLOATS_PER_TIC);
+			//cb.set([0, 0, 0, 0],  (t-1) * FLOATS_PER_TIC);
+            cb.set([
+               ticOrigin, y,
+               ticOrigin + ticWidth, y,
+            ],  (t-1) * FLOATS_PER_TIC);
 		}
 
 		this.vertexCount = nTics * VERTICES_PER_TIC;
@@ -171,13 +175,15 @@ export class ticDrawing extends abstractDrawing {
 		//debugger;
 		const gl = this.gl;
 		this.setDrawing();
-		gl.viewport(0, 0, width, height);
+		//gl.viewport(0, 0, width, height);
 
 		this.drawVariables.forEach(v => v.reloadVariable());
 
 		// if (this.vertexCount > BUFFER_MAX_NTICS * VERTICES_PER_TIC)
 		// 	debugger;
-		gl.drawArrays(gl.LINES, 0, this.vertexCount);
+        gl.lineWidth(1);
+		gl.drawArrays(gl.LINE_STRIP, 0, this.vertexCount);
+		//gl.drawArrays(gl.LINES, 0, this.vertexCount);
 
 		if (traceDrawPoints)
 			gl.drawArrays(gl.POINTS, 0, this.vertexCount);

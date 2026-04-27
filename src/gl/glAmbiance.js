@@ -10,9 +10,10 @@ import {tooOldTerminate} from '../utils/errors.js';
 // that are absent in 1, a few other things.  includes gl, canvas node, and some squirrelly code.
 
 // webgl-lint: sigh.  TODO: get this working.  if ever.
-// webgl-debug: can wrap a gl in checking code.  Spector browser plugin does this.
+// webgl-debug: can wrap a gl in checking code.  Spector browser plugin does
+// this.  Now doing this.
 
-let traceVersion = false;
+let traceVersion = true;
 
 // the gl Tests aren't tuned in to node_modules; use the https form for those.
 // the app is fine with it, so use the regular form.
@@ -30,7 +31,8 @@ else {
 // Also webgl2.
 class glAmbiance {
 	// this decides it - feel free to change this
-	static preferWebGL2 = true;
+	static preferWebGL2 = false;
+	//static preferWebGL2 = true;
 
 	constructor(canvas) {
 		this.canvas = canvas;
