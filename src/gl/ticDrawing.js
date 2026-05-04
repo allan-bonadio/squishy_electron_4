@@ -74,7 +74,7 @@ export class ticDrawing extends abstractDrawing {
 
 		//debugger;
 		this.avatar = scene.avatar;
-		this.coordBuffer = this.avatar.attachViewBuffer(BUFFER_ID, null,
+		this.coordBuffer = this.avatar.attachViewBuffer(this.scene.ticAvatarID, null,
 			2, BUFFER_MAX_NTICS * FLOATS_PER_TIC, '2D Tics');
 		//this.coordBuffer = new Float32Array(BUFFER_MAX_NTICS * FLOATS_PER_TIC);
 
@@ -116,9 +116,9 @@ export class ticDrawing extends abstractDrawing {
 		//let ticWidth = 200 / this.gl.drawingBufferWidth;
 		//let ticWidth = 20 / this.gl.drawingBufferWidth;
 
-		let ticOrigin = -50;
+		//let ticOrigin = -50;
 		//let ticOrigin = -0.5;
-		//let ticOrigin = -1;
+		let ticOrigin = -1;
 
 		if (traceHighest)
 			console.log(`➤ ➤ ➤ ticDrawing ${this.sceneName}, ${this.avatarLabel}:`+
