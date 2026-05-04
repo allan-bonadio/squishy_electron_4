@@ -20,6 +20,8 @@ class flatScene extends abstractScene {
 
 		// create avatar but don't stick buffers; the drawing does that
 		this.avatar = eAvatar.createAvatar(sceneName);
+		this.flatAvatarID = 0;
+		this.ticAvatarID = 1;
 
 		// create relevant drawings.  Do not change this order;
 		// spent a long time on this.

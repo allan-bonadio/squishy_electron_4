@@ -95,7 +95,7 @@ export class flatDrawing extends abstractDrawing {
 		// each point in the wave results in two vertices, top and wave.
 		// And each of those is four single floats going to the GPU
 		this.avatar = scene.avatar;
-		this.avatar.attachViewBuffer(0, null, 4, this.space.nPoints * 2, 'flat drawing');
+		this.avatar.attachViewBuffer(this.scene.flatAvatarID, null, 4, this.space.nPoints * 2, 'flat drawing');
 
 		this.vertexShaderSrc = vertexSrc;
 		this.fragmentShaderSrc = fragmentSrc;
@@ -153,7 +153,7 @@ export class flatDrawing extends abstractDrawing {
 		this.rowFloats = 4;
 		this.rowAttr = new drawingAttribute('row', this, this.rowFloats, () => {
 			//debugger;
-			qeFuncs.avatar_avFlatLoader(this.avatar.pointer, 0,
+			qeFuncs.avatar_avFlatLoader(this.avatar.pointer, this.scene.flatAvatarID,
 					this.scene.paintingNeeds.cavity.pointer, nPoints);
 
 			if (traceReloadRow) {
@@ -162,7 +162,7 @@ export class flatDrawing extends abstractDrawing {
 					+` total floats=${this.vertexCount * this.rowFloats}  double0=this.avatar.double0`);
 			}
 
-			return this.avatar.getViewBuffer(0);
+			return this.avatar.getViewBuffer(this.scene.flatAvatarID);
 		});
 
 	}
@@ -188,7 +188,7 @@ export class flatDrawing extends abstractDrawing {
 		if (traceFlatDrawing) {
 			console.log(`♭♭♭just drewArays-flat on avatar ptr=${this.avatar.pointer} `
 				+` this.avatar.label=${this.avatar.label}, `
-				+` buffer label=${this.avatar.bufferNames[0]}`);
+				+` buffer label=${this.avatar.bufferNames[this.scene.flatAvatarID]}`);
 		}
 
 		if (traceDrawLines) {
@@ -202,7 +202,7 @@ export class flatDrawing extends abstractDrawing {
 
 		// i think this is problematic
 		if (traceAvatarAfterDrawing) {
-			this.avatar.dumpComplexViewBuffer(0, this.nPoints,
+			this.avatar.dumpComplexViewBuffer(this.scene.flatAvatarID, this.nPoints,
 					`♭♭♭ finished drawing in flatDrawing.js`);
 			console.log(`♭♭♭ barWidthUniform=`, this.barWidthUniform.reloadFunc(),
 				+` maxHeightUniform=`, this.maxHeightUniform.reloadFunc());
