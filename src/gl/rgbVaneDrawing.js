@@ -189,7 +189,7 @@ export class rgbVaneDrawing extends abstractDrawing {
 			gl.drawArrays(gl.POINTS, first, count);
 
 		if (traceGLAfterDrawing) {
-			this.dumpGL(0, this.nPoints,
+			this.simulateGL(0, this.nPoints,
 				`🌀🌀🌀 finished drawing in rgbVaneDrawing.js; drew buf:`);
 			console.log(`🌀🌀🌀  matrixUniform=`, this.matrixUniform.reloadFunc());
 		}
@@ -197,7 +197,7 @@ export class rgbVaneDrawing extends abstractDrawing {
 
 	// simulate and calculate what WebGL would calculate, and dump that.
 	// give or take fidelity of the below.
-	dumpGL(vBuf) {
+	simulateGL(vBuf) {
 		let startEnd2 = this.space.startEnd2;
 		let first = startEnd2.start2;
 		let count = startEnd2.end2 - startEnd2.start2;
