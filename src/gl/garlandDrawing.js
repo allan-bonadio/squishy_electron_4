@@ -42,7 +42,7 @@ bit of thickness in the middle.  Colored by vertex just like the flat drawing.
 The data and avatar loading is similar to with flat drawing - real and imag
 parts of wave become the y (vertical) and z (forward) coordinates of the
 garland point.  (We then have to duplicate it all, rearranged?, to paint the
-other side of each blade.  not yet.)
+other side of each blade.  someday.)
 
 The Volume coordinates are what look like 3d coords in the view.  The unit is 1
 cell in the x direction, and OUTER_FACTOR times psi in the real and imag
@@ -66,7 +66,7 @@ const INNER_FACTOR = '.5';
 // make the line number for the start correspond to this JS file line number - the NEXT line
 const vertexSrc = `// garlandDrawing vertex
 ${cx2rygb}
-#line 68
+#line 70
 // this does all the transformation we need.  precalculated for each repaint.
 uniform mat4 matrix;
 
@@ -87,7 +87,10 @@ void main() {
 	point.x = float(ix);
 	point.w = 1.;
 
-	gl_Position = point * matrix;
+	point *= matrix;
+	float d = point.z + 2.;
+	gl_Position = vec4(point.x / d, point.y / d, d, 1);
+	//gl_Position = point / (point.z + 2.);
 
 	//  for the color, convert the complex values via this algorithm
 	vColor.rgb = cx2rygb(row.xy);
@@ -99,7 +102,7 @@ void main() {
 `;
 
 const fragmentSrc = `// garlandDrawing frag
-#line 105
+#line 106
 precision highp float;
 varying highp vec4 vColor;
 
@@ -121,7 +124,7 @@ export class garlandDrawing extends abstractDrawing {
 		this.vertexShaderSrc = vertexSrc;
 		this.fragmentShaderSrc = fragmentSrc;
 
-		//console.log(`attachViewBuffer on scene ${scene.sceneName}`);
+		//dblog(`attachViewBuffer on scene ${scene.sceneName}`);
 	}
 
 	// loads view buffer from corresponding wave, calculates highest norm.
@@ -129,7 +132,7 @@ export class garlandDrawing extends abstractDrawing {
 	createVariables() {
 		this.setDrawing();
 		if (traceDrawing)
-			console.log(`🌀🌀🌀 garlandDrawing ${this.sceneName}: creatingVariables`);
+			dblog(`🌀🌀🌀 garlandDrawing ${this.sceneName}: creatingVariables`);
 
 		this.matrixUniform = new drawingUniform('matrix', this,
 			() => {
@@ -153,9 +156,9 @@ export class garlandDrawing extends abstractDrawing {
 			        this.scene.paintingNeeds.cavity.pointer, nPoints);
 
 			if (traceReloadRow) {
-				console.log(`🌀🌀🌀 garlandDrawing  ${this.avatarLabel}: at row getViewBuffer() `
+				dblog(`🌀🌀🌀 garlandDrawing  ${this.avatarLabel}: at row getViewBuffer() `
 					+` loading to ${this.avatar.label}   this.vertexCount=${this.vertexCount} `
-					+` total floats=${this.vertexCount * this.rowFloats}  double0=this.avatar.double0`);
+					+` total floats=${this.vertexCount * this.rowFloats}  double0=${this.avatar.double0}`);
 			}
 
 			return this.avatar.getViewBuffer(0);
@@ -166,7 +169,7 @@ export class garlandDrawing extends abstractDrawing {
 	// called for each image frame on th canvas.  TODO: roll specialInfo into the input Data Arrays
 	draw(width, height, paintingNeeds) {
 		if (traceDrawing) {
-			console.log(`🌀🌀🌀 garland Drawing  ${this.avatarLabel}: `
+			dblog(`🌀🌀🌀 garland Drawing  ${this.avatarLabel}: `
 				+` width=${width}, height=${height}  drawing ${this.vertexCount/2} points `
 				+` matrix=${this.matrix}`);
 		}
@@ -175,12 +178,14 @@ export class garlandDrawing extends abstractDrawing {
 
 		this.drawVariables.forEach(v => v.reloadVariable());
 
+        dblog(`🌀 context attributes we're operating under:`, gl.getContextAttributes());
+
 		let startEnd2 = this.space.startEnd2;
 		let first = startEnd2.start2;
 		let count = startEnd2.end2 - startEnd2.start2;
 		gl.drawArrays(gl.TRIANGLE_STRIP, first, count);
 		if (traceDrawing) {
-			console.log(`🌀🌀🌀just drewArays-garland on avatar ptr=${this.avatar.pointer} `
+			dblog(`🌀🌀🌀just drewArays-garland on avatar ptr=${this.avatar.pointer} `
 				+` this.avatar.label=${this.avatar.label}, `
 				+` buffer label=${this.avatar.bufferNames[0]}`);
 		}
@@ -197,18 +202,18 @@ export class garlandDrawing extends abstractDrawing {
 		if (traceAvatarAfterDrawing) {
 			this.avatar.dumpComplexViewBuffer(0, this.nPoints,
 				`🌀🌀🌀 finished drawing in garlandDrawing.js; drew buf:`);
-			console.log(`🌀🌀🌀  matrixUniform=`, this.matrixUniform.reloadFunc());
+			dblog(`🌀🌀🌀  matrixUniform=`, this.matrixUniform.reloadFunc());
 		}
 		if (traceGLAfterDrawing) {
-			this.dumpGL(0, this.nPoints,
+			this.simulateGL(0, this.nPoints,
 				`🌀🌀🌀 finished drawing in garlandDrawing.js; drew buf:`);
-			console.log(`🌀🌀🌀  matrixUniform=`, this.matrixUniform.reloadFunc());
+			dblog(`🌀🌀🌀  matrixUniform=`, this.matrixUniform.reloadFunc());
 		}
 	}
 
     // simulate and calculate what WebGL would calculate, and dump that.
     // give or take fidelity of the below.
-    dumpGL(vBuf) {
+    simulateGL(vBuf) {
         let startEnd2 = this.space.startEnd2;
 		let first = startEnd2.start2;
 		let count = startEnd2.end2 - startEnd2.start2;
@@ -224,6 +229,7 @@ export class garlandDrawing extends abstractDrawing {
 			+`${count} vertices, not the points:`;
 
         for (let i = 0; i < count; i++) {
+            //  so this simulates the vertex shader.
         	vertexSerial = first + i;
             let rs = vertexSerial * 4;
             row = vec4.fromValues(rows[rs], rows[rs+1], rows[rs+2], rows[rs+3]);

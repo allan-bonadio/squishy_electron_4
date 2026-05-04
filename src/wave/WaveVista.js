@@ -37,8 +37,12 @@ import {dump4x4} from '../gl/helpers3D.js';
 let traceDimensions = false;
 let traceContext = false;
 let traceOrientation= false;
-let traceRotMatrix = false;
 let traceOrient = false;
+
+let traceProjMatrix = true;
+let traceOrigMatrix = true;
+let traceRotMatrix = true;
+
 
 const round = (n) => Math.round(n, 1);
 
@@ -121,19 +125,22 @@ export class WaveVista extends React.Component {
 	// makeOrigMatrix() next makes the origMatrix - the starting point for different rotations.
 	// Must be done before first repaint.
 	makeProjMatrix = () => {
-		// make the projection matrix.. never changes.	Well, maybe in the future...
+        // make the projection matrix.. never changes.  Well, if you change
+        // the FOV, you have to recalculate this.  Oh and if the window or the
+        // vista height changes.  Or ... if ...
+
 		const fieldOfView = deg2rad(this.orient.foView); // in radians
-		//const fieldOfView = (45 * Math.PI) / 180; // in radians
-
-		// choose one of the three here.  I can't figure it out.
-		//const aspect = this.canvasInnerHeight / this.canvasInnerWidth;
 		const aspect = this.canvasInnerWidth / this.canvasInnerHeight;
-		//const aspect = 1;	 // this.canvasInnerWidth / this.canvasInnerHeight;
 
-		const zNear = .1;
+        // these need to be, REALLY, the closest stuff, and the farthest stuff.
+        // Approximately.  No random guesses.
+		const zNear = 1;
 		const zFar = this.space.nPoints;
+
 		this.projMatrix = mat4.create();
-		mat4.perspective(this.projMatrix, fieldOfView, aspect, zNear, zFar);
+		mat4.perspectiveNO(this.projMatrix, fieldOfView, aspect, zNear, zFar);
+        if (traceProjMatrix)
+			dump4x4(this.projMatrix, 'vista projMatrix');
 	}
 
 	// set up origMatrix only when wave vista created, or reshaped
@@ -147,10 +154,13 @@ export class WaveVista extends React.Component {
 		//mat4.translate(origMatrix, origMatrix, [0.0, 0.0, -this.space.nStates/6 - 5]);
 		this.origMatrix = origMatrix;
 		// probably call makeRotMatrix() after this
+        if (traceOrigMatrix)
+            dump4x4(this.origMatrix, 'vista origMatrix:');
 	}
 
-	// clones an origMatrix, rotates it according to this.orient, sets it on this.matrix
-	// called when user rotates image to get a new matrix for the new rotation
+
+    // Take the origMatrix , and add on the rotations along z y x.
+    // called when user rotates image to get a new matrix for the new rotation
 	// uses this.orient.* for the angles to rotate, so make sure they're in place
 	makeRotMatrix = () => {
 		let matrix = mat4.clone(this.origMatrix);
@@ -160,15 +170,15 @@ export class WaveVista extends React.Component {
 
 		//let zRotation = rand(5.19, 5.30);
 		let zRotation = deg2rad(this.orient.z);
-		mat4.rotate(matrix, matrix, zRotation, [0, 0, 1]);
+		mat4.rotateZ(matrix, matrix, zRotation);
 
 		//let yRotation = rand(4.33, 5.20);
 		let yRotation = deg2rad(this.orient.y);
-		mat4.rotate(matrix, matrix, yRotation, [0, 1, 0]);
+		mat4.rotateY(matrix, matrix, yRotation);
 
 		//let zRotation = rand(5.19, 5.30);
 		let xRotation = deg2rad(this.orient.x);
-		mat4.rotate(matrix, matrix, xRotation, [1, 0, 0]);
+		mat4.rotateX(matrix, matrix, xRotation);
 
 		if (traceOrientation) {
 			dblog(`️🏔️ rotating z y x rotation, rads: ${zRotation} ${yRotation} ${xRotation}`);
@@ -176,6 +186,8 @@ export class WaveVista extends React.Component {
 		}
 
 		this.rotMatrix = matrix;
+        if (traceRotMatrix)
+            dump4x4(this.rotMatrix, 'vista rotMatrix:');
 		return matrix;
 	}
 
@@ -229,12 +241,12 @@ export class WaveVista extends React.Component {
 		this.props.setMainVistaRepaint(mainVistaRepaint);
 		this.animator.mainVistaRepaint ??= mainVistaRepaint;
 	};
-	// ??? there'a another one of these in Vista
-	setSpectRepaint = (spectRepaint) => {
-		this.spectRepaint ??= spectRepaint;
-		this.props.setSpectRepaint(spectRepaint);
-		this.animator.spectRepaint ??= spectRepaint;
-	};
+	// ??? there'a another one of these in Vista.  This should not be here; should be in a Spectrum component.
+    //setSpectRepaint = (spectRepaint) => {
+    //    this.spectRepaint ??= spectRepaint;
+    //    this.props.setSpectRepaint(spectRepaint);
+    //    this.animator.spectRepaint ??= spectRepaint;
+    //};
 
 	// not sure I need this in the vista.  No, I don't think I need it TODO
 	grabWaveVistaEl = el => this.WaveVistaEl = el;
