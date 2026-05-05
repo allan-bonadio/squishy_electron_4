@@ -51,7 +51,7 @@ function SetWaveTab(props) {
 
 	// must remember our own temp wave for minigraph
 	const minigraphWaveRef = useRef(new eCavity(props.space, 'minigraphWave'));
-    const minigraphWave = minigraphWaveRef.current
+	const minigraphWave = minigraphWaveRef.current
 
 	const paintingNeedsRef = useRef({cavity: minigraphWave, bumperWidth: 0})
 	const paintingNeeds = paintingNeedsRef.current;

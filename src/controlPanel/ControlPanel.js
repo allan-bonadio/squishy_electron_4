@@ -78,7 +78,7 @@ export class ControlPanel extends React.Component {
 		props.spaceCreatedProm.then(this.handleSpacePromise);
 	}
 
-    // set up the cp part of the context
+	// set up the cp part of the context
 	setUpContext() {
 		if (!this.context) {
 			// not ready yet so try again

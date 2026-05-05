@@ -99,15 +99,15 @@ export class abstractDrawing {
 			this.vertexShaderSrc);
 		gl.attachShader(program, vertexShader);
 		this.vertexShader = vertexShader;
-        //label = vertexShader.$qLabel = `${this.sceneName}-${this.drawingName}-vshader`;
-        //this.tagObject(vertexShader, label);
+		//label = vertexShader.$qLabel = `${this.sceneName}-${this.drawingName}-vshader`;
+		//this.tagObject(vertexShader, label);
 
 		const fragmentShader = this.compileShader(gl.FRAGMENT_SHADER,
 			this.fragmentShaderSrc);
 		gl.attachShader(program, fragmentShader);
 		this.fragmentShader = fragmentShader;
-        //label = fragmentShader.$qLabel = `${this.sceneName}-${this.drawingName}-fshader`;
-        //this.tagObject(fragmentShader, label);
+		//label = fragmentShader.$qLabel = `${this.sceneName}-${this.drawingName}-fshader`;
+		//this.tagObject(fragmentShader, label);
 
 		gl.linkProgram(program);
 		if (gl.getProgramParameter(program, gl.LINK_STATUS)) {
