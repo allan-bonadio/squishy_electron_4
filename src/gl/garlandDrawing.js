@@ -13,18 +13,16 @@ import {vec4, mat4} from 'gl-matrix';
 
 
 let traceAvatarAfterDrawing = false;
-let traceGLAfterDrawing = false;
+let traceGLAfterDrawing = true;
 let traceDrawing = false;
 let traceReloadRow = false;
 let traceMatrix = false;
 
 // diagnostic purposes; draws more per vertex
-let traceDrawPoints = true;
+let traceDrawPoints = false;
 let traceDrawLines = false;
 
-let pointSize = traceDrawPoints ? `gl_PointSize = 10.;` : '';
-
-/* ******************************************************* garland drawing */
+/* *********************************************** garland drawing */
 // The glsl sources for webgl drawing
 
 /*
@@ -60,8 +58,8 @@ blade is two triangles */
 // how much raw psi values should be multipled to be equivalent to x in volume
 // space values that go from 0 to N.  Adjust to taste or to N.  These are
 // inserted as numbers into the vert shader code.
-const OUTER_FACTOR = '1.0';
-const INNER_FACTOR = '.5';
+const OUTER_FACTOR = '20.0';
+const INNER_FACTOR = '10.';
 
 // make the line number for the start correspond to this JS file line number - the NEXT line
 const vertexSrc = `// garlandDrawing vertex
@@ -77,13 +75,12 @@ varying highp vec4 vColor;
 attribute vec4 row;
 
 void main() {
-	int vertexSerial = int(row.w);  // use gl_VertexID & 1 with webgl2
+	int vertexSerial = int(row.w);
 	int ix = int(vertexSerial) / 2;
-	bool odd = ix * 2 < vertexSerial;
-
+	bool odd = (ix * 2) < vertexSerial;
+	float factor = odd ? ${INNER_FACTOR} : ${OUTER_FACTOR};
 	vec4 point;
-	point.yz = row.xy;
-	point *= odd ? ${INNER_FACTOR} : ${OUTER_FACTOR};
+	point.yz = row.xy * factor;
 	point.x = float(ix);
 	point.w = 1.;
 
@@ -147,15 +144,18 @@ export class garlandDrawing extends abstractDrawing {
 		this.vertexCount = nStates * 2;  // nStates * vertsPerState
 		this.rowFloats = 4;
 		this.rowAttr = new drawingAttribute('row', this, this.rowFloats, () => {
-		    //debugger;
+			//debugger;
 			// retrieve GL rows from the cavity, including the bounds
 			qeFuncs.avatar_avFlatLoader(this.avatar.pointer, 0,
-			        this.scene.paintingNeeds.cavity.pointer, nPoints);
+					this.scene.paintingNeeds.cavity.pointer, nPoints);
 
 			if (traceReloadRow) {
-				console.log(`🌀🌀🌀 garlandDrawing  ${this.avatarLabel}: at row getViewBuffer() `
-					+` loading to ${this.avatar.label}   this.vertexCount=${this.vertexCount} `
-					+` total floats=${this.vertexCount * this.rowFloats}  double0=this.avatar.double0`);
+				console.log(`🌀🌀🌀 garlandDrawing  ${this.avatarLabel}: `
+					+` at row getViewBuffer() `
+					+` loading to ${this.avatar.label} `
+					+`  this.vertexCount=${this.vertexCount} `
+					+` total floats=${this.vertexCount * this.rowFloats} `
+					+` double0=${this.avatar.double0}`);
 			}
 
 			return this.avatar.getViewBuffer(0);
@@ -200,50 +200,56 @@ export class garlandDrawing extends abstractDrawing {
 			console.log(`🌀🌀🌀  matrixUniform=`, this.matrixUniform.reloadFunc());
 		}
 		if (traceGLAfterDrawing) {
-			this.dumpGL(0, this.nPoints,
-				`🌀🌀🌀 finished drawing in garlandDrawing.js; drew buf:`);
+			this.dumpGL();
 			console.log(`🌀🌀🌀  matrixUniform=`, this.matrixUniform.reloadFunc());
 		}
 	}
 
-    // simulate and calculate what WebGL would calculate, and dump that.
-    // give or take fidelity of the below.
-    dumpGL(vBuf) {
-        let startEnd2 = this.space.startEnd2;
+	// simulate and calculate what WebGL would calculate, and dump that.
+	// give or take fidelity of the below.
+	dumpGL() {
+		let startEnd2 = this.space.startEnd2;
 		let first = startEnd2.start2;
 		let count = startEnd2.end2 - startEnd2.start2;
-        let vertexSerial, ix, point, odd, factor, row;
-        let rows = this.avatar.getViewBuffer(0);
-        let gl_Position = vec4.create();
+		// indexed by float, not by row like gl uses it
+		let rows4 = this.avatar.getViewBuffer(0);
+		let gl_Position = vec4.create();
+		let vertexSerial, ix, point, odd, factor, row;
 
-        const _ = c => (gl_Position[c] / gl_Position[3]).toFixed(4).padStart(7);
-        //const _ = c => (gl_Position[c]).toFixed(1).padStart(9);
+		const _ = c => (gl_Position[c] /
+				gl_Position[3]).toFixed(4).padStart(7);
+		const __ = c => (row[c]).toFixed(4).padStart(7);
+		//const _ = c => (gl_Position[c]).toFixed(1).padStart(9);
 
 		'';  // collect these otherwise the console merges dup lines
-        let text = ` 🌀🌀 what the GPU calculates, only the `
-			+`${count} vertices, not the points:`;
+		let text = ` 🌀🌀 what the GPU calculates,  the `
+			+`${count} vertices\n`;
 
-        for (let i = 0; i < count; i++) {
-        	vertexSerial = first + i;
-            let rs = vertexSerial * 4;
-            row = vec4.fromValues(rows[rs], rows[rs+1], rows[rs+2], rows[rs+3]);
-            ix = Math.floor(vertexSerial / 2);
-            point = vec4.create();
-            odd = (ix & 1);
-            factor = odd ? INNER_FACTOR : OUTER_FACTOR;
-            point[0] = row[0] * factor;
-            point[1] = row[1] * factor;
-            point[2] = 0;
-            point[3] = vertexSerial;
+		for (let i = 0; i < count; i++) {
+			// the body of this loop should replicate the vector shader above
+			vertexSerial = first + i;
+			let rs = vertexSerial * 4;
+			row = vec4.fromValues(rows4[rs], rows4[rs+1], rows4[rs+2], rows4[rs+3]);
+			text += ` 🌀🌀 `
+				+` ${__(0)}   ${__(1)}   `;
+			ix = Math.floor(vertexSerial / 2);
+			odd = (ix * 2) < vertexSerial;
+			point = vec4.create();
+			factor = odd ? INNER_FACTOR : OUTER_FACTOR;
+			point[1] = row[0] * factor;
+			point[2] = row[1] * factor;
+			point[0] = ix;
+			point[3] = 1;
 
-            // point * matrix;
-            vec4.transformMat4(gl_Position, point, this.scene.paintingNeeds.rotMatrix);
-            text += ` 🌀🌀${(ix + '').padStart(3)} `
+			// point * matrix;
+			vec4.transformMat4(gl_Position, point, this.scene.paintingNeeds.rotMatrix);
+			text += ` 🌀🌀${(ix + '').padStart(3)} `
 				+` ${_(0)}   ${_(1)}   ${_(2)}  \n`;
-            //dblog(` 🌀🌀${_(0)}   ${_(1)}   ${_(2)}   ${_(3)}  `);
-        }
-        dblog(text + `  🌀🌀 `);
-    }
+		}
+		dump4x4(this.scene.paintingNeeds.rotMatrix,
+			'🌀🌀🌀 GL simulation matrix');
+		dblog(text + `  🌀🌀 `);
+	}
 
 }
 
