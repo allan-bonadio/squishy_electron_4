@@ -229,12 +229,11 @@ export class WaveVista extends React.Component {
 		this.props.setMainVistaRepaint(mainVistaRepaint);
 		this.animator.mainVistaRepaint ??= mainVistaRepaint;
 	};
-	// ??? there'a another one of these in Vista
-	setSpectRepaint = (spectRepaint) => {
-		this.spectRepaint ??= spectRepaint;
-		this.props.setSpectRepaint(spectRepaint);
-		this.animator.spectRepaint ??= spectRepaint;
-	};
+// 	setSpectRepaint = (spectRepaint) => {
+// 		this.spectRepaint ??= spectRepaint;
+// 		this.props.setSpectRepaint(spectRepaint);
+// 		this.animator.spectRepaint ??= spectRepaint;
+// 	};
 
 	// not sure I need this in the vista.  No, I don't think I need it TODO
 	grabWaveVistaEl = el => this.WaveVistaEl = el;

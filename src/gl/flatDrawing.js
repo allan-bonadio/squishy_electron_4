@@ -34,7 +34,7 @@ let displayWrapEdges = false;  // soon to be a pref
 // make the line number for the start correspond to this JS file line number - the NEXT line
 const vertexSrc = `// flat drawing vertex
 ${cx2rygb}
-#line 32
+#line 38
 varying highp vec4 vColor;
 attribute vec4 row;
 uniform float barWidth;
@@ -61,10 +61,10 @@ void main() {
 	gl_Position = vec4(x, y, 0., 1.);
 
 	//  for the color, convert the complex values via this algorithm
-	vColor.rgb = cx2rygb(row.xy);
+	//vColor.rgb = cx2rygb(row.xy);
 	//vColor.rgb = cx2rygb(vec2(row.x, row.y));
-	vColor.a = 1.;
-	//vColor = vec4(cx2rygb(vec2(row.x, row.y)), 1.);
+	//vColor.a = 1.;
+	vColor = vec4(cx2rygb(vec2(row.x, row.y)), 1.);
 
 	// make the colors darker toward zero (top)
 	if (!odd)
@@ -76,7 +76,7 @@ void main() {
 `;
 
 const fragmentSrc = `// flat drawing frag
-#line 69
+#line 80
 precision highp float;
 varying highp vec4 vColor;
 
