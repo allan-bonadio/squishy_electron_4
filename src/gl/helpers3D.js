@@ -7,13 +7,13 @@
 
 const _ = (n) => (n.toFixed(4).padStart(9, ' '));
 
-export function dump4x4(matrix, title) {
+export function dump4x4(title, matrix) {
 	if (!matrix){
 		dblog(`⣿⣿⣿mat: ${title}, matrix is null`);
 		return;
 	}
 	if (matrix.constructor.name != 'Float32Array' || 16 != matrix.length) {
-		dblog(`⣿⣿⣿mat: ${title} matrix is not a correct typed array:`,
+		dblog(`⣿⣿⣿mat: ${title} matrix, class ${matrix.constructor.name} len=${matrix.length} is not a correct typed array:`,
 			typeof matrix, matrix.constructor.name, matrix.length);
 	}
 

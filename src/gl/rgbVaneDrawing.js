@@ -13,12 +13,12 @@ import {vec4, mat4} from 'gl-matrix';
 
 this doesn't work yet.  Not sure if I'll keep it.
 
-let traceDrawing = true;
-let traceReload = true;
-let traceMatrix = true;
+let traceDrawing = false;
+let traceReload = false;
+let traceMatrix = false;
 
 // diagnostic purposes; draws more per vertex
-let traceDrawPoints = true;
+let traceDrawPoints = false;
 let traceDrawLines = false;
 
 let pointSize = traceDrawPoints ? `gl_PointSize = 10.;` : '';
@@ -127,7 +127,7 @@ export class rgbVaneDrawing extends abstractDrawing {
 				let matrix = this.scene.paintingNeeds.rotMatrix;
 
 				if (traceMatrix) {
-					dump4x4(matrix, '🌀🌀🌀 rgbVaneDrawing reloading');
+					dump4x4('🌀🌀🌀 rgbVaneDrawing reloading', matrix);
 				}
 				return {value: matrix, type: 'Matrix4fv'};
 			}
