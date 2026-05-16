@@ -7,28 +7,53 @@ description: Complex Numbers
 <h1>Complex Number refresher</h1>
 
 
-Complex numbers are those that consist of two real numbers like this:
+Complex numbers are those that consist of a real and an imaginary number like this:
 
 _a_ + _b i_
 
-_a_ is called the __real part__ and _b_ is called the __imaginary part__... although b is still a real number.  _i_ is the square root of -1, which is impossible to do using only real numbers.  There are no real numbers that make this true:
+_a_ is called the __real part__ and _bi_ is the __imaginary part__... although b is still a real number.  _i_ is the square root of -1, which is impossible to do using only real numbers.  There are no real numbers, for _i_, that make this true:
 
 _i_ <sup>2</sup> = -1
 
+because any real number is positive if you multiply it onto itself.
+The negative signs, if any, appear on both numbers and cancel out.
 
-
-<h2>history</h2>
-
+## History
 
 Real positive numbers are actual concepts everybody can get a sense of.
-But there's so many more numbers, and kinds of numbers out there, depending on your domain.
-And each group took time for people to understand them.
+But there's so many more numbers, and kinds of numbers out there, depending on what you're using them for.
+And each group took time for people to understand them, and use them.
 
-Zero was a stretch to understand for a lot of people before 1000ce.
+Zero was a stretch to understand for a lot of European people before 1000ce.
+It's nothing!  So, there's nothing to write down!
 Roman Numerals have no way to say zero.
-They tended to have spaces where a zero number would be.
+They tended to have spaces where a zero digit would be.
+
+When they started using Arabic numerals (digits), they'd have trouble.
+For instance, they'd write 207, as 2 nothing 7.
+Which often was misinterpreted as 27.
+The people using numbers were accountants and  bookkeepers.
+These numbers turned into amounts of money, so mistakes like this could be disastrous.
 
 Negative numbers require stretching reality, sometimes, too.
+And, people also had trouble understanding them, in the beginning.
+The Chinese seemed to be using them first, and bookkeepers used them for
+debts — money that you need to break even with the other person.
+
+[Cardano](https://en.wikipedia.org/wiki/Gerolamo_Cardano) (car Dan oh) , in the 1500s, was the first one in Europe to use them for mathematics.
+Back then, mathematicians were interested in polynomials, especially roots of polynomials.
+For example, find $x$ where $x^2 - 4 x + 13 = 0$.
+You can just plug them into the [quadratic equation](https://en.wikipedia.org/wiki/Quadratic_equation) for the two answers.
+The Babylonians first figured this out, although they didn't have the notation we have today.
+They used a series of steps.
+Back then, equations were just sentences, often multiple ones.
+
+That ± in the middle gives you the two different answers.
+The square root, often, will have a negative number inside, and then, you're dealing with complex numbers.
+
+Back then, people would turn inside out trying to make sense of it.
+They weren't comfortable even with negative numbers.
+Descartes (day Cart) in the 1500s called them 'imaginary' numbers, and used $i$ as $\sqrt{-1}$ .
 
 
 

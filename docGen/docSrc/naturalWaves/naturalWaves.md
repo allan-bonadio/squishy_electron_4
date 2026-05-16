@@ -28,11 +28,18 @@ description: How waves work in nature
 		/*vertical-align: middle;*/*
 	}
 	.leftSide {
+		width: 320px;
+		height: 96px;
 		float: left;
-		margin: 1em;
+		clear: left;
+		display: inline;
+		vertical-align: middle;
 	}
 	sta {
 		clear: both;
+	}
+	p {
+		clear: left;
 	}
 </style>
 
@@ -44,7 +51,7 @@ description: How waves work in nature
 Many things in nature vibrate.
 You might think that these things bang violently from one side to another, but, usually, they follow a gentle sine wave.
 
-With a guitar string, some guitar player pulls on a string and then lets go.
+With a guitar string, some guitar player pulls sideways on a string and then lets go.
 When they let go, the string is coasting through the air, and it's following the laws of nature.
 
 So, first, think about the position of the string; where it is sideways, how far from its middle position.
@@ -54,7 +61,7 @@ We can call the middle position 0, and each side –1 and +1.
 
 <sta></sta>
 <img src=sinAndCos2.png class=leftSide style='width: 437px; height: 137px' />
-The way we describe these things mathematically is with trig functions: sine and cosine.
+The way we describe these things mathematically is with trig functions: *sine* and *cosine*.  In formulas, the abbreviations are *sin*
 
 Sine and cosine are a quarter circle apart (or π/2 or 90°).
 You need both of them.
@@ -67,7 +74,11 @@ The speed is zero when the position is at -1 or 1.
 So, the speed isn't the sine, it's the cosine, 90° off.
 The derivative, rate of change, of the position is cosine.
 
-Now, think of the force that the string uses to bring it back to the middle, overshoot to the other end, and back again.  It's proportional to the (slight) curvature of the string, at that time.  So, just like the position, it's a sine wave.  But notice how, when the string is to the right, the force pushes to the left.  And, when the string is to the left, the force pushes to the right.
+Now, think of the force that the string uses to bring it back to the middle, overshoot to the other end, and back again.  It's proportional to the (slight) curvature of the string, at that time.  So, just like the position, it's a sine wave.
+
+And as soon as they're on the other side,
+the same forces work to push the string back.
+
 
 <sta></sta>
 <img src=sinCosAllFour3.png class=leftSide style='width: 436px; height: 130px' />
@@ -78,13 +89,6 @@ Sine is up-down, and the cosine is left-right.  This diagram shows how the point
 
 <sta></sta>
 <img src=circleArrows4.png class=leftSide  style='width: 217px; height: 217px; float: right'>
-
-And as soon as they're on the other side,
-the same forces work to push the string back.
-Immediately, these forces pushing back, get a little bit smaller.
-And, every fraction of a second, they get a little bit smaller still.
-These forces also follow a sine wave over time.
-And, the rate of change over time follows a sine wave.
 
 <sta></sta>
 < video src=greenTreeAndMts2.mp4 class=leftSideClear autoplay controls  \>
@@ -106,13 +110,13 @@ And, the force always overshoots.  So, the string swings to the other side.
 This is the differential equation that describes it.
 The $$\omega$$ is the greek letter omega; that's the frequency, number of radians turned per second.
 
-$$(d^2y \over dt^2) = - \omega y $$
+${d^2y \over dt^2} = - \omega y $
 
 $$y$$ is where the vibrating thing is.
-And $$d^2y \over dx^2$$ is the second derivative of it.
+And $$d^2y \over dt^2$$ is the second derivative of it.
 The minus sign on the right side is because, when the string is far to the left, the force pushes to the right.  And vice versa.  The notation is kindof screwy but that's what they use.  If you solve that, you get an exact sine wave.
 
-* Square Wave
+# Square Wave
 
 <sta></sta>
 <img src=Natural_Waves,square_wave.png class=leftSide  style='width:640px height:192px' >
@@ -121,35 +125,52 @@ Because they're not shaped exactly like a sine wave.
 For instance, a square wave isn't a sine wave.
 It's more like a buzzing sound.
 
-
 In the early 1800s, a French mathematician named Fourier figured out that any wave shape can be described as a bunch of sine waves at higher frequencies.  For instance, the square wave above can be described with this infinite series:
 
-$$sin (t)  + sin 3 t \over 3 + sin 5 t \over 5 + sin 7 t \over 7 + ... $$
+square wave = ${\sin {t}}+{\sin {3 t}\over 3}+{\sin {5 t}\over 5}+{\sin {7 t}\over 7}  ... \infty$
 
+so the ...∞ means, you keep on adding terms like ${\sin {35 t}\over 35}$ for odd numbers, all the way to infinity.
 <sta></sta>
-<img src=Natural_Waves,freq_1.png class=leftSide  style='width:640px height:192px' >
+<img src=Natural_Waves,freq_1.png class=leftSide  style='' >
 Here are the first three: frequencies 1,
 
 <sta></sta>
-<img src=Natural_Waves,freq_3.png class=leftSide  style='width:640px height:192px' >
-3,
+<img src=Natural_Waves,freq_3.png class=leftSide  style='' >
+<br />3,
 
 <sta></sta>
-<img src=Natural_Waves,freq_5.png class=leftSide  style='width:640px height:192px' >
-and 5.
+<img src=Natural_Waves,freq_5.png class=leftSide  style='' >
+<br />and 5.
 
 <sta></sta>
-<img src=Natural_Waves,each_of_the_three.png class=leftSide  style='width:640px height:192px' >
-and, here they are all on the same graph.  Notice that at the start, middle and end, all three of them have the same slope.  Each one makes the curve steeper when you add it on.  If you add them up all the way to ∞, that will result in the steep cliffsides in the square wave.
+<img src=Natural_Waves,each_of_the_three.png class=leftSide  style='' >
+<br />and, here they are all on the same graph.  Notice that at the start, middle and end, all three of them have the same slope.  Each one makes the curve steeper when you add it on (but only for shorter and shorter distances).  If you add them up all the way to ∞, that will result in the steep cliffsides in the square wave.
 
-But, in the middles, at the 1/4 and 3/4 areas, each of the three go in different directions.  If you add all the way to ∞, it'll end up flat, as in the square wave graph above.
-But, even if we just add the first three, we're getting close to a square wave.
+But, in between, at the 1/4 and 3/4 areas, each of the three go in different directions.  If you add all the way to ∞, it'll end up flat, as in the square wave graph above.
 
-<sta></sta>
-<img src=Natural_Waves,three_added_together.png class=leftSide  style='width:640px height:192px' >
-Starting to make the right shape.
 
 <sta></sta>
-<img src=Natural_Waves,ten_added_together.png class=leftSide  style='width:640px height:192px' >
-If you add up the first ten terms, you can see how much things cancel out to make the square wave.
+<img src=Natural_Waves,three_added_together.png class=leftSide  style='' ><br />
+If we just add the first three together, we're starting to make the right shape.
 
+<sta></sta>
+<img src=Natural_Waves,ten_added_together.png class=leftSide  style='' >
+<br />Here, we add up the first ten terms, 1 ... 19, you can see how much things cancel out to head towards a square wave.
+These higher frequencies are called Harmonics of the original frequency.
+Any integer multple of the original frequency is a harmonic.
+
+# Quantum Waves
+
+So, at a microscopic level, electrons are waves.
+Each electron is a blob of electron stuff, and each electron has the same amount of electron stuff in it.
+The waviness comes in when it moves around.
+
+As with other waves, you need the sine and the cosine to make it work.
+Unlike other waves, the sine and cosine aren't different things, like the speed and acceleration.
+Mathematically, the best way to represent them is with complex numbers.
+You know, a + bi.
+Then, the sine can be the imaginary part, and the cosine can be the real part.
+Or, vice versa.
+
+There's a symmetry like this.
+If you have a quantum mechanical wave, represented by complex numbers
