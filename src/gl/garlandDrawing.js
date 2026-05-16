@@ -41,7 +41,7 @@ bit of thickness in the middle.  Colored by vertex just like the flat drawing.
 The data and avatar loading is similar to with flat drawing - real and imag
 parts of wave become the y (vertical) and z (forward) coordinates of the
 garland point.  (We then have to duplicate it all, rearranged?, to paint the
-other side of each blade.  not yet.)
+other side of each blade.  someday.)
 
 The Volume coordinates are what look like 3d coords in the view.  The unit is 1
 cell in the x direction, and OUTER_FACTOR times psi in the real and imag
@@ -64,7 +64,7 @@ const INNER_FACTOR = '1.';
 // make the line number for the start correspond to this JS file line number - the NEXT line
 const vertexSrc = `// garlandDrawing vertex
 ${cx2rygb}
-#line 68
+#line 70
 // this does all the transformation we need.  precalculated for each repaint.
 uniform mat4 matrix;
 
@@ -101,7 +101,7 @@ void main() {
 `;
 
 const fragmentSrc = `// garlandDrawing frag
-#line 105
+#line 106
 precision highp float;
 varying highp vec4 vColor;
 
@@ -124,7 +124,7 @@ export class garlandDrawing extends abstractDrawing {
 		this.vertexShaderSrc = vertexSrc;
 		this.fragmentShaderSrc = fragmentSrc;
 
-		//console.log(`attachViewBuffer on scene ${scene.sceneName}`);
+		//dblog(`attachViewBuffer on scene ${scene.sceneName}`);
 	}
 
 	// loads view buffer from corresponding wave, calculates highest norm.
@@ -132,7 +132,7 @@ export class garlandDrawing extends abstractDrawing {
 	createVariables() {
 		this.setDrawing();
 		if (traceDrawing)
-			console.log(`🌀🌀🌀 garlandDrawing ${this.sceneName}: creatingVariables`);
+			dblog(`🌀🌀🌀 garlandDrawing ${this.sceneName}: creatingVariables`);
 
 		this.matrixUniform = new drawingUniform('matrix', this,
 			() => {
@@ -177,7 +177,7 @@ export class garlandDrawing extends abstractDrawing {
 	// called for each image frame on th canvas.  TODO: roll specialInfo into the input Data Arrays
 	draw(width, height, paintingNeeds) {
 		if (traceDrawing) {
-			console.log(`🌀🌀🌀 garland Drawing  ${this.avatarLabel}: `
+			dblog(`🌀🌀🌀 garland Drawing  ${this.avatarLabel}: `
 				+` width=${width}, height=${height}  drawing ${this.vertexCount/2} points `
 				+` matrix=${this.matrix}`);
 		}
@@ -186,13 +186,15 @@ export class garlandDrawing extends abstractDrawing {
 
 		this.drawVariables.forEach(v => v.reloadVariable());
 
+		dblog(`🌀 context attributes we're operating under:`, gl.getContextAttributes());
+
 		let startEnd2 = this.space.startEnd2;
 		let first = startEnd2.start2;
 		let count = startEnd2.end2 - startEnd2.start2;
 		if (!traceDontDrawTriangles)
 			gl.drawArrays(gl.TRIANGLE_STRIP, first, count);
 		if (traceDrawing) {
-			console.log(`🌀🌀🌀just drewArays-garland on avatar ptr=${this.avatar.pointer} `
+			dblog(`🌀🌀🌀just drewArays-garland on avatar ptr=${this.avatar.pointer} `
 				+` this.avatar.label=${this.avatar.label}, `
 				+` buffer label=${this.avatar.bufferNames[0]}`);
 		}
