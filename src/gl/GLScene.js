@@ -80,7 +80,7 @@ function GLScene(props) {
 	//console.log(`starting GLScene(render), sceneName=${p.sceneName}`);
 
 	if (traceMatrix && p.paintingNeeds.rotMatrix)
-		dump4x4(p.paintingNeeds.rotMatrix, '🖼  GLScene  starts with matrix');
+		dump4x4('🖼  GLScene  starts with matrix', p.paintingNeeds.rotMatrix);
 
 	// we have to keep the canvas node, to get a gl context.
 	// we need it in the state, to trigger rerender, once we've got one (2nd render)
@@ -131,7 +131,8 @@ function GLScene(props) {
 		// if (traceViewBuffer)
 		// p.avatar.cavity.dump(`🖼 GLScene ${p.sceneName}: got the cavity right here`);
 		if (traceMatrix && paintingNeeds.rotMatrix)
-			dump4x4(paintingNeeds.rotMatrix, '🖼  GLScene  glRepaint gets matrix, passes to drawAllDrawings()');
+			dump4x4('🖼  GLScene  glRepaint gets matrix, passes to drawAllDrawings()',
+			   paintingNeeds.rotMatrix);
 
 		// draw.  This won't set up an ∞ loop, right?
 		scene.drawAllDrawings(node.width, node.height, paintingNeeds);
