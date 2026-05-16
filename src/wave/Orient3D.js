@@ -26,6 +26,7 @@ const propTypes = {
    orientZPos: PropTypes.number.isRequired,
 
    orientFOView: PropTypes.number.isRequired,
+   orientFudge: PropTypes.number.isRequired,
 
    makeRotMatrix: PropTypes.func.isRequired,
    mainVistaRepaint: PropTypes.func.isRequired,
@@ -48,10 +49,11 @@ function Orient3D(props) {
 	let [zPos, setZPos] = useState(getASetting('orientSettings', 'zPos'));
 
 	let [foView, setFOView] = useState(getASetting('orientSettings', 'foView'));
+	let [fudge, setFudge] = useState(getASetting('orientSettings', 'fudge'));
 
 	const setters = {x: setX, y: setY, z: setZ,
 		xPos: setXPos, yPos: setYPos, zPos: setZPos,
-		foView: setFOView};
+		foView: setFOView, fudge: setFudge};
 
 	// actions are like {y: 44.2} usually only changing one at a time
 	// doing this so that this particular component renders.
@@ -68,6 +70,7 @@ function Orient3D(props) {
 	// x y z — rotate around just 1 axis as given by this event from this slider
 	// xPos yPos zPos — adjust offset object is from camera.
 	// foView — field of view.	Default should be 45°
+	// fudge = greggman's fudgeFactor
 	function setOneOrient(ev) {
 		let which = ev.target.className;
 		props.setOrient(which, ev.target.valueAsNumber);  // set in Vista and settings
@@ -84,6 +87,7 @@ function Orient3D(props) {
 		setX(sdo.x); setY(sdo.y); setZ(sdo.z);
 		setXPos(sdo.xPos); setYPos(sdo.yPos); setZPos(sdo.zPos);
 		setFOView(sdo.foView);
+		setFudge(sdo.fudge);
 
 		props.repaintOrient();
 	}
@@ -130,6 +134,12 @@ function Orient3D(props) {
 			<input type='range' className='foView' value={foView}
 				min={1} max={179} step={1} onChange={setOneOrient} />
 		</div>
+		<div>
+			<label>fudge {fudge}° </label>
+			<input type='range' className='fudge' value={fudge}
+				min={0} max={2} step={.1} onChange={setOneOrient} />
+		</div>
+
 		<button onClick={resetOrientation} >reset</button>
 	</div>;
 }
