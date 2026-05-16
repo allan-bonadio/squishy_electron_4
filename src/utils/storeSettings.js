@@ -24,8 +24,8 @@ import sSettings from './sSettings.js';
 
 // group, groupName = which component of sSettings this is
 // criterion: validator, see constructor
-//     The criterion are fixed and more broad than some other parts of the code,
-//     eg if 1/N is one of the limits, some other part of the code will enforce that, not here.
+//	 The criterion are fixed and more broad than some other parts of the code,
+//	 eg if 1/N is one of the limits, some other part of the code will enforce that, not here.
 //		um... except for lowPassFilter
 // The general interaction between component states and sSettings is this:
 // component states are initially set from sSettings.
@@ -177,9 +177,9 @@ function makeParam(groupName, varName, defaultValue, criterion) {
 // when referring to both, I use them interchangeably.
 // To reset them all, just delete all the local storage for this app.  I should make a button...
 
-// somewhere you have to record the defaults and criterion for each setting, so here they are
-// these also define the controls mins and maxes
-// unit tests want to recreate these from scratch
+// somewhere you have to record the defaults and criterion for each
+// setting, so here they are these also define the controls mins and
+// maxes unit tests want to recreate these from scratch
 export function createStoreSettings() {
 
 	/* ************************************ spaceParams */
@@ -241,14 +241,32 @@ export function createStoreSettings() {
 
 	localStorage.removeItem("frameSettings");  // old name for lapSettings
 
+	/* ************************************ orient for 3D */
+
+	// set in Orient3D or PivotOverlay
+	makeParam('orientSettings', 'x', 0,  {min: -180, max: +180});
+	makeParam('orientSettings', 'y', 0,  {min: -180, max: +180});
+	makeParam('orientSettings', 'z', 90,  {min: -180, max: +180});
+
+	makeParam('orientSettings', 'xPos', 0,  {min: -100, max: +100});
+	makeParam('orientSettings', 'yPos', 0,  {min: -100, max: +100});
+	makeParam('orientSettings', 'zPos', -10,  {min: -20, max: +1});
+
+	makeParam('orientSettings', 'foView', 45,  {min: 1, max: +179});
+	makeParam('orientSettings', 'fudge', 1,  {min: 0, max: +2});
+
+
 	/* ************************************miscSettings */
 	// set by clicking on tab
 	makeParam('miscSettings', 'showingTab', 'wave',
 		['wave', 'voltage', 'space', 'integration', 'rainbow']);
 
 	// set by size box on main view
-	makeParam('miscSettings', 'waveViewHeight', 402, {min: 50, max: 1e4});
+	makeParam('miscSettings', 'viewHeight', 402, {min: 50, max: 1e4});
+	makeParam('miscSettings', 'vistaHeight', 402, {min: 50, max: 1e4});
 
+	makeParam('miscSettings', 'show2D', true,  [false, true]);
+	makeParam('miscSettings', 'show3D', false,  [false, true]);
 }
 
 window.dumpSettings = () => {
@@ -310,20 +328,16 @@ export function storeAGroup(groupName, newGroup) {
 	return toSet;
 }
 
+
+
+
+
+
 // store an individual value
 export function storeASetting(groupName, varName, newValue) {
 	if (!sSettings.verifiers
 	|| !sSettings.verifiers[groupName]
 	|| !sSettings.verifiers[groupName][varName]) debugger;
-
-	// if bad value, just set to default.
-	// Should clamp continuum variables to min or max!  should eliminate variables no longer part of the group!
-// not sure what went wrong here but i fixed it...
-//console.log(`groupName=${groupName}   varName=${varName}`);
-//console.log(`sSettings.verifiers=`, sSettings.verifiers);
-//console.log(`sSettings.verifiers[${groupName}]=`, sSettings.verifiers?.[groupName]);
-//console.log(`sSettingsVerifi...[${varName}]=`, sSettings.verifiers?.[groupName]?.[varName]);
-//console.log(`sSettingsVerif[...](newValue)=`, sSettings.verifiers?.[groupName]?.[varName]?.(newValue));
 
 	let savedGroup = getAGroup(groupName);
 	savedGroup[varName] = newValue;
@@ -335,7 +349,10 @@ export function storeASetting(groupName, varName, newValue) {
 
 export function getASetting(groupName, varName) {
 	let setting = getAGroup(groupName)[varName];
-	if (!sSettings.verifiers?.[groupName]?.[varName]) debugger;
+	if (!sSettings.verifiers?.[groupName]?.[varName]) {
+		console.error(`setting not found: ${groupName} , ${varName} = `)
+		debugger;
+	}
 
 	// this can still return undefined if the groupName or varName isn't there
 	if (setting === undefined
@@ -345,7 +362,12 @@ export function getASetting(groupName, varName) {
 	return setting;
 }
 
+export function getDefaultSetting(groupName, varName) {
+	return sSettings.defaults[groupName][varName]
+}
+
 // in case you want only one exported name.  Kindof defeats the purpose huh?
-export const storeSettings = {createStoreSettings, getAGroup, storeAGroup, storeASetting, getASetting, };
+export const storeSettings = {createStoreSettings, getAGroup, storeAGroup,
+	storeASetting, getASetting, getDefaultSetting};
 export default storeSettings;
 

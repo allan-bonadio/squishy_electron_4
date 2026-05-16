@@ -14,9 +14,9 @@ import eAvatar from '../engine/eAvatar.js';
 	const nVerts = nSegs + 1;
 
 class rainbowScene extends abstractScene {
-
-	constructor(sceneName, ambiance, inputInfo) {
-		super(sceneName, ambiance);
+	// doesn't need space or inputinfo
+	constructor(sceneName, ambiance, paintingNeeds, space) {
+		super(sceneName, ambiance, paintingNeeds, space);
 
 		this.canvas = ambiance.canvas;
 		this.gl = ambiance.gl;

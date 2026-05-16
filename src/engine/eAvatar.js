@@ -17,6 +17,7 @@ let traceVBuffer = false;
 // use attachViewBuffer() to attach each of your buffers (max 4)
 
 // OR adapt a qAvatar (eg one on qSpace) with eAvatar.adaptAvatar()
+
 // the integration engine should usually populate the buffers as part
 // of its cycle, at the end of an integration lap.
 
@@ -171,10 +172,15 @@ class eAvatar {
 	}
 
 	// 0-15 for vertex bufs, any combo; 128 for index buf
-	// TODO: need also dumpComplexViewBuffer
 	dumpEachViewBuffer(bufferMask, title) {
 		console.group(title);
-		qeFuncs.avatar_dumpEachViewBuffer(this.pointer, bufferMask, ' ');
+		qeFuncs.avatar_dumpEachViewBuffer(this.pointer, bufferMask, title);
+		console.groupEnd();
+	}
+
+	dumpComplexViewBuffer(bufIx, nPoints, title) {
+		console.group(title);
+		qeFuncs.avatar_dumpComplexViewBuffer(this.pointer, bufIx, nPoints, title);
 		console.groupEnd();
 	}
 

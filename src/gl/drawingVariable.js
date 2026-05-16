@@ -3,14 +3,9 @@
 ** Copyright (C) 2021-2026 Tactile Interactive, all rights reserved
 */
 
-<<<<<<< HEAD
-=======
-// import math3d from './math3d.js';
-
->>>>>>> 0343abe... trivial/cleanup/comments/traces/linting/etc
 let traceGLCalls = false;
 let traceUniforms = false;
-let traceAttrs = true;  // quick update every reload
+let traceAttrs = false;  // quick update every reload
 let traceAttributes = false;  // full dumps every reload
 
 // attr arrays and uniforms that can change on every frame.
@@ -36,7 +31,7 @@ export class drawingVariable {
 
 		let vv = drawing.drawVariables;
 		if (vv.includes(this)) {
-			console.error(`𒐿 duplicate variable ${varName}!!`);
+			console.error(`🍯 duplicate variable ${varName}!!`);
 			return null;
 		}
 		vv.push(this);
@@ -45,7 +40,7 @@ export class drawingVariable {
 		// or maybe this is already done and so this is superflous?
 		drawing.setDrawing();
 
-		if (traceGLCalls) console.log(`𒐿 created drawingVariable '${varName}', drawing:`, drawing);
+		if (traceGLCalls) console.log(`🍯 created drawingVariable '${varName}', drawing:`, drawing);
 	}
 }
 
@@ -74,8 +69,12 @@ export class drawingUniform extends drawingVariable {
 		// this turns out to be an internal magic object
 		this.uniformLoc = this.gl.getUniformLocation(this.drawing.program, varName);
 		if (!this.uniformLoc)
-			throw new Error(`Cannot find uniform loc for uniform variable ${varName}`);
-		if (traceUniforms) console.log(`𒐿 created drawingUniform '${varName}'`);
+			throw new Error(`Cannot find uniform loc for uniform variable ${varName} `
+				+` in ${this.drawing.program.$qLabel}`);
+		if (traceUniforms) {
+			console.log(`🍯 created drawingUniform '${varName}'  in `
+		                +` ${this.drawing.program.$qLabel}`);
+		}
 
 		this.reloadVariable();
 	}
@@ -84,10 +83,12 @@ export class drawingUniform extends drawingVariable {
 	// call this when the uniform's value changes, to reload it into the GPU
 	// actually, calls before each draw, always
 	reloadVariable() {
-		// is passed the previous value
+		// value might be a JS float, vector or matrix typically 4 or 4x4.
+		// type is typically Matrix4fv, 1fv, or others; see
+		// https://developer.mozilla.org - WebGLRenderingContext
 		const {value, type} =  this.reloadFunc();
 		if (traceUniforms)
-			console.log(`𒐿 re-loading uniform ${this.varName} with value=${value} type ${type}`);
+			console.log(`🍯🍯 re-loading uniform ${this.varName} with value=${value} type ${type}`);
 
 		// you can't pass null or undefined to webgl, but remember this
 		this.value = value;
@@ -96,7 +97,7 @@ export class drawingUniform extends drawingVariable {
 			// better luck next time.
 			let msg = `uniform variable ${this.varName} has `
 						+`a problematic value(${value}) or no type(${type})`;
-			console.warn(`𒐿 ${msg}`);
+			console.trace(`🍯 ${msg}`);
 			this.drawing.skipDrawingCuzErr = msg;
 			return;
 		}
@@ -106,17 +107,16 @@ export class drawingUniform extends drawingVariable {
 
 		const method = `uniform${type}`;
 
-		// the matrix variations have this extra argument right in the middle
 		const args = [this.uniformLoc];
 		if (/^Matrix/.test(type))
-			args.push(false);
+			args.push(false);  // do not transpose
 		args.push(value);
 
-		// like gl.uniform4f(this.uniformLoc, value)
+		// like gl.uniformMatrix4f(this.uniformLoc, value)
 		gl[method].apply(gl, args);
 
 		if (traceUniforms) {
-			console.log(`𒐿 drawingUniform reloaded U variable '${this.varName}' in `);
+			console.log(`🍯 drawingUniform reloaded U variable '${this.varName}' in `);
 			console.log(`            ${this.drawing.avatarLabel} uniform gl.${method}`
 				+`  (${args[0].constructor.name}, ${args[1]}, ${args[2]} ) `);
 		}
@@ -147,7 +147,7 @@ export class drawingAttribute extends drawingVariable {
 		gl.enableVertexAttribArray(this.attrLocation);
 
 		if (this.attrLocation < 0) {
-			throw new Error(`𒐿 drawingAttribute:attr loc for '${varName}' is bad: `+
+			throw new Error(`🍯 drawingAttribute:attr loc for '${varName}' is bad: `+
 				this.attrLocation);
 		}
 
@@ -158,7 +158,7 @@ export class drawingAttribute extends drawingVariable {
 		let label = `${drawing.avatarLabel}-${drawing.drawingName}-${varName}-glbuf`;
 		this.tagObject(this.glBuffer, label);
 		this.glBuffer.$qLabel = label;
-		this.glBuffer.__SPECTOR_Metadata = { name: "cubeVerticesColorBuffer" };
+		this.glBuffer.__SPECTOR_Metadata = {name: label};
 
 		// connect  ARRAY_BUFFER to glBuffer.
 		// do I have to do this if I'm not (yet) attaching the JS-space array with bufferData?
@@ -168,7 +168,7 @@ export class drawingAttribute extends drawingVariable {
 		gl.vertexAttribPointer(this.attrLocation, tupleWidth, gl.FLOAT,
 				false, tupleWidth * 4, 0);  // normalize, stride, offset
 		if (traceGLCalls)
-			console.log(`𒐿  drawingAttribute '${this.varName}' connected to its `
+			console.log(`🍯  drawingAttribute '${this.varName}' connected to its `
 				+` glBuffer to tupleWidth=${tupleWidth}`);
 
 		// we haven't touched the actual JS data yet, this does it.  Although a lot of
@@ -196,8 +196,8 @@ export class drawingAttribute extends drawingVariable {
 		gl.bufferData(gl.ARRAY_BUFFER, floatArray, gl.DYNAMIC_DRAW);
 
 		if (traceAttrs || traceAttributes)
-			console.log(`𒐿 reload drawingAttribute '${this.varName}' in ${this.drawing.sceneName}`
-				+ ` reloaded, ${this.nTuples}  tuples of ${this.tupleWidth} floats each:`);
+			console.log(`🍯 reload drawingAttribute '${this.varName}' in ${this.drawing.drawingName}`
+				+ ` reloaded, ${this.nTuples}  tuples of ${this.tupleWidth} floats each`);
 
 		if (traceAttributes) {
 			for (let t = 0; t < this.nTuples; t++) {

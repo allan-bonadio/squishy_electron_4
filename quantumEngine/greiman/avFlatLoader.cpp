@@ -9,10 +9,10 @@
 #include "qAvatar.h"
 #include "../debroglie/qCavity.h"
 
-static const bool traceViewBuffer = false;
+static const bool traceViewBuffer = true;
 static const bool traceHighest = false;
 static const bool traceInDetail = false;  // blow-by-blow, verbose
-static const bool traceWaveDump = false;  // dumps it; verbose
+static const bool traceCavityDump = true;  // dumps it; verbose
 
 
 
@@ -46,7 +46,7 @@ void avFlatLoader(qAvatar *avatar, int bufIx, qCavity *cavity, int nPoints) {
 		printf("🚦 avFlatLoader: avatar=%p, cavity=%p, ->wave=%p avatar[ix=%d]->fArray %p\n",
 			avatar, cavity, cavity->wave, bufIx, fArray);
 	}
-	if (traceWaveDump)
+	if (traceCavityDump)
 		cavity->dump("🚦 at start of avFlatLoader()");
 
 	// this is index into the complex point, which translates to 2 GL vertices, eight single floats, 32 bytes

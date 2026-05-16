@@ -15,12 +15,19 @@ import PropTypes from 'prop-types';
 import {listOfSceneClasses} from './listOfSceneClasses.js';
 import glAmbiance from './glAmbiance.js';
 
+import {dump4x4} from '../gl/helpers3D.js';
+
 let traceSetup = false;
 let traceGeometry = false;
+
+// turn this off by setting it to '' or just turn off the booleans above; automated resetting won't touch it
+// but that turns off all the tracing... hmmm...
+let traceOnlyScene = 'mainWave3d';
 
 // this one dumps large buffers
 let traceTooEarly = false;
 let traceViewBuffer = false;
+let traceMatrix = false;
 
 
 function traceOnScreen(msg) {
@@ -35,13 +42,8 @@ const propTypes = {
    sceneName: PropTypes.string,  // name for debugging
 
    // Array of eCavity(s) or other buffers to draw or any data.  passed blindly to avatar
-   inputInfo: PropTypes.array,
-   // object with specific values needed in drawing; for waveview= {bumperWidth}
-   // TODO: include this in inputInfo and rename.  Oh now included, now need to get rid of specialInfo everywhere
-   specialInfo: PropTypes.object,
+   paintingNeeds: PropTypes.object.isRequired,
 
-
-   // Our caller gets these from eSpaceCreatedPromise; so it must be resolved by now.
    // Optional; omit if your scene is not affected by space.
    space: PropTypes.object,
 
@@ -77,6 +79,9 @@ function GLScene(props) {
 	const p = props;
 	//console.log(`starting GLScene(render), sceneName=${p.sceneName}`);
 
+	if (traceMatrix && p.paintingNeeds.rotMatrix)
+		dump4x4('🖼  GLScene  starts with matrix', p.paintingNeeds.rotMatrix);
+
 	// we have to keep the canvas node, to get a gl context.
 	// we need it in the state, to trigger rerender, once we've got one (2nd render)
 	let [canvasNode2, setCanvasNode] = useState(null);
@@ -96,51 +101,50 @@ function GLScene(props) {
 		let sClass = listOfSceneClasses[p.sceneClassName];
 
 		// for this situation, needs the space!	 if they passed it to us
-		squishScene = new sClass(p.sceneName, ambiance, p.inputInfo, p.space);
+		squishScene = new sClass(p.sceneName, ambiance, p.paintingNeeds, p.space);
 		setSquishScene(squishScene);
 		//effSceneRef.current = squishScene;
 
 		squishScene.space = p.space;
-		squishScene.completeScene(p.specialInfo);
+		squishScene.completeScene();
 
 		squishScene.glRepaint = glRepaint;
 
-		if (traceSetup) console.log(`🖼 GLScene ${p.sceneName}: `
-			+` done with initSceneClass`);
+		if (traceSetup && traceOnlyScene == p.sceneName)
+			console.log(`🖼 GLScene ${p.sceneName}:  done with initSceneClass`);
 	};
 
 	// repaint whole GL image.	this is repainting a canvas with GL.
 	// This is not 'render' as in React; react places the canvas element
 	// and this function redraws on the canvas (with gl).
 	const glRepaint =
-	() => {
+	(paintingNeeds) => {
 		// make sure we have this cuz this func gets called from all over
 		const scene = squishScene;
 		const node = canvasNode;
-		const info=p.specialInfo;
+		paintingNeeds ??= p.paintingNeeds;
 		if (! scene) {
 			if (traceTooEarly)
 				console.log(`🖼 GLScene too early for glRepaint. squishScene=`, scene);
-			return null;  // too early
+			return;  // too early
 		}
 		// if (traceViewBuffer)
 		// p.avatar.cavity.dump(`🖼 GLScene ${p.sceneName}: got the cavity right here`);
-
-		// copy from latest wave to view buffer (c++) & pick up highest
-		//p.avatar.loadViewBuffer();
-		// if (traceViewBuffer)
-		//	 p.avatar.dumpComplexViewBuffer(`🖼 GLScene ${p.sceneName}: loaded ViewBuffer`);
+		if (traceMatrix && paintingNeeds.rotMatrix)
+			dump4x4('🖼  GLScene  glRepaint gets matrix, passes to drawAllDrawings()',
+			   paintingNeeds.rotMatrix);
 
 		// draw.  This won't set up an ∞ loop, right?
-		scene.drawAllDrawings(node.width, node.height, info);
+		scene.drawAllDrawings(node.width, node.height, paintingNeeds);
 		//scene.drawAllDrawings(p.canvasInnerWidth, p.canvasInnerHeight, info);
-		if (traceGeometry) {
+		if (traceGeometry && traceOnlyScene == p.sceneName) {
 			console.log(`🖼 GLScene finished glRepaint() ${p.sceneName}:	\n`
 					+`canvasInnerWidth=${p.canvasInnerWidth}, canvasInnerHeight=${p.canvasInnerHeight}, `
-					+`specialInfo=`, info);
+					+`paintingNeeds=`, paintingNeeds);
 		}
 		return;
 	}
+	// this is how our caller might get the repaint function
 	props.setGLRepaint?.(glRepaint);
 
 //	if (canvasNode) {
@@ -177,7 +181,7 @@ function GLScene(props) {
 			if (props.animator)
 				props.animator.glRepaint = glRepaint;
 
-			if (traceSetup)
+			if (traceSetup && traceOnlyScene == p.sceneName)
 				console.log(`🖼 GLScene ${p.sceneName}: canvas ${canvasNode?.className}, gl, view&drawing done`);
 		});
 	}
@@ -187,8 +191,8 @@ function GLScene(props) {
 	// can't do much first rendering; no canvasNode cuz no canvasRef.current yet.
 	// But, in the effect after the first render, this func will get the canvas node
 	// from the ref and set everything up.	Renders: should be mostly identical,
-	//     - when dimensions of the canvas change
-	//     - every dam time you start or stop main animation cuz that flag is in the context
+	//	 - when dimensions of the canvas change
+	//	 - every dam time you start or stop main animation cuz that flag is in the context
 	const effectRepaint = () => {
 		if (!canvasNode) {
 			if (!canvasRef.current)
@@ -203,9 +207,9 @@ function GLScene(props) {
 		if (canvasRef.current && canvasNode && canvasRef.current !== canvasNode)
 			throw new Error('canvasRef.current !== canvasNode');
 
-		glRepaint();
+		glRepaint(p.paintingNeeds);
 
-		if (traceSetup) {
+		if (traceSetup && traceOnlyScene == p.sceneName) {
 			console.log(`🖼 GLScene ${p.sceneName}: effectRepaint(): completed, canvasNode=`,
 				canvasNode);
 		}
@@ -238,3 +242,65 @@ function GLScene(props) {
 
 
 export default GLScene;
+
+
+/* *************************************************** capturing frames
+from MDN:
+
+HTMLCanvasElement: toBlob() method
+Baseline Widely available
+The HTMLCanvasElement.toBlob() method creates a Blob object representing the image contained in the canvas [png or other formats]. This file may be cached on the disk or stored in memory at the discretion of the user agent.
+
+The desired file format and image quality may be specified. If the file format is not specified, or if the given format is not supported, then the data will be exported as image/png. Browsers are required to support image/png; many will support additional formats including image/jpeg and image/webp.
+
+The created image will have a resolution of 96dpi for file formats that support encoding resolution metadata.
+
+Syntax
+js
+
+Copy
+toBlob(callback)
+toBlob(callback, type)
+toBlob(callback, type, quality)
+Parameters
+callback
+A callback function with the resulting Blob object as a single argument. null may be passed if the image cannot be created for any reason.
+
+type Optional
+A string indicating the image format. The default type is image/png; that type is also used if the given type isn't supported.
+
+quality Optional
+A Number between 0 and 1 indicating the image quality to be used when creating images using file formats that support lossy compression (such as image/jpeg or image/webp). A user agent will use its default quality value if this option is not specified, or if the number is outside the allowed range.
+
+Return value
+None (undefined).
+
+Exceptions
+SecurityError
+The canvas's bitmap is not origin-clean; at least some of its contents have or may have been loaded from a site other than the one from which the document itself was loaded.
+
+*/
+/* *************************************************** capturing video
+
+from MDN:
+
+HTMLCanvasElement: captureStream() method
+Baseline Widely available
+The captureStream() method of the HTMLCanvasElement interface returns a MediaStream which includes a CanvasCaptureMediaStreamTrack containing a real-time video capture of the canvas's contents.
+
+
+CanvasCaptureMediaStreamTrack
+Limited availability
+The CanvasCaptureMediaStreamTrack interface of the Media Capture and Streams API represents the video track contained in a MediaStream being generated from a <canvas> following a call to HTMLCanvasElement.captureStream().
+
+This interface inherits the properties of its parent, MediaStreamTrack.
+
+CanvasCaptureMediaStreamTrack.canvas Read only
+Returns the HTMLCanvasElement object whose surface is captured in real-time.
+
+Instance methods
+This interface inherits the methods of its parent, MediaStreamTrack.
+
+CanvasCaptureMediaStreamTrack.requestFrame()
+Manually forces a frame to be captured and sent to the stream. This lets applications that wish to specify the frame capture times directly do so, if they specified a frameRate of 0 when calling captureStream().
+*/

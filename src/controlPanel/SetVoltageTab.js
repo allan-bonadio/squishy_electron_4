@@ -11,7 +11,7 @@ import voltDisplay from '../volts/voltDisplay.js';
 import {EFFECTIVE_VOLTS, TOO_MANY_VOLTS} from '../volts/voltConstants.js';
 import {getAGroup, storeAGroup, storeASetting} from '../utils/storeSettings.js';
 import sSettings from '../utils/sSettings.js';
-import {eSpaceCreatedPromise} from '../engine/eEngine.js';
+//import {eSpaceCreatedPromise} from '../engine/eEngine.js';
 import LogSlider from '../widgets/LogSlider.js';
 
 // miniGraph: always fixed size.    TODO: also in setWaveTab
@@ -223,7 +223,7 @@ function SetVoltageTab(p) {
 			{renderMiniGraph()}
 
 			{makeScaleSlider(breed, vP[breedScale],
-				sSettings.minMaxes.voltageParams[breedScale])} }
+				sSettings.minMaxes.voltageParams[breedScale]) }
 		</>
 	}
 
@@ -256,7 +256,7 @@ function SetVoltageTab(p) {
 			<label className='scaleDisplay' style={{display: 'inline-block'}} >
 				{(vP[`${breed}Scale`] / 1000).toFixed(2)} kV
 			</label>
-		</>;
+		</>
 	}
 
 	// only the slot/black width, otherwise blank space
@@ -308,6 +308,8 @@ function SetVoltageTab(p) {
 				<option value='hover'>only while hovering</option>
 				<option value='never'>Never</option>
 			</select>
+			<br/>
+			<small>2D only</small>
 		</label>;
 	}
 

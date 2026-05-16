@@ -2,9 +2,9 @@ These files display on top of the wave, over the webgl canvas itself (see gl dir
 
 # Strategic Files
 
-* WaveView.js - react component that contains all these and the <canvas.
+* WaveView.js - react component that displays 2d and contains all these and the <canvas.
 
-## sub-widgets of WaveView
+## sub-widgets of WaveView in ./volts directory
 * VoltArea.js - contains voltage line & axis, does click/drag
 * VoltSidebar.js - scrolling & zoom buttons
 * VoltOverlay.js - overlays canvas, contains both of the above

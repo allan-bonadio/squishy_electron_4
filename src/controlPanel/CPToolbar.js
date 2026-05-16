@@ -3,17 +3,15 @@
 ** Copyright (C) 2021-2026 Tactile Interactive, all rights reserved
 */
 
-import React, {useRef} from 'react';
+import React, {useContext} from 'react';
 import PropTypes from 'prop-types';
 import eSpace from '../engine/eSpace.js';
-//import {ShowVoltageControl} from './SetVoltageTab.js';
 import qeConsts from '../engine/qeConsts.js';
 import ResolutionDialog from './ResolutionDialog.js';
+import SquishContext from '../sPanel/SquishContext.js';
 
 let traceCPToolbar = false;
 let traceSlowerFaster = false;
-
-window.dbLog = console.log;
 
 
 // ms delay after pressing speed button before it starts repeating
@@ -37,11 +35,10 @@ const resolutionHandler = (ev) => {
 
 // the actual button they click.  The number doesn't change within a reset
 const renderResolutionControl = (N) => <div className='toolbarWidget'>
-	<div className='toolbarWidget'>
-		<button className='toolbarWidget resolutionBox' onClick={resolutionHandler} >
-			resolution {N}
-		</button>
-	</div>
+	<button className='toolbarWidget resolutionBox'
+					onClick={resolutionHandler} >
+		resolution {N}
+	</button>
 </div>;
 
 
@@ -74,7 +71,9 @@ const propTypes = {
 
 	resetWaveHandler: PropTypes.func.isRequired,
 	resetVoltageHandler: PropTypes.func.isRequired,
-	//setShowingTab: PropTypes.func,
+
+	activate2D: PropTypes.func.isRequired,
+	activate3D: PropTypes.func.isRequired,
 
 	// these two might be undefined during startup, so get ready to punt
 	N: PropTypes.number,
@@ -83,10 +82,12 @@ const propTypes = {
 };
 
 function CPToolbar(props) {
+	if (!props) return '';  // wtf was this?
+
 	cfpt(propTypes, props);
 	const p = props;
 	if (traceCPToolbar)
-		dbLog(`🧰 CPToolbar starts render.  props=`, props);
+		dblog(`🧰 CPToolbar starts render.  props=`, props);
 
 	/* ********************************************* speed buttons */
 	// user clicks/taps down on either the slower or faster speed button
@@ -95,13 +96,13 @@ function CPToolbar(props) {
 		// either faster or slower
 		if (ev.target.classList.contains('faster')) {
 			if (traceSlowerFaster)
-				dbLog(`🧰 SlowerFaster Faster starts.   `);
+				dblog(`🧰 SlowerFaster Faster starts.   `);
 			propel(FASTER_BOOST);  // speed up by big incr
 			timeoutId = setTimeout(repeatFaster, SPEED_DELAY);  // then slowly accel over time
 		}
 		else {
 			if (traceSlowerFaster)
-				dbLog(`🧰 SlowerFaster SLower starts.  `);
+				dblog(`🧰 SlowerFaster SLower starts.  `);
 			propel(SLOWER_BOOST);
 			timeoutId = setTimeout(repeatSlower, SPEED_DELAY);
 		}
@@ -169,7 +170,22 @@ function CPToolbar(props) {
 	/* 			onMouseMove={maybeStopSpeed}>
 					{onMouseMove={maybeStopSpeed}> */
 
+	const render2D3D = () => {
+		// this is set in App.js from url box
+		if (window.enable3D) {
+			return <div className='toolbarWidget '>
+				<button className={'twoD3D '+ (context.show2D ? 'butOn' : 'butOff')}
+						onClick={p.activate2D}>2D</button>
+				<button className={'twoD3D '+(context.show3D ? 'butOn' : 'butOff')}
+						onClick={p.activate3D}>3D</button>
+			</div>
+		}
+		else
+			return '';
+	}
+
 /* *************************************************** render */
+	const context = useContext(SquishContext);
 
 	return (<div className='CPToolbar'>
 
@@ -185,8 +201,16 @@ function CPToolbar(props) {
 		<div className='toolbarWidget resetButton volt'>
 				<button onClick={props.resetVoltageHandler}>Reset Voltage</button>
 		</div>
+
+		{render2D3D()}
 	</div>);
 }
 
 export default CPToolbar;
 
+// 		<div className='toolbarWidget '>
+// 				<button className={'twoD3D '+ (context.show2D ? 'butOn' : 'butOff')}
+// 						onClick={p.activate2D}>2D</button>
+// 				<button className={'twoD3D '+(context.show3D ? 'butOn' : 'butOff')}
+// 						onClick={p.activate3D}>3D</button>
+// 		</div>

@@ -10,12 +10,13 @@ import CommonDialog from './widgets/CommonDialog.js';
 import DocReader from './sPanel/DocReader.js';
 import DocMenu from './sPanel/DocMenu.js';
 
-import {eSpaceCreatedPromise} from './engine/eEngine.js';
+import {cppActivePromise} from './engine/eEngine.js';
 import './App.scss';
 
 
 let traceResize = false;
 let traceState = false;
+
 
 class App extends React.Component {
 	constructor(props) {
@@ -41,7 +42,7 @@ class App extends React.Component {
 		if (traceState)
 			console.log(`init App state to:`, this.state);
 
-		eSpaceCreatedPromise.then(space =>{
+		cppActivePromise.then(space =>{
 			// there's lots of thens on this promise, so cppRunning
 			// won't be on for many of them
 			this.setState({cppRunning: true})
@@ -59,7 +60,6 @@ class App extends React.Component {
 
 	// respond properly whenever width changed (usually user & sizebox).  Cuz canvas
 	// needs to resize itself.  Don't bother passing it in; we'll do the right thing.
-	// TODO: this isn't needed anymore, right?
 	widthDidChange = () => {
 		this.setState({bodyWidth: document.body.clientWidth});  // triggers rerenders & resizes
 		if (traceResize)
@@ -110,10 +110,6 @@ class App extends React.Component {
 		let locArgs = {};
 		if (location.search) {
 			let arArgs = location.search.substr(1).split('&');    // eslint-disable-line no-restricted-globals
-			// for (let key in arArgs) {
-			// 	locArgs[key] = arArgs[key] ?? true
-			// }
-			//arArgs.forEach(pair =>{
 			arArgs.forEach(pair =>{
 				let [key, val] = pair.split('=');
 				locArgs[key] = val ?? true;
@@ -121,7 +117,10 @@ class App extends React.Component {
 
 			// if they got the URL with ?anything on the end, open the doc reader
 			for (let topic in locArgs) {
-				setTimeout(() => DocReader.openWithUri(topic), 500);
+				if ('3D' == topic || '3d' == topic)
+					window.enable3D = true;
+				else
+					setTimeout(() => DocReader.openWithUri(topic), 500);
 				break;
 			}
 			// if (locArgs.gettingStarted) {

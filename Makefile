@@ -1,6 +1,6 @@
 #
 # Makefile -- makefile that compiles the C++ and makes all the other parts
-# Copyright (C) 2022-2022 Tactile Interactive, all rights reserved
+# Copyright (C) 2022-2026 Tactile Interactive, all rights reserved
 #
 
 quantumEngine/quantumEngine.js : quantumEngine/*.h quantumEngine/*.cpp  quantumEngine/*/*.*

@@ -13,7 +13,7 @@ import TextNSlider from '../widgets/TextNSlider.js';
 import {getAGroup} from '../utils/storeSettings.js';
 import sSettings from '../utils/sSettings.js';
 
-import {eSpaceCreatedPromise} from '../engine/eEngine.js';
+//import {eSpaceCreatedPromise} from '../engine/eEngine.js';
 import {interpretCppException} from '../utils/errors.js';
 
 // fixed size GLScene at start.  TODO: also in setVoltageTab
@@ -21,6 +21,9 @@ const MINI_WIDTH = 300;
 const MINI_HEIGHT = 150;
 
 let traceRegenerate = false;
+let traceInteract = false;
+let traceEffect = false;
+let traceSetRepaint = false;
 
 const propTypes = {
 	// actually sets the one in use by the main wave
@@ -47,10 +50,11 @@ function SetWaveTab(props) {
 	let {saveMainWave, waveParams, setWaveParams, space} = props;
 
 	// must remember our own temp wave for minigraph
-	const minigraphWaveRef = useRef(null);
-	if (!minigraphWaveRef.current)
-		minigraphWaveRef.current = new eCavity(props.space, 'minigraphWave');
-	let minigraphWave = minigraphWaveRef.current;
+	const minigraphWaveRef = useRef(new eCavity(props.space, 'minigraphWave'));
+	const minigraphWave = minigraphWaveRef.current
+
+	const paintingNeedsRef = useRef({cavity: minigraphWave, bumperWidth: 0})
+	const paintingNeeds = paintingNeedsRef.current;
 
 	// must remember our repaint func
 	const minigraphRepaintRef = useRef(null);
@@ -58,10 +62,11 @@ function SetWaveTab(props) {
 
 	// GLScene ultimately calls this to hand us the minigraph repaint function
 	function setMinigraphRepaint(repaint) {
+		if (traceSetRepaint)
+			dblog(`🎨 set mg repaint: `, repaint);
 		minigraphRepaintRef.current = minigraphRepaint = repaint;
 		minigraphRepaint.sceneName = 'mgRepaint';  // for debugging
 	}
-
 
 	// set the captive miniGraph wave to the new settings,
 	// after user changed one. this will do a GL draw.
@@ -70,22 +75,24 @@ function SetWaveTab(props) {
 		minigraphWave.setFamiliarWave(waveParams);
 
 		if (traceRegenerate)
-			console.log(`Regenerating WaveTab minigraph.  params: `, waveParams);
+			dblog(`🎨 Regenerating WaveTab minigraph.  params: `, waveParams);
 
 		if (minigraphRepaint) {
-			minigraphRepaint();
+			minigraphRepaint(paintingNeeds);
 			if (traceRegenerate)
-				console.log(`the minigraph wave after setFamiliarWave() & repaint`, minigraphWave);
+				dblog(`🎨 the minigraph wave after setFamiliarWave() & repaint`, minigraphWave);
 		}
 		else {
 			if (traceRegenerate)
-				console.log(` minigraph not painted because no minigraphRepaint()`, minigraphWave);
+				dblog(`🎨  minigraph not painted because no minigraphRepaint()`, minigraphWave);
 		}
 	}
 
 	// set any combination of the wave params, in the Control Panel state.
 	// then repaint the minigraph
 	function setAndRegenerate(wp) {
+		if (traceInteract)
+			dblog(`🎨  user interacts: `, wp);
 		setWaveParams(wp);
 
 		// set it in our local copy so it draws the latest.  isn't this redundant with setWaveParams?
@@ -156,11 +163,10 @@ function SetWaveTab(props) {
 	const glScene = <GLScene
 		space={space}
 		sceneClassName='flatScene' sceneName='swMiniGraph'
-		inputInfo={[minigraphWave]}
 		canvasInnerWidth={MINI_WIDTH}
 		canvasInnerHeight={MINI_HEIGHT}
 		setGLRepaint={setMinigraphRepaint}
-		specialInfo={{bumperWidth: 0}}
+		paintingNeeds={paintingNeeds}
 		title="preview of what your wave will look like after clicking Set Wave"
 	/>;
 
@@ -193,6 +199,8 @@ function SetWaveTab(props) {
 
 	// this will happen after the render
 	useEffect(() => {
+		if (traceEffect)
+			dblog(`🎨 useEffect triggers regen of gl`);
 		regenerateMiniGraphWave();
 		return () => {};
 	});

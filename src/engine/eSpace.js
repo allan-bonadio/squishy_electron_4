@@ -37,13 +37,10 @@ export class eSpace {
 			console.log(`eSpace constructor just starting`, dims, spaceLabel);
 		if (dims.length > MAX_DIMENSIONS)
 			throw new Error(`Too many dimensions for space: ${dims.length} given but max is ${MAX_DIMENSIONS}`);
-		if (eSpace.theSpace)
-			throw new Error('creating second space')
 		this.pointer = qeFuncs.startNewSpace(spaceLabel);
 		prepForDirectAccessors(this, this.pointer);
 
 		// make each dimension (someday there'll be more than 1)
-		//let nPoints = 1, nStates = 1;
 		dims.forEach(d => {
 			qeFuncs.addSpaceDimension(this.pointer, d.N, d.continuum,
 				d.dimLength, d.label);

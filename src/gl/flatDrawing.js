@@ -9,7 +9,7 @@ import cx2rygb from './cx2rygb/cx2rygb.glsl.js';
 import qeFuncs from '../engine/qeFuncs.js';
 import qeConsts from '../engine/qeConsts.js';
 
-let traceViewBufAfterDrawing = false;
+let traceAvatarAfterDrawing = false;
 let traceMaxHeight = false;
 let traceFlatDrawing = false;
 let traceViewport = false;
@@ -19,7 +19,6 @@ let traceReloadRow = false;
 let traceDrawPoints = false;
 let traceDrawLines = false;
 
-let pointSize = traceDrawPoints ? `gl_PointSize = 10.;` : '';
 let displayWrapEdges = false;  // soon to be a pref
 
 /* ******************************************************* flat drawing */
@@ -33,8 +32,9 @@ let displayWrapEdges = false;  // soon to be a pref
 */
 
 // make the line number for the start correspond to this JS file line number - the NEXT line
-const vertexSrc = `${cx2rygb}
-#line 32
+const vertexSrc = `// flat drawing vertex
+${cx2rygb}
+#line 38
 varying highp vec4 vColor;
 attribute vec4 row;
 uniform float barWidth;
@@ -61,22 +61,22 @@ void main() {
 	gl_Position = vec4(x, y, 0., 1.);
 
 	//  for the color, convert the complex values via this algorithm
-	vColor.rgb = cx2rygb(row.xy);
+	//vColor.rgb = cx2rygb(row.xy);
 	//vColor.rgb = cx2rygb(vec2(row.x, row.y));
-	vColor.a = 1.;
-	//vColor = vec4(cx2rygb(vec2(row.x, row.y)), 1.);
+	//vColor.a = 1.;
+	vColor = vec4(cx2rygb(vec2(row.x, row.y)), 1.);
 
 	// make the colors darker toward zero (top)
 	if (!odd)
 		vColor = vec4(vColor.r/2., vColor.g/2., vColor.b/2., vColor.a);
 
-	// dot size, in pixels not clip units.  actually a square.
-	${pointSize}
+	// dot size, in pixels not clip units.  actually a fuzzy square.
+	gl_PointSize = 10.;
 }
 `;
 
-const fragmentSrc = `
-#line 69
+const fragmentSrc = `// flat drawing frag
+#line 80
 precision highp float;
 varying highp vec4 vColor;
 
@@ -90,10 +90,12 @@ export class flatDrawing extends abstractDrawing {
 	constructor(scene) {
 		super(scene, 'flatDrawing');
 
+		//this.space = space;
+
 		// each point in the wave results in two vertices, top and wave.
 		// And each of those is four single floats going to the GPU
 		this.avatar = scene.avatar;
-		this.avatar.attachViewBuffer(0, null, 4, this.space.nPoints * 2, 'flat drawing');
+		this.avatar.attachViewBuffer(this.scene.flatAvatarID, null, 4, this.space.nPoints * 2, 'flat drawing');
 
 		this.vertexShaderSrc = vertexSrc;
 		this.fragmentShaderSrc = fragmentSrc;
@@ -108,13 +110,6 @@ export class flatDrawing extends abstractDrawing {
 		if (traceFlatDrawing)
 			console.log(`♭♭♭ flatDrawing ${this.sceneName}: creatingVariables`);
 
-		// normally autoranging would put the highest peak at the exact bottom.
-		// but we want some extra space.  not much.
-		//const vertStretch = 1.0;  // not sure why
-		//const vertStretch = 0.7;  // not sure why
-		const PADDING_ON_BOTTOM = 1.02;
-		//const PADDING_ON_BOTTOM = 1.02 * vertStretch;
-
 		this.maxHeightUniform = new drawingUniform('maxHeight', this,
 			() => {
 				// fresh out of the loader, maxHeight wobbles up and down.  Smooth it.
@@ -124,15 +119,13 @@ export class flatDrawing extends abstractDrawing {
 					// relax changes.  how  quickly?
 					this.maxHeight = this.avatar.double0;
 					//this.maxHeight = (this.maxHeight * 3 + this.avatar.double0) / 4;
-					//this.maxHeight = (this.maxHeight * 15 + this.avatar.double0) / 16;
-					//this.maxHeight = (this.maxHeight * 255 + this.avatar.double0) / 256;
 				}
 
 				if (traceMaxHeight)
 					console.log(`♭♭♭ flatDrawing reloading outer:  `
 						+` maxHeight=${this.avatar.double0.toFixed(5)} `);
 
-				return {value: this.maxHeight * PADDING_ON_BOTTOM, type: '1f'};
+				return {value: this.maxHeight * this.scene.PADDING_ON_BOTTOM, type: '1f'};
 			}
 		);
 
@@ -160,8 +153,8 @@ export class flatDrawing extends abstractDrawing {
 		this.rowFloats = 4;
 		this.rowAttr = new drawingAttribute('row', this, this.rowFloats, () => {
 			//debugger;
-			qeFuncs.avatar_avFlatLoader(this.avatar.pointer, 0, this.scene.inputInfo[0].pointer,
-					nPoints);
+			qeFuncs.avatar_avFlatLoader(this.avatar.pointer, this.scene.flatAvatarID,
+					this.scene.paintingNeeds.cavity.pointer, nPoints);
 
 			if (traceReloadRow) {
 				console.log(`♭♭♭ flatDrawing  ${this.avatarLabel}: at row getViewBuffer() `
@@ -169,13 +162,12 @@ export class flatDrawing extends abstractDrawing {
 					+` total floats=${this.vertexCount * this.rowFloats}  double0=this.avatar.double0`);
 			}
 
-			return this.avatar.getViewBuffer(0);
+			return this.avatar.getViewBuffer(this.scene.flatAvatarID);
 		});
 
 	}
 
-	// called for each image frame on th canvas.  TODO: roll specialInfo into the input Data Arrays
-	draw(width, height, specialInfo) {
+	draw(width, height) {
 		if (traceFlatDrawing) {
 			console.log(`♭♭♭ flat Drawing  ${this.avatarLabel}: `
 				+` width=${width}, height=${height}  drawing ${this.vertexCount/2} points `
@@ -184,8 +176,8 @@ export class flatDrawing extends abstractDrawing {
 		const gl = this.gl;
 		this.setDrawing();
 
-		let bw = specialInfo.bumperWidth;
-		gl.viewport(bw, 0, width - 2 * bw, height);
+		let bw = this.scene.paintingNeeds.bumperWidth;
+		//gl.viewport(bw, 0, width - 2 * bw, height);
 		if (traceViewport) {
 			console.log(`♭♭♭ flatDrawing set viewport on avatar=${this.avatarLabel}: `
 				+` width-2bw=${width - 2 * bw}, height=${height}  `
@@ -196,7 +188,7 @@ export class flatDrawing extends abstractDrawing {
 		if (traceFlatDrawing) {
 			console.log(`♭♭♭just drewArays-flat on avatar ptr=${this.avatar.pointer} `
 				+` this.avatar.label=${this.avatar.label}, `
-				+` buffer label=${this.avatar.bufferNames[0]}`);
+				+` buffer label=${this.avatar.bufferNames[this.scene.flatAvatarID]}`);
 		}
 
 		if (traceDrawLines) {
@@ -209,12 +201,12 @@ export class flatDrawing extends abstractDrawing {
 			gl.drawArrays(gl.POINTS, 0, this.vertexCount);
 
 		// i think this is problematic
-		if (traceViewBufAfterDrawing) {
-			this.avatar.dumpComplexViewBuffer(`♭♭♭ finished drawing in flatDrawing.js; drew buf:`);
-			console.log(`♭♭♭ barWidthUniform=${this.barWidthUniform.reloadFunc()} `
-				+`maxHeightUniform=${this.maxHeightUniform.reloadFunc()}`);
+		if (traceAvatarAfterDrawing) {
+			this.avatar.dumpComplexViewBuffer(this.scene.flatAvatarID, this.nPoints,
+					`♭♭♭ finished drawing in flatDrawing.js`);
+			console.log(`♭♭♭ barWidthUniform=`, this.barWidthUniform.reloadFunc(),
+				+` maxHeightUniform=`, this.maxHeightUniform.reloadFunc());
 		}
-		// ?? this.gl.bindVertexArray(null);
 	}
 }
 
