@@ -250,9 +250,10 @@ export function createStoreSettings() {
 
 	makeParam('orientSettings', 'xPos', 0,  {min: -100, max: +100});
 	makeParam('orientSettings', 'yPos', 0,  {min: -100, max: +100});
-	makeParam('orientSettings', 'zPos', -10,  {min: -200, max: +10});
+	makeParam('orientSettings', 'zPos', -10,  {min: -20, max: +1});
 
 	makeParam('orientSettings', 'foView', 45,  {min: 1, max: +179});
+	makeParam('orientSettings', 'fudge', 1,  {min: 0, max: +2});
 
 
 	/* ************************************miscSettings */
