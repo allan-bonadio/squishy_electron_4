@@ -8,8 +8,8 @@ import {abstractDrawing} from './abstractDrawing.js';
 import {drawingUniform, drawingAttribute} from './drawingVariable.js';
 
 let traceDumpVertices = true;
-let traceTicDrawing = true;
-let traceHighest = true;
+let traceTicDrawing = false;
+let traceHighest = false;
 let traceDrawPoints = true;
 
 // buffer size starts at this
@@ -40,17 +40,14 @@ let pointSize = traceDrawPoints ? `gl_PointSize = 5.;` : '';
 
 // all this really has to do is shovel out the points.  The LINE drawing mode alternates line endings
 const vertexSrc = `// ticDrawing vertex
-#line 42
+#line 44
 attribute vec2 endPoint;
 uniform float maxHeight;
-//varying highp vec4 vColor;
 
 void main() {
 	float y = endPoint.y / maxHeight;
 	y = 1. - 2. * y;
 	gl_Position = vec4(endPoint.x, y, 0., 1.);
-
-	//vColor = vec4(.5, 1., 1., 1.);
 
 	// dot size, in pixels not clip units
 	${pointSize}
@@ -60,8 +57,6 @@ void main() {
 const fragmentSrc = `// ticDrawing frag
 #line 60
 precision highp float;
-//varying highp vec4 vColor;
-
 void main() {
 	gl_FragColor = vec4(0.5, 1., 0.5, 1.);
 }
@@ -93,9 +88,10 @@ export class ticDrawing extends abstractDrawing {
 		// same as in flatDrawing, y is in units of ψ
 		this.maxHeightUniform = new drawingUniform('maxHeight', this,
 			() => {
-				if (traceHighest)
+				if (traceHighest) {
 					console.log(`ticDrawing reloading ${this.sceneName}: `+
 						` highest=${this.avatar.double0?.toFixed(5)}`);
+                }
 
 				// don't use measured highest if zero or undefined
 				let h = this.avatar.double0 || 1 /  this.space.nStates;
@@ -116,14 +112,14 @@ export class ticDrawing extends abstractDrawing {
 		//let ticWidth = 200 / this.gl.drawingBufferWidth;
 		//let ticWidth = 20 / this.gl.drawingBufferWidth;
 
-		let ticOrigin = -50;
+		//let ticOrigin = -50;
 		//let ticOrigin = -0.5;
-		//let ticOrigin = -1;
+		let ticOrigin = -1;
 
-		if (traceHighest)
+		if (traceHighest) {
 			console.log(`➤ ➤ ➤ ticDrawing ${this.sceneName}, ${this.avatarLabel}:`+
 				` highest is ${this.avatar.double0?.toFixed(6)}  ticWidth=${ticWidth}`);
-
+        }
 		//debugger;
 		// number of tics on left side, comes from the flatDrawing scale
 		// but workaround if it isn't drawing
@@ -175,7 +171,7 @@ export class ticDrawing extends abstractDrawing {
 		//debugger;
 		const gl = this.gl;
 		this.setDrawing();
-		//gl.viewport(0, 0, width, height);
+		gl.viewport(0, 0, width, height);  // probably not needed but whatever
 
 		this.drawVariables.forEach(v => v.reloadVariable());
 
@@ -187,6 +183,8 @@ export class ticDrawing extends abstractDrawing {
 
 		if (traceDrawPoints)
 			gl.drawArrays(gl.POINTS, 0, this.vertexCount);
+
+		this.avatar.dumpEachViewBuffer(2, `after draw of ticDrawing`);
 	}
 }
 
