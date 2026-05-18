@@ -311,7 +311,7 @@
 		.flatScale, .blockScale, .canyonScale {
 				grid-area: scale;
 				width: 9em;
-				textAlign: 'right';
+				text-align: 'right';
 		}
 
 		// the scales and canyon power now handled in the js code
@@ -361,7 +361,7 @@
 		margin-left: 3em;
 		font-size: .64em;
 		background-color: #ace;
-		border: 1px #444 #222;
+		border: 1px #222;
 		border-radius: .5em;
 		color: #222;
 		padding: .5em;
@@ -462,7 +462,7 @@
 			padding: 0;
 			small { display: block }
 			.continuumTitle {
-				text-weight: bold;
+				font-weight: bold;
 			};
 		}
 
