@@ -101,12 +101,15 @@ export class WaveVista extends React.Component {
 		props.spaceCreatedProm.then(space => {
 			this.space = space;
 			this.setState({space});  // please render cuz nothing renders without space
-			this.makeProjMatrix()
-			this.makeOrigMatrix();
-			this.makeRotMatrix();
+
+			this.makeWholeMatrix()
 
 			// this will be reused	with new rotMatrixes plugged in
-			this.paintingNeeds = {cavity: this.space.mainFlick, rotMatrix: this.rotMatrix};
+			this.paintingNeeds = {
+				cavity: this.space.mainFlick,
+				rotMatrix: this.rotMatrix,
+				fudge: this.orient.fudge,
+			};
 		});
 	}
 
@@ -182,7 +185,7 @@ export class WaveVista extends React.Component {
 
 		if (traceOrientation) {
 			dblog(`️🏔️ rotating z y x rotation, rads: ${zRotation} ${yRotation} ${xRotation}`);
-			dump4x4(matrix, 'end of makeRotMatrix()');
+			dump4x4('end of makeRotMatrix()', matrix);
 		}
 
 		this.rotMatrix = matrix;
@@ -191,12 +194,11 @@ export class WaveVista extends React.Component {
 		return matrix;
 	}
 
-	// doesn't do anything
-	// canvasResized() {
-	// 	this.makeProjMatrix()
-	// 	this.makeOrigMatrix();
-	// 	this.makeRotMatrix();
-	// }
+	makeWholeMatrix() {
+		this.makeProjMatrix()
+		this.makeOrigMatrix();
+		this.makeRotMatrix();
+	}
 
 	/* ******************************************* orientation 	*/
 
@@ -217,17 +219,21 @@ export class WaveVista extends React.Component {
 	}
 
 	// after angles have changed, call this to ripple it thru and repaint
+	// JUST the rotation angles.
 	repaintOrient = () => {
 		this.paintingNeeds.rotMatrix = this.makeRotMatrix();
 		this.mainVistaRepaint(this.paintingNeeds);
 	}
 
-	// repaint, effecting all changes.  Do this when canvas areas need to repaint & resize
+	// repaint, effecting all changes.  Do this when canvas areas need
+	// to repaint & resize or other Orient3D settings besides the angles
 	repaintRecreate = () => {
 		this.makeProjMatrix();
 		this.makeOrigMatrix();
-		this.paintingNeeds.rotMatrix = this.makeRotMatrix();
-		this.mainVistaRepaint(this.paintingNeeds);
+		this.paintingNeeds.fudge = this.orient.fudge;
+		this.repaintOrient();
+		// this.paintingNeeds.rotMatrix = this.makeRotMatrix();
+		// this.mainVistaRepaint(this.paintingNeeds);
 	}
 
 
@@ -241,12 +247,6 @@ export class WaveVista extends React.Component {
 		this.props.setMainVistaRepaint(mainVistaRepaint);
 		this.animator.mainVistaRepaint ??= mainVistaRepaint;
 	};
-	// ??? there'a another one of these in Vista.  This should not be here; should be in a Spectrum component.
-    //setSpectRepaint = (spectRepaint) => {
-    //    this.spectRepaint ??= spectRepaint;
-    //    this.props.setSpectRepaint(spectRepaint);
-    //    this.animator.spectRepaint ??= spectRepaint;
-    //};
 
 	// not sure I need this in the vista.  No, I don't think I need it TODO
 	grabWaveVistaEl = el => this.WaveVistaEl = el;
@@ -261,7 +261,8 @@ export class WaveVista extends React.Component {
 			let sceneName = 'mainVista';
 
 			if (traceRotMatrix)
-				dump4x4(this.paintingNeeds.rotMatrix, 'vista rotMatrix being passed to <GLScene:');
+				dump4x4('vista rotMatrix being passed to <GLScene:',
+					this.paintingNeeds.rotMatrix);
 			vista = <GLScene
 				space={this.space} animator={this.animator}
 				sceneClassName={'garlandScene'} sceneName={sceneName}
@@ -306,13 +307,23 @@ export class WaveVista extends React.Component {
 		let pOverlay = 'no O';
 		if (this.makeRotMatrix && this.mainVistaRepaint) {
 			pOverlay = <Orient3D
-					repaintOrient={this.repaintOrient}	repaintRecreate={this.repaintRecreate}
-					orientX={this.orient.x} orientY={this.orient.y} orientZ={this.orient.z}
-					orientXPos={this.orient.xPos} orientYPos={this.orient.yPos} orientZPos={this.orient.zPos}
+					repaintOrient={this.repaintOrient}
+					repaintRecreate={this.repaintRecreate}
+
+					orientX={this.orient.x}
+					orientY={this.orient.y}
+					orientZ={this.orient.z}
+
+					orientXPos={this.orient.xPos}
+					orientYPos={this.orient.yPos}
+					orientZPos={this.orient.zPos}
+
 					orientFOView={this.orient.foView}
+					orientFudge={this.orient.fudge}
 
 					setOrient={this.setOrient}
-					makeRotMatrix={this.makeRotMatrix}	mainVistaRepaint={this.mainVistaRepaint}
+					makeRotMatrix={this.makeRotMatrix}
+					mainVistaRepaint={this.mainVistaRepaint}
 				/>;
 		}
 		let vista = this.makeVista();
@@ -356,12 +367,6 @@ export class WaveVista extends React.Component {
 // />
 }
 
-//Object.assign(WaveVista.prototype, waveAux);
 
 export default WaveVista;
 
-			//🪐🪐	<img className='sizeBox' src={resizeIcon} alt='size box'
-//🪐🪐					onPointerDown={this.resizePointerDown} onPointerUp={this.resizePointerUp}
-//🪐🪐					onPointerMove={this.resizePointerMove} onPointerLeave={this.resizePointerUp}
-//🪐🪐					title="To adjust the height, drag this up or down"
-//🪐🪐					style={{width: `2em`, height: `2em`}} />

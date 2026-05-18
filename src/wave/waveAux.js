@@ -56,7 +56,7 @@ export const waveAux = {
 
 		// only need this when the WaveVista outer dims change, either a user
 		// change height or window change width.  On that occasion, we have to adjust
-		// a lot, including resizing the canvases.
+		// a lot, including resizing the canvases.  And matrices for vista.
 		if ((this.formerWidth != this.outerWidth || this.formerHeight != s.outerHeight) ) {
 			//this.updateInnerDims();
 
@@ -68,8 +68,8 @@ export const waveAux = {
 					btw props.outerWidth=${this.props.outerWidth}`);
 			}
 
-			if (this.canvasResized)
-				this.canvasResized();  // vista only
+			if (this.makeWholeMatrix)
+				this.makeWholeMatrix();  // vista only
 
 			// trigger a render.  But only if they actually changed!  potential for ∞ loop.
 			this.setState({outerHeight: s.outerHeight});

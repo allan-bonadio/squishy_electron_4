@@ -34,7 +34,7 @@ let displayWrapEdges = false;  // soon to be a pref
 // make the line number for the start correspond to this JS file line number - the NEXT line
 const vertexSrc = `// flat drawing vertex
 ${cx2rygb}
-#line 32
+#line 38
 varying highp vec4 vColor;
 attribute vec4 row;
 uniform float barWidth;
@@ -61,10 +61,10 @@ void main() {
 	gl_Position = vec4(x, y, 0., 1.);
 
 	//  for the color, convert the complex values via this algorithm
-	vColor.rgb = cx2rygb(row.xy);
+	//vColor.rgb = cx2rygb(row.xy);
 	//vColor.rgb = cx2rygb(vec2(row.x, row.y));
-	vColor.a = 1.;
-	//vColor = vec4(cx2rygb(vec2(row.x, row.y)), 1.);
+	//vColor.a = 1.;
+	vColor = vec4(cx2rygb(vec2(row.x, row.y)), 1.);
 
 	// make the colors darker toward zero (top)
 	if (!odd)
@@ -76,7 +76,7 @@ void main() {
 `;
 
 const fragmentSrc = `// flat drawing frag
-#line 69
+#line 80
 precision highp float;
 varying highp vec4 vColor;
 
@@ -95,7 +95,7 @@ export class flatDrawing extends abstractDrawing {
 		// each point in the wave results in two vertices, top and wave.
 		// And each of those is four single floats going to the GPU
 		this.avatar = scene.avatar;
-		this.avatar.attachViewBuffer(0, null, 4, this.space.nPoints * 2, 'flat drawing');
+		this.avatar.attachViewBuffer(this.scene.flatAvatarID, null, 4, this.space.nPoints * 2, 'flat drawing');
 
 		this.vertexShaderSrc = vertexSrc;
 		this.fragmentShaderSrc = fragmentSrc;
@@ -153,7 +153,7 @@ export class flatDrawing extends abstractDrawing {
 		this.rowFloats = 4;
 		this.rowAttr = new drawingAttribute('row', this, this.rowFloats, () => {
 			//debugger;
-			qeFuncs.avatar_avFlatLoader(this.avatar.pointer, 0,
+			qeFuncs.avatar_avFlatLoader(this.avatar.pointer, this.scene.flatAvatarID,
 					this.scene.paintingNeeds.cavity.pointer, nPoints);
 
 			if (traceReloadRow) {
@@ -162,7 +162,7 @@ export class flatDrawing extends abstractDrawing {
 					+` total floats=${this.vertexCount * this.rowFloats}  double0=this.avatar.double0`);
 			}
 
-			return this.avatar.getViewBuffer(0);
+			return this.avatar.getViewBuffer(this.scene.flatAvatarID);
 		});
 
 	}
@@ -188,7 +188,7 @@ export class flatDrawing extends abstractDrawing {
 		if (traceFlatDrawing) {
 			console.log(`♭♭♭just drewArays-flat on avatar ptr=${this.avatar.pointer} `
 				+` this.avatar.label=${this.avatar.label}, `
-				+` buffer label=${this.avatar.bufferNames[0]}`);
+				+` buffer label=${this.avatar.bufferNames[this.scene.flatAvatarID]}`);
 		}
 
 		if (traceDrawLines) {
@@ -202,7 +202,7 @@ export class flatDrawing extends abstractDrawing {
 
 		// i think this is problematic
 		if (traceAvatarAfterDrawing) {
-			this.avatar.dumpComplexViewBuffer(0, this.nPoints,
+			this.avatar.dumpComplexViewBuffer(this.scene.flatAvatarID, this.nPoints,
 					`♭♭♭ finished drawing in flatDrawing.js`);
 			console.log(`♭♭♭ barWidthUniform=`, this.barWidthUniform.reloadFunc(),
 				+` maxHeightUniform=`, this.maxHeightUniform.reloadFunc());

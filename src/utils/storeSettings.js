@@ -24,8 +24,8 @@ import sSettings from './sSettings.js';
 
 // group, groupName = which component of sSettings this is
 // criterion: validator, see constructor
-//     The criterion are fixed and more broad than some other parts of the code,
-//     eg if 1/N is one of the limits, some other part of the code will enforce that, not here.
+//	 The criterion are fixed and more broad than some other parts of the code,
+//	 eg if 1/N is one of the limits, some other part of the code will enforce that, not here.
 //		um... except for lowPassFilter
 // The general interaction between component states and sSettings is this:
 // component states are initially set from sSettings.
@@ -253,6 +253,7 @@ export function createStoreSettings() {
 	makeParam('orientSettings', 'zPos', -10,  {min: -50, max: -1});
 
 	makeParam('orientSettings', 'foView', 45,  {min: 1, max: +179});
+	makeParam('orientSettings', 'fudge', 1,  {min: 0, max: +2});
 
 
 	/* ************************************miscSettings */
@@ -362,11 +363,11 @@ export function getASetting(groupName, varName) {
 }
 
 export function getDefaultSetting(groupName, varName) {
-    return sSettings.defaults[groupName][varName]
+	return sSettings.defaults[groupName][varName]
 }
 
 // in case you want only one exported name.  Kindof defeats the purpose huh?
 export const storeSettings = {createStoreSettings, getAGroup, storeAGroup,
-    storeASetting, getASetting, getDefaultSetting};
+	storeASetting, getASetting, getDefaultSetting};
 export default storeSettings;
 

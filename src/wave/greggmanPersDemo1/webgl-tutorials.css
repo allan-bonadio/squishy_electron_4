@@ -32,9 +32,9 @@ canvas {
 
   text-shadow:
    -1px -1px 0 #FFF,
-    1px -1px 0 #FFF,
-    -1px 1px 0 #FFF,
-     1px 1px 0 #FFF;
+	1px -1px 0 #FFF,
+	-1px 1px 0 #FFF,
+	 1px 1px 0 #FFF;
 }
 #ui {
   opacity: 0.8;
@@ -91,7 +91,7 @@ canvas {
 /* styles to apply if in an iframe */
 
 html.iframe {
-    height: 100vh;
+	height: 100vh;
 }
 body.iframe {
   width: 100vw;
@@ -121,38 +121,38 @@ body.iframe {
   background-color: rgba(255, 255, 255, 0.6);
 }
 #ui {
-    width: 200px;
+	width: 200px;
 }
 
 @media (max-width: 390px) {
   pre {
-    font-size: xx-small !important;
-    max-width: 300px !important;
+	font-size: xx-small !important;
+	max-width: 300px !important;
   }
   canvas {
-    width: 100vw;
+	width: 100vw;
   }
   .iframe canvas {
-    width: 100vw;
-    height: 100vh;
-    border: none;
+	width: 100vw;
+	height: 100vh;
+	border: none;
   }
   #uiContainer {
-    top: 120px;
+	top: 120px;
   }
   .iframe #uiContainer {
-      top: 10px;
+	  top: 10px;
   }
 }
 
 @media (prefers-color-scheme: dark) {
   #ui .ui-dark-support {
-    color: white;
-    text-shadow:
-     -1px -1px 0 #000,
-      1px -1px 0 #000,
-      -1px 1px 0 #000,
-       1px 1px 0 #000;
+	color: white;
+	text-shadow:
+	 -1px -1px 0 #000,
+	  1px -1px 0 #000,
+	  -1px 1px 0 #000,
+	   1px 1px 0 #000;
   }
 }
 

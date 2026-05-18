@@ -6,11 +6,11 @@ modules = {exports: {
 		worker: true,
 		es2021: true,
 	},
-    "rules": {
-        "eqeqeq": "off",
-        "curly": "error",
-        "quotes": ["error", "double"],
-        "no-unused-vars": "off"
-    }
+	"rules": {
+		"eqeqeq": "off",
+		"curly": "error",
+		"quotes": ["error", "double"],
+		"no-unused-vars": "off"
+	}
 }};
 

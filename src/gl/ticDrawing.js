@@ -69,7 +69,7 @@ export class ticDrawing extends abstractDrawing {
 
 		//debugger;
 		this.avatar = scene.avatar;
-		this.coordBuffer = this.avatar.attachViewBuffer(BUFFER_ID, null,
+		this.coordBuffer = this.avatar.attachViewBuffer(this.scene.ticAvatarID, null,
 			2, BUFFER_MAX_NTICS * FLOATS_PER_TIC, '2D Tics');
 		//this.coordBuffer = new Float32Array(BUFFER_MAX_NTICS * FLOATS_PER_TIC);
 
@@ -139,10 +139,10 @@ export class ticDrawing extends abstractDrawing {
 			let y = t * separationPerTic;
 			// fill in two vertices at once
 			//cb.set([0, 0, 0, 0],  (t-1) * FLOATS_PER_TIC);
-            cb.set([
-               ticOrigin, y,
-               ticOrigin + ticWidth, y,
-            ],  (t-1) * FLOATS_PER_TIC);
+			cb.set([
+			   ticOrigin, y,
+			   ticOrigin + ticWidth, y,
+			],  (t-1) * FLOATS_PER_TIC);
 		}
 
 		this.vertexCount = nTics * VERTICES_PER_TIC;
@@ -177,7 +177,7 @@ export class ticDrawing extends abstractDrawing {
 
 		// if (this.vertexCount > BUFFER_MAX_NTICS * VERTICES_PER_TIC)
 		// 	debugger;
-        gl.lineWidth(1);
+		gl.lineWidth(1);
 		gl.drawArrays(gl.LINE_STRIP, 0, this.vertexCount);
 		//gl.drawArrays(gl.LINES, 0, this.vertexCount);
 

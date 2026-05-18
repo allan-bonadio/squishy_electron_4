@@ -32,9 +32,9 @@ We will define
 		• I = 𝜓.im at times .5dt, 1.5dt, ...
 so that in our buffers of complex numbers, the Im part is dt/2 ahead of the Re part:
 
-              real components    imag components
-initial wave:   𝜓.re(t)              𝜓.im(t + dt/2)
-1st iter wave:  𝜓.re(t + dt)         𝜓.im(t + 3dt/2)
+						real components		imag components
+initial wave:	 𝜓.re(t)							𝜓.im(t + dt/2)
+1st iter wave:	𝜓.re(t + dt)				 𝜓.im(t + 3dt/2)
 
 The natural discretization of Eqs. 6 (visscher paper) is therefore
 	𝜓.re(t + dt) = 𝜓.re(t) + dt H 𝜓.im(t + dt/2)
@@ -54,7 +54,7 @@ where H is hamiltonian, typically ( potential + ∂²/∂x² )
 this is our second derivative wrt ix:
 	qCxd2 = wave[ix-1] + wave[ix+1] - wave[ix] * 2;
 
-ix is the integer index into each length dimension.  The actual distance is dx * ix; determined by
+ix is the integer index into each length dimension.	The actual distance is dx * ix; determined by
 the length (supplied by user) and N, for each dimension of the space.
 
 // The following uses nanometers, picoseconds, etc as described in definitionOfUnits.md
@@ -99,7 +99,7 @@ void qGrinder::pointReal(qCx *newW, qCx *oldW, qCx *hamiltW, double volts, doubl
 
 	if (traceRealStep && within(ix)) {
 		speedyLog(
-		"    🧶 pointReal[%d] d2𝜓i=%3.8lf  hamiltW=%5.5lf %5.5lf %5.5lf and d2Coeff %3.8lf\n",
+		"   🧶 pointReal[%d] d2𝜓i=%3.8lf  hamiltW=%5.5lf %5.5lf %5.5lf and d2Coeff %3.8lf\n",
 		usedIx, d2𝜓i, hamiltW[-1].im, hamiltW[+1].im, hamiltW->im, d2Coeff);
 	}
 	if (traceVoltage && within(ix) && ((infrequent++ & 1023) == 0)) {

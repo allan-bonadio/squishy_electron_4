@@ -13,18 +13,17 @@ import {vec4, mat4} from 'gl-matrix';
 
 
 let traceAvatarAfterDrawing = false;
-let traceGLAfterDrawing = false;
+let traceGLAfterDrawing = true;
 let traceDrawing = false;
 let traceReloadRow = false;
 let traceMatrix = false;
 
 // diagnostic purposes; draws more per vertex
+let traceDontDrawTriangles=  false;
 let traceDrawPoints = false;
-let traceDrawLines = false;
+let traceDrawLines = true;
 
-let pointSize = traceDrawPoints ? `gl_PointSize = 10.;` : '';
-
-/* ******************************************************* garland drawing */
+/* *********************************************** garland drawing */
 // The glsl sources for webgl drawing
 
 /*
@@ -50,11 +49,10 @@ directions; hopefully those numbers are about 0.5 thru 5 or so.  The camera is
 located at the origin?.
 The points in the outer edge of the spiral follow this:
 x = ix
-y = OUTER_FACTOR * 𝜓_real
-z = OUTER_FACTOR * 𝜓_imag
-These are done in the GLSL code.
+y = OUTER_FACTOR * N * 𝜓_real
+z = OUTER_FACTOR * N * 𝜓_imag
 
-Use INNER_FACTOR for the inner edge of the spiral, or zero.  So (frst try) each
+Use INNER_FACTOR for the inner edge of the spiral, or zero.  So (first try) each
 blade is two triangles */
 
 // how much raw psi values should be multipled to be equivalent to x in volume
@@ -70,6 +68,9 @@ ${cx2rygb}
 // this does all the transformation we need.  precalculated for each repaint.
 uniform mat4 matrix;
 
+uniform float fudge;  // kindof like the zoom factor
+uniform float nStates;  // N
+
 // the V shader calculates the color to use, and sets this so the frag shader can get it.
 varying highp vec4 vColor;
 
@@ -77,20 +78,18 @@ varying highp vec4 vColor;
 attribute vec4 row;
 
 void main() {
-	int vertexSerial = int(row.w);  // use gl_VertexID & 1 with webgl2
+	int vertexSerial = int(row.w);
 	int ix = int(vertexSerial) / 2;
-	bool odd = ix * 2 < vertexSerial;
-
+	bool odd = (ix * 2) < vertexSerial;
+	float factor = odd ? ${INNER_FACTOR} : ${OUTER_FACTOR};
 	vec4 point;
-	point.yz = row.xy;
-	point *= odd ? ${INNER_FACTOR} : ${OUTER_FACTOR};
+	point.yz = row.xy * factor * nStates;
 	point.x = float(ix);
 	point.w = 1.;
 
-	point *= matrix;
-	float d = point.z + 2.;
-	gl_Position = vec4(point.x / d, point.y / d, d, 1);
-	//gl_Position = point / (point.z + 2.);
+	gl_Position = point * matrix;
+	gl_Position.w = 1.0 + gl_Position.z * fudge;
+
 
 	//  for the color, convert the complex values via this algorithm
 	vColor.rgb = cx2rygb(row.xy);
@@ -118,8 +117,9 @@ export class garlandDrawing extends abstractDrawing {
 
 		// each point in the wave results in two vertices, top and wave.
 		// And each of those is four single floats going to the GPU
+		this.nPoints = this.space.nPoints;
 		this.avatar = scene.avatar;
-		this.avatar.attachViewBuffer(0, null, 4, this.space.nPoints * 2, 'garland drawing');
+		this.avatar.attachViewBuffer(0, null, 4, this.nPoints * 2, 'garland drawing');
 
 		this.vertexShaderSrc = vertexSrc;
 		this.fragmentShaderSrc = fragmentSrc;
@@ -139,26 +139,34 @@ export class garlandDrawing extends abstractDrawing {
 				let matrix = this.scene.paintingNeeds.rotMatrix;
 
 				if (traceMatrix) {
-					dump4x4(matrix, '🌀🌀🌀 garlandDrawing reloading');
+					dump4x4('🌀🌀🌀 garlandDrawing reloading', matrix);
 				}
 				return {value: matrix, type: 'Matrix4fv'};
 			}
 		);
 
-		let nPoints = this.nPoints = this.space.nPoints;
-		let nStates = this.nStates = this.space.nStates;
+		this.fudgeUniform = new drawingUniform('fudge', this,
+			() => ({value: this.scene.paintingNeeds.fudge, type: '1f'}));
+
+		let nStates = this.space.nStates;
+		this.NUniform = new drawingUniform('nStates', this,
+			() => ({value: nStates, type: '1f'}));
+
 		this.vertexCount = nStates * 2;  // nStates * vertsPerState
 		this.rowFloats = 4;
 		this.rowAttr = new drawingAttribute('row', this, this.rowFloats, () => {
-		    //debugger;
+			//debugger;
 			// retrieve GL rows from the cavity, including the bounds
 			qeFuncs.avatar_avFlatLoader(this.avatar.pointer, 0,
-			        this.scene.paintingNeeds.cavity.pointer, nPoints);
+					this.scene.paintingNeeds.cavity.pointer, this.nPoints);
 
 			if (traceReloadRow) {
-				dblog(`🌀🌀🌀 garlandDrawing  ${this.avatarLabel}: at row getViewBuffer() `
-					+` loading to ${this.avatar.label}   this.vertexCount=${this.vertexCount} `
-					+` total floats=${this.vertexCount * this.rowFloats}  double0=${this.avatar.double0}`);
+				console.log(`🌀🌀🌀 garlandDrawing  ${this.avatarLabel}: `
+					+` at row getViewBuffer() `
+					+` loading to ${this.avatar.label} `
+					+`  this.vertexCount=${this.vertexCount} `
+					+` total floats=${this.vertexCount * this.rowFloats} `
+					+` double0=${this.avatar.double0}`);
 			}
 
 			return this.avatar.getViewBuffer(0);
@@ -178,12 +186,13 @@ export class garlandDrawing extends abstractDrawing {
 
 		this.drawVariables.forEach(v => v.reloadVariable());
 
-        dblog(`🌀 context attributes we're operating under:`, gl.getContextAttributes());
+		dblog(`🌀 context attributes we're operating under:`, gl.getContextAttributes());
 
 		let startEnd2 = this.space.startEnd2;
 		let first = startEnd2.start2;
 		let count = startEnd2.end2 - startEnd2.start2;
-		gl.drawArrays(gl.TRIANGLE_STRIP, first, count);
+		if (!traceDontDrawTriangles)
+			gl.drawArrays(gl.TRIANGLE_STRIP, first, count);
 		if (traceDrawing) {
 			dblog(`🌀🌀🌀just drewArays-garland on avatar ptr=${this.avatar.pointer} `
 				+` this.avatar.label=${this.avatar.label}, `
@@ -192,7 +201,7 @@ export class garlandDrawing extends abstractDrawing {
 
 		if (traceDrawLines) {
 			gl.lineWidth(1);  // it's the only option anyway
-			gl.drawArrays(gl.GL_LINE_STRIP, first, count);
+			gl.drawArrays(gl.LINE_STRIP, first, count);
 		}
 
 		if (traceDrawPoints)
@@ -200,56 +209,62 @@ export class garlandDrawing extends abstractDrawing {
 
 		// i think this is problematic
 		if (traceAvatarAfterDrawing) {
+			let mat = this.matrixUniform.reloadFunc().value;
 			this.avatar.dumpComplexViewBuffer(0, this.nPoints,
 				`🌀🌀🌀 finished drawing in garlandDrawing.js; drew buf:`);
-			dblog(`🌀🌀🌀  matrixUniform=`, this.matrixUniform.reloadFunc());
+			dump4x4(`🌀🌀🌀  matrixUni after draw`, mat);
 		}
 		if (traceGLAfterDrawing) {
-			this.simulateGL(0, this.nPoints,
-				`🌀🌀🌀 finished drawing in garlandDrawing.js; drew buf:`);
-			dblog(`🌀🌀🌀  matrixUniform=`, this.matrixUniform.reloadFunc());
+			this.simulateGL();
+			let mat = this.matrixUniform.reloadFunc().value;
+			dump4x4(`🌀🌀🌀  matrixUni after draw=`, mat);
 		}
 	}
 
-    // simulate and calculate what WebGL would calculate, and dump that.
-    // give or take fidelity of the below.
-    simulateGL(vBuf) {
-        let startEnd2 = this.space.startEnd2;
+	// simulate and calculate what WebGL would calculate, and dump that.
+	// give or take fidelity of the below.
+	simulateGL() {
+		let startEnd2 = this.space.startEnd2;
 		let first = startEnd2.start2;
 		let count = startEnd2.end2 - startEnd2.start2;
-        let vertexSerial, ix, point, odd, factor, row;
-        let rows = this.avatar.getViewBuffer(0);
-        let gl_Position = vec4.create();
+		// indexed by float, not by row like gl uses it
+		let rows4 = this.avatar.getViewBuffer(0);
+		let gl_Position = vec4.create();
+		let vertexSerial, ix, point, odd, factor, row;
 
-        const _ = c => (gl_Position[c] / gl_Position[3]).toFixed(4).padStart(7);
-        //const _ = c => (gl_Position[c]).toFixed(1).padStart(9);
+		const _ = c => (gl_Position[c]).toFixed(4).padStart(7);
+		const __ = c => (row[c]).toFixed(4).padStart(7);
+		//const _ = c => (gl_Position[c]).toFixed(1).padStart(9);
 
 		'';  // collect these otherwise the console merges dup lines
-        let text = ` 🌀🌀 what the GPU calculates, only the `
-			+`${count} vertices, not the points:`;
+		let text = ` 🌀🌀 what the GPU calculates,  the `
+			+`${count} vertices\n`;
 
-        for (let i = 0; i < count; i++) {
-            //  so this simulates the vertex shader.
-        	vertexSerial = first + i;
-            let rs = vertexSerial * 4;
-            row = vec4.fromValues(rows[rs], rows[rs+1], rows[rs+2], rows[rs+3]);
-            ix = Math.floor(vertexSerial / 2);
-            point = vec4.create();
-            odd = (ix & 1);
-            factor = odd ? INNER_FACTOR : OUTER_FACTOR;
-            point[0] = row[0] * factor;
-            point[1] = row[1] * factor;
-            point[2] = 0;
-            point[3] = vertexSerial;
+		for (let i = 0; i < count; i++) {
+			// the body of this loop should replicate the vector shader above
+			vertexSerial = first + i;
+			let rs = vertexSerial * 4;
+			row = vec4.fromValues(rows4[rs], rows4[rs+1], rows4[rs+2], rows4[rs+3]);
+			text += ` 🌀🌀 `
+				+` ${__(0)} +i  ${__(1)}   `;
+			ix = Math.floor(vertexSerial / 2);
+			odd = (ix * 2) < vertexSerial;
+			point = vec4.create();
+			factor = odd ? INNER_FACTOR : OUTER_FACTOR;
+			point[1] = row[0] * factor;
+			point[2] = row[1] * factor;
+			point[0] = ix;
+			point[3] = 1;
 
-            // point * matrix;
-            vec4.transformMat4(gl_Position, point, this.scene.paintingNeeds.rotMatrix);
-            text += ` 🌀🌀${(ix + '').padStart(3)} `
-				+` ${_(0)}   ${_(1)}   ${_(2)}  \n`;
-            //dblog(` 🌀🌀${_(0)}   ${_(1)}   ${_(2)}   ${_(3)}  `);
-        }
-        dblog(text + `  🌀🌀 `);
-    }
+			// point * matrix;
+			vec4.transformMat4(gl_Position, point, this.scene.paintingNeeds.rotMatrix);
+			text += ` [${String(ix).padStart(3)}] `
+				+` ${_(0)}   ${_(1)}   ${_(2)}   ${_(3)}  \n`
+				;
+		}
+		dump4x4('🌀🌀🌀 GL simulation matrix', this.scene.paintingNeeds.rotMatrix);
+		dblog(text + `  🌀🌀 `);
+	}
 
 }
 

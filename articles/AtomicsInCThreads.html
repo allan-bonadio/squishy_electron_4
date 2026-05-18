@@ -6,291 +6,291 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
   <title>Beej's Guide to C Programming</title>
   <style>
-    html {
-      color: #1a1a1a;
-      background-color: #fdfdfd;
-    }
-    body {
-      margin: 0 auto;
-      max-width: 36em;
-      padding-left: 50px;
-      padding-right: 50px;
-      padding-top: 50px;
-      padding-bottom: 50px;
-      hyphens: auto;
-      overflow-wrap: break-word;
-      text-rendering: optimizeLegibility;
-      font-kerning: normal;
-    }
-    @media (max-width: 600px) {
-      body {
-        font-size: 0.9em;
-        padding: 12px;
-      }
-      h1 {
-        font-size: 1.8em;
-      }
-    }
-    @media print {
-      html {
-        background-color: white;
-      }
-      body {
-        background-color: transparent;
-        color: black;
-        font-size: 12pt;
-      }
-      p, h2, h3 {
-        orphans: 3;
-        widows: 3;
-      }
-      h2, h3, h4 {
-        page-break-after: avoid;
-      }
-    }
-    p {
-      margin: 1em 0;
-    }
-    a {
-      color: #1a1a1a;
-    }
-    a:visited {
-      color: #1a1a1a;
-    }
-    img {
-      max-width: 100%;
-    }
-    svg {
-      height: auto;
-      max-width: 100%;
-    }
-    h1, h2, h3, h4, h5, h6 {
-      margin-top: 1.4em;
-    }
-    h5, h6 {
-      font-size: 1em;
-      font-style: italic;
-    }
-    h6 {
-      font-weight: normal;
-    }
-    ol, ul {
-      padding-left: 1.7em;
-      margin-top: 1em;
-    }
-    li > ol, li > ul {
-      margin-top: 0;
-    }
-    blockquote {
-      margin: 1em 0 1em 1.7em;
-      padding-left: 1em;
-      border-left: 2px solid #e6e6e6;
-      color: #606060;
-    }
-    code {
-      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
-      font-size: 85%;
-      margin: 0;
-      hyphens: manual;
-    }
-    pre {
-      margin: 1em 0;
-      overflow: auto;
-    }
-    pre code {
-      padding: 0;
-      overflow: visible;
-      overflow-wrap: normal;
-    }
-    .sourceCode {
-     background-color: transparent;
-     overflow: visible;
-    }
-    hr {
-      background-color: #1a1a1a;
-      border: none;
-      height: 1px;
-      margin: 1em 0;
-    }
-    table {
-      margin: 1em 0;
-      border-collapse: collapse;
-      width: 100%;
-      overflow-x: auto;
-      display: block;
-      font-variant-numeric: lining-nums tabular-nums;
-    }
-    table caption {
-      margin-bottom: 0.75em;
-    }
-    tbody {
-      margin-top: 0.5em;
-      border-top: 1px solid #1a1a1a;
-      border-bottom: 1px solid #1a1a1a;
-    }
-    th {
-      border-top: 1px solid #1a1a1a;
-      padding: 0.25em 0.5em 0.25em 0.5em;
-    }
-    td {
-      padding: 0.125em 0.5em 0.25em 0.5em;
-    }
-    header {
-      margin-bottom: 4em;
-      text-align: center;
-    }
-    #TOC li {
-      list-style: none;
-    }
-    #TOC ul {
-      padding-left: 1.3em;
-    }
-    #TOC > ul {
-      padding-left: 0;
-    }
-    #TOC a:not(:hover) {
-      text-decoration: none;
-    }
-    code{white-space: pre-wrap;}
-    span.smallcaps{font-variant: small-caps;}
-    div.columns{display: flex; gap: min(4vw, 1.5em);}
-    div.column{flex: auto; overflow-x: auto;}
-    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
-    /* The extra [class] is a hack that increases specificity enough to
-       override a similar rule in reveal.js */
-    ul.task-list[class]{list-style: none;}
-    ul.task-list li input[type="checkbox"] {
-      font-size: inherit;
-      width: 0.8em;
-      margin: 0 0.8em 0.2em -1.6em;
-      vertical-align: middle;
-    }
-    /* CSS for syntax highlighting */
-    pre > code.sourceCode { white-space: pre; position: relative; }
-    pre > code.sourceCode > span { line-height: 1.25; }
-    pre > code.sourceCode > span:empty { height: 1.2em; }
-    .sourceCode { overflow: visible; }
-    code.sourceCode > span { color: inherit; text-decoration: inherit; }
-    div.sourceCode { margin: 1em 0; }
-    pre.sourceCode { margin: 0; }
-    @media screen {
-    div.sourceCode { overflow: auto; }
-    }
-    @media print {
-    pre > code.sourceCode { white-space: pre-wrap; }
-    pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
-    }
-    pre.numberSource code
-      { counter-reset: source-line 0; }
-    pre.numberSource code > span
-      { position: relative; left: -4em; counter-increment: source-line; }
-    pre.numberSource code > span > a:first-child::before
-      { content: counter(source-line);
-        position: relative; left: -1em; text-align: right; vertical-align: baseline;
-        border: none; display: inline-block;
-        -webkit-touch-callout: none; -webkit-user-select: none;
-        -khtml-user-select: none; -moz-user-select: none;
-        -ms-user-select: none; user-select: none;
-        padding: 0 4px; width: 4em;
-        color: #aaaaaa;
-      }
-    pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
-    div.sourceCode
-      {   }
-    @media screen {
-    pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
-    }
-    code span.al { color: #ff0000; font-weight: bold; } /* Alert */
-    code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
-    code span.at { color: #7d9029; } /* Attribute */
-    code span.bn { color: #40a070; } /* BaseN */
-    code span.bu { color: #008000; } /* BuiltIn */
-    code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
-    code span.ch { color: #4070a0; } /* Char */
-    code span.cn { color: #880000; } /* Constant */
-    code span.co { color: #60a0b0; font-style: italic; } /* Comment */
-    code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
-    code span.do { color: #ba2121; font-style: italic; } /* Documentation */
-    code span.dt { color: #902000; } /* DataType */
-    code span.dv { color: #40a070; } /* DecVal */
-    code span.er { color: #ff0000; font-weight: bold; } /* Error */
-    code span.ex { } /* Extension */
-    code span.fl { color: #40a070; } /* Float */
-    code span.fu { color: #06287e; } /* Function */
-    code span.im { color: #008000; font-weight: bold; } /* Import */
-    code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
-    code span.kw { color: #007020; font-weight: bold; } /* Keyword */
-    code span.op { color: #666666; } /* Operator */
-    code span.ot { color: #007020; } /* Other */
-    code span.pp { color: #bc7a00; } /* Preprocessor */
-    code span.sc { color: #4070a0; } /* SpecialChar */
-    code span.ss { color: #bb6688; } /* SpecialString */
-    code span.st { color: #4070a0; } /* String */
-    code span.va { color: #19177c; } /* Variable */
-    code span.vs { color: #4070a0; } /* VerbatimString */
-    code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+	html {
+	  color: #1a1a1a;
+	  background-color: #fdfdfd;
+	}
+	body {
+	  margin: 0 auto;
+	  max-width: 36em;
+	  padding-left: 50px;
+	  padding-right: 50px;
+	  padding-top: 50px;
+	  padding-bottom: 50px;
+	  hyphens: auto;
+	  overflow-wrap: break-word;
+	  text-rendering: optimizeLegibility;
+	  font-kerning: normal;
+	}
+	@media (max-width: 600px) {
+	  body {
+		font-size: 0.9em;
+		padding: 12px;
+	  }
+	  h1 {
+		font-size: 1.8em;
+	  }
+	}
+	@media print {
+	  html {
+		background-color: white;
+	  }
+	  body {
+		background-color: transparent;
+		color: black;
+		font-size: 12pt;
+	  }
+	  p, h2, h3 {
+		orphans: 3;
+		widows: 3;
+	  }
+	  h2, h3, h4 {
+		page-break-after: avoid;
+	  }
+	}
+	p {
+	  margin: 1em 0;
+	}
+	a {
+	  color: #1a1a1a;
+	}
+	a:visited {
+	  color: #1a1a1a;
+	}
+	img {
+	  max-width: 100%;
+	}
+	svg {
+	  height: auto;
+	  max-width: 100%;
+	}
+	h1, h2, h3, h4, h5, h6 {
+	  margin-top: 1.4em;
+	}
+	h5, h6 {
+	  font-size: 1em;
+	  font-style: italic;
+	}
+	h6 {
+	  font-weight: normal;
+	}
+	ol, ul {
+	  padding-left: 1.7em;
+	  margin-top: 1em;
+	}
+	li > ol, li > ul {
+	  margin-top: 0;
+	}
+	blockquote {
+	  margin: 1em 0 1em 1.7em;
+	  padding-left: 1em;
+	  border-left: 2px solid #e6e6e6;
+	  color: #606060;
+	}
+	code {
+	  font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+	  font-size: 85%;
+	  margin: 0;
+	  hyphens: manual;
+	}
+	pre {
+	  margin: 1em 0;
+	  overflow: auto;
+	}
+	pre code {
+	  padding: 0;
+	  overflow: visible;
+	  overflow-wrap: normal;
+	}
+	.sourceCode {
+	 background-color: transparent;
+	 overflow: visible;
+	}
+	hr {
+	  background-color: #1a1a1a;
+	  border: none;
+	  height: 1px;
+	  margin: 1em 0;
+	}
+	table {
+	  margin: 1em 0;
+	  border-collapse: collapse;
+	  width: 100%;
+	  overflow-x: auto;
+	  display: block;
+	  font-variant-numeric: lining-nums tabular-nums;
+	}
+	table caption {
+	  margin-bottom: 0.75em;
+	}
+	tbody {
+	  margin-top: 0.5em;
+	  border-top: 1px solid #1a1a1a;
+	  border-bottom: 1px solid #1a1a1a;
+	}
+	th {
+	  border-top: 1px solid #1a1a1a;
+	  padding: 0.25em 0.5em 0.25em 0.5em;
+	}
+	td {
+	  padding: 0.125em 0.5em 0.25em 0.5em;
+	}
+	header {
+	  margin-bottom: 4em;
+	  text-align: center;
+	}
+	#TOC li {
+	  list-style: none;
+	}
+	#TOC ul {
+	  padding-left: 1.3em;
+	}
+	#TOC > ul {
+	  padding-left: 0;
+	}
+	#TOC a:not(:hover) {
+	  text-decoration: none;
+	}
+	code{white-space: pre-wrap;}
+	span.smallcaps{font-variant: small-caps;}
+	div.columns{display: flex; gap: min(4vw, 1.5em);}
+	div.column{flex: auto; overflow-x: auto;}
+	div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+	/* The extra [class] is a hack that increases specificity enough to
+	   override a similar rule in reveal.js */
+	ul.task-list[class]{list-style: none;}
+	ul.task-list li input[type="checkbox"] {
+	  font-size: inherit;
+	  width: 0.8em;
+	  margin: 0 0.8em 0.2em -1.6em;
+	  vertical-align: middle;
+	}
+	/* CSS for syntax highlighting */
+	pre > code.sourceCode { white-space: pre; position: relative; }
+	pre > code.sourceCode > span { line-height: 1.25; }
+	pre > code.sourceCode > span:empty { height: 1.2em; }
+	.sourceCode { overflow: visible; }
+	code.sourceCode > span { color: inherit; text-decoration: inherit; }
+	div.sourceCode { margin: 1em 0; }
+	pre.sourceCode { margin: 0; }
+	@media screen {
+	div.sourceCode { overflow: auto; }
+	}
+	@media print {
+	pre > code.sourceCode { white-space: pre-wrap; }
+	pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+	}
+	pre.numberSource code
+	  { counter-reset: source-line 0; }
+	pre.numberSource code > span
+	  { position: relative; left: -4em; counter-increment: source-line; }
+	pre.numberSource code > span > a:first-child::before
+	  { content: counter(source-line);
+		position: relative; left: -1em; text-align: right; vertical-align: baseline;
+		border: none; display: inline-block;
+		-webkit-touch-callout: none; -webkit-user-select: none;
+		-khtml-user-select: none; -moz-user-select: none;
+		-ms-user-select: none; user-select: none;
+		padding: 0 4px; width: 4em;
+		color: #aaaaaa;
+	  }
+	pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+	div.sourceCode
+	  {   }
+	@media screen {
+	pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+	}
+	code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+	code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+	code span.at { color: #7d9029; } /* Attribute */
+	code span.bn { color: #40a070; } /* BaseN */
+	code span.bu { color: #008000; } /* BuiltIn */
+	code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+	code span.ch { color: #4070a0; } /* Char */
+	code span.cn { color: #880000; } /* Constant */
+	code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+	code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+	code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+	code span.dt { color: #902000; } /* DataType */
+	code span.dv { color: #40a070; } /* DecVal */
+	code span.er { color: #ff0000; font-weight: bold; } /* Error */
+	code span.ex { } /* Extension */
+	code span.fl { color: #40a070; } /* Float */
+	code span.fu { color: #06287e; } /* Function */
+	code span.im { color: #008000; font-weight: bold; } /* Import */
+	code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+	code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+	code span.op { color: #666666; } /* Operator */
+	code span.ot { color: #007020; } /* Other */
+	code span.pp { color: #bc7a00; } /* Preprocessor */
+	code span.sc { color: #4070a0; } /* SpecialChar */
+	code span.ss { color: #bb6688; } /* SpecialString */
+	code span.st { color: #4070a0; } /* String */
+	code span.va { color: #19177c; } /* Variable */
+	code span.vs { color: #4070a0; } /* VerbatimString */
+	code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
   </style>
-  <link href="https://fonts.googleapis.com/css?family=Roboto|Roboto+Mono&display=swap" rel="stylesheet"> 
+  <link href="https://fonts.googleapis.com/css?family=Roboto|Roboto+Mono&display=swap" rel="stylesheet">
 
   <!-- BG custom styling -->
   <style type="text/css">
   /* Fix for line numbers not visible */
   /*
   pre.numberSource code > span {
-      left: -1em;
+	  left: -1em;
   }
   pre.numberSource {
-      margin-left: initial;
+	  margin-left: initial;
   }
   */
 
   /* Put some space after the section numbers */
   span.toc-section-number::after {
-      content: "\a0\a0\a0";  /* non-breaking whitespace */
+	  content: "\a0\a0\a0";  /* non-breaking whitespace */
   }
 
   /* Hide underlines on code number links */
   pre > code.sourceCode > span > a:first-child::before {
-      text-decoration: none;
+	  text-decoration: none;
   }
 
   /* Color the source blocks */
   div.sourceCode {
-      background-color: #f0f0f0;
+	  background-color: #f0f0f0;
   }
 
   /* Fix iOS big text rendering issue */
   pre > code.sourceCode > span {
-      display: initial;
+	  display: initial;
   }
 
 
   /* Color the inline code */
   code:not(.sourceCode) {
-      background: #f0f0f0;
-      padding-left: 0.2em;
-      padding-right: 0.2em;
-      border-radius: 0.2em;
+	  background: #f0f0f0;
+	  padding-left: 0.2em;
+	  padding-right: 0.2em;
+	  border-radius: 0.2em;
   }
 
   /* Keep code tags from wrapping in tables */
   tbody code {
-      white-space: nowrap;
+	  white-space: nowrap;
   }
 
   td {
-      vertical-align: top;
+	  vertical-align: top;
   }
 
   body {
-      font-size: 12pt;
-      max-width: 43em;
+	  font-size: 12pt;
+	  max-width: 43em;
   }
   </style>
   <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
   <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
   <!--[if lt IE 9]>
-    <script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv-printshiv.min.js"></script>
+	<script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv-printshiv.min.js"></script>
   <![endif]-->
 </head>
 <body>
@@ -341,43 +341,43 @@
 <span id="cb766-6"><a href="chapter-atomics.html#cb766-6"></a></span>
 <span id="cb766-7"><a href="chapter-atomics.html#cb766-7"></a><span class="dt">int</span> thread1<span class="op">(</span><span class="dt">void</span> <span class="op">*</span>arg<span class="op">)</span></span>
 <span id="cb766-8"><a href="chapter-atomics.html#cb766-8"></a><span class="op">{</span></span>
-<span id="cb766-9"><a href="chapter-atomics.html#cb766-9"></a>    <span class="op">(</span><span class="dt">void</span><span class="op">)</span>arg<span class="op">;</span></span>
+<span id="cb766-9"><a href="chapter-atomics.html#cb766-9"></a>	<span class="op">(</span><span class="dt">void</span><span class="op">)</span>arg<span class="op">;</span></span>
 <span id="cb766-10"><a href="chapter-atomics.html#cb766-10"></a></span>
-<span id="cb766-11"><a href="chapter-atomics.html#cb766-11"></a>    printf<span class="op">(</span><span class="st">&quot;Thread 1: Sleeping for 1.5 seconds</span><span class="sc">\n</span><span class="st">&quot;</span><span class="op">);</span></span>
-<span id="cb766-12"><a href="chapter-atomics.html#cb766-12"></a>    thrd_sleep<span class="op">(&amp;(</span><span class="kw">struct</span> timespec<span class="op">){.</span>tv_sec<span class="op">=</span><span class="dv">1</span><span class="op">,</span> <span class="op">.</span>tv_nsec<span class="op">=</span><span class="dv">500000000</span><span class="op">},</span> NULL<span class="op">);</span></span>
+<span id="cb766-11"><a href="chapter-atomics.html#cb766-11"></a>	printf<span class="op">(</span><span class="st">&quot;Thread 1: Sleeping for 1.5 seconds</span><span class="sc">\n</span><span class="st">&quot;</span><span class="op">);</span></span>
+<span id="cb766-12"><a href="chapter-atomics.html#cb766-12"></a>	thrd_sleep<span class="op">(&amp;(</span><span class="kw">struct</span> timespec<span class="op">){.</span>tv_sec<span class="op">=</span><span class="dv">1</span><span class="op">,</span> <span class="op">.</span>tv_nsec<span class="op">=</span><span class="dv">500000000</span><span class="op">},</span> NULL<span class="op">);</span></span>
 <span id="cb766-13"><a href="chapter-atomics.html#cb766-13"></a></span>
-<span id="cb766-14"><a href="chapter-atomics.html#cb766-14"></a>    printf<span class="op">(</span><span class="st">&quot;Thread 1: Setting x to 3490</span><span class="sc">\n</span><span class="st">&quot;</span><span class="op">);</span></span>
-<span id="cb766-15"><a href="chapter-atomics.html#cb766-15"></a>    x <span class="op">=</span> <span class="dv">3490</span><span class="op">;</span></span>
+<span id="cb766-14"><a href="chapter-atomics.html#cb766-14"></a>	printf<span class="op">(</span><span class="st">&quot;Thread 1: Setting x to 3490</span><span class="sc">\n</span><span class="st">&quot;</span><span class="op">);</span></span>
+<span id="cb766-15"><a href="chapter-atomics.html#cb766-15"></a>	x <span class="op">=</span> <span class="dv">3490</span><span class="op">;</span></span>
 <span id="cb766-16"><a href="chapter-atomics.html#cb766-16"></a></span>
-<span id="cb766-17"><a href="chapter-atomics.html#cb766-17"></a>    printf<span class="op">(</span><span class="st">&quot;Thread 1: Exiting</span><span class="sc">\n</span><span class="st">&quot;</span><span class="op">);</span></span>
-<span id="cb766-18"><a href="chapter-atomics.html#cb766-18"></a>    <span class="cf">return</span> <span class="dv">0</span><span class="op">;</span></span>
+<span id="cb766-17"><a href="chapter-atomics.html#cb766-17"></a>	printf<span class="op">(</span><span class="st">&quot;Thread 1: Exiting</span><span class="sc">\n</span><span class="st">&quot;</span><span class="op">);</span></span>
+<span id="cb766-18"><a href="chapter-atomics.html#cb766-18"></a>	<span class="cf">return</span> <span class="dv">0</span><span class="op">;</span></span>
 <span id="cb766-19"><a href="chapter-atomics.html#cb766-19"></a><span class="op">}</span></span>
 <span id="cb766-20"><a href="chapter-atomics.html#cb766-20"></a></span>
 <span id="cb766-21"><a href="chapter-atomics.html#cb766-21"></a><span class="dt">int</span> thread2<span class="op">(</span><span class="dt">void</span> <span class="op">*</span>arg<span class="op">)</span></span>
 <span id="cb766-22"><a href="chapter-atomics.html#cb766-22"></a><span class="op">{</span></span>
-<span id="cb766-23"><a href="chapter-atomics.html#cb766-23"></a>    <span class="op">(</span><span class="dt">void</span><span class="op">)</span>arg<span class="op">;</span></span>
+<span id="cb766-23"><a href="chapter-atomics.html#cb766-23"></a>	<span class="op">(</span><span class="dt">void</span><span class="op">)</span>arg<span class="op">;</span></span>
 <span id="cb766-24"><a href="chapter-atomics.html#cb766-24"></a></span>
-<span id="cb766-25"><a href="chapter-atomics.html#cb766-25"></a>    printf<span class="op">(</span><span class="st">&quot;Thread 2: Waiting for 3490</span><span class="sc">\n</span><span class="st">&quot;</span><span class="op">);</span></span>
-<span id="cb766-26"><a href="chapter-atomics.html#cb766-26"></a>    <span class="cf">while</span> <span class="op">(</span>x <span class="op">!=</span> <span class="dv">3490</span><span class="op">)</span> <span class="op">{}</span>  <span class="co">// spin here</span></span>
+<span id="cb766-25"><a href="chapter-atomics.html#cb766-25"></a>	printf<span class="op">(</span><span class="st">&quot;Thread 2: Waiting for 3490</span><span class="sc">\n</span><span class="st">&quot;</span><span class="op">);</span></span>
+<span id="cb766-26"><a href="chapter-atomics.html#cb766-26"></a>	<span class="cf">while</span> <span class="op">(</span>x <span class="op">!=</span> <span class="dv">3490</span><span class="op">)</span> <span class="op">{}</span>  <span class="co">// spin here</span></span>
 <span id="cb766-27"><a href="chapter-atomics.html#cb766-27"></a></span>
-<span id="cb766-28"><a href="chapter-atomics.html#cb766-28"></a>    printf<span class="op">(</span><span class="st">&quot;Thread 2: Got 3490--exiting!</span><span class="sc">\n</span><span class="st">&quot;</span><span class="op">);</span></span>
-<span id="cb766-29"><a href="chapter-atomics.html#cb766-29"></a>    <span class="cf">return</span> <span class="dv">0</span><span class="op">;</span></span>
+<span id="cb766-28"><a href="chapter-atomics.html#cb766-28"></a>	printf<span class="op">(</span><span class="st">&quot;Thread 2: Got 3490--exiting!</span><span class="sc">\n</span><span class="st">&quot;</span><span class="op">);</span></span>
+<span id="cb766-29"><a href="chapter-atomics.html#cb766-29"></a>	<span class="cf">return</span> <span class="dv">0</span><span class="op">;</span></span>
 <span id="cb766-30"><a href="chapter-atomics.html#cb766-30"></a><span class="op">}</span></span>
 <span id="cb766-31"><a href="chapter-atomics.html#cb766-31"></a></span>
 <span id="cb766-32"><a href="chapter-atomics.html#cb766-32"></a><span class="dt">int</span> main<span class="op">(</span><span class="dt">void</span><span class="op">)</span></span>
 <span id="cb766-33"><a href="chapter-atomics.html#cb766-33"></a><span class="op">{</span></span>
-<span id="cb766-34"><a href="chapter-atomics.html#cb766-34"></a>    x <span class="op">=</span> <span class="dv">0</span><span class="op">;</span></span>
+<span id="cb766-34"><a href="chapter-atomics.html#cb766-34"></a>	x <span class="op">=</span> <span class="dv">0</span><span class="op">;</span></span>
 <span id="cb766-35"><a href="chapter-atomics.html#cb766-35"></a></span>
-<span id="cb766-36"><a href="chapter-atomics.html#cb766-36"></a>    thrd_t t1<span class="op">,</span> t2<span class="op">;</span></span>
+<span id="cb766-36"><a href="chapter-atomics.html#cb766-36"></a>	thrd_t t1<span class="op">,</span> t2<span class="op">;</span></span>
 <span id="cb766-37"><a href="chapter-atomics.html#cb766-37"></a></span>
-<span id="cb766-38"><a href="chapter-atomics.html#cb766-38"></a>    thrd_create<span class="op">(&amp;</span>t1<span class="op">,</span> thread1<span class="op">,</span> NULL<span class="op">);</span></span>
-<span id="cb766-39"><a href="chapter-atomics.html#cb766-39"></a>    thrd_create<span class="op">(&amp;</span>t2<span class="op">,</span> thread2<span class="op">,</span> NULL<span class="op">);</span></span>
+<span id="cb766-38"><a href="chapter-atomics.html#cb766-38"></a>	thrd_create<span class="op">(&amp;</span>t1<span class="op">,</span> thread1<span class="op">,</span> NULL<span class="op">);</span></span>
+<span id="cb766-39"><a href="chapter-atomics.html#cb766-39"></a>	thrd_create<span class="op">(&amp;</span>t2<span class="op">,</span> thread2<span class="op">,</span> NULL<span class="op">);</span></span>
 <span id="cb766-40"><a href="chapter-atomics.html#cb766-40"></a></span>
-<span id="cb766-41"><a href="chapter-atomics.html#cb766-41"></a>    thrd_join<span class="op">(</span>t1<span class="op">,</span> NULL<span class="op">);</span></span>
-<span id="cb766-42"><a href="chapter-atomics.html#cb766-42"></a>    thrd_join<span class="op">(</span>t2<span class="op">,</span> NULL<span class="op">);</span></span>
+<span id="cb766-41"><a href="chapter-atomics.html#cb766-41"></a>	thrd_join<span class="op">(</span>t1<span class="op">,</span> NULL<span class="op">);</span></span>
+<span id="cb766-42"><a href="chapter-atomics.html#cb766-42"></a>	thrd_join<span class="op">(</span>t2<span class="op">,</span> NULL<span class="op">);</span></span>
 <span id="cb766-43"><a href="chapter-atomics.html#cb766-43"></a></span>
-<span id="cb766-44"><a href="chapter-atomics.html#cb766-44"></a>    printf<span class="op">(</span><span class="st">&quot;Main    : Threads are done, so x better be 3490</span><span class="sc">\n</span><span class="st">&quot;</span><span class="op">);</span></span>
-<span id="cb766-45"><a href="chapter-atomics.html#cb766-45"></a>    printf<span class="op">(</span><span class="st">&quot;Main    : And indeed, x == </span><span class="sc">%d\n</span><span class="st">&quot;</span><span class="op">,</span> x<span class="op">);</span></span>
+<span id="cb766-44"><a href="chapter-atomics.html#cb766-44"></a>	printf<span class="op">(</span><span class="st">&quot;Main	: Threads are done, so x better be 3490</span><span class="sc">\n</span><span class="st">&quot;</span><span class="op">);</span></span>
+<span id="cb766-45"><a href="chapter-atomics.html#cb766-45"></a>	printf<span class="op">(</span><span class="st">&quot;Main	: And indeed, x == </span><span class="sc">%d\n</span><span class="st">&quot;</span><span class="op">,</span> x<span class="op">);</span></span>
 <span id="cb766-46"><a href="chapter-atomics.html#cb766-46"></a><span class="op">}</span></span></code></pre></div>
 <p></p>
 <p>The second thread spins in place, looking at the flag and waiting for it to get set to the value <code>3490</code>. And the first one does that.</p>
@@ -387,8 +387,8 @@
 <span id="cb767-3"><a href="chapter-atomics.html#cb767-3" aria-hidden="true" tabindex="-1"></a>Thread 1: Setting x to 3490</span>
 <span id="cb767-4"><a href="chapter-atomics.html#cb767-4" aria-hidden="true" tabindex="-1"></a>Thread 1: Exiting</span>
 <span id="cb767-5"><a href="chapter-atomics.html#cb767-5" aria-hidden="true" tabindex="-1"></a>Thread 2: Got 3490--exiting!</span>
-<span id="cb767-6"><a href="chapter-atomics.html#cb767-6" aria-hidden="true" tabindex="-1"></a>Main    : Threads are done, so x better be 3490</span>
-<span id="cb767-7"><a href="chapter-atomics.html#cb767-7" aria-hidden="true" tabindex="-1"></a>Main    : And indeed, x == 3490</span></code></pre></div>
+<span id="cb767-6"><a href="chapter-atomics.html#cb767-6" aria-hidden="true" tabindex="-1"></a>Main	: Threads are done, so x better be 3490</span>
+<span id="cb767-7"><a href="chapter-atomics.html#cb767-7" aria-hidden="true" tabindex="-1"></a>Main	: And indeed, x == 3490</span></code></pre></div>
 <p>Look, ma! We’re accessing a variable from different threads and not using a mutex! And that’ll work every time thanks to the atomic nature of atomic variables.</p>
 <p>You might be wondering what happens if that’s a regular non-atomic <code>int</code>, instead. Well, on my system it still works… unless I do an optimized build in which case it hangs on thread 2 waiting to see the 3490 to get set<a href="function-specifiers-alignment-specifiersoperators.html#fn208" class="footnote-ref" id="fnref208" role="doc-noteref"><sup>208</sup></a>.</p>
 <p>But that’s just the beginning of the story. The next part is going to require more brain power and has to do with something called <em>synchronization</em>.</p>
@@ -412,13 +412,13 @@
 <div class="sourceCode" id="cb769"><pre class="sourceCode numberSource c numberLines"><code class="sourceCode c"><span id="cb769-1"><a href="chapter-atomics.html#cb769-1"></a><span class="dt">int</span> x <span class="op">=</span> <span class="dv">0</span><span class="op">,</span> y <span class="op">=</span> <span class="dv">0</span><span class="op">;</span></span>
 <span id="cb769-2"><a href="chapter-atomics.html#cb769-2"></a></span>
 <span id="cb769-3"><a href="chapter-atomics.html#cb769-3"></a>thread1<span class="op">()</span> <span class="op">{</span></span>
-<span id="cb769-4"><a href="chapter-atomics.html#cb769-4"></a>    x <span class="op">=</span> <span class="dv">2</span><span class="op">;</span></span>
-<span id="cb769-5"><a href="chapter-atomics.html#cb769-5"></a>    y <span class="op">=</span> <span class="dv">3</span><span class="op">;</span></span>
+<span id="cb769-4"><a href="chapter-atomics.html#cb769-4"></a>	x <span class="op">=</span> <span class="dv">2</span><span class="op">;</span></span>
+<span id="cb769-5"><a href="chapter-atomics.html#cb769-5"></a>	y <span class="op">=</span> <span class="dv">3</span><span class="op">;</span></span>
 <span id="cb769-6"><a href="chapter-atomics.html#cb769-6"></a><span class="op">}</span></span>
 <span id="cb769-7"><a href="chapter-atomics.html#cb769-7"></a></span>
 <span id="cb769-8"><a href="chapter-atomics.html#cb769-8"></a>thread2<span class="op">()</span> <span class="op">{</span></span>
-<span id="cb769-9"><a href="chapter-atomics.html#cb769-9"></a>    <span class="cf">while</span> <span class="op">(</span>y <span class="op">!=</span> <span class="dv">3</span><span class="op">)</span> <span class="op">{}</span>  <span class="co">// spin</span></span>
-<span id="cb769-10"><a href="chapter-atomics.html#cb769-10"></a>    printf<span class="op">(</span><span class="st">&quot;x is now </span><span class="sc">%d\n</span><span class="st">&quot;</span><span class="op">,</span> x<span class="op">);</span>  <span class="co">// 2? ...or 0?</span></span>
+<span id="cb769-9"><a href="chapter-atomics.html#cb769-9"></a>	<span class="cf">while</span> <span class="op">(</span>y <span class="op">!=</span> <span class="dv">3</span><span class="op">)</span> <span class="op">{}</span>  <span class="co">// spin</span></span>
+<span id="cb769-10"><a href="chapter-atomics.html#cb769-10"></a>	printf<span class="op">(</span><span class="st">&quot;x is now </span><span class="sc">%d\n</span><span class="st">&quot;</span><span class="op">,</span> x<span class="op">);</span>  <span class="co">// 2? ...or 0?</span></span>
 <span id="cb769-11"><a href="chapter-atomics.html#cb769-11"></a><span class="op">}</span></span></code></pre></div>
 <p>What is the output from thread 2?</p>
 <p>Well, if <code>x</code> gets assigned <code>2</code> <em>before</em> <code>y</code> is assigned <code>3</code>, then I’d expect the output to be the very sensible:</p>
@@ -433,13 +433,13 @@
 <span id="cb771-2"><a href="chapter-atomics.html#cb771-2"></a>atomic <span class="dt">int</span> y <span class="op">=</span> <span class="dv">0</span><span class="op">;</span>  <span class="co">// Make y atomic</span></span>
 <span id="cb771-3"><a href="chapter-atomics.html#cb771-3"></a></span>
 <span id="cb771-4"><a href="chapter-atomics.html#cb771-4"></a>thread1<span class="op">()</span> <span class="op">{</span></span>
-<span id="cb771-5"><a href="chapter-atomics.html#cb771-5"></a>    x <span class="op">=</span> <span class="dv">2</span><span class="op">;</span></span>
-<span id="cb771-6"><a href="chapter-atomics.html#cb771-6"></a>    y <span class="op">=</span> <span class="dv">3</span><span class="op">;</span>             <span class="co">// Synchronize on write</span></span>
+<span id="cb771-5"><a href="chapter-atomics.html#cb771-5"></a>	x <span class="op">=</span> <span class="dv">2</span><span class="op">;</span></span>
+<span id="cb771-6"><a href="chapter-atomics.html#cb771-6"></a>	y <span class="op">=</span> <span class="dv">3</span><span class="op">;</span>			 <span class="co">// Synchronize on write</span></span>
 <span id="cb771-7"><a href="chapter-atomics.html#cb771-7"></a><span class="op">}</span></span>
 <span id="cb771-8"><a href="chapter-atomics.html#cb771-8"></a></span>
 <span id="cb771-9"><a href="chapter-atomics.html#cb771-9"></a>thread2<span class="op">()</span> <span class="op">{</span></span>
-<span id="cb771-10"><a href="chapter-atomics.html#cb771-10"></a>    <span class="cf">while</span> <span class="op">(</span>y <span class="op">!=</span> <span class="dv">3</span><span class="op">)</span> <span class="op">{}</span>  <span class="co">// Synchronize on read</span></span>
-<span id="cb771-11"><a href="chapter-atomics.html#cb771-11"></a>    printf<span class="op">(</span><span class="st">&quot;x is now </span><span class="sc">%d\n</span><span class="st">&quot;</span><span class="op">,</span> x<span class="op">);</span>  <span class="co">// 2, period.</span></span>
+<span id="cb771-10"><a href="chapter-atomics.html#cb771-10"></a>	<span class="cf">while</span> <span class="op">(</span>y <span class="op">!=</span> <span class="dv">3</span><span class="op">)</span> <span class="op">{}</span>  <span class="co">// Synchronize on read</span></span>
+<span id="cb771-11"><a href="chapter-atomics.html#cb771-11"></a>	printf<span class="op">(</span><span class="st">&quot;x is now </span><span class="sc">%d\n</span><span class="st">&quot;</span><span class="op">,</span> x<span class="op">);</span>  <span class="co">// 2, period.</span></span>
 <span id="cb771-12"><a href="chapter-atomics.html#cb771-12"></a><span class="op">}</span></span></code></pre></div>
 <p>Because the threads synchronize across <code>y</code>, all writes in thread 1 that happened <em>before</em> the write to <code>y</code> are visible in thread 2 <em>after</em> the read from <code>y</code> (in the <code>while</code> loop).</p>
 <p>It’s important to note a couple things here:</p>
@@ -485,20 +485,20 @@
 atomic_int a = 0;
 
 thread1() {
-    x = 10;
-    y = 20;
-    a = 999;  // Release
-    z = 30;
+	x = 10;
+	y = 20;
+	a = 999;  // Release
+	z = 30;
 }
 
 thread2()
 {
-    while (a != 999) { } // Acquire
+	while (a != 999) { } // Acquire
 
-    assert(x == 10);  // never asserts, x is always 10
-    assert(y == 20);  // never asserts, y is always 20
+	assert(x == 10);  // never asserts, x is always 10
+	assert(y == 20);  // never asserts, y is always 20
 
-    assert(z == 0);  // might assert!!
+	assert(z == 0);  // might assert!!
 }</code></pre>
 <p>In the above example, <code>thread2</code> can be sure of the values in <code>x</code> and <code>y</code> after it acquires <code>a</code> because they were set before <code>thread1</code> released the atomic <code>a</code>.</p>
 <p>But <code>thread2</code> can’t be sure of <code>z</code>’s value because it happened after the release. Maybe the assignment to <code>z</code> got moved before the assignment to <code>a</code>.</p>
@@ -526,27 +526,27 @@ thread2()
 <div class="sourceCode" id="cb773"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb773-1"><a href="chapter-atomics.html#cb773-1" aria-hidden="true" tabindex="-1"></a>atomic_int x <span class="op">=</span> <span class="dv">0</span><span class="op">;</span></span>
 <span id="cb773-2"><a href="chapter-atomics.html#cb773-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb773-3"><a href="chapter-atomics.html#cb773-3" aria-hidden="true" tabindex="-1"></a>thread1<span class="op">()</span> <span class="op">{</span></span>
-<span id="cb773-4"><a href="chapter-atomics.html#cb773-4" aria-hidden="true" tabindex="-1"></a>    x <span class="op">=</span> x <span class="op">+</span> <span class="dv">3</span><span class="op">;</span>  <span class="co">// NOT atomic!</span></span>
+<span id="cb773-4"><a href="chapter-atomics.html#cb773-4" aria-hidden="true" tabindex="-1"></a>	x <span class="op">=</span> x <span class="op">+</span> <span class="dv">3</span><span class="op">;</span>  <span class="co">// NOT atomic!</span></span>
 <span id="cb773-5"><a href="chapter-atomics.html#cb773-5" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
 <p>Since there’s a read of <code>x</code> on the right hand side of the assignment and a write effectively on the left, these are two operations. Another thread could sneak in the middle and make you unhappy.</p>
 <p>But you <em>can</em> use the shorthand <code>+=</code> to get an atomic operation:</p>
 <div class="sourceCode" id="cb774"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb774-1"><a href="chapter-atomics.html#cb774-1" aria-hidden="true" tabindex="-1"></a>atomic_int x <span class="op">=</span> <span class="dv">0</span><span class="op">;</span></span>
 <span id="cb774-2"><a href="chapter-atomics.html#cb774-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb774-3"><a href="chapter-atomics.html#cb774-3" aria-hidden="true" tabindex="-1"></a>thread1<span class="op">()</span> <span class="op">{</span></span>
-<span id="cb774-4"><a href="chapter-atomics.html#cb774-4" aria-hidden="true" tabindex="-1"></a>    x <span class="op">+=</span> <span class="dv">3</span><span class="op">;</span>   <span class="co">// ATOMIC!</span></span>
+<span id="cb774-4"><a href="chapter-atomics.html#cb774-4" aria-hidden="true" tabindex="-1"></a>	x <span class="op">+=</span> <span class="dv">3</span><span class="op">;</span>   <span class="co">// ATOMIC!</span></span>
 <span id="cb774-5"><a href="chapter-atomics.html#cb774-5" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
 <p>In that case, <code>x</code> will be atomically incremented by <code>3</code>—no other thread can jump in the middle.</p>
 <p>In particular, the following operators are atomic read-modify-write operations with sequential consistency, so use them with gleeful abandon. (In the example, <code>a</code> is atomic.)</p>
-<div class="sourceCode" id="cb775"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb775-1"><a href="chapter-atomics.html#cb775-1" aria-hidden="true" tabindex="-1"></a>a<span class="op">++</span>       a<span class="op">--</span>       <span class="op">--</span>a       <span class="op">++</span>a</span>
-<span id="cb775-2"><a href="chapter-atomics.html#cb775-2" aria-hidden="true" tabindex="-1"></a>a <span class="op">+=</span> b    a <span class="op">-=</span> b    a <span class="op">*=</span> b    a <span class="op">/=</span> b    a <span class="op">%=</span> b</span>
-<span id="cb775-3"><a href="chapter-atomics.html#cb775-3" aria-hidden="true" tabindex="-1"></a>a <span class="op">&amp;=</span> b    a <span class="op">|=</span> b    a <span class="op">^=</span> b    a <span class="op">&gt;&gt;=</span> b   a <span class="op">&lt;&lt;=</span> b</span></code></pre></div>
+<div class="sourceCode" id="cb775"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb775-1"><a href="chapter-atomics.html#cb775-1" aria-hidden="true" tabindex="-1"></a>a<span class="op">++</span>	   a<span class="op">--</span>	   <span class="op">--</span>a	   <span class="op">++</span>a</span>
+<span id="cb775-2"><a href="chapter-atomics.html#cb775-2" aria-hidden="true" tabindex="-1"></a>a <span class="op">+=</span> b	a <span class="op">-=</span> b	a <span class="op">*=</span> b	a <span class="op">/=</span> b	a <span class="op">%=</span> b</span>
+<span id="cb775-3"><a href="chapter-atomics.html#cb775-3" aria-hidden="true" tabindex="-1"></a>a <span class="op">&amp;=</span> b	a <span class="op">|=</span> b	a <span class="op">^=</span> b	a <span class="op">&gt;&gt;=</span> b   a <span class="op">&lt;&lt;=</span> b</span></code></pre></div>
 <p></p>
 <h2 data-number="40.7" id="library-functions-that-automatically-synchronize"><span class="header-section-number">40.7</span> Library Functions that Automatically Synchronize</h2>
 <p></p>
 <p>So far we’ve talked about how you can synchronize with atomic variables, but it turns out there are a few library functions that do some limited behind-the-scenes synchronization, themselves.</p>
-<div class="sourceCode" id="cb776"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb776-1"><a href="chapter-atomics.html#cb776-1" aria-hidden="true" tabindex="-1"></a>call_once<span class="op">()</span>      thrd_create<span class="op">()</span>       thrd_join<span class="op">()</span></span>
-<span id="cb776-2"><a href="chapter-atomics.html#cb776-2" aria-hidden="true" tabindex="-1"></a>mtx_lock<span class="op">()</span>       mtx_timedlock<span class="op">()</span>     mtx_trylock<span class="op">()</span></span>
-<span id="cb776-3"><a href="chapter-atomics.html#cb776-3" aria-hidden="true" tabindex="-1"></a>malloc<span class="op">()</span>         calloc<span class="op">()</span>            realloc<span class="op">()</span></span>
+<div class="sourceCode" id="cb776"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb776-1"><a href="chapter-atomics.html#cb776-1" aria-hidden="true" tabindex="-1"></a>call_once<span class="op">()</span>	  thrd_create<span class="op">()</span>	   thrd_join<span class="op">()</span></span>
+<span id="cb776-2"><a href="chapter-atomics.html#cb776-2" aria-hidden="true" tabindex="-1"></a>mtx_lock<span class="op">()</span>	   mtx_timedlock<span class="op">()</span>	 mtx_trylock<span class="op">()</span></span>
+<span id="cb776-3"><a href="chapter-atomics.html#cb776-3" aria-hidden="true" tabindex="-1"></a>malloc<span class="op">()</span>		 calloc<span class="op">()</span>			realloc<span class="op">()</span></span>
 <span id="cb776-4"><a href="chapter-atomics.html#cb776-4" aria-hidden="true" tabindex="-1"></a>aligned_alloc<span class="op">()</span></span></code></pre></div>
 <p><strong><code>call_once()</code></strong>—Synchronizes with all subsequent calls to <code>call_once()</code> for a particular flag. This way subsequent calls can rest assured that if another thread sets the flag, they will see it.</p>
 <p><strong><code>thrd_create()</code></strong>—Synchronizes with the beginning of the new thread. The new thread can be sure it will see all shared memory writes from the parent thread from before the <code>thrd_create()</code> call.</p>
@@ -860,15 +860,15 @@ thread2()
 <span id="cb781-6"><a href="chapter-atomics.html#cb781-6" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb781-7"><a href="chapter-atomics.html#cb781-7" aria-hidden="true" tabindex="-1"></a><span class="dt">int</span> main<span class="op">(</span><span class="dt">void</span><span class="op">)</span></span>
 <span id="cb781-8"><a href="chapter-atomics.html#cb781-8" aria-hidden="true" tabindex="-1"></a><span class="op">{</span></span>
-<span id="cb781-9"><a href="chapter-atomics.html#cb781-9" aria-hidden="true" tabindex="-1"></a>    <span class="dt">bool</span> r <span class="op">=</span> atomic_flag_test_and_set<span class="op">(&amp;</span>f<span class="op">);</span></span>
-<span id="cb781-10"><a href="chapter-atomics.html#cb781-10" aria-hidden="true" tabindex="-1"></a>    printf<span class="op">(</span><span class="st">&quot;Value was: </span><span class="sc">%d\n</span><span class="st">&quot;</span><span class="op">,</span> r<span class="op">);</span>           <span class="co">// 0</span></span>
+<span id="cb781-9"><a href="chapter-atomics.html#cb781-9" aria-hidden="true" tabindex="-1"></a>	<span class="dt">bool</span> r <span class="op">=</span> atomic_flag_test_and_set<span class="op">(&amp;</span>f<span class="op">);</span></span>
+<span id="cb781-10"><a href="chapter-atomics.html#cb781-10" aria-hidden="true" tabindex="-1"></a>	printf<span class="op">(</span><span class="st">&quot;Value was: </span><span class="sc">%d\n</span><span class="st">&quot;</span><span class="op">,</span> r<span class="op">);</span>		   <span class="co">// 0</span></span>
 <span id="cb781-11"><a href="chapter-atomics.html#cb781-11" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb781-12"><a href="chapter-atomics.html#cb781-12" aria-hidden="true" tabindex="-1"></a>    r <span class="op">=</span> atomic_flag_test_and_set<span class="op">(&amp;</span>f<span class="op">);</span></span>
-<span id="cb781-13"><a href="chapter-atomics.html#cb781-13" aria-hidden="true" tabindex="-1"></a>    printf<span class="op">(</span><span class="st">&quot;Value was: </span><span class="sc">%d\n</span><span class="st">&quot;</span><span class="op">,</span> r<span class="op">);</span>           <span class="co">// 1</span></span>
+<span id="cb781-12"><a href="chapter-atomics.html#cb781-12" aria-hidden="true" tabindex="-1"></a>	r <span class="op">=</span> atomic_flag_test_and_set<span class="op">(&amp;</span>f<span class="op">);</span></span>
+<span id="cb781-13"><a href="chapter-atomics.html#cb781-13" aria-hidden="true" tabindex="-1"></a>	printf<span class="op">(</span><span class="st">&quot;Value was: </span><span class="sc">%d\n</span><span class="st">&quot;</span><span class="op">,</span> r<span class="op">);</span>		   <span class="co">// 1</span></span>
 <span id="cb781-14"><a href="chapter-atomics.html#cb781-14" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb781-15"><a href="chapter-atomics.html#cb781-15" aria-hidden="true" tabindex="-1"></a>    atomic_flag_clear<span class="op">(&amp;</span>f<span class="op">);</span></span>
-<span id="cb781-16"><a href="chapter-atomics.html#cb781-16" aria-hidden="true" tabindex="-1"></a>    r <span class="op">=</span> atomic_flag_test_and_set<span class="op">(&amp;</span>f<span class="op">);</span></span>
-<span id="cb781-17"><a href="chapter-atomics.html#cb781-17" aria-hidden="true" tabindex="-1"></a>    printf<span class="op">(</span><span class="st">&quot;Value was: </span><span class="sc">%d\n</span><span class="st">&quot;</span><span class="op">,</span> r<span class="op">);</span>           <span class="co">// 0</span></span>
+<span id="cb781-15"><a href="chapter-atomics.html#cb781-15" aria-hidden="true" tabindex="-1"></a>	atomic_flag_clear<span class="op">(&amp;</span>f<span class="op">);</span></span>
+<span id="cb781-16"><a href="chapter-atomics.html#cb781-16" aria-hidden="true" tabindex="-1"></a>	r <span class="op">=</span> atomic_flag_test_and_set<span class="op">(&amp;</span>f<span class="op">);</span></span>
+<span id="cb781-17"><a href="chapter-atomics.html#cb781-17" aria-hidden="true" tabindex="-1"></a>	printf<span class="op">(</span><span class="st">&quot;Value was: </span><span class="sc">%d\n</span><span class="st">&quot;</span><span class="op">,</span> r<span class="op">);</span>		   <span class="co">// 0</span></span>
 <span id="cb781-18"><a href="chapter-atomics.html#cb781-18" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
 <p> </p>
 <h2 data-number="40.11" id="atomic-structs-and-unions"><span class="header-section-number">40.11</span> Atomic <code>struct</code>s and <code>union</code>s</h2>
@@ -880,13 +880,13 @@ thread2()
 <span id="cb782-3"><a href="chapter-atomics.html#cb782-3"></a></span>
 <span id="cb782-4"><a href="chapter-atomics.html#cb782-4"></a><span class="dt">int</span> main<span class="op">(</span><span class="dt">void</span><span class="op">)</span></span>
 <span id="cb782-5"><a href="chapter-atomics.html#cb782-5"></a><span class="op">{</span></span>
-<span id="cb782-6"><a href="chapter-atomics.html#cb782-6"></a>    <span class="kw">struct</span> point <span class="op">{</span></span>
-<span id="cb782-7"><a href="chapter-atomics.html#cb782-7"></a>        <span class="dt">float</span> x<span class="op">,</span> y<span class="op">;</span></span>
-<span id="cb782-8"><a href="chapter-atomics.html#cb782-8"></a>    <span class="op">};</span></span>
+<span id="cb782-6"><a href="chapter-atomics.html#cb782-6"></a>	<span class="kw">struct</span> point <span class="op">{</span></span>
+<span id="cb782-7"><a href="chapter-atomics.html#cb782-7"></a>		<span class="dt">float</span> x<span class="op">,</span> y<span class="op">;</span></span>
+<span id="cb782-8"><a href="chapter-atomics.html#cb782-8"></a>	<span class="op">};</span></span>
 <span id="cb782-9"><a href="chapter-atomics.html#cb782-9"></a></span>
-<span id="cb782-10"><a href="chapter-atomics.html#cb782-10"></a>    <span class="kw">_Atomic</span><span class="op">(</span><span class="kw">struct</span> point<span class="op">)</span> p<span class="op">;</span></span>
+<span id="cb782-10"><a href="chapter-atomics.html#cb782-10"></a>	<span class="kw">_Atomic</span><span class="op">(</span><span class="kw">struct</span> point<span class="op">)</span> p<span class="op">;</span></span>
 <span id="cb782-11"><a href="chapter-atomics.html#cb782-11"></a></span>
-<span id="cb782-12"><a href="chapter-atomics.html#cb782-12"></a>    printf<span class="op">(</span><span class="st">&quot;Is lock free: </span><span class="sc">%d\n</span><span class="st">&quot;</span><span class="op">,</span> atomic_is_lock_free<span class="op">(&amp;</span>p<span class="op">));</span></span>
+<span id="cb782-12"><a href="chapter-atomics.html#cb782-12"></a>	printf<span class="op">(</span><span class="st">&quot;Is lock free: </span><span class="sc">%d\n</span><span class="st">&quot;</span><span class="op">,</span> atomic_is_lock_free<span class="op">(&amp;</span>p<span class="op">));</span></span>
 <span id="cb782-13"><a href="chapter-atomics.html#cb782-13"></a><span class="op">}</span></span></code></pre></div>
 <p>Here’s the catch: you can’t access fields of an atomic <code>struct</code> or <code>union</code>… so what’s the point? Well, you can atomically <em>copy</em> the entire <code>struct</code> into a non-atomic variable and then use it. You can atomically copy the other way, too.</p>
 <div class="sourceCode" id="cb783"><pre class="sourceCode numberSource c numberLines"><code class="sourceCode c"><span id="cb783-1"><a href="chapter-atomics.html#cb783-1"></a><span class="pp">#include </span><span class="im">&lt;stdio.h&gt;</span></span>
@@ -894,20 +894,20 @@ thread2()
 <span id="cb783-3"><a href="chapter-atomics.html#cb783-3"></a></span>
 <span id="cb783-4"><a href="chapter-atomics.html#cb783-4"></a><span class="dt">int</span> main<span class="op">(</span><span class="dt">void</span><span class="op">)</span></span>
 <span id="cb783-5"><a href="chapter-atomics.html#cb783-5"></a><span class="op">{</span></span>
-<span id="cb783-6"><a href="chapter-atomics.html#cb783-6"></a>    <span class="kw">struct</span> point <span class="op">{</span></span>
-<span id="cb783-7"><a href="chapter-atomics.html#cb783-7"></a>        <span class="dt">float</span> x<span class="op">,</span> y<span class="op">;</span></span>
-<span id="cb783-8"><a href="chapter-atomics.html#cb783-8"></a>    <span class="op">};</span></span>
+<span id="cb783-6"><a href="chapter-atomics.html#cb783-6"></a>	<span class="kw">struct</span> point <span class="op">{</span></span>
+<span id="cb783-7"><a href="chapter-atomics.html#cb783-7"></a>		<span class="dt">float</span> x<span class="op">,</span> y<span class="op">;</span></span>
+<span id="cb783-8"><a href="chapter-atomics.html#cb783-8"></a>	<span class="op">};</span></span>
 <span id="cb783-9"><a href="chapter-atomics.html#cb783-9"></a></span>
-<span id="cb783-10"><a href="chapter-atomics.html#cb783-10"></a>    <span class="kw">_Atomic</span><span class="op">(</span><span class="kw">struct</span> point<span class="op">)</span> p<span class="op">;</span></span>
-<span id="cb783-11"><a href="chapter-atomics.html#cb783-11"></a>    <span class="kw">struct</span> point t<span class="op">;</span></span>
+<span id="cb783-10"><a href="chapter-atomics.html#cb783-10"></a>	<span class="kw">_Atomic</span><span class="op">(</span><span class="kw">struct</span> point<span class="op">)</span> p<span class="op">;</span></span>
+<span id="cb783-11"><a href="chapter-atomics.html#cb783-11"></a>	<span class="kw">struct</span> point t<span class="op">;</span></span>
 <span id="cb783-12"><a href="chapter-atomics.html#cb783-12"></a></span>
-<span id="cb783-13"><a href="chapter-atomics.html#cb783-13"></a>    p <span class="op">=</span> <span class="op">(</span><span class="kw">struct</span> point<span class="op">){</span><span class="dv">1</span><span class="op">,</span> <span class="dv">2</span><span class="op">};</span>  <span class="co">// Atomic copy</span></span>
+<span id="cb783-13"><a href="chapter-atomics.html#cb783-13"></a>	p <span class="op">=</span> <span class="op">(</span><span class="kw">struct</span> point<span class="op">){</span><span class="dv">1</span><span class="op">,</span> <span class="dv">2</span><span class="op">};</span>  <span class="co">// Atomic copy</span></span>
 <span id="cb783-14"><a href="chapter-atomics.html#cb783-14"></a></span>
-<span id="cb783-15"><a href="chapter-atomics.html#cb783-15"></a>    <span class="co">//printf(&quot;%f\n&quot;, p.x);  // Error</span></span>
+<span id="cb783-15"><a href="chapter-atomics.html#cb783-15"></a>	<span class="co">//printf(&quot;%f\n&quot;, p.x);  // Error</span></span>
 <span id="cb783-16"><a href="chapter-atomics.html#cb783-16"></a></span>
-<span id="cb783-17"><a href="chapter-atomics.html#cb783-17"></a>    t <span class="op">=</span> p<span class="op">;</span>   <span class="co">// Atomic copy</span></span>
+<span id="cb783-17"><a href="chapter-atomics.html#cb783-17"></a>	t <span class="op">=</span> p<span class="op">;</span>   <span class="co">// Atomic copy</span></span>
 <span id="cb783-18"><a href="chapter-atomics.html#cb783-18"></a></span>
-<span id="cb783-19"><a href="chapter-atomics.html#cb783-19"></a>    printf<span class="op">(</span><span class="st">&quot;</span><span class="sc">%f\n</span><span class="st">&quot;</span><span class="op">,</span> t<span class="op">.</span>x<span class="op">);</span>  <span class="co">// OK!</span></span>
+<span id="cb783-19"><a href="chapter-atomics.html#cb783-19"></a>	printf<span class="op">(</span><span class="st">&quot;</span><span class="sc">%f\n</span><span class="st">&quot;</span><span class="op">,</span> t<span class="op">.</span>x<span class="op">);</span>  <span class="co">// OK!</span></span>
 <span id="cb783-20"><a href="chapter-atomics.html#cb783-20"></a><span class="op">}</span></span></code></pre></div>
 <p>You can also declare a <code>struct</code> where individual fields are atomic. It is implementation defined if atomic types are allowed on bitfields.</p>
 <p></p>
