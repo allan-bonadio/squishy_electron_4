@@ -50,7 +50,8 @@ class glAmbiance {
 			tooOldTerminate();
 
 		// leave this until I have things working better TODO
-		this.gl.cullFace(this.gl.FRONT_AND_BACK);
+		// NO!! this disables all drawing.  Default is to not cull anything.
+		//this.gl.cullFace(this.gl.FRONT_AND_BACK);
 
 		// caller must wait for this before it's ready to go
 		if (webglLintProm) {
