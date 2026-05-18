@@ -39,9 +39,9 @@ let traceContext = false;
 let traceOrientation= false;
 let traceOrient = false;
 
-let traceProjMatrix = true;
-let traceOrigMatrix = true;
-let traceRotMatrix = true;
+let traceProjMatrix = false;
+let traceOrigMatrix = false;
+let traceRotMatrix = false;
 
 
 const round = (n) => Math.round(n, 1);

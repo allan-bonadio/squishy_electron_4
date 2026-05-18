@@ -9,10 +9,10 @@
 #include "qAvatar.h"
 #include "../debroglie/qCavity.h"
 
-static const bool traceViewBuffer = true;
+static const bool traceViewBuffer = false;
 static const bool traceHighest = false;
 static const bool traceInDetail = false;  // blow-by-blow, verbose
-static const bool traceCavityDump = true;  // dumps it; verbose
+static const bool traceCavityDump = false;  // dumps it; verbose
 
 
 

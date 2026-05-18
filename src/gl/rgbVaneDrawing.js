@@ -13,9 +13,9 @@ import {vec4, mat4} from 'gl-matrix';
 
 this doesn't work yet.  Not sure if I'll keep it.
 
-let traceDrawing = true;
-let traceReload = true;
-let traceMatrix = true;
+let traceDrawing = false;
+let traceReload = false;
+let traceMatrix = false;
 
 // diagnostic purposes; draws more per vertex
 let traceDrawPoints = true;
