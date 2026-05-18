@@ -120,7 +120,7 @@ export class drawingUniform extends drawingVariable {
 		if (traceUniforms) {
 			console.log(`🍯 drawingUniform reloaded U variable '${this.varName}' in `);
 			console.log(`            ${this.drawing.avatarLabel} uniform gl.${method}`
-				+`  (${args[0].constructor.name}, ${args[1]}, ${args[2]} ) `);
+				+`  (${args[0].constructor.name}, ${args[2] ?? args[1]} ) `);
 		}
 	}
 }
@@ -164,7 +164,7 @@ export class drawingAttribute extends drawingVariable {
 
 		// connect  ARRAY_BUFFER to glBuffer.
 		// do I have to do this if I'm not (yet) attaching the JS-space array with bufferData?
-		gl.bindBuffer(gl.ARRAY_BUFFER, this.glBuffer);
+		// no, makes no sense.  only before gl.bufferData()  gl.bindBuffer(gl.ARRAY_BUFFER, this.glBuffer);
 
 		// our attribute here, connect it to ARRAY_BUFFER and therefore that glBuffer
 		gl.vertexAttribPointer(this.attrLocation, tupleWidth, gl.FLOAT,
@@ -195,7 +195,8 @@ export class drawingAttribute extends drawingVariable {
 		this.nTuples = this.floatArray.nTuples;
 
 		gl.bindBuffer(gl.ARRAY_BUFFER, this.glBuffer);
-		gl.bufferData(gl.ARRAY_BUFFER, floatArray, gl.DYNAMIC_DRAW);
+		gl.bufferData(gl.ARRAY_BUFFER, floatArray, gl.STATIC_DRAW);  // try this
+		//gl.bufferData(gl.ARRAY_BUFFER, floatArray, gl.DYNAMIC_DRAW);
 
 		if (traceAttrs || traceAttributes)
 			console.log(`🍯 reload drawingAttribute '${this.varName}' in ${this.drawing.drawingName}`
