@@ -19,7 +19,7 @@ let traceReloadRow = false;
 let traceMatrix = false;
 
 // diagnostic purposes; draws more per vertex
-let traceDrawPoints = true;
+let traceDrawPoints = false;
 let traceDrawLines = false;
 
 let pointSize = traceDrawPoints ? `gl_PointSize = 10.;` : '';
@@ -60,8 +60,8 @@ blade is two triangles */
 // how much raw psi values should be multipled to be equivalent to x in volume
 // space values that go from 0 to N.  Adjust to taste or to N.  These are
 // inserted as numbers into the vert shader code.
-const OUTER_FACTOR = '1.0';
-const INNER_FACTOR = '.5';
+const OUTER_FACTOR = '.001';
+const INNER_FACTOR = '.00';
 
 // make the line number for the start correspond to this JS file line number - the NEXT line
 const vertexSrc = `// garlandDrawing vertex
