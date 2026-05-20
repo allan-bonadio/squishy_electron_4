@@ -38,7 +38,7 @@ export class drawingVariable {
 
 		// whichever variable this is a subclass of, constructors will need this
 		// or maybe this is already done and so this is superflous?
-		drawing.setDrawing();
+		// maybe this isn't needed 4:46 drawing.setDrawing();
 
 		if (traceGLCalls) console.log(`🍯 created drawingVariable '${varName}', drawing:`, drawing);
 	}
@@ -139,7 +139,7 @@ export class drawingAttribute extends drawingVariable {
 		const gl = this.gl;
 		this.tupleWidth = tupleWidth;  // num of float32s in each row/tuple
 		this.sceneName = this.drawing.sceneName;
-		this.drawing.setDrawing();
+		// maybe this isn't needed 4:46 this.drawing.setDrawing();
 
 		// small integer indicating which attr this is.
 		// Set by compileProgram() for each attr in each drawing in GL context
@@ -181,7 +181,7 @@ export class drawingAttribute extends drawingVariable {
 	// must return another Float32Array (or same) with extra JS property 'nTuples'
 	reloadVariable() {
 		const gl = this.gl;
-		this.drawing.setDrawing();
+		// maybe this isn't needed 4:46 this.drawing.setDrawing();
 
 		// get the latest from the real world.
 		// WebGL2Fundamentals said we don't have to do this if it's the same buffer (w/diff values) every time.
