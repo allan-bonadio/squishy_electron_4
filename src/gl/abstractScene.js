@@ -104,7 +104,9 @@ export class abstractScene {
 		this.drawings.forEach(drawing => {
 			// individual uniforms (and others?) can abort drawing if they're like NaN etc
 			drawing.skipDrawingCuzErr = null;
-			drawing.setDrawing();
+
+			// must useProgram cuz we're going thru a loop of different drawings/programs
+			this.gl.useProgram(this.program);
 			drawing.drawVariables.forEach(v => v.reloadVariable());
 
 			if (!drawing.skipDrawingCuzErr)

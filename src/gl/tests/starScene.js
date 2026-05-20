@@ -84,7 +84,7 @@ export class starDrawing extends abstractDrawing {
 
 	// all to do this one differently
 	createVariables() {
-		this.setDrawing();
+		this.gl.useProgram(this.program);
 		//debugger;
 
 		this.cornerColorUni =
@@ -102,7 +102,7 @@ export class starDrawing extends abstractDrawing {
 
 	draw(width, height, paintingNeeds) {
 		const gl = this.gl;
-		this.setDrawing();
+		this.gl.useProgram(this.program);
 		//debugger;
 
 		gl.viewport(0, 0, width, height);

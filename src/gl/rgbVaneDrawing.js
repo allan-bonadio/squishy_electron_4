@@ -118,7 +118,7 @@ export class rgbVaneDrawing extends abstractDrawing {
 	// loads view buffer from corresponding wave, calculates highest norm.
 	// one time set up of variables for this drawing, every time canvas and scene is recreated
 	createVariables() {
-		this.setDrawing();
+		this.gl.useProgram(this.program);
 		if (traceDrawing)
 			console.log(`🌀🌀🌀 rgbVaneDrawing ${this.sceneName}: creatingVariables`);
 
@@ -163,9 +163,7 @@ export class rgbVaneDrawing extends abstractDrawing {
 				+` matrix=${this.matrix}`);
 		}
 		const gl = this.gl;
-		this.setDrawing();
-
-
+		this.gl.useProgram(this.program);
 
 		return;
 

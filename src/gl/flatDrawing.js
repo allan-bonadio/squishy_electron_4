@@ -106,7 +106,7 @@ export class flatDrawing extends abstractDrawing {
 	// loads view buffer from corresponding wave, calculates highest norm.
 	// one time set up of variables for this drawing, every time canvas and scene is recreated
 	createVariables() {
-		this.setDrawing();
+		this.gl.useProgram(this.program);
 		if (traceFlatDrawing)
 			console.log(`♭♭♭ flatDrawing ${this.sceneName}: creatingVariables`);
 
@@ -174,7 +174,7 @@ export class flatDrawing extends abstractDrawing {
 				+` maxHeight=${this.maxHeight}`);
 		}
 		const gl = this.gl;
-		this.setDrawing();
+		this.gl.useProgram(this.program);
 
 		let bw = this.scene.paintingNeeds.bumperWidth;
 		//gl.viewport(bw, 0, width - 2 * bw, height);
@@ -202,6 +202,7 @@ export class flatDrawing extends abstractDrawing {
 
 		// i think this is problematic
 		if (traceAvatarAfterDrawing) {
+			this.avatar.dumpEachViewBuffer(3, `done drawing flat`);
 			this.avatar.dumpComplexViewBuffer(this.scene.flatAvatarID, this.nPoints,
 					`♭♭♭ finished drawing in flatDrawing.js`);
 			console.log(`♭♭♭ barWidthUniform=`, this.barWidthUniform.reloadFunc(),

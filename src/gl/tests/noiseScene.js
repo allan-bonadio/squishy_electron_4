@@ -74,7 +74,7 @@ export class noiseDrawing extends abstractDrawing {
 
 	// all to do this one differently
 	createVariables() {
-		this.setDrawing();
+		this.gl.useProgram(this.program);
 		//debugger;
 
 		this.imageWidthUni =
@@ -89,7 +89,7 @@ export class noiseDrawing extends abstractDrawing {
 
 	draw(width, height, paintingNeeds) {
 		const gl = this.gl;
-		this.setDrawing();
+		this.gl.useProgram(this.program);
 		debugger;
 
 		gl.viewport(... drawing calculates this on the fly);

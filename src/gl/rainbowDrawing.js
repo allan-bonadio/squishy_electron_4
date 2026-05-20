@@ -150,7 +150,7 @@ export class rainbowDrawing extends abstractDrawing {
 				+` width=${width}, height=${height}  drawing ${nVERTS} points`);
 		}
 		const gl = this.gl;
-		this.setDrawing();
+		this.gl.useProgram(this.program);
 
 		this.drawVariables.forEach(v => v.reloadVariable());
 

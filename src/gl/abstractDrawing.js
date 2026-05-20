@@ -48,11 +48,11 @@ export class abstractDrawing {
 	/* *********************************** Shader Creation/Compile */
 
 	// tell GL that this is the program to use.  On this gl context, till another setDrawing.
-	setDrawing() {
-		if (!this.program)
-			throw `in drawing: bad program=${this.program}`;
-		this.gl.useProgram(this.program);
-	}
+// 	setDrawing() {
+// 		if (!this.program)
+// 			throw `in drawing: bad program=${this.program}`;
+// 		this.gl.useProgram(this.program);
+// 	}
 
 	// compile one or the other shader; used only by compileProgram()
 	compileShader(type, srcString) {
@@ -112,10 +112,11 @@ export class abstractDrawing {
 		gl.linkProgram(program);
 		if (gl.getProgramParameter(program, gl.LINK_STATUS)) {
 			this.program = program;
-			this.setDrawing();  // is this needed?!
 
-			if (traceAttrNames)
+			if (traceAttrNames) {
+				this.gl.useProgram(this.program);
 				this.dumpAttrNames('right after link');
+			}
 			return
 			// after this, you'll attach your drawVariables with your subclassed createVariables() method.
 		}
