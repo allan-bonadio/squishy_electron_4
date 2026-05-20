@@ -15,6 +15,7 @@ static const bool traceCreation = false;
 static const bool traceHighest = false;
 
 #define MAX_N_BUFFERS  4
+#define MAX_MASK  0xF
 
 /* ********************************************* loading view bufs */
 
@@ -165,7 +166,7 @@ void qAvatar::dumpEachViewBuffer(int bufferMask, const char *title) {
 
 			// spaces for the rest of the heading for this buffer
 			for (int coordIx = 1; coordIx < nC; coordIx++) {
-				charsUsed += snprintf(txt+charsUsed, TXTLEN - charsUsed, "           ");
+				charsUsed += snprintf(txt+charsUsed, TXTLEN - charsUsed, "            ");
 			}
 			// between buffers on line
 			charsUsed += snprintf(txt+charsUsed, TXTLEN - charsUsed, "    ");
@@ -177,26 +178,43 @@ void qAvatar::dumpEachViewBuffer(int bufferMask, const char *title) {
 	printf("%s\n", txt);
 	charsUsed = 0;
 
+	// fmd the length of the longest buffer
+	int longestBuffer = -1;
+	which = bufferMask;
+	for (int bufferIx = 0; (bufferIx < MAX_N_BUFFERS) && which; bufferIx++) {
+		if ((which & 1) && NULL != viewBuffers[bufferIx].fArray) {
+			int nv = viewBuffers[bufferIx].nVertices;
+			if (nv > longestBuffer)
+				longestBuffer = nv;
+		}
+	}
+
+
 	// Actual Buffer Data.  one ROW PER VERTEX... so a bit convoluted
 	// TODO: handle buffers with different lengths
-	for (int vertexIx = 0; vertexIx < viewBuffers[0].nVertices; vertexIx++) {
+	for (int vertexIx = 0; vertexIx < longestBuffer; vertexIx++) {
 		// on this line: do which viewBuffers at vertexIx, and each of their coordinates
 			// row heading
 		charsUsed += snprintf(txt+charsUsed, TXTLEN - charsUsed, "%4d ", vertexIx);
-		which = (bufferMask & 0xF);
+		which = (bufferMask & MAX_MASK);
 		for (int bufferIx = 0; (bufferIx < MAX_N_BUFFERS) && which; bufferIx++) {
 
+			int nC = viewBuffers[bufferIx].nCoords;
 			if ((which & 1) && (viewBuffers[bufferIx].fArray)) {
-				int nC = viewBuffers[bufferIx].nCoords;
 				float *vertexStart = viewBuffers[bufferIx].fArray + nC * vertexIx;
 
 				for (int coordIx = 0; coordIx < nC; coordIx++) {
-					charsUsed += snprintf(txt+charsUsed, TXTLEN - charsUsed, " %9.2f ", vertexStart[coordIx]);
+					charsUsed += snprintf(txt+charsUsed, TXTLEN - charsUsed, " %9.3f ", vertexStart[coordIx]);
 				}
 				charsUsed += snprintf(txt+charsUsed, TXTLEN - charsUsed, "    ");
-				if (101 != txt[TXTLEN - 1])
-					throw std::runtime_error("qAvatar::dumpComplexViewBuffer() overflowed txt buffer in vex!!");
 			}  // end of vb buffer IF stmt
+			else {
+				for (int coordIx = 0; coordIx < nC; coordIx++)
+					charsUsed += snprintf(txt+charsUsed, TXTLEN - charsUsed, "           ");
+				charsUsed += snprintf(txt+charsUsed, TXTLEN - charsUsed, "    ");
+			}
+			if (101 != txt[TXTLEN - 1])
+				throw std::runtime_error("qAvatar::dumpComplexViewBuffer() overflowed txt buffer in vex!!");
 			which >>= 1;
 		}  // end of vb buffer loop
 		printf(" %s\n", txt);  // end of one line
