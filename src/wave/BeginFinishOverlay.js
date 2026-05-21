@@ -54,14 +54,14 @@ function BeginFinishOverlay(props) {
 	if (context.shouldBeIntegrating) {
 		if (traceBeginFinish) console.log(`🛑 was integrating, making finish button`);
 		ssButton = <button className='beginFinishWidget finishButton' onClick={cp.finishAnimating}
-					alt='🛑 finish integrating' title='🛑 finish integrating' >
+					alt='🛑 stop integrating' title='🛑 stop integrating' >
 			<img src={finishIcon}  style={{width: '1em'}}/>
 		</button>
 	}
 	else {
 		if (traceBeginFinish) console.log(`🟩 integration is finished, making begin button`);
 		ssButton = <button className='beginFinishWidget beginButton' onClick={cp.beginAnimating}
-				alt='🟩 begin integrating'  title='🟩 begin integrating' >
+				alt='🟩 start integrating'  title='🟩 start integrating' >
 			<img src={beginIcon}  style={{width: '1em'}} />
 		</button>
 	}
