@@ -10,7 +10,6 @@ import qeConsts from './qeConsts.js';
 
 let traceCreation = false;
 //let traceHighest = false;
-let traceVBuffer = false;
 
 // HOW TO USE     use avatars this way:
 // create one with eAvatar.createAvatar()
@@ -73,33 +72,34 @@ class eAvatar {
 	}
 
 	// set an element in the typedArray bloc
-	reserveTypedArray(whichBuffer, array) {
+	reserveTypedArray(whichBuffer, float32) {
 		if (this.typedArrays[whichBuffer])
-			throw Error(`🚦 typed array ${whichBuffer} already reserved in ${this.label} avatar`);
-		return this.typedArrays[whichBuffer] = array;
+			throw Error(`🚦 typed float32 ${whichBuffer} already reserved in ${this.label} avatar`);
+		return this.typedArrays[whichBuffer] = float32;
 	}
 
-	// adds another view buffer onto the avatar.  You choose which one, need not
-	// be consecutive. But cannot do duplicates.  Returns the typed array itself.
-	// Will ultimately hold
-	// (nCoordsPerVertex * nVertices) single floats. useThisMemory is a float *
-	// pointer for the array in C++ memory.  Just an integer, in C++ global
-	// space. pass it if you have one, or else it'll allocate its own in C++ space.
-	// allocate the index buf bloc in C++, then wrap it in a typed array in JS
+	// adds another view buffer onto the avatar.  You choose which one,
+	// need not be consecutive. Try to choose a meaningful name, like the variable name in glsl.  Cannot do duplicates.  Returns the
+	// typed array itself. Will ultimately hold (nCoordsPerVertex *
+	// nVertices) single floats. useThisMemory is a float * pointer for
+	// the array in C++ memory.  Just an integer number in JS pass it
+	// if you have one, or else it'll allocate its own in C++ space.
+	// allocate the index buf bloc in C++, then wrap it in a typed
+	// array in JS
 	attachViewBuffer(whichBuffer, useThisMemory,
 				nCoordsPerVertex, nVertices, name) {
 		if (this.typedArrays[whichBuffer])
-			throw `🚦 Second allocate of typed array ${this.label} buffer ${whichBuffer}`;
+			throw `🚦 Second allocate of typed array buffer ${name} ${whichBuffer} for ${this.label}`;
 		this.bufferNames[whichBuffer] = name;
 
 		// buffer of floats, 4 by apiece.  Extra factor of 2 cuz I dunno
 		const nFloats = nCoordsPerVertex * nVertices;
 		if (!useThisMemory)
-			useThisMemory = qeFuncs.buffer_allocateBuffer(nFloats * 8);
+			useThisMemory = qeFuncs.buffer_allocateBuffer(nFloats * 4);
 
-		let pointer = qeFuncs.avatar_attachViewBuffer(this.pointer, whichBuffer,
+		let vbuf = qeFuncs.avatar_attachViewBuffer(this.pointer, whichBuffer,
 				useThisMemory, nCoordsPerVertex, nVertices);
-		const tArray = new Float32Array(window.Module.HEAPF32.buffer, pointer, nFloats);
+		const tArray = new Float32Array(window.Module.HEAPF32.buffer, vbuf, nFloats);
 		tArray.nTuples = nVertices;  // hack so you can pass around the array and its size,
 					//  and change the size from one draw to the next.  someday.
 
@@ -107,20 +107,20 @@ class eAvatar {
 	}
 
 	// allocate the index buf bloc in C++, then wrap it in a typed array in JS.  Unused as of this writing.
-	attachIndexBuffer(useThisMemory, nItems) {
-
-		if (this.indexBuffer)
-			throw `🚦 Second allocate of typed array ${this.label} buffer ${whichBuffer}`;
-
-		if (!useThisMemory)
-			useThisMemory = qeFuncs.buffer_allocateBuffer(2 * nItems);
-
-		// buffer of short ints, 16 bits apiece
-		const pointer = qeFuncs.avatar_attachIndexBuffer(this.pointer, useThisMemory, nItems);
-		this.indexBuffer = new Uint16Array(window.Module.HEAPU16.buffer, pointer, nItems);
-
-		return this.indexBuffer;
-	}
+	// attachIndexBuffer(useThisMemory, nItems) {
+	//
+	// 	if (this.indexBuffer)
+	// 		throw `🚦 Second allocate of typed array ${this.label} buffer ${whichBuffer}`;
+	//
+	// 	if (!useThisMemory)
+	// 		useThisMemory = qeFuncs.buffer_allocateBuffer(2 * nItems);
+	//
+	// 	// buffer of short ints, 16 bits apiece
+	// 	const vbuf = qeFuncs.avatar_attachIndexBuffer(this.pointer, useThisMemory, nItems);
+	// 	this.indexBuffer = new Uint16Array(window.Module.HEAPU16.buffer, vbuf, nItems);
+	//
+	// 	return this.indexBuffer;
+	// }
 
 	// our pre-allocated qAvatar has view buffers in C++ space that we don't have
 	// typed arrays for yet.  Set those up.  Called by adaptAvatar()
@@ -164,7 +164,6 @@ class eAvatar {
 	// this just gets the TypedArray, ready to use.  attachViewBuffer() also returns it.
 	getViewBuffer(bufferIx) {
 		return this.typedArrays[bufferIx];
-		//avatar_getViewBuffer(this.pointer, bufferIx);
 	}
 
 	dumpMeta(title) {
@@ -184,11 +183,11 @@ class eAvatar {
 		console.groupEnd();
 	}
 
-	dumpIndex(title) {
-		console.group(title);
-		qeFuncs.avatar_dumpIndex(this.pointer, title);
-		console.groupEnd();
-	}
+// 	dumpIndex(title) {
+// 		console.group(title);
+// 		qeFuncs.avatar_dumpIndex(this.pointer, title);
+// 		console.groupEnd();
+// 	}
 }
 
 export default eAvatar;
