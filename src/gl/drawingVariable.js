@@ -158,8 +158,10 @@ export class drawingAttribute extends drawingVariable {
 		// connect  ARRAY_BUFFER to glBuffer.
 		// do I have to do this if I'm not (yet) attaching the JS-space array with bufferData?
 		// no there it is in reloadVariable() so these two lines are superfluous
-		// gl.bindBuffer(gl.ARRAY_BUFFER, this.glBuffer);
-		// gl.bufferData(gl.ARRAY_BUFFER, floatArray, gl.DYNAMIC_DRAW);  // is this optional cuz reload will do this?
+		gl.bindBuffer(gl.ARRAY_BUFFER, this.glBuffer);
+
+		// is this optional cuz reload will do this? no it crashes cuz floatArray not three yet
+		//gl.bufferData(gl.ARRAY_BUFFER, floatArray, gl.DYNAMIC_DRAW);
 
 		// various ways to label it; each works with a difft debugging system.  some obsolete. 😟
 		let label = `${drawing.avatarLabel}-${drawing.drawingName}-${varName}-glbuf`;
@@ -167,7 +169,6 @@ export class drawingAttribute extends drawingVariable {
 		this.glBuffer.$qLabel = label;
 		this.glBuffer.__SPECTOR_Metadata = {name: label};
 
-		// our attribute here, connect it to ARRAY_BUFFER and therefore that glBuffer
 		gl.vertexAttribPointer(this.attrLocation, tupleWidth, gl.FLOAT,
 				false, tupleWidth * 4, 0);  // normalize, stride, offset
 		if (traceGLCalls)

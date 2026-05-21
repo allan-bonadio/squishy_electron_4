@@ -11,9 +11,10 @@ let traceDumpVertices = false;
 let traceTicDrawing = false;
 let traceHighest = false;
 let traceDrawPoints = false;
+let traceAvatarAfterDrawing = false;
 
 // buffer size starts at this
-const BUFFER_MAX_NTICS = 100;
+const BUFFER_MAX_NTICS = 50;
 
 // buffer: x & y, * 3 vertices per tic
 const FLOATS_PER_VERTEX = 2;  // 2D
@@ -41,14 +42,14 @@ let pointSize = traceDrawPoints ? `gl_PointSize = 5.;` : '';
 // all this really has to do is shovel out the points.  The LINE drawing mode alternates line endings
 const vertexSrc = `// ticDrawing vertex
 #line 42
-attribute vec2 endPoint;
+attribute vec2 coords;
 uniform float maxHeight;
 //varying highp vec4 vColor;
 
 void main() {
-	float y = endPoint.y / maxHeight;
+	float y = coords.y / maxHeight;
 	y = 1. - 2. * y;
-	gl_Position = vec4(endPoint.x, y, 0., 1.);
+	gl_Position = vec4(coords.x, y, 0., 1.);
 
 	//vColor = vec4(.5, 1., 1., 1.);
 
@@ -75,7 +76,7 @@ export class ticDrawing extends abstractDrawing {
 		//debugger;
 		this.avatar = scene.avatar;
 		this.coordBuffer = this.avatar.attachViewBuffer(this.scene.ticAvatarID, null,
-			2, BUFFER_MAX_NTICS * FLOATS_PER_TIC, '2D Tics');
+			2, BUFFER_MAX_NTICS * FLOATS_PER_TIC, 'coords');
 		//this.coordBuffer = new Float32Array(BUFFER_MAX_NTICS * FLOATS_PER_TIC);
 
 		this.vertexShaderSrc = vertexSrc;
@@ -86,7 +87,7 @@ export class ticDrawing extends abstractDrawing {
 	// and scene is recreated
 	createVariables() {
 		//debugger;
-		this.setDrawing();
+		this.gl.useProgram(this.program);
 		if (traceTicDrawing)
 			console.log(`➤ ➤ ➤ ticDrawing ${this.sceneName}: creatingVariables`);
 
@@ -98,20 +99,21 @@ export class ticDrawing extends abstractDrawing {
 						` highest=${this.avatar.double0?.toFixed(5)}`);
 
 				// don't use measured highest if zero or undefined
-				let h = this.avatar.double0 || 1 /  this.space.nStates;
+				let h = this.avatar.double0 || (3 /  this.space.nStates);
 				return {value: h * this.scene.PADDING_ON_BOTTOM,
 					type: '1f'};
 			}
 		);
 
-		this.endPointAttr = new drawingAttribute('endPoint', this,
+		this.theAttribute = new drawingAttribute('coords', this,
 			FLOATS_PER_VERTEX, () => this.generateTics());
 	}
 
 	// generate the current tics, for the attribute's reloadFunc
 	generateTics() {
-		// x, in clip coords.  Width is really length of tic
-		let ticWidth = 0.1;
+		// x, in clip coords -1....+1.  Width is really length of tic
+		let ticWidth = 0.02;
+		//let ticWidth = 0.01;
 		//let ticWidth = 2000 / this.gl.drawingBufferWidth;
 		//let ticWidth = 200 / this.gl.drawingBufferWidth;
 		//let ticWidth = 20 / this.gl.drawingBufferWidth;
@@ -125,7 +127,7 @@ export class ticDrawing extends abstractDrawing {
 				` highest is ${this.avatar.double0?.toFixed(6)}  ticWidth=${ticWidth}`);
 
 		//debugger;
-		// number of tics on left side, comes from the flatDrawing scale
+		// number of tics on left side, comes from the flatDrawing maxHeighy
 		// but workaround if it isn't drawing
 		let avgψ = 1 /  this.space.nStates;
 		// if smooth highest isn't calculated yet, just use average ψ
@@ -174,19 +176,25 @@ export class ticDrawing extends abstractDrawing {
 
 		//debugger;
 		const gl = this.gl;
-		this.setDrawing();
+		this.gl.useProgram(this.program);
 		//gl.viewport(0, 0, width, height);
+		gl.bindBuffer(gl.ARRAY_BUFFER, this.glBuffer);
 
-		this.drawVariables.forEach(v => v.reloadVariable());
+		this.drawUniforms.forEach(v => v.reloadVariable());
+		this.theAttribute.reloadVariable();
+		//this.drawVariables.forEach(v => v.reloadVariable());
 
 		// if (this.vertexCount > BUFFER_MAX_NTICS * VERTICES_PER_TIC)
 		// 	debugger;
 		gl.lineWidth(1);
-		gl.drawArrays(gl.LINE_STRIP, 0, this.vertexCount);
-		//gl.drawArrays(gl.LINES, 0, this.vertexCount);
+		//gl.drawArrays(gl.LINE_STRIP, 0, this.vertexCount);
+		gl.drawArrays(gl.LINES, 0, this.vertexCount);
 
 		if (traceDrawPoints)
 			gl.drawArrays(gl.POINTS, 0, this.vertexCount);
+
+		if (traceAvatarAfterDrawing)
+			this.avatar.dumpEachViewBuffer(3, `done drawing tics`);
 	}
 }
 

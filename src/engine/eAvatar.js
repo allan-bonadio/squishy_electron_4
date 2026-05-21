@@ -95,7 +95,7 @@ class eAvatar {
 		// buffer of floats, 4 by apiece.  Extra factor of 2 cuz I dunno
 		const nFloats = nCoordsPerVertex * nVertices;
 		if (!useThisMemory)
-			useThisMemory = qeFuncs.buffer_allocateBuffer(nFloats * 4);
+			useThisMemory = qeFuncs.buffer_allocateBuffer(nFloats * 4);  // TODO  need to change to 4
 
 		let vbuf = qeFuncs.avatar_attachViewBuffer(this.pointer, whichBuffer,
 				useThisMemory, nCoordsPerVertex, nVertices);
