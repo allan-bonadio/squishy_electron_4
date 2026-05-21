@@ -5,7 +5,7 @@
 
 let traceGLCalls = false;
 let traceUniforms = false;
-let traceAttrs = false;  // quick update every reload
+let traceAttrs = true;  // quick update every reload
 let traceAttributes = false;  // full dumps every reload
 
 // attr arrays and uniforms that can change on every frame.
@@ -15,7 +15,7 @@ let traceAttributes = false;  // full dumps every reload
 // abstract superclass for all of these.
 export class drawingVariable {
 	// the drawing is what it's used in.  Must have a:
-	// gl, drawVariables array, program,
+	// gl, drawUniforms array, program,
 	// reloadFunc will AUTOMATICALLY be called before each frame to refresh the value
 	constructor(varName, drawing, reloadFunc) {
 		this.drawing = drawing;
@@ -28,13 +28,6 @@ export class drawingVariable {
 		if (! varName || ! drawing)
 			throw new Error(`bad name ${varName} or drawing ${drawing} `
 				+` used to create a view var`);
-
-		let vv = drawing.drawVariables;
-		if (vv.includes(this)) {
-			console.error(`🍯 duplicate variable ${varName}!!`);
-			return null;
-		}
-		vv.push(this);
 
 		// whichever variable this is a subclass of, constructors will need this
 		// or maybe this is already done and so this is superflous?
@@ -65,6 +58,14 @@ function isFiniteAr(value) {
 export class drawingUniform extends drawingVariable {
 	constructor(varName, drawing, reloadFunc) {
 		super(varName, drawing, reloadFunc);
+
+		let vv = drawing.drawUniforms;
+		//let vv = drawing.drawVariables;
+		if (vv.includes(this)) {
+			console.error(`🍯 duplicate variable ${varName}!!`);
+			return null;
+		}
+		vv.push(this);
 
 		// this turns out to be an internal magic object
 		this.uniformLoc = this.gl.getUniformLocation(this.drawing.program, varName);
@@ -142,7 +143,7 @@ export class drawingAttribute extends drawingVariable {
 		// maybe this isn't needed 4:46 this.drawing.setDrawing();
 
 		// small integer indicating which attr this is.
-		// Set by compileProgram() for each attr in each drawing in GL context
+		// Set by compileProgram() for each attr in each drawing in each shader in GL context
 		this.attrLocation = this.gl.getAttribLocation(drawing.program, varName);
 		gl.enableVertexAttribArray(this.attrLocation);
 
@@ -154,15 +155,17 @@ export class drawingAttribute extends drawingVariable {
 		// create gl GPU buffer
 		this.glBuffer = gl.createBuffer();
 
+		// connect  ARRAY_BUFFER to glBuffer.
+		// do I have to do this if I'm not (yet) attaching the JS-space array with bufferData?
+		// no there it is in reloadVariable() so these two lines are superfluous
+		// gl.bindBuffer(gl.ARRAY_BUFFER, this.glBuffer);
+		// gl.bufferData(gl.ARRAY_BUFFER, floatArray, gl.DYNAMIC_DRAW);  // is this optional cuz reload will do this?
+
 		// various ways to label it; each works with a difft debugging system.  some obsolete. 😟
 		let label = `${drawing.avatarLabel}-${drawing.drawingName}-${varName}-glbuf`;
 		this.tagObject(this.glBuffer, label);
 		this.glBuffer.$qLabel = label;
 		this.glBuffer.__SPECTOR_Metadata = {name: label};
-
-		// connect  ARRAY_BUFFER to glBuffer.
-		// do I have to do this if I'm not (yet) attaching the JS-space array with bufferData?
-		gl.bindBuffer(gl.ARRAY_BUFFER, this.glBuffer);
 
 		// our attribute here, connect it to ARRAY_BUFFER and therefore that glBuffer
 		gl.vertexAttribPointer(this.attrLocation, tupleWidth, gl.FLOAT,
@@ -191,7 +194,9 @@ export class drawingAttribute extends drawingVariable {
 			throw `reloadFunc() returned null on var=${varName} scene=${this.drawing.drawingName}`;
 		}
 		this.nTuples = this.floatArray.nTuples;
+		if (!this.nTuples) throw `false nTuples ${this.nTuples} in ${this.varName} in ${this.sceneName}`;
 
+		//dblog(`not binding buffer!`)
 		gl.bindBuffer(gl.ARRAY_BUFFER, this.glBuffer);
 		gl.bufferData(gl.ARRAY_BUFFER, floatArray, gl.DYNAMIC_DRAW);
 

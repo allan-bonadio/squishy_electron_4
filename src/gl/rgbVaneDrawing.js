@@ -165,11 +165,10 @@ export class rgbVaneDrawing extends abstractDrawing {
 		const gl = this.gl;
 		this.gl.useProgram(this.program);
 
-		return;
 
-
-
-		this.drawVariables.forEach(v => v.reloadVariable());
+		this.drawUniforms.forEach(v => v.reloadVariable());
+		this.theAttribute.reloadVariable();
+		//this.drawVariables.forEach(v => v.reloadVariable());
 
 		gl.drawArrays(gl.TRIANGLE_STRIP, 0, this.nVertices);
 		if (traceDrawing) {

@@ -95,7 +95,7 @@ export class flatDrawing extends abstractDrawing {
 		// each point in the wave results in two vertices, top and wave.
 		// And each of those is four single floats going to the GPU
 		this.avatar = scene.avatar;
-		this.avatar.attachViewBuffer(this.scene.flatAvatarID, null, 4, this.space.nPoints * 2, 'flat drawing');
+		this.avatar.attachViewBuffer(this.scene.flatAvatarID, null, 4, this.space.nPoints * 2, 'row');
 
 		this.vertexShaderSrc = vertexSrc;
 		this.fragmentShaderSrc = fragmentSrc;
@@ -151,7 +151,8 @@ export class flatDrawing extends abstractDrawing {
 
 		this.vertexCount = nPoints * 2;  // nPoints * vertsPerBar
 		this.rowFloats = 4;
-		this.rowAttr = new drawingAttribute('row', this, this.rowFloats, () => {
+		this.theAttribute = new drawingAttribute('row', this, this.rowFloats, () => {
+		//this.rowAttr = new drawingAttribute('row', this, this.rowFloats, () => {
 			//debugger;
 			qeFuncs.avatar_avFlatLoader(this.avatar.pointer, this.scene.flatAvatarID,
 					this.scene.paintingNeeds.cavity.pointer, nPoints);
@@ -183,7 +184,10 @@ export class flatDrawing extends abstractDrawing {
 				+` width-2bw=${width - 2 * bw}, height=${height}  `
 				+` drawing ${this.vertexCount/2} points`);
 		}
-		this.drawVariables.forEach(v => v.reloadVariable());
+		this.drawUniforms.forEach(v => v.reloadVariable());
+		//this.drawVariables.forEach(v => v.reloadVariable());
+		this.theAttribute.reloadVariable();
+
 		gl.drawArrays(gl.TRIANGLE_STRIP, 0, this.vertexCount);
 		if (traceFlatDrawing) {
 			console.log(`♭♭♭just drewArays-flat on avatar ptr=${this.avatar.pointer} `

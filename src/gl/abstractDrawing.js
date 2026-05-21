@@ -42,7 +42,9 @@ export class abstractDrawing {
 
 		this.drawingName = drawingName;
 
-		this.drawVariables = [];  // vars for this drawing ONLY
+		this.drawUniforms = [];  // unis for this drawing ONLY
+		//this.drawVariables = [];  // vars for this drawing ONLY
+		this.theAttribute = null;  // one attribute only
 	}
 
 	/* *********************************** Shader Creation/Compile */
@@ -114,11 +116,11 @@ export class abstractDrawing {
 			this.program = program;
 
 			if (traceAttrNames) {
-				this.gl.useProgram(this.program);
+				this.gl.useProgram(program);
 				this.dumpAttrNames('right after link');
 			}
 			return
-			// after this, you'll attach your drawVariables with your subclassed createVariables() method.
+			// after this, you'll attach your drawUniforms & attr with your subclassed createVariables() method.
 		}
 
 		// somehow failed compile.  So, no program

@@ -106,8 +106,10 @@ export class abstractScene {
 			drawing.skipDrawingCuzErr = null;
 
 			// must useProgram cuz we're going thru a loop of different drawings/programs
-			this.gl.useProgram(this.program);
-			drawing.drawVariables.forEach(v => v.reloadVariable());
+			this.gl.useProgram(drawing.program);
+			drawing.drawUniforms.forEach(v => v.reloadVariable());
+			drawing.theAttribute.reloadVariable();
+			//drawing.drawVariables.forEach(v => v.reloadVariable());
 
 			if (!drawing.skipDrawingCuzErr)
 				drawing.draw(width, height);
