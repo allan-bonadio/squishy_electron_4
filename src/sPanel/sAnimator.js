@@ -19,6 +19,7 @@ let traceIntegration = false;
 let traceAFPeriod = false;
 let traceTypicalVideoPeriod = false;
 let traceEachRaf = false;
+let traceSingleFrame = false;
 
 let typical = 100;
 
@@ -226,7 +227,8 @@ class sAnimator {
 
 	// do the grind for this time around
 	rAFIntegrate() {
-		if (!this.getContext().shouldBeIntegrating) return;
+		const context = this.getContext();
+		if (!context.shouldBeIntegrating) return;
 
 		// time for another normal iteration.  Trigger the threads.
 		this.grinder.triggerIteration();
@@ -234,7 +236,10 @@ class sAnimator {
 			console.log(`🎥 another normal integration lap done `
 				+`at ${performance.now() & 16383} arbitrary ms`);
 		}
-
+		if (traceSingleFrame) {
+			context.controlPanel.finishAnimating();
+			console.log(`🎥 integration stopped for traceSingleFrame debugging`);
+		}
 	}
 
 	// do one frame - one video frame's worth of iink (and calculations)
