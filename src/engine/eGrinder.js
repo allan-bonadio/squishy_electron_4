@@ -116,7 +116,7 @@ class eGrinder {
 //	+` button; lower frequencies and more space points will help.`;
 
 	// call this to trigger all the threads to do the next iteration.  We COULD do this in C++
-	// but the Atomics api can do it, too.
+	// but the Atomics api can do it, too.  So this is the bottleneck.
 	triggerIteration() {
 
 		if (true) {

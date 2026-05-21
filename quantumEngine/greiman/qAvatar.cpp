@@ -58,7 +58,7 @@ qAvatar::~qAvatar(void) {
 
 // attach given buffer (useThisBuffer) as a view buffer in this avatar at
 // position whichBuffer.  If useThisBuffer is null, then allocate it and use
-// that.  does NOT clear or init the buffer.
+// that.  does NOT clear or init the buffer.  (name exists only on JS obj)
 float *qAvatar::attachViewBuffer(int whichBuffer, float *useThisBuffer,
 		int nCoordsPerVertex, int nVertices) {
 	viewBufInfo *vb = viewBuffers + whichBuffer;
