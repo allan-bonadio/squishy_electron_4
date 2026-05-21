@@ -36,9 +36,9 @@ class glAmbiance {
 
 	constructor(canvas) {
 		this.canvas = canvas;
-		this.attachEventHandlers();  // might return errors about context creation/loss
+		this.attachEventHandlers();  // might console.warn() errors about context creation/loss
 
-		// yes this is decided for each avatar even though the answer is the same.
+		// yes this is decided for each canvas even though the answer is the same.
 		// Gotta get the GL for the Canvas.
 		if (glAmbiance.preferWebGL2)
 			this.setupGL2(canvas);
@@ -50,7 +50,7 @@ class glAmbiance {
 			tooOldTerminate();
 
 		// leave this until I have things working better TODO
-		this.gl.cullFace(this.gl.FRONT_AND_BACK);
+		//this.gl.cullFace(this.gl.FRONT_AND_BACK);
 
 		// caller must wait for this before it's ready to go
 		if (webglLintProm) {
