@@ -178,7 +178,7 @@ export class ticDrawing extends abstractDrawing {
 		const gl = this.gl;
 		this.gl.useProgram(this.program);
 		//gl.viewport(0, 0, width, height);
-		gl.bindBuffer(gl.ARRAY_BUFFER, this.glBuffer);
+		gl.bindBuffer(gl.ARRAY_BUFFER, this.theAttribute.glBuffer);
 
 		this.drawUniforms.forEach(v => v.reloadVariable());
 		this.theAttribute.reloadVariable();
