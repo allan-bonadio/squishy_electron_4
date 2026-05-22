@@ -145,7 +145,6 @@ export class drawingAttribute extends drawingVariable {
 		// small integer indicating which attr this is.
 		// Set by compileProgram() for each attr in each drawing in each shader in GL context
 		this.attrLocation = this.gl.getAttribLocation(drawing.program, varName);
-		gl.enableVertexAttribArray(this.attrLocation);
 
 		if (this.attrLocation < 0) {
 			throw new Error(`🍯 drawingAttribute:attr loc for '${varName}' is bad: `+
@@ -155,25 +154,11 @@ export class drawingAttribute extends drawingVariable {
 		// create gl GPU buffer
 		this.glBuffer = gl.createBuffer();
 
-		// connect  ARRAY_BUFFER to glBuffer.
-		// do I have to do this if I'm not (yet) attaching the JS-space array with bufferData?
-		// no there it is in reloadVariable() so these two lines are superfluous
-		gl.bindBuffer(gl.ARRAY_BUFFER, this.glBuffer);
-
-		// is this optional cuz reload will do this? no it crashes cuz floatArray not three yet
-		//gl.bufferData(gl.ARRAY_BUFFER, floatArray, gl.DYNAMIC_DRAW);
-
 		// various ways to label it; each works with a difft debugging system.  some obsolete. 😟
 		let label = `${drawing.avatarLabel}-${drawing.drawingName}-${varName}-glbuf`;
 		this.tagObject(this.glBuffer, label);
 		this.glBuffer.$qLabel = label;
 		this.glBuffer.__SPECTOR_Metadata = {name: label};
-
-		gl.vertexAttribPointer(this.attrLocation, tupleWidth, gl.FLOAT,
-				false, tupleWidth * 4, 0);  // normalize, stride, offset
-		if (traceGLCalls)
-			console.log(`🍯  drawingAttribute '${this.varName}' connected to its `
-				+` glBuffer to tupleWidth=${tupleWidth}`);
 
 		// we haven't touched the actual JS data yet, this does it.  Although a lot of
 		// other stuff isn't ready.
@@ -197,8 +182,16 @@ export class drawingAttribute extends drawingVariable {
 		this.nTuples = this.floatArray.nTuples;
 		if (!this.nTuples) throw `false nTuples ${this.nTuples} in ${this.varName} in ${this.sceneName}`;
 
-		//dblog(`not binding buffer!`)
-		gl.bindBuffer(gl.ARRAY_BUFFER, this.glBuffer);// superfluous?  can't tell
+		// connect  ARRAY_BUFFER to glBuffer.
+		gl.bindBuffer(gl.ARRAY_BUFFER, this.glBuffer);
+		gl.enableVertexAttribArray(this.attrLocation);
+
+		gl.vertexAttribPointer(this.attrLocation, this.tupleWidth, gl.FLOAT,
+				false, this.tupleWidth * 4, 0);  // normalize, stride, offset
+		if (traceGLCalls)
+			console.log(`🍯  drawingAttribute '${this.varName}' connected to its `
+				+` glBuffer to tupleWidth=${this.tupleWidth}`);
+
 		gl.bufferData(gl.ARRAY_BUFFER, floatArray, gl.DYNAMIC_DRAW);
 
 		if (traceAttrs || traceAttributes)
