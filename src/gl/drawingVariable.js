@@ -198,7 +198,7 @@ export class drawingAttribute extends drawingVariable {
 		if (!this.nTuples) throw `false nTuples ${this.nTuples} in ${this.varName} in ${this.sceneName}`;
 
 		//dblog(`not binding buffer!`)
-		gl.bindBuffer(gl.ARRAY_BUFFER, this.glBuffer);
+		gl.bindBuffer(gl.ARRAY_BUFFER, this.glBuffer);// superfluous?  can't tell
 		gl.bufferData(gl.ARRAY_BUFFER, floatArray, gl.DYNAMIC_DRAW);
 
 		if (traceAttrs || traceAttributes)
