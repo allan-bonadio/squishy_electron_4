@@ -175,7 +175,7 @@ export class flatDrawing extends abstractDrawing {
 				+` maxHeight=${this.maxHeight}`);
 		}
 		const gl = this.gl;
-		this.gl.useProgram(this.program);
+		// done in abstractScene.drawAllDrawings   this.gl.useProgram(this.program);
 
 		let bw = this.scene.paintingNeeds.bumperWidth;
 		//gl.viewport(bw, 0, width - 2 * bw, height);
@@ -184,9 +184,10 @@ export class flatDrawing extends abstractDrawing {
 				+` width-2bw=${width - 2 * bw}, height=${height}  `
 				+` drawing ${this.vertexCount/2} points`);
 		}
-		this.drawUniforms.forEach(v => v.reloadVariable());
-		//this.drawVariables.forEach(v => v.reloadVariable());
-		this.theAttribute.reloadVariable();
+		// done in abstractScene.drawAllDrawings
+		// this.drawUniforms.forEach(v => v.reloadVariable());
+		// //this.drawVariables.forEach(v => v.reloadVariable());
+		// this.theAttribute.reloadVariable();
 
 		gl.drawArrays(gl.TRIANGLE_STRIP, 0, this.vertexCount);
 		if (traceFlatDrawing) {
