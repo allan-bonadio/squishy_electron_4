@@ -62,8 +62,7 @@ function SetVoltageTab(p) {
 		voltDisplay.copyVolts(mgVars.miniGraphBuffer, space.voltageBuffer);
 
 		// each voltDisplay manages a voltage context; this one does the minigraph one
-		mgVars.miniVoltDisplay = new voltDisplay('miniVoltDisplay',
-			space.start, space.end, space.continuum,
+		mgVars.miniVoltDisplay = new voltDisplay('miniVoltDisplay', space,
 			mgVars.miniGraphBuffer, getAGroup('voltageSettings'));
 		mgVars.miniVoltDisplay.setVoltScales(0, MINI_WIDTH, MINI_HEIGHT);
 	}
@@ -137,7 +136,6 @@ function SetVoltageTab(p) {
 	// the minigraph is all in svg; no gl
 	function renderMiniGraph() {
 		vDisp.setFamiliarVoltage(vP);  // fill my buffer
-		//vDisp.setVoltScales(0, MINI_WIDTH, MINI_HEIGHT);
 
 		// fill the voltage buffer
 		vDisp.setAutoRange();
@@ -156,11 +154,6 @@ function SetVoltageTab(p) {
 	// call whenever somehing changes that affects the minigraph.
 	// Somehow setState() on the ControlPanel doesn't do it.
 	function updateMiniGraph(change) {
-
-
-
-		//vDisp.setFamiliarVoltage(vP);  // don't need this cuz setAutoRange()?  TODO
-		//vDisp.setVoltScales(0, MINI_WIDTH, MINI_HEIGHT);
 
 		// new range to autorange for new params
 		vDisp.setAutoRange();
