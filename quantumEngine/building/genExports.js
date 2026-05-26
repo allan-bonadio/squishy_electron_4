@@ -232,7 +232,7 @@ ${defineFuncBody.join('\n')}
 	\n`;
 	if (traceOutput)
 		console.log('qeFuncs.js:\n' + funcCode);
-	let cleanCode = funcCode.replace(/\n\t/g, '\n');  // tabs from above string
+	let cleanCode = funcCode.replace(/\n\t+/g, '\n');  // tabs from above string
 	if (traceOutput)
 		console.log('qeFuncs.js:\n' + cleanCode);
 
@@ -247,11 +247,12 @@ function generateQeConsts() {
 	let constCode = `/*
 	** qeConsts - quantum engine constants shared js ⇆  C++
 	** this file generated ${new Date()}
-	** by the file SquishyElectron/quantumEngine/building/genExports.js
+	** by the file quantumEngine/building/genExports.js
 	*/
 
 	const qeConsts = {};
 	${JsConsts.join('\n\t')}
+	Object.freeze(qeConsts);
 	export default qeConsts;
 	`;
 
