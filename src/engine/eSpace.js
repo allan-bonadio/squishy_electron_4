@@ -3,6 +3,7 @@
 ** Copyright (C) 2021-2026 Tactile Interactive, all rights reserved
 */
 import qeFuncs from './qeFuncs.js';
+import qeConsts from './qeConsts.js';
 import InteStats from '../controlPanel/InteStats.js';
 import {prepForDirectAccessors} from '../utils/directAccessors.js';
 import voltDisplay from '../volts/voltDisplay.js';
@@ -137,8 +138,41 @@ export class eSpace {
 
 	/* ****************************    👽   👽    end of direct accessors */
 
+	/* ******************************************** rendering helpers */
+
+		// the actual datapoints are on the edges between segments.
+		// So, 8 states means nPoints=10 means 9 or 10 segments.  depending.
+		// For contENDLESS, this means 8 segments
+		// drawn.  Resonant wavelength is 8.
+		// For contWELL, this means the data edges on each end are zero, with 8
+		//     actual datapoints for the state.  10 segments drawn, although the
+		//     outer 2 go off to infinity.  Resonant wavelength is 9.
+
+
+	// calculate the relative barWidth given N and the continuum.  a fraction of 1.
+	// So everybody's on the same page with it.
+	// Also start and end for drawing onscreen cuz continuum
+	// use it like this: d3.scaleLinear([start, end], leftCoord, rightCoord);
+	// then loop 1...end or 0...(start+end) if you need the endpoints
+	get drawingDescription() {
+		const space = this;
+		if (space.continuum == qeConsts.contENDLESS) {
+			// eg for N=8, 8 segments and segment 0===8 and 1===9
+			return {barWidth: 1 / this.nStates, start: this.start, end: this.end};
+		}
+		else if (space.continuum == qeConsts.contWELL) {
+			// eg for N=8, 8 segments plus two on ends that go to ∞,
+			// so segment 0===9=∞
+			return {barWidth: 1 / this.nPoints, start: 0, end: this.end + this.start};
+		}
+		else {
+			throw `bad continuum ${this.continuum}`;
+		}
+	}
+
+
 	// return me the start, end, etc of this 1d space
-	// call it like this: const {start, end, N, continuum} = space.startEnd;
+	// call it like this: const {start, end, N, continuum} = this.startEnd;
 	get startEnd() {
 		//const dim = this.dimensions[0];
 		return {start: this.start, end: this.end, N: this.N, nPoints: this.nPoints,
