@@ -44,7 +44,8 @@ describe(`findVoltExtremes() method`, () => {
 		// shouldn't matter what the settings passed in are
 		volts16 = new Float64Array(16);  // all zeroes, right?
 		// TODO: should also test well continuum!
-		vDisp = new voltDisplay('test findVoltExtremes', 0, 16, qeConsts.contENDLESS, volts16,
+		let dummySpace = {start: 0; end: 16, continuum: qeConsts.contENDLESS};
+		vDisp = new voltDisplay('test findVoltExtremes', dummySpace, volts16,
 			{showVoltage: 'always', heightVolts: 0, bottomVolts: 0,});
 		// maybe someday vDispSize.setGraphSize(0, MINI_WIDTH, MINI_HEIGHT);
 
@@ -117,7 +118,8 @@ describe(`voltage creation & consistency`, () => {
 
 	])(`voltDisplay created w/%j  should yield %o`, (settings, mungeFunc, expected) => {
 		mungeFunc?.();
-		vDisp = new voltDisplay('test created', 0, 16, qeConsts.contENDLESS, volts16,
+		let dummySpace = {start: 0; end: 16, continuum: qeConsts.contENDLESS};
+		vDisp = new voltDisplay('test findVoltExtremes', dummySpace, volts16,
 			{showVoltage: 'always', ...settings});
 		// maybe someday vDispSize.setGraphSize(0, MINI_WIDTH, MINI_HEIGHT);
 		tryOutConsistency(vDisp);
@@ -135,7 +137,8 @@ describe(`voltDisplay Zoom`, () => {
 	let vDisp;
 	beforeAll(() => {
 		volts16 = new Float64Array(16);  // all zeroes, right?
-		vDisp = new voltDisplay('test Zoom', 0, 16, qeConsts.contENDLESS, volts16);
+		let dummySpace = {start: 0; end: 16, continuum: qeConsts.contENDLESS};
+		vDisp = new voltDisplay('test findVoltExtremes', dummySpace, volts16);
 		// maybe someday vDispSize.setGraphSize(0, MINI_WIDTH, MINI_HEIGHT);
 	});
 

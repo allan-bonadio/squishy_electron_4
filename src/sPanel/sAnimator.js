@@ -19,7 +19,8 @@ let traceIntegration = false;
 let traceAFPeriod = false;
 let traceTypicalVideoPeriod = false;
 let traceEachRaf = false;
-let traceSingleFrame = false;
+
+let traceSingleFrame = true;
 
 let typical = 100;
 

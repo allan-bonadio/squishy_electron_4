@@ -216,8 +216,8 @@ class SquishPanel extends React.Component {
 			// eslint-disable-next-line no-ex-assign
 			const iex = interpretCppException(ex);
 			debugger;
-			if (traceNewSpace)
-				dblog(`🎇 🐣 🎇 space Created failed!  `);
+			console.error(`🎇 🐣 🎇 space Created failed!  `, iex);
+
 			//eSpaceCreatedFail(iex);
 		}
 	}

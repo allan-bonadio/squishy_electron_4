@@ -7,6 +7,7 @@
 // This.  Take a pointer to a qGrinder, and contextMap[pointer] = the context
 // for that SquishPanel.  For that matter, you can also register any other
 // pointer as belonging to a context.  Just as long as there's no collisions!
+// I don't think this is very useful.  Never was.
 
 const pointerContextMap = [];
 

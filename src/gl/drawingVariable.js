@@ -5,8 +5,8 @@
 
 let traceGLCalls = false;
 let traceUniforms = false;
-let traceAttrs = true;  // quick update every reload
-let traceAttributes = false;  // full dumps every reload
+let traceAttributes = false;  // quick update every reload
+let traceAttributesFull = false;  // full dumps every reload
 
 // attr arrays and uniforms that can change on every frame.
 // you can set a static value or a function that'll return it
@@ -193,12 +193,12 @@ export class drawingAttribute extends drawingVariable {
 				+` glBuffer to tupleWidth=${this.tupleWidth}`);
 
 		gl.bufferData(gl.ARRAY_BUFFER, floatArray, gl.DYNAMIC_DRAW);
+		if (traceAttributes || traceAttributesFull)
 
-		if (traceAttrs || traceAttributes)
 			console.log(`🍯 reload drawingAttribute '${this.varName}' in ${this.drawing.drawingName}`
 				+ ` reloaded, ${this.nTuples}  tuples of ${this.tupleWidth} floats each`);
 
-		if (traceAttributes) {
+		if (traceAttributesFull) {
 			for (let t = 0; t < this.nTuples; t++) {
 				let line = `[${String(t).padStart(4)}]  `;
 				for (let f = 0; f < this.tupleWidth; f++)
