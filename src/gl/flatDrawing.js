@@ -138,21 +138,18 @@ export class flatDrawing extends abstractDrawing {
 		// there's 7 bars between.  9 bars total, 10 edges, matching the 10 = nPoints
 		// So, the same for WELL and ENDLESS
 
-		// barWidth: width of each bargraph bar
+		let {barWidth, start, end} = this.space.drawingDescription;
+
 		let nPoints = this.nPoints = this.space.nPoints;
-		let barWidth;
+		let nStates = this.space.nStates;
 		this.barWidthUniform = new drawingUniform('barWidth', this,
-			() => {
-				barWidth = 1 / (nPoints - 1)
-				return { value: barWidth, type: '1f' };
-			}
+			() => ( { value: barWidth, type: '1f' } )
 		);
-		if (traceFlatDrawing) console.log(`♭♭♭ barWidth= ${barWidth}`);
+		if (traceFlatDrawing) console.log(`♭♭♭ barWidth frac of 1= ${barWidth}`);
 
 		this.vertexCount = nPoints * 2;  // nPoints * vertsPerBar
 		this.rowFloats = 4;
 		this.theAttribute = new drawingAttribute('row', this, this.rowFloats, () => {
-		//this.rowAttr = new drawingAttribute('row', this, this.rowFloats, () => {
 			//debugger;
 			qeFuncs.avatar_avFlatLoader(this.avatar.pointer, this.scene.flatAvatarID,
 					this.scene.paintingNeeds.cavity.pointer, nPoints);
@@ -177,13 +174,15 @@ export class flatDrawing extends abstractDrawing {
 		const gl = this.gl;
 		// done in abstractScene.drawAllDrawings   this.gl.useProgram(this.program);
 
-		let bw = this.scene.paintingNeeds.bumperWidth;
-		//gl.viewport(bw, 0, width - 2 * bw, height);
-		if (traceViewport) {
-			console.log(`♭♭♭ flatDrawing set viewport on avatar=${this.avatarLabel}: `
-				+` width-2bw=${width - 2 * bw}, height=${height}  `
-				+` drawing ${this.vertexCount/2} points`);
-		}
+		// not used anywhere
+		// let bw = this.scene.paintingNeeds.bumperWidth;
+		// //gl.viewport(bw, 0, width - 2 * bw, height);
+		// if (traceViewport) {
+		// 	console.log(`♭♭♭ flatDrawing set viewport on avatar=${this.avatarLabel}: `
+		// 		+` width-2bw=${width - 2 * bw}, height=${height}  `
+		// 		+` drawing ${this.vertexCount/2} points`);
+		// }
+
 		// done in abstractScene.drawAllDrawings
 		// this.drawUniforms.forEach(v => v.reloadVariable());
 		// //this.drawVariables.forEach(v => v.reloadVariable());

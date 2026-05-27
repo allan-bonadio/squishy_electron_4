@@ -14,6 +14,7 @@ import * as d3 from "d3";
 class drawingDescription {
 	// the constructor merely figures the lowest info based on the space alone
 	constructor(space) {
+		this.continuum = space.continuum;
 		if (space.continuum == qeConsts.contENDLESS) {
 			// eg for N=8, 8 segments and segment 0===8 and 1===9
 			this.barWidth = 1 / space.nStates;

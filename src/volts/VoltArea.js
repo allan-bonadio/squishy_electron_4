@@ -380,12 +380,13 @@ function VoltArea(props) {
 		return '';  // too early
 
 	// width of each bar
-	let barWidth = p.drawingWidth / p.space.nPoints;
-	if (traceRendering) {
-		console.log(`⚡️ VoltArea.render, drawing left:${p.drawingLeft}
-			width=${p.drawingWidth}  height=${p.canvasInnerHeight}
-			barWidth=${barWidth}`);
-	}
+	// let {barWidth, start, end} = this.space.drawingDescription;
+
+	//let barWidth = p.drawingWidth / p.space.nPoints;
+	// if (traceRendering) {
+	// 	console.log(`⚡️ VoltArea.render, drawing left:${p.drawingLeft}
+	// 		width=${p.drawingWidth}  height=${p.canvasInnerHeight}`);
+	// }
 
 	mVD.setVoltScales(p.drawingLeft, p.drawingWidth, p.canvasInnerHeight);
 
@@ -393,13 +394,13 @@ function VoltArea(props) {
 	// NO!  this is done in VoltOverlay  let vClass = p.showVoltage +'ShowVoltage';
 	// so the whole assembly shows and hides incl sidebar
 
+	let viewBoxStr = `${p.drawingLeft} 0 ${p.drawingWidth} ${p.canvasInnerHeight}`;
 	if (traceViewBox) {
-	    dblog(`⚡️  about to use viewBox ${p.drawingLeft} 0 `
-	        +` ${p.drawingWidth} ${p.canvasInnerHeight}`);
+	    dblog(`⚡️  svg viewBox ${viewBoxStr}`);
 	}
 	let vArea = (
 		<svg className='VoltArea'
-			viewBox={`${p.drawingLeft} 0 ${p.drawingWidth} ${p.canvasInnerHeight}`}
+			viewBox={viewBoxStr}
 			x={p.drawingLeft} width={p.drawingWidth} height={p.canvasInnerHeight}
 			ref={svgRef}
 			onPointerMove={pointerMove}
