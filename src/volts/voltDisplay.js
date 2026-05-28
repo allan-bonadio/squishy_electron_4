@@ -268,12 +268,14 @@ export class voltDisplay {
 			points[0] = `M${x},` + skyHigh;
 			didMove = true;
 			didLine = false;
+			start++;  // don't overwrite the first one we just made
 			tpip(x, skyHigh, '️left bumper');
 
 			// should I get rid of this if the point at end-1 is NAN?  probably.  unlikely, though
 			//end += 1;
 			x = this.xScale(end).toFixed(1);
 			points[end] = `L${x},` + skyHigh;
+			end--;  // don't overwrite the last one we just made
 			tpip(x, skyHigh, '️right bumper');
 			break;
 
