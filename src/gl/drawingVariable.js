@@ -15,7 +15,7 @@ let traceAttributesFull = false;  // full dumps every reload
 // abstract superclass for all of these.
 export class drawingVariable {
 	// the drawing is what it's used in.  Must have a:
-	// gl, drawUniforms array, program,
+	// gl, drawVariables array, program,
 	// reloadFunc will AUTOMATICALLY be called before each frame to refresh the value
 	constructor(varName, drawing, reloadFunc) {
 		this.drawing = drawing;
@@ -35,6 +35,16 @@ export class drawingVariable {
 
 		if (traceGLCalls) console.log(`🍯 created drawingVariable '${varName}', drawing:`, drawing);
 	}
+
+	addVariable(drawing) {
+		let vv = drawing.drawVariables;
+		if (vv.includes(this)) {
+			console.error(`🍯 duplicate variable ${varName}!!`);
+			return null;
+		}
+		vv.push(this);
+	}
+
 }
 
 
@@ -59,13 +69,7 @@ export class drawingUniform extends drawingVariable {
 	constructor(varName, drawing, reloadFunc) {
 		super(varName, drawing, reloadFunc);
 
-		let vv = drawing.drawUniforms;
-		//let vv = drawing.drawVariables;
-		if (vv.includes(this)) {
-			console.error(`🍯 duplicate variable ${varName}!!`);
-			return null;
-		}
-		vv.push(this);
+                this.addVariable(drawing);
 
 		// this turns out to be an internal magic object
 		this.uniformLoc = this.gl.getUniformLocation(this.drawing.program, varName);
@@ -142,6 +146,8 @@ export class drawingAttribute extends drawingVariable {
 		this.sceneName = this.drawing.sceneName;
 		// maybe this isn't needed 4:46 this.drawing.setDrawing();
 
+		this.addVariable(drawing);
+
 		// small integer indicating which attr this is.
 		// Set by compileProgram() for each attr in each drawing in each shader in GL context
 		this.attrLocation = this.gl.getAttribLocation(drawing.program, varName);
@@ -180,7 +186,8 @@ export class drawingAttribute extends drawingVariable {
 			throw `reloadFunc() returned null on var=${varName} scene=${this.drawing.drawingName}`;
 		}
 		this.nTuples = this.floatArray.nTuples;
-		if (!this.nTuples) throw `false nTuples ${this.nTuples} in ${this.varName} in ${this.sceneName}`;
+		// ticDrawing can have zero tics when first created
+		//if (!this.nTuples) throw `false nTuples ${this.nTuples} in ${this.varName} in ${this.sceneName}`;
 
 		// connect  ARRAY_BUFFER to glBuffer.
 		gl.bindBuffer(gl.ARRAY_BUFFER, this.glBuffer);

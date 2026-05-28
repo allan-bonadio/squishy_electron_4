@@ -154,7 +154,8 @@ export class garlandDrawing extends abstractDrawing {
 
 		this.vertexCount = nStates * 2;  // nStates * vertsPerState
 		this.rowFloats = 4;
-		this.theAttribute = new drawingAttribute('row', this, this.rowFloats, () => {
+		this.rowAttr = new drawingAttribute('row', this, this.rowFloats,
+		    () => {
 		//this.rowAttr = new drawingAttribute('row', this, this.rowFloats, () => {
 			//debugger;
 			// retrieve GL rows from the cavity, including the bounds
@@ -185,8 +186,8 @@ export class garlandDrawing extends abstractDrawing {
 		const gl = this.gl;
 		//??? this.setDrawing();
 
-		this.drawUniforms.forEach(v => v.reloadVariable());
-		this.theAttribute.reloadVariable();
+        //this.drawVariables.forEach(v => v.reloadVariable());
+        //this.theAttribute.reloadVariable();
 
 		//this.drawVariables.forEach(v => v.reloadVariable());
 

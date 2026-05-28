@@ -149,7 +149,8 @@ export class flatDrawing extends abstractDrawing {
 
 		this.vertexCount = nPoints * 2;  // nPoints * vertsPerBar
 		this.rowFloats = 4;
-		this.theAttribute = new drawingAttribute('row', this, this.rowFloats, () => {
+		new drawingAttribute('row', this, this.rowFloats,
+		    () => {
 			//debugger;
 			qeFuncs.avatar_avFlatLoader(this.avatar.pointer, this.scene.flatAvatarID,
 					this.scene.paintingNeeds.cavity.pointer, nPoints);
@@ -184,7 +185,7 @@ export class flatDrawing extends abstractDrawing {
 		// }
 
 		// done in abstractScene.drawAllDrawings
-		// this.drawUniforms.forEach(v => v.reloadVariable());
+		// this.drawVariables.forEach(v => v.reloadVariable());
 		// //this.drawVariables.forEach(v => v.reloadVariable());
 		// this.theAttribute.reloadVariable();
 

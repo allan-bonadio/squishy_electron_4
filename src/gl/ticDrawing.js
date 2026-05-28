@@ -105,7 +105,7 @@ export class ticDrawing extends abstractDrawing {
 			}
 		);
 
-		this.theAttribute = new drawingAttribute('coords', this,
+		this.coordsAttr = new drawingAttribute('coords', this,
 			FLOATS_PER_VERTEX, () => this.generateTics());
 	}
 
@@ -178,10 +178,10 @@ export class ticDrawing extends abstractDrawing {
 		const gl = this.gl;
 		this.gl.useProgram(this.program);
 		//gl.viewport(0, 0, width, height);
-		gl.bindBuffer(gl.ARRAY_BUFFER, this.theAttribute.glBuffer);
+		//gl.bindBuffer(gl.ARRAY_BUFFER, this.theAttribute.glBuffer);
 
-		this.drawUniforms.forEach(v => v.reloadVariable());
-		this.theAttribute.reloadVariable();
+//		this.drawUniforms.forEach(v => v.reloadVariable());
+//		this.theAttribute.reloadVariable();
 		//this.drawVariables.forEach(v => v.reloadVariable());
 
 		// if (this.vertexCount > BUFFER_MAX_NTICS * VERTICES_PER_TIC)

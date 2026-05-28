@@ -42,9 +42,7 @@ export class abstractDrawing {
 
 		this.drawingName = drawingName;
 
-		this.drawUniforms = [];  // unis for this drawing ONLY
-		//this.drawVariables = [];  // vars for this drawing ONLY
-		this.theAttribute = null;  // one attribute only
+		this.drawVariables = [];  // vars for this drawing ONLY
 	}
 
 	/* *********************************** Shader Creation/Compile */
@@ -120,7 +118,7 @@ export class abstractDrawing {
 				this.dumpAttrNames('right after link');
 			}
 			return
-			// after this, you'll attach your drawUniforms & attr with your subclassed createVariables() method.
+			// after this, you'll attach your drawVariables with your subclassed createVariables() method.
 		}
 
 		// somehow failed compile.  So, no program

@@ -69,7 +69,8 @@ export class rainbowDrawing extends abstractDrawing {
 
 	// one time set up of variables for this drawing, every time canvas and scene is recreated
 	createVariables() {
-		this.setDrawing();
+		//this.setDrawing();
+		this.gl.useProgram(this.program);
 		if (traceRainbowDrawing)
 			console.log(`🌈 🌈 rainbow: creatingVariables`);
 
@@ -152,8 +153,15 @@ export class rainbowDrawing extends abstractDrawing {
 		const gl = this.gl;
 		this.gl.useProgram(this.program);
 
-		this.drawUniforms.forEach(v => v.reloadVariable());
-		this.theAttribute.reloadVariable();
+		//this.drawVariables.forEach(v => v.reloadVariable());
+		//this.theAttribute?.reloadVariable();
+
+        //this.posAttr.reloadVariable();
+        //this.waveAttr.reloadVariable();
+
+		// this.colAttr = new drawingAttribute('col', this, 3, () => {
+		// 	return col;
+		// });
 		//this.drawVariables.forEach(v => v.reloadVariable());
 
 		this.avatar.dumpEachViewBuffer(5, `avatar for rainbow cx just before draw`);
