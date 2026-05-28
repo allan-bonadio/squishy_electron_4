@@ -28,12 +28,12 @@ qSpace *makeFullSpace(int N) {
 	if (traceMakeSpace) printf("🧨 🧨  starting makeFullSpace(%d), about to startNewSpace\n", N);
 
 	qSpace *space = startNewSpace(MAKEFULLSPACE_LABEL);
-	if (traceMakeSpace) printf("        finished startNewSpace(), on to add\n");
+	if (traceMakeSpace) printf("		finished startNewSpace(), on to add\n");
 	addSpaceDimension(space, N, contENDLESS, 10, "x");
-	if (traceMakeSpace) printf("        finished addSpaceDimension(), on to complete\n");
+	if (traceMakeSpace) printf("		finished addSpaceDimension(), on to complete\n");
 	completeNewSpace(space, 1);
 
-	if (traceMakeSpace) printf("        finished makeFullSpace(%d)\n", N);
+	if (traceMakeSpace) printf("		finished makeFullSpace(%d)\n", N);
 	return space;
 }
 
@@ -44,13 +44,13 @@ qSpace *makeBareSpace(int N, int continuum) {
 	if (traceMakeSpace) printf("🧨 🧨 makeBareSpace(%d)\n", N);
 
 	qSpace *space = new qSpace(MAKEBARESPACE_LABEL);
-	if (traceMakeSpace) printf("    makeBareSpace: sizeof(qSpace) = %ld    space* = %p\n",
+	if (traceMakeSpace) printf("	makeBareSpace: sizeof(qSpace) = %ld	space* = %p\n",
 		sizeof(qSpace), space);
 	space->addDimension(N, continuum, .37, MAKEBARE1DDIM_LABEL);
-	if (traceMakeSpace) printf("    makeBareSpace: did Add, about to Init\n");
+	if (traceMakeSpace) printf("	makeBareSpace: did Add, about to Init\n");
 	space->initSpace();
 
-	if (traceMakeSpace) printf("    makeBareSpace: done\n");
+	if (traceMakeSpace) printf(" makeBareSpace: done\n");
 	return space;
 }
 

@@ -104,7 +104,7 @@ void qGrinder::pointReal(qCx *newW, qCx *oldW, qCx *hamiltW, double volts, doubl
 	}
 	if (traceVoltage && within(ix) && ((infrequent++ & 1023) == 0)) {
 //		speedyLog("hiay\n");
-		speedyLog("    🧶 voltage[%d] V=%12.3lf\n", usedIx, volts);
+		speedyLog("	🧶 voltage[%d] V=%12.3lf\n", usedIx, volts);
 	}
 
 	// total hamiltonian including voltage (remember hamiltW isn't the hamiltonian,
@@ -123,7 +123,7 @@ void qGrinder::pointReal(qCx *newW, qCx *oldW, qCx *hamiltW, double volts, doubl
 	// new = old + 𝛥 dt   note subtraction
 	newW->re = oldW->re - dt * H𝜓;
 	if (traceRealStep && within(ix))
-		speedyLog("    🧶 pointReal[%d] oldW->re=%3.8lf  newW->re=%3.8lf  H𝜓=%3.8lf\n",
+		speedyLog("	🧶 pointReal[%d] oldW->re=%3.8lf  newW->re=%3.8lf  H𝜓=%3.8lf\n",
 		samplePoint, oldW->re, newW->re, H𝜓);
 
 	qCheck(*newW, "vischer pointReal done for ix=", usedIx);
@@ -134,11 +134,11 @@ void qGrinder::pointReal(qCx *newW, qCx *oldW, qCx *hamiltW, double volts, doubl
 void qGrinder::pointImaginary(qCx *newW, qCx *oldW, qCx *hamiltW, double volts, double dt, int ix) {
 	// second deriv d2𝜓.re / dx**2
 	double d2𝜓r = (hamiltW[-1].re + hamiltW[+1].re - hamiltW->re * 2) * d2Coeff;
-	if (traceImaginaryStep) speedyLog("    🧶 pointImaginary\n");
+	if (traceImaginaryStep) speedyLog("	🧶 pointImaginary\n");
 
 	if (traceImaginaryStep && within(ix)) {
 		speedyLog(
-		"    🧶 pointImaginary[%d] d2𝜓i=%3.8lf  hamiltW=%5.5lf %5.5lf %5.5lf and d2Coeff %3.8lf\n",
+		"	🧶 pointImaginary[%d] d2𝜓i=%3.8lf  hamiltW=%5.5lf %5.5lf %5.5lf and d2Coeff %3.8lf\n",
 		usedIx, d2𝜓r, hamiltW[-1].im, hamiltW[+1].im, hamiltW->im, d2Coeff);
 	}
 
@@ -150,9 +150,9 @@ void qGrinder::pointImaginary(qCx *newW, qCx *oldW, qCx *hamiltW, double volts, 
 	}
 
 	//  new = old + 𝛥 dt   note addition
-	if (traceImaginaryStep) speedyLog("    🧶 pointImaginary\n");
+	if (traceImaginaryStep) speedyLog("	🧶 pointImaginary\n");
 	newW->im = oldW->im + dt * H𝜓;
-	if (traceImaginaryStep) speedyLog("    🧶 pointImaginary\n");
+	if (traceImaginaryStep) speedyLog("	🧶 pointImaginary\n");
 
 	qCheck(*newW, "vischer pointImaginary");
 }
@@ -162,7 +162,7 @@ void qGrinder::pointImaginary(qCx *newW, qCx *oldW, qCx *hamiltW, double volts, 
 // these work the same whether ENDLESS or WELL.
 
 // first step: advance the 𝜓.re one dt, from t to t + dt
-// oldW points to buffer with real = 𝜓.re(t)    imag = 𝜓.im(t + dt/2)
+// oldW points to buffer with real = 𝜓.re(t)	imag = 𝜓.im(t + dt/2)
 // newW points to buffer with real = 𝜓.re(t + dt)   imag unchanged = 𝜓.im(t + dt/2)
 // hamiltW is what we calculate the derivitives from
 // here we will calculate the 𝜓.re(t + dt) values in a new buffer only, and fill them in.
@@ -181,7 +181,7 @@ void qGrinder::hitReal(qCx *newW, qCx *oldW, qCx *hamiltW, double dt) {
 	}
 	flick->fixThoseBoundaries(newW);
 
-	if (traceVischerBench) speedyLog("      hitReal, done: time=%lf ms\n",
+	if (traceVischerBench) speedyLog("	  hitReal, done: time=%lf ms\n",
 		getTimeDouble());
 	if (traceRealStep) speedyLog("🧶 end of hitReal\n");
 }
@@ -201,7 +201,7 @@ void qGrinder::hitImaginary(qCx *newW, qCx *oldW, qCx *hamiltW, double dt) {
 
 	flick->fixThoseBoundaries(newW);
 
-	if (traceVischerBench) speedyLog("      hitImaginary done: time=%lf ms\n",
+	if (traceVischerBench) speedyLog("	  hitImaginary done: time=%lf ms\n",
 		getTimeDouble());
 	if (traceImaginaryStep) speedyLog("🧶 end of hitImaginary");
 

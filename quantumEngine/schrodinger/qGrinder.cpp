@@ -83,15 +83,15 @@ qGrinder::qGrinder(qSpace *sp, int nGrWorkers, const char *lab)
 		dumpObj(" qGrinder 🪓 constructed");
 
 		qDimension *dims = space->dimensions;
-		printf("          its qDimension:   N=%d start=%d end=%d ",
+		printf("		  its qDimension:   N=%d start=%d end=%d ",
 			dims[0].N, dims[0].start, dims[0].end);
-		printf("        nStates=%d nPoints=%d\n", dims[0].nStates, dims[0].nPoints);
-		printf("        its continuum=%d spectrumLength=%d label=%s\n",
+		printf("		nStates=%d nPoints=%d\n", dims[0].nStates, dims[0].nPoints);
+		printf("		its continuum=%d spectrumLength=%d label=%s\n",
 			dims[0].continuum, dims[0].spectrumLength, dims[0].label);
 
-		printf("      the qSpace for 🪓 grinder %s:   magic=" MAGIC_FORMAT " spacelabel=%s\n",
+		printf("	  the qSpace for 🪓 grinder %s:   magic=" MAGIC_FORMAT " spacelabel=%s\n",
 			label, MAGIC_ARGS, space->label);
-		printf("         nDimesions=%d   nStates=%d nPoints=%d voltage=%p spectrumLength=%d  samplePoint=%d\n",
+		printf("		 nDimesions=%d   nStates=%d nPoints=%d voltage=%p spectrumLength=%d  samplePoint=%d\n",
 			space->nDimensions, space->nStates, space->nPoints,
 			space->voltage, space->spectrumLength,
 			samplePoint);
@@ -124,7 +124,7 @@ qGrinder::~qGrinder(void) {
 // out when it all works.
 void qGrinder::formatDirectOffsets(void) {
 	// don't need magic
-	printf("🪓 🪓 --------------- starting    👽   👽    eGrinder direct access    👽   👽    JS getters & setters--------------\n\n");
+	printf("🪓 🪓 --------------- starting	👽   👽	eGrinder direct access	👽   👽	JS getters & setters--------------\n\n");
 	// these can come in any order; the .h file determines the memory layout
 	// but keep in same order as the .h file so I don't go crazy.  Commented ones don't have js accessors.
 
@@ -190,7 +190,7 @@ void qGrinder::formatDirectOffsets(void) {
 	makeByteGetter(sentinel);  // should always be value grSENTINEL_VALUE; only for validation
 	makeByteSetter(sentinel);
 
-	printf("\n🪓 🪓 --------------- done with    👽   👽    eGrinder direct access    👽   👽    --------------\n");
+	printf("\n🪓 🪓 --------------- done with	👽   👽	eGrinder direct access	👽   👽	--------------\n");
 }
 
 /* ********************************************************** dumpObj  */
@@ -198,19 +198,19 @@ void qGrinder::formatDirectOffsets(void) {
 // dump all the fields of a grinder
 void qGrinder::dumpObj(const char *title) {
 	speedyLog("\n🪓🪓 ==== qGrinder | %s ", title);
-	speedyLog("        magic: " MAGIC_FORMAT "   qSpace=%p '%s'   \n",
+	speedyLog("		magic: " MAGIC_FORMAT "   qSpace=%p '%s'   \n",
 		MAGIC_ARGS, space, label);
 
-	speedyLog("        elapsedTime=%lf, refDt=%lf, \n",
+	speedyLog("		elapsedTime=%lf, refDt=%lf, \n",
 		elapsedTime, space->refDt);
 
-	speedyLog("        flick=%p, voltage=%p, spect=%p\n",
+	speedyLog("		flick=%p, voltage=%p, spect=%p\n",
 		flick, voltage, spect);
 
-	speedyLog("        shouldBeIntegrating: %hhu   isIntegrating: %hhu   pleaseFFT=%hhu \n",
+	speedyLog("		shouldBeIntegrating: %hhu   isIntegrating: %hhu   pleaseFFT=%hhu \n",
 		shouldBeIntegrating, isIntegrating, pleaseFFT);
 
-	speedyLog("        ==== end of qGrinder::dumpObj(%s) ====\n\n", title);
+	speedyLog("		==== end of qGrinder::dumpObj(%s) ====\n\n", title);
 }
 
 /* ********************************************************** grinder */
@@ -305,7 +305,7 @@ void qGrinder::oneLap() {
 	if (traceIntegration) {
 		speedyLog("qGrinder 🪓 starting oneLap() "
 			"shouldBeIntegrating: %hhu   isIntegrating: %hhu   stretchedDt=%lg"
-			"   refDt=%lf    elapsedTime=%lf   \n",
+			"   refDt=%lf	elapsedTime=%lf   \n",
 			shouldBeIntegrating, isIntegrating,
 			stretchedDt, space->refDt, elapsedTime   );
 		// dtFactor is in controlpanel state  only
@@ -356,11 +356,11 @@ void qGrinder::oneLap() {
 	double iProd = flick->normalize();
 	if (dumpFFHiResSpectums) flick->dumpHiRes("wave END after normalize");
 	if (traceIProd && ((int) lapSerial & 31) == 0)
-		speedyLog("      🪓 qGrinder lap %d elapsed %4.6lf  iProd= %lf \n",
+		speedyLog("	  🪓 qGrinder lap %d elapsed %4.6lf  iProd= %lf \n",
 			lapSerial, elapsedTime, iProd);
 
 	if (traceJustWave)
-		flick->dump("     🪓 qGrinder traceJustWave at end of lap", true);
+		flick->dump("	 🪓 qGrinder traceJustWave at end of lap", true);
 
 	if (traceIntegration) {
 		speedyLog("🪓 qGrinder::oneLap() done; shouldBeIntegrating: %hhu   isIntegrating: %hhu "
@@ -398,7 +398,7 @@ void qGrinder::aggregateCalcTime(void) {
 
 		speedyLog(" qGrinder 🪓 aggregate time summed: %5.6lf ms, maxed: %5.6lf ms\n",
 			totalCalcTime, maxCalcTime);
-		speedyLog("       videoFP: %5.6lf  new stepsPerLap: %d    time per step: %5.8lf µs\n",
+		speedyLog("	   videoFP: %5.6lf  new stepsPerLap: %d	time per step: %5.8lf µs\n",
 			videoFP, stepsPerLap, maxCalcTime/stepsPerLap * 1e6);
 	}
 }
@@ -429,7 +429,7 @@ void qGrinder::threadsHaveFinished() {
 
 	if (traceIntegration)  {
 		speedyLog("🪓 threadsHaveFinished: shouldBeIntegrating=%hhu   isIntegrating=%hhu "
-			"   stretchedDt=%lg  refDt=%lf    elapsedTime=%lf   \n",
+			"   stretchedDt=%lg  refDt=%lf	elapsedTime=%lf   \n",
 				shouldBeIntegrating, isIntegrating, stretchedDt, space->refDt, elapsedTime);
 	}
 

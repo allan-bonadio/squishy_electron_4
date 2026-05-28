@@ -99,8 +99,6 @@ export class flatDrawing extends abstractDrawing {
 
 		this.vertexShaderSrc = vertexSrc;
 		this.fragmentShaderSrc = fragmentSrc;
-
-		//console.log(`attachViewBuffer on scene ${scene.sceneName}`);
 	}
 
 	// loads view buffer from corresponding wave, calculates highest norm.

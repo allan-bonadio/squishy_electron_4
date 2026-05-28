@@ -32,24 +32,24 @@ alarmError ( )
 }
 
 
-echo "                                     🎁 🛫 🔨 Install squish on nakoda " `pwd`  `date +%c %Z`
+echo "									 🎁 🛫 🔨 Install squish on nakoda " `pwd`  `date +%c %Z`
 ls -lh
 rm -rf build
 
-echo "                                     🎁 🛫 🔨 Now to decompress" `pwd`  `date +%c`
+echo "									 🎁 🛫 🔨 Now to decompress" `pwd`  `date +%c`
 unzip -oq build.zip || exit 3
 echo "build contents:"
 ls -lh build
 echo
 
-echo "                                     🎁 🛫 🔨 rename, build => $timestamp"
+echo "									 🎁 🛫 🔨 rename, build => $timestamp"
 mv -fv build $timestamp || alarmError
 mv -fv build.zip $timestamp.zip || alarmError
 echo "emplaced directory $timestamp:"
 ls -lh $timestamp
 echo
 
-echo "                                     🎁 🛫 🔨 now the switchover: point 'active' to $timestamp"
+echo "									 🎁 🛫 🔨 now the switchover: point 'active' to $timestamp"
 ./useBuild $timestamp || alarmError
 echo "active points to, and contents:"
 ls -l active active/

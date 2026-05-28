@@ -12,11 +12,11 @@ extern qCx hamiltonian(struct qSpace *space, qCx *wave, int ix);
 // currently we support only one dimension.  But we're envisioning...
 //
 // contENDLESS: number of data nPoints: = N+2.  Two on the ends get reflected from elements 1 and N.
-//     Numbered 0=left bound  1...N = data points   N+1 = right bound
+//	 Numbered 0=left bound  1...N = data points   N+1 = right bound
 // contWELL: number of data nPoints: = N+2.  Two on the ends are fixed at zero
-//     cuz the potential is ∞ there.  BUT they are actually part of the wave, so the wave
-//     has N+1 states, state 0 and N are degenerate and fixed at zero, so total wavelength N+1
-//     Numbered 0=left zero  1...N = data points   N+1 = right zero
+//	 cuz the potential is ∞ there.  BUT they are actually part of the wave, so the wave
+//	 has N+1 states, state 0 and N are degenerate and fixed at zero, so total wavelength N+1
+//	 Numbered 0=left zero  1...N = data points   N+1 = right zero
 // contDISCRETE is for angular momentum and other situations
 
 /* *************************************** one for each DIMENSION of the wave array */

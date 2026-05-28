@@ -126,7 +126,7 @@ stepFunctions[3] = step3;
 //					qCx hamiltonian(qSpace *space, qCx *wave, int ix) {
 //						// so at location ix, if dx = 1,
 //						// the derivative would be (𝜓[ix+1] - 𝜓[ix])
-//						//                      or (𝜓[ix] - 𝜓[ix-1])
+//						//					  or (𝜓[ix] - 𝜓[ix-1])
 //						// so second deriv would be 𝜓[ix+1] + 𝜓[ix-1] - 2* 𝜓[ix]
 //						qCx d2 = wave[ix-1] + wave[ix+1] - wave[ix] * 2;
 //						qCheck(d2, "hamiltonian d2", ix);
