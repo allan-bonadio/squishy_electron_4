@@ -413,7 +413,7 @@ export class voltDisplay {
 		return y0_1 * voltageParams.canyonScale;
 	}
 
-	// generate a canyon, flat etc voltage potential in the given array, according to params.
+	// generate a canyon, flat etc voltage potential in this.voltageBuffer, according to params.
 	// And set the height and bottom.  I don't think this works well.  Avoid.
 	setFamiliarVoltage(voltageParams) {
 		let {voltageCenter, voltageBreed, canyonPower, canyonScale,
@@ -472,7 +472,7 @@ export class voltDisplay {
 	}
 
 	// set bottomVolts and heightVolts to the results of setFamiliarVolts()
-	// and adjust scales.  Not sure if this is useful...
+	// and adjust scales.  Not sure if this is useful...  TODO
 	setFamiliarDomain(voltageParams, vWidth, vHeight) {
 
 		if (traceFamiliar)

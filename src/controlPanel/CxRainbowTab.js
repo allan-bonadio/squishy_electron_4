@@ -18,7 +18,7 @@ function CxRainbowTab(props) {
 		<h3>Complex Rainbow</h3>
 
 		<div style={{display: 'flex', flexDirection: 'row'}}>
-			<div key='canvas'
+			<div key='theCanvas'
 					style={{flex: '0 0 100px', padding: '1em', backgroundColor: 'black'}}>
 				<GLScene
 					sceneClassName='rainbowScene' sceneName='CxRainbow'
@@ -31,7 +31,7 @@ function CxRainbowTab(props) {
 			<div key='blurb' style={{flex: '1 1 200px', textAlign: 'left', margin: '1em'}}>
 				The colors in a wave show the phase of that part of the wave.
 				The phase is important because it determines whether the wave
-				reinforces itself or cancels itself out, at each place.
+				reinforces itself or cancels itself out, at each state (place).
 			</div>
 		</div>
 	</div>;
