@@ -314,7 +314,7 @@ function SetVoltageTab(p) {
 		<div className='voltageBreedPanel'>
 			{renderBreedSelector()}
 
-			<button onClick={p.saveMainVoltage}
+			<button className='lite' onClick={saveMainVoltage}
 					title={"This will set the voltage on the main display above, "
 						+" from what you've created on this panel, and save it for next time."}>
 				Set Voltage

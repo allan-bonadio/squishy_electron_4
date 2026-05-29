@@ -407,7 +407,7 @@ export class ControlPanel extends React.Component {
 	}
 
 	setAndRenderFamiliarVoltage(vP) {
-		this.space.vDisp.setAutoRange(vP);
+		this.space.vDisp.setFamiliarVoltage(vP);
 		this.space.updateDrawnVoltagePath();  // visible change on screen
 	}
 
