@@ -210,7 +210,7 @@ function SetWaveTab(props) {
 		<h3>Design a new Wave</h3>
 		<div className='waveTabCol '>
 			{breedSelector}
-			<button className='setWaveButton'
+			<button className='lite setWaveButton'
 					onClick={ev => saveMainWave(waveParams)}
 					title='start using it' >
 				Set Wave

@@ -35,7 +35,7 @@ const resolutionHandler = (ev) => {
 
 // the actual button they click.  The number doesn't change within a reset
 const renderResolutionControl = (N) => <div className='toolbarWidget'>
-	<button className='toolbarWidget resolutionBox'
+	<button className='dark toolbarWidget resolutionBox'
 					onClick={resolutionHandler} >
 		resolution {N}
 	</button>
@@ -146,7 +146,7 @@ function CPToolbar(props) {
 	// the slower and faster buttons should stop when they get mouseUp events.
 	// except sometimes those events get lost, so also leave and move events
 	const renderSpeedControl = () => (<>
-			<button className='toolbarWidget speedButton slower'
+			<button className='dark toolbarWidget speedButton slower'
 					onMouseDown={downSpeedHandler}
 					onMouseUp={upSpeedHandler}
 					onMouseLeave={upSpeedHandler}
@@ -158,7 +158,7 @@ function CPToolbar(props) {
 				{p.formatDtFactor()}
 			</span>
 
-			<button className='toolbarWidget speedButton faster'
+			<button className='dark toolbarWidget speedButton faster'
 					onMouseDown={downSpeedHandler}
 					onMouseUp={upSpeedHandler}
 					onMouseLeave={upSpeedHandler}
@@ -195,11 +195,11 @@ function CPToolbar(props) {
 		<span className='toolSpacer' style={{width: '.3em'}}></span>
 
 		<div className='toolbarWidget resetButton wave'>
-				<button onClick={props.resetWaveHandler}>Reset Wave</button>
+				<button className='dark' onClick={props.resetWaveHandler}>Reset Wave</button>
 		</div>
 
 		<div className='toolbarWidget resetButton volt'>
-				<button onClick={props.resetVoltageHandler}>Reset Voltage</button>
+				<button className='dark' onClick={props.resetVoltageHandler}>Reset Voltage</button>
 		</div>
 
 		{render2D3D()}

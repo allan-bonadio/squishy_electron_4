@@ -192,20 +192,43 @@ button {
 	margin: .2em;
 	font-size: 100%;
 	border-radius: .5em;
+	border-style: outset;
 
 	cursor: pointer;
 	//background-color: #fff;
 	//color: #004;
 
-	// hint that you can click it
-	&:hover {
-		background-color: #225;
+	// dark and lite are colors for the wholebutton, regardless of what they're on
+	&.lite {
+		background-color: #ccc;
+		&:hover {
+			background-color: #ee8;
+		}
+		&:active {
+			background-color: #ff0;
+			color: #000;
+			border-style: inset;
+		}
 	}
 
-	&:active {
-		background-color: #048;
-		color: #fff;
-		border-style: inset;
+	// glass is transparent, overlaying on on the main view/vista
+	&.dark, &.glass {
+		&:hover {
+			background-color: #4448;
+		}
+		&:active {
+			background-color: #00f;
+			color: #fff;
+			border-style: inset;
+		}
+	}
+
+	&.dark {
+		background-color: #444;
+	}
+
+	&.glass {
+		background-color: transparent;
 	}
 }
 

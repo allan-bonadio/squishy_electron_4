@@ -140,7 +140,7 @@ function Orient3D(props) {
 				min={0} max={2} step={.1} onChange={setOneOrient} />
 		</div>
 
-		<button onClick={resetOrientation} >reset</button>
+		<button className='glass' onClick={resetOrientation} >reset</button>
 	</div>;
 }
 

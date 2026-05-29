@@ -331,7 +331,7 @@ class sAnimator {
 		return <div className='runningDiagnosticCycle' style={{display: 'block'}}>
 			<span>total frames: {s.runningCycleIntegrateSerial.toFixed(0)} &nbsp;
 				elapsed vtime: {s.runningCycleElapsedTime.toFixed(3)} &nbsp;</span>
-			<button onClick={this.startRunningDiagnosticCycle}>start running 1 cycle</button>
+			<button className='lite' onClick={this.startRunningDiagnosticCycle}>start running 1 cycle</button>
 		</div>
 	}
 

@@ -136,7 +136,7 @@ function SimpleDialog(props) {
 		<article id='SimpleDialog' onKeyDown={CommonDialog.returnEscapeKeyDown} >
 			<p>{props.text}</p>
 			<nav>
-				<button onClick={CommonDialog.closeDialog} autoFocus={true} >OK</button>
+				<button className='glass' onClick={CommonDialog.closeDialog} autoFocus={true} >OK</button>
 			</nav>
 		</article>
 	);
@@ -205,7 +205,7 @@ function ErrorDialog(props) {
 			<h2><big>💥</big> Error {where}</h2>
 			{prepError(ex)}
 			<nav>
-				<button onClick={CommonDialog.closeDialog}  autoFocus={true} >OK</button>
+				<button className='glass' onClick={CommonDialog.closeDialog}  autoFocus={true} >OK</button>
 			</nav>
 		</article>
 	);
@@ -226,7 +226,7 @@ if (traceTestSimpleNError) {
 	div.innerHTML = `<button
 		onclick='CommonDialog.openSimpleDialog("hi howarya")'>
 		simple</button>
-		<button onclick='CommonDialog.openErrorDialog(new Error("Penny has left the stable"),
+		<button className='glass' onclick='CommonDialog.openErrorDialog(new Error("Penny has left the stable"),
 		"the stable")'>error</button>`;
 	document.body.append(div);
 }
