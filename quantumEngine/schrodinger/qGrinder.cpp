@@ -57,10 +57,11 @@ qGrinder::qGrinder(qSpace *sp, int nGrWorkers, const char *lab)
 		shouldBeIntegrating(false), isIntegrating(false),
 		pleaseFFT(false), sentinel(grSENTINEL_VALUE) {
 
-	// number of waves
+	// number of wave buffers.  Why is the qGrinder making the qFlick TODO ?!?!
 	flick = new qFlick(space, 3);
 
 	// recieves wave after a lap is done; then vbufs generated from that
+	// wait I don't think this is used anymore TODO
 	stage = new qCavity(space, NULL);
 
 	// so wave in the flick points to the zero-th wave
