@@ -1,11 +1,19 @@
 /*
-** helpers 3 dimensions -- 3d playground for Squish
+** helpers 3 dimensions -- random funcs for Squish
 ** Copyright (C) 2026-2026 Tactile Interactive, all rights reserved
 */
 
 //import {mat4} from 'gl-matrix';
 
-const _ = (n) => (n.toFixed(4).padStart(9, ' '));
+// wtf is wrong with this?!?!?!
+const _ = (n) => {
+	if (typeof n != 'number' || n == undefined) {
+		console.error(`undefined n`);
+		//debugger;
+		return 'undefined n';
+	}
+	return n.toFixed(4).padStart(9, ' ')
+};
 
 export function dump4x4(title, matrix) {
 	if (!matrix){
@@ -16,6 +24,8 @@ export function dump4x4(title, matrix) {
 		dblog(`⣿⣿⣿mat: ${title} matrix, class ${matrix.constructor.name} len=${matrix.length} is not a correct typed array:`,
 			typeof matrix, matrix.constructor.name, matrix.length);
 	}
+
+console.warn(matrix);
 
 	dblog(`⣿⣿⣿mat: ${title}
 	${_(matrix[0])} + ${_(matrix[1])} + ${_(matrix[2])} + ${_(matrix[3])}
