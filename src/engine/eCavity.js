@@ -5,8 +5,9 @@
 
 // There is no eBuffer or eSpectrum; C++ deals with those exclusively
 
+import eObject from './eObject.js';
 import qeConsts from './qeConsts.js';
-import {cppObjectRegistry, prepForDirectAccessors} from '../utils/directAccessors.js';
+//import {cppObjectRegistry, prepForDirectAccessors} from '../utils/directAccessors.js';
 import eSpace from './eSpace.js';
 import rainbowDump from '../utils/rainbowDump.js';
 import familiarWaves from './familiarWaves.js';
@@ -47,10 +48,8 @@ function dumpRow(ix, re, im, prev, isBorder) {
 
 // this is just a 1D wave.  Used typically for internal calculations with complex
 // numbers.  Or use eFlick.
-class eCavity {
+class eCavity extends eObject {
 	// useThis32F is one of these:
-	// • NO obsolete! (maybe still works but Float64Array() allocates its
-	//       own buffer) a C++ wave/spectrum buffer ptr, integer
 	// • a Float64Array[2*nPoints], with pairs being the real and im parts of psi.
 	//       From C++ so bytes are in the emscripten heap
 	// 		 (I bet you could pass it a JS array and some stuff would work)
@@ -59,21 +58,28 @@ class eCavity {
 	// pointer should be pointer to qCavity in C++, otherwise leave it falsy.
 	// If you use pointer, leave the useThis32F null; it's ignored
 	// label is optional and only JS side
-	constructor(space, label = 'wave', useThis32F, pointer) {
+	constructor() {
+		super();
+	}
+
+	// this is NOT called by subclass eFlick.  Long story.
+	postConstructor(space, label = 'wave', useThis32F, pointer)
+	{
 		this.space = space;
 		if (!(space instanceof eSpace))
 			throw new Error("new eCavity: space is not an eSpace")
 
 		if (pointer) {
-			this.pointer = pointer;  // a qCavity
+			//this._pointer_ = pointer;  // a qCavity
 			//?? waveArg = this._wave;
 		}
 		else {
 			// make a new qCavity
 			//debugger;
-			this.pointer = qeFuncs.cavity_create(space.pointer, null);
+			pointer = qeFuncs.cavity_create(space._pointer_, null);
 		}
-		prepForDirectAccessors(this, this.pointer);
+		setPointer(pointer);
+//		prepForDirectAccessors(this, this._pointer_);
 		this.label = label;
 
 		// now for the buffer
@@ -123,18 +129,18 @@ class eCavity {
 	// null out all other JS objects and buffers it points to, so ref counting
 	// can recycle it all
 	liquidate() {
-		wave_delete(this.pointer);
+		wave_delete(this._pointer_);
 		this.space = this.wave = null;
 	}
 
 	/* ****************************************************    👽   👽    direct access */
 
-	get _wave() { return this.ints[3]; }
+	get _wave() { return this._ints_[3]; }
 
-	get nPoints() { return this.ints[4]; }
-	get start() { return this.ints[5]; }
-	get end() { return this.ints[6]; }
-	get continuum() { return this.ints[7]; }
+	get nPoints() { return this._ints_[4]; }
+	get start() { return this._ints_[5]; }
+	get end() { return this._ints_[6]; }
+	get continuum() { return this._ints_[7]; }
 
 	/* ****************************    👽   👽    end of direct accessors */
 

@@ -7,6 +7,7 @@ import qeConsts from './qeConsts.js';
 import InteStats from '../controlPanel/InteStats.js';
 import {prepForDirectAccessors} from '../utils/directAccessors.js';
 import voltDisplay from '../volts/voltDisplay.js';
+import eObject from './eObject.js';
 import eAvatar from './eAvatar.js';
 import eGrinder from './eGrinder.js';
 import eCavity from './eCavity.js';
@@ -15,7 +16,7 @@ import {getAGroup} from '../utils/storeSettings.js';
 import {interpretCppException} from '../utils/errors.js';
 import {MAX_DIMENSIONS, N_THREADS} from './eEngine.js';
 
-let traceSpace = false;
+let traceSpace = true;
 let traceFamiliarWave = false;
 let traceGlobalSpace = false;
 
@@ -29,26 +30,30 @@ let traceGlobalSpace = false;
 // does all dimensions in constructor, at least.
 // Coords are the same if two dims are parallel, eg two particles with x coords.
 // Not the same if one particle with x and y coords; eg you could have an endless canal.
-export class eSpace {
+export class eSpace extends eObject {
 	// some bugs cause a big restart, creating a new space, and a big mess.
 	static theSpace = null;
 
 	constructor(dims, spaceLabel) {
+		super();
 		if (traceSpace)
-			console.log(`eSpace constructor just starting`, dims, spaceLabel);
+			console.log(`eSpace constructor starting: dims=`, dims, spaceLabel);
+
+		this.setPointer(qeFuncs.startNewSpace(spaceLabel));
+
 		if (dims.length > MAX_DIMENSIONS)
 			throw new Error(`Too many dimensions for space: ${dims.length} given but max is ${MAX_DIMENSIONS}`);
-		this.pointer = qeFuncs.startNewSpace(spaceLabel);
-		prepForDirectAccessors(this, this.pointer);
+		// this._pointer_ = qeFuncs.startNewSpace(spaceLabel);
+		// prepForDirectAccessors(this, this._pointer_);
 
 		// make each dimension (someday there'll be more than 1)
 		dims.forEach(d => {
-			qeFuncs.addSpaceDimension(this.pointer, d.N, d.continuum,
+			qeFuncs.addSpaceDimension(this._pointer_, d.N, d.continuum,
 				d.dimLength, d.label);
 			}
 		);
 
-		qeFuncs.completeNewSpace(this.pointer, N_THREADS);
+		qeFuncs.completeNewSpace(this._pointer_, N_THREADS);
 
 		// direct access into the voltage buffer
 		this.voltageBuffer = new Float64Array(window.Module.HEAPF64.buffer,
@@ -62,10 +67,10 @@ export class eSpace {
 		// no, done by scene this.miniGraphAvatar = eAvatar.adaptAvatar(this._miniGraphAvatar);
 
 		this.grinder = new eGrinder(this);
-		this._grinder = this.grinder.pointer;
+		this._grinder = this.grinder._pointer_;
 
 		this.mainFlick = this.grinder.flick;  // i know its a flick not a wave
-		this._mainFlick = this.mainFlick.pointer;  // i know its a flick not a wave
+		this._mainFlick = this.mainFlick._pointer_;  // i know its a flick not a wave
 
 		// SetWave most recent settings.
 		let waveParams = getAGroup('waveParams');
@@ -87,9 +92,9 @@ export class eSpace {
 		try {
 			if (traceSpace) {
 				// trace msgs in C++ should agree with these
-				let mgAv =  '0x'+ this.miniGraphAvatar.pointer.toString(16);
-				let mainAv = '0x'+  this.mainAvatar.pointer.toString(16);
-				let spP = '0x'+ this.pointer.toString(16);
+				let mgAv =  '0x'+ this.miniGraphAvatar._pointer_.toString(16);
+				let mainAv = '0x'+  this.mainAvatar._pointer_.toString(16);
+				let spP = '0x'+ this._pointer_.toString(16);
 				console.log(`🚀  liquidating main avatar=${mainAv}  mini avatar=${mgAv} `
 					+`  space=${spP} `,
 					this);
@@ -104,7 +109,7 @@ export class eSpace {
 			this.voltageBuffer = this.dimensions = null;
 
 			// finally, get rid of the C++ object
-			qeFuncs.deleteFullSpace(this.pointer);
+			qeFuncs.deleteFullSpace(this._pointer_);
 			if (traceSpace) console.log(`🚀  done  liquidating eSpace:`, this);
 		} catch (ex) {
 			// eslint-disable-next-line no-ex-assign
@@ -116,24 +121,24 @@ export class eSpace {
 	/* *********************************    👽   👽    Direct Accessors */
 	// see qSpace.cpp and directAccessors.h to regenerate this.
 
-	get _voltage() { return this.ints[1]; }
+	get _voltage() { return this._ints_[1]; }
 
-	get N() { return this.ints[2]; }
-	get continuum() { return this.ints[3]; }
-	get start() { return this.ints[4]; }
-	get end() { return this.ints[5]; }
-	get nStates() { return this.ints[51]; }
-	get nPoints() { return this.ints[52]; }
-	get dimLength() { return this.doubles[4]; }
-	get refDt() { return this.doubles[24]; }
-	set refDt(a) { this.doubles[24] = a; }
-	get nDimensions() { return this.ints[50]; }
-	get spectrumLength() { return this.ints[53]; }
-	get _mainFlick() { return this.ints[54]; }
-	set _mainFlick(a) { this.ints[54] = a; }
-	get _grinder() { return this.ints[55]; }
-	set _grinder(a) { this.ints[55] = a; }
-	get _label() { return this.pointer + 224; }
+	get N() { return this._ints_[2]; }
+	get continuum() { return this._ints_[3]; }
+	get start() { return this._ints_[4]; }
+	get end() { return this._ints_[5]; }
+	get nStates() { return this._ints_[51]; }
+	get nPoints() { return this._ints_[52]; }
+	get dimLength() { return this._doubles_[4]; }
+	get refDt() { return this._doubles_[24]; }
+	set refDt(a) { this._doubles_[24] = a; }
+	get nDimensions() { return this._ints_[50]; }
+	get spectrumLength() { return this._ints_[53]; }
+	get _mainFlick() { return this._ints_[54]; }
+	set _mainFlick(a) { this._ints_[54] = a; }
+	get _grinder() { return this._ints_[55]; }
+	set _grinder(a) { this._ints_[55] = a; }
+	get _label() { return this._pointer_ + 224; }
 
 
 	/* ****************************    👽   👽    end of direct accessors */

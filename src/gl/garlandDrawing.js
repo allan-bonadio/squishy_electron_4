@@ -159,8 +159,8 @@ export class garlandDrawing extends abstractDrawing {
 		//this.rowAttr = new drawingAttribute('row', this, this.rowFloats, () => {
 			//debugger;
 			// retrieve GL rows from the cavity, including the bounds
-			qeFuncs.avatar_avFlatLoader(this.avatar.pointer, 0,
-					this.scene.paintingNeeds.cavity.pointer, this.nPoints);
+			qeFuncs.avatar_avFlatLoader(this.avatar._pointer_, 0,
+					this.scene.paintingNeeds.cavity._pointer_, this.nPoints);
 
 			if (traceReloadRow) {
 				console.log(`🌀🌀🌀 garlandDrawing  ${this.avatarLabel}: `
@@ -199,7 +199,7 @@ export class garlandDrawing extends abstractDrawing {
 		if (!traceDontDrawTriangles)
 			gl.drawArrays(gl.TRIANGLE_STRIP, first, count);
 		if (traceDrawing) {
-			dblog(`🌀🌀🌀just drewArays-garland on avatar ptr=${this.avatar.pointer} `
+			dblog(`🌀🌀🌀just drewArays-garland on avatar ptr=${this.avatar._pointer_} `
 				+` this.avatar.label=${this.avatar.label}, `
 				+` buffer label=${this.avatar.bufferNames[0]}`);
 		}

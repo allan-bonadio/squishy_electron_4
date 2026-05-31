@@ -9,7 +9,7 @@
 // obj it corresponds to.  there'll be no collisions)
 // Object constuctores generally do this automatically in prepForDirectAccessors()
 // but for typed array you have to do this by hand.
-// like this:     cppObjectRegistry[blah.pointer] = blah;
+// like this:     cppObjectRegistry[blah._pointer_] = blah;
 // TODO: do we actually use this anywhere?!?
 export let cppObjectRegistry = {};
 
@@ -21,8 +21,8 @@ export let cppObjectRegistry = {};
 export function prepForDirectAccessors(_this, pointer) {
 	// we directly access fields in this C++ object,
 	// cuz the overhead from each js-C++ call is kindof large
-	_this.pointer = pointer;
-	if (!_this.pointer)
+	_this._pointer_ = pointer;
+	if (!_this._pointer_)
 		console.error(`Error in Direct Accessors: pointer is falsy`, pointer);
 
 	// these lengths must be big enough to reach to all local variables on your objects

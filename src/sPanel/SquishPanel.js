@@ -30,10 +30,10 @@ import {waitForSpaceCreatedPromise} from '../wave/waveContext.js';	// TODO: get 
 
 // runtime debugging flags - you can change in the debugger or here
 let tracePromises = false;
-let traceSquishPanel = false;
+let traceSquishPanel = true;
 let traceWidth = false;
 let traceSBIUpdate = false;
-let traceNewSpace = false;
+let traceNewSpace = true;
 
 /* ************************************************ construction & reconstruction */
 
@@ -233,11 +233,11 @@ class SquishPanel extends React.Component {
 			// space will end up in the state but meanwhile we need it now
 			this.space = space;
 			this.setState({space});	 // maybe i don't need this if it's in the context?
-			pointerContextMap.register(space.pointer, this.state);
+			pointerContextMap.register(space._pointer_, this.state);
 
 			//this.mainAvatar = space.mainAvatar;
 			this.grinder = space.grinder;
-			pointerContextMap.register(space.grinder.pointer, this.state);
+			pointerContextMap.register(space.grinder._pointer_, this.state);
 			//pointerContextMap.dump();
 			this.animator.grinder = this.grinder;
 			this.animator.space = this.space;

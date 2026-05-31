@@ -170,7 +170,7 @@ export class rgbVaneDrawing extends abstractDrawing {
 
 		gl.drawArrays(gl.TRIANGLE_STRIP, 0, this.nVertices);
 		if (traceDrawing) {
-			console.log(`🌀🌀🌀just drewArays-rgbVane on avatar ptr=${this.avatar.pointer} `
+			console.log(`🌀🌀🌀just drewArays-rgbVane on avatar ptr=${this.avatar._pointer_} `
 				+` this.avatar.label=${this.avatar.label}, `
 				+` buffer label=${this.avatar.bufferNames[0]}`);
 		}

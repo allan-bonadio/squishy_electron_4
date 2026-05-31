@@ -6,7 +6,8 @@
 // There is no eBuffer or eSpectrum; C++ deals with those exclusively
 
 import qeConsts from './qeConsts.js';
-import {cppObjectRegistry, prepForDirectAccessors} from '../utils/directAccessors.js';
+//import {cppObjectRegistry, prepForDirectAccessors} from '../utils/directAccessors.js';
+import eObject from './eObject.js';
 import eSpace from './eSpace.js';
 import eCavity from './eCavity.js';
 
@@ -23,13 +24,26 @@ const _ = num => num.toFixed(4).padStart(9);
 class eFlick extends eCavity {
 	// see how much we can freeload off of class qCavity.  All the direct accessor
 	// variables are in different places!! but everything else should work ok.  i
-	// think.  Only available constructor is with pointer and no typed array buffer.
-	// cuz there's multiple waves.
+	// think.  the eFlick constructor is called by the eGrinder constructor.  Analogously,
+	// the qFlick constructor is called by the qGrinder constructor
 	// label is optional and only JS side
-	constructor(space, label, pointer) {
-		super(space, label, null, pointer);
+	constructor(space, label = 'wave', pointer) {
+		super();
 
-		// no already created.  Figure this out later.  qeFuncs.flick_create(space.pointer);
+		//space, label = 'wave', useThis32F, pointer
+		this.space = space;
+		if (!(space instanceof eSpace))
+			throw new Error("new eCavity: space is not an eSpace")
+
+		// no already created.  Figure this out later.  ???
+		//let pointer = qeFuncs.flick_create(space._pointer_);
+		this.setPointer(pointer);
+		// had args: space, label, null, pointer
+
+		// now for the buffer
+		this.completeWave(null);
+
+		this.label = label;
 	}
 
 	// finish the construction.  eFlick (the only one) is constructed by the space
@@ -42,7 +56,7 @@ class eFlick extends eCavity {
 	// delete, except 'delete' is a reserved word.  Turn everything off.
 	// null out all other JS objects and buffers it points to, so ref counting can recycle it all
 	liquidate() {
-		flick_delete(this.pointer);
+		flick_delete(this._pointer_);
 		this.space = this.wave = null;
 	}
 
@@ -51,12 +65,12 @@ class eFlick extends eCavity {
 	// have to override qCavity's versions.  But the constructor for eCavity calls
 	// prepForDirectAccessors() for us, and it works the same.
 
-	get _wave() { return this.ints[7]; }
+	get _wave() { return this._ints_[7]; }
 
-	get nPoints() { return this.ints[8]; }
-	get start() { return this.ints[9]; }
-	get end() { return this.ints[10]; }
-	get continuum() { return this.ints[11]; }
+	get nPoints() { return this._ints_[8]; }
+	get start() { return this._ints_[9]; }
+	get end() { return this._ints_[10]; }
+	get continuum() { return this._ints_[11]; }
 
 	/* ****************************    👽   👽    end of direct accessors */
 	// hope everything else works!  All of qCavity's methods work on

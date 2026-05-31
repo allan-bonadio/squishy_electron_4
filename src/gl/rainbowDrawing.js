@@ -168,7 +168,7 @@ export class rainbowDrawing extends abstractDrawing {
 
 		//gl.drawArrays(gl.TRIANGLE_STRIP, 0, nVERTS);
 		gl.drawArrays(gl.TRIANGLE_FAN, 0, nVERTS);
-		// console.log(`just drewArays-rainbow on avatar ptr=${this.avatar.pointer} `
+		// console.log(`just drewArays-rainbow on avatar ptr=${this.avatar._pointer_} `
 		// 	+` this.avatar.label=${this.avatar.label}, buffer label= `
 		// 	+` ${this.avatar.bufferNames[0]}`);
 

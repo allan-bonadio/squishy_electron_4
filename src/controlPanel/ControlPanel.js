@@ -298,7 +298,7 @@ export class ControlPanel extends React.Component {
 				if (this.grinder.isIntegrating)
 					space.grinder.pleaseFFT = true;  // remind me after next iter
 				else
-					qeFuncs.grinder_askForFFT(space.grinder.pointer);  // do it now
+					qeFuncs.grinder_askForFFT(space.grinder._pointer_);  // do it now
 			}
 		});
 	}
@@ -346,7 +346,7 @@ export class ControlPanel extends React.Component {
 
 		mainFlick.setFamiliarWave(waveParams);  // eSpace does this initially
 
-		//qeFuncs.grinder_copyFromAvatar(this.grinder.pointer, this.mainAvatar.pointer);
+		//qeFuncs.grinder_copyFromAvatar(this.grinder._pointer_, this.mainAvatar._pointer_);
 		this.props.resetAndRepaintMainWave();
 	}
 
