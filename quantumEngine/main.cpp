@@ -16,7 +16,8 @@
 // Hand it some numbers from the builder script.
 // all these param names must be lower case for some reason.
 EM_JS(int, qeStarted, (int max_dimensions, int n_threads, int sqdevel), {
-	const bailoutTime = Date.now() + 300_000;
+	const started = Date.now();
+	const bailoutTime = started + 300_000;
 
 	// sometimes these things start in the wrong order
 	let inter = setInterval(() => {
@@ -27,12 +28,13 @@ EM_JS(int, qeStarted, (int max_dimensions, int n_threads, int sqdevel), {
 			window.startUpFromCpp(max_dimensions, n_threads, sqdevel);
 		}
 		else {
-			let tim = new Date();
-
-			if (bailoutTime < tim.getTime()) {
-				console.error(`could not start up Cpp at `, tim);
+			const tim = new Date();
+			const now = tim.getTime();
+			if (bailoutTime < now) {
+				let msg = `could not start up Cpp after ${(now - started)/1000} seconds, at` + tim;
+				console.error(msg);
 				clearInterval(inter);
-				throw `could not start up Cpp`;
+				throw msg;
 			}
 			console.log(`try again later, see if cpp set up yet  `, tim.toTimeString());
 		}
