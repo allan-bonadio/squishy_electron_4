@@ -20,7 +20,7 @@ let traceAFPeriod = false;
 let traceTypicalVideoPeriod = false;
 let traceEachRaf = false;
 
-let traceSingleFrame = true;
+let traceSingleFrame = false;
 
 let typical = 100;
 

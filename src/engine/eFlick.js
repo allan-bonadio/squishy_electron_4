@@ -61,9 +61,8 @@ class eFlick extends eCavity {
 	}
 
 	/* *************************************    👽   👽    direct access */
-	// these are different offsets from qCavity; therefore all of these
-	// have to override qCavity's versions.  But the constructor for eCavity calls
-	// prepForDirectAccessors() for us, and it works the same.
+	// these are different offsets from qCavity (? they were); therefore all of these
+	// have to override qCavity's versions.
 
 	get _wave() { return this._ints_[7]; }
 

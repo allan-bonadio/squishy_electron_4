@@ -12,8 +12,8 @@ import drawingDescription from '../wave/drawingDescription.js';
 
 let traceFamiliar = false;
 let traceScales = false;
-let tracePathAttribute = true;
-let tracePathIndividualPoints = true;
+let tracePathAttribute = false;
+let tracePathIndividualPoints = false;
 
 let traceVoltArithmetic = false;
 let traceVoltScales = false;

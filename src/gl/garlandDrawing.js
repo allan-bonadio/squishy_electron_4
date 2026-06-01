@@ -13,15 +13,15 @@ import {vec4, mat4} from 'gl-matrix';
 
 
 let traceAvatarAfterDrawing = false;
-let traceGLAfterDrawing = true;
+let traceGLAfterDrawing = false;
 let traceDrawing = false;
 let traceReloadRow = false;
 let traceMatrix = false;
 
 // diagnostic purposes; draws more per vertex
-let traceDontDrawTriangles=  true;
+let traceDontDrawTriangles=  false;
 let traceDrawPoints = false;
-let traceDrawLines = true;
+let traceDrawLines = false;
 
 /* *********************************************** garland drawing */
 // The glsl sources for webgl drawing
