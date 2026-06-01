@@ -135,12 +135,12 @@ class eCavity extends eObject {
 
 	/* ****************************************************    👽   👽    direct access */
 
-	get _wave() { return this._ints_[3]; }
+	get _wave() { return this._ints_[7]; }
 
-	get nPoints() { return this._ints_[4]; }
-	get start() { return this._ints_[5]; }
-	get end() { return this._ints_[6]; }
-	get continuum() { return this._ints_[7]; }
+	get nPoints() { return this._ints_[8]; }
+	get start() { return this._ints_[9]; }
+	get end() { return this._ints_[10]; }
+	get continuum() { return this._ints_[11]; }
 
 	/* ****************************    👽   👽    end of direct accessors */
 
