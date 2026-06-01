@@ -7,7 +7,7 @@
 // See how these are used in qGrinder.cpp and qSpace.cpp . Use one of these
 // printf macros,  for each field from your .h file that
 // you want to share with JS. You should arrange the fields in the .h file from
-// wides (doubles) to narrows (bools or bytes) for safer alignment, or just count bytes.
+// wides (_doubles_) to narrows (bools or bytes) for safer alignment, or just count bytes.
 // Include or omit fields and setters in C++ depending on if you use these macros in
 // the JS proxy class, in JS.
 
@@ -21,25 +21,25 @@
 
 // use for bool field, or anything 1 byte.  probably should rename this all from bool to byte.
 #define byteOffset(field)  (int) ((byte *) &this->field - (byte *) this)
-#define makeBoolGetter(field)  printf("\tget " #field  "() { return Boolean(this.bytes[%d]); }\n", byteOffset(field));
-#define makeBoolSetter(field)  printf("\tset " #field  "(a) { this.bytes[%d] = Boolean(a); }\n", byteOffset(field));
+#define makeBoolGetter(field)  printf("\tget " #field  "() { return Boolean(this._bytes_[%d]); }\n", byteOffset(field));
+#define makeBoolSetter(field)  printf("\tset " #field  "(a) { this._bytes_[%d] = Boolean(a); }\n", byteOffset(field));
 
 // use for anything 1 byte, other than a bool.
-#define makeByteGetter(field)  printf("\tget "  #field  "() { return this.bytes[%d]; }\n", byteOffset(field));
-#define makeByteSetter(field)  printf("\tset " #field  "(a) { this.bytes[%d] = a; }\n", byteOffset(field));
+#define makeByteGetter(field)  printf("\tget "  #field  "() { return this._bytes_[%d]; }\n", byteOffset(field));
+#define makeByteSetter(field)  printf("\tset " #field  "(a) { this._bytes_[%d] = a; }\n", byteOffset(field));
 
 // use for a standard C string, char[]
-#define makeStringPointer(field)  printf("\tget _" #field  "() { return this.pointer + %d; }\n", byteOffset(field));
-#define makeNamedStringPointer(name, field)  printf("\tget _" #name  "() { return this.pointer + %d; }\n", byteOffset(field));
+#define makeStringPointer(field)  printf("\tget _" #field  "() { return this._pointer_ + %d; }\n", byteOffset(field));
+#define makeNamedStringPointer(name, field)  printf("\tget _" #name  "() { return this._pointer_ + %d; }\n", byteOffset(field));
 
 // make a pointer to anything else actually inside the object (just like a string)
-#define makeInsidePointer(field)  printf("\tget _" #field  "() { return this.pointer + %d; }\n", byteOffset(field));
+#define makeInsidePointer(field)  printf("\tget _" #field  "() { return this._pointer_ + %d; }\n", byteOffset(field));
 
 // use for int field, or anything 32 bits, like a pointer
 #define intOffset(field)  (int) ((int *) &this->field - (int *) this)
-#define makeIntGetter(field)  printf("\tget " #field  "() { return this.ints[%d]; }\n", intOffset(field));
-#define makeNamedIntGetter(name, field)  printf("\tget " #name  "() { return this.ints[%d]; }\n", intOffset(field));
-#define makeIntSetter(field)  printf("\tset " #field  "(a) { this.ints[%d] = a; }\n", intOffset(field));
+#define makeIntGetter(field)  printf("\tget " #field  "() { return this._ints_[%d]; }\n", intOffset(field));
+#define makeNamedIntGetter(name, field)  printf("\tget " #name  "() { return this._ints_[%d]; }\n", intOffset(field));
+#define makeIntSetter(field)  printf("\tset " #field  "(a) { this._ints_[%d] = a; }\n", intOffset(field));
 
 // Just need this offset in the JS, so JS can get at the atomics that must be in typed arrays
 #define makeIntOffset(field)  printf("\t"  #field  "Offset = %d;\n", intOffset(field));
@@ -47,15 +47,15 @@
 // like makeIntGetter() but creates a different name so as to not conflict with actual JS field in same class.
 // This will return to JS the C++ pointer value, which can be wrapped into a JS e-class.
 // Rare setter cuz only C++ sets the pointers in constructors or other
-#define makePointerGetter(field)  printf("\tget _" #field  "() { return this.ints[%d]; }\n", intOffset(field));
-#define makeNamedPointerGetter(name, field)  printf("\tget " #name  "() { return this.doubles[%d]; }\n", intOffset(field));
-#define makePointerSetter(field)  printf("\tset _" #field  "(a) { this.ints[%d] = a; }\n", intOffset(field));
+#define makePointerGetter(field)  printf("\tget _" #field  "() { return this._ints_[%d]; }\n", intOffset(field));
+#define makeNamedPointerGetter(name, field)  printf("\tget " #name  "() { return this._doubles_[%d]; }\n", intOffset(field));
+#define makePointerSetter(field)  printf("\tset _" #field  "(a) { this._ints_[%d] = a; }\n", intOffset(field));
 
 // use for double float field, or anything 64 bits
 #define doubleOffset(field)  (int) ((double *) &this->field - (double *) this)
-#define makeDoubleGetter(field)  printf("\tget " #field  "() { return this.doubles[%d]; }\n", doubleOffset(field));
-#define makeNamedDoubleGetter(name, field)  printf("\tget " #name  "() { return this.doubles[%d]; }\n", doubleOffset(field));
-#define makeDoubleSetter(field)  printf("\tset " #field  "(a) { this.doubles[%d] = a; }\n", doubleOffset(field));
+#define makeDoubleGetter(field)  printf("\tget " #field  "() { return this._doubles_[%d]; }\n", doubleOffset(field));
+#define makeNamedDoubleGetter(name, field)  printf("\tget " #name  "() { return this._doubles_[%d]; }\n", doubleOffset(field));
+#define makeDoubleSetter(field)  printf("\tset " #field  "(a) { this._doubles_[%d] = a; }\n", doubleOffset(field));
 
 // Uncomment only the first line below, for normal operation. When you
 // change some field arrangements or sizes for the major objects that
