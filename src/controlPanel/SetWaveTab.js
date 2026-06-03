@@ -50,17 +50,26 @@ function SetWaveTab(props) {
 	let {saveMainWave, waveParams, setWaveParams, space} = props;
 
 	// must remember our own temp wave for minigraph
-	const minigraphWaveRef = useRef(new eCavity(props.space, 'minigraphWave'));
-	const minigraphWave = minigraphWaveRef.current
+
+	const minigraphWaveRef = useRef(cavity);
+	let minigraphWave;
+	if (minigraphWaveRef.current) {
+        minigraphWave = minigraphWaveRef.current
+	}
+	else {
+        minigraphWave = new eCavity();
+        minigraphWave.postConstructor(props.space, 'minigraphWave');
+        minigraphWaveRef.current = minigraphWave;
+	}
 
 	const paintingNeedsRef = useRef({cavity: minigraphWave, bumperWidth: 0})
 	const paintingNeeds = paintingNeedsRef.current;
 
-	// must remember our repaint func
+    // must remember our repaint func. GLScene ultimately calls setMinigraphRepaint() to hand us
+    // the special minigraph repaint function, saved in the minigraphRepaintRef
 	const minigraphRepaintRef = useRef(null);
-	let minigraphRepaint = minigraphRepaintRef.current;
+	let minigraphRepaint = minigraphRepaintRef.current;  // early on, null
 
-	// GLScene ultimately calls this to hand us the minigraph repaint function
 	function setMinigraphRepaint(repaint) {
 		if (traceSetRepaint)
 			dblog(`🎨 set mg repaint: `, repaint);
