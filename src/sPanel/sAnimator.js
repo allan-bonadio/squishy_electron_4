@@ -20,7 +20,7 @@ let traceAFPeriod = false;
 let traceTypicalVideoPeriod = false;
 let traceEachRaf = false;
 
-let traceSingleFrame = true;
+let traceSingleFrame = false;
 
 let typical = 100;
 
@@ -211,7 +211,7 @@ class sAnimator {
 		// an error (eg divergence) will halt integration.  Start Over will put it back.
 		console.log(`🎥 sAnimator: hadException   will dialog`);
 		this.getContext().controlPanel.finishAnimating();
-		this.errorMessage = qeFuncs.grinder_getExceptionMessage(this.grinder.pointer);
+		this.errorMessage = qeFuncs.grinder_getExceptionMessage(this.grinder._pointer_);
 		if (!this.errorMessage) this.errorMessage = 'sorry, no message.  🫦 🥺';
 		console.error(`had Exception!  '${this.errorMessage}'  ex=${this.grinder.hadException} `);
 		const ex = new Error(this.errorMessage);
@@ -331,7 +331,7 @@ class sAnimator {
 		return <div className='runningDiagnosticCycle' style={{display: 'block'}}>
 			<span>total frames: {s.runningCycleIntegrateSerial.toFixed(0)} &nbsp;
 				elapsed vtime: {s.runningCycleElapsedTime.toFixed(3)} &nbsp;</span>
-			<button onClick={this.startRunningDiagnosticCycle}>start running 1 cycle</button>
+			<button className='lite' onClick={this.startRunningDiagnosticCycle}>start running 1 cycle</button>
 		</div>
 	}
 

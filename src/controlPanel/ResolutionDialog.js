@@ -188,10 +188,10 @@ export default class ResolutionDialog extends React.Component {
 				{this.renderContinuum()}
 				{this.renderSpaceLength()}
 				<section className='okCancel'>
-					<button className='cancelButton' onClick={this.cancel}>
+					<button className='lite cancelButton' onClick={this.cancel}>
 							Cancel
 					</button>
-					<button className='okButton' onClick={this.OK}>
+					<button className='lite okButton' onClick={this.OK}>
 							Recreate Space
 					</button>
 				</section>

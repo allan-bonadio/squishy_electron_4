@@ -11,23 +11,23 @@
 )
 
 # To run all the tests, run it like this:
-#    quantumEngine> make test
+#   quantumEngine> make test
 # or
-#    quantumEngine> testing/cppuRunner.sh
+#   quantumEngine> testing/cppuRunner.sh
 #
 # To run under debugger:
-#    quantumEngine> testing/cppuRunner.sh db
+#   quantumEngine> testing/cppuRunner.sh db
 # or
-#    quantumEngine> testing/cppuRunner.sh db foo bar
+#   quantumEngine> testing/cppuRunner.sh db foo bar
 #
 # To run all tests whose Names include the string 'foo' and those including 'bar':
-#    quantumEngine> testing/cppuRunner.sh foo bar
+#   quantumEngine> testing/cppuRunner.sh foo bar
 #
 # To run all tests under Group(s), use this:
-#    quantumEngine> testing/cppuRunner.sh -g foo -g bar
+#   quantumEngine> testing/cppuRunner.sh -g foo -g bar
 #
 # to use any other cppuTest switches, do it like this
-#    quantumEngine> testing/cppuRunner.sh -sn foo -xg bar
+#   quantumEngine> testing/cppuRunner.sh -sn foo -xg bar
 # see other switches https://cpputest.github.io/manual.html#command-line-switches
 #
 

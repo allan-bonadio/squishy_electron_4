@@ -3,8 +3,9 @@
 ** Copyright (C) 2022-2026 Tactile Interactive, all rights reserved
 */
 
-import {cppObjectRegistry, prepForDirectAccessors} from '../utils/directAccessors.js';
+//import {cppObjectRegistry, prepForDirectAccessors} from '../utils/directAccessors.js';
 //import eCavity from './eCavity.js';
+import eObject from './eObject.js';
 import qeFuncs from './qeFuncs.js';
 import qeConsts from './qeConsts.js';
 
@@ -21,7 +22,7 @@ let traceCreation = false;
 // of its cycle, at the end of an integration lap.
 
 
-class eAvatar {
+class eAvatar extends eObject {
 	// create An eAvatar complete with its inner qAvatar.  (zero buffers)
 	// use this if you're doing something other than the original  space's avatars
 	static createAvatar(label) {
@@ -47,10 +48,12 @@ class eAvatar {
 	// the C++ address space, to the qAvatar object. The space comes with 2
 	// qAvatars already. Or, call createAvatar() above.
 	constructor(pointer) {
+		super();
 		if (!pointer) throw Error("Need pointer to create eAvatar")
-		prepForDirectAccessors(this, pointer);
+		//prepForDirectAccessors(this, pointer);
 		if (!pointer || pointer < 10)
 			throw "cannot construct eAvatar without qAvatar pointer: ${pointer}";
+		this.setPointer(pointer);
 
 		// for the Float32Arrays for each C++ float arrays
 		this.typedArrays = new Array(4);
@@ -97,7 +100,7 @@ class eAvatar {
 		if (!useThisMemory)
 			useThisMemory = qeFuncs.buffer_allocateBuffer(nFloats * 4);
 
-		let vbuf = qeFuncs.avatar_attachViewBuffer(this.pointer, whichBuffer,
+		let vbuf = qeFuncs.avatar_attachViewBuffer(this._pointer_, whichBuffer,
 				useThisMemory, nCoordsPerVertex, nVertices);
 		const tArray = new Float32Array(window.Module.HEAPF32.buffer, vbuf, nFloats);
 		tArray.nTuples = nVertices;  // hack so you can pass around the array and its size,
@@ -116,7 +119,7 @@ class eAvatar {
 	// 		useThisMemory = qeFuncs.buffer_allocateBuffer(2 * nItems);
 	//
 	// 	// buffer of short ints, 16 bits apiece
-	// 	const vbuf = qeFuncs.avatar_attachIndexBuffer(this.pointer, useThisMemory, nItems);
+	// 	const vbuf = qeFuncs.avatar_attachIndexBuffer(this._pointer_, useThisMemory, nItems);
 	// 	this.indexBuffer = new Uint16Array(window.Module.HEAPU16.buffer, vbuf, nItems);
 	//
 	// 	return this.indexBuffer;
@@ -141,23 +144,23 @@ class eAvatar {
 	/* *****************************************    👽   👽    Direct Accessors */
 	// see qAvatar.cpp to regenerate this. Note these are all scalars; buffers
 
-	get _space() { return this.ints[1]; }
-	set _space(a) { this.ints[1] = a; }
-	get _cavity() { return this.ints[2]; }
-	set _cavity(a) { this.ints[2] = a; }
-	get int0() { return this.ints[3]; }
-	set int0(a) { this.ints[3] = a; }
-	get int1() { return this.ints[4]; }
-	set int1(a) { this.ints[4] = a; }
-	get double0() { return this.doubles[3]; }
-	set double0(a) { this.doubles[3] = a; }
-	get double1() { return this.doubles[4]; }
-	set double1(a) { this.doubles[4] = a; }
-	get _label() { return this.pointer + 40; }
-	get _indexBuffer() { return this.ints[18]; }
-	set _indexBuffer(a) { this.ints[18] = a; }
-	get _nIndices() { return this.ints[19]; }
-	get _viewBuffers() { return this.pointer + 80; }
+	get _space() { return this._ints_[1]; }
+	set _space(a) { this._ints_[1] = a; }
+	get _cavity() { return this._ints_[2]; }
+	set _cavity(a) { this._ints_[2] = a; }
+	get int0() { return this._ints_[3]; }
+	set int0(a) { this._ints_[3] = a; }
+	get int1() { return this._ints_[4]; }
+	set int1(a) { this._ints_[4] = a; }
+	get double0() { return this._doubles_[3]; }
+	set double0(a) { this._doubles_[3] = a; }
+	get double1() { return this._doubles_[4]; }
+	set double1(a) { this._doubles_[4] = a; }
+	get _label() { return this._pointer_ + 40; }
+	get _indexBuffer() { return this._ints_[18]; }
+	set _indexBuffer(a) { this._ints_[18] = a; }
+	get _nIndices() { return this._ints_[19]; }
+	get _viewBuffers() { return this._pointer_ + 80; }
 
 	/* ****************************    👽   👽    end of direct accessors */
 
@@ -167,25 +170,25 @@ class eAvatar {
 	}
 
 	dumpMeta(title) {
-		qeFuncs.avatar_dumpMeta(this.pointer, title);
+		qeFuncs.avatar_dumpMeta(this._pointer_, title);
 	}
 
 	// 0-15 for vertex bufs, any combo; 128 for index buf
 	dumpEachViewBuffer(bufferMask, title) {
 		console.group(title);
-		qeFuncs.avatar_dumpEachViewBuffer(this.pointer, bufferMask, title);
+		qeFuncs.avatar_dumpEachViewBuffer(this._pointer_, bufferMask, title);
 		console.groupEnd();
 	}
 
 	dumpComplexViewBuffer(bufIx, nPoints, title) {
 		console.group(title);
-		qeFuncs.avatar_dumpComplexViewBuffer(this.pointer, bufIx, nPoints, title);
+		qeFuncs.avatar_dumpComplexViewBuffer(this._pointer_, bufIx, nPoints, title);
 		console.groupEnd();
 	}
 
 // 	dumpIndex(title) {
 // 		console.group(title);
-// 		qeFuncs.avatar_dumpIndex(this.pointer, title);
+// 		qeFuncs.avatar_dumpIndex(this._pointer_, title);
 // 		console.groupEnd();
 // 	}
 }

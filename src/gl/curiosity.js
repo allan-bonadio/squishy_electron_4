@@ -9,6 +9,7 @@
 
 function raceThruAll(gl, funcName, arg, kList) {
 	const wgl2 = !(gl.VERSION == 7938);  // for now
+		// still the same in 2026
 
 	kList.forEach(k => {
 		if ('WebGL2' != k.only || wgl2) {

@@ -4,10 +4,10 @@
 */
 
 // a 'wave' is a straight array of qCx, of length space->nPoints.
-//    named this way even for spectrums
+//	named this way even for spectrums
 // a 'qBuffer' is a wrapped wave that knows how to traverse itself
 // a 'qCavity' is an object with cool methods for the wave it encloses,
-//    plus a qSpace pointer.  Subclass of qBuffer.
+//	plus a qSpace pointer.  Subclass of qBuffer.
 // a 'qFlick' (see below) is a sequence of waves
 // a 'qSpectrum' is like a qCavity designed for FFT results - momentums not locations.  Subclass of qBuffer.
 

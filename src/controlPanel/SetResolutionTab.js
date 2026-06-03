@@ -69,7 +69,7 @@ function SetResolutionTab(props) {
 				<b> {continuumName}</b> space.
 			</span>
 		</h3>
-		<button className='setResolutionButton'
+		<button className='lite setResolutionButton'
 					onClick={runResolutionDialog}>
 				Change Space
 			<div style={{fontSize: '.8em'}}>

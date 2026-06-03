@@ -109,7 +109,7 @@ class App extends React.Component {
 		// parse URL args
 		let locArgs = {};
 		if (location.search) {
-			let arArgs = location.search.substr(1).split('&');    // eslint-disable-line no-restricted-globals
+			let arArgs = location.search.substr(1).split('&');	// eslint-disable-line no-restricted-globals
 			arArgs.forEach(pair =>{
 				let [key, val] = pair.split('=');
 				locArgs[key] = val ?? true;

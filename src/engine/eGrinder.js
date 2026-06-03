@@ -3,7 +3,8 @@
 ** Copyright (C) 2023-2026 Tactile Interactive, all rights reserved
 */
 
-import {prepForDirectAccessors} from '../utils/directAccessors.js';
+import eObject from './eObject.js';
+//import {prepForDirectAccessors} from '../utils/directAccessors.js';
 import qeFuncs from './qeFuncs.js';
 // import qeConsts from './qeConsts.js';
 import {getASetting} from '../utils/storeSettings.js';
@@ -31,15 +32,16 @@ function checkgrinderOffsets(grinder) {
 // Some Calculation/Grinder terms: see qGrinder.h
 
 // a qGrinder manages integration frames of a wave
-class eGrinder {
+class eGrinder extends eObject {
 	// eSpace we're in , creates its eGrinder
 	constructor(space) {
+		super();
 	//constructor(space, avatar, pointer) {
-		let pointer = qeFuncs.grinder_create(space.pointer, 1, 'main');
+		let pointer = qeFuncs.grinder_create(space._pointer_, 1, 'main');
 		/// ummm...
-		prepForDirectAccessors(this, pointer);
+		//prepForDirectAccessors(this, pointer);
 		// ?? this.label = window.Module.AsciiToString(this._label);
-
+		this.setPointer(pointer);
 		this.space = space;
 // 		this.avatar = avatar;  // the avatar it loads into
 // 		avatar.grinder = this;
@@ -61,7 +63,7 @@ class eGrinder {
 		this.cavity.liquidate();
 		this.space = this.cavity = this.vBuffer = null;
 
-		qeFuncs.grinder_delete(this.pointer);
+		qeFuncs.grinder_delete(this._pointer_);
 	}
 
 	/* *****************************    👽   👽    Direct Accessors */
@@ -71,41 +73,41 @@ class eGrinder {
 	// of qSpace (in JS just an int); this.space is the JS reference to
 	// the JS instance of eSpace
 
-	get _space() { return this.ints[1]; }
-	get _flick() { return this.ints[3]; }
-	get _voltage() { return this.ints[4]; }
-	get _spect() { return this.ints[5]; }
-	get _stage() { return this.ints[2]; }
+	get _space() { return this._ints_[1]; }
+	get _flick() { return this._ints_[3]; }
+	get _voltage() { return this._ints_[4]; }
+	get _spect() { return this._ints_[5]; }
+	get _stage() { return this._ints_[2]; }
 
-	get videoFP() { return this.doubles[4]; }
-	set videoFP(a) { this.doubles[4] = a; }
-	get totalCalcTime() { return this.doubles[5]; }
-	get maxCalcTime() { return this.doubles[6]; }
+	get videoFP() { return this._doubles_[4]; }
+	set videoFP(a) { this._doubles_[4] = a; }
+	get totalCalcTime() { return this._doubles_[5]; }
+	get maxCalcTime() { return this._doubles_[6]; }
 
-	get stretchedDt() { return this.doubles[7]; }
-	set stretchedDt(a) { this.doubles[7] = a; }
-	get divergence() { return this.doubles[9]; }
-	get elapsedTime() { return this.doubles[10]; }
-	set elapsedTime(a) { this.doubles[10] = a; }
-	get nGrWorkers() { return this.ints[23]; }
+	get stretchedDt() { return this._doubles_[7]; }
+	set stretchedDt(a) { this._doubles_[7] = a; }
+	get divergence() { return this._doubles_[9]; }
+	get elapsedTime() { return this._doubles_[10]; }
+	set elapsedTime(a) { this._doubles_[10] = a; }
+	get nGrWorkers() { return this._ints_[23]; }
 	startAtomicOffset = 24;
-	get startAtomic() { return this.ints[24]; }
+	get startAtomic() { return this._ints_[24]; }
 
-	get _exceptionCode() { return this.pointer + 112; }
-	get hadException() { return Boolean(this.bytes[127]); }
-	set hadException(a) { this.bytes[127] = Boolean(a); }
-	get _label() { return this.pointer + 128; }
+	get _exceptionCode() { return this._pointer_ + 112; }
+	get hadException() { return Boolean(this._bytes_[127]); }
+	set hadException(a) { this._bytes_[127] = Boolean(a); }
+	get _label() { return this._pointer_ + 128; }
 
-	get shouldBeIntegrating() { return Boolean(this.bytes[160]); }
-	set shouldBeIntegrating(a) { this.bytes[160] = Boolean(a); }
-	get isIntegrating() { return Boolean(this.bytes[161]); }
-	set isIntegrating(a) { this.bytes[161] = Boolean(a); }
-	get pleaseFFT() { return Boolean(this.bytes[162]); }
-	set pleaseFFT(a) { this.bytes[162] = Boolean(a); }
-	get needsRepaint() { return Boolean(this.bytes[163]); }
-	set needsRepaint(a) { this.bytes[163] = Boolean(a); }
-	get sentinel() { return this.bytes[164]; }
-	set sentinel(a) { this.bytes[164] = a; }
+	get shouldBeIntegrating() { return Boolean(this._bytes_[160]); }
+	set shouldBeIntegrating(a) { this._bytes_[160] = Boolean(a); }
+	get isIntegrating() { return Boolean(this._bytes_[161]); }
+	set isIntegrating(a) { this._bytes_[161] = Boolean(a); }
+	get pleaseFFT() { return Boolean(this._bytes_[162]); }
+	set pleaseFFT(a) { this._bytes_[162] = Boolean(a); }
+	get needsRepaint() { return Boolean(this._bytes_[163]); }
+	set needsRepaint(a) { this._bytes_[163] = Boolean(a); }
+	get sentinel() { return this._bytes_[164]; }
+	set sentinel(a) { this._bytes_[164] = a; }
 
 	/* ******************* end of direct accessors */
 
@@ -127,8 +129,8 @@ class eGrinder {
 			}
 
 			// the 'new' way: triggering it in JS with Atomics api
-			Atomics.store(this.ints, this.startAtomicOffset, 0);
-			let nWoke = Atomics.notify(this.ints, this.startAtomicOffset);
+			Atomics.store(this._ints_, this.startAtomicOffset, 0);
+			let nWoke = Atomics.notify(this._ints_, this.startAtomicOffset);
 			if (traceTriggerIteration)
 				console.log(`triggerIteration 🎥 nWoke:`, nWoke);
 		}
@@ -140,7 +142,7 @@ class eGrinder {
 					+`voltageFactor=${this.voltageFactor}`);
 			}
 
-			qeFuncs.grinder_triggerIteration(this.pointer);
+			qeFuncs.grinder_triggerIteration(this._pointer_);
 		}
 
 		// if (qeConsts.grSENTINEL_VALUE !== this.sentinel) {
@@ -159,11 +161,11 @@ class eGrinder {
 	// for testing maybe keep the single threaded way
 	// can throw std::runtime_error("divergence")
 	// oneLap() {
-	// 	qeFuncs.this_oneLap(this.pointer);
+	// 	qeFuncs.this_oneLap(this._pointer_);
 	// }
 
 	askForFFT() {
-		qeFuncs.this_askForFFT(this.pointer);
+		qeFuncs.this_askForFFT(this._pointer_);
 	}
 
 }

@@ -12,8 +12,8 @@ import drawingDescription from '../wave/drawingDescription.js';
 
 let traceFamiliar = false;
 let traceScales = false;
-let tracePathAttribute = true;
-let tracePathIndividualPoints = true;
+let tracePathAttribute = false;
+let tracePathIndividualPoints = false;
 
 let traceVoltArithmetic = false;
 let traceVoltScales = false;
@@ -268,12 +268,14 @@ export class voltDisplay {
 			points[0] = `M${x},` + skyHigh;
 			didMove = true;
 			didLine = false;
+			start++;  // don't overwrite the first one we just made
 			tpip(x, skyHigh, '️left bumper');
 
 			// should I get rid of this if the point at end-1 is NAN?  probably.  unlikely, though
 			//end += 1;
 			x = this.xScale(end).toFixed(1);
 			points[end] = `L${x},` + skyHigh;
+			end--;  // don't overwrite the last one we just made
 			tpip(x, skyHigh, '️right bumper');
 			break;
 
@@ -411,7 +413,7 @@ export class voltDisplay {
 		return y0_1 * voltageParams.canyonScale;
 	}
 
-	// generate a canyon, flat etc voltage potential in the given array, according to params.
+	// generate a canyon, flat etc voltage potential in this.voltageBuffer, according to params.
 	// And set the height and bottom.  I don't think this works well.  Avoid.
 	setFamiliarVoltage(voltageParams) {
 		let {voltageCenter, voltageBreed, canyonPower, canyonScale,
@@ -470,7 +472,7 @@ export class voltDisplay {
 	}
 
 	// set bottomVolts and heightVolts to the results of setFamiliarVolts()
-	// and adjust scales.  Not sure if this is useful...
+	// and adjust scales.  Not sure if this is useful...  TODO
 	setFamiliarDomain(voltageParams, vWidth, vHeight) {
 
 		if (traceFamiliar)

@@ -53,14 +53,14 @@ function BeginFinishOverlay(props) {
 	let ssButton;
 	if (context.shouldBeIntegrating) {
 		if (traceBeginFinish) console.log(`🛑 was integrating, making finish button`);
-		ssButton = <button className='beginFinishWidget finishButton' onClick={cp.finishAnimating}
+		ssButton = <button className='lite beginFinishWidget finishButton' onClick={cp.finishAnimating}
 					alt='🛑 stop integrating' title='🛑 stop integrating' >
 			<img src={finishIcon}  style={{width: '1em'}}/>
 		</button>
 	}
 	else {
 		if (traceBeginFinish) console.log(`🟩 integration is finished, making begin button`);
-		ssButton = <button className='beginFinishWidget beginButton' onClick={cp.beginAnimating}
+		ssButton = <button className='lite beginFinishWidget beginButton' onClick={cp.beginAnimating}
 				alt='🟩 start integrating'  title='🟩 start integrating' >
 			<img src={beginIcon}  style={{width: '1em'}} />
 		</button>
@@ -73,7 +73,7 @@ function BeginFinishOverlay(props) {
 		<span style={{width: '2em', display: 'inline-block'}} />
 
 		{/* longer running button; runs as long as you hold it down */}
-		<button className='runningWidget'
+		<button className='lite runningWidget'
 				alt={helpRunning} title={helpRunning}
 				onMouseMove={preventDragAway}
 				onMouseDown={cp.beginAnimating}

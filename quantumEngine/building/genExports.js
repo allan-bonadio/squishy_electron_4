@@ -57,9 +57,9 @@ let exportsSrc  = [
 	{name: 'cavity_create', args: ['number', 'number'], retType: 'number'},
 	{name: 'cavity_delete', args: ['number'], retType: null},
 
-	{name: 'flick_create', args: ['number', 'number'], retType: 'number'},
-	{name: 'flick_delete', args: ['number'], retType: null},
-
+	// not needed, qFlick constructed by qGrinder
+	//{name: 'flick_create', args: ['number', 'number'], retType: 'number'},
+	//{name: 'flick_delete', args: ['number'], retType: null},
 	//? can't get to work {name: 'flick_delete', args: ['number'], retType: null},
 
 	/* ***************************************** avatars */

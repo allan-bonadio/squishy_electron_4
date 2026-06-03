@@ -4,8 +4,8 @@
 # Runs on local side (panama/dnipro)
 
 timestamp=`date -u +%F,%H.%M`
-echo "              🛫 🛫 🛫 Deploy Production $timestamp Squishy Electron" `date +'%c %Z' `
-echo "                                               run this only After build"
+echo "			  🛫 🛫 🛫 Deploy Production $timestamp Squishy Electron" `date +'%c %Z' `
+echo "											   run this only After build"
 
 if [ `uname` != 'Darwin' ]
 then
@@ -29,7 +29,7 @@ fi
 echo you can do either make deploy or npm deploy, same
 
 # make sure it's there & compiled
-echo "                             🛫 🛫 🛫  make sure crucial build files are there"
+echo "							 🛫 🛫 🛫  make sure crucial build files are there"
 WASMFILES="qEng/quantumEngine.js qEng/quantumEngine.wasm "
 IMAGES="images/eclipseOnTransparent.gif images/splat.png logos/logoKetE.png"
 DOCFILES="doc/gettingStarted/gettingStarted.html  doc/digitalWaves/digitalWaves.html \
@@ -41,17 +41,17 @@ do
 	then
 		echo $'\e[1;31m !! file missing.  build/$fn not there\e[0m'
 		ls -lF build/$fn
-		echo $'\e[1;31m try    npm run build\e[0m'
+		echo $'\e[1;31m try	npm run build\e[0m'
 		exit 77
 	fi
 done
 
 
-echo "                             🛫 🛫 🛫  a bit of cleanup:"
+echo "							 🛫 🛫 🛫  a bit of cleanup:"
 xattr -cr build
 rm -f build/.DS_Store build/*/.DS_Store build/*/*/.DS_Store
 
-echo "                             🛫 🛫 🛫  Contents of build dir:"
+echo "							 🛫 🛫 🛫  Contents of build dir:"
 ls build
 # ls -lFa build/
 # echo
@@ -59,10 +59,10 @@ ls build
 # du -sh build/*
 echo
 
-echo "                             🛫 🛫 🛫  starting zip compression"
+echo "							 🛫 🛫 🛫  starting zip compression"
 rm -f build.zip
 zip -rq build.zip build
-echo "                             🛫 🛫 🛫  done with zipping, here it is:"
+echo "							 🛫 🛫 🛫  done with zipping, here it is:"
 ls -lhF build.zip
 echo
 
@@ -70,7 +70,7 @@ echo
 # u must be Allan for this to work
 # https://man.openbsd.org/sftp
 # dest url must always be last
-echo "                             🛫 🛫 🛫  About to upload zip"
+echo "							 🛫 🛫 🛫  About to upload zip"
 
 # "-b - -N" is batch mode; any failure ends session
 sftp -p $NAKODA_SKEY  -b - -N  allan@nakoda <<PETULANT_OLIGARCHS
@@ -95,24 +95,24 @@ fi
 
 
 # now decompress, on the server
-echo "                             🛫 🛫 🛫  About to decompress and activate ➤ ➤ ➤ ➤ ➤ == nakoda login stuff..."
+echo "							 🛫 🛫 🛫  About to decompress and activate ➤ ➤ ➤ ➤ ➤ == nakoda login stuff..."
 ssh  $NAKODA_SKEY  allan@nakoda <<-WALKING_SPEED
 	set -x
-	echo "                             🛫 🛫 🛫   ➤ ➤ ➤ ➤ = =➤  ...logged into nakoda $timestamp"
+	echo "							 🛫 🛫 🛫   ➤ ➤ ➤ ➤ = =➤  ...logged into nakoda $timestamp"
 	cd /var/www/squish || exit 1
 	./install.sh "$timestamp"
 
 WALKING_SPEED
-echo "                             🛫 🛫 🛫  should now be activated"
+echo "							 🛫 🛫 🛫  should now be activated"
 
 
-echo "                             🛫 🛫 🛫  test to see if files are up there - do a Diff"
+echo "							 🛫 🛫 🛫  test to see if files are up there - do a Diff"
 curl https://squish.tactileint.org > /tmp/actualSquishIndexOnline.html
 sleep 5  # give it time to soak in.  So the diff doesn't screw up.
 if diff build/index.html /tmp/actualSquishIndexOnline.html
-then echo "                               🛫 🛫  😅 😅 😅 Deploy Completed, looks good so far!"  `date +%c`
+then echo "							   🛫 🛫  😅 😅 😅 Deploy Completed, looks good so far!"  `date +%c`
 	echo "To activate the symlink to $timestamp, login to nakoda and   ./useBuild $timestamp"
-	echo "Remember to tag it,    git tag -a deploy$timestamp   and enter descr "
+	echo "Remember to tag it,	git tag -a deploy$timestamp   and enter descr "
 	exit 0
 else echo  $'\e[1;31m !! the diff didn,t compare - index.html are different\e[0m'
 	exit 61

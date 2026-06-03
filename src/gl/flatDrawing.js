@@ -99,8 +99,6 @@ export class flatDrawing extends abstractDrawing {
 
 		this.vertexShaderSrc = vertexSrc;
 		this.fragmentShaderSrc = fragmentSrc;
-
-		//console.log(`attachViewBuffer on scene ${scene.sceneName}`);
 	}
 
 	// loads view buffer from corresponding wave, calculates highest norm.
@@ -152,8 +150,8 @@ export class flatDrawing extends abstractDrawing {
 		new drawingAttribute('row', this, this.rowFloats,
 		    () => {
 			//debugger;
-			qeFuncs.avatar_avFlatLoader(this.avatar.pointer, this.scene.flatAvatarID,
-					this.scene.paintingNeeds.cavity.pointer, nPoints);
+			qeFuncs.avatar_avFlatLoader(this.avatar._pointer_, this.scene.flatAvatarID,
+					this.scene.paintingNeeds.cavity._pointer_, nPoints);
 
 			if (traceReloadRow) {
 				console.log(`♭♭♭ flatDrawing  ${this.avatarLabel}: at row getViewBuffer() `
@@ -191,7 +189,7 @@ export class flatDrawing extends abstractDrawing {
 
 		gl.drawArrays(gl.TRIANGLE_STRIP, 0, this.vertexCount);
 		if (traceFlatDrawing) {
-			console.log(`♭♭♭just drewArays-flat on avatar ptr=${this.avatar.pointer} `
+			console.log(`♭♭♭just drewArays-flat on avatar ptr=${this.avatar._pointer_} `
 				+` this.avatar.label=${this.avatar.label}, `
 				+` buffer label=${this.avatar.bufferNames[this.scene.flatAvatarID]}`);
 		}

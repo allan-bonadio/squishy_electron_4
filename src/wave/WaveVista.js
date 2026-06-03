@@ -143,7 +143,7 @@ export class WaveVista extends React.Component {
 		this.projMatrix = mat4.create();
 		mat4.perspectiveNO(this.projMatrix, fieldOfView, aspect, zNear, zFar);
         if (traceProjMatrix)
-			dump4x4(this.projMatrix, 'vista projMatrix');
+			dump4x4('vista projMatrix', this.projMatrix);
 	}
 
 	// set up origMatrix only when wave vista created, or reshaped
@@ -158,7 +158,7 @@ export class WaveVista extends React.Component {
 		this.origMatrix = origMatrix;
 		// probably call makeRotMatrix() after this
         if (traceOrigMatrix)
-            dump4x4(this.origMatrix, 'vista origMatrix:');
+            dump4x4('vista origMatrix:', this.origMatrix);
 	}
 
 
@@ -190,7 +190,7 @@ export class WaveVista extends React.Component {
 
 		this.rotMatrix = matrix;
         if (traceRotMatrix)
-            dump4x4(this.rotMatrix, 'vista rotMatrix:');
+            dump4x4('vista rotMatrix:', this.rotMatrix);
 		return matrix;
 	}
 

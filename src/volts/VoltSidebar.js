@@ -67,20 +67,20 @@ function VoltSidebar(props) {
 		<aside className='VoltSidebar waveButtonPanel'
 				onPointerEnter={pointerEnter} onPointerLeave={pointerLeave} >
 
-			<button className='scrollUp' onClick={ev => mainVDisp.scrollVoltHandler(+1)}>
-				<img src={upIcon} height='1em' />
+			<button className='glass scrollUp' onClick={ev => mainVDisp.scrollVoltHandler(+1)}>
+				<img src={upIcon} />
 			</button>
 
-			<button className='zoomIn' onClick={ev => mainVDisp.zoomVoltHandler(-1)}>
-				<img src={plusIcon} height='1em' />
+			<button className='glass zoomIn' onClick={ev => mainVDisp.zoomVoltHandler(-1)}>
+				<img src={plusIcon} />
 			</button>
 
-			<button className='zoomOut' onClick={ev => mainVDisp.zoomVoltHandler(+1)}>
-				<img src={minusIcon} height='1em' />
+			<button className='glass zoomOut' onClick={ev => mainVDisp.zoomVoltHandler(+1)}>
+				<img src={minusIcon} />
 			</button>
 
-			<button className='scrollDown' onClick={ev => mainVDisp.scrollVoltHandler(-1)}>
-				<img src={downIcon} height='1em' />
+			<button className='glass scrollDown' onClick={ev => mainVDisp.scrollVoltHandler(-1)}>
+				<img src={downIcon} />
 			</button>
 
 		</aside>

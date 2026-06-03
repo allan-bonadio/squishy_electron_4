@@ -87,7 +87,7 @@ function DocReader(props) {
 
 	return (
 		<dialog id='DocReader' ref={dialogRef} >
-			<button className='x_close_box' onClick={DocReader.close} >×</button>
+			<button className='dark x_close_box' onClick={DocReader.close} >×</button>
 			{content}
 		</dialog>
 	);
