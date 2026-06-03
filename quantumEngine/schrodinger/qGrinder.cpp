@@ -57,7 +57,7 @@ qGrinder::qGrinder(qSpace *sp, int nGrWorkers, const char *lab)
 		shouldBeIntegrating(false), isIntegrating(false),
 		pleaseFFT(false), sentinel(grSENTINEL_VALUE) {
 
-	// number of waves
+	// number of waves for our algorithm
 	flick = new qFlick(space, 3);
 
 	// recieves wave after a lap is done; then vbufs generated from that

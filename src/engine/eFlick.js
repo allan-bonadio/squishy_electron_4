@@ -32,7 +32,7 @@ class eFlick extends eCavity {
 		// no already created.  Figure this out later.  qeFuncs.flick_create(space.pointer);
 	}
 
-	// finish the construction.  eFlick (the only one) is constructed by the space
+	// finish the construction.  eFlick (the only one) is constructed by the grinder
 	// with all its buffers.  No fussing.  useThis32F is null.  ._wave is pointer to the qcavity's wave.
 	completeWave(useThis32F) {
 		// always had the C++ buffer, need this too
@@ -47,9 +47,9 @@ class eFlick extends eCavity {
 	}
 
 	/* *************************************    👽   👽    direct access */
-	// these are different offsets from qCavity; therefore all of these
-	// have to override qCavity's versions.  But the constructor for eCavity calls
-	// prepForDirectAccessors() for us, and it works the same.
+    // these are different offsets from qCavity; therefore all of these have to
+    // override qCavity's versions.  But the eFlick and eCavity both inherit
+    // from eOject, and it works the same.
 
 	get _wave() { return this.ints[7]; }
 
