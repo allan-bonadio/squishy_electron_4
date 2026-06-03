@@ -22,8 +22,9 @@ class eObject {
 	constructor() {
 	}
 
-	// some proxies don't figure out a pointer till a bit after construction
-	// so this is sortof a post-constructor or a constructor finisher.  Allproxy objects must call it in constructor.
+    // some proxies don't figure out a pointer till a bit after construction so
+    // this is sortof a post-constructor or a constructor finisher.  All proxy
+    // objects must call it in constructor.
 	setPointer(pointer)
 	{
 		if (!pointer)
