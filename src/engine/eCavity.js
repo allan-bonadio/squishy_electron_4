@@ -49,6 +49,10 @@ function dumpRow(ix, re, im, prev, isBorder) {
 // this is just a 1D wave.  Used typically for internal calculations with complex
 // numbers.  Or use eFlick.
 class eCavity extends eObject {
+	constructor() {
+		super();
+	}
+
 	// useThis32F is one of these:
 	// • a Float64Array[2*nPoints], with pairs being the real and im parts of psi.
 	//       From C++ so bytes are in the emscripten heap
@@ -58,10 +62,6 @@ class eCavity extends eObject {
 	// pointer should be pointer to qCavity in C++, otherwise leave it falsy.
 	// If you use pointer, leave the useThis32F null; it's ignored
 	// label is optional and only JS side
-	constructor() {
-		super();
-	}
-
 	// this is NOT called by subclass eFlick.  Long story.
 	postConstructor(space, label = 'wave', useThis32F, pointer)
 	{
@@ -78,7 +78,7 @@ class eCavity extends eObject {
 			//debugger;
 			pointer = qeFuncs.cavity_create(space._pointer_, null);
 		}
-		setPointer(pointer);
+		this.setPointer(pointer);
 //		prepForDirectAccessors(this, this._pointer_);
 		this.label = label;
 
@@ -87,12 +87,12 @@ class eCavity extends eObject {
 	}
 
 	// finish the construction.  eFlick has to do it differently.
-	// label is optional and only JS side
 	completeWave(useThis32F) {
 		if (!useThis32F) {
 			// _wave must be a pointer to the existing qCavity's buffer
 			if (this._wave < 256) {
-				console.error(`this._wave pointer is too small ${this._wave}, but ok if just generating direct accessors`);
+				console.error(`this._wave pointer seems to be too low, probably null: `
+                    +` ${this._wave}, ??but ok if just generating direct accessors??`);
 				let temp_wave = qeFuncs.buffer_allocateWave(this.space.nPoints * 2);
 				this.wave = new Float64Array(Module.HEAPF64.buffer, temp_wave, 2 * this.space.nPoints );
 			}
@@ -120,8 +120,8 @@ class eCavity extends eObject {
 			}
 		}
 		else {
-			debugger;
 			throw new Error(`call to construct eCavity failed cuz bad useThis32F=${useThis32F}`);
+			debugger;
 		}
 	}
 
