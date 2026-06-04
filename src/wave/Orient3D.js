@@ -16,6 +16,14 @@ const ZPOS_DEFAULT = -100;
 const propTypes = {
    setOrient: PropTypes.func.isRequired,
 
+   // this is returned.  Pass it in with, whatever, but must have all these
+   // fields (not just the ones in .shape())
+   orient: PropTypes.shape({
+   	xAng: PropTypes.number.isRequired,
+   	yPos: PropTypes.number.isRequired,
+   	hfoView: PropTypes.number.isRequired,
+   })
+
    // rotation around xyz axes - separate them so any change renders
    orientX: PropTypes.number.isRequired,
    orientY: PropTypes.number.isRequired,
@@ -40,22 +48,22 @@ function Orient3D(props) {
 		console.trace(`WTF is this?	 No props?`);
 
 	// these seem unnecessary but the sliders themselves don't update otherwise
-	let [x, setX] = useState(getASetting('orientSettings', 'x'));
-	let [y, setY] = useState(getASetting('orientSettings', 'y'));
-	let [z, setZ] = useState(getASetting('orientSettings', 'z'));
+	let [xAng, setX] = useState(getASetting('orientSettings', 'xAng'));
+	let [yAng, setY] = useState(getASetting('orientSettings', 'yAng'));
+	let [zAng, setZ] = useState(getASetting('orientSettings', 'zAng'));
 
 	let [xPos, setXPos] = useState(getASetting('orientSettings', 'xPos'));
 	let [yPos, setYPos] = useState(getASetting('orientSettings', 'yPos'));
 	let [zPos, setZPos] = useState(getASetting('orientSettings', 'zPos'));
 
-	let [foView, setFOView] = useState(getASetting('orientSettings', 'foView'));
+	let [hfoView, setFOView] = useState(getASetting('orientSettings', 'hfoView'));
 	let [fudge, setFudge] = useState(getASetting('orientSettings', 'fudge'));
 
-	const setters = {x: setX, y: setY, z: setZ,
+	const setters = {xAng: setX, yAng: setY, zAng: setZ,
 		xPos: setXPos, yPos: setYPos, zPos: setZPos,
-		foView: setFOView, fudge: setFudge};
+		hfoView: setFOView, fudge: setFudge};
 
-	// actions are like {y: 44.2} usually only changing one at a time
+	// actions are like {yAng: 44.2} usually only changing one at a time
 	// doing this so that this particular component renders.
 //	  function reducer(orient, action) {
 //		  return {...orient, ...action};
@@ -67,9 +75,9 @@ function Orient3D(props) {
 	if (traceOrient)
 		dblog(`starting Orient3D ${p.orientX}  ${p.orientY}	 ${p.orientZ}	`, p);
 
-	// x y z — rotate around just 1 axis as given by this event from this slider
+	// xAng yAng zAng — rotate around just 1 axis as given by this event from this slider
 	// xPos yPos zPos — adjust offset object is from camera.
-	// foView — field of view.	Default should be 45°
+	// hfoView — field of view.	Default should be 45°
 	// fudge = greggman's fudgeFactor
 	function setOneOrient(ev) {
 		let which = ev.target.className;
@@ -84,9 +92,9 @@ function Orient3D(props) {
 	function resetOrientation() {
 		const sdo = sSettings.defaults.orientSettings;
 		props.setOrient('multi', { ...sdo});
-		setX(sdo.x); setY(sdo.y); setZ(sdo.z);
+		setX(sdo.xAng); setY(sdo.yAng); setZ(sdo.zAng);
 		setXPos(sdo.xPos); setYPos(sdo.yPos); setZPos(sdo.zPos);
-		setFOView(sdo.foView);
+		setFOView(sdo.hfoView);
 		setFudge(sdo.fudge);
 
 		props.repaintOrient();
@@ -98,41 +106,41 @@ function Orient3D(props) {
 	return <div className='Orient3D' >
 
 		<div>
-			<label>x {x}°</label>
-			<input type='range' className='x' value={x}
+			<label>xAng {xAng}°</label>
+			<input type='range' className='xAng' value={xAng}
 				min={-360} max={360} step={1} onChange={setOneOrient} />
 		</div>
 		<div>
-			<label>y {y}°</label>
-			<input type='range' className='y' value={y}
+			<label>yAng {yAng}°</label>
+			<input type='range' className='yAng' value={yAng}
 				min={-360} max={360} step={1} onChange={setOneOrient} />
 		</div>
 		<div>
-			<label>z {z}°</label>
-			<input type='range' className='z' value={z}
+			<label>zAng {zAng}°</label>
+			<input type='range' className='zAng' value={zAng}
 				min={-360} max={360} step={1} onChange={setOneOrient} />
 		</div>
 
 		<div>
-			<label>x {xPos} c</label>
+			<label>xPos {xPos} c</label>
 			<input type='range' className='xPos' value={xPos}
 				min={-100} max={100} step={1} onChange={setOneOrient} />
 		</div>
 		<div>
-			<label>y {yPos} c</label>
+			<label>yPos {yPos} c</label>
 			<input type='range' className='yPos' value={yPos}
 				min={-100} max={100} step={1} onChange={setOneOrient} />
 		</div>
 		<div>
-			<label>z {zPos} c</label>
+			<label>zPoz {zPos} c</label>
 			<input type='range' className='zPos' value={zPos}
 				min={-300} max={1} step={1} onChange={setOneOrient} />
 		</div>
 
 		<div>
-			<label>fov {foView}° </label>
-			<input type='range' className='foView' value={foView}
-				min={1} max={179} step={1} onChange={setOneOrient} />
+			<label>fov {hfoView}° </label>
+			<input type='range' className='hfoView' value={hfoView}
+				min={1} max={120} step={1} onChange={setOneOrient} />
 		</div>
 		<div>
 			<label>fudge {fudge}° </label>

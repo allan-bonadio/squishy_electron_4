@@ -123,6 +123,37 @@ export class WaveVista extends React.Component {
 
 	/* ******************************************* orientation matrix	*/
 
+// from glmatrix sources:
+/* Generates a perspective projection matrix with the given bounds.
+ * The near/far clip planes correspond to a normalized device coordinate Z range of [-1, 1],
+ * which matches WebGL/OpenGL's clip volume.
+ * Passing null/undefined/no value for far will generate infinite projection matrix.
+ *
+ * @param {mat4} out mat4 frustum matrix will be written into
+ * @param {number} fovy Vertical field of view in radians
+ * @param {number} aspect Aspect ratio. typically viewport width/height
+ * @param {number} near Near bound of the frustum
+ * @param {number} far Far bound of the frustum, can be null or Infinity
+ * @returns {mat4} out
+ */
+// export function perspectiveNO(out, fovy, aspect, near, far) {
+//   const f = 1.0 / Math.tan(fovy / 2);
+//   out[0] = f / aspect; out[1] = 0; out[2] = 0; out[3] = 0;
+// 	out[4] = 0; out[5] = f; out[6] = 0; out[7] = 0;
+// 	out[8] = 0; out[9] = 0;				out[11] = -1;
+// 	out[12] = 0; out[13] = 0;			out[15] = 0;
+// 	if (far != null && far !== Infinity) {
+// 		const nf = 1 / (near - far);
+// 		out[10] = (far + near) * nf;
+// 		out[14] = 2 * far * near * nf;
+// 	} else {
+// 		out[10] = -1;
+// 		out[14] = -2 * near;
+// 	}
+//   return out;
+// }
+
+
 	// recalculate the perspective matrix, given changed canvas geometry.
 	// Must have canvasInnerWidth/Height from updateInnerDims() already calculated.
 	// makeOrigMatrix() next makes the origMatrix - the starting point for different rotations.
@@ -132,16 +163,18 @@ export class WaveVista extends React.Component {
         // the FOV, you have to recalculate this.  Oh and if the window or the
         // vista height changes.  Or ... if ...
 
-		const fieldOfView = deg2rad(this.orient.foView); // in radians
+		// hfov = horizontal field of view; default for glMatrix is vertical
+		const horizontalFieldOfView = deg2rad(this.orient.hfoView); // in radians
 		const aspect = this.canvasInnerWidth / this.canvasInnerHeight;
 
         // these need to be, REALLY, the closest stuff, and the farthest stuff.
-        // Approximately.  No random guesses.
+        // Approximately.  No random guesses.  Maps to the depth buffer.
 		const zNear = 1;
 		const zFar = this.space.nPoints;
 
 		this.projMatrix = mat4.create();
-		mat4.perspectiveNO(this.projMatrix, fieldOfView, aspect, zNear, zFar);
+		mat4.perspectiveNO(this.projMatrix, horizontalFieldOfView * aspect,
+					aspect, zNear, zFar);
         if (traceProjMatrix)
 			dump4x4('vista projMatrix', this.projMatrix);
 	}
@@ -208,7 +241,7 @@ export class WaveVista extends React.Component {
 	setOrient = (coord, newVal) => {
 		if (traceOrient) dblog(`️🏔️ setOrient(${coord}, `, newVal, `) `);
 		if ('multi' == coord) {
-			// same object
+			// all of them
 			Object.assign(this.orient, newVal);
 			storeAGroup('orientSettings', this.orient);
 		}
@@ -310,6 +343,8 @@ export class WaveVista extends React.Component {
 					repaintOrient={this.repaintOrient}
 					repaintRecreate={this.repaintRecreate}
 
+					orient={this.orient}
+
 					orientX={this.orient.x}
 					orientY={this.orient.y}
 					orientZ={this.orient.z}
@@ -318,7 +353,7 @@ export class WaveVista extends React.Component {
 					orientYPos={this.orient.yPos}
 					orientZPos={this.orient.zPos}
 
-					orientFOView={this.orient.foView}
+					orientFOView={this.orient.hfoView}
 					orientFudge={this.orient.fudge}
 
 					setOrient={this.setOrient}
