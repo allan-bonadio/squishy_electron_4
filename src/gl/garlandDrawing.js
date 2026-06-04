@@ -17,11 +17,12 @@ let traceGLAfterDrawing = false;
 let traceDrawing = false;
 let traceReloadRow = false;
 let traceMatrix = false;
+let traceUColor = true;
 
 // diagnostic purposes; draws more per vertex
 let traceDontDrawTriangles=  false;
 let traceDrawPoints = false;
-let traceDrawLines = false;
+let traceDrawLines = true;
 
 /* *********************************************** garland drawing */
 // The glsl sources for webgl drawing
@@ -71,7 +72,9 @@ uniform mat4 matrix;
 uniform float fudge;  // kindof like the zoom factor
 uniform float nStates;  // N
 
-// the V shader calculates the color to use, and sets this so the frag shader can get it.
+// the V shader calculates the color to use, and sets this so the frag
+// shader can get the varying.
+uniform highp vec4 uColor;
 varying highp vec4 vColor;
 
 // the one list of numbers input
@@ -91,9 +94,15 @@ void main() {
 	gl_Position.w = 1.0 + gl_Position.z * fudge;
 
 
-	//  for the color, convert the complex values via this algorithm
-	vColor.rgb = cx2rygb(row.xy);
-	vColor.a = 1.;
+	//  for the wave color, convert the complex values via this algorithm
+	// or use the uColor constant color handed in
+	if (uColor.r < 0.0) {
+		vColor.rgb = cx2rygb(row.xy);
+		vColor.a = 1.;  // uColor.a  TODO
+	}
+	else {
+		vColor = uColor;
+	}
 
 	// dot size, in pixels not clip units.  actually a fuzzy square.
 	gl_PointSize = 10.;
@@ -124,7 +133,7 @@ export class garlandDrawing extends abstractDrawing {
 		this.vertexShaderSrc = vertexSrc;
 		this.fragmentShaderSrc = fragmentSrc;
 
-		//dblog(`attachViewBuffer on scene ${scene.sceneName}`);
+		this.uColor = [0,0,0,0];
 	}
 
 	// loads view buffer from corresponding wave, calculates highest norm.
@@ -145,6 +154,15 @@ export class garlandDrawing extends abstractDrawing {
 			}
 		);
 
+		this.uColorUniform = new drawingUniform('uColor', this,
+			() => {
+				if (traceUColor) {
+					dblog('🌀🌀🌀 garlandDrawing uColor', this.uColor);
+				}
+				return {value: this.uColor, type: '4f'};
+			}
+		);
+
 		this.fudgeUniform = new drawingUniform('fudge', this,
 			() => ({value: this.scene.paintingNeeds.fudge, type: '1f'}));
 
@@ -156,14 +174,13 @@ export class garlandDrawing extends abstractDrawing {
 		this.rowFloats = 4;
 		this.rowAttr = new drawingAttribute('row', this, this.rowFloats,
 		    () => {
-		//this.rowAttr = new drawingAttribute('row', this, this.rowFloats, () => {
 			//debugger;
 			// retrieve GL rows from the cavity, including the bounds
 			qeFuncs.avatar_avFlatLoader(this.avatar._pointer_, 0,
 					this.scene.paintingNeeds.cavity._pointer_, this.nPoints);
 
 			if (traceReloadRow) {
-				console.log(`🌀🌀🌀 garlandDrawing  ${this.avatarLabel}: `
+				dblog(`🌀🌀🌀 garlandDrawing  ${this.avatarLabel}: `
 					+` at row getViewBuffer() `
 					+` loading to ${this.avatar.label} `
 					+`  this.vertexCount=${this.vertexCount} `
@@ -191,22 +208,27 @@ export class garlandDrawing extends abstractDrawing {
 
 		//this.drawVariables.forEach(v => v.reloadVariable());
 
-		dblog(`🌀 context attributes we're operating under:`, gl.getContextAttributes());
-
 		let startEnd2 = this.space.startEnd2;
 		let first = startEnd2.start2;
 		let count = startEnd2.end2 - startEnd2.start2;
-		if (!traceDontDrawTriangles)
+
+		if (!traceDontDrawTriangles) {
+			this.uColor = [-1, 0, 0, 1];  // complex rainbow
+			this.uColorUniform.reloadVariable();
 			gl.drawArrays(gl.TRIANGLE_STRIP, first, count);
+		}
 		if (traceDrawing) {
-			dblog(`🌀🌀🌀just drewArays-garland on avatar ptr=${this.avatar._pointer_} `
+			dblog(`🌀🌀🌀just drewArrays-garland on avatar ptr=${this.avatar._pointer_} `
 				+` this.avatar.label=${this.avatar.label}, `
 				+` buffer label=${this.avatar.bufferNames[0]}`);
 		}
 
 		if (traceDrawLines) {
+			this.uColor = [0.8, 0.8, 0.8, 1];
+			this.uColorUniform.reloadVariable();
 			gl.lineWidth(1);  // it's the only option anyway
-			gl.drawArrays(gl.LINE_STRIP, first, count);
+			gl.drawArrays(gl.LINES, first, count);
+			//gl.drawArrays(gl.LINE_STRIP, first, count);
 		}
 
 		if (traceDrawPoints)
