@@ -77,7 +77,7 @@ const propTypes = {
 function GLScene(props) {
 	cfpt(propTypes, props);
 	const p = props;
-	//console.log(`starting GLScene(render), sceneName=${p.sceneName}`);
+	//dblog(`starting GLScene(render), sceneName=${p.sceneName}`);
 
 	if (traceMatrix && p.paintingNeeds.rotMatrix)
 		dump4x4('🖼  GLScene  starts with matrix', p.paintingNeeds.rotMatrix);
@@ -111,7 +111,7 @@ function GLScene(props) {
 		squishScene.glRepaint = glRepaint;
 
 		if (traceSetup && traceOnlyScene == p.sceneName)
-			console.log(`🖼 GLScene ${p.sceneName}:  done with initSceneClass`);
+			dblog(`🖼 GLScene ${p.sceneName}:  done with initSceneClass`);
 	};
 
 	// repaint whole GL image.	this is repainting a canvas with GL.
@@ -125,7 +125,7 @@ function GLScene(props) {
 		paintingNeeds ??= p.paintingNeeds;
 		if (! scene) {
 			if (traceTooEarly)
-				console.log(`🖼 GLScene too early for glRepaint. squishScene=`, scene);
+				dblog(`🖼 GLScene too early for glRepaint. squishScene=`, scene);
 			return;  // too early
 		}
 		// if (traceViewBuffer)
@@ -138,7 +138,7 @@ function GLScene(props) {
 		scene.drawAllDrawings(node.width, node.height, paintingNeeds);
 		//scene.drawAllDrawings(p.canvasInnerWidth, p.canvasInnerHeight, info);
 		if (traceGeometry && traceOnlyScene == p.sceneName) {
-			console.log(`🖼 GLScene finished glRepaint() ${p.sceneName}:	\n`
+			dblog(`🖼 GLScene finished glRepaint() ${p.sceneName}:	\n`
 					+`canvasInnerWidth=${p.canvasInnerWidth}, canvasInnerHeight=${p.canvasInnerHeight}, `
 					+`paintingNeeds=`, paintingNeeds);
 		}
@@ -154,7 +154,7 @@ function GLScene(props) {
 //	}
 
 	if (traceGeometry && 'mainWave' == p.sceneName) {
-		console.log(`🖼 GLScene rend '${p.sceneName}': canvas=${canvasNode?.nodeName} `
+		dblog(`🖼 GLScene rend '${p.sceneName}': canvas=${canvasNode?.nodeName} `
 			+`canv inner dims: w=${p.canvasInnerWidth} h=${p.canvasInnerHeight} `);
 	}
 
@@ -181,8 +181,12 @@ function GLScene(props) {
 			if (props.animator)
 				props.animator.glRepaint = glRepaint;
 
-			if (traceSetup && traceOnlyScene == p.sceneName)
-				console.log(`🖼 GLScene ${p.sceneName}: canvas ${canvasNode?.className}, gl, view&drawing done`);
+			if (traceSetup && traceOnlyScene == p.sceneName) {
+				dblog(`🖼 GLScene ${p.sceneName}: canvas ${canvasNode?.className}, `
+				      +` gl, view&drawing installed`);
+            dblog(`🌀 context attributes we're operating under:`, gl.getContextAttributes());
+         }
+
 		});
 	}
 
@@ -210,7 +214,7 @@ function GLScene(props) {
 		glRepaint(p.paintingNeeds);
 
 		if (traceSetup && traceOnlyScene == p.sceneName) {
-			console.log(`🖼 GLScene ${p.sceneName}: effectRepaint(): completed, canvasNode=`,
+			dblog(`🖼 GLScene ${p.sceneName}: effectRepaint(): completed, canvasNode=`,
 				canvasNode);
 		}
 	}
