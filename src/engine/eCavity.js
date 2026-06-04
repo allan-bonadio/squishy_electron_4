@@ -92,12 +92,14 @@ class eCavity extends eObject {
 			// _wave must be a pointer to the existing qCavity's buffer
 			if (this._wave < 256) {
 				console.error(`this._wave pointer seems to be too low, probably null: `
-                    +` ${this._wave}, ??but ok if just generating direct accessors??`);
+                    +` ${this._wave}, (but ok if just generating directAccessors)`);
 				let temp_wave = qeFuncs.buffer_allocateWave(this.space.nPoints * 2);
-				this.wave = new Float64Array(Module.HEAPF64.buffer, temp_wave, 2 * this.space.nPoints );
+				this.wave = new Float64Array(Module.HEAPF64.buffer, temp_wave,
+						2 * this.space.nPoints );
 			}
 			else {
-				this.wave = new Float64Array(window.Module.HEAPF64.buffer, this._wave, 2 * this.space.nPoints );
+				this.wave = new Float64Array(window.Module.HEAPF64.buffer, this._wave,
+						2 * this.space.nPoints );
 			}
 		}
 		else if (Array.isArray(useThis32F) & 'Float64Array' == useThis32F.constructor.name) {
@@ -133,14 +135,17 @@ class eCavity extends eObject {
 		this.space = this.wave = null;
 	}
 
-	/* ****************************************************    👽   👽    direct access */
+	/* *******************************************    👽   👽    direct access */
+	// compare with eFlick, which should be a subclass, right?  Well,
+	// the offsets are different.  Sometimes.  No idea why; but I do
+	// the directAccessors separately. grr.
 
-	get _wave() { return this._ints_[7]; }
+	get _wave() { return this._ints_[3]; }
 
-	get nPoints() { return this._ints_[8]; }
-	get start() { return this._ints_[9]; }
-	get end() { return this._ints_[10]; }
-	get continuum() { return this._ints_[11]; }
+	get nPoints() { return this._ints_[4]; }
+	get start() { return this._ints_[5]; }
+	get end() { return this._ints_[6]; }
+	get continuum() { return this._ints_[7]; }
 
 	/* ****************************    👽   👽    end of direct accessors */
 
