@@ -4,7 +4,7 @@
 */
 
 let traceGLCalls = false;
-let traceUniforms = false;
+let traceUniforms = true;
 let traceAttributes = false;  // quick update every reload
 let traceAttributesFull = false;  // full dumps every reload
 
@@ -33,7 +33,7 @@ export class drawingVariable {
 		// or maybe this is already done and so this is superflous?
 		// maybe this isn't needed 4:46 drawing.setDrawing();
 
-		if (traceGLCalls) console.log(`🍯 created drawingVariable '${varName}', drawing:`, drawing);
+		if (traceGLCalls) dblog(`🍯 created drawingVariable '${varName}', drawing:`, drawing);
 	}
 
 	addVariable(drawing) {
@@ -77,7 +77,7 @@ export class drawingUniform extends drawingVariable {
 			throw new Error(`Cannot find uniform loc for uniform variable ${varName} `
 				+` in ${this.drawing.program.$qLabel}`);
 		if (traceUniforms) {
-			console.log(`🍯 created drawingUniform '${varName}'  in `
+			dblog(`🍯 created drawingUniform '${varName}'  in `
 		                +` ${this.drawing.program.$qLabel}`);
 		}
 
@@ -88,12 +88,15 @@ export class drawingUniform extends drawingVariable {
 	// call this when the uniform's value changes, to reload it into the GPU
 	// actually, calls before each draw, always
 	reloadVariable() {
+		if (traceUniforms)
+			dblog(`🍯🍯 re-loading uniform '${this.varName}' ...`);
+
 		// value might be a JS float, vector or matrix typically 4 or 4x4.
 		// type is typically Matrix4fv, 1fv, or others; see
 		// https://developer.mozilla.org - WebGLRenderingContext
 		const {value, type} =  this.reloadFunc();
 		if (traceUniforms)
-			console.log(`🍯🍯 re-loading uniform ${this.varName} with value=${value} type ${type}`);
+			dblog(`   ...with value=${value} type ${type}`);
 
 		// you can't pass null or undefined to webgl, but remember this
 		this.value = value;
@@ -112,18 +115,22 @@ export class drawingUniform extends drawingVariable {
 
 		const method = `uniform${type}`;
 
-		const args = [this.uniformLoc];
+		// like gl.uniformMatrix4f(this.uniformLoc, value) or uniform1f() etc
+		let args = [this.uniformLoc];
 		if (/^Matrix/.test(type))
 			args.push(false);  // do not transpose
-		args.push(value);
+		if (Array.isArray(value)) {
+			args = args.concat(value);
+		}
+		else {
+			args.push(value);
+		}
 
-		// like gl.uniformMatrix4f(this.uniformLoc, value)
 		gl[method].apply(gl, args);
 
 		if (traceUniforms) {
-			console.log(`🍯 drawingUniform reloaded U variable '${this.varName}' in `);
-			console.log(`            ${this.drawing.avatarLabel} uniform gl.${method}`
-				+`  (${args[0].constructor.name}, ${args[1]}, ${args[2]} ) `);
+			dblog(`🍯 drawingUniform reloaded U variable '${this.varName}' in `);
+			dblog(`            ${this.drawing.avatarLabel} uniform gl.${method}`, args);
 		}
 	}
 }
@@ -196,13 +203,13 @@ export class drawingAttribute extends drawingVariable {
 		gl.vertexAttribPointer(this.attrLocation, this.tupleWidth, gl.FLOAT,
 				false, this.tupleWidth * 4, 0);  // normalize, stride, offset
 		if (traceGLCalls)
-			console.log(`🍯  drawingAttribute '${this.varName}' connected to its `
+			dblog(`🍯  drawingAttribute '${this.varName}' connected to its `
 				+` glBuffer to tupleWidth=${this.tupleWidth}`);
 
 		gl.bufferData(gl.ARRAY_BUFFER, floatArray, gl.DYNAMIC_DRAW);
 		if (traceAttributes || traceAttributesFull)
 
-			console.log(`🍯 reload drawingAttribute '${this.varName}' in ${this.drawing.drawingName}`
+			dblog(`🍯 reload drawingAttribute '${this.varName}' in ${this.drawing.drawingName}`
 				+ ` reloaded, ${this.nTuples}  tuples of ${this.tupleWidth} floats each`);
 
 		if (traceAttributesFull) {
@@ -210,7 +217,7 @@ export class drawingAttribute extends drawingVariable {
 				let line = `[${String(t).padStart(4)}]  `;
 				for (let f = 0; f < this.tupleWidth; f++)
 					line += `  ${this.floatArray[t * this.tupleWidth + f].toFixed(6)}`;
-				console.log(line);
+				dblog(line);
 			}
 		}
 	}
