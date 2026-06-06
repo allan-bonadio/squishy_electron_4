@@ -36,11 +36,11 @@ import {dump4x4} from '../gl/helpers3D.js';
 
 let traceDimensions = false;
 let traceContext = false;
-let traceOrientation= false;
+let traceOrientation= true;
 let traceOrient = false;
 
 let traceProjMatrix = true;
-let traceOrigMatrix = true;
+let traceOffMatrix = true;
 let traceRotMatrix = true;
 
 
@@ -72,7 +72,6 @@ export class WaveVista extends React.Component {
 		show3D: PropTypes.bool.isRequired,
 
 		setMainVistaRepaint: PropTypes.func,
-		setSpectRepaint: PropTypes.func,
 
 		spaceCreatedProm: PropTypes.object.isRequired,
 	};
@@ -86,8 +85,8 @@ export class WaveVista extends React.Component {
 		// no!  see promise then() below  this.space = props.space;
 
 		this.state = {
-			// height of just the canvas + DOUBLE_THICKNESSpx, as set by user with size box
-			// integer pixels
+			// height of just the canvas + DOUBLE_THICKNESSpx, as set by
+			// user with size box integer pixels
 			outerHeight: round(getASetting('miscSettings', 'vistaHeight')),
 		}
 
@@ -102,12 +101,12 @@ export class WaveVista extends React.Component {
 			this.space = space;
 			this.setState({space});  // please render cuz nothing renders without space
 
-			this.makeWholeMatrix()
+			this.unifyMatrices()
 
 			// this will be reused	with new rotMatrixes plugged in
 			this.paintingNeeds = {
 				cavity: this.space.mainFlick,
-				rotMatrix: this.rotMatrix,
+				unifiedMatrix: this.unifiedMatrix,
 				fudge: this.orient.fudge,
 			};
 		});
@@ -118,6 +117,8 @@ export class WaveVista extends React.Component {
 	setHeight = (height) => {
 		this.setState({outerHeight: height});
 		storeASetting('miscSettings', 'vistaHeight', height);
+
+		// why don't i have to do this in 2d?!?
 	}
 
 
@@ -154,83 +155,90 @@ export class WaveVista extends React.Component {
 // }
 
 
-	// recalculate the perspective matrix, given changed canvas geometry.
-	// Must have canvasInnerWidth/Height from updateInnerDims() already calculated.
-	// makeOrigMatrix() next makes the origMatrix - the starting point for different rotations.
-	// Must be done before first repaint.
-	makeProjMatrix = () => {
+	// recalculate the perspective matrix, given changed canvas
+	// geometry. Must have canvasInnerWidth/Height from
+	// updateInnerDims() already calculated. offsetMatrix() next
+	// makes the offMatrix - the starting point for different
+	// rotations. Must be done before first repaint.
+	projectMatrix = () => {
         // make the projection matrix.. never changes.  Well, if you change
         // the FOV, you have to recalculate this.  Oh and if the window or the
         // vista height changes.  Or ... if ...
+		const aspect = this.canvasInnerWidth / this.canvasInnerHeight;
 
 		// hfov = horizontal field of view; default for glMatrix is vertical
 		const horizontalFieldOfView = deg2rad(this.orient.hfoView); // in radians
-		const aspect = this.canvasInnerWidth / this.canvasInnerHeight;
 
-        // these need to be, REALLY, the closest stuff, and the farthest stuff.
-        // Approximately.  No random guesses.  Maps to the depth buffer.
+		// these need to be, REALLY, the closest stuff, and the farthest stuff.
+		// Approximately.  Maps to the depth buffer.
 		const zNear = 1;
 		const zFar = this.space.nPoints;
 
 		this.projMatrix = mat4.create();
+
+		// multiply by aspect?  I would think it should divide by aspect?  TODO
 		mat4.perspectiveNO(this.projMatrix, horizontalFieldOfView * aspect,
 					aspect, zNear, zFar);
-        if (traceProjMatrix)
+		if (traceProjMatrix) {
+			dblog(`️🏔️ projection: aspect=${aspect} `
+				+`  hFOV=${horizontalFieldOfView*180/3.14159} `
+				+` zNear=${zNear}   zFar=${zFar}  `);
 			dump4x4('vista projMatrix', this.projMatrix);
+		}
+      if (!isFinite(this.projMatrix[0])) debugger;
 	}
 
-	// set up origMatrix only when wave vista created, or reshaped
+	// set up offMatrix only when wave vista created, or reshaped
 	// the original matrix that rotations get appended onto.
 	// (most of the mat4 functions have the dest as the first argument.)
-	makeOrigMatrix = () => {
-		let origMatrix = mat4.clone(this.projMatrix)
-		// const origMatrix = mat4.create();
+	offsetMatrix = () => {
+		let offMatrix = mat4.clone(this.projMatrix)
+		// const offMatrix = mat4.create();
 
-		mat4.translate(origMatrix, origMatrix, [this.orient.xPos, this.orient.yPos, this.orient.zPos]);
-		//mat4.translate(origMatrix, origMatrix, [0.0, 0.0, -this.space.nStates/6 - 5]);
-		this.origMatrix = origMatrix;
-		// probably call makeRotMatrix() after this
-        if (traceOrigMatrix)
-            dump4x4('vista origMatrix:', this.origMatrix);
+		mat4.translate(offMatrix, offMatrix,
+				[this.orient.xPos, this.orient.yPos, this.orient.zPos]);
+		if (traceOrientation) {
+			let o = this.orient;
+			dblog(`️🏔️ offfsets xyz: ${o.xPos}  ${o.yPos}  ${o.zPos}  `);
+		}
+		this.offMatrix = offMatrix;
+		// probably call rotateMatrix() after this
+		if (traceOffMatrix)
+			dump4x4('vista offMatrix:', this.offMatrix);
+		if (!isFinite(this.offMatrix[0])) debugger;
 	}
 
-
-    // Take the origMatrix , and add on the rotations along z y x.
+    // Take the offMatrix , and add on the rotations along z y x.
     // called when user rotates image to get a new matrix for the new rotation
 	// uses this.orient.* for the angles to rotate, so make sure they're in place
-	makeRotMatrix = () => {
-		let matrix = mat4.clone(this.origMatrix);
+	rotateMatrix = () => {
+		let matrix = mat4.clone(this.offMatrix);
 
-		// only for testing.  The numbers were found empirically
-		//const rand = (min, max) => (max-min) * Math.random() + min;
-
-		//let zRotation = rand(5.19, 5.30);
-		let zRotation = deg2rad(this.orient.z);
+		let zRotation = deg2rad(this.orient.zAng);
 		mat4.rotateZ(matrix, matrix, zRotation);
 
-		//let yRotation = rand(4.33, 5.20);
-		let yRotation = deg2rad(this.orient.y);
+		let yRotation = deg2rad(this.orient.yAng);
 		mat4.rotateY(matrix, matrix, yRotation);
 
-		//let zRotation = rand(5.19, 5.30);
-		let xRotation = deg2rad(this.orient.x);
+		let xRotation = deg2rad(this.orient.xAng);
 		mat4.rotateX(matrix, matrix, xRotation);
 
 		if (traceOrientation) {
-			dblog(`️🏔️ rotating z y x rotation, rads: ${zRotation} ${yRotation} ${xRotation}`);
-			dump4x4('end of makeRotMatrix()', matrix);
+			dblog(`️🏔️ rotating z y x rotation: ${zRotation*180/3.14159}° ${yRotation*180/3.14159}° ${xRotation*180/3.14159}°`);
+			dump4x4('end of rotateMatrix()', matrix);
 		}
 
-		this.rotMatrix = matrix;
+		this.unifiedMatrix = matrix;
         if (traceRotMatrix)
-            dump4x4('vista rotMatrix:', this.rotMatrix);
+            dump4x4('vista unifiedMatrix:', this.unifiedMatrix);
+         if (!isFinite(matrix[0])) debugger;
 		return matrix;
 	}
 
-	makeWholeMatrix() {
-		this.makeProjMatrix()
-		this.makeOrigMatrix();
-		this.makeRotMatrix();
+	unifyMatrices() {
+		this.projectMatrix()
+		this.offsetMatrix();
+		this.rotateMatrix();
 	}
 
 	/* ******************************************* orientation 	*/
@@ -238,41 +246,60 @@ export class WaveVista extends React.Component {
 	// called when user tries to rotate it, whether pivot or orient
 	// coord = x y z strings or 'multi'	  newVal is new angle around that axis or orient obj
 	// pass an object, with one, two or all three
-	setOrient = (coord, newVal) => {
-		if (traceOrient) dblog(`️🏔️ setOrient(${coord}, `, newVal, `) `);
-		if ('multi' == coord) {
-			// all of them
-			Object.assign(this.orient, newVal);
-			storeAGroup('orientSettings', this.orient);
-		}
-		else {
-			this.orient[coord] = newVal;
-			storeASetting('orientSettings', coord, newVal);
-		}
-	}
 
-	// after angles have changed, call this to ripple it thru and repaint
-	// JUST the rotation angles.
-	repaintOrient = () => {
-		this.paintingNeeds.rotMatrix = this.makeRotMatrix();
+
+	// after angles have changed, call this to ripple it thru and
+	// repaint JUST the rotation angles.  Save a microsecond :-) of cpu by
+	// avoiding matrix mults.
+	orientNRepaint = () => {
+		this.paintingNeeds.unifiedMatrix = this.rotateMatrix();
 		this.mainVistaRepaint(this.paintingNeeds);
 	}
 
-	// repaint, effecting all changes.  Do this when canvas areas need
-	// to repaint & resize or other Orient3D settings besides the angles
-	repaintRecreate = () => {
-		this.makeProjMatrix();
-		this.makeOrigMatrix();
-		this.paintingNeeds.fudge = this.orient.fudge;
-		this.repaintOrient();
-		// this.paintingNeeds.rotMatrix = this.makeRotMatrix();
+	// repaint, rebuilding all matrices, effecting all changes.  Do
+	// this when canvas areas need to repaint & resize or other
+	// Orient3D settings besides the angles
+	buildNRepaint = () => {
+		this.projectMatrix();
+		this.offsetMatrix();
+		this.paintingNeeds.fudge = this.orient.fudge;  // becomes a uniform
+		this.orientNRepaint();
+		// this.paintingNeeds.unifiedMatrix = this.rotateMatrix();
 		// this.mainVistaRepaint(this.paintingNeeds);
+	}
+
+	// do most of setting any of them
+	setOne(varName, newVal) {
+		if (traceOrient) dblog(`️🏔️ set one(${varName}, `, newVal, `) `);
+		this.orient[varName] = newVal;
+		storeASetting('orientSettings', varName, newVal);
+	}
+
+	// set a rotation ANGLE: xAng, yAng or zAng
+	setAngSetting = (coord, newVal) => {
+		this.setOne(coord, newVal);
+		this.orientNRepaint();
+	}
+
+	// set Any of the Orient settings, angle or not
+	setOneSetting = (varName, newVal) => {
+		this.setOne(varName, newVal);
+		this.buildNRepaint();
+	}
+
+	// set all of them.  newVal is an obj with... most or all of them.
+	// Missing ones won't be set.  this is for reset on Orient3D
+	setOrientAll = (newSettings) => {
+		if (traceOrient) dblog(`️🏔️ setOrientAll(${coord}, `, newSettings, `) `);
+		Object.assign(this.orient, newSettings);
+		storeAGroup('orientSettings', this.orient);
+		this.buildNRepaint();
 	}
 
 
 	/* ********************************************************* render*/
-	// once the repaint function is created, call this here so everybody can find it.
-	// pass along the vital repaint functions
+	// once the repaint function is created by GLScene, call this here so everybody can find it.
+	// pass along the vital repaint function
 	setMainVistaRepaint = (mainVistaRepaint) => {
 		this.mainVistaRepaint ??= mainVistaRepaint;
 		this.mainVistaRepaint.sceneName = 'mainVistaRepaint';  // for debugging
@@ -294,8 +321,8 @@ export class WaveVista extends React.Component {
 			let sceneName = 'mainVista';
 
 			if (traceRotMatrix)
-				dump4x4('vista rotMatrix being passed to <GLScene:',
-					this.paintingNeeds.rotMatrix);
+				dump4x4('vista unifiedMatrix being passed to <GLScene:',
+					this.paintingNeeds.unifiedMatrix);
 			vista = <GLScene
 				space={this.space} animator={this.animator}
 				sceneClassName={'garlandScene'} sceneName={sceneName}
@@ -333,34 +360,55 @@ export class WaveVista extends React.Component {
 		}
 
 		if (traceOrientation) {
-			dblog(`️🏔️ about to render Orient3D orientX=${this.orient.x} `
-				+` orientY=${this.orient.y} orientZ=${this.orient.z}`);
+			dblog(`️🏔️ about to render Orient3D orient.x=${this.orient.x} `
+				+` orient.y=${this.orient.y} orient.z=${this.orient.z}`);
 		}
 
 		let pOverlay = 'no O';
-		if (this.makeRotMatrix && this.mainVistaRepaint) {
+		if (this.rotateMatrix && this.mainVistaRepaint) {
 			pOverlay = <Orient3D
-					repaintOrient={this.repaintOrient}
-					repaintRecreate={this.repaintRecreate}
-
 					orient={this.orient}
 
-					orientX={this.orient.x}
-					orientY={this.orient.y}
-					orientZ={this.orient.z}
-
-					orientXPos={this.orient.xPos}
-					orientYPos={this.orient.yPos}
-					orientZPos={this.orient.zPos}
-
-					orientFOView={this.orient.hfoView}
-					orientFudge={this.orient.fudge}
-
-					setOrient={this.setOrient}
-					makeRotMatrix={this.makeRotMatrix}
-					mainVistaRepaint={this.mainVistaRepaint}
+					setAngSetting={this.setAngSetting}
+					setOneSetting={this.setOneSetting}
+					setOrientAll={this.setOrientAll}
 				/>;
 		}
+
+					// rotateMatrix={this.rotateMatrix}
+					// mainVistaRepaint={this.mainVistaRepaint}
+					// orientX={this.orient.x}
+					// orientY={this.orient.y}
+					// orientZ={this.orient.z}
+					//
+					// orientXPos={this.orient.xPos}
+					// orientYPos={this.orient.yPos}
+					// orientZPos={this.orient.zPos}
+					//
+					// orientFOView={this.orient.hfoView}
+					// orientFudge={this.orient.fudge}
+					//
+					// orientNRepaint={this.orientNRepaint}
+					// buildNRepaint={this.buildNRepaint}
+
+					// orientX={this.orient.x}
+					// orientY={this.orient.y}
+					// orientZ={this.orient.z}
+					//
+					// orientXPos={this.orient.xPos}
+					// orientYPos={this.orient.yPos}
+					// orientZPos={this.orient.zPos}
+					//
+					// orientFOView={this.orient.hfoView}
+					// orientFudge={this.orient.fudge}
+					//
+					// setAngSettings={this.setAngSettings}
+					// setOneSettings={this.setOneSettings}
+					// setOrientAll={this.setOrientAll}
+					// rotateMatrix={this.rotateMatrix}
+					// mainVistaRepaint={this.mainVistaRepaint}
+
+
 		let vista = this.makeVista();
 
 		// the glScene is one layer.  Over that is the widget area
@@ -369,7 +417,8 @@ export class WaveVista extends React.Component {
 		// shows up, instead of bland divs.
 		return (
 		<div className='WaveVista'
-			style={{height: `${s.outerHeight}px`, display: (p.show3D ? 'flex' : 'none')}}
+			style={{height: `${s.outerHeight}px`,
+				display: (p.show3D ? 'flex' : 'none')}}
 			onPointerUp={this.finishIntegration}
 			onFocus={ev => console.log(`️🏔️ focus ON`)}
 			ref={this.grabWaveVistaEl}>
@@ -377,7 +426,8 @@ export class WaveVista extends React.Component {
 			{vista}
 
 			<div className='widgetArea' key='widgetArea'
-						style={{flexBasis: this.canvasInnerWidth +'px', height: this.canvasInnerHeight + 'px'}}>
+						style={{flexBasis: this.canvasInnerWidth +'px',
+							height: this.canvasInnerHeight + 'px'}}>
 
 				<section className='timeOverlay'
 					style={{maxWidth: this.canvasInnerWidth +'px'}}>
