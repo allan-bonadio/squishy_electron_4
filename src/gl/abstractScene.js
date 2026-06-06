@@ -110,7 +110,7 @@ export class abstractScene {
 			drawing.drawVariables.forEach(v => v.reloadVariable());
 
 			if (!drawing.skipDrawingCuzErr)
-				drawing.draw(width, height);
+				drawing.draw(width, height, this.paintingNeeds);
 		});
 	}
 }
