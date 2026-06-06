@@ -25,7 +25,7 @@ export function dump4x4(title, matrix) {
 			typeof matrix, matrix.constructor.name, matrix.length);
 	}
 
-console.warn(matrix);
+	//console.warn(matrix);
 
 	dblog(`⣿⣿⣿mat: ${title}
 	${_(matrix[0])} + ${_(matrix[1])} + ${_(matrix[2])} + ${_(matrix[3])}

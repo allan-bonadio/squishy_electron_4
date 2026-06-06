@@ -16,8 +16,8 @@ let traceAvatarAfterDrawing = false;
 let traceGLAfterDrawing = false;
 let traceDrawing = false;
 let traceReloadRow = false;
-let traceMatrix = false;
-let traceUColor = true;
+let traceMatrix = true;
+let traceUColor = false;
 
 // diagnostic purposes; draws more per vertex
 let traceDontDrawTriangles=  false;
@@ -145,7 +145,8 @@ export class garlandDrawing extends abstractDrawing {
 
 		this.matrixUniform = new drawingUniform('matrix', this,
 			() => {
-				let matrix = this.scene.paintingNeeds.rotMatrix;
+				let matrix = this.scene.paintingNeeds.unifiedMatrix;
+         if (!isFinite(matrix[0])) debugger;
 
 				if (traceMatrix) {
 					dump4x4('🌀🌀🌀 garlandDrawing reloading', matrix);
@@ -193,13 +194,14 @@ export class garlandDrawing extends abstractDrawing {
 
 	}
 
-	// called for each image frame on th canvas.  TODO: roll specialInfo into the input Data Arrays
+	// called for each image frame on th canvas.
 	draw(width, height, paintingNeeds) {
 		if (traceDrawing) {
 			dblog(`🌀🌀🌀 garland Drawing  ${this.avatarLabel}: `
 				+` width=${width}, height=${height}  drawing ${this.vertexCount/2} points `
-				+` matrix=${this.matrix}`);
+				+` matrix=${paintingNeeds.unifiedMatrix}`);
 		}
+         if (!isFinite(paintingNeeds.unifiedMatrix[0])) debugger;
 		const gl = this.gl;
 		//??? this.setDrawing();
 
@@ -258,6 +260,7 @@ export class garlandDrawing extends abstractDrawing {
 		let rows4 = this.avatar.getViewBuffer(0);
 		let gl_Position = vec4.create();
 		let vertexSerial, ix, point, odd, factor, row;
+         if (!isFinite(this.scene.paintingNeeds.unifiedMatrix[0])) debugger;
 
 		const _ = c => (gl_Position[c]).toFixed(4).padStart(7);
 		const __ = c => (row[c]).toFixed(4).padStart(7);
@@ -284,12 +287,13 @@ export class garlandDrawing extends abstractDrawing {
 			point[3] = 1;
 
 			// point * matrix;
-			vec4.transformMat4(gl_Position, point, this.scene.paintingNeeds.rotMatrix);
+			vec4.transformMat4(gl_Position, point,
+				this.scene.paintingNeeds.unifiedMatrix);
 			text += ` [${String(ix).padStart(3)}] `
 				+` ${_(0)}   ${_(1)}   ${_(2)}   ${_(3)}  \n`
 				;
 		}
-		dump4x4('🌀🌀🌀 GL simulation matrix', this.scene.paintingNeeds.rotMatrix);
+		dump4x4('🌀🌀🌀 GL simulation matrix', this.scene.paintingNeeds.unifiedMatrix);
 		dblog(text + `  🌀🌀 `);
 	}
 

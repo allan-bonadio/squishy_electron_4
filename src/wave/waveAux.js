@@ -68,8 +68,8 @@ export const waveAux = {
 					btw props.outerWidth=${this.props.outerWidth}`);
 			}
 
-			if (this.makeWholeMatrix)
-				this.makeWholeMatrix();  // vista only
+			if (this.unifyMatrices)
+				this.unifyMatrices();  // vista only
 
 			// trigger a render.  But only if they actually changed!  potential for ∞ loop.
 			this.setState({outerHeight: s.outerHeight});

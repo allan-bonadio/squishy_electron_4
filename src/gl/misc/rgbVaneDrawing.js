@@ -124,7 +124,7 @@ export class rgbVaneDrawing extends abstractDrawing {
 
 		this.matrixUniform = new drawingUniform('matrix', this,
 			() => {
-				let matrix = this.scene.paintingNeeds.rotMatrix;
+				let matrix = this.scene.paintingNeeds.unifiedMatrix;
 
 				if (traceMatrix) {
 					dump4x4('🌀🌀🌀 rgbVaneDrawing reloading', matrix);
@@ -220,7 +220,7 @@ export class rgbVaneDrawing extends abstractDrawing {
 			point[3] = vertexSerial;
 
 			// point * matrix;
-			vec4.transformMat4(gl_Position, point, this.scene.paintingNeeds.rotMatrix);
+			vec4.transformMat4(gl_Position, point, this.scene.paintingNeeds.unifiedMatrix);
 			text += ` 🌀🌀${(ix + '').padStart(3)} `
 				+` ${_(0)}   ${_(1)}   ${_(2)}  \n`;
 			//dblog(` 🌀🌀${_(0)}   ${_(1)}   ${_(2)}   ${_(3)}  `);

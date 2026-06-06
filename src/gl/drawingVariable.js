@@ -4,7 +4,7 @@
 */
 
 let traceGLCalls = false;
-let traceUniforms = true;
+let traceUniforms = false;
 let traceAttributes = false;  // quick update every reload
 let traceAttributesFull = false;  // full dumps every reload
 
@@ -91,7 +91,7 @@ export class drawingUniform extends drawingVariable {
 		if (traceUniforms)
 			dblog(`🍯🍯 re-loading uniform '${this.varName}' ...`);
 
-		// value might be a JS float, vector or matrix typically 4 or 4x4.
+		// value might be a JS float, typed vector or matrix, typically 4 or 4x4.
 		// type is typically Matrix4fv, 1fv, or others; see
 		// https://developer.mozilla.org - WebGLRenderingContext
 		const {value, type} =  this.reloadFunc();
@@ -105,7 +105,7 @@ export class drawingUniform extends drawingVariable {
 			// better luck next time.
 			let msg = `uniform variable ${this.varName} has `
 						+`a problematic value(${value}) or no type(${type})`;
-			console.trace(`🍯 ${msg}`);
+			console.error(`🍯 ${msg}`);
 			this.drawing.skipDrawingCuzErr = msg;
 			return;
 		}
