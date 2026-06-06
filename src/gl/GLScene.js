@@ -79,8 +79,8 @@ function GLScene(props) {
 	const p = props;
 	//dblog(`starting GLScene(render), sceneName=${p.sceneName}`);
 
-	if (traceMatrix && p.paintingNeeds.rotMatrix)
-		dump4x4('🖼  GLScene  starts with matrix', p.paintingNeeds.rotMatrix);
+	if (traceMatrix && p.paintingNeeds.unifiedMatrix)
+		dump4x4('🖼  GLScene  starts with matrix', p.paintingNeeds.unifiedMatrix);
 
 	// we have to keep the canvas node, to get a gl context.
 	// we need it in the state, to trigger rerender, once we've got one (2nd render)
@@ -130,9 +130,9 @@ function GLScene(props) {
 		}
 		// if (traceViewBuffer)
 		// p.avatar.cavity.dump(`🖼 GLScene ${p.sceneName}: got the cavity right here`);
-		if (traceMatrix && paintingNeeds.rotMatrix)
+		if (traceMatrix && paintingNeeds.unifiedMatrix)
 			dump4x4('🖼  GLScene  glRepaint gets matrix, passes to drawAllDrawings()',
-			   paintingNeeds.rotMatrix);
+			   paintingNeeds.unifiedMatrix);
 
 		// draw.  This won't set up an ∞ loop, right?
 		scene.drawAllDrawings(node.width, node.height, paintingNeeds);
@@ -230,6 +230,11 @@ function GLScene(props) {
 	// canvasNode might not be there yet... will this work?
 	let cWidth = p.canvasInnerWidth;
 	let cHeight = p.canvasInnerHeight;
+
+   // hey this did it although the whole dam things is squished
+   if (gl) {
+      gl.viewport(0, 0, cWidth, cHeight);
+   }
 
 	// style attribute needed to set canvas physical width/height.
 	return (
