@@ -63,7 +63,6 @@ export class WaveView extends React.Component {
 
 		// GL funcs
 		setMainViewRepaint: PropTypes.func,
-		setSpectRepaint: PropTypes.func,
 
 		spaceCreatedProm: PropTypes.object.isRequired,
 	};
@@ -76,8 +75,8 @@ export class WaveView extends React.Component {
 		Object.assign(this, waveAux);
 
 		this.state = {
-			// height of just the canvas + DOUBLE_THICKNESSpx, as set by user with size box
-			// integer pixels
+			// height of just the canvas + DOUBLE_THICKNESSpx, as set by
+			// user with size box integer pixels
 			outerHeight: round(getASetting('miscSettings', 'viewHeight')),
 		}
 
@@ -125,12 +124,6 @@ export class WaveView extends React.Component {
 
 		this.props.setMainViewRepaint(mainViewRepaint);
 		this.animator.mainViewRepaint ??= mainViewRepaint;
-	};
-	// not used.  will require whole nother file like this ??? there'a another one of these in View
-	setSpectRepaint = (spectRepaint) => {
-		this.spectRepaint ??= spectRepaint;
-		this.props.setSpectRepaint(spectRepaint);
-		this.animator.spectRepaint ??= spectRepaint;
 	};
 
 	grabWaveViewEl = el => this.waveViewEl = el;
@@ -209,7 +202,8 @@ export class WaveView extends React.Component {
 		// the glScene is one layer.  Over that is the widget area	Bumpers are outside.
 		return (
 		<div className='WaveView'
-			style={{height: `${s.outerHeight}px`, display: (p.show2D ? 'flex' : 'none')}}
+			style={{height: `${s.outerHeight}px`,
+				display: (p.show2D ? 'flex' : 'none')}}
 			onPointerEnter={this.hoverEnter} onPointerLeave={this.hoverLeave}
 			onPointerUp={this.finishIntegration}
 			onFocus={ev => console.log(`WaveView focus ON`)}
@@ -236,12 +230,8 @@ export class WaveView extends React.Component {
 
 				<BeginFinishOverlay />
 
-
-
-
 				<SizeBox which='view' setHeight={this.setHeight}
 						initialHeight={s.outerHeight} />
-
 
 			</div>
 			<div className='bumper right' key='right'
