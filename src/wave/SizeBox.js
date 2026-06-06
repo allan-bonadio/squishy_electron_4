@@ -9,27 +9,33 @@ import PropTypes, {checkPropTypes} from 'prop-types';
 import resizeIcon from './waveViewIcons/resize.png';
 import {storeASetting} from '../utils/storeSettings.js';
 
-let traceDragCanvasHeight = false;
+let traceDragCanvasHeight = true;
+
+// only one human can drag it at a time, right?  so its ok to make it global.
+let isResizing;
+let resizingYOffset;
 
 const propTypes = {
 	// our caller, the wave, gets new height
 	setHeight: PropTypes.func.isRequired,
+	//initialHeight: PropTypes.number.isRequired,
 	which: PropTypes.string.isRequired,  // either "view" or "vista"
-	initialHeight: PropTypes.number.isRequired,
 };
 
 
 function SizeBox(props) {
 	cfpt(propTypes, props);
 
-	let [height, setHeight] = useState(props.initialHeight);
-	let stuffRef = useRef({});
-	let stuff = stuffRef.current;  // little details we need to keep
+//	let [height, setHeight] = useState(props.initialHeight);
+	// this will remember the height from the latest render
+	let height;
 
 	function setWaveHeight(newHeight) {
-		if (newHeight == height) return;
-		setHeight(newHeight);  // for next time around
-		height = newHeight;  // for this time
+		// don't CONTINUOUSLY set the canvas size!
+		if (height && newHeight == height) return;
+
+		//setHeight(newHeight);  // for next time around
+		height = newHeight;
 		props.setHeight(newHeight);  // for the wave box
 		storeASetting('miscSettings', props.which + 'Height', newHeight);
 	}
@@ -39,12 +45,14 @@ function SizeBox(props) {
 	// note: anything funny and the event falls thru to the wave panel
 	const resizePointerDown = ev => {
 		if (!(ev.buttons & 1)) return;
-		stuff.resizing = true;
+		isResizing = true;
+		if (!height)
+			height = ev.pageY;
 
 		// the small distance from the mousedown to the bottom of the size box
-		stuff.yOffset = Math.round(height - ev.pageY);
+		resizingYOffset = Math.round(height - ev.pageY);
 		if (traceDragCanvasHeight)
-			console.log(`📦📦 resizePointer down ${ev.pageX} ${ev.pageY} offset=${stuff.yOffset}`);
+			console.log(`📦📦 resizePointer down ${ev.pageX} ${ev.pageY} offset=${resizingYOffset}`);
 		ev.target.setPointerCapture(ev.pointerId);
 
 		// now it's ours so don't let it click through
@@ -55,27 +63,29 @@ function SizeBox(props) {
 	const resizePointerMove = ev => {
 		// mouse moves happen all the time; don't bother me
 		if (!(ev.buttons & 1)) return;
-		if (!stuff.resizing)
+		if (!isResizing)
 			return;
 
-		const vHeight = Math.round(ev.pageY + stuff.yOffset);
+		const vHeight = Math.round(ev.pageY + resizingYOffset);
 		setWaveHeight(vHeight);
 		if (traceDragCanvasHeight) {
-			console.log(`📦📦 resizePointer drag ${ev.pageX} ${ev.pageY}  newheight=${ev.pageY + stuff.yOffset}`);
+			console.log(`📦📦 resizePointer drag ${ev.pageX} ${ev.pageY}  newheight=${ev.pageY + resizingYOffset}`);
 		}
 
 		ev.preventDefault();
 		ev.stopPropagation();
 	};
 
-	// usually I send pointerLeave events here, but now with pointerCapture, maybe it doesn't matter.??
-	// I do get pointerLeave events, but only after pointerUp, if the pointer is out of the size box.??
+	// usually I get pointerLeave events here, but now with
+	// pointerCapture, maybe it doesn't matter.?? I do get pointerLeave
+	// events, but only after pointerUp, if the pointer is out of the
+	// size box.??
 	const resizePointerUp = ev => {
 		if (!(ev.buttons & 1)) return;
 
 		if (traceDragCanvasHeight)
 			console.log(`📦📦 resizePointer up ${ev.pageX} ${ev.pageY}`);
-		stuff.resizing = false;
+		isResizing = false;
 
 		ev.preventDefault();
 		ev.stopPropagation();
