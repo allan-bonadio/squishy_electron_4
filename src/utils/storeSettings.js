@@ -244,9 +244,9 @@ export function createStoreSettings() {
 	/* ************************************ orient for 3D */
 
 	// set in Orient3D or PivotOverlay
-	makeParam('orientSettings', 'x', 90,  {min: -180, max: +180});
-	makeParam('orientSettings', 'y', 0,  {min: -180, max: +180});
-	makeParam('orientSettings', 'z', 90,  {min: -180, max: +180});
+	makeParam('orientSettings', 'xAng', 90,  {min: -45, max: +180});
+	makeParam('orientSettings', 'yAng', 0,  {min: -180, max: +180});
+	makeParam('orientSettings', 'zAng', 90,  {min: -0, max: +180});
 
 	makeParam('orientSettings', 'xPos', 0,  {min: -100, max: +100});
 	makeParam('orientSettings', 'yPos', 0,  {min: -100, max: +100});
