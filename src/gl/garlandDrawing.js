@@ -146,7 +146,7 @@ export class garlandDrawing extends abstractDrawing {
 		this.matrixUniform = new drawingUniform('matrix', this,
 			() => {
 				let matrix = this.scene.paintingNeeds.unifiedMatrix;
-         if (!isFinite(matrix[0])) debugger;
+				 if (!isFinite(matrix[0])) debugger;
 
 				if (traceMatrix) {
 					dump4x4('🌀🌀🌀 garlandDrawing reloading', matrix);
