@@ -11,7 +11,7 @@ import qeConsts from '../engine/qeConsts.js';
 import {dump4x4} from './helpers3D.js';
 import {vec4, mat4} from 'gl-matrix';
 
-this doesn't work yet.  Not sure if I'll keep it.
+//this doesn't work yet.  Not sure if I'll keep it.
 
 let traceDrawing = false;
 let traceReload = false;
@@ -24,9 +24,13 @@ let traceDrawLines = false;
 let pointSize = traceDrawPoints ? `gl_PointSize = 10.;` : '';
 
 /* ******************************************* vane drawing */
-// The glsl sources for webgl drawing
+// The Vane is like a weather vane, outdoors on a post, pointing
+// north, east etc.  This one is a pyramid peaking at 0,0,0., with
+// three legs coming out in the x y z directions.  x is red, length 1,
+// y is green, length 2, and z blue, length 3.
 
-// data: just rgb vertices:
+
+// vertex positions
 const posData = new Float32Array([
 0, 0, 0, 1,
 1, 0, 0, 1,
@@ -40,59 +44,20 @@ const posData = new Float32Array([
 0, 0, 0, 1,
 ]);
 
+// just rgb for the vertices above
 const colorData = new Float32Array([
 1, 1, 1, 1,
-1, 0, 0, 1,
+1, 0, 0, 1,  // red
 0, 1, 0, 1,
 1, 1, 1, 1,
-0, 1, 0, 1,
+0, 1, 0, 1,  // green
 0, 0, 1, 1,
-1, 1, 1, 1,
+1, 1, 1, 1,  // white
 0, 0, 1, 1,
 1, 0, 0, 1,
 1, 1, 1, 1,
 ]);
 
-
-// make the line number for the start correspond to this JS file line number - the NEXT line
-const vertexSrc = `// rgbVaneDrawing vertex
-#line 61
-// this does all the transformation we need.  precalculated for each repaint.
-uniform mat4 matrix;
-
-// sets this so the frag shader can get it.
-varying highp vec4 vColor;
-
-// the list of numbers input
-attribute vec4 posData;
-attribute vec4 colorData;
-
-void main() {
-	vec4 point;
-	point.xyzw = posData.xyzw;
-
-	vec4 position = point * matrix;
-
-	float zToDivideBy = position.z + 10.;
-	gl_Position = vec4(position.xy / zToDivideBy, position.zw);
-
-	//  for the color, convert the complex values via this algorithm
-	vColor = colorData;
-
-	// dot size, in pixels not clip units.  actually a fuzzy square.
-	gl_PointSize = 10.;
-}
-`;
-
-const fragmentSrc = `// rgbVaneDrawing frag
-#line 87
-precision highp float;
-varying highp vec4 vColor;
-
-void main() {
-	gl_FragColor = vColor;
-}
-`;
 
 // the original display that's worth watching: rgbVane upside down hump graph
 export class rgbVaneDrawing extends abstractDrawing {
@@ -207,7 +172,7 @@ export class rgbVaneDrawing extends abstractDrawing {
 			+`${count} vertices, not the points:`;
 
 		for (let i = 0; i < count; i++) {
-		vertexSerial = first + i;
+			let vertexSerial = first + i;
 			let rs = vertexSerial * 4;
 			row = vec4.fromValues(rows[rs], rows[rs+1], rows[rs+2], rows[rs+3]);
 			ix = Math.floor(vertexSerial / 2);
