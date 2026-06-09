@@ -12,6 +12,32 @@ import {dump4x4} from './helpers3D.js';
 import {vec4, mat4} from 'gl-matrix';
 
 //this doesn't work yet.  Not sure if I'll keep it.
+/* ******************************************* vane scene */
+
+
+
+class rgbVaneScene extends abstractScene {
+	// doesn't need space or inputinfo
+	constructor(sceneName, ambiance, paintingNeeds, space) {
+		super(sceneName, ambiance, paintingNeeds, space);
+
+		this.canvas = ambiance.canvas;
+		this.gl = ambiance.gl;
+
+		// create avatar but don't add buffers; the drawing does that
+		this.avatar = eAvatar.createAvatar(sceneName);
+
+		// create relevant drawings.
+		this.drawings = [ new rgbVaneDrawing(this) ];
+	}
+}
+
+
+export default rgbVaneScene;
+
+
+
+/* ******************************************* vane drawing */
 
 let traceDrawing = false;
 let traceReload = false;
@@ -23,7 +49,6 @@ let traceDrawLines = false;
 
 let pointSize = traceDrawPoints ? `gl_PointSize = 10.;` : '';
 
-/* ******************************************* vane drawing */
 // The Vane is like a weather vane, outdoors on a post, pointing
 // north, east etc.  This one is a pyramid peaking at 0,0,0., with
 // three legs coming out in the x y z directions.  x is red, length 1,
