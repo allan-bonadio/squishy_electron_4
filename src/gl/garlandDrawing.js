@@ -63,7 +63,7 @@ const OUTER_FACTOR = '2.0';
 const INNER_FACTOR = '1.';
 
 // make the line number for the start correspond to this JS file line number - the NEXT line
-const vertexSrc = `// garlandDrawing vertex
+const vertexShaderSrc = `// garlandDrawing vertex
 ${cx2rygb}
 #line 70
 // this does all the transformation we need.  precalculated for each repaint.
@@ -109,7 +109,7 @@ void main() {
 }
 `;
 
-const fragmentSrc = `// garlandDrawing frag
+const fragmentShaderSrc = `// garlandDrawing frag
 #line 106
 precision highp float;
 varying highp vec4 vColor;
@@ -130,8 +130,8 @@ export class garlandDrawing extends abstractDrawing {
 		this.avatar = scene.avatar;
 		this.avatar.attachViewBuffer(0, null, 4, this.nPoints * 2, 'garland drawing');
 
-		this.vertexShaderSrc = vertexSrc;
-		this.fragmentShaderSrc = fragmentSrc;
+		this.vertexShaderSrc = vertexShaderSrc;
+		this.fragmentShaderSrc = fragmentShaderSrc;
 
 		this.uColor = [0,0,0,0];
 	}

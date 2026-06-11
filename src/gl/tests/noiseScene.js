@@ -33,7 +33,7 @@ function createNoise() {
 }
 
 // keep these #lines pointing to the next line number in the file!
-const vertexSrc = `
+const vertexShaderSrc = `
 #line 38
 precision highp float;
 uniform int imageWidth;
@@ -53,7 +53,7 @@ void main() {
 }
 `;
 
-const fragmentSrc = `
+const fragmentShaderSrc = `
 #line 58
 precision highp float;
 varying vec4 color;
@@ -68,8 +68,8 @@ export class noiseDrawing extends abstractDrawing {
 	constructor(scene) {
 		super(scene);
 
-		this.vertexShaderSrc = vertexSrc;
-		this.fragmentShaderSrc = fragmentSrc;
+		this.vertexShaderSrc = vertexShaderSrc;
+		this.fragmentShaderSrc = fragmentShaderSrc;
 	}
 
 	// all to do this one differently

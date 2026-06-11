@@ -32,7 +32,7 @@ let displayWrapEdges = false;  // soon to be a pref
 */
 
 // make the line number for the start correspond to this JS file line number - the NEXT line
-const vertexSrc = `// flat drawing vertex
+const vertexShaderSrc = `// flat drawing vertex
 ${cx2rygb}
 #line 38
 varying highp vec4 vColor;
@@ -75,7 +75,7 @@ void main() {
 }
 `;
 
-const fragmentSrc = `// flat drawing frag
+const fragmentShaderSrc = `// flat drawing frag
 #line 80
 precision highp float;
 varying highp vec4 vColor;
@@ -97,8 +97,8 @@ export class flatDrawing extends abstractDrawing {
 		this.avatar = scene.avatar;
 		this.avatar.attachViewBuffer(this.scene.flatAvatarID, null, 4, this.space.nPoints * 2, 'row');
 
-		this.vertexShaderSrc = vertexSrc;
-		this.fragmentShaderSrc = fragmentSrc;
+		this.vertexShaderSrc = vertexShaderSrc;
+		this.fragmentShaderSrc = fragmentShaderSrc;
 	}
 
 	// loads view buffer from corresponding wave, calculates highest norm.

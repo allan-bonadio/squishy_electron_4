@@ -33,7 +33,7 @@ function createVertices() {
 }
 
 // keep these #lines pointing to the next line number in the file!
-const vertexSrc = `
+const vertexShaderSrc = `
 #line 38
 precision highp float;
 uniform vec4 cornerColorUni;
@@ -59,7 +59,7 @@ void main() {
 }
 `;
 
-const fragmentSrc = `
+const fragmentShaderSrc = `
 #line 7065
 precision highp float;
 uniform vec4 cornerColorUni;
@@ -78,8 +78,8 @@ export class starDrawing extends abstractDrawing {
 	constructor(scene) {
 		super(scene, 'starDrawing');
 
-		this.vertexShaderSrc = vertexSrc;
-		this.fragmentShaderSrc = fragmentSrc;
+		this.vertexShaderSrc = vertexShaderSrc;
+		this.fragmentShaderSrc = fragmentShaderSrc;
 	}
 
 	// all to do this one differently

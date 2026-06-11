@@ -40,7 +40,7 @@ let pointSize = traceDrawPoints ? `gl_PointSize = 5.;` : '';
 // gets out of sync so easily!
 
 // all this really has to do is shovel out the points.  The LINE drawing mode alternates line endings
-const vertexSrc = `// ticDrawing vertex
+const vertexShaderSrc = `// ticDrawing vertex
 #line 42
 attribute vec2 coords;
 uniform float maxHeight;
@@ -58,7 +58,7 @@ void main() {
 }
 `;
 
-const fragmentSrc = `// ticDrawing frag
+const fragmentShaderSrc = `// ticDrawing frag
 #line 60
 precision highp float;
 //varying highp vec4 vColor;
@@ -79,8 +79,8 @@ export class ticDrawing extends abstractDrawing {
 			2, BUFFER_MAX_NTICS * FLOATS_PER_TIC, 'coords');
 		//this.coordBuffer = new Float32Array(BUFFER_MAX_NTICS * FLOATS_PER_TIC);
 
-		this.vertexShaderSrc = vertexSrc;
-		this.fragmentShaderSrc = fragmentSrc;
+		this.vertexShaderSrc = vertexShaderSrc;
+		this.fragmentShaderSrc = fragmentShaderSrc;
 	}
 
 	// one time set up of variables for this drawing, every time canvas
