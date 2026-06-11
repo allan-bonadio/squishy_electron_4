@@ -21,7 +21,8 @@ const sqrtTwo = Math.SQRT2.toFixed(6);  // 1.4142...
 // what we're here for.  This is all GLSL.
 // Convert a complex number to an rgb triplet using RYGB mapping.
 export const cx2rygb = `
-#line 24
+// file cx2rygb
+#line 26
 
 // take a complex  num and use the octogon alg to figure out the color
 // complex is normalized?  ∑  r**2 + i**2 == 1 maybe

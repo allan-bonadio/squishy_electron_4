@@ -69,9 +69,9 @@ export class drawingUniform extends drawingVariable {
 	constructor(varName, drawing, reloadFunc) {
 		super(varName, drawing, reloadFunc);
 
-                this.addVariable(drawing);
-
+		 this.addVariable(drawing);
 		// this turns out to be an internal magic object
+
 		this.uniformLoc = this.gl.getUniformLocation(this.drawing.program, varName);
 		if (!this.uniformLoc)
 			throw new Error(`Cannot find uniform loc for uniform variable ${varName} `
@@ -119,6 +119,8 @@ export class drawingUniform extends drawingVariable {
 		let args = [this.uniformLoc];
 		if (/^Matrix/.test(type))
 			args.push(false);  // do not transpose
+
+		// if array is a Normal JS array (not typed), string the components along in the arg list
 		if (Array.isArray(value)) {
 			args = args.concat(value);
 		}
