@@ -36,12 +36,12 @@ import {dump4x4} from '../gl/helpers3D.js';
 
 let traceDimensions = false;
 let traceContext = false;
-let traceOrientation= true;
+let traceOrientation= false;
 let traceOrient = false;
 
-let traceProjMatrix = true;
-let traceOffMatrix = true;
-let traceRotMatrix = true;
+let traceProjMatrix = false;
+let traceOffMatrix = false;
+let traceRotMatrix = false;
 
 
 const round = (n) => Math.round(n, 1);
@@ -320,7 +320,8 @@ export class WaveVista extends React.Component {
 		const s = this.state;
 
 		if (this.space) {
-			let sceneClassName = 'garlandScene';
+			let sceneClassName = 'rgbVaneScene';
+			// let sceneClassName = 'garlandScene';
 			let sceneName = 'mainVista';
 
 			if (traceRotMatrix)
@@ -328,11 +329,12 @@ export class WaveVista extends React.Component {
 					this.paintingNeeds.unifiedMatrix);
 			vista = <GLScene
 				space={this.space} animator={this.animator}
-				sceneClassName={'garlandScene'} sceneName={sceneName}
+				sceneName={sceneName}
 				paintingNeeds={this.paintingNeeds}
 				canvasInnerWidth={this.canvasInnerWidth}
 				canvasInnerHeight={this.canvasInnerHeight}
 				setGLRepaint={this.setMainVistaRepaint}
+				sceneClassName={sceneClassName}
 			/>;
 		}
 		else {
