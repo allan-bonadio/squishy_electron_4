@@ -3,18 +3,64 @@
 ** Copyright (C) 2026-2026 Tactile Interactive, all rights reserved
 */
 
-import abstractDrawing from './abstractDrawing.js';
-import {drawingUniform, drawingAttribute} from './drawingVariable.js';
-import cx2rygb from './cx2rygb/cx2rygb.glsl.js';
-import qeFuncs from '../engine/qeFuncs.js';
-import qeConsts from '../engine/qeConsts.js';
-import {dump4x4} from './helpers3D.js';
 import {vec4, mat4} from 'gl-matrix';
 
+import abstractDrawing from '../abstractDrawing.js';
+import abstractScene from '../abstractScene.js';
+import {drawingUniform, drawingAttribute} from '../drawingVariable.js';
+// import cx2rygb from '../cx2rygb/cx2rygb.glsl.js';
+import qeFuncs from '../../engine/qeFuncs.js';
+import qeConsts from '../../engine/qeConsts.js';
+import {dump4x4} from '../helpers3D.js';
+import eAvatar from '../../engine/eAvatar.js';
+
 //this doesn't work yet.  Not sure if I'll keep it.
+
+// diagnostic purposes; draws more per vertex
+let traceDrawPoints = false;
+let traceDrawing = false;
+let traceDrawLines = false;
+let traceGLAfterDrawing = false;
+let traceMatrix = true;
+let traceReload = false;
+
+
 /* ******************************************* vane scene */
 
+const vertexShaderSrc = `// rgbVane vertexShader
+#line 25
+precision highp float;
 
+attribute vec4 pos;
+attribute vec4 color;
+varying vec4 colorVar;
+uniform mat4 matrix;
+
+void main() {
+	gl_PointSize = 4.;
+
+	gl_Position = pos * matrix;
+	//gl_Position = vec4(pos, 0, 1);
+
+	colorVar = color;
+
+
+	// for actual testing of cx to rygb
+	//colorVar = vec4(0.4, 0.6, 0.2, 1.0);
+}
+`;
+
+const fragmentShaderSrc = `
+#line 45
+// rgbVane fragShader
+precision highp float;
+varying vec4 colorVar;
+
+void main() {
+	gl_FragColor = colorVar;
+	//gl_FragColor = vec4(colorVar);
+}
+`;
 
 class rgbVaneScene extends abstractScene {
 	// doesn't need space or inputinfo
@@ -32,22 +78,8 @@ class rgbVaneScene extends abstractScene {
 	}
 }
 
-
-export default rgbVaneScene;
-
-
-
 /* ******************************************* vane drawing */
 
-let traceDrawing = false;
-let traceReload = false;
-let traceMatrix = false;
-
-// diagnostic purposes; draws more per vertex
-let traceDrawPoints = false;
-let traceDrawLines = false;
-
-let pointSize = traceDrawPoints ? `gl_PointSize = 10.;` : '';
 
 // The Vane is like a weather vane, outdoors on a post, pointing
 // north, east etc.  This one is a pyramid peaking at 0,0,0., with
@@ -62,9 +94,9 @@ const posData = new Float32Array([
 0, 2, 0, 1,
 0, 0, 0, 1,
 0, 2, 0, 1,
-0, 0, 3, 1,
+0, 0, 1, 1,
 0, 0, 0, 1,
-0, 0, 3, 1,
+0, 0, 1, 1,
 1, 0, 0, 1,
 0, 0, 0, 1,
 ]);
@@ -89,13 +121,14 @@ export class rgbVaneDrawing extends abstractDrawing {
 	constructor(scene) {
 		super(scene, 'rgbVaneDrawing');
 
-		// each point in the wave results in two vertices, top and wave.
+		// each point in the wave results in two vertices, but it's a strip so consecutive vertices.
 		// And each of those is four single floats going to the GPU
 		this.avatar = scene.avatar;
-		this.avatar.attachViewBuffer(2, null, 4, 5, 'rgbVane drawing');
+		this.avatar.attachViewBuffer(1, null, 4, 10, 'pos');
+		this.avatar.attachViewBuffer(2, null, 4, 10, 'color');
 
-		this.vertexShaderSrc = vertexSrc;
-		this.fragmentShaderSrc = fragmentSrc;
+		this.vertexShaderSrc = vertexShaderSrc;
+		this.fragmentShaderSrc = fragmentShaderSrc;
 
 		//console.log(`attachViewBuffer on scene ${scene.sceneName}`);
 
@@ -114,29 +147,44 @@ export class rgbVaneDrawing extends abstractDrawing {
 
 		this.matrixUniform = new drawingUniform('matrix', this,
 			() => {
-				let matrix = this.scene.paintingNeeds.unifiedMatrix;
+				//let matrix = this.scene.paintingNeeds.unifiedMatrix;
+				let matrix = mat4.create();
+				// mat4.scale(matrix, matrix, [.3, .3, .3, .3, ]);
+				// mat4.rotateX(matrix, matrix, 1.0);
+				// mat4.rotateY(matrix, matrix, 2.0);
+
+				let canvas = this.gl.canvas;
+				let aspect = canvas.width / canvas.height;
+				let fovy = 1;
+				let near = 0.5, far = 100;
+				mat4.perspectiveNO(matrix, fovy, aspect, near, far);
+
+				mat4.rotateX(matrix, matrix, 1.5);
+				mat4.rotateZ(matrix, matrix, 1.5);
+
+				 if (!isFinite(matrix[0])) debugger;
 
 				if (traceMatrix) {
-					dump4x4('🌀🌀🌀 rgbVaneDrawing reloading', matrix);
+					dump4x4('🌀🌀🌀 rgbVaneDrawing reloading matrix', matrix);
 				}
 				return {value: matrix, type: 'Matrix4fv'};
 			}
 		);
 
-		this.posDataAttr = new drawingAttribute('posData', this, posData,
+		this.posAttr = new drawingAttribute('pos', this, 4,
 			() => {
 			if (traceReload) {
-				console.log(`🌀🌀🌀 rgbVaneDrawing  posDataAttr:  `,
+				console.log(`🌀🌀🌀 rgbVaneDrawing  posAttr:  `,
 					posData);
 			}
 
 			return posData;
 		});
 
-		this.colorDataAttr = new drawingAttribute('colorData', this, colorData,
+		this.colorAttr = new drawingAttribute('color', this, 4,
 			() => {
 				if (traceReload) {
-					console.log(`🌀🌀🌀 rgbVaneDrawing  colorDataAttr:  `,
+					console.log(`🌀🌀🌀 rgbVaneDrawing  colorAttr:  `,
 							colorData);
 			}
 
@@ -153,7 +201,7 @@ export class rgbVaneDrawing extends abstractDrawing {
 				+` matrix=${this.matrix}`);
 		}
 		const gl = this.gl;
-		this.gl.useProgram(this.program);
+		gl.useProgram(this.program);
 
 
 		//this.drawVariables.forEach(v => v.reloadVariable());
@@ -174,7 +222,7 @@ export class rgbVaneDrawing extends abstractDrawing {
 			gl.drawArrays(gl.POINTS, first, count);
 
 		if (traceGLAfterDrawing) {
-			this.simulateGL(0, this.nPoints,
+			this.simulateGL(
 				`🌀🌀🌀 finished drawing in rgbVaneDrawing.js; drew buf:`);
 			console.log(`🌀🌀🌀  matrixUniform=`, this.matrixUniform.reloadFunc());
 		}
@@ -182,7 +230,7 @@ export class rgbVaneDrawing extends abstractDrawing {
 
 	// simulate and calculate what WebGL would calculate, and dump that.
 	// give or take fidelity of the below.
-	simulateGL(vBuf) {
+	simulateGL() {
 		let startEnd2 = this.space.startEnd2;
 		let first = startEnd2.start2;
 		let count = startEnd2.end2 - startEnd2.start2;
@@ -219,5 +267,5 @@ export class rgbVaneDrawing extends abstractDrawing {
 	}
 }
 
-export default rgbVaneDrawing;
+export default rgbVaneScene;
 
