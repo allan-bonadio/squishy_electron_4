@@ -6,7 +6,7 @@
 // TODO: rename this GLScene => GLCanvas after the dust settles
 // or something like 'main gl canvas' or something
 
-// GLScene	wraps a canvas for display.	 Via webgl.
+// GLScene	wraps a canvas for display.  Via webgl.
 // And the Drawing and Scene machinery mgmt.  General for all gl canvases.
 
 import React, {useState, useRef, useEffect} from 'react';
@@ -38,8 +38,8 @@ function traceOnScreen(msg) {
 
 
 const propTypes = {
-   sceneClassName: PropTypes.string.isRequired,  // what to draw
-   sceneName: PropTypes.string,  // name for debugging
+   sceneClassName: PropTypes.string.isRequired,	 // what to draw
+   sceneName: PropTypes.string,	 // name for debugging
 
    // Array of eCavity(s) or other buffers to draw or any data.  passed blindly to avatar
    paintingNeeds: PropTypes.object.isRequired,
@@ -66,7 +66,7 @@ const propTypes = {
 };
 
 
-// Wraps a DOM canvas to do webgl.	All webgl rectangles should use this.
+// Wraps a DOM canvas to do webgl. All webgl rectangles should use this.
 // For each GLScene, there's one:
 // - canvas element, and one gl drawing context
 // - one Scene that encloses one or more drawings
@@ -80,7 +80,7 @@ function GLScene(props) {
 	//dblog(`starting GLScene(render), sceneName=${p.sceneName}`);
 
 	if (traceMatrix && p.paintingNeeds.unifiedMatrix)
-		dump4x4('🖼  GLScene  starts with matrix', p.paintingNeeds.unifiedMatrix);
+		dump4x4('🖼	 GLScene  starts with matrix', p.paintingNeeds.unifiedMatrix);
 
 	// we have to keep the canvas node, to get a gl context.
 	// we need it in the state, to trigger rerender, once we've got one (2nd render)
@@ -95,8 +95,8 @@ function GLScene(props) {
 	let [gl, setGl] = useState(null);
 	let [squishScene, setSquishScene] = useState(null);
 
-	// set up the squish Scene - collection of drawings to draw in one canvas.	Base classes
-	// abstractDrawing and abstractScene must do this after the ambiance and canvas exists.	 Once only.
+	// set up the squish Scene - collection of drawings to draw in one canvas. Base classes
+	// abstractDrawing and abstractScene must do this after the ambiance and canvas exists.  Once only.
 	const initSceneClass = (ambiance) => {
 		let sClass = listOfSceneClasses[p.sceneClassName];
 
@@ -114,7 +114,7 @@ function GLScene(props) {
 			dblog(`🖼 GLScene ${p.sceneName}:  done with initSceneClass`);
 	};
 
-	// repaint whole GL image.	this is repainting a canvas with GL.
+	// repaint whole GL image. this is repainting a canvas with GL.
 	// This is not 'render' as in React; react places the canvas element
 	// and this function redraws on the canvas (with gl).
 	const glRepaint =
@@ -126,12 +126,12 @@ function GLScene(props) {
 		if (! scene) {
 			if (traceTooEarly)
 				dblog(`🖼 GLScene too early for glRepaint. squishScene=`, scene);
-			return;  // too early
+			return;	 // too early
 		}
 		// if (traceViewBuffer)
 		// p.avatar.cavity.dump(`🖼 GLScene ${p.sceneName}: got the cavity right here`);
 		if (traceMatrix && paintingNeeds.unifiedMatrix)
-			dump4x4('🖼  GLScene  glRepaint gets matrix, passes to drawAllDrawings()',
+			dump4x4('🖼	 GLScene  glRepaint gets matrix, passes to drawAllDrawings()',
 			   paintingNeeds.unifiedMatrix);
 
 		// draw.  This won't set up an ∞ loop, right?
@@ -146,12 +146,6 @@ function GLScene(props) {
 	}
 	// this is how our caller might get the repaint function
 	props.setGLRepaint?.(glRepaint);
-
-//	if (canvasNode) {
-//		// each canvas node (used for gl) has its own GLScene and squish scene and glRepaint func
-//		// with its own closure and variable values.
-//		canvasNode.glRepaint = glRepaint;
-//	}
 
 	if (traceGeometry && 'mainWave' == p.sceneName) {
 		dblog(`🖼 GLScene rend '${p.sceneName}': canvas=${canvasNode?.nodeName} `
@@ -183,9 +177,9 @@ function GLScene(props) {
 
 			if (traceSetup && traceOnlyScene == p.sceneName) {
 				dblog(`🖼 GLScene ${p.sceneName}: canvas ${canvasNode?.className}, `
-				      +` gl, view&drawing installed`);
-            dblog(`🌀 context attributes we're operating under:`, gl.getContextAttributes());
-         }
+					  +` gl, view&drawing installed`);
+			dblog(`🌀 context attributes we're operating under:`, gl.getContextAttributes());
+		 }
 
 		});
 	}
@@ -194,7 +188,7 @@ function GLScene(props) {
 	// Effect.
 	// can't do much first rendering; no canvasNode cuz no canvasRef.current yet.
 	// But, in the effect after the first render, this func will get the canvas node
-	// from the ref and set everything up.	Renders: should be mostly identical,
+	// from the ref and set everything up. Renders: should be mostly identical,
 	//	 - when dimensions of the canvas change
 	//	 - every dam time you start or stop main animation cuz that flag is in the context
 	const effectRepaint = () => {
@@ -233,7 +227,7 @@ function GLScene(props) {
 
    // hey this did it although the whole dam things is squished
    if (gl) {
-      gl.viewport(0, 0, cWidth, cHeight);
+	  gl.viewport(0, 0, cWidth, cHeight);
    }
 
 	// style attribute needed to set canvas physical width/height.

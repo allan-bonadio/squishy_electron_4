@@ -54,21 +54,21 @@ function SetWaveTab(props) {
 	const minigraphWaveRef = useRef(null);
 	let minigraphWave;
 	if (minigraphWaveRef.current) {
-        minigraphWave = minigraphWaveRef.current
+		minigraphWave = minigraphWaveRef.current
 	}
 	else {
-        minigraphWave = new eCavity();
-        minigraphWave.postConstructor(props.space, 'minigraphWave', null, null);
-        minigraphWaveRef.current = minigraphWave;
+		minigraphWave = new eCavity();
+		minigraphWave.postConstructor(props.space, 'minigraphWave', null, null);
+		minigraphWaveRef.current = minigraphWave;
 	}
 
 	const paintingNeedsRef = useRef({cavity: minigraphWave, bumperWidth: 0})
 	const paintingNeeds = paintingNeedsRef.current;
 
-    // must remember our repaint func. GLScene ultimately calls setMinigraphRepaint() to hand us
-    // the special minigraph repaint function, saved in the minigraphRepaintRef
+	// must remember our repaint func. GLScene ultimately calls setMinigraphRepaint() to hand us
+	// the special minigraph repaint function, saved in the minigraphRepaintRef
 	const minigraphRepaintRef = useRef(null);
-	let minigraphRepaint = minigraphRepaintRef.current;  // early on, null
+	let minigraphRepaint = minigraphRepaintRef.current;	 // early on, null
 
 	// GLScene will call this when our repaint func is constructed
 	function setMinigraphRepaint(repaint) {
@@ -151,17 +151,17 @@ function SetWaveTab(props) {
 		/>
 
 		<TextNSlider className='pulseWidth' label='pulse width, %'
-			style={{display: needPulseWidth ? 'block' :  'none'}}
+			style={{display: needPulseWidth ? 'block' :	 'none'}}
 			value={+waveParams.pulseWidth}
 			min={sSettings.minMaxes.waveParams.pulseWidth.min}
 			max={sSettings.minMaxes.waveParams.pulseWidth.max}
 			step={.1}
 			handleChange={setPulseWidth}
-			title="how fat your  wave packet should be, percent of whole cavity length"
+			title="how fat your	 wave packet should be, percent of whole cavity length"
 		/>
 
 		<TextNSlider className='offset' label='offset, %'
-			style={{display: needOffset ? 'block' :  'none'}}
+			style={{display: needOffset ? 'block' :	 'none'}}
 			value={+waveParams.pulseCenter}
 			min={sSettings.minMaxes.waveParams.pulseCenter.min}
 			max={sSettings.minMaxes.waveParams.pulseCenter.max}
@@ -192,19 +192,19 @@ function SetWaveTab(props) {
 
 		<label title='two identical waves traveling in opposite directions, superimposed'>
 			standing
-			<input type='radio'  checked={'standing' == breed} name='standing'
+			<input type='radio'	 checked={'standing' == breed} name='standing'
 				onChange={ev => setBreed('standing')} />
 		</label>
 
 		<label title='a typical wave packet'>
 			gauss pulse
-			<input type='radio'  checked={'gaussian' == breed} name='gaussian'
+			<input type='radio'	 checked={'gaussian' == breed} name='gaussian'
 				onChange={ev => setBreed('gaussian')} />
 		</label>
 
-		{/* sorry don't have time to fix this now     <label>
+		{/* sorry don't have time to fix this now	  <label>
 			chord pulse
-			<input type='radio'  checked={'chord' == breed}
+			<input type='radio'	 checked={'chord' == breed}
 				onChange={ev => setBreed('chord')} />
 		</label>*/}
 	</div>;

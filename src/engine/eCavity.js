@@ -46,7 +46,7 @@ function dumpRow(ix, re, im, prev, isBorder) {
 
 /* ******************************************************* eCavity */
 
-// this is just a 1D wave.  Used typically for internal calculations with complex
+// this is just a 1D wave. Used typically for internal calculations with complex
 // numbers.  Or use eFlick.
 class eCavity extends eObject {
 	constructor() {
@@ -55,10 +55,10 @@ class eCavity extends eObject {
 
 	// useThis32F is one of these:
 	// • a Float64Array[2*nPoints], with pairs being the real and im parts of psi.
-	//       From C++ so bytes are in the emscripten heap
-	// 		 (I bet you could pass it a JS array and some stuff would work)
+	//   From C++ so bytes are in the emscripten heap
+	//   (I bet you could pass it a JS array and some stuff would work)
 	// • Or absent/null, in which case it's dynamially allocated to 2*space.nPoints size
-	//        (JS only)
+	//    (JS only)
 	// pointer should be pointer to qCavity in C++, otherwise leave it falsy.
 	// If you use pointer, leave the useThis32F null; it's ignored
 	// label is optional and only JS side
@@ -70,7 +70,7 @@ class eCavity extends eObject {
 			throw new Error("new eCavity: space is not an eSpace")
 
 		if (pointer) {
-			//this._pointer_ = pointer;  // a qCavity
+			//this._pointer_ = pointer;	 // a qCavity
 			//?? waveArg = this._wave;
 		}
 		else {
@@ -79,7 +79,6 @@ class eCavity extends eObject {
 			pointer = qeFuncs.cavity_create(space._pointer_, null);
 		}
 		this.setPointer(pointer);
-//		prepForDirectAccessors(this, this._pointer_);
 		this.label = label;
 
 		// now for the buffer
@@ -92,7 +91,7 @@ class eCavity extends eObject {
 			// _wave must be a pointer to the existing qCavity's buffer
 			if (this._wave < 256) {
 				console.error(`this._wave pointer seems to be too low, probably null: `
-                    +` ${this._wave}, (but ok if just generating directAccessors)`);
+					+` ${this._wave}, (but ok if just generating directAccessors)`);
 				let temp_wave = qeFuncs.buffer_allocateWave(this.space.nPoints * 2);
 				this.wave = new Float64Array(Module.HEAPF64.buffer, temp_wave,
 						2 * this.space.nPoints );
@@ -127,7 +126,7 @@ class eCavity extends eObject {
 		}
 	}
 
-	// delete, except 'delete' is a reserved word.  Turn everything off.
+	// delete, except 'delete' is a reserved word. Turn everything off.
 	// null out all other JS objects and buffers it points to, so ref counting
 	// can recycle it all
 	liquidate() {
@@ -135,8 +134,8 @@ class eCavity extends eObject {
 		this.space = this.wave = null;
 	}
 
-	/* *******************************************    👽   👽    direct access */
-	// compare with eFlick, which should be a subclass, right?  Well,
+	/* *******************************************	  👽   👽	 direct access */
+	// compare with eFlick, which should be a subclass, right?	Well,
 	// the offsets are different.  Sometimes.  No idea why; but I do
 	// the directAccessors separately. grr.
 
@@ -147,14 +146,14 @@ class eCavity extends eObject {
 	get end() { return this._ints_[6]; }
 	get continuum() { return this._ints_[7]; }
 
-	/* ****************************    👽   👽    end of direct accessors */
+	/* ****************************	   👽	👽	  end of direct accessors */
 
 	/* ******************************************** dumping */
 
 	// dump any wave buffer according to that space.
 	// RETURNS A STRING of the wave.
 	dumpThat(wave) {
-		if (this.nPoints <= 0) throw Error("🚀  eSpace::dumpThat	() with zero points");
+		if (this.nPoints <= 0) throw Error("🚀	eSpace::dumpThat	() with zero points");
 
 		const {start2, end2, continuum} = this.space.startEnd2;
 		let ix2 = 0;
@@ -188,7 +187,7 @@ class eCavity extends eObject {
 
 	/* ******************************************* calculatons */
 
-	// calculate ⟨𝜓 | 𝜓⟩  'inner product'.
+	// calculate ⟨𝜓 | 𝜓⟩	'inner product'.
 	// See also C++ function of same name, that one's official.
 	// is this calculating right?  I don't think so.
 	innerProduct() {
@@ -237,12 +236,12 @@ class eCavity extends eObject {
 
 		case qeConsts.contWELL:
 			// the points on the end are ∞ voltage, but the arithmetic goes bonkers
-			// if I actually set the voltage to ∞.  Remember complex values 2 doubles
+			// if I actually set the voltage to ∞. Remember complex values 2 doubles
 			w[0] = w[1] = w[end2] = w[end2+1] = 0;
 			break;
 
 		case qeConsts.contENDLESS:
-			// the points on the end get set to the opposite side.  Remember this is for complex, 2x floats
+			// the points on the end get set to the opposite side. Remember this is for complex, 2x floats
 			w[0] = w[end2-2];
 			w[1]  = w[end2-1];
 			w[end2] = w[2];
@@ -251,7 +250,7 @@ class eCavity extends eObject {
 
 		default:
 			debugger;
-			throw new Error(`🚀  bad continuum '${continuum}' in `
+			throw new Error(`🚀	 bad continuum '${continuum}' in `
 				+` eSpace.fixThoseBoundaries()`);
 		}
 	}

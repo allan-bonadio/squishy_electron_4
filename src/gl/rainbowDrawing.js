@@ -17,7 +17,7 @@ let traceRainbowDrawing = false;
 
 /* ********************************** shaders */
 
-//  ${cx2rygb}
+//	${cx2rygb}
 const vertexShaderSrc = `${cx2rygb}
 #line 23
 precision highp float;
@@ -86,7 +86,7 @@ export class rainbowDrawing extends abstractDrawing {
 		});
 
 		// this.colAttr = new drawingAttribute('col', this, 3, () => {
-		// 	return col;
+		//	return col;
 		// });
 
 		this.waveAttr = new drawingAttribute('wave', this, 2, () => {
@@ -95,7 +95,7 @@ export class rainbowDrawing extends abstractDrawing {
 	}
 
 
-	// load up the avatar with numbers.  We generate bare coords ±1
+	// load up the avatar with numbers.	 We generate bare coords ±1
 	loader(avatar) {
 		const pos = avatar.getViewBuffer(0);
 		//const col = avatar.getViewBuffer(1);
@@ -122,8 +122,8 @@ export class rainbowDrawing extends abstractDrawing {
 			let si0 = Math.sin(angle);
 			let co0 = Math.cos(angle);
 			// console.log(`seg: ${s}  angle: ${angle.toFixed(4)} `
-			// 	+` degrees: ${(angle * 180 / 3.1415926535898).toFixed(4)} `
-			// 	+` sine ${si0.toFixed(4)}   cosine ${co0.toFixed(4)}`);
+			//	+` degrees: ${(angle * 180 / 3.1415926535898).toFixed(4)} `
+			//	+` sine ${si0.toFixed(4)}	cosine ${co0.toFixed(4)}`);
 
 			pos[p + 0] = RADIUS * co0 + originX;
 			pos[p + 1] = RADIUS * si0 + originY;
@@ -148,7 +148,7 @@ export class rainbowDrawing extends abstractDrawing {
 
 		if (traceRainbowDrawing) {
 			console.log(`🌈 🌈 rainbowDrawing  ${this.avatarLabel}: `
-				+` width=${width}, height=${height}  drawing ${nVERTS} points`);
+				+` width=${width}, height=${height}	 drawing ${nVERTS} points`);
 		}
 		const gl = this.gl;
 		this.gl.useProgram(this.program);
@@ -156,11 +156,11 @@ export class rainbowDrawing extends abstractDrawing {
 		//this.drawVariables.forEach(v => v.reloadVariable());
 		//this.theAttribute?.reloadVariable();
 
-        //this.posAttr.reloadVariable();
-        //this.waveAttr.reloadVariable();
+		//this.posAttr.reloadVariable();
+		//this.waveAttr.reloadVariable();
 
 		// this.colAttr = new drawingAttribute('col', this, 3, () => {
-		// 	return col;
+		//	return col;
 		// });
 		//this.drawVariables.forEach(v => v.reloadVariable());
 
@@ -169,8 +169,8 @@ export class rainbowDrawing extends abstractDrawing {
 		//gl.drawArrays(gl.TRIANGLE_STRIP, 0, nVERTS);
 		gl.drawArrays(gl.TRIANGLE_FAN, 0, nVERTS);
 		// console.log(`just drewArays-rainbow on avatar ptr=${this.avatar._pointer_} `
-		// 	+` this.avatar.label=${this.avatar.label}, buffer label= `
-		// 	+` ${this.avatar.bufferNames[0]}`);
+		//	+` this.avatar.label=${this.avatar.label}, buffer label= `
+		//	+` ${this.avatar.bufferNames[0]}`);
 
 		if (traceDrawLines) {
 			gl.lineWidth(1);  // it's the only option anyway

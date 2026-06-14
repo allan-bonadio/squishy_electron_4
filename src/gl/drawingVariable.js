@@ -78,7 +78,7 @@ export class drawingUniform extends drawingVariable {
 				+` in ${this.drawing.program.$qLabel}`);
 		if (traceUniforms) {
 			dblog(`🍯 created drawingUniform '${varName}'  in `
-		                +` ${this.drawing.program.$qLabel}`);
+						+` ${this.drawing.program.$qLabel}`);
 		}
 
 		this.reloadVariable();
@@ -96,7 +96,7 @@ export class drawingUniform extends drawingVariable {
 		// https://developer.mozilla.org - WebGLRenderingContext
 		const {value, type} =  this.reloadFunc();
 		if (traceUniforms)
-			dblog(`   ...with value=${value} type ${type}`);
+			dblog(`	  ...with value=${value} type ${type}`);
 
 		// you can't pass null or undefined to webgl, but remember this
 		this.value = value;
@@ -132,7 +132,7 @@ export class drawingUniform extends drawingVariable {
 
 		if (traceUniforms) {
 			dblog(`🍯 drawingUniform reloaded U variable '${this.varName}' in `);
-			dblog(`            ${this.drawing.avatarLabel} uniform gl.${method}`, args);
+			dblog(`			   ${this.drawing.avatarLabel} uniform gl.${method}`, args);
 		}
 	}
 }
@@ -144,9 +144,9 @@ export class drawingUniform extends drawingVariable {
 // coordinates and color for that point
 
 // create this as many times as you have buffers as input to vec shader
-// always float32.  reloadFunc() must return a Float32TypedArray with a non-array property
+// always float32. reloadFunc() must return a Float32TypedArray with a non-array property
 // 'nTuples' that gives the number of rows or vertices used, each tupleWidth number of floats
-// eg for x & y, tupleWidth=2.  sequence of several tuples gets draw, however.
+// eg for x & y, tupleWidth=2. sequence of several tuples gets draw, however.
 export class drawingAttribute extends drawingVariable {
 	constructor(varName, drawing, tupleWidth, reloadFunc = () => {}) {
 		super(varName, drawing, reloadFunc);
@@ -169,7 +169,7 @@ export class drawingAttribute extends drawingVariable {
 		// create gl GPU buffer
 		this.glBuffer = gl.createBuffer();
 
-		// various ways to label it; each works with a difft debugging system.  some obsolete. 😟
+		// various ways to label it; each works with a difft debugging system. some obsolete. 😟
 		let label = `${drawing.avatarLabel}-${drawing.drawingName}-${varName}-glbuf`;
 		this.tagObject(this.glBuffer, label);
 		this.glBuffer.$qLabel = label;
@@ -189,7 +189,7 @@ export class drawingAttribute extends drawingVariable {
 
 		// get the latest from the real world.
 		// WebGL2Fundamentals said we don't have to do this if it's the same buffer (w/diff values) every time.
-		// if I understood them correctly.  afraid to try... or maybe misunderstood...
+		// if I understood them correctly. afraid to try... or maybe misunderstood...
 		let floatArray = this.floatArray = this.reloadFunc();
 		if (!floatArray) {
 			throw `reloadFunc() returned null on var=${varName} scene=${this.drawing.drawingName}`;
@@ -198,12 +198,12 @@ export class drawingAttribute extends drawingVariable {
 		// ticDrawing can have zero tics when first created
 		//if (!this.nTuples) throw `false nTuples ${this.nTuples} in ${this.varName} in ${this.sceneName}`;
 
-		// connect  ARRAY_BUFFER to glBuffer.
+		// connect	ARRAY_BUFFER to glBuffer.
 		gl.bindBuffer(gl.ARRAY_BUFFER, this.glBuffer);
 		gl.enableVertexAttribArray(this.attrLocation);
 
 		gl.vertexAttribPointer(this.attrLocation, this.tupleWidth, gl.FLOAT,
-				false, this.tupleWidth * 4, 0);  // normalize, stride, offset
+				false, this.tupleWidth * 4, 0);	 // normalize, stride, offset
 		if (traceGLCalls)
 			dblog(`🍯  drawingAttribute '${this.varName}' connected to its `
 				+` glBuffer to tupleWidth=${this.tupleWidth}`);
@@ -216,7 +216,7 @@ export class drawingAttribute extends drawingVariable {
 
 		if (traceAttributesFull) {
 			for (let t = 0; t < this.nTuples; t++) {
-				let line = `[${String(t).padStart(4)}]  `;
+				let line = `[${String(t).padStart(4)}]	`;
 				for (let f = 0; f < this.tupleWidth; f++)
 					line += `  ${this.floatArray[t * this.tupleWidth + f].toFixed(6)}`;
 				dblog(line);

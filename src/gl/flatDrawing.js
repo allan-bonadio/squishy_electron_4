@@ -26,8 +26,8 @@ let displayWrapEdges = false;  // soon to be a pref
 
 /*
 ** data format of attributes:  four column table of floats
-** 𝜓.re  𝜓.im   (unused)   serial.
-** uses gl_VertexID   NO! that's opengl 2 only
+** 𝜓.re  𝜓.im	  (unused)	 serial.
+** uses gl_VertexID	  NO! that's opengl 2 only
 ** to figure out whether the y should be re^2+im^2 or zero
 */
 
@@ -50,7 +50,7 @@ void main() {
 		y = (row.x * row.x + row.y * row.y) / maxHeight;
 	}
 	else {
-		y = 0.;  // top of the screen
+		y = 0.;	 // top of the screen
 	}
 	y = 1. - 2. * y;
 
@@ -60,7 +60,7 @@ void main() {
 
 	gl_Position = vec4(x, y, 0., 1.);
 
-	//  for the color, convert the complex values via this algorithm
+	//	for the color, convert the complex values via this algorithm
 	//vColor.rgb = cx2rygb(row.xy);
 	//vColor.rgb = cx2rygb(vec2(row.x, row.y));
 	//vColor.a = 1.;
@@ -70,7 +70,7 @@ void main() {
 	if (!odd)
 		vColor = vec4(vColor.r/2., vColor.g/2., vColor.b/2., vColor.a);
 
-	// dot size, in pixels not clip units.  actually a fuzzy square.
+	// dot size, in pixels not clip units. actually a fuzzy square.
 	gl_PointSize = 10.;
 }
 `;
@@ -110,11 +110,11 @@ export class flatDrawing extends abstractDrawing {
 
 		this.maxHeightUniform = new drawingUniform('maxHeight', this,
 			() => {
-				// fresh out of the loader, maxHeight wobbles up and down.  Smooth it.
+				// fresh out of the loader, maxHeight wobbles up and down. Smooth it.
 				if (!this.maxHeight)  // ??
 					this.maxHeight = this.avatar.double0;
 				else {
-					// relax changes.  how  quickly?
+					// relax changes.  how	quickly?
 					this.maxHeight = this.avatar.double0;
 					//this.maxHeight = (this.maxHeight * 3 + this.avatar.double0) / 4;
 				}
@@ -128,12 +128,12 @@ export class flatDrawing extends abstractDrawing {
 		);
 
 
-		// WELL continuum:  potential at the ends of the well are infinite; so
+		// WELL continuum:	potential at the ends of the well are infinite; so
 		// psi on the border points is zero. These are the boundary datapoints,
 		// so for N=8, 10 edges between 9 bars, 7 between and 2 on ends.
 
 		// for ENDLESS, we wrap around one bar, so if N=8, there's two border bar at 0 and 8.
-		// there's 7 bars between.  9 bars total, 10 edges, matching the 10 = nPoints
+		// there's 7 bars between. 9 bars total, 10 edges, matching the 10 = nPoints
 		// So, the same for WELL and ENDLESS
 
 		let {barWidth, start, end} = this.space.drawingDescription;
@@ -145,17 +145,17 @@ export class flatDrawing extends abstractDrawing {
 		);
 		if (traceFlatDrawing) console.log(`♭♭♭ barWidth frac of 1= ${barWidth}`);
 
-		this.vertexCount = nPoints * 2;  // nPoints * vertsPerBar
+		this.vertexCount = nPoints * 2;	 // nPoints * vertsPerBar
 		this.rowFloats = 4;
 		new drawingAttribute('row', this, this.rowFloats,
-		    () => {
+			() => {
 			//debugger;
 			qeFuncs.avatar_avFlatLoader(this.avatar._pointer_, this.scene.flatAvatarID,
 					this.scene.paintingNeeds.cavity._pointer_, nPoints);
 
 			if (traceReloadRow) {
 				console.log(`♭♭♭ flatDrawing  ${this.avatarLabel}: at row getViewBuffer() `
-					+` loading to ${this.avatar.label}   this.vertexCount=${this.vertexCount} `
+					+` loading to ${this.avatar.label}	 this.vertexCount=${this.vertexCount} `
 					+` total floats=${this.vertexCount * this.rowFloats}  double0=this.avatar.double0`);
 			}
 
@@ -167,7 +167,7 @@ export class flatDrawing extends abstractDrawing {
 	draw(width, height) {
 		if (traceFlatDrawing) {
 			console.log(`♭♭♭ flat Drawing  ${this.avatarLabel}: `
-				+` width=${width}, height=${height}  drawing ${this.vertexCount/2} points `
+				+` width=${width}, height=${height}	 drawing ${this.vertexCount/2} points `
 				+` maxHeight=${this.maxHeight}`);
 		}
 		const gl = this.gl;
@@ -177,9 +177,9 @@ export class flatDrawing extends abstractDrawing {
 		// let bw = this.scene.paintingNeeds.bumperWidth;
 		// //gl.viewport(bw, 0, width - 2 * bw, height);
 		// if (traceViewport) {
-		// 	console.log(`♭♭♭ flatDrawing set viewport on avatar=${this.avatarLabel}: `
-		// 		+` width-2bw=${width - 2 * bw}, height=${height}  `
-		// 		+` drawing ${this.vertexCount/2} points`);
+		//	console.log(`♭♭♭ flatDrawing set viewport on avatar=${this.avatarLabel}: `
+		//  +` width-2bw=${width - 2 * bw}, height=${height}  `
+		//  +` drawing ${this.vertexCount/2} points`);
 		// }
 
 		// done in abstractScene.drawAllDrawings
