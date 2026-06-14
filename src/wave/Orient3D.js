@@ -7,6 +7,7 @@ import React, {useState, useReducer} from 'react';
 import PropTypes from 'prop-types';
 
 import {getASetting, storeASetting, getAGroup} from '../utils/storeSettings.js';
+import sSettings from '../utils/sSettings.js';
 
 let traceOrient = false;
 
@@ -17,7 +18,7 @@ const propTypes = {
    //setOrient: PropTypes.func.isRequired,
 
    // in/out.  Pass it in with, whatever, but must have all these
-   // fields (not just the ones in propTypes.shape())
+   // fields (not just the ones listed here)
    orient: PropTypes.shape({
    	xAng: PropTypes.number.isRequired,
    	yPos: PropTypes.number.isRequired,
@@ -25,24 +26,9 @@ const propTypes = {
    	// plus others i'm too lazy to do
    }),
 
-   // rotation around xyz axes - separate them so any change renders
-	// orientXAng: PropTypes.number.isRequired,
-	// orientYAng: PropTypes.number.isRequired,
-	// orientZAng: PropTypes.number.isRequired,
-	//
-	// orientXPos: PropTypes.number.isRequired,
-	// orientYPos: PropTypes.number.isRequired,
-	// orientZPos: PropTypes.number.isRequired,
-	//
-	// orientHFOView: PropTypes.number.isRequired,
-	// orientFudge: PropTypes.number.isRequired,
-
-	// makeRotMatrix: PropTypes.func.isRequired,
-	// mainVistaRepaint: PropTypes.func.isRequired,
    setAngSetting: PropTypes.func.isRequired,
    setOneSetting: PropTypes.func.isRequired,
    setOrientAll: PropTypes.func.isRequired,
-   //buildNRepaint: PropTypes.func.isRequired,
 }
 
 function Orient3D(props) {
@@ -74,7 +60,7 @@ function Orient3D(props) {
 
 	// xAng yAng zAng — rotate around just 1 axis as given by this event from this slider
 	// xPos yPos zPos — adjust offset object is from origin.
-	// hfoView — horiz field of view.	Default should be 45°?
+	// hfoView — horiz field of view. Default should be 45°?
 	// fudge = greggman's fudgeFactor
 	// function setOneSetting(which, value) {
 	// 	props.setOrient(which, value);  // set in WaveVista and settings
@@ -116,56 +102,61 @@ function Orient3D(props) {
 	if (traceOrient)
 		dblog(`Orient3D render orient=`, p.orient);
 
+    // all the mins and maxes are the store mins and maxes
+	const omm = sSettings.minMaxes.orientSettings;
+	//let maxi = sSettings.minMaxes.lapSettings.dtFactor.max;
+
+
 	return <div className='Orient3D' >
 
 		<div>
 			<label>xAng {xAng}°
 				<input type='range' className='xAng' value={xAng}
-					min={-360} max={360} step={1} onChange={handleAngSetting} />
+					min={omm.xAng.min} max={omm.xAng.max} step={1} onChange={handleAngSetting} />
 			</label>
 		</div>
 		<div>
 			<label>yAng {yAng}°
 				<input type='range' className='yAng' value={yAng}
-					min={-360} max={360} step={1} onChange={handleAngSetting} />
+					min={omm.yAng.min} max={omm.yAng.max} step={1} onChange={handleAngSetting} />
 			</label>
 		</div>
 		<div>
 			<label>zAng {zAng}°
 				<input type='range' className='zAng' value={zAng}
-					min={-360} max={360} step={1} onChange={handleAngSetting} />
+					min={omm.zAng.min} max={omm.zAng.max} step={1} onChange={handleAngSetting} />
 			</label>
 		</div>
 
 		<div>
 			<label>xPos {xPos} c
 				<input type='range' className='xPos' value={xPos}
-					min={-100} max={100} step={1} onChange={handleOneSetting} />
+					min={omm.xPos.min} max={omm.xPos.max} step={1} onChange={handleOneSetting} />
 			</label>
 		</div>
 		<div>
 			<label>yPos {yPos} c
 				<input type='range' className='yPos' value={yPos}
-					min={-100} max={100} step={1} onChange={handleOneSetting} />
+					min={omm.yPos.min} max={omm.yPos.max} step={1} onChange={handleOneSetting} />
 			</label>
 		</div>
 		<div>
 			<label>zPos {zPos} c
 				<input type='range' className='zPos' value={zPos}
-					min={-300} max={1} step={1} onChange={handleOneSetting} />
+					min={omm.zPos.min} max={omm.zPos.max} step={1} onChange={handleOneSetting} />
 			</label>
 		</div>
 
 		<div>
 			<label>fov {hfoView}°
 				<input type='range' className='hfoView' value={hfoView}
-					min={1} max={120} step={1} onChange={handleOneSetting} />
+					min={omm.hfoView.min} max={omm.hfoView.max} step={1} onChange={handleOneSetting} />
 			</label>
 		</div>
 		<div>
 			<label>fudge {fudge}
 				<input type='range' className='fudge' value={fudge}
-					min={0} max={2} step={.1} onChange={handleOneSetting} />
+					min={omm.fudge.min} max={omm.fudge.max} step={.1} onChange={handleOneSetting} />
 			</label>
 		</div>
 

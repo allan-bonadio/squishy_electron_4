@@ -14,7 +14,7 @@ import sSettings from './sSettings.js';
 // so I fell back to some lame functions.
 // TURNS OUT, all those fuckups were because there were circular import dependencies.
 // So, something gets loaded before something else, which ends up undefined!
-// Move functions into different files, or rearrange them, to fix.  Should work then.
+// Move functions into different files, or rearrange them, to fix. Should work then.
 // Actually, make all the data structures into its own file that doesn't import anything.
 
 // Reconstruction: to support both methods, must have code for both.
@@ -26,7 +26,7 @@ import sSettings from './sSettings.js';
 // criterion: validator, see constructor
 //	 The criterion are fixed and more broad than some other parts of the code,
 //	 eg if 1/N is one of the limits, some other part of the code will enforce that, not here.
-//		um... except for lowPassFilter
+//  um... except for lowPassFilter
 // The general interaction between component states and sSettings is this:
 // component states are initially set from sSettings.
 // When changed, both the state and sSettings, and sending
@@ -123,7 +123,7 @@ function makeParam(groupName, varName, defaultValue, criterion) {
 //let value = savedGroup[varName];
 //if (value === undefined || !criterionFunction(value)) {
 //	savedGroup[varName] = value = defaultValue;
-//	localStorage.setItem(groupName,  JSON.stringify(savedGroup));
+//	localStorage.setItem(groupName,	 JSON.stringify(savedGroup));
 //}
 //else {
 //	value = savedGroup[varName];
@@ -148,27 +148,6 @@ function makeParam(groupName, varName, defaultValue, criterion) {
 		Object.assign(vari, {...criterionFunction})
 	}
 
-
-
-	// now for the shit that doesn't work
-//	Object.defineProperty(group, varName, {
-//		get: function() {
-//			return value
-//		},
-//
-//		set: function(newVal) {
-//			if (newVal === undefined || ! criterionFunction(newVal))
-//				value = defaultValue;
-//			else
-//				value = newVal;
-//
-//			saveGroup(group);
-//		},
-//
-//		configurable: true,
-//		//configurable: false,
-//		enumerable: true,
-//	});
 }
 
 /* **************************************************** Params & Settings */
@@ -184,7 +163,7 @@ export function createStoreSettings() {
 
 	/* ************************************ spaceParams */
 
-	// see also resolution dialog to change these.  Never changes after page loaded.
+	// see also resolution dialog to change these. Never changes after page loaded.
 	makeParam('spaceParams', 'N', 64,  N => isPowerOf2(N) );
 	makeParam('spaceParams', 'continuum', qeConsts.contENDLESS,
 		[qeConsts.contDISCRETE, qeConsts.contWELL, qeConsts.contENDLESS]);
@@ -196,7 +175,7 @@ export function createStoreSettings() {
 	// the immediate values of the sliders and controls. So 'Set Wave' button
 	// actually sets the wave, but meanwhile the setting sliders need to be
 	// remembered; this does it.  Voltage and space too; not active until user
-	// does something. This also defines slider mins and maxes!  One source of
+	// does something. This also defines slider mins and maxes!	 One source of
 	// truth.
 
 	makeParam('waveParams', 'waveBreed', 'gaussian', ['circular', 'standing', 'gaussian', 'chord']);
@@ -205,7 +184,7 @@ export function createStoreSettings() {
 	makeParam('waveParams', 'pulseCenter', 20, {min: 0, max: 100});
 
 	/* ************************************ voltage */
-	// the voltage controls   volts ≈ canyonScale * x ** canyonPower sortof
+	// the voltage controls	  volts ≈ canyonScale * x ** canyonPower sortof
 	// where x is centered at voltageCenter% across
 	// again, params are stored until the user does something to fulfill it like clicking on Set Wave
 	makeParam('voltageParams', 'voltageBreed', 'flat', ['flat', 'slot', 'block', 'canyon']);
@@ -227,13 +206,13 @@ export function createStoreSettings() {
 	makeParam('voltageSettings', 'bottomVolts', -EFFECTIVE_VOLTS, extremes);
 	makeParam('voltageSettings', 'heightVolts', 2 * EFFECTIVE_VOLTS,
 		{min: EFFECTIVE_VOLTS * .001, max: EFFECTIVE_VOLTS * 1000});
-	//makeParam('voltageSettings', 'minBottom', -.5, extremes);  // soon to be deprecated
+	//makeParam('voltageSettings', 'minBottom', -.5, extremes);	 // soon to be deprecated
 	// always = min + 2 * heightVolts makeParam('voltageSettings', 'maxBottom', 16, {min: -256, max: 256});
 
 	/* ************************************ lapSettings */
 
 	// set in integration tab
-	makeParam('lapSettings', 'shouldBeIntegrating', false,  [false, true]);
+	makeParam('lapSettings', 'shouldBeIntegrating', false,	[false, true]);
 	//makeParam('lapSettings', 'chosenFP', 50, {min: 16, max: 60_001});
 	makeParam('lapSettings', 'dtFactor', 1, {min: 1e-6, max: 100, });
 	//makeParam('lapSettings', 'stepsPerLap', 10, {min: 2, max: 50});
@@ -244,16 +223,17 @@ export function createStoreSettings() {
 	/* ************************************ orient for 3D */
 
 	// set in Orient3D or PivotOverlay
-	makeParam('orientSettings', 'xAng', 90,  {min: -45, max: +180});
-	makeParam('orientSettings', 'yAng', 0,  {min: -180, max: +180});
-	makeParam('orientSettings', 'zAng', 90,  {min: -0, max: +180});
+	makeParam('orientSettings', 'xAng', 0,	{min: -180, max: +180});
+	makeParam('orientSettings', 'yAng', 0,	{min: -180, max: +180});
+	makeParam('orientSettings', 'zAng', 0,	{min: -180, max: +180});
 
-	makeParam('orientSettings', 'xPos', 0,  {min: -100, max: +100});
-	makeParam('orientSettings', 'yPos', 0,  {min: -100, max: +100});
-	makeParam('orientSettings', 'zPos', -10,  {min: -20, max: +1});
+	makeParam('orientSettings', 'xPos', 0,	{min: -20, max: +20});
+	makeParam('orientSettings', 'yPos', 0,	{min: -20, max: +20});
+	makeParam('orientSettings', 'zPos', -10,  {min: -20, max: +20});
 
-	makeParam('orientSettings', 'hfoView', 45,  {min: 1, max: +179});
-	makeParam('orientSettings', 'fudge', 1,  {min: 0, max: +2});
+	// get rid of these?  TODO
+	makeParam('orientSettings', 'hfoView', 45,	{min: 1, max: +179});
+	makeParam('orientSettings', 'fudge', 1,	 {min: 0, max: +2});
 
 
 	/* ************************************miscSettings */
@@ -266,7 +246,7 @@ export function createStoreSettings() {
 	makeParam('miscSettings', 'vistaHeight', 402, {min: 50, max: 1e4});
 
 	makeParam('miscSettings', 'show2D', true,  [false, true]);
-	makeParam('miscSettings', 'show3D', false,  [false, true]);
+	makeParam('miscSettings', 'show3D', false,	[false, true]);
 }
 
 window.dumpSettings = () => {
@@ -299,7 +279,7 @@ export function getAGroup(groupName) {
 	let group = {...sSettings.defaults[groupName], ...gr};
 
 	// if some old vars are left over from a previous version, remove them
-	const asg = sSettings.verifiers[groupName];  // true only for vars that are supported
+	const asg = sSettings.verifiers[groupName];	 // true only for vars that are supported
 	let varName;
 	for (varName in group) {
 		if (!asg[varName])
@@ -324,7 +304,7 @@ export function storeAGroup(groupName, newGroup) {
 		else
 			toSet[varName] = newGroup[varName];
 	}
-	localStorage.setItem(groupName,  JSON.stringify(toSet));
+	localStorage.setItem(groupName,	 JSON.stringify(toSet));
 	return toSet;
 }
 
