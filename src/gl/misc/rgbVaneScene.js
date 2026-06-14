@@ -23,6 +23,7 @@ let traceDrawLines = false;
 let traceGLAfterDrawing = false;
 let traceMatrix = true;
 let traceReload = false;
+let traceRotMatrix = false;
 
 
 /* ******************************************* vane scene */
@@ -91,9 +92,9 @@ class rgbVaneScene extends abstractScene {
 const posData = new Float32Array([
 0, 0, 0, 1,
 1, 0, 0, 1,
-0, 2, 0, 1,
+0, 1, 0, 1,
 0, 0, 0, 1,
-0, 2, 0, 1,
+0, 1, 0, 1,
 0, 0, 1, 1,
 0, 0, 0, 1,
 0, 0, 1, 1,
@@ -147,20 +148,7 @@ export class rgbVaneDrawing extends abstractDrawing {
 
 		this.matrixUniform = new drawingUniform('matrix', this,
 			() => {
-				//let matrix = this.scene.paintingNeeds.unifiedMatrix;
-				let matrix = mat4.create();
-				// mat4.scale(matrix, matrix, [.3, .3, .3, .3, ]);
-				// mat4.rotateX(matrix, matrix, 1.0);
-				// mat4.rotateY(matrix, matrix, 2.0);
-
-				let canvas = this.gl.canvas;
-				let aspect = canvas.width / canvas.height;
-				let fovy = 1;
-				let near = 0.5, far = 100;
-				mat4.perspectiveNO(matrix, fovy, aspect, near, far);
-
-				mat4.rotateX(matrix, matrix, 1.5);
-				mat4.rotateZ(matrix, matrix, 1.5);
+			let matrix = this.scene.paintingNeeds.unifiedMatrix;
 
 				 if (!isFinite(matrix[0])) debugger;
 
