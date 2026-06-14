@@ -81,7 +81,7 @@ class sAnimator {
 	// Measure how long it takes to paint; update integration statistics.
 	drawLatestLap() {
 		//if (traceStats) console.log(`🎥 time since last tic: ${performance.now()
-		//		- this.inteTimes.startIntegrationTime}ms`);
+		//  - this.inteTimes.startIntegrationTime}ms`);
 		let startDrawTime = performance.now();
 		this.inteTimes.frameDrawPeriod = startDrawTime - this.inteTimes.prevDrawTime;
 		this.inteTimes.prevDrawTime = startDrawTime;

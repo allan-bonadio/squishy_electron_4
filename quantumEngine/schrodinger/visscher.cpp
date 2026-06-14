@@ -54,7 +54,7 @@ where H is hamiltonian, typically ( potential + ∂²/∂x² )
 this is our second derivative wrt ix:
 	qCxd2 = wave[ix-1] + wave[ix+1] - wave[ix] * 2;
 
-ix is the integer index into each length dimension.	The actual distance is dx * ix; determined by
+ix is the integer index into each length dimension. The actual distance is dx * ix; determined by
 the length (supplied by user) and N, for each dimension of the space.
 
 // The following uses nanometers, picoseconds, etc as described in definitionOfUnits.md
@@ -103,7 +103,7 @@ void qGrinder::pointReal(qCx *newW, qCx *oldW, qCx *hamiltW, double volts, doubl
 		usedIx, d2𝜓i, hamiltW[-1].im, hamiltW[+1].im, hamiltW->im, d2Coeff);
 	}
 	if (traceVoltage && within(ix) && ((infrequent++ & 1023) == 0)) {
-//		speedyLog("hiay\n");
+//  speedyLog("hiay\n");
 		speedyLog("	🧶 voltage[%d] V=%12.3lf\n", usedIx, volts);
 	}
 

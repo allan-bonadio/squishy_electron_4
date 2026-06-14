@@ -187,9 +187,9 @@ void qFlick::dumpLatest(const char *titleIn, bool withExtras) {
 //void qFlick::dumpAllWaves(const char *title) {
 //	printf("==== FlickAll | %s\n", title);
 //	for (int i = 0; i < nWaves; i++) {
-//		//printf("wave %d -- ", i);
-//		//dumpThatWave(waves[i], true);
-//		//printf("      inner products: %lf\n", );
+//  //printf("wave %d -- ", i);
+//  //dumpThatWave(waves[i], true);
+//  //printf("      inner products: %lf\n", );
 //	}
 //	printf("==== FlickAll End ====\n");
 //}
@@ -277,8 +277,8 @@ void qFlick::setCurrent(int newSerial) {
 //	//printf("        got to loop\n");
 //	for (int ix = dims->start; ix < end; ix++) { double mag =
 //	magnitude(doubleSerial, ix); sum += mag;
-//		//printf("                dserial=%d ix=%d  mag=%lf
-//		//sum=%lf\n", doubleSerial, ix, mag, sum);
+//  //printf("                dserial=%d ix=%d  mag=%lf
+//  //sum=%lf\n", doubleSerial, ix, mag, sum);
 //	//printf("        returning sum=%lf\n", sum);
 //	return sum; }
 //}
@@ -299,19 +299,19 @@ void qFlick::setCurrent(int newSerial) {
 //	printf("           wave = %p   older %p\r", wave, older);
 //
 //	if (inProd == 0.) {
-//		// wtf is this zero wave?  never possible.  And, we can't divide by zero.
-//		// Fill it with +1, normalized.  This should be really unusual.
-//		for (int ix = dims->start; ix < dims->end; ix++)
-//			wave[ix] = older[ix] = qCx(1);
-//		inProd = dims->N;
+//  // wtf is this zero wave?  never possible.  And, we can't divide by zero.
+//  // Fill it with +1, normalized.  This should be really unusual.
+//  for (int ix = dims->start; ix < dims->end; ix++)
+//  	wave[ix] = older[ix] = qCx(1);
+//  inProd = dims->N;
 //	}
 //	double factor = sqrt(1./inProd);
 //	printf("           total innerProduct is %lf factor=%lf\r", inProd, factor);
 //
 //	// apply the factor everywhere
 //	for (int ix = dims->start; ix < dims->end; ix++) {
-//		wave[ix] *= factor;
-//		older[ix] *= factor;
+//  wave[ix] *= factor;
+//  older[ix] *= factor;
 //	}
 //	fixBoundaries();
 //	dump("qFlick::normalize done", true);

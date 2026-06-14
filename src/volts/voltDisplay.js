@@ -510,10 +510,10 @@ export class voltDisplay {
 			height =  (highest - lowest);
 			bottom = lowest;
 			let aBitExtra = MARGIN - height;
-			//			if (aBitExtra > 0) {
-			//				height = MARGIN
-			//				bottom -= MARGIN / 2;
-			//			}
+			//  	if (aBitExtra > 0) {
+			//  		height = MARGIN
+			//  		bottom -= MARGIN / 2;
+			//  	}
 			//height =  sqrt(abs(highest * EFFECTIVE_VOLTS)) + MARGIN;
 			//bottom = -MARGIN / 2;
 			break;

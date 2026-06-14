@@ -87,8 +87,8 @@ class SquishPanel extends React.Component {
 			this.state.show3D = false;
 		}
 
-		// this will end up in everybody's context.	 Unfortunately, the
-		// context isn't always there on creation.	This is why we pass
+		// this will end up in everybody's context.  Unfortunately, the
+		// context isn't always there on creation. This is why we pass
 		// the space down the props
 		this.state.spaceCreatedProm = new Promise((succeed, fail) => {
 			this.spaceSucceed = succeed;
@@ -129,7 +129,7 @@ class SquishPanel extends React.Component {
 	static contextType = SquishContext;
 
 	// sbi, the state is kept in this state, the context, and in the grinder
-	// this should be the only way to set sbi.	Note does NOT trigger!	Nor set grinder.
+	// this should be the only way to set sbi. Note does NOT trigger!	Nor set grinder.
 	setShouldBeIntegrating = (sbi) => {
 		this.setState({shouldBeIntegrating: sbi});
 
@@ -161,7 +161,7 @@ class SquishPanel extends React.Component {
 		storeASetting('miscSettings', showX, whetherTo);
 	}
 
-	// these are the functions that change the 2d/3d setting.  Get at the state in the context.	 These functions get passed down.
+	// these are the functions that change the 2d/3d setting.  Get at the state in the context.  These functions get passed down.
 	activate2D = (ev) => {
 		// if turning off 2d, make sure 3d is on.  but leave it alone if shift is down.
 		this.activateX('show2D', ! this.state.show2D) ;
@@ -176,7 +176,7 @@ class SquishPanel extends React.Component {
 	};
 
 	// these functions are passed in props to lower levels mostly for initialization.
-	// called once ONLY in control panel during setup.	Either one can set space.
+	// called once ONLY in control panel during setup. Either one can set space.
 	setCPContext = (cp) => {
 		this.setState({controlPanel: cp});
 		// not there anyway this.setState({space: cp.space});
@@ -263,7 +263,7 @@ class SquishPanel extends React.Component {
 			throw ex;
 		});
 
-		// check for obsolescence.	Do this after HTML stuff appears.
+		// check for obsolescence. Do this after HTML stuff appears.
 		if (!window.WebAssembly)
 			tooOldTerminate('WebAssembly');
 		if (!window.Worker)

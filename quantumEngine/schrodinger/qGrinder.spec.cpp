@@ -82,7 +82,7 @@ static void isAllZeroesExceptFor(qBuffer *qcavity, int except1, bool shouldFail,
 
 		// prepare for a possible error message.  but cppu throws away this message!
 
-		// for the excepted frequency, we don't care.	 error radius ~ 1e-12; roundoff norm ~ 1e-31
+		// for the excepted frequency, we don't care.  error radius ~ 1e-12; roundoff norm ~ 1e-31
 		// so if there's a value that's too big, we'll get a message in buf
 		if (ix != except1) {
 			double norm = cx.norm();
@@ -103,18 +103,18 @@ static void isAllZeroesExceptFor(qBuffer *qcavity, int except1, bool shouldFail,
 			}
 		}
 
-//		if (ix != except1) {
-//			if ((cx.norm() > ERROR_RADIUS) ^ shouldFail) {
-//				strcat(buf, "not zero, should be\n");
-//				FAIL(buf);
-//			}
-//		}
-//		else {
-//			if ((cx.norm() < ERROR_RADIUS) ^ shouldFail) {
-//				strcat(buf, "is zero, shouldn't be\n");
-//				FAIL(buf);
-//			}
-//		}
+//  if (ix != except1) {
+//  	if ((cx.norm() > ERROR_RADIUS) ^ shouldFail) {
+//  		strcat(buf, "not zero, should be\n");
+//  		FAIL(buf);
+//  	}
+//  }
+//  else {
+//  	if ((cx.norm() < ERROR_RADIUS) ^ shouldFail) {
+//  		strcat(buf, "is zero, shouldn't be\n");
+//  		FAIL(buf);
+//  	}
+//  }
 	}
 
 }

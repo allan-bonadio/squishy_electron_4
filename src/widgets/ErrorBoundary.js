@@ -297,27 +297,6 @@ class ErrorBoundary extends React.Component {
 		return this.props.children;
 	}
 
-	//render() {
-	//	if (this.state.hasError) {
-	//		console.log(this.info)
-	//		return <main style={{textAlign: 'center', color: '#fee'}}>
-	//			<h1>Error in SquishyElectron</h1>
-	//			<p style={{backgroundColor: '#400', color: '#fdd'}}>
-	//				Error: {this.state.error0 || this.error || '-'}</p>
-	//			<p style={{backgroundColor: '#840', color: '#fed'}}>
-	//				Stack: {this.info ? this.info.componentStack : '-'}</p>
-	//			<p style={{backgroundColor: '#804', color: '#fde'}}>
-	//				Info: {JSON.stringify(this.info)}</p>
-	//			<p style={{backgroundColor: '#fee', color: '#000'}}>
-	//				<button className='lite' onClick={() => this.recover()}>
-	//					try to restart</button></p>
-	//		</main>;
-	//	}
-	//
-	//	// otherwise, be transparent
-	//	return this.props.children;
-	//}
-	//
 	// will this ever become great?
 	recover() {
 		let errorMsg = this.state.error0;

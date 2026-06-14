@@ -13,7 +13,7 @@ let traceDrag = false;
 // The Arena is the element the dragging 'should' be confined to (but prob not)
 // How to use:
 // in constructor: pass three handlers, any of which can be null:
-//		this.cnDrag = new clickNDrag(this.onDown, this.onEvent, this.onUp);
+//  this.cnDrag = new clickNDrag(this.onDown, this.onEvent, this.onUp);
 // in render():
 // when rendering arena, ref={this.cnDrag.refArena}
 // when rendering target, ref={this.cnDrag.refTarget}

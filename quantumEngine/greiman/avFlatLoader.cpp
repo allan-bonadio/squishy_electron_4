@@ -26,7 +26,7 @@ static const bool traceCavityDump = false;  // dumps it; verbose
 void avFlatLoader(qAvatar *avatar, int bufIx, qCavity *cavity, int nPoints) {
 //	int *p = (int *) avatar;
 //	printf("%8lx %8lx %8lx %8lx %8lx %8lx %8lx %8lx ",
-//		p[0], p[1], p[2], p[3], p[4], p[5], p[6], p[7]);
+//  p[0], p[1], p[2], p[3], p[4], p[5], p[6], p[7]);
 
 
 	if (traceViewBuffer)

@@ -66,7 +66,7 @@ class App extends React.Component {
 			console.log(`🍦 widthDidChange: bodyWidth= ${document.body.clientWidth}`);
 
 		// the doc reader tries to track the window size
-		// not anymore.  these function(s) are commented out.	DocReader.setDimensions(this.bodyWidth);
+		// not anymore.  these function(s) are commented out. DocReader.setDimensions(this.bodyWidth);
 	}
 
 	// once at startup, shortly after first render
@@ -101,7 +101,7 @@ class App extends React.Component {
 		// NO somehow if I don't init clientWidth in constructor, this catches and fixes it
 		//if (this.state.clientWidth != this.bodyWidth) {
 		//	if (traceResize)
-		//		console.log(`🍦 ‼️mounting resize cuz scrollbar: ${this.state.clientWidth} --> ${this.bodyWidth} `);
+		//  console.log(`🍦 ‼️mounting resize cuz scrollbar: ${this.state.clientWidth} --> ${this.bodyWidth} `);
 		//	this.setState({clientWidth: this.bodyWidth});
 		//	//debugger;
 		//}

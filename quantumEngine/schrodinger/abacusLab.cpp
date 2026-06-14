@@ -30,10 +30,10 @@ static void stepOnSeg(progress *prog) {
 //	int gap = prog->behind->border - prog->behind->border;
 //	int gapMasked &= gap & aba->statesMask;
 //	if (gap < 4) {
-//		// short - just do them all
+//  // short - just do them all
 //	}
 //	else {
-//		// do the behind, do the ahead
+//  // do the behind, do the ahead
 //	}
 }
 

@@ -4,6 +4,7 @@
 */
 
 import {mat4} from 'gl-matrix';
+import {dump4x4} from '../gl/helpers3D.js';
 
 const d2r = Math.PI / 180;
 
@@ -18,7 +19,7 @@ let traceProjMatrix = false;
 let traceOffMatrix = true;
 
 
-// the rule in this class is to always keep the intermediate matrix in this.matrix.
+// the rule in this class is to always keep the intermediate matrix in this.matrix
 // then, you can rearrange teh functions in unifyMatrices()
 export class matrixGen {
 	// orient has all the vars needed to construct the matrix

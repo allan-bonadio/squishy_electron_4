@@ -30,11 +30,11 @@ let traceTestSimpleNError = false;
 // it'll print an error on the console but actually the 2nd dialog will still work.
 
 // to test the polyfill, try changing 'dialog' to a 'footer' element
-//		- here in this file
-//		- also in node_modules/dialog-polyfill/dist/dialog-polyfill.esm.js
-//			global search-replace /'dialog'/ to /'footer'/
-//		- also in node_modules/dialog-polyfill/dist/dialog-polyfill.css
-//			replace /dialog/ to /footer/ with WHOLE WORD on, ie  NOT in _dialog_overlay
+//  - here in this file
+//  - also in node_modules/dialog-polyfill/dist/dialog-polyfill.esm.js
+//  	global search-replace /'dialog'/ to /'footer'/
+//  - also in node_modules/dialog-polyfill/dist/dialog-polyfill.css
+//  	replace /dialog/ to /footer/ with WHOLE WORD on, ie  NOT in _dialog_overlay
 // 	- optional: change also in App.scss; or just realize that non-essential styles will be omitted
 // You'll have to kill and restart npm start; it caches the node_modules and doesn't check for changes.
 // and set them BACK when you're done!

@@ -139,7 +139,7 @@ export class WaveVista extends React.Component {
 		// wait this isn't right needs to just do orientation TODO
 		if (this.mainVistaRepaint)
 			this.mainVistaRepaint(this.paintingNeeds);
-	}.
+	}
 
 	// repaint, rebuilding all matrices, effecting all changes.  Do
 	// this when canvas areas need to repaint & resize or other

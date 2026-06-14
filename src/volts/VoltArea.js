@@ -1,6 +1,6 @@
 /*
 ** Voltage Area -- the off-white voltage line, and its tactile
-**		    interactions when the user moves it.  for Squishy Electron
+**	  interactions when the user moves it.  for Squishy Electron
 ** Copyright (C) 2021-2026 Tactile Interactive, all rights reserved
 */
 
@@ -396,7 +396,7 @@ function VoltArea(props) {
 
 	let viewBoxStr = `${p.drawingLeft} 0 ${p.drawingWidth} ${p.canvasInnerHeight}`;
 	if (traceViewBox) {
-	    dblog(`⚡️  svg viewBox ${viewBoxStr}`);
+        dblog(`⚡️  svg viewBox ${viewBoxStr}`);
 	}
 	let vArea = (
 		<svg className='VoltArea'

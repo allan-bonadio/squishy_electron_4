@@ -279,8 +279,8 @@ void qAvatar::dumpIndex(const char *title) {
 	for (int i = 0; i < nIndices; i += IXES_PER_ROW) {
 		printf("got %d bytes left... ix ix=%d\n", TXTLEN - charsUsed, i);
 		for (int j = 0; (j < IXES_PER_ROW) && (j+i < nIndices); j++) {
-//			if (6 == j || 12 == j)
-//				strcpy(txt+charsUsed, "     ");
+//  	if (6 == j || 12 == j)
+//  		strcpy(txt+charsUsed, "     ");
 			charsUsed += snprintf(txt+charsUsed, TXTLEN - charsUsed, " %4d", indexBuffer[i+j]);
 		}
 		printf(" %s\n", txt);

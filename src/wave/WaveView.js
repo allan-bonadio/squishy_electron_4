@@ -3,7 +3,7 @@
 ** Copyright (C) 2021-2026 Tactile Interactive, all rights reserved
 */
 
-// Each wraps a canvas for display.	 Via webgl.	 along with svg doohickeys and what not.
+// Each wraps a canvas for display.  Via webgl.  along with svg doohickeys and what not.
 // You can have many in a squishPanel?, each subscribing to the same space.
 // One is the main view, displaying current simulation in 2d.  Others communicate with
 // control panel tabs to display proposed settings before effecting them.
@@ -48,7 +48,7 @@ export class WaveView extends React.Component {
 		// no!	handed in by promise space: PropTypes.instanceOf(eSpace),
 
 		// handed in, pixels.  Width of whole waveview, including sidebar,
-		// bumpers and border.	Canvas is CANVAS_BORDER_THICKNESS pixel smaller
+		// bumpers and border. Canvas is CANVAS_BORDER_THICKNESS pixel smaller
 		// all around for border.
 		outerWidth: PropTypes.number.isRequired,
 
@@ -98,7 +98,7 @@ export class WaveView extends React.Component {
 	}
 
 	/* ********************************************************* hover */
-	// I'm done trying to get the css :hover to do this right.	Enter and Leave events
+	// I'm done trying to get the css :hover to do this right. Enter and Leave events
 	// now turn on/off the voltage display.
 
 	hoverEnter = ev => {
@@ -245,14 +245,3 @@ export class WaveView extends React.Component {
 
 
 export default WaveView;
-
-//					<div className='northEastWrapper'>
-//						frame <span className='voNorthEast'>{tnf.frameSerialText}</span>
-//					</div>
-
-
-//				<img className='sizeBox' src={resizeIcon} alt='size box'
-//					onPointerDown={this.resizePointerDown} onPointerUp={this.resizePointerUp}
-//					onPointerMove={this.resizePointerMove} onPointerLeave={this.resizePointerUp}
-//					title="To adjust the height, drag this up or down"
-//					style={{width: `2em`, height: `2em`}} />
