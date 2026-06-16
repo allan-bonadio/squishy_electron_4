@@ -29,7 +29,7 @@ let traceRotMatrix = false;
 /* ******************************************* vane scene */
 
 const vertexShaderSrc = `// rgbVane vertexShader
-#line 25
+#line 33
 precision highp float;
 
 attribute vec4 pos;
@@ -40,11 +40,12 @@ uniform mat4 matrix;
 void main() {
 	gl_PointSize = 4.;
 
-	gl_Position = pos * matrix;
+	//vec4 posT = pos * matrix
+	vec4 posT = matrix * pos;
+	gl_Position = posT / posT.z;
 	//gl_Position = vec4(pos, 0, 1);
 
 	colorVar = color;
-
 
 	// for actual testing of cx to rygb
 	//colorVar = vec4(0.4, 0.6, 0.2, 1.0);
@@ -67,9 +68,6 @@ class rgbVaneScene extends abstractScene {
 	// doesn't need space or inputinfo
 	constructor(sceneName, ambiance, paintingNeeds, space) {
 		super(sceneName, ambiance, paintingNeeds, space);
-
-		this.canvas = ambiance.canvas;
-		this.gl = ambiance.gl;
 
 		// create avatar but don't add buffers; the drawing does that
 		this.avatar = eAvatar.createAvatar(sceneName);

@@ -65,11 +65,11 @@ const INNER_FACTOR = '1.';
 // make the line number for the start correspond to this JS file line number - the NEXT line
 const vertexShaderSrc = `// garlandDrawing vertex
 ${cx2rygb}
-#line 70
+#line 69
 // this does all the transformation we need.  precalculated for each repaint.
 uniform mat4 matrix;
 
-uniform float fudge;  // kindof like the zoom factor
+//uniform float fudge;  // kindof like the zoom factor
 uniform float nStates;	// N
 
 // the V shader calculates the color to use, and sets this so the frag
@@ -90,8 +90,10 @@ void main() {
 	point.x = float(ix);
 	point.w = 1.;
 
-	gl_Position = point * matrix;
-	gl_Position.w = 1.0 + gl_Position.z * fudge;
+	vec4 pointM = point * matrix;
+	float zz = 1.0 + pointM.z;
+	gl_Position = pointM / zz;
+	//gl_Position.w = 1.0 + gl_Position.z * fudge;
 
 
 	//	for the wave color, convert the complex values via this algorithm
@@ -110,7 +112,7 @@ void main() {
 `;
 
 const fragmentShaderSrc = `// garlandDrawing frag
-#line 106
+#line 116
 precision highp float;
 varying highp vec4 vColor;
 
@@ -164,8 +166,8 @@ export class garlandDrawing extends abstractDrawing {
 			}
 		);
 
-		this.fudgeUniform = new drawingUniform('fudge', this,
-			() => ({value: this.scene.paintingNeeds.fudge, type: '1f'}));
+		//this.fudgeUniform = new drawingUniform('fudge', this,
+		//	() => ({value: this.scene.paintingNeeds.fudge, type: '1f'}));
 
 		let nStates = this.space.nStates;
 		this.NUniform = new drawingUniform('nStates', this,

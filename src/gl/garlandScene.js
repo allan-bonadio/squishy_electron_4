@@ -7,6 +7,7 @@ import {mat4} from 'gl-matrix';
 
 import abstractScene from './abstractScene.js';
 import garlandDrawing from './garlandDrawing.js';
+import {rgbVaneDrawing} from './misc/rgbVaneScene.js';
 import eAvatar from '../engine/eAvatar.js';
 
 
@@ -14,16 +15,13 @@ class garlandScene extends abstractScene {
 	constructor(sceneName, ambiance, paintingNeeds, space) {
 		super(sceneName, ambiance, paintingNeeds, space);
 
-		this.space = space;
-		this.paintingNeeds = paintingNeeds;
-
 		// create avatar but don't stick buffers; the drawing does that
 		this.avatar = eAvatar.createAvatar(sceneName);
 
 		// create relevant drawings.
 		this.drawings = [
 			new garlandDrawing(this, space),
-			//new rgbVaneDrawing(this, space),
+			new rgbVaneDrawing(this, space),
 		];
 
 	}
