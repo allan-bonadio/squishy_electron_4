@@ -104,9 +104,7 @@ export class matrixGen {
 		let matrix = mat4.clone(this.matrix);
 
 		mat4.rotateZ(matrix, matrix, d2r * this.orient.zAng);
-
 		mat4.rotateY(matrix, matrix, d2r * this.orient.yAng);
-
 		mat4.rotateX(matrix, matrix, d2r * this.orient.xAng);
 
 		if (traceOrientation) {
@@ -115,12 +113,10 @@ export class matrixGen {
 			dump4x4('end of rotateMatrix()', matrix);
 		}
 
-		//this.rotatedMatrix =
 		this.matrix = matrix;
 		if (traceRotMatrix)
 			dump4x4('vista after rotate:', matrix);
 		if (!isFinite(matrix[0])) debugger;
-		//return matrix;
 	}
 
 	// this theoretically builds THE matrix I use to txform vertices.

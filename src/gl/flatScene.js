@@ -15,9 +15,6 @@ class flatScene extends abstractScene {
 
 		this.PADDING_ON_BOTTOM = 1.02;
 
-		// this.space = space;
-		//this.paintingNeeds = paintingNeeds; done in abstract scene
-
 		// create avatar but don't stick buffers; the drawing does that
 		this.avatar = eAvatar.createAvatar(sceneName);
 		this.flatAvatarID = 0;
