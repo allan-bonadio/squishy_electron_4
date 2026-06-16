@@ -1,0 +1,27 @@
+# EditorConfig https://editorconfig.org   for SquishyElectron
+# trying to avoid binary file types... if by chance I ever end up editing one
+
+# top-most EditorConfig file
+root = true
+
+# suffixes
+[*.{js,mjs,cjs,json,html,scss,css,txt,cpp,h,md,sh,py,conf}]
+indent_style = tab
+indent_size = 4
+tab_width = 4
+end_of_line = lf
+charset = utf-8
+trim_trailing_whitespace = true
+insert_final_newline = true
+
+# whole files
+[Makefile,package-lock.json,package.json,LICENSE,README.*]
+indent_style = tab
+indent_size = 4
+tab_width = 4
+end_of_line = lf
+charset = utf-8
+trim_trailing_whitespace = true
+insert_final_newline = true
+
+
