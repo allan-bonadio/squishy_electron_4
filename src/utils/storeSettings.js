@@ -229,7 +229,7 @@ export function createStoreSettings() {
 
 	makeParam('orientSettings', 'xPos', 0,	{min: -20, max: +20});
 	makeParam('orientSettings', 'yPos', 0,	{min: -20, max: +20});
-	makeParam('orientSettings', 'zPos', -10,  {min: -20, max: +20});
+	makeParam('orientSettings', 'zPos', 0,  {min: -20, max: +20});
 
 	// get rid of these?  TODO
 	makeParam('orientSettings', 'hfoView', 45,	{min: 1, max: +179});
