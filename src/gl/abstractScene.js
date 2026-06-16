@@ -32,6 +32,7 @@ export class abstractScene {
 		this.canvas = ambiance.canvas;
 		this.gl = ambiance.gl;
 		this.tagObject = ambiance.tagObject;
+		if (!paintingNeeds || !space) throw `paintingNeeds ${paintingNeeds}  or space ${space} is null`;
 		this.paintingNeeds = paintingNeeds;  // might be undef
 		this.space = space;  // might be undef
 		if (! this.canvas) throw new Error(`abstractScene: being created without canvas`);
