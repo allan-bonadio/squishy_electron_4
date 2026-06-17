@@ -14,6 +14,7 @@ body {
 	color: #eee;
 	margin: 0;
 	padding: 0;
+	font-family: verdana, tahoma, helvetica, sans-serif;
 
 	// some stupid plugin sets our font to some crap
 	#root {
@@ -200,6 +201,7 @@ button {
 
 	// dark and lite are colors for the wholebutton, regardless of what they're on
 	&.lite {
+		font-family: verdana, tahoma, helvetica, sans-serif;
 		background-color: #ccc;
 		&:hover {
 			background-color: #ee8;
@@ -213,6 +215,7 @@ button {
 
 	// glass is transparent, overlaying on on the main view/vista
 	&.dark, &.glass {
+		font-family: verdana, tahoma, helvetica, sans-serif;
 		&:hover {
 			background-color: #4448;
 		}
