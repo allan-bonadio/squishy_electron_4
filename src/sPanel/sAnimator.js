@@ -8,7 +8,7 @@ import {interpretCppException} from '../utils/errors.js';
 //import SquishPanel from './SquishPanel.js';
 import CommonDialog from '../widgets/CommonDialog.js';
 import {getASetting} from '../utils/storeSettings.js';
-import {thousands, thousandsSpaces} from '../utils/formatNumber.js';
+//import {thousands, thousandsSpaces} from '../utils/formatNumber.js';
 import qeFuncs from '../engine/qeFuncs.js';
 import qeConsts from '../engine/qeConsts.js';
 
@@ -77,7 +77,7 @@ class sAnimator {
 			nw.innerHTML = tnf.elapsedTimeText;
 	}
 
-	// Repaint, with webgl, the latest waveview.  Whether it needs it or not.
+	// Repaint, with webgl, the latest wave.  Whether it needs it or not.
 	// Measure how long it takes to paint; update integration statistics.
 	drawLatestLap() {
 		//if (traceStats) console.log(`🎥 time since last tic: ${performance.now()
@@ -87,8 +87,7 @@ class sAnimator {
 		this.inteTimes.prevDrawTime = startDrawTime;
 
 		this.mainViewRepaint?.();   // mainViewRepaint() func won't be here until GLScene renders
-		this.mainVistaRepaint?.();   // mainViewRepaint() func won't be here until GLScene renders
-		this.mainSpectrumRepaint?.();   // mainViewRepaint() func won't be here until GLScene renders
+-               this.mainVistaRepaint?.();   // mainViewRepaint() func won't be here until GLScene renders
 		this.showTime();  // part of the draw time - the picoseconds (per lap?)
 
 		// update dom elements in integration tab to latest stats (if it's been shown at least once)
@@ -269,7 +268,7 @@ class sAnimator {
 
 	/* *************************************  runningDiagnosticCycle of circular wave*/
 
-	// special test code.  From years ago.   probably broken
+	// special test code.  From years ago.   years and years.  probably broken
 
 	// use for benchmarking with a circular wave.  Will start frame, and stop after
 	// the leftmost state is at its peak.  Then display stats.
