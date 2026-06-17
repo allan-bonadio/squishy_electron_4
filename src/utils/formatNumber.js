@@ -3,6 +3,25 @@
 ** Copyright (C) 2021-2026 Tactile Interactive, all rights reserved
 */
 
+// switching over to Intl package cuz no tests needed
+
+let formatterObj = new Intl.NumberFormat('en-US',
+	{notation: 'engineering', useGrouping: 'min2', signDisplay: 'negative',
+		minimumFractionDigits: 3});
+
+dblog(`formatter options: `, formatterObj.resolvedOptions());
+
+let formatter = formatterObj.format;
+
+// examples:
+
+// notation: 'engineering'
+// numberFormat('en-US', {notation: 'engineering'})
+//   { __proto__: Intl.NumberFormat.prototype },
+//   "en-US",
+//   { notation: "scientific" },
+// );
+
 /* ********************************** toSiPieces() */
 // SI suffixes, as in milli, micro, nano, pico, .... kilo, mega, giga, ...
 const suffixes = [
@@ -18,28 +37,43 @@ const suffixMid = suffixes.indexOf('');
 
 // return a string for this real number, with greek/roman suffixes for the exponent
 // returns {mantissa: digits, suffix: si suffix, iTHous = equivalent si suffix as integer power}
-export function toSiPieces(f) {
-	const thousands = Math.log10(f) / 3;
-	const iThous = Math.floor(thousands);
-	let suffix = suffixes[iThous + suffixMid];
-	if (suffix === undefined)
-		suffix = `e${iThous > 0 ? '+' : ''}${iThous * 3}`;
-	const mantissa = f / (1000 ** iThous);
-	return {mantissa, suffix, iThous};
-}
+// export function toSiPieces(f) {
+// 	const thousands = Math.log10(f) / 3;
+// 	const iThous = Math.floor(thousands);
+// 	let suffix = suffixes[iThous + suffixMid];
+// 	if (suffix === undefined)
+// 		suffix = `e${iThous > 0 ? '+' : ''}${iThous * 3}`;
+// 	const mantissa = f / (1000 ** iThous);
+// 	return {mantissa, suffix, iThous};
+//}
 
+// This doesn't seem to be used anywhere...
 // return a string for this real number, with greek/roman suffixes instead of exponent
-export function toSiSuffix(f, nDigits) {
+export function toSiSuffix(f, nDigits = 0) {
 	if (f === 0)
 		return '0';
 
-	const pieces = toSiPieces(f);
-	const num = pieces.mantissa.toPrecision(nDigits) + pieces.suffix;
-	if (f < 0)
-		return '-' + num;
-	else
-		return num;
+	let fmt = formatter(f, {minimumFractionDigits: nDigits});
+	let pieces = fmt.match(/E(\d+)$/)
+	if (pieces) {
+		let nThousands = Math.round(pieces[2] / 3);
+		let suffix = suffixes[nThousands + suffixMid];
+		return `${pieces[1]} ${suffix}`
+	}
+	else {
+		return fmt;
+	}
 }
+
+
+
+// 	const pieces = toSiPieces(f);
+// 	const num = pieces.mantissa.toPrecision(nDigits) + pieces.suffix;
+// 	if (f < 0)
+// 		return '-' + num;
+// 	else
+// 		return num;
+
 
 
 /* ********************************** thousands() */
@@ -55,6 +89,7 @@ export function thousands(n) {
 	return thousandsSpaces(n);
 }
 
+// This doesn't seem to be used anywhere...
 // put spaces between triples of digits.  ALWAYS positive reals.  Also decimal places.
 // not sure why I did this cuz it's built in to intl but in case you have an
 // ancient browser ... but if you do, you can't run webassembly or GL...
