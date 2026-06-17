@@ -14,7 +14,7 @@
 
 😡- more unit tests!  for js side.  And should work on C++ ones too.  Get the current ones working again.  at least.
 
-😡- common scss is included multiple times - is this right?
+- common scss is included multiple times - is this right?
 
 *- Tooltips are tiny!  need something better.
 
@@ -38,10 +38,10 @@ Now the offset slider.  JUST the offset slider.  Doing it slowly is OK.
 
 ## GL & WaveView
 
-😡- left tic marks rarely draw.
+- left tic marks rarely draw.  😀
 
 
-- display Garland Spiral in 3d could be easy.  haha
+😡- display Garland Spiral in 3d could be easy.  haha
 
 * - should have x axis on the bottom marked in nm
 
@@ -73,7 +73,7 @@ certain it doesn't. But now I have FFTs to measure it at least.  If you think ab
 
 - RK4?  probably not.
 
-- qGrinder really needs to be broken in two.  (or three?)  And whole schrodinger directory.  ONe needs to handle the threadsf and (?) grinding.  Or something.  Use the name of that black womaem from nasa for a new dir.
+- qGrinder really needs to be broken in two.  (or three?)  And whole schrodinger directory.  ONe needs to handle the threadsf and (?) grinding.  Or something.  Use the name of that Hidden Figures chick from nasa for a new dir.
 
 😡- Should allow almost any number N, not just powers of 2
 
@@ -93,9 +93,6 @@ certain it doesn't. But now I have FFTs to measure it at least.  If you think ab
 - complex numbers, fourier transform
 
 - the voltage
-
-😡- some button to get to some of the docs
-
 
 ## Wish List
 
@@ -123,7 +120,7 @@ total kinetic
 
 - UI ability to set n of dimensions, and to specify angular momentum, and any
 	energy/potential differences therein.  Two particles in the same space should
-	have the same X coordinates; one in 2-d space should have X  and Y coords.  The
+	have the same-space X coordinates; one in 2-d space should have X  and Y coords.  The
 	V potential would be 1-dimensional or 2 dimensional, depending.  whew, not this year.
 
 - Any number of dimensions, eg x and s, the spin, becomes ψ[1...N][-½,

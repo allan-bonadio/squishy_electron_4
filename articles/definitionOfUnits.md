@@ -99,7 +99,7 @@ U = eV, where e is electron charge, and V is the voltage — the electrical pote
 That sounds like the whole electron, but really the electron is broken up into 16 or
 128 cells or whatever N is.  That's why we say eV𝜓, where 𝜓 is in millipsis per cell.
 
-Actually, the only reason for e is to multiply it by a voltage, so it's more like eV is the quantity we're concerned with.  Which seems to be about .005, with the settings I have now, at voltage=5V, voltageFactor=-0.1 (?!?!?) and inverseℏ at .0095 (which won't change).  That is, .005 is effective as a voltage at altering the wave progression over time.  (wrong i think)
+Actually, the only reason for e is to multiply it by a voltage, so it's more like eV is the quantity we're concerned with.  Which seems to be about .005, with the settings I have now, at voltage=5V, voltageFactor=-0.1 (?!?!?) and inverse ℏ at .0095 (which won't change).  That is, .005 is effective as a voltage at altering the wave progression over time.  (wrong i think)
 
 For a point, if the U𝜓 / | 𝜓 | is (?) about -0.005
 that is for U ≈ volts * voltageFactor * hamiltW->im * inverseℏ
@@ -235,3 +235,34 @@ hOver2m_e = 105.4571817 / (2 * 0.91093837015)   nm² / ps
 Divide this by dx² and it's ready to use for integrating.
 
 
+## ••••••••••••••••••••••• proposed Small Squishy Units
+
+With picoseconds, we end up working in thousanths of a ps.
+With nanometers, we end up working in thousanths of a nm.
+So why not go down a factor of a thousand
+
+### Distance
+We measure distance in picometers (pm).
+pronounced 'pie-ko-meter' or 'pee-ko-meter'.
+The smallest metal traces on the latest microchips,
+is about 24000pm, as of 2022.
+A Sulfur atom is about 100 pm in diameter.
+
+1 meter = 1e12 pm
+
+### Time
+We measure time in femtoseconds (fs),
+pronounced 'fem-toe-second'
+This is a quadrillionth of a second.
+Light travels about 0.3 µm, in a femtosecond.
+(It goes about 1 foot per nanosecond, or 30 cm)
+
+1 sec = 1e15 fs
+
+### Mass
+not really using mass for anything; except that coefficient which comes pre-multiplied
+The whole schrodinger's equation is an energy equation, but the mass is effectively factored out.
+
+### Electrical units
+
+oh probably the same, volts, coulombs, amps

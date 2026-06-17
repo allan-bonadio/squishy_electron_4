@@ -1,5 +1,10 @@
-happy newyears 2026.
+🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 2026 Jun 17
+Finally getting 3d working with raw WebGL.  All sorts of goofy stuff that doesn't work the way Greggmann recommends.  In particular, the 'perspective' transformation seems to just make a mess; when I got rid of it, things started coming together.
 
+Have now made wave dir, and WaveVista for 3d.  View is 2d, Vista is 3d.  Plus orient3d, and others.
+
+🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 2026 jan 1
+happy newyears 2026.
 
 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 🫣 2025 Aug 28
 
