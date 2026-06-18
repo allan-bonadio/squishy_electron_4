@@ -8,7 +8,7 @@ import eObject from './eObject.js';
 import qeFuncs from './qeFuncs.js';
 // import qeConsts from './qeConsts.js';
 import {getASetting} from '../utils/storeSettings.js';
-import {thousandsSpaces} from '../utils/formatNumber.js';
+//import {thousandsSpaces} from '../utils/formatNumber.js';
 import eFlick from './eFlick.js';
 
 let traceCreation = false;
