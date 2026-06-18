@@ -94,7 +94,6 @@ export class WaveVista extends React.Component {
 		// not in state cuz changes trigger repaint not render
 		//debugger;
 		this.orient = getAGroup('orientSettings');
-		this.mGen = new matrixGen(this.orient)
 
 		this.createInnerDims();	 // screen dimensions of canvas, in waveAux
 
@@ -109,6 +108,8 @@ export class WaveVista extends React.Component {
 				unifiedMatrix: this.unifiedMatrix,
 				fudge: this.orient.fudge,
 			};
+			this.mGen = new matrixGen(this.orient, this.space.nPoints,
+				this.canvasInnerWidth, this.canvasInnerHeight);
 
 			this.buildNRepaint()
 		});
@@ -135,10 +136,12 @@ export class WaveVista extends React.Component {
 	// repaint JUST the rotation angles.  Save a microsecond :-) of cpu by
 	// avoiding matrix mults.
 	orientNRepaint = () => {
-		this.paintingNeeds.unifiedMatrix = this.mGen.unifyMatrices();
-		// wait this isn't right needs to just do orientation TODO
-		if (this.mainVistaRepaint)
-			this.mainVistaRepaint(this.paintingNeeds);
+		if (this.mGen) {
+			this.paintingNeeds.unifiedMatrix = this.mGen.unifyMatrices();
+			// wait this isn't right needs to just do orientation TODO
+			if (this.mainVistaRepaint)
+				this.mainVistaRepaint(this.paintingNeeds);
+		}
 	}
 
 	// repaint, rebuilding all matrices, effecting all changes.  Do
