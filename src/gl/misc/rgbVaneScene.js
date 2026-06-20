@@ -21,7 +21,7 @@ let traceDrawPoints = false;
 let traceDrawing = false;
 let traceDrawLines = false;
 let traceGLAfterDrawing = false;
-let traceMatrix = true;
+let traceMatrix = false;
 let traceReload = false;
 let traceRotMatrix = false;
 

@@ -14,9 +14,9 @@ const d2r = Math.PI / 180;
 //	paintingNeeds = { unifiedMatrix: mg.unifyMatrices() };
 
 let traceOrientation= false;
-let traceRotMatrix = true;
+let traceRotMatrix = false;
 let traceProjMatrix = false;
-let traceOffMatrix = true;
+let traceOffMatrix = false;
 
 
 // the rule in this class is to always keep the intermediate matrix in this.matrix
