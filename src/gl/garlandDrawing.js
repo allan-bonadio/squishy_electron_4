@@ -13,10 +13,10 @@ import {vec4, mat4} from 'gl-matrix';
 
 
 let traceAvatarAfterDrawing = false;
-let traceGLAfterDrawing = false;
+let traceSimulateGL = true;
 let traceDrawing = false;
 let traceReloadRow = false;
-let traceMatrix = true;
+let traceMatrix = false;
 let traceUColor = false;
 
 // diagnostic purposes; draws more per vertex
@@ -206,10 +206,21 @@ export class garlandDrawing extends abstractDrawing {
 
 	}
 
+	/* **************************************** repeat drawing 1 */
 	// multi-draw: really I need to redraw with the same input variables, several times
 	// 2x front and back of blade?
 	// 1x ladder rung separators between blades in garland
 	// 2x ladder sides on panels
+
+	// ok so have operations:
+	// bool even is outer, else inner
+	// bool odd is outer, else inner
+	// byte drawarrays opcode — draw triangles, line strips, etc
+	// 		no, that's JS-side.  don't put that in the uniform.
+	// color scheme: cx, all one color..  uColor does this already
+
+
+	/* **************************************** repeat drawing 2 */
 
 	// called for each image frame on th canvas.
 	draw(width, height, paintingNeeds) {
@@ -258,9 +269,9 @@ export class garlandDrawing extends abstractDrawing {
 			let mat = this.matrixUniform.reloadFunc().value;
 			this.avatar.dumpComplexViewBuffer(0, this.nPoints,
 				`🌀🌀🌀 finished drawing in garlandDrawing.js; drew buf:`);
-			dump4x4(`🌀🌀🌀	 matrixUni after draw`, mat);
+			dump4x4(`🌀🌀🌀	 AvatarAfterDrawing `, mat);
 		}
-		if (traceGLAfterDrawing) {
+		if (traceSimulateGL) {
 			this.simulateGL();
 			let mat = this.matrixUniform.reloadFunc().value;
 			dump4x4(`🌀🌀🌀	 matrixUni after draw=`, mat);
@@ -283,9 +294,8 @@ export class garlandDrawing extends abstractDrawing {
 		let rows4 = this.avatar.getViewBuffer(0);
 		let gl_Position = vec4.create();
 		if (!isFinite(this.scene.paintingNeeds.unifiedMatrix[0])) debugger;
-
-		const _ = c => (gl_Position[c]).toFixed(4).padStart(7);
-		const __ = c => (row[c]).toFixed(4).padStart(7);
+		let row = vec4.create();
+		const _ = c => (gl_Position[c]).toFixed(8).padStart(11);
 
 		'';	 // collect these otherwise the console merges dup lines
 		let text = ` 🌀🌀 what the GPU calculates,	the `
@@ -297,8 +307,9 @@ export class garlandDrawing extends abstractDrawing {
 			// of the attr
 			let vertexSerial = first + i;
 			let rs = vertexSerial * 4;
-			row = vec4.fromValues(rows4[rs], rows4[rs+1],
+			let row = vec4.fromValues(rows4[rs], rows4[rs+1],
 				rows4[rs+2], rows4[rs+3]);
+			const __ = c => (row[c]).toFixed(8).padStart(11);
 			text += ` 🌀🌀 `
 				+` ${__(0)} +i	${__(1)}   `;
 
@@ -313,20 +324,18 @@ export class garlandDrawing extends abstractDrawing {
 			point[3] = 1;
 
 			// point * matrix;
-			let pointM;
+			let pointM = vec4.create();
 			vec4.transformMat4(pointM, point,
 				this.scene.paintingNeeds.unifiedMatrix);
 			let zz = 1.0 + pointM[2];  // for perspective
 
 			// (z - near) / (far - near)
-			float zd = (pointM.z - nStates / 2.) / nStates;
+			let zd = (pointM[2] - nStates / 2.) / nStates;  // for depth 0...1
 
-			 = vec4.create();
 			//let gl_Position = vec4.create();
 			//gl_Position = pointM / zz;
 			let gl_Position = vec4.fromValues(point[0]/zz, point[1]/zz,
-					point[2]/zz, point[3]/zz);
-			gl_Position.z = zd;
+					zd, 1);
 
 			text += ` [${String(ix).padStart(3)}] `
 				+` ${_(0)}	 ${_(1)}   ${_(2)}	 ${_(3)}  \n`;
