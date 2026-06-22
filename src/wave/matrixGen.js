@@ -142,3 +142,23 @@ export class matrixGen {
 
 
 export default matrixGen;
+
+/* ***************************************************** just screwing around */
+
+dblog(`just screwing around`);
+let aa = [3,4,5,6];
+let bb = [13,14,15,16];
+let cc = [23,24,25,26];
+let matrix;
+
+matrix = mat4.create();
+mat4.frustum(matrix, -5, 5, -3, 3, 1, 10);
+dump4x4('frustum:', matrix);
+
+matrix = mat4.create();
+let eye=[0, 0, 6];
+let center=[0, 0, 0];
+let up = [0, 10, 0];
+mat4.lookAt(matrix, eye, center, up);
+dump4x4('lookAt:', matrix);
+
