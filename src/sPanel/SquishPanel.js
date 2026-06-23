@@ -23,7 +23,7 @@ import {tooOldTerminate} from '../utils/errors.js';
 import {cppActivePromise} from '../engine/eEngine.js';
 
 import SquishContext from './SquishContext.js';
-import pointerContextMap from '../engine/pointerContextMap.js';	 // TODO: get rid of this
+//import pointerContextMap from '../engine/pointerContextMap.js';	 // TODO: get rid of this
 import {waitForSpaceCreatedPromise} from '../wave/waveContext.js';	// TODO: get rid of this
 //import waveAux from '../wave/waveAux.js';
 
@@ -233,11 +233,11 @@ class SquishPanel extends React.Component {
 			// space will end up in the state but meanwhile we need it now
 			this.space = space;
 			this.setState({space});	 // maybe i don't need this if it's in the context?
-			pointerContextMap.register(space._pointer_, this.state);
+			//pointerContextMap.register(space._pointer_, this.state);
 
 			//this.mainAvatar = space.mainAvatar;
 			this.grinder = space.grinder;
-			pointerContextMap.register(space.grinder._pointer_, this.state);
+			//pointerContextMap.register(space.grinder._pointer_, this.state);
 			//pointerContextMap.dump();
 			this.animator.grinder = this.grinder;
 			this.animator.space = this.space;
@@ -314,9 +314,10 @@ class SquishPanel extends React.Component {
 		// does NOT alter any react component state but does start integration
 		this.shouldBeIntegratingUpdate();
 
-		if (traceWidth)
+		if (traceWidth) {
 			dblog(`👑 SquishPanel render, p.bodyWidth=${p.bodyWidth} = outerWidth `
 				+ ` body.clientWidth=${document.body.clientWidth}`);
+		}
 		//debugger;
 
 		let wView = '';
@@ -327,7 +328,6 @@ class SquishPanel extends React.Component {
 					setWVContext={this.setWVContext}
 					setShouldBeIntegrating={this.setShouldBeIntegrating}
 					setMainViewRepaint={this.setMainViewRepaint}
-					setSpectRepaint={this.setSpectRepaint}
 					spaceCreatedProm={this.state.spaceCreatedProm}
 					sPanel={this}
 					show2D={s.show2D}
@@ -341,7 +341,6 @@ class SquishPanel extends React.Component {
 					setWVContext={this.setWVContext}
 					setShouldBeIntegrating={this.setShouldBeIntegrating}
 					setMainVistaRepaint={this.setMainVistaRepaint}
-					setSpectRepaint={this.setSpectRepaint}
 					spaceCreatedProm={this.state.spaceCreatedProm}
 					sPanel={this}
 					show3D={s.show3D}
@@ -350,7 +349,7 @@ class SquishPanel extends React.Component {
 
 		return (
 			<SquishContext.Provider value={this.state} >
-				<article className={`SquishPanel space` + s.name} ref={this.setSPElement}>
+				<article className={`SquishPanel space ` + s.name} ref={this.setSPElement}>
 
 					{wVista}
 					{wView}

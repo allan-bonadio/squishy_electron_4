@@ -3,6 +3,8 @@
 ** Copyright (C) 2025-2026 Tactile Interactive, all rights reserved
 */
 
+this file is no longer used
+
 // from C++: how are you going to tell what SquishPanel you're operating under?
 // This.  Take a pointer to a qGrinder, and contextMap[pointer] = the context
 // for that SquishPanel.  For that matter, you can also register any other

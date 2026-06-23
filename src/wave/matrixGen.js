@@ -14,18 +14,21 @@ const d2r = Math.PI / 180;
 //	paintingNeeds = { unifiedMatrix: mg.unifyMatrices() };
 
 let traceOrientation= false;
-let traceRotMatrix = true;
+let traceRotMatrix = false;
 let traceProjMatrix = false;
-let traceOffMatrix = true;
+let traceOffMatrix = false;
 
 
 // the rule in this class is to always keep the intermediate matrix in this.matrix
 // then, you can rearrange teh functions in unifyMatrices()
 export class matrixGen {
 	// orient has all the vars needed to construct the matrix
-	constructor(orient) {
+	constructor(orient, nPoints, canvasInnerWidth, canvasInnerHeight) {
 		this.orient = orient;
 		this.newMatrix();
+		this.nPoints = nPoints;
+		this.canvasInnerWidth = canvasInnerWidth;
+		this.canvasInnerHeight = canvasInnerHeight;
 	}
 
 	// start over
@@ -33,6 +36,8 @@ export class matrixGen {
 		this.matrix = mat4.create();
 	}
 
+	// this perspective matrix just seemed to make a mess out of everything.
+	// I took it out and suddenly stuff works.
 	// recalculate the perspective matrix, given changed canvas
 	// geometry/numbers. Must have canvasInnerWidth/Height from
 	// updateInnerDims() already calculated. offsetMatrix() next
@@ -52,7 +57,7 @@ export class matrixGen {
 		// these need to be, REALLY, the closest stuff, and the farthest stuff.
 		// Approximately.  Maps to the depth buffer.
 		const zNear = 1;
-		const zFar = this.space.nPoints;
+		const zFar = this.nPoints;
 
 
 		// multiply by aspect?	I would think it should divide by aspect?  TODO
@@ -130,6 +135,7 @@ export class matrixGen {
 		//this.projectMatrix();
 
 		// these mostly work as advertised and as controlled by Orient3d
+		// keep interchanging offsetMatrix() and rotateMatrix()
 		this.rotateMatrix();
 		this.offsetMatrix();
 		this.unifiedMatrix = this.matrix;

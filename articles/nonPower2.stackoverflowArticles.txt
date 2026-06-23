@@ -1,0 +1,426 @@
+FFT for non power-of-2 input length
+Asked 2 years, 6 months ago
+Modified 2 years, 6 months ago
+Viewed 569 times
+Vote
+
+I am writing a Fast Fourier Transform (FFT) in Python and facing problems with input data lengths that are not powers of 2. I came across recommendations to pad such inputs with zeros to reach the nearest power of 2, but I found the results are much different compared to standard implementations (numpy)
+
+Here's my implementation of the FFT:
+
+def myfft(x):
+    N = len(x)
+    if N <= 1:
+        return x
+    evens = myfft(x[0::2])
+    odds = myfft(x[1::2])
+    t = np.exp(-2j * np.pi * np.arange(N) / N)
+    f = np.concatenate([evens + t[:N//2] * odds,
+                        evens + t[N//2:] * odds])
+    return f
+This gives the same result as numpy.fft.fft() when the input length is a power of 2, but gives a different result for zero padding input.
+
+output1 = np.fft.fft([1,2,3,4,5,6,7])
+output2 = myfft([1,2,3,4,5,6,7,0])
+
+output1: [28  -3.5+7.3j -3.5+2.8j -3.5+0.8j -3.5-0.8j -3.5-2.8j -3.5-7.3j        ]
+output2: [28  -9.7+4j   -4-4j      1.7-4j    4         1.7+4j   -4+4j     -9.7-4j]
+Is zero-padding a good approach for handling non power-of-2 input lengths in FFT? If so, what is the correct way to implement it?
+
+pythonnumpyfft
+Share
+Edit
+Follow
+Flag
+edited Nov 25, 2023 at 17:30
+asked Nov 25, 2023 at 17:20
+Jihyun's user avatar
+Jihyun
+1,12566 silver badges2323 bronze badges
+1
+
+numpy doesn't convert to a power of 2, it uses a different algorithm than the basic power of 2 FFT algorithm. –
+Ahmed AEK
+ CommentedNov 25, 2023 at 17:32
+1
+
+math.stackexchange.com/questions/77118/non-power-of-2-ffts –
+Ahmed AEK
+ CommentedNov 25, 2023 at 17:33
+1
+
+What you have to remember when using FFTs is that there is an implicit periodicity in your dataset with the supplied data pattern repeated in a cyclic loop. Your data is therefore equivalent to ...01234567012345670.... vs ...12345671234567... and numpy has done a radix 7 FFT here. Making an FFT deliver an accurate DFT is distinctly non-trivial - people usually zero pad with almost as many zeroes as they have data and in addition apply a window function and/or a compact convolution to the source data. Numerical Recipes isn't a bad place to look for some real world guidance on this. –
+Martin Brown
+ CommentedNov 26, 2023 at 10:13
+
+
+
+
+
+
+
+
+ FFT for n Points (non power of 2 )
+Asked 12 years, 5 months ago
+Modified 12 years, 5 months ago
+Viewed 12k times
+4
+
+I need to know a way to make FFT (DFT) work with just n points, where n is not a power of 2.
+
+I want to analyze an modify the sound spectrum, in particular of Wave-Files, which have in common 44100 sampling points. But my FFT does not work, it only works with points which are in shape like 2^n.
+
+So what can I do? Beside fill up the vector with zeros to the next power of 2 ?! Any way to modify the FFT algorithm?
+
+Thanks!
+
+signal-processingfft
+Share
+Edit
+Follow
+Flag
+edited Dec 26, 2013 at 9:29
+Nagaraj S's user avatar
+Nagaraj S
+13.5k66 gold badges3636 silver badges5353 bronze badges
+asked Dec 26, 2013 at 9:27
+ShuftY's user avatar
+ShuftY
+9922 gold badges22 silver badges88 bronze badges
+2
+
+Duplicate on Math.StackExchange math.stackexchange.com/q/77118 –
+user541686
+ CommentedDec 26, 2013 at 9:31
+
+This question appears to be off-topic because it is about the math foundations of an algorithm, and math.stackexchange.com/q/77118 already has good answers to this question. –
+Christopher Creutzig
+ CommentedDec 26, 2013 at 10:02
+Add a comment
+Start a bounty
+3 Answers
+Sorted by:
+
+Highest score (default)
+3
+
+You can use the FFTW library or the code generators of the Spiral project. They implement FFT for numbers with small prime factors, break down large prime factors p by reducing it to a FFT of size (p-1) which is even, etc.
+
+However, just for signal analysis it is questionable why you want to analyze exactly one second of sound and not smaller units. Also, you may want to use a windowing procedure to avoid the jumps at the ends of the segment.
+
+Share
+Edit
+Follow
+Flag
+answered Dec 26, 2013 at 11:34
+Lutz Lehmann's user avatar
+Lutz Lehmann
+26.1k22 gold badges2828 silver badges5858 bronze badges
+Comments
+
+2
+
+Aside from padding the array as you suggest, or using some other library function, you can construct a Fourier transform with arbitrary length and spacing in the frequency domain (also for non-integer sample spacings).
+
+This is a well know result and is based on the Chirp-z transform (or Bluestein's FFT). Another good reference is given by Rabiner and can be found at the above link.
+
+In summary, with this approach you don't have to write the FFT yourself, you can simply use an existing high-performance FFT and then apply the convolution theorem to a suitably scaled and conditioned version of your signal.
+
+The performance will still be, O(n*log n), multiplied by some implementation-dependent scaling factor.
+
+Share
+Edit
+Follow
+Flag
+answered Dec 26, 2013 at 23:26
+Bruce Dean's user avatar
+Bruce Dean
+2,80822 gold badges2222 silver badges3131 bronze badges
+Comments
+
+Vote
+
+The FFT is just a faster method of computing the DFT for certain length vectors; and a DFT can be computed for any length of input vector. You can also zero-pad your input vector to a length supported by your FFT library, which may be faster.
+
+If you want to modify your sound file, you may need to use the overlap-add or overlap-save fast convolution filtering after determining the length of the impulse response of your frequency domain modification.
+
+Share
+Edit
+Follow
+Flag
+answered Dec 27, 2013 at 19:53
+hotpaw2's user avatar
+hotpaw2
+70.8k1515 gold badges9696 silver badges157157 bronze badges
+Comments
+
+
+
+
+
+[suggestedby one of the above]
+Non-power-of-2 FFT's?
+Asked 14 years, 7 months ago
+Modified 5 years, 9 months ago
+Viewed 46k times
+45
+
+If I have a program that can compute FFT's for sizes that are powers of 2, how can I use it to compute FFT's for other sizes?
+
+I have read that I can supposedly zero-pad the original points, but I'm lost as to how this gives me the correct answer. If I transform a function with 5 points, I expect to get back a 5-point DFT, and I don't understand how I can extract that from the 8-point DFT (which was calculated with zero-padding).
+
+algorithmsfourier-analysis
+Share
+Cite
+Follow
+edited Oct 30, 2011 at 9:34
+J. M. ain't a mathematician's user avatar
+J. M. ain't a mathematician
+77.2k88 gold badges223223 silver badges349349 bronze badges
+asked Oct 30, 2011 at 7:08
+user541686's user avatar
+user541686
+14.4k1717 gold badges5555 silver badges9999 bronze badges
+Add a comment
+3 Answers
+Sorted by:
+
+Highest score (default)
+52
+
+Sure, you can use a radix-2 FFT to compute FFTs for lengths not a power of 2 (but it is not as efficient as using methods specifically tailored to the factors of the sequence length). However, it's not as easy as merely padding the original array. The right way of going about it, due to Rabiner, Schafer, and Rader, is termed the "chirp-z transform". (This is a slightly condensed version of the paper previously linked to.)
+
+To motivate the chirp-z idea, consider the DFT
+
+𝑋𝑘=∑𝑛=0𝑁−1𝑥𝑛(𝑒−2𝜋𝑖/𝑁)𝑘𝑛,𝑘=0,…,𝑁−1
+
+The key step, attributed to Bluestein, considers the algebraic identity
+
+𝑘𝑛=12(𝑘2+𝑛2−(𝑘−𝑛)2)
+
+Substituting into the DFT and expanding out the powers yields
+
+=∑𝑛=0𝑁−1𝑥𝑛(𝑒−2𝜋𝑖/𝑁)12(𝑘2+𝑛2−(𝑘−𝑛)2)((𝑒−2𝜋𝑖/𝑁)𝑘2/2)∑𝑛=0𝑁−1(𝑥𝑛(𝑒−2𝜋𝑖/𝑁)𝑛2/2(𝑒−2𝜋𝑖/𝑁)−(𝑘−𝑛)22)
+
+and we then recognize that the summation expression is precisely in the form of a convolution. The factor (𝑒−2𝜋𝑖/𝑁)𝑘2/2
+ is what is termed as a "chirp"; hence the name "chirp-z transform".
+
+Chirp-z thus consists of three stages:
+
+taking the Hadamard (componentwise) product of the original sequence with the chirp
+convolving with the reciprocal chirp (which of course is equivalent to the inverse FFT of the product of the FFTs of the Hadamard product and the reciprocal chirp)
+taking the Hadamard product of that result with a chirp. We see that three or so FFTs are needed (barring the possibility of an exploitable symmetry being present).
+MATLAB's Signal Processing toolbox implements this algorithm as the function czt(). See the code in the corresponding M-file for implementation details.
+
+The Code
+I (the original poster) ended up making a Python version using SciPy, so I thought I'd edit this answer to include the code:
+
+from scipy import *
+
+def czt(x, m=None, w=None, a=None):
+    # Translated from GNU Octave's czt.m
+
+    n = len(x)
+    if m is None: m = n
+    if w is None: w = exp(-2j * pi / m)
+    if a is None: a = 1
+
+    chirp = w ** (arange(1 - n, max(m, n)) ** 2 / 2.0)
+    N2 = int(2 ** ceil(log2(m + n - 1)))  # next power of 2
+    xp = append(x * a ** -arange(n) * chirp[n - 1 : n + n - 1], zeros(N2 - n))
+    ichirpp = append(1 / chirp[: m + n - 1], zeros(N2 - (m + n - 1)))
+    r = ifft(fft(xp) * fft(ichirpp))
+    return r[n - 1 : m + n - 1] * chirp[n - 1 : m + n - 1]
+
+@vectorize  # Rounds complex numbers
+def cround(z, d=None): return round(z.real, d) + 1j * round(z.imag, d)
+
+arr = [1.0, 2.0, 3.0]
+
+print cround(czt(arr), 4)       # [ 6.0+0.j    -1.5+0.866j -1.5-0.866j]
+print cround(fft(arr), 4)       # [ 6.0+0.j    -1.5+0.866j -1.5-0.866j]
+Share
+Cite
+Follow
+edited Sep 11, 2020 at 6:26
+answered Oct 30, 2011 at 12:24
+J. M. ain't a mathematician's user avatar
+J. M. ain't a mathematician
+77.2k88 gold badges223223 silver badges349349 bronze badges
+I just tried implementing this, and partly through, I realized it seems like I'd misunderstood this initially... it doesn't seem like it quite answers my question. It seems like you're mentioning how to compute Fourier transforms of an arbitrary set of N points, whereas I'm asking for obtaining a Fourier transform for these set of N points where the transform itself also has N points. An I misreading the answer, or is it indeed not answering this question? –
+user541686
+ CommentedNov 24, 2011 at 6:20
+1
+Huh? It does answer the question. You said you wanted an 𝑛
+-point transform but can only do radix-2 FFTs, didn't you? What chirp-z does is to pad before convolving (I was assuming you're already familiar with the padding that needs to be done before convolution via FFT is performed). When all is done, the first 𝑛
+ components are precisely the transform. Did you check the MATLAB implementation? –
+J. M. ain't a mathematician
+ CommentedNov 24, 2011 at 6:28
+2
+Barring that, you might want to look it up in Arndt's Matters Computational. –
+J. M. ain't a mathematician
+ CommentedNov 24, 2011 at 6:31
+If you need help with implementation, may I suggest asking a new question? –
+J. M. ain't a mathematician
+ CommentedNov 24, 2011 at 6:32
+1
+Please note that the posted results: print cround(czt(arr), 4) # [ 6.0+0.j -1.5+0.866j -1.5-0.866j] print cround(fft(arr), 4) # [ 6.0+0.j -1.5+0.866j -1.5-0.866j] are for arr = [1.0, 2.0, 3.0], and not arr = [1.0, 2.0, 3.0, 2.5, 3.5]. –
+user67288
+ CommentedMar 18, 2013 at 13:08
+Show 4 more comments
+10
+
+If you want to code a DFT of size 𝑁=5
+ you have several options:
+
+8-point FFT, after zero-padding
+Evaluate the DFT directly
+Special FFT algorithms (eg: Rader)
+The zero-padding option is popular, and it's exact (in two senses: the inverse gives you back the original zero-padding sequence; and both the 8-point transform and the 5-point transform correspond to the same underlying continuous DTFT, only sampled at different frequencies). But you can't (directly, efficiently) obtain from it the 5-point DTF. So, of you really want those 5 values, this is not the alternative.
+
+The naive alternative, to compute the 5-point DFT directly, evaluating the formula, is -of course- not a FFT (not 'fast') but for such a small size the difference might not be important.
+
+The other alternative (a true 5-point FFT) is the most efficient but also the more complex to understand and implement. And you can't use a elementary power-of-two FFT program to implement this.
+
+Share
+Cite
+Follow
+edited Oct 30, 2011 at 13:39
+answered Oct 30, 2011 at 11:54
+leonbloy's user avatar
+leonbloy
+67.1k1010 gold badges7979 silver badges170170 bronze badges
+If you want the FFT of a sequence whose length is not a power of 2, and you don't have the machinery for things like the prime-factor algorithm or Winograd's algorithm, there is a method due to Glassman that is often better than actually using the defining sum for DFT. See these three references for details. (It's slower than a proper FFT, but generally faster than the DFT.) –
+J. M. ain't a mathematician
+ CommentedOct 30, 2011 at 12:32
+@ShreevatsaR: Thanks, fixed –
+leonbloy
+ CommentedOct 30, 2011 at 13:40
+@leonbloy: I thought I understood initially, but now I'm not sure I quite understand what's going on... the question wasn't about calculating an FFT of any N points, but about doing so and obtaining a Fourier transform which itself also has N points (while, of course, doing so in faster-than-quadratic time). Sorry if you already answered this, but I can't quite distill it from the post (maybe I'm just not understanding it)... but the question is, how do I go about doing this? –
+user541686
+ CommentedNov 24, 2011 at 6:23
+@Mehrdad: I'm assuming from your restriction that all you can do are hardcoded radix-2 FFTs, and you are not allowed to write a new algorithm? Otherwise, you might want to try out the alternatives I linked to in my first comment here. (Yes, they're slightly slower than chirp-z, but the algorithms might be a bit more understandable.) –
+J. M. ain't a mathematician
+ CommentedNov 24, 2011 at 6:52
+@J.M.: No no that wasn't the case -- I can certainly code a new algorithm; I just misunderstood some things and so wasn't sure if what was posted here actually gives the result I was looking for. It seems like it does, though, so forget what I mentioned. :) (I'll post again if get confused later.) –
+user541686
+ CommentedNov 24, 2011 at 6:59
+Add a comment
+4
+
+Are you aware of FFTW? It's been available for free for years; I have used it and can attest to its ease of use and speed.
+
+Share
+Cite
+Follow
+answered Mar 23, 2013 at 12:27
+Ron Gordon's user avatar
+Ron Gordon
+143k1717 gold badges201201 silver badges326326 bronze badges
+1
+I too use FFTW, which is still fast and easy to use in December 2023! –
+Ed Graham
+ CommentedDec 13, 2023 at 19:07
+
+
+
+
+
+
+ FFT in Numpy (Python) when N is not a power of 2
+Asked 13 years, 6 months ago
+Modified 12 years, 8 months ago
+Viewed 10k times
+4
+
+My question is about the algorithm which is used in Numpy's FFT function.
+
+The documentation of Numpy says that it uses the Cooley-Tukey algorithm. However, as you may know, this algorithm works only if the number N of points is a power of 2.
+
+Does numpy pad my input vector x[n] in order to calculate its FFT X[k]? (I don't think so, since the number of points I have in the output is also N). How could I actually "see" the code which is used by numpy for its FFT function?
+
+Cheers!
+
+pythonnumpyfft
+Share
+Edit
+Follow
+Flag
+asked Dec 12, 2012 at 13:52
+Pedro Rodrigues's user avatar
+Pedro Rodrigues
+4311 silver badge33 bronze badges
+
+stackoverflow.com/questions/6855169/… –
+mmgp
+ CommentedDec 12, 2012 at 13:59
+3
+
+Well... here's one way to actually see the code. If that's not what you mean, then perhaps you should rephrase. –
+senderle
+ CommentedDec 12, 2012 at 14:09
+
+The easy hack is to downsample to the next lowest power of 2. Maybe even do that multiple times choosing which points to exclude at random, and average the results together. –
+wberry
+ CommentedDec 12, 2012 at 14:37
+Add a comment
+Start a bounty
+2 Answers
+Sorted by:
+
+Highest score (default)
+Did this work?
+Help others by voting on useful content.
+
+12
+
+The docs say numpy's FFT is based on FFTPACK.
+
+In the FFTPACK docs I find the following:
+
+subroutine rffti(n,wsave)
+
+subroutine rffti initializes the array wsave which is used in both rfftf and rfftb. the prime factorization of n together with a tabulation of the trigonometric functions are computed and stored in wsave.
+
+The standard Cooley-Tukey algorithm is "radix-2 with decimation in time", which recursively reduces the computation of an FFT of size 2*n into 2 FFTs of size n, plus n FFTs of size 2. There is a general factorization version of the same algorithm that turns an FFT of size m*ninto n FFTs of size m plus m FFTs of size n. The fact that the preparation routines in FFTPACK compute the prime factorization of the input size, seems to indicate this is what they are doing. So unless you go for a prime number of elements, or your number of elements has a very large prime factor, you should still get a pretty good speed-up.
+
+A few years back I blogged about both the radix-2 and general factorization versions of Cooley-Tukey's algorithmn. Reading those may help understand what seems to be going on inside NumPy. The following picture, taken from there, depicts a CT FFT:
+
+enter image description here
+
+Share
+Edit
+Follow
+Flag
+edited Dec 12, 2012 at 15:03
+answered Dec 12, 2012 at 14:57
+Jaime's user avatar
+Jaime
+67.8k1919 gold badges129129 silver badges164164 bronze badges
+2 Comments
+
+
+endolith
+Over a year ago
+and for prime sizes, it just does the brute force DFT, not an FFT, right?
+
+Jaime
+Over a year ago
+@endolith That's what it seems to be happening. There are FFT algorithms for prime sized inputs, I think FFTW has some of those. But on my numpy installation, doing some timings seems to indicate that prime sizes are brute forced, yes.
+2
+
+In my experience the algorithms don't do automatic padding, or at least some of them don't. For example, running the scipy.signal.hilbert method on a signal that wasn't of length == a power of two took about 45 seconds. When I padded the signal myself with zeros to such a length, it took 100ms.
+
+YMMV but it's something to double check basically any time you run a signal processing algorithm.
+
+Share
+Edit
+Follow
+Flag
+answered Oct 12, 2013 at 2:52
+choldgraf's user avatar
+choldgraf
+3,73944 gold badges2626 silver badges2929 bronze badges
+
+
+see also doc articles/chirp-z-algorithm,bstj48-5-1249.pdf

@@ -5,6 +5,7 @@
 
 
 let tracePowerToIndex = false;
+let traceTwoIndex = false;
 
 // neat trick i wish i'd thought of:
 // function isPowerOf2(value) {
@@ -210,7 +211,12 @@ export class twoSidedInfo {
 		let power = indexToPower(false, this.stepsPerDecade, this.singleIx);
 		if (this.neg)
 			power = -power;
-		console.log(`🙃 spd${this.stepsPerDecade} twoIndex${twoIndex} singleIx${this.singleIx} p${power.toPrecision(5)}`)
+
+		if (traceTwoIndex) {
+			console.log(`🙃 spd${this.stepsPerDecade} twoIndex${twoIndex} `
+			+` singleIx${this.singleIx} p${power.toPrecision(5)}`);
+		}
+
 		return power;
 	}
 

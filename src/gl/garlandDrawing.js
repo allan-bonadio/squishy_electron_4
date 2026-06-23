@@ -13,10 +13,10 @@ import {vec4, mat4} from 'gl-matrix';
 
 
 let traceAvatarAfterDrawing = false;
-let traceGLAfterDrawing = false;
+let traceSimulateGL = true;
 let traceDrawing = false;
 let traceReloadRow = false;
-let traceMatrix = true;
+let traceMatrix = false;
 let traceUColor = false;
 
 // diagnostic purposes; draws more per vertex
@@ -82,19 +82,29 @@ attribute vec4 row;
 
 void main() {
 	int vertexSerial = int(row.w);
+
 	int ix = int(vertexSerial) / 2;
 	bool odd = (ix * 2) < vertexSerial;
 	float factor = odd ? ${INNER_FACTOR} : ${OUTER_FACTOR};
+	//factor /= 100.;
+
+	// so the actual z coord goes to divide x and y, below..
+	// But, glPosition wants it remapped to 0...1
 	vec4 point;
-	point.yz = row.xy * factor * nStates;
-	point.x = float(ix);
+	point.yz = row.xy * factor;
+	//point.yz = row.xy * factor * nStates;
+	point.x = (float(ix) - nStates/2.) / 10.;
 	point.w = 1.;
 
 	vec4 pointM = point * matrix;
-	float zz = 1.0 + pointM.z;
-	gl_Position = pointM / zz;
-	//gl_Position.w = 1.0 + gl_Position.z * fudge;
+	float zz = 1.0 + pointM.z;  // for perspective
 
+	// (z - near) / (far - near)
+	float zd = (pointM.z - nStates / 2.) / nStates;
+
+	gl_Position = pointM / zz;
+	gl_Position.z = zd;
+	//gl_Position.w = 1.0 + gl_Position.z * fudge;
 
 	//	for the wave color, convert the complex values via this algorithm
 	// or use the uColor constant color handed in
@@ -196,6 +206,22 @@ export class garlandDrawing extends abstractDrawing {
 
 	}
 
+	/* **************************************** repeat drawing 1 */
+	// multi-draw: really I need to redraw with the same input variables, several times
+	// 2x front and back of blade?
+	// 1x ladder rung separators between blades in garland
+	// 2x ladder sides on panels
+
+	// ok so have operations:
+	// bool even is outer, else inner
+	// bool odd is outer, else inner
+	// byte drawarrays opcode — draw triangles, line strips, etc
+	// 		no, that's JS-side.  don't put that in the uniform.
+	// color scheme: cx, all one color..  uColor does this already
+
+
+	/* **************************************** repeat drawing 2 */
+
 	// called for each image frame on th canvas.
 	draw(width, height, paintingNeeds) {
 		if (traceDrawing) {
@@ -243,13 +269,18 @@ export class garlandDrawing extends abstractDrawing {
 			let mat = this.matrixUniform.reloadFunc().value;
 			this.avatar.dumpComplexViewBuffer(0, this.nPoints,
 				`🌀🌀🌀 finished drawing in garlandDrawing.js; drew buf:`);
-			dump4x4(`🌀🌀🌀	 matrixUni after draw`, mat);
+			dump4x4(`🌀🌀🌀	 AvatarAfterDrawing `, mat);
 		}
-		if (traceGLAfterDrawing) {
+		if (traceSimulateGL) {
 			this.simulateGL();
 			let mat = this.matrixUniform.reloadFunc().value;
 			dump4x4(`🌀🌀🌀	 matrixUni after draw=`, mat);
 		}
+	}
+
+	/* ****************************** simulate GL for testing */
+	simulateRowIteration() {
+
 	}
 
 	// simulate and calculate what WebGL would calculate, and dump that.
@@ -258,48 +289,63 @@ export class garlandDrawing extends abstractDrawing {
 		let startEnd2 = this.space.startEnd2;
 		let first = startEnd2.start2;
 		let count = startEnd2.end2 - startEnd2.start2;
+		let nStates = this.space.nStates;
 		// indexed by float, not by row like gl uses it
 		let rows4 = this.avatar.getViewBuffer(0);
 		let gl_Position = vec4.create();
-		let vertexSerial, ix, point, odd, factor, row;
-		 if (!isFinite(this.scene.paintingNeeds.unifiedMatrix[0])) debugger;
-
-		const _ = c => (gl_Position[c]).toFixed(4).padStart(7);
-		const __ = c => (row[c]).toFixed(4).padStart(7);
-		//const _ = c => (gl_Position[c]).toFixed(1).padStart(9);
+		if (!isFinite(this.scene.paintingNeeds.unifiedMatrix[0])) debugger;
+		let row = vec4.create();
+		const _ = c => (gl_Position[c]).toFixed(8).padStart(11);
 
 		'';	 // collect these otherwise the console merges dup lines
 		let text = ` 🌀🌀 what the GPU calculates,	the `
 			+`${count} vertices\n`;
 
 		for (let i = 0; i < count; i++) {
-			// the body of this loop should replicate the vector shader above
-			vertexSerial = first + i;
+			// the body of this loop should replicate the vector
+			// shader above, like GL calls this function for each row
+			// of the attr
+			let vertexSerial = first + i;
 			let rs = vertexSerial * 4;
-			row = vec4.fromValues(rows4[rs], rows4[rs+1], rows4[rs+2], rows4[rs+3]);
+			let row = vec4.fromValues(rows4[rs], rows4[rs+1],
+				rows4[rs+2], rows4[rs+3]);
+			const __ = c => (row[c]).toFixed(8).padStart(11);
 			text += ` 🌀🌀 `
 				+` ${__(0)} +i	${__(1)}   `;
-			ix = Math.floor(vertexSerial / 2);
-			odd = (ix * 2) < vertexSerial;
-			point = vec4.create();
-			factor = odd ? INNER_FACTOR : OUTER_FACTOR;
-			point[1] = row[0] * factor;
-			point[2] = row[1] * factor;
+
+			let ix = Math.floor(vertexSerial / 2);
+			let odd = (ix * 2) < vertexSerial;
+			let point = vec4.create();
+			let factor = odd ? INNER_FACTOR : OUTER_FACTOR;
+
+			point[1] = row[0] * factor;  // real => y coord
+			point[2] = row[1] * factor;  // imag => z coord
 			point[0] = ix;
 			point[3] = 1;
 
 			// point * matrix;
-			vec4.transformMat4(gl_Position, point,
+			let pointM = vec4.create();
+			vec4.transformMat4(pointM, point,
 				this.scene.paintingNeeds.unifiedMatrix);
+			let zz = 1.0 + pointM[2];  // for perspective
+
+			// (z - near) / (far - near)
+			let zd = (pointM[2] - nStates / 2.) / nStates;  // for depth 0...1
+
+			//let gl_Position = vec4.create();
+			//gl_Position = pointM / zz;
+			let gl_Position = vec4.fromValues(point[0]/zz, point[1]/zz,
+					zd, 1);
+
 			text += ` [${String(ix).padStart(3)}] `
-				+` ${_(0)}	 ${_(1)}   ${_(2)}	 ${_(3)}  \n`
-				;
+				+` ${_(0)}	 ${_(1)}   ${_(2)}	 ${_(3)}  \n`;
 		}
-		dump4x4('🌀🌀🌀 GL simulation matrix', this.scene.paintingNeeds.unifiedMatrix);
 		dblog(text + `	🌀🌀 `);
 	}
 
 }
+// dump4x4('🌀🌀🌀 GL simulation matrix',
+// 		this.scene.paintingNeeds.unifiedMatrix);
 
 export default garlandDrawing;
 
