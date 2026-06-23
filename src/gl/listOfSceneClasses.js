@@ -8,6 +8,7 @@ import flatScene from './flatScene.js';
 import garlandScene from './garlandScene.js';
 import rainbowScene from './rainbowScene.js';
 import rgbVaneScene from './misc/rgbVaneScene.js';
+import plusFieldScene from './misc/plusFieldScene.js';
 
 let traceSceneClasses = false;
 
@@ -22,6 +23,7 @@ export const listOfSceneClasses = {
 	garlandScene,
 	rainbowScene,
 	rgbVaneScene,
+	plusFieldScene,
 };
 
 if (traceSceneClasses)

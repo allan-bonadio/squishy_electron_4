@@ -201,8 +201,10 @@ export class WaveVista extends React.Component {
 		const s = this.state;
 
 		if (this.space) {
+			//let sceneClassName = 'garlandScene';
+			let sceneClassName = 'plusFieldScene';
 			//let sceneClassName = 'rgbVaneScene';
-			let sceneClassName = 'garlandScene';
+
 			let sceneName = 'mainVista';
 
 			if (traceRotMatrix)
