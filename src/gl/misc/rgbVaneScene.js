@@ -20,16 +20,29 @@ import eAvatar from '../../engine/eAvatar.js';
 let traceDrawPoints = false;
 let traceDrawing = false;
 let traceDrawLines = false;
-let traceGLAfterDrawing = false;
 let traceMatrix = false;
 let traceReload = false;
-let traceRotMatrix = false;
 
 
 /* ******************************************* vane scene */
 
+class rgbVaneScene extends abstractScene {
+	// doesn't need space or inputinfo
+	constructor(sceneName, ambiance, paintingNeeds, space) {
+		super(sceneName, ambiance, paintingNeeds, space);
+
+		// create avatar but don't add buffers; the drawing does that
+		this.avatar = eAvatar.createAvatar(sceneName);
+
+		// create relevant drawings.
+		this.drawings = [ new rgbVaneDrawing(this) ];
+	}
+}
+
+/* ******************************************* vane GLSL */
+
 const vertexShaderSrc = `// rgbVane vertexShader
-#line 33
+#line 48
 precision highp float;
 
 attribute vec4 pos;
@@ -53,29 +66,15 @@ void main() {
 `;
 
 const fragmentShaderSrc = `
-#line 45
+#line 72
 // rgbVane fragShader
 precision highp float;
 varying vec4 colorVar;
 
 void main() {
 	gl_FragColor = colorVar;
-	//gl_FragColor = vec4(colorVar);
 }
 `;
-
-class rgbVaneScene extends abstractScene {
-	// doesn't need space or inputinfo
-	constructor(sceneName, ambiance, paintingNeeds, space) {
-		super(sceneName, ambiance, paintingNeeds, space);
-
-		// create avatar but don't add buffers; the drawing does that
-		this.avatar = eAvatar.createAvatar(sceneName);
-
-		// create relevant drawings.
-		this.drawings = [ new rgbVaneDrawing(this) ];
-	}
-}
 
 /* ******************************************* vane drawing */
 
@@ -142,7 +141,7 @@ export class rgbVaneDrawing extends abstractDrawing {
 	createVariables() {
 		this.gl.useProgram(this.program);
 		if (traceDrawing)
-			console.log(`🌀🌀🌀 rgbVaneDrawing ${this.sceneName}: creatingVariables`);
+			console.log(`↗️↗️↗️↗️ rgbVaneDrawing ${this.sceneName}: creatingVariables`);
 
 		this.matrixUniform = new drawingUniform('matrix', this,
 			() => {
@@ -151,7 +150,7 @@ export class rgbVaneDrawing extends abstractDrawing {
 				 if (!isFinite(matrix[0])) debugger;
 
 				if (traceMatrix) {
-					dump4x4('🌀🌀🌀 rgbVaneDrawing reloading matrix', matrix);
+					dump4x4('↗️↗️↗️ rgbVaneDrawing reloading matrix', matrix);
 				}
 				return {value: matrix, type: 'Matrix4fv'};
 			}
@@ -160,7 +159,7 @@ export class rgbVaneDrawing extends abstractDrawing {
 		this.posAttr = new drawingAttribute('pos', this, 4,
 			() => {
 			if (traceReload) {
-				console.log(`🌀🌀🌀 rgbVaneDrawing  posAttr:  `,
+				console.log(`↗️↗️↗️ rgbVaneDrawing  posAttr:  `,
 					posData);
 			}
 
@@ -170,7 +169,7 @@ export class rgbVaneDrawing extends abstractDrawing {
 		this.colorAttr = new drawingAttribute('color', this, 4,
 			() => {
 				if (traceReload) {
-					console.log(`🌀🌀🌀 rgbVaneDrawing  colorAttr:  `,
+					console.log(`↗️↗️↗️ rgbVaneDrawing  colorAttr:  `,
 							colorData);
 			}
 
@@ -182,7 +181,7 @@ export class rgbVaneDrawing extends abstractDrawing {
 	// called for each image frame on th canvas.  TODO: roll specialInfo into the input Data Arrays
 	draw(width, height, paintingNeeds) {
 		if (traceDrawing) {
-			console.log(`🌀🌀🌀 rgbVane Drawing  ${this.avatarLabel}: `
+			console.log(`↗️↗️↗️ rgbVane Drawing  ${this.avatarLabel}: `
 				+` width=${width}, height=${height}  drawing ${this.vertexCount/2} points `
 				+` matrix=${this.matrix}`);
 		}
@@ -194,63 +193,20 @@ export class rgbVaneDrawing extends abstractDrawing {
 
 		gl.drawArrays(gl.TRIANGLE_STRIP, 0, this.nVertices);
 		if (traceDrawing) {
-			console.log(`🌀🌀🌀just drewArays-rgbVane on avatar ptr=${this.avatar._pointer_} `
+			console.log(`↗️↗️↗️just drewArays-rgbVane on avatar ptr=${this.avatar._pointer_} `
 				+` this.avatar.label=${this.avatar.label}, `
 				+` buffer label=${this.avatar.bufferNames[0]}`);
 		}
 
 		if (traceDrawLines) {
 			gl.lineWidth(1);  // it's the only option anyway
-			gl.drawArrays(gl.GL_LINE_STRIP, first, count);
+			gl.drawArrays(gl.GL_LINE_STRIP, 0, this.nVertices);
 		}
 
 		if (traceDrawPoints)
-			gl.drawArrays(gl.POINTS, first, count);
-
-		if (traceGLAfterDrawing) {
-			this.simulateGL(
-				`🌀🌀🌀 finished drawing in rgbVaneDrawing.js; drew buf:`);
-			console.log(`🌀🌀🌀  matrixUniform=`, this.matrixUniform.reloadFunc());
-		}
+			gl.drawArrays(gl.POINTS, 0, this.nVertices);
 	}
 
-	// simulate and calculate what WebGL would calculate, and dump that.
-	// give or take fidelity of the below.
-	simulateGL() {
-		let startEnd2 = this.space.startEnd2;
-		let first = startEnd2.start2;
-		let count = startEnd2.end2 - startEnd2.start2;
-		let vertexSerial, ix, point, odd, factor, row;
-		let rows = this.avatar.getViewBuffer(0);
-		let gl_Position = vec4.create();
-
-		const _ = c => (gl_Position[c] / gl_Position[3]).toFixed(4).padStart(7);
-
-		// collect these otherwise the console merges dup lines
-		let text = ` 🌀🌀 what the GPU calculates, only the `
-			+`${count} vertices, not the points:`;
-
-		for (let i = 0; i < count; i++) {
-			let vertexSerial = first + i;
-			let rs = vertexSerial * 4;
-			row = vec4.fromValues(rows[rs], rows[rs+1], rows[rs+2], rows[rs+3]);
-			ix = Math.floor(vertexSerial / 2);
-			point = vec4.create();
-			odd = (ix & 1);
-			factor = odd ? INNER_FACTOR : OUTER_FACTOR;
-			point[0] = row[0] * factor;
-			point[1] = row[1] * factor;
-			point[2] = 0;
-			point[3] = vertexSerial;
-
-			// point * matrix;
-			vec4.transformMat4(gl_Position, point, this.scene.paintingNeeds.unifiedMatrix);
-			text += ` 🌀🌀${(ix + '').padStart(3)} `
-				+` ${_(0)}   ${_(1)}   ${_(2)}  \n`;
-			//dblog(` 🌀🌀${_(0)}   ${_(1)}   ${_(2)}   ${_(3)}  `);
-		}
-		dblog(text + `  🌀🌀 `);
-	}
 }
 
 export default rgbVaneScene;
