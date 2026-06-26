@@ -140,7 +140,7 @@ export class garlandDrawing extends abstractDrawing {
 		// And each of those is four single floats going to the GPU
 		this.nPoints = this.space.nPoints;
 		this.avatar = scene.avatar;
-		this.avatar.attachViewBuffer(0, null, 4, this.nPoints * 2, 'garland drawing');
+		this.avatar.attachViewBuffer(this.scene.garlandAvatarID, null, 4, this.nPoints * 2, 'garland drawing');
 
 		this.vertexShaderSrc = vertexShaderSrc;
 		this.fragmentShaderSrc = fragmentShaderSrc;

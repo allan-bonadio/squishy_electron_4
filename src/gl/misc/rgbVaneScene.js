@@ -122,8 +122,8 @@ export class rgbVaneDrawing extends abstractDrawing {
 		// each point in the wave results in two vertices, but it's a strip so consecutive vertices.
 		// And each of those is four single floats going to the GPU
 		this.avatar = scene.avatar;
-		this.avatar.attachViewBuffer(1, null, 4, 10, 'pos');
-		this.avatar.attachViewBuffer(2, null, 4, 10, 'color');
+		this.avatar.attachViewBuffer(this.scene.rgbVanePosAvatarID, null, 4, 10, 'pos');
+		this.avatar.attachViewBuffer(this.scene.rgbVaneColorAvatarID, null, 4, 10, 'color');
 
 		this.vertexShaderSrc = vertexShaderSrc;
 		this.fragmentShaderSrc = fragmentShaderSrc;
