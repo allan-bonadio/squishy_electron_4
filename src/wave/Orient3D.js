@@ -112,19 +112,19 @@ function Orient3D(props) {
 		<div>
 			<label>xAng {xAng}°
 				<input type='range' className='xAng' value={xAng}
-					min={omm.xAng.min} max={omm.xAng.max} step={15} onChange={handleAngSetting} />
+					min={omm.xAng.min} max={omm.xAng.max} step={5} onChange={handleAngSetting} />
 			</label>
 		</div>
 		<div>
 			<label>yAng {yAng}°
 				<input type='range' className='yAng' value={yAng}
-					min={omm.yAng.min} max={omm.yAng.max} step={15} onChange={handleAngSetting} />
+					min={omm.yAng.min} max={omm.yAng.max} step={5} onChange={handleAngSetting} />
 			</label>
 		</div>
 		<div>
 			<label>zAng {zAng}°
 				<input type='range' className='zAng' value={zAng}
-					min={omm.zAng.min} max={omm.zAng.max} step={15} onChange={handleAngSetting} />
+					min={omm.zAng.min} max={omm.zAng.max} step={5} onChange={handleAngSetting} />
 			</label>
 		</div>
 
