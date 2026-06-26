@@ -18,9 +18,9 @@ import eAvatar from '../../engine/eAvatar.js';
 
 // diagnostic purposes; draws more per vertex
 let traceDrawPoints = false;
-let traceDrawing = true;
+let traceDrawing = false;
 let traceMatrix = false;
-let traceReload = true;
+let traceReload = false;
 
 
 /* ******************************************* plus scene */
@@ -39,9 +39,30 @@ class plusFieldScene extends abstractScene {
 }
 
 /* ******************************************* plus drawing */
+// This just sets up six-pointed stars all over the volume for testing
+
+// number of plusses outside of the center plus
+const RADIUS = 10;
+
+// width/height/depth of the cloud of plusses
+const SIDE = 2 * RADIUS + 1;
+const nPLUSSES = SIDE ** 3;
+
+// two  verts each * 3 directions
+const nVERTICES = 6 * nPLUSSES;
+
+const ARM_LENGTH = .1;
+
+// we need a function that yields 0...1 for zNear...zFar
+// (z - zNear) / (zFar - zNear)
+const zNear = .1;
+const zFar = (SIDE * 3 + zNear + 3) * 3;
+const zzNear = zNear.toFixed(1);  // strings for insertion into glsl
+const zzThickness = (zFar - zNear).toFixed(1);
+
 
 const vertexShaderSrc = `// plusField vertexShader
-#line 48
+#line 63
 precision highp float;
 
 attribute vec4 tip;
@@ -51,15 +72,37 @@ uniform mat4 matrix;
 void main() {
 	gl_PointSize = 4.;
 
+	// in JS this looks like tip * matrix, i think
 	vec4 posT = matrix * tip;
 	gl_Position = posT;
+	//gl_Position.z = 1.;
+	gl_Position.w = posT.z;
+	//gl_Position.w = 1.;
 
-	colorVar = vec4(1,1,.5,1);;
+	//vec4 posT = tip * matrix;
+
+	// so gregman says:
+	// "It turns out WebGL takes the x,y,z,w value we assign to
+	// gl_Position in our vertex shader and divides it by w
+	// automatically."
+	// So, w should get the real-space distance, and z should get the
+	// clipspace number.  Ecept we don't want the clipspace z getting
+	// divided by the distance z.
+//
+// 	gl_Position.xy = posT.xy / posT.z;
+//
+// 	//gl_Position.z = posT.z;
+// 	gl_Position.z = (posT.z - ${zzNear}) / ${zzThickness};
+//
+// 	gl_Position.w = gl_Position.z;
+	//gl_Position.w = 1.;
+
+	colorVar = vec4(1, 1, 0.5, 1);
 }
 `;
 
 const fragmentShaderSrc = `
-#line 70
+#line 102
 // plusField fragShader
 precision highp float;
 varying vec4 colorVar;
@@ -70,17 +113,6 @@ void main() {
 `;
 
 
-// This just sets up six-pointed stars all over the volume for testing
-
-const RADIUS = 1;
-const SIDE = 2 * RADIUS + 1;
-const nPLUSSES = SIDE ** 3;
-
-// two  verts each * 3 directions
-const nVERTICES = 6 * nPLUSSES;
-
-const ARM_LENGTH = .1;
-
 // the original display that's worth watching: plusField upside down hump graph
 export class plusFieldDrawing extends abstractDrawing {
 	constructor(scene) {
@@ -90,7 +122,7 @@ export class plusFieldDrawing extends abstractDrawing {
 		// And each of those is four single floats going to the GPU
 		this.avatar = scene.avatar;
 		// id 3, no mem, 4 floats per vertex,
-		this.buf = this.avatar.attachViewBuffer(3, null, 4, nVERTICES, 'tip');
+		this.buf = this.avatar.attachViewBuffer(this.scene.plusFieldAvatarID, null, 4, nVERTICES + 20, 'tip');
 
 		this.vertexShaderSrc = vertexShaderSrc;
 		this.fragmentShaderSrc = fragmentShaderSrc;
@@ -102,20 +134,30 @@ export class plusFieldDrawing extends abstractDrawing {
 	}
 
 	dump() {
-		let total = [];
+		let total = [' '];
 		let buf = this.buf;
+		let rbase, cbase, jbase;
 		// loop over
 		for (let r = 0; r < SIDE * SIDE * 3; r++) {
+			rbase = r * SIDE * SIDE * 3;
 			for (let c = 0; c < SIDE; c++) {
-				for (let j = 0; j < 4; j++) {
-					let ix = ((r *  SIDE + c) * SIDE + j)
+				cbase = c;
+
+				// each row, two vertices
+				for (let j = 0; j < 8; j++) {
+					// two specific vertices for this line seg; 8 nums
+					let ix = ((r *  SIDE + c) * 8 + j)
+					//dblog(`${ix} comes from j=${j}, c=${c}  r=${r}`);/////
+					if (4 == j)
+						total.push(`   `);
 					total.push(this.buf[ix].toFixed(1).padStart(6));
 				}
 				total.push(`\n`);
 			}
 			total.push(`\n`);
 		}
-		dblog(`the plus field should have ${3 * SIDE**3 * 8}: `, total.join(' '));
+		dblog(`the plus field should have ${3 * SIDE**3 * 8} numbers:`);
+		dblog(total.join(''));
 	}
 
 	/* ******************************************* populating */
@@ -130,15 +172,15 @@ export class plusFieldDrawing extends abstractDrawing {
 		for (let direction = 0; direction < 3; direction++) {
 
 			// the position of the center of the plus, along x axis
-			for (let xx = -RADIUS; xx < RADIUS; xx++) {
+			for (let xx = -RADIUS; xx <= RADIUS; xx++) {
 				here[0] = xx;
 
 				// along y axis
-				for (let yy = -RADIUS; yy < RADIUS; yy++) {
+				for (let yy = -RADIUS; yy <= RADIUS; yy++) {
 					here[1] = yy;
 
 					// along z axis
-					for (let zz = -RADIUS; zz < RADIUS; zz++) {
+					for (let zz = -RADIUS; zz <= RADIUS; zz++) {
 						here[2] = zz;
 						//(xx * SIDE + yy) * SIDE + zz;
 
@@ -163,7 +205,7 @@ export class plusFieldDrawing extends abstractDrawing {
 			}
 		}
 		this.dump();
-		dblog(this.buf);
+		dblog(`total ${offset} items: `, this.buf);
 	}
 
 	/* ******************************************* populating */
@@ -203,7 +245,7 @@ export class plusFieldDrawing extends abstractDrawing {
 	draw(width, height, paintingNeeds) {
 		if (traceDrawing) {
 			console.log(`➕➕➕ plusField Drawing  ${this.avatarLabel}: `
-				+` width=${width}, height=${height}  drawing ${this.vertexCount/2} points `
+				+` width=${width}, height=${height}  drawing ${nVERTICES/2} points `
 				+` matrix=${this.matrix}`);
 		}
 		const gl = this.gl;
@@ -212,12 +254,13 @@ export class plusFieldDrawing extends abstractDrawing {
 		//this.drawVariables.forEach(v => v.reloadVariable());
 
 		gl.lineWidth(1);  // it's the only option anyway
-		gl.drawArrays(gl.GL_LINE_STRIP, 0, nVERTICES);
+		gl.drawArrays(gl.LINES, 0, nVERTICES);
+		//gl.drawArrays(gl.LINE_STRIP, 0, nVERTICES);
 
 		if (traceDrawing) {
 			console.log(`➕➕➕just drewArays-plusField on avatar ptr=${this.avatar._pointer_} `
 				+` this.avatar.label=${this.avatar.label}, `
-				+` buffer label=${this.avatar.bufferNames[0]}`);
+				+` buffer label=${this.avatar.bufferNames[this.scene.plusFieldAvatarID]}`);
 		}
 
 

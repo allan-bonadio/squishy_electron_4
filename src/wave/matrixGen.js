@@ -19,6 +19,7 @@ let traceProjMatrix = false;
 let traceOffMatrix = false;
 
 
+
 // the rule in this class is to always keep the intermediate matrix in this.matrix
 // then, you can rearrange teh functions in unifyMatrices()
 export class matrixGen {
@@ -29,9 +30,10 @@ export class matrixGen {
 		this.nPoints = nPoints;
 		this.canvasInnerWidth = canvasInnerWidth;
 		this.canvasInnerHeight = canvasInnerHeight;
+		this.aspect = canvasInnerWidth / canvasInnerHeight;
 	}
 
-	// start over
+	// minimal matrix that'll work sortof
 	newMatrix() {
 		this.matrix = mat4.create();
 	}
@@ -42,14 +44,14 @@ export class matrixGen {
 	// geometry/numbers. Must have canvasInnerWidth/Height from
 	// updateInnerDims() already calculated. offsetMatrix() next
 	// makes the offMatrix - the starting point for different
-	// rotations. Must be done before first repaint.
+	// rotations.
 	projectMatrix = () => {
 		let matrix = this.matrix;
 
 		// make the projection matrix.. never changes. Well, if you change
 		// the FOV, you have to recalculate this.  Oh and if the window or the
 		// vista height changes.  Or ... if ...
-		const aspect = this.canvasInnerWidth / this.canvasInnerHeight;
+		//const aspect = this.canvasInnerWidth / this.canvasInnerHeight;
 
 		// hfov = horizontal field of view; default for glMatrix is vertical
 		const horizontalFieldOfView = d2r * this.orient.hfoView; // in radians
@@ -73,8 +75,16 @@ export class matrixGen {
 	  this.matrix = this.projMatrix = matrix;
 	}
 
+	// so gregman says:
+	// "It turns out WebGL takes the x,y,z,w value we assign to
+	// gl_Position in our vertex shader and divides it by w
+	// automatically."
+	// So, w should get the real-space distance, and z should get the
+	// clipspace number.  Ecept we don't want the clipspace z getting
+	// divided by the distance z.
+
 	regularMatrix = () => {
-		// start with identity matrix at 30% size
+
 		let matrix = this.matrix;
 		mat4.scale(matrix, matrix, [.3, .3, .3, .3, ]);
 		this.matrix = matrix;
@@ -94,7 +104,6 @@ export class matrixGen {
 			dblog(`️🏔️ offfsets xyz: ${o.xPos}	 ${o.yPos}	${o.zPos}  `);
 		}
 
-		// probably call rotateMatrix() after this
 		if (traceOffMatrix)
 			dump4x4('vista matrix after translate:', matrix);
 		if (!isFinite(matrix[0])) debugger;
@@ -124,23 +133,36 @@ export class matrixGen {
 		if (!isFinite(matrix[0])) debugger;
 	}
 
-	// this theoretically builds THE matrix I use to txform vertices.
+	fixForScreen() {
+		mat4.scale(this.matrix, this.matrix,
+			[1, this.aspect, 1, 1]);
+	}
+
+	// final assembly
 	// Based on orient passed in
 	// sets this.unifiedMatrix, and returns it
 	unifyMatrices() {
 		this.newMatrix();
 
+		//this.fixForScreen();  // here?
+
 		// one of these for starters
 		this.regularMatrix();
 		//this.projectMatrix();
+
+
+
 
 		// these mostly work as advertised and as controlled by Orient3d
 		// keep interchanging offsetMatrix() and rotateMatrix()
 		this.rotateMatrix();
 		this.offsetMatrix();
-		this.unifiedMatrix = this.matrix;
 
-		  if (!isFinite(this.matrix[0])) debugger;
+		this.fixForScreen();  // here?
+
+
+		this.unifiedMatrix = this.matrix;
+		if (!isFinite(this.matrix[0])) debugger;
 		return this.unifiedMatrix;
 	}
 
