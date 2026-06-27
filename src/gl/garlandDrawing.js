@@ -201,7 +201,7 @@ export class garlandDrawing extends abstractDrawing {
 					+` double0=${this.avatar.double0}`);
 			}
 
-			return this.avatar.getViewBuffer(0);
+			return this.avatar.getViewBuffer(this.scene.garlandAvatarID);
 		});
 
 	}
@@ -248,9 +248,11 @@ export class garlandDrawing extends abstractDrawing {
 			gl.drawArrays(gl.TRIANGLE_STRIP, first, count);
 		}
 		if (traceDrawing) {
-			dblog(`🌀🌀🌀just drewArrays-garland on avatar ptr=${this.avatar._pointer_} `
+			dblog(`🌀🌀🌀just drewArrays-garland on avatar `
+				+` ptr=${this.avatar._pointer_} `
 				+` this.avatar.label=${this.avatar.label}, `
-				+` buffer label=${this.avatar.bufferNames[0]}`);
+				+` buffer label= `
+				+` ${this.avatar.bufferNames[this.scene.garlandAvatarID]}`);
 		}
 
 		if (traceDrawLines) {
@@ -267,7 +269,8 @@ export class garlandDrawing extends abstractDrawing {
 		// i think this is problematic
 		if (traceAvatarAfterDrawing) {
 			let mat = this.matrixUniform.reloadFunc().value;
-			this.avatar.dumpComplexViewBuffer(0, this.nPoints,
+			this.avatar.dumpComplexViewBuffer(this.scene.garlandAvatarID,
+				this.nPoints,
 				`🌀🌀🌀 finished drawing in garlandDrawing.js; drew buf:`);
 			dump4x4(`🌀🌀🌀	 AvatarAfterDrawing `, mat);
 		}
@@ -291,7 +294,7 @@ export class garlandDrawing extends abstractDrawing {
 		let count = startEnd2.end2 - startEnd2.start2;
 		let nStates = this.space.nStates;
 		// indexed by float, not by row like gl uses it
-		let rows4 = this.avatar.getViewBuffer(0);
+		let rows4 = this.avatar.getViewBuffer(this.scene.garlandAvatarID);
 		let gl_Position = vec4.create();
 		if (!isFinite(this.scene.paintingNeeds.unifiedMatrix[0])) debugger;
 		let row = vec4.create();

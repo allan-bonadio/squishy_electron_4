@@ -55,6 +55,8 @@ const RADIANS_PER_SEG = DEGREES_PER_SEG / 180. * π;
 const nSEGS = Math.round(360 / DEGREES_PER_SEG);
 const nVERTS = nSEGS + 2;  // zero is central pt; then we use start & end again
 
+
+
 // a piechart-like image of all the complex colors around |u| = 1
 export class rainbowDrawing extends abstractDrawing {
 	// constructor must create the Avatar if the scene hasn't, create all of attrs and uniforms.
@@ -74,9 +76,10 @@ export class rainbowDrawing extends abstractDrawing {
 		if (traceRainbowDrawing)
 			console.log(`🌈 🌈 rainbow: creatingVariables`);
 
-		const pos = this.pos = this.avatar.attachViewBuffer(0, null, 2, nVERTS, 'pos');
+		const pos = this.pos = this.avatar.attachViewBuffer(
+			this.scene.posAvatarID, null, 2, nVERTS, 'pos');
 		//const col = this.col = this.avatar.attachViewBuffer(1, null, 3, nVERTS, 'col');
-		const wave = this.wave = this.avatar.attachViewBuffer(2, null, 2, nVERTS, 'wave');
+		const wave = this.wave = this.avatar.attachViewBuffer(this.scene.colorAvatarID, null, 2, nVERTS, 'wave');  // unused?  TODO
 
 		// load the data before sending off the buffers
 		this.loader(this.avatar);
@@ -97,9 +100,9 @@ export class rainbowDrawing extends abstractDrawing {
 
 	// load up the avatar with numbers.	 We generate bare coords ±1
 	loader(avatar) {
-		const pos = avatar.getViewBuffer(0);
+		const pos = avatar.getViewBuffer(this.scene.rgbVanePosAvatarID);
 		//const col = avatar.getViewBuffer(1);
-		const wave = avatar.getViewBuffer(2);
+		const wave = avatar.getViewBuffer(this.scene.rgbVaneColorAvatarID);
 		let p = 0, c = 0, w = 0;
 		const RADIUS = 1;
 		const originX = 0, originY = 0;

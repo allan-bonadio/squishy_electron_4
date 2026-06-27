@@ -32,6 +32,7 @@ class plusFieldScene extends abstractScene {
 
 		// create avatar but don't add buffers; the drawing does that
 		this.avatar = eAvatar.createAvatar(sceneName);
+		this.plusFieldAvatarID = 3;
 
 		// create relevant drawings.
 		this.drawings = [ new plusFieldDrawing(this) ];

@@ -23,6 +23,8 @@ class rainbowScene extends abstractScene {
 
 		// create avatar but don't add buffers; the drawing does that
 		this.avatar = eAvatar.createAvatar(sceneName);
+		this.scene.rainbowPosAvatarID = 0;
+		this.scene.rainbowWaveAvatarID = 1;  // i don't think this is used? TODO
 
 		// create relevant drawings.
 		this.drawings = [ new rainbowDrawing(this) ];

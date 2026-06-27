@@ -18,8 +18,9 @@ class garlandScene extends abstractScene {
 		// create avatar but don't stick buffers; the drawing does that
 		this.avatar = eAvatar.createAvatar(sceneName);
 
-		// all the different buffers wei might use in this scene
+		// all the different buffers we might use in this scene
 		this.garlandAvatarID = 0;
+
 		this.rgbVanePosAvatarID = 1;  // testing only
 		this.rgbVaneColorAvatarID = 2;  // testing only
 		this.plusFieldAvatarID = 3;  // testing only
