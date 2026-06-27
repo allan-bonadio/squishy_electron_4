@@ -18,16 +18,13 @@ import qeConsts from '../engine/qeConsts.js';
 import './wave.scss';
 //import './WaveVista.scss';
 import {getASetting, storeASetting, getAGroup, storeAGroup} from '../utils/storeSettings.js';
-//import {waitForSpaceCreatedPromise} from './waveContext.js';
 import waveAux from './waveAux.js';
 import SizeBox from './SizeBox.js';
 
 import PivotOverlay from './PivotOverlay.js';
 import Orient3D from './Orient3D.js';
-// import {WELL_BUMPER_WIDTH} from '../volts/voltConstants.js';
 import GLScene from '../gl/GLScene.js';
 import Spinner from '../widgets/Spinner.js';
-//import {eSpaceCreatedPromise} from '../engine/eEngine.js';
 import SquishContext from '../sPanel/SquishContext.js';
 import BeginFinishOverlay from './BeginFinishOverlay.js';
 import matrixGen from './matrixGen.js';
@@ -204,8 +201,8 @@ export class WaveVista extends React.Component {
 		const s = this.state;
 
 		if (this.space) {
-			//let sceneClassName = 'garlandScene';
-			let sceneClassName = 'plusFieldScene';
+			let sceneClassName = 'garlandScene';
+			//let sceneClassName = 'plusFieldScene';
 			//let sceneClassName = 'rgbVaneScene';
 
 			let sceneName = 'mainVista';
