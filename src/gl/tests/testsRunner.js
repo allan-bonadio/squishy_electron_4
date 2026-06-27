@@ -8,6 +8,8 @@ import {mockSpace, mockAvatar, mockGLScene} from './mockGLScene.js';
 import {starScene} from './starScene.js';
 import {noiseScene} from './noiseScene.js';
 
+// NOT SURE if this works anymore TODO
+
 // pretend jquery
 window.$ = document.querySelector.bind(document);
 window.$$ = (sel) => Array.from(document.querySelectorAll(sel));
