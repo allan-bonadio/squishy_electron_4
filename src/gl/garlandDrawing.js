@@ -13,7 +13,7 @@ import {vec4, mat4} from 'gl-matrix';
 
 
 let traceAvatarAfterDrawing = false;
-let traceSimulateGL = true;
+let traceSimulateGL = false;
 let traceDrawing = false;
 let traceReloadRow = false;
 let traceMatrix = false;
@@ -59,7 +59,7 @@ blade is two triangles */
 // how much raw psi values should be multipled to be equivalent to x in volume
 // space values that go from 0 to N.  Adjust to taste or to N. These are
 // inserted as numbers into the vert shader code.
-const OUTER_FACTOR = '2.0';
+const OUTER_FACTOR = '5.0';
 const INNER_FACTOR = '1.';
 
 // make the line number for the start correspond to this JS file line number - the NEXT line
@@ -93,18 +93,18 @@ void main() {
 	vec4 point;
 	point.yz = row.xy * factor;
 	//point.yz = row.xy * factor * nStates;
-	point.x = (float(ix) - nStates/2.) / 10.;
-	point.w = 1.;
+	point.x = (float(ix) - nStates/2.) / 5.;
 
 	vec4 pointM = point * matrix;
-	float zz = 1.0 + pointM.z;  // for perspective
+	float zPers = 1.0 + pointM.z;  // for perspective
 
+	// z for depth buffer -  remap to 0...1
 	// (z - near) / (far - near)
-	float zd = (pointM.z - nStates / 2.) / nStates;
+	float zDepth = (pointM.z - nStates / 2.) / nStates;
 
-	gl_Position = pointM / zz;
-	gl_Position.z = zd;
-	//gl_Position.w = 1.0 + gl_Position.z * fudge;
+	gl_Position.xy = pointM.xy / zPers;
+	gl_Position.z = zDepth;
+	gl_Position.w = 1.;
 
 	//	for the wave color, convert the complex values via this algorithm
 	// or use the uColor constant color handed in
@@ -313,7 +313,7 @@ export class garlandDrawing extends abstractDrawing {
 			let row = vec4.fromValues(rows4[rs], rows4[rs+1],
 				rows4[rs+2], rows4[rs+3]);
 			const __ = c => (row[c]).toFixed(8).padStart(11);
-			text += ` 🌀🌀 `
+			text += ` 🌀 `
 				+` ${__(0)} +i	${__(1)}   `;
 
 			let ix = Math.floor(vertexSerial / 2);
@@ -330,15 +330,15 @@ export class garlandDrawing extends abstractDrawing {
 			let pointM = vec4.create();
 			vec4.transformMat4(pointM, point,
 				this.scene.paintingNeeds.unifiedMatrix);
-			let zz = 1.0 + pointM[2];  // for perspective
+			let zPers = 1.0 + pointM[2];  // for perspective
 
 			// (z - near) / (far - near)
-			let zd = (pointM[2] - nStates / 2.) / nStates;  // for depth 0...1
+			let zDepth = (pointM[2] - nStates / 2.) / nStates;  // for depth 0...1
 
 			//let gl_Position = vec4.create();
-			//gl_Position = pointM / zz;
-			let gl_Position = vec4.fromValues(point[0]/zz, point[1]/zz,
-					zd, 1);
+			//gl_Position = pointM / zPers;
+			let gl_Position = vec4.fromValues(point[0]/zPers, point[1]/zPers,
+					zDepth, 1);
 
 			text += ` [${String(ix).padStart(3)}] `
 				+` ${_(0)}	 ${_(1)}   ${_(2)}	 ${_(3)}  \n`;
