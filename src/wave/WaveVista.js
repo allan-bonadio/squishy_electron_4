@@ -9,14 +9,12 @@
 
 import React, {useContext} from 'react';
 import PropTypes, {checkPropTypes} from 'prop-types';
-//import * as d3 from "d3";
 
 import {mat4} from 'gl-matrix';
 
 import eSpace from '../engine/eSpace.js';
 import qeConsts from '../engine/qeConsts.js';
 import './wave.scss';
-//import './WaveVista.scss';
 import {getASetting, storeASetting, getAGroup, storeAGroup} from '../utils/storeSettings.js';
 import waveAux from './waveAux.js';
 import SizeBox from './SizeBox.js';
@@ -37,9 +35,10 @@ let traceContext = false;
 let traceOrientation= false;
 let traceOrient = false;
 
-let traceProjMatrix = false;
-let traceOffMatrix = false;
 let traceRotMatrix = false;
+
+let traceShowOrient3D = true;
+let traceDontShowPivotOverlay = false;
 
 
 const round = (n) => Math.round(n, 1);
@@ -252,15 +251,27 @@ export class WaveVista extends React.Component {
 				+` orient.y=${this.orient.y} orient.z=${this.orient.z}`);
 		}
 
-		let pOverlay = 'no O';
-		if (this.mainVistaRepaint) {
-			pOverlay = <Orient3D
-					orient={this.orient}
+		let pivotOverlay = '';
+		let orientOverlay = '';
 
-					setAngSetting={this.setAngSetting}
-					setOneSetting={this.setOneSetting}
-					setOrientAll={this.setOrientAll}
-				/>;
+		if (this.mainVistaRepaint) {
+			// normally on for production use
+			if (!traceDontShowPivotOverlay){
+				pivotOverlay = <PivotOverlay
+						orient={this.orient}
+						setAngSetting={this.setAngSetting}
+					/>;
+			}
+
+			// normally off for production use
+			if (traceShowOrient3D){
+				orientOverlay = <Orient3D
+						orient={this.orient}
+						setAngSetting={this.setAngSetting}
+						setOneSetting={this.setOneSetting}
+						setOrientAll={this.setOrientAll}
+					/>;
+			}
 		}
 
 		let vista = this.makeVista();
@@ -291,7 +302,9 @@ export class WaveVista extends React.Component {
 
 				</section>
 
-				{pOverlay}
+				{pivotOverlay}
+				{orientOverlay}
+
 
 				<BeginFinishOverlay />
 
@@ -303,7 +316,6 @@ export class WaveVista extends React.Component {
 		</div>
 		);
 	}
-// />
 }
 
 
