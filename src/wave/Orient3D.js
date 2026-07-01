@@ -15,8 +15,6 @@ let traceOrient = false;
 const ZPOS_DEFAULT = -100;
 
 const propTypes = {
-   //setOrient: PropTypes.func.isRequired,
-
    // in/out.  Pass it in with, whatever, but must have all these
    // fields (not just the ones listed here)
    orient: PropTypes.shape({

@@ -21,6 +21,7 @@ let traceDrawPoints = false;
 let traceDrawing = false;
 let traceMatrix = false;
 let traceReload = false;
+let tracePopulate = false;
 
 
 /* ******************************************* plus scene */
@@ -205,8 +206,11 @@ export class plusFieldDrawing extends abstractDrawing {
 				}
 			}
 		}
-		this.dump();
-		dblog(`total ${offset} items: `, this.buf);
+
+		if (tracePopulate) {
+			this.dump();
+			dblog(`total ${offset} items: `, this.buf);
+		}
 	}
 
 	/* ******************************************* populating */
