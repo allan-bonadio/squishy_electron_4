@@ -60,7 +60,7 @@ blade is two triangles */
 // space values that go from 0 to N.  Adjust to taste or to N. These are
 // inserted as numbers into the vert shader code.
 const OUTER_FACTOR = '5.0';
-const INNER_FACTOR = '1.';
+const INNER_FACTOR = '4.';
 
 // make the line number for the start correspond to this JS file line number - the NEXT line
 const vertexShaderSrc = `// garlandDrawing vertex
@@ -96,7 +96,7 @@ void main() {
 	point.x = (float(ix) - nStates/2.) / 5.;
 
 	vec4 pointM = point * matrix;
-	float zPers = 1.0 + pointM.z;  // for perspective
+	float zPers = 2.0 + pointM.z;  // for perspective
 
 	// z for depth buffer -  remap to 0...1
 	// (z - near) / (far - near)
