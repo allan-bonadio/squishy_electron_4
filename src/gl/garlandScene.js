@@ -8,6 +8,8 @@ import {mat4} from 'gl-matrix';
 import abstractScene from './abstractScene.js';
 import garlandDrawing from './garlandDrawing.js';
 import {rgbVaneDrawing} from './misc/rgbVaneScene.js';
+import {plusFieldDrawing} from './misc/plusFieldScene.js';
+
 import eAvatar from '../engine/eAvatar.js';
 
 
@@ -28,7 +30,8 @@ class garlandScene extends abstractScene {
 		// create relevant drawings.
 		this.drawings = [
 			new garlandDrawing(this, space),
-			new rgbVaneDrawing(this, space),
+			// new rgbVaneDrawing(this, space),
+			// new plusFieldDrawing(this, space),
 		];
 
 	}
