@@ -14,9 +14,9 @@ const d2r = Math.PI / 180;
 //	paintingNeeds = { unifiedMatrix: mg.unifyMatrices() };
 
 let traceOrientation= false;
-let traceRotMatrix = false;
+let traceRotMatrix = true;
 let traceProjMatrix = false;
-let traceOffMatrix = false;
+let traceOffMatrix = true;
 
 
 
@@ -24,16 +24,16 @@ let traceOffMatrix = false;
 // then, you can rearrange teh functions in unifyMatrices()
 export class matrixGen {
 	// orient has all the vars needed to construct the matrix
-	constructor(orient, nPoints, canvasInnerWidth, canvasInnerHeight) {
+	constructor(orient, nStates, canvasInnerWidth, canvasInnerHeight) {
 		this.orient = orient;
 		this.newMatrix();
-		this.nPoints = nPoints;
+		this.nStates = nStates;
 		this.canvasInnerWidth = canvasInnerWidth;
 		this.canvasInnerHeight = canvasInnerHeight;
 		this.aspect = canvasInnerWidth / canvasInnerHeight;
 	}
 
-	// minimal matrix that'll work sortof
+	// start with minimal matrix, identity
 	newMatrix() {
 		this.matrix = mat4.create();
 	}
@@ -59,7 +59,7 @@ export class matrixGen {
 		// these need to be, REALLY, the closest stuff, and the farthest stuff.
 		// Approximately.  Maps to the depth buffer.
 		const zNear = 1;
-		const zFar = this.nPoints;
+		const zFar = this.nStates;
 
 
 		// multiply by aspect?	I would think it should divide by aspect?  TODO
@@ -86,7 +86,7 @@ export class matrixGen {
 	regularMatrix = () => {
 
 		let matrix = this.matrix;
-		mat4.scale(matrix, matrix, [.3, .3, .3, .3, ]);
+		//mat4.scale(matrix, matrix, [.3, .3, .3, .3, ]);
 		this.matrix = matrix;
 	}
 
@@ -101,7 +101,7 @@ export class matrixGen {
 				[this.orient.xPos, this.orient.yPos, this.orient.zPos]);
 		if (traceOrientation) {
 			let o = this.orient;
-			dblog(`️🏔️ offfsets xyz: ${o.xPos}	 ${o.yPos}	${o.zPos}  `);
+			dblog(`️🏔️ offfsets xyz: ${o.xPos} ${o.yPos}	${o.zPos}  `);
 		}
 
 		if (traceOffMatrix)
@@ -133,32 +133,28 @@ export class matrixGen {
 		if (!isFinite(matrix[0])) debugger;
 	}
 
+	// screen is not square.  Make image fit.
 	fixForScreen() {
 		mat4.scale(this.matrix, this.matrix,
 			[1, this.aspect, 1, 1]);
 	}
 
-	// final assembly
-	// Based on orient passed in
-	// sets this.unifiedMatrix, and returns it
+	// final assembly.  Call this when orient changes.
+	// Based on orient passed in constructor, but current values
+	// runs through all calcs; sets this.unifiedMatrix, and returns it
 	unifyMatrices() {
 		this.newMatrix();
 
-		//this.fixForScreen();  // here?
-
 		// one of these for starters
-		this.regularMatrix();
+		//this.regularMatrix();
 		//this.projectMatrix();
-
-
-
 
 		// these mostly work as advertised and as controlled by Orient3d
 		// keep interchanging offsetMatrix() and rotateMatrix()
 		this.rotateMatrix();
 		this.offsetMatrix();
 
-		this.fixForScreen();  // here?
+		this.fixForScreen();
 
 
 		this.unifiedMatrix = this.matrix;
@@ -171,22 +167,22 @@ export class matrixGen {
 
 export default matrixGen;
 
-/* ***************************************************** just screwing around */
+/* ************************************ just screwing around */
 
-dblog(`just screwing around`);
-let aa = [3,4,5,6];
-let bb = [13,14,15,16];
-let cc = [23,24,25,26];
-let matrix;
-
-matrix = mat4.create();
-mat4.frustum(matrix, -5, 5, -3, 3, 1, 10);
-dump4x4('frustum:', matrix);
-
-matrix = mat4.create();
-let eye=[0, 0, 6];
-let center=[0, 0, 0];
-let up = [0, 10, 0];
-mat4.lookAt(matrix, eye, center, up);
-dump4x4('lookAt:', matrix);
+// dblog(`just screwing around`);
+// let aa = [3,4,5,6];
+// let bb = [13,14,15,16];
+// let cc = [23,24,25,26];
+// let matrix;
+//
+// matrix = mat4.create();
+// mat4.frustum(matrix, -5, 5, -3, 3, 1, 10);
+// dump4x4('frustum:', matrix);
+//
+// matrix = mat4.create();
+// let eye=[0, 0, 6];
+// let center=[0, 0, 0];
+// let up = [0, 10, 0];
+// mat4.lookAt(matrix, eye, center, up);
+// dump4x4('lookAt:', matrix);
 
