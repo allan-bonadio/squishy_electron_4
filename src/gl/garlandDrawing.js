@@ -60,7 +60,7 @@ blade is two triangles */
 // space values that go from 0 to N.  Adjust to taste or to N. These are
 // inserted as numbers into the vert shader code.
 const OUTER_FACTOR = '5.0';
-const INNER_FACTOR = '4.';
+const INNER_FACTOR = '1.';
 
 // make the line number for the start correspond to this JS file line number - the NEXT line
 const vertexShaderSrc = `// garlandDrawing vertex
@@ -131,7 +131,7 @@ void main() {
 }
 `;
 
-// the original display that's worth watching: garland upside down hump graph
+// the original display that's worth watching: garland
 export class garlandDrawing extends abstractDrawing {
 	constructor(scene) {
 		super(scene, 'garlandDrawing');
@@ -158,7 +158,9 @@ export class garlandDrawing extends abstractDrawing {
 		this.matrixUniform = new drawingUniform('matrix', this,
 			() => {
 				let matrix = this.scene.paintingNeeds.unifiedMatrix;
-				 if (!isFinite(matrix[0])) debugger;
+				if (!matrix)
+					matrix = mat4.create();  // starting up only
+				if (!isFinite(matrix[0])) debugger;
 
 				if (traceMatrix) {
 					dump4x4('🌀🌀🌀 garlandDrawing reloading', matrix);
@@ -229,9 +231,10 @@ export class garlandDrawing extends abstractDrawing {
 				+` width=${width}, height=${height}	 drawing ${this.vertexCount/2} points `
 				+` matrix=${paintingNeeds.unifiedMatrix}`);
 		}
+		if (!paintingNeeds.unifiedMatrix)
+			paintingNeeds.unifiedMatrix = mat4.create();  // too soon after startup
 		 if (!isFinite(paintingNeeds.unifiedMatrix[0])) debugger;
 		const gl = this.gl;
-		//??? this.setDrawing();
 
 		//this.drawVariables.forEach(v => v.reloadVariable());
 		//this.theAttribute.reloadVariable();
