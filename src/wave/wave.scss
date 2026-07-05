@@ -177,52 +177,63 @@
 
 // wave VISTA only, 3D and all of the matrix stuff
 .WaveVista {
-	// experimental orientation UI.  eight sliders for x y z axis rotation, position etc.
-	.PivotOverlay {
+	.OrientLayer {
 		position: absolute;
 
 		width: 100%;
 		height: 100%;
 		right: 0;
 		bottom: 0;
-		z-index: 50;
-	}
 
-	// diagnostic panel; not always shown
-	.Orient3D {
-		position: absolute;
-		display: flex;
-		flex-direction: column;
+		// normal production layer that gets drag evemts for rotation
+		.PivotOverlay {
+			position: absolute;
 
-		width: 24em;
-		right: 0;
-		bottom: 0;
-		z-index: 50;
-		padding: .31em;
-		border: .17em #666 solid;
-		margin: .31em;
+			width: 100%;
+			height: 100%;
+			right: 0;
+			bottom: 0;
+			z-index: 40;
+		}
 
-		// each slider
-		div {
-			flex: 0 0 2em;
-			pointer-events: none;
-			text-align: right;
+		// diagnostic panel; not always shown
+		// eight sliders for x y z axis rotation, position etc.
+		.Orient3D {
+			position: absolute;
+			display: flex;
+			flex-direction: column;
 
-			label {
-				width: 27em;
-				text-shadow: 0 0 .25em #000f;
-				margin-right: .6em;
+			width: 24em;
+			right: 0;
+			bottom: 0;
+			z-index: 50;
+			padding: .31em;
+			border: .17em #666 solid;
+			margin: .31em;
 
-				input {
-					pointer-events: auto;
-					width: 12em;
-					line-height: 1em;
+			// each slider
+			div {
+				flex: 0 0 2em;
+				pointer-events: none;
+				text-align: right;
+
+				label {
+					width: 27em;
+					text-shadow: 0 0 .25em #000f;
+					margin-right: .6em;
+
+					input {
+						pointer-events: auto;
+						width: 12em;
+						line-height: 1em;
+					}
 				}
 			}
+			button {
+				color: #ccc
+			}
 		}
-		button {
-			color: #ccc
-		}
+
 	}
 }
 

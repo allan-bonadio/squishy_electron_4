@@ -12,7 +12,6 @@ import sSettings from '../utils/sSettings.js';
 let traceOrient = false;
 
 
-const ZPOS_DEFAULT = -100;
 
 const propTypes = {
    // in/out.  Pass it in with, whatever, but must have all these
@@ -36,20 +35,20 @@ function Orient3D(props) {
 
 	// these seem unnecessary but the sliders themselves don't update otherwise
 	// cmon, cant i just have one state var for this whole component?
-	let [xAng, setXAng] = useState(getASetting('orientSettings', 'xAng'));
-	let [yAng, setYAng] = useState(getASetting('orientSettings', 'yAng'));
-	let [zAng, setZAng] = useState(getASetting('orientSettings', 'zAng'));
+	// let [xAng, setXAng] = useState(getASetting('orientSettings', 'xAng'));
+	// let [yAng, setYAng] = useState(getASetting('orientSettings', 'yAng'));
+	// let [zAng, setZAng] = useState(getASetting('orientSettings', 'zAng'));
+	//
+	// let [xPos, setXPos] = useState(getASetting('orientSettings', 'xPos'));
+	// let [yPos, setYPos] = useState(getASetting('orientSettings', 'yPos'));
+	// let [zPos, setZPos] = useState(getASetting('orientSettings', 'zPos'));
+	//
+	// let [hfoView, setHFOView] = useState(getASetting('orientSettings', 'hfoView'));
+	// let [fudge, setFudge] = useState(getASetting('orientSettings', 'fudge'));
 
-	let [xPos, setXPos] = useState(getASetting('orientSettings', 'xPos'));
-	let [yPos, setYPos] = useState(getASetting('orientSettings', 'yPos'));
-	let [zPos, setZPos] = useState(getASetting('orientSettings', 'zPos'));
-
-	let [hfoView, setHFOView] = useState(getASetting('orientSettings', 'hfoView'));
-	let [fudge, setFudge] = useState(getASetting('orientSettings', 'fudge'));
-
-	const setters = {xAng: setXAng, yAng: setYAng, zAng: setZAng,
-		xPos: setXPos, yPos: setYPos, zPos: setZPos,
-		hfoView: setHFOView, fudge: setFudge};
+	// const setters = {xAng: setXAng, yAng: setYAng, zAng: setZAng,
+	// 	xPos: setXPos, yPos: setYPos, zPos: setZPos,
+	// 	hfoView: setHFOView, fudge: setFudge};
 
 	//debugger;
 	let p = props;
@@ -65,11 +64,12 @@ function Orient3D(props) {
 	// 	setters[which](value);  // set state in this component's state
 	// 	this.props.orient[which] = value;
 	// }
+
 	// handler, only for the angles x y z
 	function handleAngSetting(ev) {
 		let which = ev.target.className;
 		let value = ev.target.valueAsNumber;
-		setters[which](value);
+		//setters[which](value);
 
 		// set in Vista and settings
 		props.setAngSetting(which, value);
@@ -78,7 +78,7 @@ function Orient3D(props) {
 	function handleOneSetting(ev) {
 		let which = ev.target.className;
 		let value = ev.target.valueAsNumber;
-		setters[which](value);
+		//setters[which](value);
 
 		// set in Vista and settings
 		props.setOneSetting(which, value);
@@ -89,10 +89,10 @@ function Orient3D(props) {
 		const sdo = sSettings.defaults.orientSettings;
 
 		// becha I dont need any of these if I trigger the whole orient3d
-		setXAng(sdo.xAng); setYAng(sdo.yAng); setZAng(sdo.zAng);
-		setXPos(sdo.xPos); setYPos(sdo.yPos); setZPos(sdo.zPos);
-		setHFOView(sdo.hfoView);
-		setFudge(sdo.fudge);
+		// setXAng(sdo.xAng); setYAng(sdo.yAng); setZAng(sdo.zAng);
+		// setXPos(sdo.xPos); setYPos(sdo.yPos); setZPos(sdo.zPos);
+		// setHFOView(sdo.hfoView);
+		// setFudge(sdo.fudge);
 
 		props.setOrientAll(sdo);
 	}
@@ -102,58 +102,59 @@ function Orient3D(props) {
 
     // all the mins and maxes are the store mins and maxes
 	const omm = sSettings.minMaxes.orientSettings;
+	const po = p.orient;
 	//let maxi = sSettings.minMaxes.lapSettings.dtFactor.max;
 
 
 	return <div className='Orient3D' >
 
 		<div>
-			<label>xAng {xAng}°
-				<input type='range' className='xAng' value={xAng}
+			<label>xAng {po.xAng}°
+				<input type='range' className='xAng' value={po.xAng}
 					min={omm.xAng.min} max={omm.xAng.max} step={5} onChange={handleAngSetting} />
 			</label>
 		</div>
 		<div>
-			<label>yAng {yAng}°
-				<input type='range' className='yAng' value={yAng}
+			<label>yAng {po.yAng}°
+				<input type='range' className='yAng' value={po.yAng}
 					min={omm.yAng.min} max={omm.yAng.max} step={5} onChange={handleAngSetting} />
 			</label>
 		</div>
 		<div>
-			<label>zAng {zAng}°
-				<input type='range' className='zAng' value={zAng}
+			<label>zAng {po.zAng}°
+				<input type='range' className='zAng' value={po.zAng}
 					min={omm.zAng.min} max={omm.zAng.max} step={5} onChange={handleAngSetting} />
 			</label>
 		</div>
 
 		<div>
-			<label>xPos {xPos} c
-				<input type='range' className='xPos' value={xPos}
+			<label>xPos {po.xPos} c
+				<input type='range' className='xPos' value={po.xPos}
 					min={omm.xPos.min} max={omm.xPos.max} step={1} onChange={handleOneSetting} />
 			</label>
 		</div>
 		<div>
-			<label>yPos {yPos} c
-				<input type='range' className='yPos' value={yPos}
+			<label>yPos {po.yPos} c
+				<input type='range' className='yPos' value={po.yPos}
 					min={omm.yPos.min} max={omm.yPos.max} step={1} onChange={handleOneSetting} />
 			</label>
 		</div>
 		<div>
-			<label>zPos {zPos} c
-				<input type='range' className='zPos' value={zPos}
+			<label>zPos {po.zPos} c
+				<input type='range' className='zPos' value={po.zPos}
 					min={omm.zPos.min} max={omm.zPos.max} step={1} onChange={handleOneSetting} />
 			</label>
 		</div>
 
 		<div>
-			<label>fov {hfoView}°
-				<input type='range' className='hfoView' value={hfoView}
+			<label>fov {po.hfoView}°
+				<input type='range' className='hfoView' value={po.hfoView}
 					min={omm.hfoView.min} max={omm.hfoView.max} step={1} onChange={handleOneSetting} />
 			</label>
 		</div>
 		<div>
-			<label>fudge {fudge}
-				<input type='range' className='fudge' value={fudge}
+			<label>fudge {po.fudge}
+				<input type='range' className='fudge' value={po.fudge}
 					min={omm.fudge.min} max={omm.fudge.max} step={.1} onChange={handleOneSetting} />
 			</label>
 		</div>

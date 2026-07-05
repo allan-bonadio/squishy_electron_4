@@ -201,7 +201,7 @@ export class WaveView extends React.Component {
 
 		// the glScene is one layer.  Over that is the widget area	Bumpers are outside.
 		return (
-		<div className='WaveView'
+		<article className='WaveView'
 			style={{height: `${s.outerHeight}px`,
 				display: (p.show2D ? 'flex' : 'none')}}
 			onPointerEnter={this.hoverEnter} onPointerLeave={this.hoverLeave}
@@ -237,7 +237,7 @@ export class WaveView extends React.Component {
 			<div className='bumper right' key='right'
 				style={{flexBasis: this.bumperWidth +'px', height: this.canvasInnerHeight}} />
 
-		</div>
+		</article>
 		);
 	}
 

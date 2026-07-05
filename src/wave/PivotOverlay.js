@@ -45,14 +45,17 @@ export function PivotOverlay(props) {
 				xAng: props.orient.xAng, yAng: props.orient.yAng};
 		}
 
-		// ok now, how far has it moved and in what direction?
-		// measure from mousedown point
-		let delMouseX = ev.pageX - pointerDown.x;
-		let delMouseY = ev.pageY - pointerDown.y;
+		// ok now, how far has it moved and in what direction? measure
+		// from mousedown point.  Note:xAng and yAng need to be
+		// reversed: xAng is rotation around y axis, etc.
+		let delMouseY = ev.pageX - pointerDown.x;
+		let delMouseX = ev.pageY - pointerDown.y;
 
 		// so that means new angles are:
-		props.setAngSetting('xAng', props.orient.xAng + delMouseX * X_PIX_RATIO);
-		props.setAngSetting('yAng', props.orient.yAng + delMouseY * Y_PIX_RATIO);
+		props.setAngSetting('xAng',
+			props.orient.xAng + delMouseX * X_PIX_RATIO);
+		props.setAngSetting('yAng',
+			props.orient.yAng + delMouseY * Y_PIX_RATIO);
 	}
 
 	return <section className='PivotOverlay'

@@ -19,13 +19,14 @@ import {getASetting, storeASetting, getAGroup, storeAGroup} from '../utils/store
 import waveAux from './waveAux.js';
 import SizeBox from './SizeBox.js';
 
-import PivotOverlay from './PivotOverlay.js';
-import Orient3D from './Orient3D.js';
+// import PivotOverlay from './PivotOverlay.js';
+// import Orient3D from './Orient3D.js';
+import OrientLayer from './OrientLayer.js';
 import GLScene from '../gl/GLScene.js';
 import Spinner from '../widgets/Spinner.js';
 import SquishContext from '../sPanel/SquishContext.js';
 import BeginFinishOverlay from './BeginFinishOverlay.js';
-import matrixGen from './matrixGen.js';
+//import matrixGen from './matrixGen.js';
 import resizeIcon from './waveViewIcons/resize.png';
 import {dump4x4} from '../gl/helpers3D.js';
 
@@ -40,13 +41,10 @@ let traceRotMatrix = false;
 let traceShowOrient3D = true;
 let traceDontShowPivotOverlay = false;
 
-
 const round = (n) => Math.round(n, 1);
 
 // the numerical angles are -360...+360, whether useful or not.
 const d2r = Math.PI / 180;
-
-
 
 export class WaveVista extends React.Component {
 	static propTypes = {
@@ -66,6 +64,7 @@ export class WaveVista extends React.Component {
 		setShouldBeIntegrating: PropTypes.func.isRequired,
 		sPanel: PropTypes.object.isRequired,
 
+		// false to hide the vista
 		show3D: PropTypes.bool.isRequired,
 
 		setMainVistaRepaint: PropTypes.func,
@@ -101,13 +100,15 @@ export class WaveVista extends React.Component {
 			// this will be reused	with new rotMatrixes plugged in
 			this.paintingNeeds = {
 				cavity: this.space.mainFlick,
-				unifiedMatrix: this.unifiedMatrix,
-				fudge: this.orient.fudge,
+				unifiedMatrix: null,   // to be filled in this.unifiedMatrix,
+				//fudge: this.orient.fudge,
 			};
-			this.mGen = new matrixGen(this.orient, this.space.nPoints,
-				this.canvasInnerWidth, this.canvasInnerHeight);
 
-			this.buildNRepaint()
+			// this.mGen = new matrixGen(this.orient, this.space.nPoints,
+			// 	this.canvasInnerWidth, this.canvasInnerHeight);
+			// now done in OrientLayer
+
+			//this.buildNRepaint()
 		});
 	}
 
@@ -121,68 +122,69 @@ export class WaveVista extends React.Component {
 	}
 
 
-	/* ******************************************* orientation	*/
+	// 	******************************************* orientation	*/
+	//
+	// 	// called when user tries to rotate it, whether pivot or orient
+	// 	// coord = x y z strings or 'multi'	  newVal is new angle around that axis or orient obj
+	// 	// pass an object, with one, two or all three
+	//
+	//
+	// 	// after angles have changed, call this to ripple it thru and
+	// 	// repaint JUST the rotation angles.  Save a microsecond :-) of cpu by
+	// 	// avoiding matrix mults.
+	// 	orientNRepaint = () => {
+	// 		if (this.mGen) {
+	// 			this.paintingNeeds.unifiedMatrix = this.mGen.unifyMatrices();
+	// 			// wait this isn't right needs to just do orientation TODO
+	// 			if (this.mainVistaRepaint)
+	// 				this.mainVistaRepaint(this.paintingNeeds);
+	// 		}
+	// 	}
+	//
+	// 	// repaint, rebuilding all matrices, effecting all changes.  Do
+	// 	// this when canvas areas need to repaint & resize or other
+	// 	// Orient3D settings besides just the angles
+	// 	buildNRepaint = () => {
+	// 		this.paintingNeeds.unifiedMatrix = this.mGen.unifyMatrices();
+	// 		if (this.mainVistaRepaint)
+	// 			this.mainVistaRepaint(this.paintingNeeds);
+	// 	}
+	//
+	// 	// do most of setting any of them
+	// 	setOne(varName, newVal) {
+	// 		if (traceOrient) dblog(`️🏔️ set one(${varName}, `, newVal, `) `);
+	// 		this.orient[varName] = newVal;
+	// 		storeASetting('orientSettings', varName, newVal);
+	// 	}
+	//
+	// 	// set a rotation ANGLE: xAng, yAng or zAng
+	// 	setAngSetting = (coord, newVal) => {
+	// 		this.setOne(coord, newVal);
+	//
+	// 		//this.orientNRepaint();
+	// 		this.buildNRepaint();
+	// 	}
+	//
+	// 	// set Any of the Orient settings, angle or not
+	// 	setOneSetting = (varName, newVal) => {
+	// 		this.setOne(varName, newVal);
+	// 		this.buildNRepaint();
+	// 	}
+	//
+	// 	// set all of them.  newVal is an obj with... most or all of them.
+	// 	// Missing ones won't be set.  this is for reset on Orient3D
+	// 	setOrientAll = (newSettings) => {
+	// 		if (traceOrient) dblog(`️🏔️ setOrientAll(${coord}, `, newSettings, `) `);
+	// 		Object.assign(this.orient, newSettings);
+	// 		storeAGroup('orientSettings', this.orient);
+	// 		this.buildNRepaint();
+	// 	}
 
-	// called when user tries to rotate it, whether pivot or orient
-	// coord = x y z strings or 'multi'	  newVal is new angle around that axis or orient obj
-	// pass an object, with one, two or all three
 
+	/* ************************************************* render */
 
-	// after angles have changed, call this to ripple it thru and
-	// repaint JUST the rotation angles.  Save a microsecond :-) of cpu by
-	// avoiding matrix mults.
-	orientNRepaint = () => {
-		if (this.mGen) {
-			this.paintingNeeds.unifiedMatrix = this.mGen.unifyMatrices();
-			// wait this isn't right needs to just do orientation TODO
-			if (this.mainVistaRepaint)
-				this.mainVistaRepaint(this.paintingNeeds);
-		}
-	}
-
-	// repaint, rebuilding all matrices, effecting all changes.  Do
-	// this when canvas areas need to repaint & resize or other
-	// Orient3D settings besides just the angles
-	buildNRepaint = () => {
-		this.paintingNeeds.unifiedMatrix = this.mGen.unifyMatrices();
-		if (this.mainVistaRepaint)
-			this.mainVistaRepaint(this.paintingNeeds);
-	}
-
-	// do most of setting any of them
-	setOne(varName, newVal) {
-		if (traceOrient) dblog(`️🏔️ set one(${varName}, `, newVal, `) `);
-		this.orient[varName] = newVal;
-		storeASetting('orientSettings', varName, newVal);
-	}
-
-	// set a rotation ANGLE: xAng, yAng or zAng
-	setAngSetting = (coord, newVal) => {
-		this.setOne(coord, newVal);
-
-		//this.orientNRepaint();
-		this.buildNRepaint();
-	}
-
-	// set Any of the Orient settings, angle or not
-	setOneSetting = (varName, newVal) => {
-		this.setOne(varName, newVal);
-		this.buildNRepaint();
-	}
-
-	// set all of them.  newVal is an obj with... most or all of them.
-	// Missing ones won't be set.  this is for reset on Orient3D
-	setOrientAll = (newSettings) => {
-		if (traceOrient) dblog(`️🏔️ setOrientAll(${coord}, `, newSettings, `) `);
-		Object.assign(this.orient, newSettings);
-		storeAGroup('orientSettings', this.orient);
-		this.buildNRepaint();
-	}
-
-
-	/* ********************************************************* render*/
-	// once the repaint function is created by GLScene, call this here so everybody can find it.
-	// pass along the vital repaint function
+	// once the repaint function is created by GLScene, call this here
+	// so everybody can find it. pass along the vital repaint function
 	setMainVistaRepaint = (mainVistaRepaint) => {
 		this.mainVistaRepaint ??= mainVistaRepaint;
 		this.mainVistaRepaint.sceneName = 'mainVistaRepaint';  // for debugging
@@ -207,8 +209,8 @@ export class WaveVista extends React.Component {
 			let sceneName = 'mainVista';
 
 			if (traceRotMatrix)
-				dump4x4('vista unifiedMatrix being passed to <GLScene:',
-					this.paintingNeeds.unifiedMatrix);
+				dump4x4('vista paintingNeeds being passed to <GLScene:',
+					this.paintingNeeds);
 			vista = <GLScene
 				space={this.space} animator={this.animator}
 				sceneName={sceneName}
@@ -252,26 +254,25 @@ export class WaveVista extends React.Component {
 		}
 
 		let pivotOverlay = '';
-		let orientOverlay = '';
 
 		if (this.mainVistaRepaint) {
-			// normally on for production use
-			if (!traceDontShowPivotOverlay){
-				pivotOverlay = <PivotOverlay
-						orient={this.orient}
-						setAngSetting={this.setAngSetting}
-					/>;
-			}
+			// // normally on for production use
+			// if (!traceDontShowPivotOverlay){
+			// 	pivotOverlay = <PivotOverlay
+			// 			orient={this.orient}
+			// 			setAngSetting={this.setAngSetting}
+			// 		/>;
+			// }
 
-			// normally off for production use
-			if (traceShowOrient3D){
-				orientOverlay = <Orient3D
-						orient={this.orient}
-						setAngSetting={this.setAngSetting}
-						setOneSetting={this.setOneSetting}
-						setOrientAll={this.setOrientAll}
-					/>;
-			}
+			// // normally off for production use
+			// if (traceShowOrient3D){
+			// 	orientOverlay = <Orient3D
+			// 			orient={this.orient}
+			// 			setAngSetting={this.setAngSetting}
+			// 			setOneSetting={this.setOneSetting}
+			// 			setOrientAll={this.setOrientAll}
+			// 		/>;
+			// }
 		}
 
 		let vista = this.makeVista();
@@ -281,7 +282,7 @@ export class WaveVista extends React.Component {
 		// view/vista, etc should be sections and articles and whatever else
 		// shows up, instead of bland divs.
 		return (
-		<div className='WaveVista'
+		<article className='WaveVista'
 			style={{height: `${s.outerHeight}px`,
 				display: (p.show3D ? 'flex' : 'none')}}
 			onPointerUp={this.finishIntegration}
@@ -302,9 +303,11 @@ export class WaveVista extends React.Component {
 
 				</section>
 
-				{pivotOverlay}
-				{orientOverlay}
-
+				<OrientLayer  nStates={this.space?.nStates}
+					canvasInnerWidth={this.canvasInnerHeight}
+					canvasInnerHeight={this.canvasInnerHeight}
+					paintingNeeds={this.paintingNeeds}
+					mainVistaRepaint={this.mainVistaRepaint} />
 
 				<BeginFinishOverlay />
 
@@ -313,7 +316,7 @@ export class WaveVista extends React.Component {
 
 			</div>
 
-		</div>
+		</article>
 		);
 	}
 }
