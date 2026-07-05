@@ -26,7 +26,7 @@ class drawingDescription {
 			// so segment 0 === 9 = ∞
 			this.barWidth = 1 / space.nPoints;
 			this.start = 0;
-			this.end = space.end + space.start;
+			this.end = space.nPoints;
 		}
 		else {
 			throw `bad space continuum ${space.continuum}`;
