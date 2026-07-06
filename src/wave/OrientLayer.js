@@ -17,6 +17,7 @@ import sSettings from '../utils/sSettings.js';
 let traceOrient = false;
 let traceDontShowPivotOverlay = false;
 let traceShowOrient3D = true;
+let traceAction = true;
 
 const propTypes = {
 	nStates: PropTypes.number,
@@ -40,6 +41,8 @@ function OrientLayer(props) {
 		// note whole object changed as per reducer rules
 		ori = {...ori, ...action};
 		storeAGroup('orientSettings', ori);
+		if (traceAction)
+			dblog(`orient layer action `, action, `  new angles: `, ori);
 		return ori;
 	}
 
