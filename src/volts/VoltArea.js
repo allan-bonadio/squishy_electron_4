@@ -274,7 +274,8 @@ function VoltArea(props) {
 		dragging = false;  // only if pointer up, not for leave, so user can drag as far as they want
 	}
 
-	//☹️🧐 wheel: turn this off cuz it messes up scrolling the whole window.
+	//☹️🧐 wheel: turned this off cuz it messes up scrolling the whole window.
+	//☹️🧐 Used to scrolll the volltage line
 	//☹️🧐 we only do vertical.  right now.  Moves the voltage line (but not its voltage)
 	//☹️🧐 By default this is handled as a passive event, but we need active so we have to do it outselves.
 //☹️🧐 	const wheelHandler =
