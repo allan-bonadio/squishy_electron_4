@@ -60,7 +60,7 @@ blade is two triangles */
 // space values that go from 0 to N.  Adjust to taste or to N. These are
 // inserted as numbers into the vert shader code.
 const OUTER_FACTOR = '5.0';
-const INNER_FACTOR = '1.';
+const INNER_FACTOR = '3.';
 
 // make the line number for the start correspond to this JS file line number - the NEXT line
 const vertexShaderSrc = `// garlandDrawing vertex
@@ -86,14 +86,13 @@ void main() {
 	int ix = int(vertexSerial) / 2;
 	bool odd = (ix * 2) < vertexSerial;
 	float factor = odd ? ${INNER_FACTOR} : ${OUTER_FACTOR};
-	//factor /= 100.;
 
 	// so the actual z coord goes to divide x and y, below..
 	// But, glPosition wants it remapped to 0...1
 	vec4 point;
 	point.yz = row.xy * factor;
 	//point.yz = row.xy * factor * nStates;
-	point.x = (float(ix) - nStates/2.) / 5.;
+	point.x = (float(ix) - nStates/2.) * .05;
 
 	vec4 pointM = point * matrix;
 	float zPers = 2.0 + pointM.z;  // for perspective

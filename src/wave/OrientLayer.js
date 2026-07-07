@@ -27,6 +27,7 @@ const propTypes = {
 	mainVistaRepaint: PropTypes.func,
 }
 
+const _ = (v) => v.toFixed(2);
 // this encloses the elements that the user drags or clicks to change
 // the contents of the orient objct: angles but also offsets.
 // Also owns the orient and matrixGen objects.
@@ -36,13 +37,15 @@ function OrientLayer(props) {
 	cfpt(propTypes, props);
 
 	// here, action is just an object with one or more member values
-	// to substitute in.  always the same 'type'
+	// to substitute in.  Only way to change the orient object
 	function reducer(ori, action) {
 		// note whole object changed as per reducer rules
 		ori = {...ori, ...action};
 		storeAGroup('orientSettings', ori);
 		if (traceAction)
-			dblog(`orient layer action `, action, `  new angles: `, ori);
+			dblog(`orient layer action `, action, `  new angles: \n`,
+				_(ori.xAng), _(ori.yAng), _(ori.zAng),
+				_(ori.xPos), _(ori.yPos), _(ori.zPos), );
 		return ori;
 	}
 
@@ -65,7 +68,7 @@ function OrientLayer(props) {
 	// repaint JUST the rotation angles.  Save a microsecond :-) of cpu by
 	// avoiding matrix mults.
 	const orientNRepaint = () => {
-		paintingNeeds.unifiedMatrix = mGen.unifyMatrices();
+		paintingNeeds.unifiedMatrix = mGen.unifyMatrices(orient);
 		// wait this isn't right needs to just do orientation TODO
 		if (props.mainVistaRepaint)
 			props.mainVistaRepaint(props.paintingNeeds);
@@ -75,7 +78,7 @@ function OrientLayer(props) {
 	// this when canvas areas need to repaint & resize or other
 	// Orient3D settings besides just the angles
 	const buildNRepaint = () => {
-		props.paintingNeeds.unifiedMatrix = mGen.unifyMatrices();
+		props.paintingNeeds.unifiedMatrix = mGen.unifyMatrices(orient);
 		if (props.mainVistaRepaint)
 			props.mainVistaRepaint(props.paintingNeeds);
 	}

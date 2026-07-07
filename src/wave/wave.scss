@@ -83,6 +83,7 @@
 		bottom: 1em;
 		height: 1em;
 		width: 10em;
+		z-index: 50;
 		button {
 			height: 1em;
 
@@ -184,6 +185,8 @@
 		height: 100%;
 		right: 0;
 		bottom: 0;
+		z-index: 40;
+		pointer-events: none;
 
 		// normal production layer that gets drag evemts for rotation
 		.PivotOverlay {
@@ -193,7 +196,8 @@
 			height: 100%;
 			right: 0;
 			bottom: 0;
-			z-index: 40;
+			z-index: 10;
+			pointer-events: auto;
 		}
 
 		// diagnostic panel; not always shown
@@ -206,10 +210,10 @@
 			width: 24em;
 			right: 0;
 			bottom: 0;
-			z-index: 50;
 			padding: .31em;
 			border: .17em #666 solid;
 			margin: .31em;
+			z-index: 50;
 
 			// each slider
 			div {
@@ -221,6 +225,7 @@
 					width: 27em;
 					text-shadow: 0 0 .25em #000f;
 					margin-right: .6em;
+					pointer-events: auto;
 
 					input {
 						pointer-events: auto;

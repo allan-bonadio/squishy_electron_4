@@ -11,7 +11,7 @@ const d2r = Math.PI / 180;
 // how to use (give or take):
 //	mg = new matrixGen(this.orient);
 //	do other funcs in this class
-//	paintingNeeds = { unifiedMatrix: mg.unifyMatrices() };
+//	paintingNeeds = { unifiedMatrix: mg.unifyMatrices(origin) };
 
 let traceOrientation= false;
 let traceRotMatrix = true;
@@ -31,6 +31,10 @@ export class matrixGen {
 		this.canvasInnerWidth = canvasInnerWidth;
 		this.canvasInnerHeight = canvasInnerHeight;
 		this.aspect = canvasInnerWidth / canvasInnerHeight;
+	}
+
+	setOrient(orient) {
+		this.orient = orient;
 	}
 
 	// start with minimal matrix, identity
@@ -142,7 +146,8 @@ export class matrixGen {
 	// final assembly.  Call this when orient changes.
 	// Based on orient passed in constructor, but current values
 	// runs through all calcs; sets this.unifiedMatrix, and returns it
-	unifyMatrices() {
+	unifyMatrices(orient) {
+		this.orient = orient ?? this.orient;
 		this.newMatrix();
 
 		// one of these for starters

@@ -11,6 +11,9 @@ import PropTypes from 'prop-types';
 let X_PIX_RATIO = .05;
 let Y_PIX_RATIO = .05;
 
+const roundAngle = (theta) => Math.max(-90, Math.min(90, Math.round(theta/5) * 5));
+
+
 const propTypes = {
 	// in/out.  Pass it in with, whatever, but must have all these
 	// fields (not just the ones listed here): {xyz}{Ang,Pos}
@@ -53,9 +56,11 @@ export function PivotOverlay(props) {
 
 		// so that means new angles are:
 		props.setAngSetting('xAng',
-			props.orient.xAng + delMouseX * X_PIX_RATIO);
+			roundAngle(props.orient.xAng + delMouseX * X_PIX_RATIO));
+			//Math.round(props.orient.xAng + delMouseX * X_PIX_RATIO));
 		props.setAngSetting('yAng',
-			props.orient.yAng + delMouseY * Y_PIX_RATIO);
+			roundAngle(props.orient.yAng + delMouseY * Y_PIX_RATIO));
+			//Math.round(props.orient.yAng + delMouseY * Y_PIX_RATIO));
 	}
 
 	return <section className='PivotOverlay'
