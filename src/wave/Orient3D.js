@@ -90,7 +90,7 @@ function Orient3D(props) {
 
 	const oneSlider = (vName) =>
 		<div>
-			<label>{vName} {po[vName]}°
+			<label>{vName} {po[vName]}{vName[1]=='A' ? '°' : 'c'}
 				<input type='range' className={vName} value={po[vName]}
 					min={omm[vName].min} max={omm[vName].max} step={5} onChange={handleAngSetting} />
 			</label>

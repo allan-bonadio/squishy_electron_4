@@ -22,7 +22,7 @@ let traceUColor = false;
 // diagnostic purposes; draws more per vertex
 let traceDontDrawTriangles=	 false;
 let traceDrawPoints = false;
-let traceDrawLines = true;
+let traceDrawLines = false;
 
 /* *********************************************** garland drawing */
 // The glsl sources for webgl drawing
@@ -68,9 +68,10 @@ ${cx2rygb}
 #line 69
 // this does all the transformation we need.  precalculated for each repaint.
 uniform mat4 matrix;
+uniform ivec4 mode;
 
 //uniform float fudge;  // kindof like the zoom factor
-uniform float nStates;	// N
+uniform float nStates;	 // N
 
 // the V shader calculates the color to use, and sets this so the frag
 // shader can get the varying.
@@ -84,8 +85,14 @@ void main() {
 	int vertexSerial = int(row.w);
 
 	int ix = int(vertexSerial) / 2;
-	bool odd = (ix * 2) < vertexSerial;
-	float factor = odd ? ${INNER_FACTOR} : ${OUTER_FACTOR};
+	float factor;
+	if ((ix * 2) < vertexSerial)
+		factor = (mode[0] > 0) ? ${OUTER_FACTOR} : ${INNER_FACTOR};
+	else
+		factor = (mode[1] > 0) ? ${OUTER_FACTOR} : ${INNER_FACTOR};
+
+	//bool odd = (ix * 2) < vertexSerial;
+	//float factor = odd ? ${INNER_FACTOR} : ${OUTER_FACTOR};
 
 	// so the actual z coord goes to divide x and y, below..
 	// But, glPosition wants it remapped to 0...1
@@ -121,7 +128,7 @@ void main() {
 `;
 
 const fragmentShaderSrc = `// garlandDrawing frag
-#line 116
+#line 132
 precision highp float;
 varying highp vec4 vColor;
 
@@ -135,7 +142,14 @@ export class garlandDrawing extends abstractDrawing {
 	constructor(scene) {
 		super(scene, 'garlandDrawing');
 
-		// each point in the wave results in two vertices, top and wave.
+		// this says what to draw each time.
+		// mode[0] = true to draw inside (odd ix) strip border on large side
+		// mode[1] = true to draw outside (even ix) strip border on large side
+		this.mode = new Int32Array(4);
+
+		this.uColor = [0,0,0,0];
+
+		// each point in the wave results in two vertices, inner and outer.
 		// And each of those is four single floats going to the GPU
 		this.nPoints = this.space.nPoints;
 		this.avatar = scene.avatar;
@@ -143,8 +157,6 @@ export class garlandDrawing extends abstractDrawing {
 
 		this.vertexShaderSrc = vertexShaderSrc;
 		this.fragmentShaderSrc = fragmentShaderSrc;
-
-		this.uColor = [0,0,0,0];
 	}
 
 	// loads view buffer from corresponding wave, calculates highest norm.
@@ -154,6 +166,12 @@ export class garlandDrawing extends abstractDrawing {
 		if (traceDrawing)
 			dblog(`🌀🌀🌀 garlandDrawing ${this.sceneName}: creatingVariables`);
 
+
+		this.modeUniform = new drawingUniform('mode', this,
+			() => {
+				return {value: this.mode, type: '4iv'};
+			}
+		);
 		this.matrixUniform = new drawingUniform('matrix', this,
 			() => {
 				let matrix = this.scene.paintingNeeds.unifiedMatrix;
@@ -215,7 +233,7 @@ export class garlandDrawing extends abstractDrawing {
 
 	// ok so have operations:
 	// bool even is outer, else inner
-	// bool odd is outer, else inner
+	// bool outside is outer, else inner
 	// byte drawarrays opcode — draw triangles, line strips, etc
 	// 		no, that's JS-side.  don't put that in the uniform.
 	// color scheme: cx, all one color..  uColor does this already
@@ -223,47 +241,74 @@ export class garlandDrawing extends abstractDrawing {
 
 	/* **************************************** repeat drawing 2 */
 
+	// take advantage of the fact that the same data works for all the decorations we use.
+	drawOnce(gl, verb, first, count, inner, outer, color) {
+		this.uColor = color;
+		this.uColorUniform.reloadVariable();
+
+		this.mode[0] = inner;
+		this.mode[1] = outer;
+		this.modeUniform.reloadVariable();
+
+		gl.drawArrays(verb, first, count);
+
+
+		// dblog(`🌀🌀🌀just drewArrays-garland on avatar `
+		// 	+` ptr=${this.avatar._pointer_} `
+		// 	+` this.avatar.label=${this.avatar.label}, `
+		// 	+` buffer label= `
+		// 	+` ${this.avatar.bufferNames[this.scene.garlandAvatarID]}`);
+	}
+
+	// draw all the Onces for the whole drawing
+	drawWhole(first, count) {
+		const gl = this.gl;
+
+		// the color strip
+		this.drawOnce(gl, gl.TRIANGLE_STRIP, first, count, 0, 1, [-1, 0, 0, 1]);  // rainbow from cx
+
+		// rungs of the ladder
+		//this.drawOnce(gl, gl.LINES, first, count, 0, 1, [0.7, 0.7, 0.7, 1]);
+
+		// side edges of the ladder
+		this.drawOnce(gl, gl.LINE_STRIP, first, count, 0, 0, [0.7, 0.7, 0.7, 1]);
+		this.drawOnce(gl, gl.LINE_STRIP, first, count, 1, 1, [0.7, 0.7, 0.7, 1]);
+
+
+		if (traceDrawLines) {
+			// this.uColor = [0.9, 0.9, 0.9, 1];
+			// this.uColorUniform.reloadVariable();
+			// gl.drawArrays(gl.LINES, first, count);
+			this.drawOnce(gl, gl.LINE_STRIP, first, count, 0, 1, [1, .5, 1, 1]);
+			//gl.drawArrays(gl.LINE_STRIP, first, count);
+		}
+	}
+
 	// called for each image frame on th canvas.
 	draw(width, height, paintingNeeds) {
+		const gl = this.gl;
 		if (traceDrawing) {
 			dblog(`🌀🌀🌀 garland Drawing  ${this.avatarLabel}: `
 				+` width=${width}, height=${height}	 drawing ${this.vertexCount/2} points `
 				+` matrix=${paintingNeeds.unifiedMatrix}`);
 		}
+		gl.lineWidth(1);  // it's the only option anyway
+
+		let startEnd2 = this.space.startEnd2;
+		let first = startEnd2.start2;
+		let count = startEnd2.end2 - startEnd2.start2;
+
 		if (!paintingNeeds.unifiedMatrix)
 			paintingNeeds.unifiedMatrix = mat4.create();  // too soon after startup
-		 if (!isFinite(paintingNeeds.unifiedMatrix[0])) debugger;
-		const gl = this.gl;
+		if (!isFinite(paintingNeeds.unifiedMatrix[0])) debugger;
+
+		this.drawWhole(first, count);
 
 		//this.drawVariables.forEach(v => v.reloadVariable());
 		//this.theAttribute.reloadVariable();
 
 		//this.drawVariables.forEach(v => v.reloadVariable());
 
-		let startEnd2 = this.space.startEnd2;
-		let first = startEnd2.start2;
-		let count = startEnd2.end2 - startEnd2.start2;
-
-		if (!traceDontDrawTriangles) {
-			this.uColor = [-1, 0, 0, 1];  // complex rainbow
-			this.uColorUniform.reloadVariable();
-			gl.drawArrays(gl.TRIANGLE_STRIP, first, count);
-		}
-		if (traceDrawing) {
-			dblog(`🌀🌀🌀just drewArrays-garland on avatar `
-				+` ptr=${this.avatar._pointer_} `
-				+` this.avatar.label=${this.avatar.label}, `
-				+` buffer label= `
-				+` ${this.avatar.bufferNames[this.scene.garlandAvatarID]}`);
-		}
-
-		if (traceDrawLines) {
-			this.uColor = [0.8, 0.8, 0.8, 1];
-			this.uColorUniform.reloadVariable();
-			gl.lineWidth(1);  // it's the only option anyway
-			gl.drawArrays(gl.LINES, first, count);
-			//gl.drawArrays(gl.LINE_STRIP, first, count);
-		}
 
 		if (traceDrawPoints)
 			gl.drawArrays(gl.POINTS, first, count);
@@ -291,6 +336,7 @@ export class garlandDrawing extends abstractDrawing {
 	// simulate and calculate what WebGL would calculate, and dump that.
 	// give or take fidelity of the below.
 	simulateGL() {
+	console.error(`maybe garland simulateGL() not working now`)
 		let startEnd2 = this.space.startEnd2;
 		let first = startEnd2.start2;
 		let count = startEnd2.end2 - startEnd2.start2;
@@ -319,9 +365,9 @@ export class garlandDrawing extends abstractDrawing {
 				+` ${__(0)} +i	${__(1)}   `;
 
 			let ix = Math.floor(vertexSerial / 2);
-			let odd = (ix * 2) < vertexSerial;
+			let outside = (ix * 2) < vertexSerial;
 			let point = vec4.create();
-			let factor = odd ? INNER_FACTOR : OUTER_FACTOR;
+			let factor = outside ? INNER_FACTOR : OUTER_FACTOR;
 
 			point[1] = row[0] * factor;  // real => y coord
 			point[2] = row[1] * factor;  // imag => z coord

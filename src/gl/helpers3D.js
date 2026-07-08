@@ -41,7 +41,7 @@ export function formatXYZ(which, orient) {
 	}
 	// which is like 'Pos' for pposition nums
 
-	return `${_(orient.xPos)}  ${_(orient.yPos)}  ${_(orient.zPos)} `);
+	return `${_(orient.xPos)}  ${_(orient.yPos)}  ${_(orient.zPos)} `;
 
 	// ┑┎
 	//${title}, ${title},
@@ -52,7 +52,7 @@ export function dumpOrient(title, orient) {
 		dblog(`⣿⣿⣿ 🌔 bad orient: ${title}, as passed: `, orient);
 		return;
 	}
-	dblog(`action: ,${formatXYZ('Ang', orient)}, 'ↀ', ${formatXYZ('Pos', orient)} `;
+	dblog(`action: ,${formatXYZ('Ang', orient)}, 'ↀ', ${formatXYZ('Pos', orient)} `);
 
 
 	//	+` ┑┎  ${_(orient.xPos)}  ${_(orient.yPos)}  ${_(orient.zPos)}  `);

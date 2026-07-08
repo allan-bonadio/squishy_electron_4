@@ -4,7 +4,7 @@
 */
 
 let traceGLCalls = false;
-let traceUniforms = false;
+let traceUniforms = true;
 let traceAttributes = false;  // quick update every reload
 let traceAttributesFull = false;  // full dumps every reload
 
@@ -111,8 +111,6 @@ export class drawingUniform extends drawingVariable {
 		}
 
 		const gl = this.gl;
-		// already done this.uniformLoc = gl.getUniformLocation(this.drawing.program, this.varName);
-
 		const method = `uniform${type}`;
 
 		// like gl.uniformMatrix4f(this.uniformLoc, value) or uniform1f() etc
@@ -122,7 +120,7 @@ export class drawingUniform extends drawingVariable {
 
 		// if array is a Normal JS array (not typed), string the components along in the arg list
 		if (Array.isArray(value)) {
-			args = args.concat(value);
+			args = args.concat(value);  // typed arrays return false, not Arrays
 		}
 		else {
 			args.push(value);
@@ -133,6 +131,7 @@ export class drawingUniform extends drawingVariable {
 		if (traceUniforms) {
 			dblog(`🍯 drawingUniform reloaded U variable '${this.varName}' in `);
 			dblog(`			   ${this.drawing.avatarLabel} uniform gl.${method}`, args);
+			dblog(`            value = `, value);
 		}
 	}
 }
