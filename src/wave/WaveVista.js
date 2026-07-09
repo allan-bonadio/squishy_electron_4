@@ -20,7 +20,7 @@ import waveAux from './waveAux.js';
 import SizeBox from './SizeBox.js';
 
 // import PivotLayer from './PivotLayer.js';
-// import Orient3D from './Orient3D.js';
+// import OrientBox from './OrientBox.js';
 import OrientLayer from './OrientLayer.js';
 import GLScene from '../gl/GLScene.js';
 import Spinner from '../widgets/Spinner.js';
@@ -143,7 +143,7 @@ export class WaveVista extends React.Component {
 	//
 	// 	// repaint, rebuilding all matrices, effecting all changes.  Do
 	// 	// this when canvas areas need to repaint & resize or other
-	// 	// Orient3D settings besides just the angles
+	// 	// OrientBox settings besides just the angles
 	// 	buildNRepaint = () => {
 	// 		this.paintingNeeds.unifiedMatrix = this.mGen.unifyMatrices();
 	// 		if (this.mainVistaRepaint)
@@ -172,7 +172,7 @@ export class WaveVista extends React.Component {
 	// 	}
 	//
 	// 	// set all of them.  newVal is an obj with... most or all of them.
-	// 	// Missing ones won't be set.  this is for reset on Orient3D
+	// 	// Missing ones won't be set.  this is for reset on OrientBox
 	// 	setOrientAll = (newSettings) => {
 	// 		if (traceOrient) dblog(`️🏔️ setOrientAll(${coord}, `, newSettings, `) `);
 	// 		Object.assign(this.orient, newSettings);
@@ -249,7 +249,7 @@ export class WaveVista extends React.Component {
 		}
 
 		if (traceOrientation) {
-			dblog(`️🏔️ about to render Orient3D orient.x=${this.orient.x} `
+			dblog(`️🏔️ about to render OrientBox orient.x=${this.orient.x} `
 				+` orient.y=${this.orient.y} orient.z=${this.orient.z}`);
 		}
 
@@ -266,7 +266,7 @@ export class WaveVista extends React.Component {
 
 			// // normally off for production use
 			// if (traceShowOrient3D){
-			// 	orientOverlay = <Orient3D
+			// 	orientOverlay = <OrientBox
 			// 			orient={this.orient}
 			// 			setAngSetting={this.setAngSetting}
 			// 			setOneSetting={this.setOneSetting}

@@ -28,7 +28,7 @@ const propTypes = {
    setOrientAll: PropTypes.func.isRequired,
 }
 
-function Orient3D(props) {
+function OrientBox(props) {
 	cfpt(propTypes, props);
 	if (!props)
 		console.trace(`WTF is this?	 No props?`);
@@ -36,7 +36,7 @@ function Orient3D(props) {
 	//debugger;
 	let p = props;
 	if (traceOrient)
-		dblog(`starting Orient3D `, p);
+		dblog(`starting OrientBox `, p);
 
 	// xAng yAng zAng — rotate around just 1 axis as given by this event from this slider
 	// xPos yPos zPos — adjust offset object is from origin.
@@ -57,7 +57,7 @@ function Orient3D(props) {
 		// set in Vista and settings
 		props.setAngSetting(which, value);
 	}
-	// handler, for any Orient3D setting
+	// handler, for any OrientBox setting
 	function handleOneSetting(ev) {
 		let which = ev.target.className;
 		let value = ev.target.valueAsNumber;
@@ -81,7 +81,7 @@ function Orient3D(props) {
 	}
 
 	if (traceOrient)
-		dblog(`Orient3D render orient=`, p.orient);
+		dblog(`OrientBox render orient=`, p.orient);
 
     // all the mins and maxes are the store mins and maxes
 	const omm = sSettings.minMaxes.orientSettings;
@@ -96,7 +96,7 @@ function Orient3D(props) {
 			</label>
 		</div>;
 
-	return <div className='Orient3D' >
+	return <div className='OrientBox' >
 		{oneSlider('xAng')}
 		{oneSlider('yAng')}
 		{oneSlider('zAng')}
@@ -164,4 +164,4 @@ function Orient3D(props) {
 
 
 
-export default Orient3D;
+export default OrientBox;

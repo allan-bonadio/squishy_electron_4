@@ -222,7 +222,7 @@ export function createStoreSettings() {
 
 	/* ************************************ orient for 3D */
 
-	// set in Orient3D or PivotLayer
+	// set in OrientBox or PivotLayer
 	makeParam('orientSettings', 'xAng', 0,	{min: -90, max: +90});
 	makeParam('orientSettings', 'yAng', 0,	{min: -90, max: +90});
 	makeParam('orientSettings', 'zAng', 0,	{min: -90, max: +90});

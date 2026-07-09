@@ -7,7 +7,7 @@ import React, {useRef, useReducer} from 'react';
 import PropTypes from 'prop-types';
 
 import PivotLayer from './PivotLayer.js';
-import Orient3D from './Orient3D.js';
+import OrientBox from './OrientBox.js';
 import matrixGen from './matrixGen.js';
 
 import {getASetting, storeASetting, getAGroup, storeAGroup}
@@ -76,7 +76,7 @@ function OrientLayer(props) {
 
 	// repaint, rebuilding all matrices, effecting all changes.  Do
 	// this when canvas areas need to repaint & resize or other
-	// Orient3D settings besides just the angles
+	// OrientBox settings besides just the angles
 	const buildNRepaint = () => {
 		props.paintingNeeds.unifiedMatrix = mGen.unifyMatrices(orient);
 		if (props.mainVistaRepaint)
@@ -106,7 +106,7 @@ function OrientLayer(props) {
 	}
 
 	// set all of them.  newVal is an obj with all of them.
-	// Missing ones won't be set.  this is for reset on Orient3D
+	// Missing ones won't be set.  this is for reset on OrientBox
 	const setOrientAll = (newSettings) => {
 		if (traceOrient) dblog(`️🏔️ setOrientAll(${coord}, `, newSettings, `) `);
 		let newOrient = Object.assign({}, orient, newSettings);
@@ -124,7 +124,7 @@ function OrientLayer(props) {
 	// 	// set in Vista and settings
 	// 	setAngSetting(which, value);
 	// }
-	// // handler, for any Orient3D setting
+	// // handler, for any OrientBox setting
 	// function handleOneSetting(ev) {
 	// 	let which = ev.target.className;
 	// 	let value = ev.target.valueAsNumber;
@@ -165,7 +165,7 @@ function OrientLayer(props) {
 	// normally off for production use
 	let orientOverlay = '';
 	if (traceShowOrient3D){
-		orientOverlay = <Orient3D
+		orientOverlay = <OrientBox
 				orient={orient}
 				setAngSetting={setAngSetting}
 				setOneSetting={setOneSetting}
