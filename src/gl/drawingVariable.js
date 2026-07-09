@@ -4,7 +4,7 @@
 */
 
 let traceGLCalls = false;
-let traceUniforms = true;
+let traceUniforms = false;
 let traceAttributes = false;  // quick update every reload
 let traceAttributesFull = false;  // full dumps every reload
 
