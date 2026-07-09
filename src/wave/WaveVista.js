@@ -19,7 +19,7 @@ import {getASetting, storeASetting, getAGroup, storeAGroup} from '../utils/store
 import waveAux from './waveAux.js';
 import SizeBox from './SizeBox.js';
 
-// import PivotOverlay from './PivotOverlay.js';
+// import PivotLayer from './PivotLayer.js';
 // import Orient3D from './Orient3D.js';
 import OrientLayer from './OrientLayer.js';
 import GLScene from '../gl/GLScene.js';
@@ -258,7 +258,7 @@ export class WaveVista extends React.Component {
 		if (this.mainVistaRepaint) {
 			// // normally on for production use
 			// if (!traceDontShowPivotOverlay){
-			// 	pivotOverlay = <PivotOverlay
+			// 	pivotOverlay = <PivotLayer
 			// 			orient={this.orient}
 			// 			setAngSetting={this.setAngSetting}
 			// 		/>;

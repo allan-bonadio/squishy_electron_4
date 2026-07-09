@@ -1,5 +1,5 @@
 /*
-** PivotOverlay -- layer for user to rotate 3d image of wave
+** PivotLayer -- layer for user to rotate 3d image of wave
 ** Copyright (C) 2026-2026 Tactile Interactive, all rights reserved
 */
 
@@ -27,7 +27,7 @@ const propTypes = {
 	setAngSetting: PropTypes.func.isRequired,
 };
 
-export function PivotOverlay(props) {
+export function PivotLayer(props) {
 	cfpt(propTypes, props);
 
 	const pointerDownRef = useRef();
@@ -63,8 +63,8 @@ export function PivotOverlay(props) {
 			//Math.round(props.orient.yAng + delMouseY * Y_PIX_RATIO));
 	}
 
-	return <section className='PivotOverlay'
+	return <section className='PivotLayer'
 		onPointerMove={moveHandler} />
 }
 
-export default PivotOverlay;
+export default PivotLayer;

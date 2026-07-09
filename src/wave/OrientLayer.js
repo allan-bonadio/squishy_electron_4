@@ -6,7 +6,7 @@
 import React, {useRef, useReducer} from 'react';
 import PropTypes from 'prop-types';
 
-import PivotOverlay from './PivotOverlay.js';
+import PivotLayer from './PivotLayer.js';
 import Orient3D from './Orient3D.js';
 import matrixGen from './matrixGen.js';
 
@@ -156,7 +156,7 @@ function OrientLayer(props) {
 	// normally on for production use
 	let pivotOverlay = '';
 	if (!traceDontShowPivotOverlay){
-		pivotOverlay = <PivotOverlay
+		pivotOverlay = <PivotLayer
 				orient={orient}
 				setAngSetting={setAngSetting}
 			/>;
