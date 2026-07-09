@@ -60,7 +60,7 @@ blade is two triangles */
 // space values that go from 0 to N.  Adjust to taste or to N. These are
 // inserted as numbers into the vert shader code.
 const OUTER_FACTOR = '5.0';
-const INNER_FACTOR = '3.';
+const INNER_FACTOR = '1.';
 
 // make the line number for the start correspond to this JS file line number - the NEXT line
 const vertexShaderSrc = `// garlandDrawing vertex
