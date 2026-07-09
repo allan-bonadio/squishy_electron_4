@@ -8,8 +8,8 @@ import PropTypes from 'prop-types';
 
 // one mouse unit equals how many screen pixel units?
 // or, um, the angle in degrees it should equate to
-let X_PIX_RATIO = .05;
-let Y_PIX_RATIO = .05;
+let X_PIX_RATIO = .005;
+let Y_PIX_RATIO = .005;
 
 const roundAngle = (theta) => Math.max(-90, Math.min(90, Math.round(theta/5) * 5));
 
@@ -20,7 +20,7 @@ const propTypes = {
 	orient: PropTypes.shape({
 		xAng: PropTypes.number.isRequired,
 		yPos: PropTypes.number.isRequired,
-		hfoView: PropTypes.number.isRequired,
+		hfoView: PropTypes.number,
 		// plus others i'm too lazy to do
 	}),
 
