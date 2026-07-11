@@ -13,91 +13,96 @@ let traceDragCanvasHeight = true;
 
 // only one human can drag it at a time, right?  so its ok to make it global.
 let isResizing;
-let resizingYOffset;
 
 const propTypes = {
+	height: PropTypes.number.isRequired,
 	// our caller, the wave, gets new height
 	setHeight: PropTypes.func.isRequired,
-	//initialHeight: PropTypes.number.isRequired,
 	which: PropTypes.string.isRequired,  // either "view" or "vista"
+	// or potentially other things that use the size box.   Do I really need this?
 };
 
 
 function SizeBox(props) {
 	cfpt(propTypes, props);
 
-//	let [height, setHeight] = useState(props.initialHeight);
 	// this will remember the height from the latest render
-	let height;
+	let [draggingPageY, setDraggingPageY] = useState();
+	let [draggingHeight, setDraggingHeight] = useState(props.height);
 
 	function setWaveHeight(newHeight) {
-		// don't CONTINUOUSLY set the canvas size!
-		if (height && newHeight == height) return;
+		if (isNaN(newHeight)) debugger;
 
-		//setHeight(newHeight);  // for next time around
-		height = newHeight;
+		// don't CONTINUOUSLY set the canvas size!
+		if (draggingHeight && newHeight == draggingHeight) return;
+
 		props.setHeight(newHeight);  // for the wave box
 		storeASetting('miscSettings', props.which + 'Height', newHeight);
 	}
 
 	// these are for resizing ONLY with the size box
-	// We let the user drag into the size box and drag out if they want
 	// note: anything funny and the event falls thru to the wave panel
 	const resizePointerDown = ev => {
 		if (!(ev.buttons & 1)) return;
-		isResizing = true;
-		if (!height)
-			height = ev.pageY;
-
-		// the small distance from the mousedown to the bottom of the size box
-		resizingYOffset = Math.round(height - ev.pageY);
-		if (traceDragCanvasHeight)
-			console.log(`📦📦 resizePointer down ${ev.pageX} ${ev.pageY} offset=${resizingYOffset}`);
 		ev.target.setPointerCapture(ev.pointerId);
+		isResizing = true;
+
+		// for next move
+		setDraggingPageY(Math.round(ev.pageY));  // it comes in with lots of decimal places
+		setDraggingHeight(props.height);
+
+		if (traceDragCanvasHeight)
+			console.log(`📦📦 resizePointer down Height=${props.height} `
+				+`evPageY=${draggingPageY}`);
 
 		// now it's ours so don't let it click through
 		ev.preventDefault();
 		ev.stopPropagation();
 	};
 
+	// all the moving happens in the moment, in the move handler
 	const resizePointerMove = ev => {
 		// mouse moves happen all the time; don't bother me
 		if (!(ev.buttons & 1)) return;
 		if (!isResizing)
 			return;
+		if (isNaN(draggingHeight) || isNaN(draggingPageY)) debugger;
 
-		const vHeight = Math.round(ev.pageY + resizingYOffset);
-		setWaveHeight(vHeight);
+		// movement since last move or down event
+		let pageY = Math.round(ev.pageY);   // it comes in with lots of decimal places
+		let newHeight = draggingHeight + pageY - draggingPageY;
+		if (isNaN(newHeight)) debugger;
+		setWaveHeight(newHeight);
+		setDraggingPageY(pageY);
+		setDraggingHeight(newHeight);
+
 		if (traceDragCanvasHeight) {
-			console.log(`📦📦 resizePointer drag ${ev.pageX} ${ev.pageY}  newheight=${ev.pageY + resizingYOffset}`);
+			console.log(`📦📦 resizePointer Move draggingHeight=${newHeight} `
+				+` pageY=${pageY}`);
 		}
 
 		ev.preventDefault();
 		ev.stopPropagation();
 	};
 
-	// usually I get pointerLeave events here, but now with
-	// pointerCapture, maybe it doesn't matter.?? I do get pointerLeave
-	// events, but only after pointerUp, if the pointer is out of the
-	// size box.??
 	const resizePointerUp = ev => {
 		if (!(ev.buttons & 1)) return;
 
 		if (traceDragCanvasHeight)
-			console.log(`📦📦 resizePointer up ${ev.pageX} ${ev.pageY}`);
+			console.log(`📦📦 resizePointer up pageY=${ev.pageY}`);
 		isResizing = false;
+		// PointerCapture turns off automatically on mouseup
 
 		ev.preventDefault();
 		ev.stopPropagation();
 	};
 
 	return <div className='sizeBox'
-				onPointerEnter={resizePointerDown}
 				onPointerDown={resizePointerDown}
 				onPointerUp={resizePointerUp}
 				onPointerLeave={resizePointerUp}
 				onPointerMove={resizePointerMove}
-				title="To adjust the height, drag this up or down">
+				title="To adjust the height, drag this box up or down">
 			<img src={resizeIcon} alt='size box' />
 		</div>
 }

@@ -231,7 +231,7 @@ export class WaveView extends React.Component {
 				<BeginFinishOverlay />
 
 				<SizeBox which='view' setHeight={this.setHeight}
-						initialHeight={s.outerHeight} />
+						height={s.outerHeight} />
 
 			</div>
 			<div className='bumper right' key='right'

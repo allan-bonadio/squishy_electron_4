@@ -311,8 +311,8 @@ export class WaveVista extends React.Component {
 
 				<BeginFinishOverlay />
 
-				<SizeBox which='vista' setHeight={this.setHeight}
-						initialHeight={s.outerHeight} />
+				<SizeBox which='vista' height={s.outerHeight } setHeight={this.setHeight}
+						which='vista' />
 
 			</div>
 

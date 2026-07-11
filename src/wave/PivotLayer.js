@@ -44,15 +44,15 @@ export function PivotLayer(props) {
 		if (!pointerDown) {
 			// must be starting - mouse down, or mouse enter
 			// remember where mouse down was and what angles that meant
-			pointerDown = pointerDownRef.current = {x: ev.pageX, y: ev.pageY,
+			pointerDown = pointerDownRef.current = {x: ev.clientX, y: ev.clientY,
 				xAng: props.orient.xAng, yAng: props.orient.yAng};
 		}
 
 		// ok now, how far has it moved and in what direction? measure
 		// from mousedown point.  Note:xAng and yAng need to be
 		// reversed: xAng is rotation around y axis, etc.
-		let delMouseY = ev.pageX - pointerDown.x;
-		let delMouseX = ev.pageY - pointerDown.y;
+		let delMouseY = ev.clientX - pointerDown.x;
+		let delMouseX = ev.clientY - pointerDown.y;
 
 		// so that means new angles are:
 		props.setAngSetting('xAng',
