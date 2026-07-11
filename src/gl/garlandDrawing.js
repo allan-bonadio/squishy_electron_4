@@ -16,7 +16,7 @@ let traceAvatarAfterDrawing = false;
 let traceSimulateGL = false;
 let traceDrawing = false;
 let traceReloadRow = false;
-let traceMatrix = true;
+let traceMatrix = false;
 let traceUColor = false;
 
 // diagnostic purposes; draws more per vertex
