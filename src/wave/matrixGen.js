@@ -13,10 +13,10 @@ const d2r = Math.PI / 180;
 //	do other funcs in this class
 //	paintingNeeds = { unifiedMatrix: mg.unifyMatrices(origin) };
 
-let traceOrientation= false;
-let traceRotMatrix = true;
+let traceOrientation= true;
+let traceRotMatrix = false;
 let traceProjMatrix = false;
-let traceOffMatrix = true;
+let traceOffMatrix = false;
 
 
 
@@ -152,7 +152,7 @@ export class matrixGen {
 
 		// one of these for starters
 		//this.regularMatrix();
-		//this.projectMatrix();
+		this.projectMatrix();
 
 		// these mostly work as advertised and as controlled by Orient3d
 		// keep interchanging offsetMatrix() and rotateMatrix()
