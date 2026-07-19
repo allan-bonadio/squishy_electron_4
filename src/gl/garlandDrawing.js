@@ -49,7 +49,7 @@ cell in the x direction, and OUTER_FACTOR times psi in the real and imag
 directions; hopefully those numbers are about 0.5 thru 5 or so.  The camera is
 located at the origin?.
 The points in the outer edge of the spiral follow this:
-x = ix
+x = ix * factor, moved to be center between ±each end
 y = OUTER_FACTOR * N * 𝜓_real
 z = OUTER_FACTOR * N * 𝜓_imag
 
@@ -61,6 +61,9 @@ blade is two triangles */
 // inserted as numbers into the vert shader code.
 const OUTER_FACTOR = '5.0';
 const INNER_FACTOR = '1.';
+
+// original idea was, each cell fo space was 1 x unit.  Turns out, that's too big.  this controls it
+const IX_MAG = '0.01';
 
 // make the line number for the start correspond to this JS file line number - the NEXT line
 const vertexShaderSrc = `// garlandDrawing vertex
@@ -99,7 +102,7 @@ void main() {
 	vec4 point;
 	point.yz = row.xy * factor;
 	//point.yz = row.xy * factor * nStates;
-	point.x = (float(ix) - nStates/2.) * .05;
+	point.x = (float(ix) - nStates/2.) * ${IX_MAG};
 
 	vec4 pointM = point * matrix;
 	float zPers = 2.0 + pointM.z;  // for perspective
@@ -252,7 +255,6 @@ export class garlandDrawing extends abstractDrawing {
 
 		gl.drawArrays(verb, first, count);
 
-
 		// dblog(`🌀🌀🌀just drewArrays-garland on avatar `
 		// 	+` ptr=${this.avatar._pointer_} `
 		// 	+` this.avatar.label=${this.avatar.label}, `
@@ -263,16 +265,17 @@ export class garlandDrawing extends abstractDrawing {
 	// draw all the Onces for the whole drawing
 	drawWhole(first, count) {
 		const gl = this.gl;
+		const LADDER_GRAY = [0.7, 0.7, 0.7, 1];
 
 		// the color strip
 		this.drawOnce(gl, gl.TRIANGLE_STRIP, first, count, 0, 1, [-1, 0, 0, 1]);  // rainbow from cx
 
 		// rungs of the ladder
-		//this.drawOnce(gl, gl.LINES, first, count, 0, 1, [0.7, 0.7, 0.7, 1]);
+		//this.drawOnce(gl, gl.LINES, first, count, 0, 1, LADDER_GRAY);
 
 		// side edges of the ladder
-		this.drawOnce(gl, gl.LINE_STRIP, first, count, 0, 0, [0.7, 0.7, 0.7, 1]);
-		this.drawOnce(gl, gl.LINE_STRIP, first, count, 1, 1, [0.7, 0.7, 0.7, 1]);
+		this.drawOnce(gl, gl.LINE_STRIP, first, count, 0, 0, LADDER_GRAY);
+		this.drawOnce(gl, gl.LINE_STRIP, first, count, 1, 1, LADDER_GRAY);
 
 
 		if (traceDrawLines) {
