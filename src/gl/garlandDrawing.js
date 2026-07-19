@@ -16,7 +16,7 @@ let traceAvatarAfterDrawing = false;
 let traceSimulateGL = false;
 let traceDrawing = false;
 let traceReloadRow = false;
-let traceMatrix = false;
+let traceMatrix = true;
 let traceUColor = false;
 
 // diagnostic purposes; draws more per vertex
@@ -271,8 +271,8 @@ export class garlandDrawing extends abstractDrawing {
 		//this.drawOnce(gl, gl.LINES, first, count, 0, 1, [0.7, 0.7, 0.7, 1]);
 
 		// side edges of the ladder
-		this.drawOnce(gl, gl.LINE_STRIP, first, count, 0, 0, [0.7, 0.7, 0.7, 1]);
-		this.drawOnce(gl, gl.LINE_STRIP, first, count, 1, 1, [0.7, 0.7, 0.7, 1]);
+		// this.drawOnce(gl, gl.LINE_STRIP, first, count, 0, 0, [0.7, 0.7, 0.7, 1]);
+		// this.drawOnce(gl, gl.LINE_STRIP, first, count, 1, 1, [0.7, 0.7, 0.7, 1]);
 
 
 		if (traceDrawLines) {
