@@ -1,12 +1,13 @@
 
 // cx2rygb.txlated.js -- generated from cx2rygb.glsl.js into js
 // mostly for testing purposes.  do not edit!  instead edit cx2rygb.glsl.js & run unit tests
-// this file written Mon Jan 26 2026 15:15:42 GMT-0800 (Pacific Standard Time)
+// this file written Sun Jul 12 2026 23:01:08 GMT-0700 (Pacific Daylight Time)
 
 // needed defs of vec2 (complex only) and vec3 (rgb only)
 const vec2 = (x=0, y=0) => ({x, y});
 const vec3 = (r=0, g=0, b=0) => ({r, g, b});
 
+// file cx2rygb
 
 
 // take a complex  num and use the octogon alg to figure out the color
