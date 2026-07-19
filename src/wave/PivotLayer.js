@@ -83,6 +83,16 @@ export function PivotLayer(props) {
 		let delMouseY = ev.clientX - pointerDown.x;
 		let delMouseX = ev.clientY - pointerDown.y;
 
+		dblog(`client    pDown    delMouse`);
+		dblog(`${ev.clientX}  —  ${pointerDown.x}  =  ${delMouseX}`);
+		dblog(`${ev.clientY}  —  ${pointerDown.y}  =  ${delMouseY}`);
+
+		dblog(`Ang   + delMouse*RATIO    new angle`);
+		dblog(`${props.orient.xAng} +   ${delMouseX * X_PIX_RATIO}  `
+			+`=  ${props.orient.xAng + delMouseX * X_PIX_RATIO}`);
+		dblog(`${props.orient.yAng}  +  ${delMouseY * Y_PIX_RATIO}  `
+			+`=  ${props.orient.yAng + delMouseY * Y_PIX_RATIO}`);
+
 		// so that means new angles are:
 		props.setAngSetting('xAng',
 			roundAngle(props.orient.xAng + delMouseX * X_PIX_RATIO));

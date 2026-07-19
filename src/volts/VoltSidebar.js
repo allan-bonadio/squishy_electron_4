@@ -68,7 +68,7 @@ function VoltSidebar(props) {
 				onPointerEnter={pointerEnter} onPointerLeave={pointerLeave} >
 
 			<button className='glass scrollUp' onClick={ev => mainVDisp.scrollVoltHandler(+1)}>
-				<img src={upIcon} />
+				<img src={downIcon} />
 			</button>
 
 			<button className='glass zoomIn' onClick={ev => mainVDisp.zoomVoltHandler(-1)}>
@@ -80,7 +80,7 @@ function VoltSidebar(props) {
 			</button>
 
 			<button className='glass scrollDown' onClick={ev => mainVDisp.scrollVoltHandler(-1)}>
-				<img src={downIcon} />
+				<img src={upIcon} />
 			</button>
 
 		</aside>
