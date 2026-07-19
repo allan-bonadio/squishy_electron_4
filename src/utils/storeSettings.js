@@ -231,7 +231,7 @@ export function createStoreSettings() {
 	makeParam('orientSettings', 'yPos', 0,	{min: -20, max: +20});
 	makeParam('orientSettings', 'zPos', 0,  {min: -20, max: +20});
 
-	// get rid of these?  TODO
+	// get rid of these?  TODO gonna try to reserect the Perspecive matrix call.
 	makeParam('orientSettings', 'hfoView', 45,	{min: 1, max: +179});
 	makeParam('orientSettings', 'fudge', 1,	 {min: 0, max: +2});
 
