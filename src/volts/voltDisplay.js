@@ -7,21 +7,24 @@ import qeConsts from '../engine/qeConsts.js';
 //import {scaleLinear} from 'd3-scale';
 import {EFFECTIVE_VOLTS, TOO_MANY_VOLTS, LOW_VOLTS} from './voltConstants.js';
 import {getAGroup, storeASetting} from '../utils/storeSettings.js';
-import * as d3 from "d3";
-import drawingDescription from '../wave/drawingDescription.js';
+//import * as d3 from "d3";
+import drawDesc2D from '../wave/drawDesc2D.js';
 
 let traceFamiliar = false;
-let traceScales = false;
+let traceScales = true;
 let tracePathAttribute = false;
 let tracePathIndividualPoints = false;
 
 let traceVoltArithmetic = false;
-let traceVoltScales = false;
+let traceVoltScales = true;
 let traceScrolling = false;
 let traceZooming = false;
 
 
 const {min, max, abs, round, sqrt, cbrt, log10} = Math;
+
+// does optimizer eliminate this, leading to errors downstream?  this fixes it
+const qe_Consts = qeConsts;
 
 // zooming in or out, changes the heightVolts by this factor either way.
 const zoomFactor = Math.sqrt(2);
@@ -43,8 +46,8 @@ export class voltDisplay {
 		// point-by-point voltage values, + start and end of voltage buffer, aligned with waves
 		this.label = label;
 		this.space = space;
-		this.drDesc = new drawingDescription(space);
-		Object.assign(this, this.drDesc);
+		this.drawDesc2D = new drawDesc2D(space);
+		Object.assign(this, this.drawDesc2D);
 		this.voltageBuffer = voltageBuffer;
 
 		if (settings) {
@@ -59,7 +62,7 @@ export class voltDisplay {
 			// in case the numbers are crazy
 			this.decideBottomHeightVolts();
 
-			this.drDesc.addYScales(settings.bottomVolts,
+			this.drawDesc2D.addYScales(settings.bottomVolts,
 				settings.bottomVolts + settings.heightVolts,
 				settings.canvasHeight
 			);
@@ -88,21 +91,21 @@ export class voltDisplay {
 	}
 
 	// take the dr disc from the space (fairly sparse) and add some more things like scalers
-	// get drawingDescription() {
-	// 	let drDesc = this.drDesc = this.space.drawingDescription;
+	// get drawDesc2D() {
+	// 	let drawDesc2D = this.drawDesc2D = this.space.drawDesc2D;
 	//
-	// 	drDesc.xScale = d3.scaleLinear(
+	// 	drawDesc2D.xScale = d3.scaleLinear(
 	// 		[this.start, this.end],
 	// 		[drawingLeft, drawingLeft + drawingWidth]);
-	// 	drDesc.yScale = d3.scaleLinear(
+	// 	drawDesc2D.yScale = d3.scaleLinear(
 	// 		[this.bottomVolts, this.bottomVolts + this.heightVolts],
 	// 		[0, canvasHeight]);
-	// 	drDesc.yUpsideDown = d3.scaleLinear(
+	// 	drawDesc2D.yUpsideDown = d3.scaleLinear(
 	// 		[this.bottomVolts, this.bottomVolts + this.heightVolts],
 	// 		[canvasHeight, 0]);
-	// 	drDesc.canvasHeight = canvasHeight;
+	// 	drawDesc2D.canvasHeight = canvasHeight;
 	//
-	// 	return drDesc;
+	// 	return drawDesc2D;
 	// }
 
 	// all of our properties, but not the datapoints.  Optional: pass voltage params
@@ -176,7 +179,7 @@ export class voltDisplay {
 	//
 	// 	this.drawingLeft = drawingLeft;
 	// 	this.drawingWidth = drawingWidth;
-	// 	this.drDesc.addXScales(drawingLeft, drawingLeft + drawingWidth);
+	// 	this.drawDesc2D.addXScales(drawingLeft, drawingLeft + drawingWidth);
 	// 	//this.drawingHeight = canvasHeight;
 	// }
 
@@ -187,17 +190,18 @@ export class voltDisplay {
 		isOK(drawingLeft); isOK(drawingWidth);
 		isOK(this.bottomVolts); isOK(this.heightVolts);
 
-		if (this.drawingLeft === drawingLeft && this.drawingWidth === drawingWidth
-						&& this.drDesc.canvasHeight === canvasHeight)
-			console.warn(`drawingLeft drawingWidth canvasHeight are being set superfluously?`);
+		// no happens all hte time.  Need drawDesc2D
+		// if (this.drawingLeft === drawingLeft && this.drawingWidth === drawingWidth
+		// 				&& this.drawDesc2D.canvasHeight === canvasHeight)
+		// 	console.warn(`drawingLeft drawingWidth canvasHeight are being set superfluously?`);
 
 		this.drawingLeft = drawingLeft;
 		this.drawingWidth = drawingWidth;
-		this.drDesc.addXScales(drawingLeft, drawingLeft + drawingWidth);
+		this.drawDesc2D.addXScales(drawingLeft, drawingLeft + drawingWidth);
 
-		this.drDesc.addYScales(this.bottomVolts, this.bottomVolts + this.heightVolts, canvasHeight);
+		this.drawDesc2D.addYScales(this.bottomVolts, this.bottomVolts + this.heightVolts, canvasHeight);
 
-		Object.assign(this, this.drDesc);  // copies it all over this obj
+		Object.assign(this, this.drawDesc2D);  // copies it all over this obj
 
 		if (traceScales)
 			console.log(`${this.label}: bottomVolts=${this.bottomVolts} `
@@ -219,8 +223,10 @@ export class voltDisplay {
 	// usedYScale is either yScale or yUpsideDown; your choice
 	// want the syntax to be easy to debug
 	makeVoltagePathAttribute(usedYScale) {
-		let {barWidth, start, end} = this.drDesc;
-		this.xScale = this.drDesc.xScale;
+		window.vDispMVPASpace = this.space;
+		this.drawDesc2D = this.space.drawDesc2D;
+		let {barWidth, start, end} = this.drawDesc2D;
+		this.xScale = this.drawDesc2D.xScale;
 
 		// this.xScale = d3.scaleLinear([start, end],
 		// 		[drawingLeft, drawingLeft + drawingWidth]);
@@ -256,10 +262,10 @@ export class voltDisplay {
 		// get ready to stop and start the path if needed
 		let didMove = false, didLine = false;
 		switch (this.continuum) {
-		case qeConsts.contDISCRETE:
+		case qe_Consts.contDISCRETE:
 			throw new Error(`discrete continuum in makeVoltagePathAttribute`);
 
-		case qeConsts.contWELL:
+		case qe_Consts.contWELL:
 			// potential at the ends of the well are 'infinite'; therefore regular points run start ... end-1.
 			// just do a line going up on each end.  skyHigh isn't ∞ but should get slanted line
 			let skyHigh = usedYScale(this.bottomVolts + 5 * this.heightVolts).toFixed(1);
@@ -279,7 +285,7 @@ export class voltDisplay {
 			tpip(x, skyHigh, '️right bumper');
 			break;
 
-		case qeConsts.contENDLESS:
+		case qe_Consts.contENDLESS:
 			// make the voltage buffer wraparound
 			voltageBuffer[0] = voltageBuffer[end-1];
 			voltageBuffer[end+start] = voltageBuffer[1];

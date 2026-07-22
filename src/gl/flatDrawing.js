@@ -136,7 +136,8 @@ export class flatDrawing extends abstractDrawing {
 		// there's 7 bars between. 9 bars total, 10 edges, matching the 10 = nPoints
 		// So, the same for WELL and ENDLESS
 
-		let {barWidth, start, end} = this.space.drawingDescription;
+		window.flatDrwSpace = this.space;////TODO
+		let {barWidth, start, end} = this.space.drawDesc2D;
 
 		let nPoints = this.nPoints = this.space.nPoints;
 		let nStates = this.space.nStates;

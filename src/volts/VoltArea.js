@@ -19,7 +19,7 @@ import SquishContext from '../sPanel/SquishContext.js';
 
 let traceVoltageArea = false;
 
-let traceRendering = false;
+let traceRendering = true;
 let traceProfileDragging = false;
 let traceTweening = false;
 let traceWheel = false;
@@ -338,6 +338,9 @@ function VoltArea(props) {
 
 	// this one actually draws the voltage line, normally
 	function renderVoltagePath() {
+		// this is goofy ... shouldn't this already be set into mVD!?!?!  TODO
+		mVD.drawDesc2D.addScales(mVD);
+
 		// the lines themselves: exactly overlapping.  tactile wider than visible.
 		const pathAttribute = mVD.makeVoltagePathAttribute(mVD.yScale);
 		if (traceRendering)
@@ -372,7 +375,7 @@ function VoltArea(props) {
 		let txX = p.drawingLeft + p.drawingWidth;
 		let txY = p.canvasInnerHeight;
 		vAx.attr('transform', `translate(${txX}, ${txY})`);
-		vAx.call(axis);
+		vAx.call(axis, mVD.yUpsideDown);
 		//debugger;
 		return voltageAxis.toReact();
 	}
@@ -380,20 +383,8 @@ function VoltArea(props) {
 	if (! p.space)
 		return '';  // too early
 
-	// width of each bar
-	// let {barWidth, start, end} = this.space.drawingDescription;
-
-	//let barWidth = p.drawingWidth / p.space.nPoints;
-	// if (traceRendering) {
-	// 	console.log(`⚡️ VoltArea.render, drawing left:${p.drawingLeft}
-	// 		width=${p.drawingWidth}  height=${p.canvasInnerHeight}`);
-	// }
-
+	// superfluous?  no.
 	mVD.setVoltScales(p.drawingLeft, p.drawingWidth, p.canvasInnerHeight);
-
-	// these elements show and hide
-	// NO!  this is done in VoltOverlay  let vClass = p.showVoltage +'ShowVoltage';
-	// so the whole assembly shows and hides incl sidebar
 
 	let viewBoxStr = `${p.drawingLeft} 0 ${p.drawingWidth} ${p.canvasInnerHeight}`;
 	if (traceViewBox) {
