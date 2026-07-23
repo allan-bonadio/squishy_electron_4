@@ -3,6 +3,8 @@
 ** Copyright (C) 2026-2026 Tactile Interactive, all rights reserved
 */
 
+this file is no longer used
+
 import qeConsts from '../engine/qeConsts.js';
 //import {scaleLinear} from 'd3-scale';
 // import {EFFECTIVE_VOLTS, TOO_MANY_VOLTS, LOW_VOLTS} from './voltConstants.js';

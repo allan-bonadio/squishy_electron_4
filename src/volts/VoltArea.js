@@ -339,7 +339,9 @@ function VoltArea(props) {
 	// this one actually draws the voltage line, normally
 	function renderVoltagePath() {
 		// this is goofy ... shouldn't this already be set into mVD!?!?!  TODO
-		mVD.drawDesc2D.addScales(mVD);
+		//mVD.drawDesc2D.addScales(mVD);
+		if (!mVD.xScale || !mVD.yScale)
+			throw `no xScale ${mVD.xScale} or yScale ${mVD.yScale} `;
 
 		// the lines themselves: exactly overlapping.  tactile wider than visible.
 		const pathAttribute = mVD.makeVoltagePathAttribute(mVD.yScale);

@@ -15,7 +15,7 @@ import eFlick from './eFlick.js';
 import {getAGroup} from '../utils/storeSettings.js';
 import {interpretCppException} from '../utils/errors.js';
 import {MAX_DIMENSIONS, N_THREADS} from './eEngine.js';
-import drawDesc2D from '../wave/drawDesc2D.js';
+//import drawDesc2D from '../wave/drawDesc2D.js';
 
 let traceSpace = true;
 let traceFamiliarWave = false;
@@ -160,27 +160,29 @@ export class eSpace extends eObject {
 	// Also start and end for drawing onscreen cuz continuum
 	// use it like this: d3.scaleLinear([start, end], leftCoord, rightCoord);
 	// then loop 1...end or 0...(start+end) if you need the endpoints
-	get drawDesc2D() {
-		if (!this._drawDesc2D)
-			this._drawDesc2D = new drawDesc2D(this);
-		return this._drawDesc2D;
-		// maybe this should calculate each component on the fly with multiple getters?
-		// TODO
 
-		// const space = this;
-		// if (space.continuum == qeConsts.contENDLESS) {
-		// 	// eg for N=8, 8 segments and segment 0===8 and 1===9
-		// 	return {barWidth: 1 / this.nStates, start: this.start, end: this.end};
-		// }
-		// else if (space.continuum == qeConsts.contWELL) {
-		// 	// eg for N=8, 8 segments plus two on ends that go to ∞,
-		// 	// so segment 0===9=∞
-		// 	return {barWidth: 1 / this.nPoints, start: 0, end: this.end + this.start};
-		// }
-		// else {
-		// 	throw `bad continuum ${this.continuum}`;
-		// }
-	}
+	// THIS IS ABSORBED INTO voltDisplay
+// 	gesfghsfght drawDesczfghsfgh2D() {
+// 		if (!this._drawDesc2D)
+// 			this._drawDesc2D = new drawDesc2D(this);
+// 		return this._drawDesc2D;
+// 		// maybe this should calculate each component on the fly with multiple getters?
+// 		// TODO
+//
+// 		// const space = this;
+// 		// if (space.continuum == qeConsts.contENDLESS) {
+// 		// 	// eg for N=8, 8 segments and segment 0===8 and 1===9
+// 		// 	return {barWidth: 1 / this.nStates, start: this.start, end: this.end};
+// 		// }
+// 		// else if (space.continuum == qeConsts.contWELL) {
+// 		// 	// eg for N=8, 8 segments plus two on ends that go to ∞,
+// 		// 	// so segment 0===9=∞
+// 		// 	return {barWidth: 1 / this.nPoints, start: 0, end: this.end + this.start};
+// 		// }
+// 		// else {
+// 		// 	throw `bad continuum ${this.continuum}`;
+// 		// }
+// 	}
 
 
 	// return me the start, end, etc of this 1d space

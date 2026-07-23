@@ -95,9 +95,10 @@ export class WaveView extends React.Component {
 	setHeight = (height) => {
 		this.setState({outerHeight: height});
 		storeASetting('miscSettings', 'viewHeight', height);
+		updateViewHeight(height);
 	}
 
-	/* ********************************************************* hover */
+	/* *********************************************** hover */
 	// I'm done trying to get the css :hover to do this right. Enter and Leave events
 	// now turn on/off the voltage display.
 
