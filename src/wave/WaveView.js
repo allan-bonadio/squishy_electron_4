@@ -47,9 +47,10 @@ export class WaveView extends React.Component {
 
 		// no!	handed in by promise space: PropTypes.instanceOf(eSpace),
 
-		// handed in, pixels.  Width of whole waveview, including sidebar,
-		// bumpers and border. Canvas is CANVAS_BORDER_THICKNESS pixel smaller
-		// all around for border.
+		// handed in, pixels.  Width of whole waveview, including
+		// sidebar, bumpers and border. Canvas is
+		// CANVAS_BORDER_THICKNESS pixel smaller all around for
+		// border.  (outer height is in state)
 		outerWidth: PropTypes.number.isRequired,
 
 		// sAnimator
@@ -87,6 +88,12 @@ export class WaveView extends React.Component {
 			this.space = space;
 			this.setState({space});  // please render cuz nothing renders without space
 			this.paintingNeeds = {cavity: this.space.mainFlick, bumperWidth: this.bumperWidth}
+
+			const vd = this.vDisp = space.vDisp;
+			vd.addXScales(this.CANVAS_BORDER_THICKNESS,
+				outerWidth - this.CANVAS_BORDER_THICKNESS);
+			vd.addYScales(bottomValue, topValue, outerHeight - 2 * this.CANVAS_BORDER_THICKNESS);
+
 		});
 	}
 
@@ -95,12 +102,12 @@ export class WaveView extends React.Component {
 	setHeight = (height) => {
 		this.setState({outerHeight: height});
 		storeASetting('miscSettings', 'viewHeight', height);
-		updateViewHeight(height);
+		this.space.vDisp.updateViewHeight(height);
 	}
 
 	/* *********************************************** hover */
-	// I'm done trying to get the css :hover to do this right. Enter and Leave events
-	// now turn on/off the voltage display.
+	// I'm done trying to get the css :hover to do this right. Enter
+	// and Leave events now turn on/off the voltage display.
 
 	hoverEnter = ev => {
 		if (traceHover)
@@ -116,7 +123,7 @@ export class WaveView extends React.Component {
 			this.waveViewEl.classList.remove('wvHovering')
 	}
 
-	/* ********************************************************* render */
+	/* ******************************************** render */
 
 	// pass along the vital repaint functions
 	setMainViewRepaint = (mainViewRepaint) => {

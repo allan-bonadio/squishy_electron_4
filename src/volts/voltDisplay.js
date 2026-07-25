@@ -72,7 +72,8 @@ export class voltDisplay {
 		if (!voltSettings) throw `no voltSettings for ${this.label} voltDisplay`;
 
 		// only applies and only needed for the 2d view
-		this.viewCanvasHeight = viewCanvasHeight ?? getASetting('miscSettings', 'viewHeight');
+		this.viewCanvasHeight = viewCanvasHeight
+			?? getASetting('miscSettings', 'viewHeight');
 
 		// adjust the range over which the user can slide the bottomVolts,
 		// in case the numbers are crazy
@@ -83,8 +84,8 @@ export class voltDisplay {
 	// Or, initially.
 	updateViewHeight(viewCanvasHeight) {
 		this.viewCanvasHeight = viewCanvasHeight ?? getASetting('miscSettings', 'viewHeight');
-		this.addYScales(voltSettings.bottomVolts,
-			voltSettings.bottomVolts + voltSettings.heightVolts,
+		this.addYScales(this.bottomVolts,
+			this.bottomVolts + this.heightVolts,
 			viewCanvasHeight);
 
 	}
@@ -92,9 +93,9 @@ export class voltDisplay {
 	// set ANY field, from the 'from' argument, into this
 	// from = {aField: aValue, anotherField: anotherValue}
 	// does anybody use this?>!?  TODO
-	setSettings(from) {
-		Object.assign(this, from);
-	}
+	// setSettings(from) {
+	// 	Object.assign(this, from);
+	// }
 
 	// create a voltDisplay the way the space needs it.  Also the view canvas.
 	static newForSpace(space, viewCanvasHeight) {
@@ -172,11 +173,12 @@ export class voltDisplay {
 		this.measuredMaxVolts = maxi;
 	}
 
-	// THIS IS PERFECT, don't change it!!
-	// Adjust bottomVolts and heightVolts to the existing potential numbers, so it looks nice.
-	// call this after changing the volts buffer, by the familiar settings.
+	// Adjust bottomVolts and heightVolts to the measured potential
+	// numbers, so it looks nice. call this after changing the volts
+	// buffer, by the familiar settings.
 	decideBottomHeightVolts() {
-		// make sure some part of the current voltage is visible somewhere - adjust bottomVolts if needed
+		// make sure some part of the current voltage is visible
+		// somewhere - adjust bottomVolts if needed
 		this.findVoltExtremes();
 
 		// if this doesn't include zero, include it
@@ -205,7 +207,7 @@ export class voltDisplay {
 
 	// once you figure out voltage limits to display, and the pixel height
 	// here, y can be any kind of value that varies continuously from
-	// bottom to top of whatever
+	// bottom to top of whatever, but mostly we use voltage
 	addYScales(bottomValue, topValue, viewCanvasHeight) {
 		if (!this.yScale) {
 			this.yScale = d3.scaleLinear(
@@ -292,8 +294,10 @@ export class voltDisplay {
 			throw new Error(`discrete continuum in makeVoltagePathAttribute`);
 
 		case qe_Consts.contWELL:
-			// potential at the ends of the well are 'infinite'; therefore regular points run start ... end-1.
-			// just do a line going up on each end.  skyHigh isn't ∞ but should get slanted line
+			// potential at the ends of the well are 'infinite';
+			// therefore regular points run start ... end-1. just do a
+			// line going up on each end.  skyHigh isn't ∞ but should
+			// get slanted line
 			let skyHigh = usedYScale(this.bottomVolts + 5 * this.heightVolts).toFixed(1);
 
 			x = this.xScale(0).toFixed(1);
