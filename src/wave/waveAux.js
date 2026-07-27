@@ -36,7 +36,7 @@ export const waveAux = {
 			console.log(`🏄 canvas updateInner: w=${this.canvasInnerWidth} h=${this.canvasInnerHeight}`);
 	},
 
-	// called in constructors
+	// called in constructors; remember width & height so we can tell if the user changed it
 	createInnerDims() {
 			this.updateInnerDims();  // after outerWidth done
 
@@ -44,7 +44,6 @@ export const waveAux = {
 			this.formerHeight = Math.round(this.state.outerHeight);
 
 			this.animator = this.props.animator;
-
 	},
 
 	// the actual componentDidUpdate for WaveView or Vista.
@@ -67,8 +66,10 @@ export const waveAux = {
 					btw props.outerWidth=${this.props.outerWidth}`);
 			}
 
-			if (this.unifyMatrices)
-				this.unifyMatrices();  // vista only
+			this.vDisp.updateViewWidth(this.outerWidth - this.DOUBLE_THICKNESS);
+
+			if (this.unifyMatrices)  // vista only
+				this.unifyMatrices();
 
 			// trigger a render.  But only if they actually changed!  potential for ∞ loop.
 			this.setState({outerHeight: s.outerHeight});

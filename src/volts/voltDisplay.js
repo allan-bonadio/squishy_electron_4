@@ -13,7 +13,7 @@ let tracePathAttribute = false;
 let tracePathIndividualPoints = false;
 
 let traceVoltArithmetic = false;
-let traceScales = false;
+let traceYScales = false;
 let traceVoltScales = false;
 let traceScrolling = false;
 let traceZooming = false;
@@ -80,16 +80,6 @@ export class voltDisplay {
 		// adjust the range over which the user can slide the bottomVolts,
 		// in case the numbers are crazy
 		this.decideBottomHeightVolts();
-	}
-
-	// the user dragged the view canvas (2d) up or down so adjust.
-	// Or, initially.
-	updateViewHeight(viewCanvasHeight) {
-		this.viewCanvasHeight = viewCanvasHeight ?? getASetting('miscSettings', 'viewHeight');
-		this.addYScales(this.bottomVolts,
-			this.bottomVolts + this.heightVolts,
-			viewCanvasHeight);
-
 	}
 
 	// set ANY field, from the 'from' argument, into this
@@ -207,9 +197,15 @@ export class voltDisplay {
 		}
 	}
 
+	updateViewWidth(viewCanvasWidth) {
+		this.viewCanvasWidth = viewCanvasWidth;  // ?? getASetting('miscSettings', 'viewWidth');
+		this.xScale.range([0, viewCanvasWidth])
+	}
+
 	// once you figure out voltage limits to display, and the pixel height
 	// here, y can be any kind of value that varies continuously from
-	// bottom to top of whatever, but mostly we use voltage
+	// bottom to top of whatever, but mostly we use voltage.
+	// Will NOT adjust if yScale already created!
 	addYScales(bottomValue, topValue, viewCanvasHeight) {
 		if (!this.yScale) {
 			this.yScale = d3.scaleLinear(
@@ -222,8 +218,17 @@ export class voltDisplay {
 		}
 	}
 
+	// the user dragged the sizebox (2d) up or
+	// down so adjust.   (or changed height for other reasons)
+	updateViewHeight(viewCanvasHeight) {
+		this.viewCanvasHeight = viewCanvasHeight;  // ?? getASetting('miscSettings', 'viewHeight');
+		this.yScale.range([0, viewCanvasHeight])
+		this.yUpsideDown.range([viewCanvasHeight, 0])
+	}
+
+
  	// set our xScale and yScale according to the geom numbers passed
- 	// in, and our own settings.  Used by VoltArea to plot potential.
+ 	// in, and our own settings.  ONLY for initial setting.
  	//  X in, in units of dx, Y in, in units of volts
 	setVoltScales(drawingLeft, drawingWidth, viewCanvasHeight) {
 		isOK(drawingLeft); isOK(drawingWidth);
@@ -233,23 +238,29 @@ export class voltDisplay {
 		this.drawingWidth = drawingWidth;
 		this.addXScales(drawingLeft, drawingLeft + drawingWidth);
 
+		this.viewCanvasHeight = viewCanvasHeight;
 		this.addYScales(this.bottomVolts, this.bottomVolts + this.heightVolts, viewCanvasHeight);
 
 		//Object.assign(this, this.drawDesc2D);  // copies it all over this obj
 
-		if (traceScales)
+		if (traceYScales) {
 			console.log(`${this.label}: bottomVolts=${this.bottomVolts} `
 				+` heightVolts=${this.heightVolts}   viewCanvasHeight=${viewCanvasHeight}`);
+		}
 
 		if (traceVoltScales) {
-			console.log(`⚡️ ⚡️   voltagearea.setVoltScales()  done
-				X domain & range: `, this.xScale.domain(), this.xScale.range(), `
-				Y domain & range: `, this.yScale.domain(),  this.yScale.range(), `
-				Y UpsideDown: `, this.yUpsideDown.domain(),  this.yUpsideDown.range(),
-				`Zero on: xscale, yscale, upsdown:`,
-						this.xScale(0),  this.yScale(0),  this.yUpsideDown(0));
+			dumpVoltScales(drawingLeft, drawingWidth, viewCanvasHeight);
 		}
 		return true;
+	}
+
+	dumpVoltScales(drawingLeft, drawingWidth, viewCanvasHeight) {
+		console.log(`⚡️ ⚡️   voltagearea.setVoltScales()  done
+			X domain & range: `, this.xScale.domain(), this.xScale.range(), `
+			Y domain & range: `, this.yScale.domain(),  this.yScale.range(), `
+			Y UpsideDown: `, this.yUpsideDown.domain(),  this.yUpsideDown.range(),
+			`Zero on: xscale, yscale, upsdown:`,
+					this.xScale(0),  this.yScale(0),  this.yUpsideDown(0));
 	}
 
 	/* **************************************************** Rendering */
