@@ -9,18 +9,16 @@ import {getAGroup, getASetting, storeASetting} from '../utils/storeSettings.js';
 import * as d3 from 'd3';
 import familiarVolts from './familiarVolts.js';
 
-let traceFamiliar = false;
-let traceScales = true;
 let tracePathAttribute = false;
 let tracePathIndividualPoints = false;
 
 let traceVoltArithmetic = false;
-let traceVoltScales = true;
+let traceScales = false;
+let traceVoltScales = false;
 let traceScrolling = false;
 let traceZooming = false;
 
-
-const {min, max, abs, round, sqrt, cbrt, log10} = Math;
+const {min, max, sqrt} = Math;
 
 // does optimizer eliminate this, leading to errors downstream?  this fixes it
 const qe_Consts = qeConsts;
@@ -44,7 +42,11 @@ export class voltDisplay {
 	// cuz the Voltage minigraph needs its own buffer
 	// viewCanvasHeight, height ONLY of view canvas
 	constructor(label, space, voltageBuffer, voltSettings, viewCanvasHeight) {
-		// point-by-point voltage values, + start and end of voltage buffer, aligned with waves
+		// extra methods for making volt profiles
+		Object.assign(this, familiarVolts);
+
+		// point-by-point voltage values, + start and end of voltage buffer,
+		// aligned with waves
 		this.label = label;
 		this.space = space;
 		//this.drawDesc2D = new drawDesc2D(space);
@@ -325,7 +327,8 @@ export class voltDisplay {
 
 		default:
 			debugger;
-			throw new Error(`⚡️  bad continuum '${this.continuum}' in  makeVoltagePathAttribute()`);
+			throw new Error(`⚡️  bad continuum '${this.continuum}' in  `
+				+` makeVoltagePathAttribute()`);
 		}
 
 		for (let ix = start; ix <= end; ix++) {
@@ -339,7 +342,8 @@ export class voltDisplay {
 			// ±∞ come out as NaN.
 			y = usedYScale(voltageBuffer[ix]);
 			if (!isFinite(y) || y < -TOO_MANY_VOLTS || y > TOO_MANY_VOLTS) {
-				// Absent.  the line ends here, for this pt and maybe a few more; just omit it
+				// Absent.  the line ends here, for this pt and maybe a few
+				// more; just omit it
 				didMove = didLine = false;
 				pt = '';
 			}
@@ -412,8 +416,5 @@ export class voltDisplay {
 		this.setVoltScales(this.drawingLeft, this.drawingWidth, this.viewCanvasHeight);
 	}
 }
-
-// more methods
-Object.assign(voltDisplay, familiarVolts);
 
 export default voltDisplay;

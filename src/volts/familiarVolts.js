@@ -8,7 +8,9 @@ import qeConsts from '../engine/qeConsts.js';
 import {EFFECTIVE_VOLTS, TOO_MANY_VOLTS, LOW_VOLTS} from './voltConstants.js';
 import {getAGroup, storeASetting} from '../utils/storeSettings.js';
 
+const {min, max, abs, round, sqrt} = Math;
 
+let traceFamiliar = false;
 
 // this is an add-on for voltDispay object
 const familiarVolts = {
