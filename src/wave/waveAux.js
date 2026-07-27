@@ -17,7 +17,6 @@ const CANVAS_BORDER_THICKNESS = 1;
 const DOUBLE_THICKNESS = 2 * CANVAS_BORDER_THICKNESS;
 
 let traceDimensions = false;
-let traceDragCanvasHeight = false;
 
 export const waveAux = {
 

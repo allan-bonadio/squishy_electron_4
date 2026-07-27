@@ -90,9 +90,13 @@ export class WaveView extends React.Component {
 			this.paintingNeeds = {cavity: this.space.mainFlick, bumperWidth: this.bumperWidth}
 
 			const vd = this.vDisp = space.vDisp;
-			vd.addXScales(this.CANVAS_BORDER_THICKNESS,
-				outerWidth - this.CANVAS_BORDER_THICKNESS);
-			vd.addYScales(bottomValue, topValue, outerHeight - 2 * this.CANVAS_BORDER_THICKNESS);
+			vd.setVoltScales(this.CANVAS_BORDER_THICKNESS,
+				props.outerWidth - this.CANVAS_BORDER_THICKNESS,
+				this.state.outerHeight - 2 * this.CANVAS_BORDER_THICKNESS);
+
+//			vd.addXScales(this.CANVAS_BORDER_THICKNESS,
+//				outerWidth - this.CANVAS_BORDER_THICKNESS);
+//			vd.addYScales(bottomValue, topValue, outerHeight - 2 * this.CANVAS_BORDER_THICKNESS);
 
 		});
 	}
