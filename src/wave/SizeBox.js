@@ -31,7 +31,7 @@ function SizeBox(props) {
 	let [draggingHeight, setDraggingHeight] = useState(props.height);
 
 	function setWaveHeight(newHeight) {
-		if (isNaN(newHeight)) debugger;
+		if (!isFinite(newHeight)) debugger;
 
 		// don't CONTINUOUSLY set the canvas size!
 		if (draggingHeight && newHeight == draggingHeight) return;
@@ -66,12 +66,12 @@ function SizeBox(props) {
 		if (!(ev.buttons & 1)) return;
 		if (!isResizing)
 			return;
-		if (isNaN(draggingHeight) || isNaN(draggingPageY)) debugger;
+		if (!isFinite(draggingHeight) || !isFinite(draggingPageY)) debugger;
 
 		// movement since last move or down event
 		let pageY = Math.round(ev.pageY);   // it comes in with lots of decimal places
 		let newHeight = draggingHeight + pageY - draggingPageY;
-		if (isNaN(newHeight)) debugger;
+		if (!isFinite(newHeight)) debugger;
 		setWaveHeight(newHeight);
 		setDraggingPageY(pageY);
 		setDraggingHeight(newHeight);
