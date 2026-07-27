@@ -15,7 +15,7 @@ import {getASetting, storeASetting, getAGroup, storeAGroup}
 import sSettings from '../utils/sSettings.js';
 
 let traceOrient = true;
-let traceDontShowPivotOverlay = true;
+let traceDontShowPivotOverlay = false;
 let traceShowOrient3D = true;
 let traceAction = true;
 

@@ -19,7 +19,7 @@ import SquishContext from '../sPanel/SquishContext.js';
 
 let traceVoltageArea = false;
 
-let traceRendering = true;
+let traceRendering = false;
 let traceProfileDragging = false;
 let traceTweening = false;
 let traceWheel = false;

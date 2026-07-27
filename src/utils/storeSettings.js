@@ -115,20 +115,6 @@ function makeCriterionFunction(criterion) {
 function makeParam(groupName, varName, defaultValue, criterion) {
 	const criterionFunction = makeCriterionFunction(criterion);
 
-	// retrieve from localStorage and set this var, or set to default if not there yet.
-//sSettings[groupName] = sSettings[groupName] || {};
-//let group = sSettings[groupName];
-//let savedGroup = localStorage.getItem(groupName) || '{}';
-//savedGroup = JSON.parse(savedGroup);
-//let value = savedGroup[varName];
-//if (value === undefined || !criterionFunction(value)) {
-//	savedGroup[varName] = value = defaultValue;
-//	localStorage.setItem(groupName,	 JSON.stringify(savedGroup));
-//}
-//else {
-//	value = savedGroup[varName];
-//}
-
 	sSettings.defaults[groupName] ??= {};
 	sSettings.defaults[groupName][varName] = defaultValue;
 	sSettings.verifiers[groupName] ??= {};
@@ -136,7 +122,6 @@ function makeParam(groupName, varName, defaultValue, criterion) {
 	sSettings.minMaxes[groupName] ??= {};
 	if (typeof criterion == 'object' && criterion.max !== undefined)
 		sSettings.minMaxes[groupName][varName] = criterion;
-
 
 	// try again, meekly
 	sSettings[groupName] ??= {};

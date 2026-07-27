@@ -9,7 +9,7 @@ import PropTypes, {checkPropTypes} from 'prop-types';
 import resizeIcon from './waveViewIcons/resize.png';
 import {storeASetting} from '../utils/storeSettings.js';
 
-let traceDragCanvasHeight = true;
+let traceDragCanvasHeight = false;
 
 // only one human can drag it at a time, right?  so its ok to make it global.
 let isResizing;
