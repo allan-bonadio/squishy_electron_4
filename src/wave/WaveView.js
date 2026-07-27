@@ -91,8 +91,8 @@ export class WaveView extends React.Component {
 
 			const vd = this.vDisp = space.vDisp;
 			vd.setVoltScales(this.CANVAS_BORDER_THICKNESS,
-				props.outerWidth - this.CANVAS_BORDER_THICKNESS,
-				this.state.outerHeight - 2 * this.CANVAS_BORDER_THICKNESS);
+				props.outerWidth - this.DOUBLE_THICKNESS,
+				this.state.outerHeight - this.DOUBLE_THICKNESS);
 
 //			vd.addXScales(this.CANVAS_BORDER_THICKNESS,
 //				outerWidth - this.CANVAS_BORDER_THICKNESS);
@@ -103,6 +103,7 @@ export class WaveView extends React.Component {
 
 	static contextType = SquishContext;
 
+	// when user adjusts height with size box
 	setHeight = (height) => {
 		this.setState({outerHeight: height});
 		storeASetting('miscSettings', 'viewHeight', height);
