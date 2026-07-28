@@ -22,7 +22,7 @@ const propTypes = {
 		xAng: PropTypes.number.isRequired,
 		yAng: PropTypes.number.isRequired,
 		zAng: PropTypes.number.isRequired,
-		//hfoView: PropTypes.number,
+		//vfoView: PropTypes.number,
 		// plus others i'm too lazy to do
 	}),
 

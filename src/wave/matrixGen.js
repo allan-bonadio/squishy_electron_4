@@ -15,7 +15,7 @@ const d2r = Math.PI / 180;
 
 let traceOrientation= true;
 let traceRotMatrix = false;
-let traceProjMatrix = false;
+let traceProjMatrix = true;
 let traceOffMatrix = false;
 
 
@@ -55,10 +55,10 @@ export class matrixGen {
 		// make the projection matrix.. never changes. Well, if you change
 		// the FOV, you have to recalculate this.  Oh and if the window or the
 		// vista height changes.  Or ... if ...
-		//const aspect = this.canvasInnerWidth / this.canvasInnerHeight;
+		const aspect = this.canvasInnerWidth / this.canvasInnerHeight;
 
 		// hfov = horizontal field of view; default for glMatrix is vertical
-		const horizontalFieldOfView = d2r * this.orient.hfoView; // in radians
+		const verticalFieldOfView = d2r * this.orient.vfoView; // in radians
 
 		// these need to be, REALLY, the closest stuff, and the farthest stuff.
 		// Approximately.  Maps to the depth buffer.
@@ -67,11 +67,11 @@ export class matrixGen {
 
 
 		// multiply by aspect?	I would think it should divide by aspect?  TODO
-		mat4.perspectiveNO(matrix, horizontalFieldOfView * aspect,
+		mat4.perspectiveNO(matrix, verticalFieldOfView * aspect,
 					aspect, zNear, zFar);
 		if (traceProjMatrix) {
 			dblog(`️🏔️ projection: aspect=${aspect} `
-				+`	hFOV=${horizontalFieldOfView*180/3.14159} `
+				+`	hFOV=${verticalFieldOfView*180/Math.PI} `
 				+` zNear=${zNear}	zFar=${zFar}  `);
 			dump4x4('vista projMatrix', matrix);
 		}

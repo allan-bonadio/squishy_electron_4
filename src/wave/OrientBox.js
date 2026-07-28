@@ -19,7 +19,7 @@ const propTypes = {
    orient: PropTypes.shape({
    	xAng: PropTypes.number.isRequired,
    	yPos: PropTypes.number.isRequired,
-   	hfoView: PropTypes.number.isRequired,
+   	vfoView: PropTypes.number.isRequired,
    	// plus others i'm too lazy to do
    }),
 
@@ -40,7 +40,7 @@ function OrientBox(props) {
 
 	// xAng yAng zAng — rotate around just 1 axis as given by this event from this slider
 	// xPos yPos zPos — adjust offset object is from origin.
-	// hfoView — horiz field of view. Default should be 45°?
+	// vfoView — horiz field of view. Default should be 45°?
 	// fudge = greggman's fudgeFactor
 	// function setOneSetting(which, value) {
 	// 	props.setOrient(which, value);  // set in WaveVista and settings
@@ -74,7 +74,7 @@ function OrientBox(props) {
 		// becha I dont need any of these if I trigger the whole orient3d
 		// setXAng(sdo.xAng); setYAng(sdo.yAng); setZAng(sdo.zAng);
 		// setXPos(sdo.xPos); setYPos(sdo.yPos); setZPos(sdo.zPos);
-		// setHFOView(sdo.hfoView);
+		// setVFOView(sdo.vfoView);
 		// setFudge(sdo.fudge);
 
 		props.setOrientAll(sdo);
@@ -150,9 +150,9 @@ function OrientBox(props) {
 // </div>
 //
 // <div>
-// 	<label>fov {po.hfoView}°
-// 		<input type='range' className='hfoView' value={po.hfoView}
-// 			min={omm.hfoView.min} max={omm.hfoView.max} step={1} onChange={handleOneSetting} />
+// 	<label>fov {po.vfoView}°
+// 		<input type='range' className='vfoView' value={po.vfoView}
+// 			min={omm.vfoView.min} max={omm.vfoView.max} step={1} onChange={handleOneSetting} />
 // 	</label>
 // </div>
 // <div>

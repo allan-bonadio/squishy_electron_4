@@ -144,7 +144,7 @@ function OrientLayer(props) {
 	// 	// becha I dont need any of these if I trigger the whole orient3d
 	// 	// setXAng(sdo.xAng); setYAng(sdo.yAng); setZAng(sdo.zAng);
 	// 	// setXPos(sdo.xPos); setYPos(sdo.yPos); setZPos(sdo.zPos);
-	// 	// setHFOView(sdo.hfoView);
+	// 	// setvfoView(sdo.vfoView);
 	// 	// setFudge(sdo.fudge);
 	// 	//
 	// 	// props.setOrientAll(sdo);
