@@ -203,6 +203,7 @@ button {
 	&.lite {
 		font-family: verdana, tahoma, helvetica, sans-serif;
 		background-color: #ccc;
+		padding-bottom: .25em;
 		&:hover {
 			background-color: #ee8;
 		}
@@ -216,6 +217,7 @@ button {
 	// glass is transparent, overlaying on on the main view/vista
 	&.dark, &.glass {
 		font-family: verdana, tahoma, helvetica, sans-serif;
+		padding-bottom: .25em;
 		&:hover {
 			background-color: #4448;
 		}
@@ -342,7 +344,6 @@ dialog#CommonDialog {
 	border: none;
 	border-radius: 0;
 	line-height: .5em;
-	margin: .5em;
 	background-color: transparent;
 
 	&:hover {
