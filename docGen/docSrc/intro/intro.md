@@ -8,13 +8,8 @@ description: Getting Started
 This is a project I've been working on for a few years, off and on in my free time.
 It's a work in progress, and this is the Alpha version here.
 
-<a href='mailto:bojnac@tactileint.org"  >
-Send Feedback Here sorry messed up!!!  😡 🥺 😢 😒
-</a>
 <mailBack>
 </mailBack>
-
-?subject="Squishy Electron Feedback'
 
 '''Quantum Mechanics''' is an alternate set of rules for very tiny things,
 like the size of atoms and molecules.
@@ -36,10 +31,10 @@ Ask instead, why is it that **humans have trouble understanding** microscopic pa
 
 Like any other child, **I didn't have any quantum toys**.
 I had toys made of metal, plastic, fabric, wood.
-That's because I grew up with solid objects, with definite surfaces, like anybody else.
+That's because I grew up with macroscopic objects, with definite surfaces, like anybody else.
 Wood and metal and plastic all have surfaces; they have different textures,
 but their surface layers all seem infinitesimally thin, and mostly inflexible.
-Things made of fabric did hae fuzy surfaces, sometimes, but the amount of fuzz rarely changed.
+Things made of fabric did have fuzy surfaces, sometimes, but the amount of fuzz didn't change.
 ![](biteRemote.jpg)
 I'd finger them, follow the surfaces and edges with my fingers or toes,
 and put them in my mouth and feel them with my lips and tongue.
@@ -129,7 +124,7 @@ therefore, finite, so we can model it here.
 
 ![an electron circling its nucleus](orbitingElectron.png)
 <aside style='float: right;'>
-####So, how does an atom work?
+#### So, how does an atom work?
 
 The electrons have the same basic properties,
 but they're all attracted to the protons in the nucleus.

@@ -117,6 +117,7 @@ class App extends React.Component {
 
 			// if they got the URL with ?anything on the end, open the doc reader
 			for (let topic in locArgs) {
+				// except for this
 				if ('3D' == topic || '3d' == topic)
 					window.enable3D = true;
 				else

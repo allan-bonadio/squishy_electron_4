@@ -66,7 +66,7 @@ export const waveAux = {
 					btw props.outerWidth=${this.props.outerWidth}`);
 			}
 
-			if (this.vDisp)
+			if (this.vDisp)  // should never be unfilled
 				this.vDisp.updateViewWidth(this.outerWidth - this.DOUBLE_THICKNESS);
 
 			if (this.unifyMatrices)  // vista only
