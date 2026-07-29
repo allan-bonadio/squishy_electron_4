@@ -10,7 +10,7 @@ import React from 'react';
 import PropTypes, {checkPropTypes} from 'prop-types';
 
 import DocReader from './DocReader.js';
-import './DocMenu.scss';
+import './DocReader.scss';
 
 // This is a menu into /public/doc for the user to find documentation from the /DocGen subdirectory.
 
