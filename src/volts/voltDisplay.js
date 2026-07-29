@@ -24,8 +24,7 @@ const {min, max, sqrt} = Math;
 const qe_Consts = qeConsts;
 
 // zooming in or out, changes the heightVolts by this factor either way.
-const zoomFactor = Math.sqrt(2);
-const logZoomFactor = Math.log(zoomFactor);
+const zoomFactor = 1.1;
 
 const isOK = (c) => {
 	if (c == null || !isFinite(c)) {
@@ -104,24 +103,6 @@ export class voltDisplay {
 			toArray[ix] = fromArray[ix];
 	}
 
-	// take the dr disc from the space (fairly sparse) and add some more things like scalers
-	// get drawDesc2D() {
-	// 	let drawDesc2D = this.drawDesc2D = this.space.drawDesc2D;
-	//
-	// 	drawDesc2D.xScale = d3.scaleLinear(
-	// 		[this.start, this.end],
-	// 		[drawingLeft, drawingLeft + drawingWidth]);
-	// 	drawDesc2D.yScale = d3.scaleLinear(
-	// 		[this.bottomVolts, this.bottomVolts + this.heightVolts],
-	// 		[0, viewCanvasHeight]);
-	// 	drawDesc2D.yUpsideDown = d3.scaleLinear(
-	// 		[this.bottomVolts, this.bottomVolts + this.heightVolts],
-	// 		[viewCanvasHeight, 0]);
-	// 	drawDesc2D.viewCanvasHeight = viewCanvasHeight;
-	//
-	// 	return drawDesc2D;
-	// }
-
 	// all of our properties, but not the datapoints.  Optional: pass voltage params
 	dumpVoltDisplay(title, voltageParams) {
 		this.findVoltExtremes();
@@ -188,13 +169,13 @@ export class voltDisplay {
 	/* *********************************************** scales */
 	// once you figure out where you're drawing (drawingLeft,
 	// drawingRight), call this. You could use it for any variable
-	// that varies linearly from left to right by ix, science coordinate.
+	// that varies linearly from left to right by ix, like x pixels
 	addXScales(drawingLeft, drawingRight) {
-		if (!this.xScale) {
+		//if (!this.xScale) {
 			this.xScale = d3.scaleLinear(
 				[this.start, this.end],
 				[drawingLeft, drawingRight]);
-		}
+		//}
 	}
 
 	updateViewWidth(viewCanvasWidth) {
@@ -207,7 +188,7 @@ export class voltDisplay {
 	// bottom to top of whatever, but mostly we use voltage.
 	// Will NOT adjust if yScale already created!
 	addYScales(bottomValue, topValue, viewCanvasHeight) {
-		if (!this.yScale) {
+		//if (!this.yScale) {
 			this.yScale = d3.scaleLinear(
 				[bottomValue, topValue],
 				[0, viewCanvasHeight]);
@@ -215,7 +196,7 @@ export class voltDisplay {
 				[bottomValue, topValue],
 				[viewCanvasHeight, 0]);
 			this.viewCanvasHeight = viewCanvasHeight;
-		}
+		//}
 	}
 
 	// the user dragged the sizebox (2d) up or
@@ -228,8 +209,8 @@ export class voltDisplay {
 
 
  	// set our xScale and yScale according to the geom numbers passed
- 	// in, and our own settings.  ONLY for initial setting.
- 	//  X in, in units of dx, Y in, in units of volts
+ 	// in, and our own settings.
+ 	//  X in, in units of dx or ix, Y in, in units of volts
 	setVoltScales(drawingLeft, drawingWidth, viewCanvasHeight) {
 		isOK(drawingLeft); isOK(drawingWidth);
 		isOK(this.bottomVolts); isOK(this.heightVolts);
@@ -387,9 +368,11 @@ export class voltDisplay {
 	}
 
 	/* ************************************************* interaction */
+	scrollCount = 0;
+	zoomCount = 0;
 
 	// called when user scrolls up or down.
-	// frac = fraction of a height, 1=scrolled to top, one click.  -1=scrolled toward bottom, one click.
+	// frac = fraction of a height, +=scrolled to top.  - =scrolled toward bottom
 	// Other scroll mechanisms pass other proportional numbers
 	scrollVoltHandler(frac) {
 		let distance = this.heightVolts * frac / 4;
@@ -397,20 +380,21 @@ export class voltDisplay {
 		this.setBottomVolts(this.bottomVolts + distance);
 
 		if (traceScrolling)
-			console.log(`userScroll(frac=${frac}) => bottomVolts=${this.bottomVolts}`);
+			console.log(`userScroll(frac=${frac}) => bottomVolts=${this.bottomVolts}  count=${this.scrollCount++}`);
 	}
 
-	// called when human zooms in or out.  pass +1 or -1.  heightVolts expands
-	// or contracts a fixed  factor up and down.
-	zoomVoltHandler(inOut) {
-		// keep looking at same place
+	// called when human zooms in or out.  pass number for how much.  heightVolts expands
+	// or contracts a fixed  factor up and down, keeping the center at same place.
+	// + = zoom in, voltage height reduces   – = zoom out, voltage height increases
+	zoomVoltHandler(inAmount) {
+		// keep looking at same place (in the center)
 		let midView = this.bottomVolts + this.heightVolts/2;
 
 		if (traceZooming)
-			this.dumpVoltDisplay(`zoom START ${inOut}: old midView=${midView}`);
+			this.dumpVoltDisplay(`zoom START ${inAmount}: old midView=${midView} count=${this.zoomCount++}`);
 
 		// zoom in/out to int powers of ZoomFactor.
-		let h = this.heightVolts * zoomFactor ** inOut;
+		let h = this.heightVolts * zoomFactor ** inAmount;
 		this.setHeightVolts(h);
 		this.setBottomVolts(midView - h / 2);
 	}

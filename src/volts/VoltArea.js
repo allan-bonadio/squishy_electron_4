@@ -62,6 +62,12 @@ function VoltArea(props) {
 		console.log(`⚡️ starting VoltArea`);
 	const context = useContext(SquishContext);
 
+	// must render when wheel changes these
+	let [vBottom, setVBottom] = useState(mVD.bottomVolts);
+	let[ vHeight, setVHeight] = useState(mVD.heightVolts);
+
+
+
 	// svg element ref.
 	// const svgRef = useRef();
 	// let svgEl = svgRef.current;
@@ -95,7 +101,7 @@ function VoltArea(props) {
 	// has the user dragged beyond the top/bottom?
 	function strayOutside(newVoltage) {
 
-		// dragged outside? scroll, or stretch.  The amount per pointerMove is
+		// dragged outside? scroll, or stretch.  The amount per pointerMoveOnTactile is
 		// supposed to be cpu-speed-independent, on whole.  If you just make it
 		// 'feel' right, it goes way too fast in 5 or 10 years.
 		let now = performance.now();
@@ -208,10 +214,10 @@ function VoltArea(props) {
 
 	// pointer down on the path.tactile element.  The VoltArea function is not
 	// called during dragging; only at the end.
-	const pointerDown =
+	const pointerDownOnTactile =
 	(ev) => {
 		if (traceProfileDragging)
-			console.log(`👈 👆  pointerDown on tactile Line`, this, ev);
+			console.log(`👈 👆  pointerDownOnTactile on tactile Line`, this, ev);
 
 		// only react if the LEFT button is down
 		if (ev.buttons & 1) {
@@ -227,9 +233,9 @@ function VoltArea(props) {
 	}
 
 	// for a move, do mostly what the other events do
-	const pointerMove =
+	const pointerMoveOnTactile =
 	(ev) => {
-		// only react if it was properly started on a pointerDown in the VoltArea, and still down
+		// only react if it was properly started on a pointerDownOnTactile in the VoltArea, and still down
 		if ((ev.buttons & 1) && dragging) {
 			onePoint(ev);
 			ev.preventDefault();
@@ -237,7 +243,7 @@ function VoltArea(props) {
 		}
 	}
 
-	const pointerLeave =
+	const pointerLeaveTactile =
 	(ev) => {
 		if (dragging) {
 			if (traceProfileDragging) {
@@ -258,10 +264,10 @@ function VoltArea(props) {
 		}
 	}
 
-	const pointerUp =
+	const pointerUpFromTactile =
 	(ev) => {
 		if (dragging) {
-			pointerLeave(ev);
+			pointerLeaveTactile(ev);
 		}
 		else {
 			// just a mouse release, not on anything else, can stop animation (but not start it again)
@@ -274,65 +280,80 @@ function VoltArea(props) {
 		dragging = false;  // only if pointer up, not for leave, so user can drag as far as they want
 	}
 
-	//☹️🧐 wheel: turned this off cuz it messes up scrolling the whole window.
-	//☹️🧐 Used to scrolll the volltage line
-	//☹️🧐 we only do vertical.  right now.  Moves the voltage line (but not its voltage)
-	//☹️🧐 By default this is handled as a passive event, but we need active so we have to do it outselves.
-//☹️🧐 	const wheelHandler =
-//☹️🧐 	(ev) => {
-//☹️🧐 		let deltaPixels;
-//☹️🧐
-//☹️🧐 		switch (ev.deltaMode) {
-//☹️🧐 		case WheelEvent.DOM_DELTA_PIXEL:
-//☹️🧐 			deltaPixels = ev.deltaY;
-//☹️🧐 			break;
-//☹️🧐
-//☹️🧐 		case WheelEvent.DOM_DELTA_LINE:
-//☹️🧐 			deltaPixels = ev.deltaY * Math.sqrt(mVD.canvasHeight);
-//☹️🧐 			break;
-//☹️🧐
-//☹️🧐 		case WheelEvent.DOM_DELTA_PAGE:
-//☹️🧐 			deltaPixels = ev.deltaY * mVD.canvasHeight;
-//☹️🧐 			break;
-//☹️🧐 		}
-//☹️🧐
-//☹️🧐 		//☹️🧐 convert pixels delta to voltage delta to fraction delta fractiion of whole heightVolts
-//☹️🧐 		let fracAmount = -deltaPixels / mVD.canvasHeight;
-//☹️🧐 		//☹️🧐let fracAmount = mVD.yScale.invert(deltaPixels) / mVD.heightVolts;
-//☹️🧐 		mVD.scrollVoltHandler(fracAmount);
-//☹️🧐 		if (traceWheel) {
-//☹️🧐 			console.log(`wheel event: deltaY=${ev.deltaY}  deltaMode=${ev.deltaMode} `
-//☹️🧐 				+` scaled delta=${mVD.yScale.invert(deltaPixels)} fracAmount=${fracAmount}`,
-//☹️🧐 				ev);
-//☹️🧐 		}
-//☹️🧐
-//☹️🧐 		// we can't do the preventDefault() if this handler is passive.  Hence all the kicking and screaming.
-//☹️🧐 		ev.preventDefault();
-//☹️🧐 		ev.stopPropagation();
-//☹️🧐 	}
+	// Used to scroll & zoom the voltage line we only do vertical.
+	// right now.  Moves the voltage line (but not its voltage) By
+	// default this is handled as a passive event, but we need active
+	// so we have to do it outselves.
+ 	const wheelHandler =
+ 	(ev) => {
+ 		let deltaPixels;
+ 		if (!ev.shiftKey && !ev.altKey) return;
+ 		//dblog(`wheelHandler: shift=${ev.shiftKey}, alt=${ev.altKey}`, ev);
 
-	//☹️🧐 set the wheel event handler, with passive OFF and with capture so we can
-	//☹️🧐 avoid passing it to anybody else.
-//☹️🧐 	const wheelHandlerOptions = {passive: false, capture: true};
+ 		switch (ev.deltaMode) {
+ 		case WheelEvent.DOM_DELTA_PIXEL:
+ 			deltaPixels = ev.deltaY;
+ 			break;
 
-	//☹️🧐 intercepted with a ref callback, we set the wheel event handler and
-	//☹️🧐 remove it when done, as we should.  React 19+ apparently wants you to
-	//☹️🧐 RETURN a cleanup function instead of calling svgRefCallback() with null.
-// 	const svgRefCallback = (se) => {
-// 		return;
-//☹️🧐 		if (!se)  {
-//☹️🧐 			//☹️🧐 element went away.  (or this is the first render... in which case the remove is harmless.)
-//☹️🧐 			//☹️🧐 must be exactly same args as the add call
-//☹️🧐 			svgEl.removeEventListener('wheel', wheelHandler, wheelHandlerOptions)
-//☹️🧐 		}
-//☹️🧐
-//☹️🧐 		svgRef.current = svgEl = se;
-//☹️🧐
-//☹️🧐 		if (svgEl) {
-//☹️🧐 			//☹️🧐 all of this is to set passive here to false.   React gives us no way to do that.
-//☹️🧐 			svgEl.addEventListener('wheel', wheelHandler, wheelHandlerOptions);
-//☹️🧐 		}
-	//}
+ 		case WheelEvent.DOM_DELTA_LINE:
+ 			deltaPixels = ev.deltaY * Math.sqrt(mVD.canvasHeight);
+ 			break;
+
+ 		case WheelEvent.DOM_DELTA_PAGE:
+ 			deltaPixels = ev.deltaY * mVD.canvasHeight;
+ 			break;
+ 		}
+
+ 		// convert pixels delta to voltage delta to fraction delta
+ 		// fractiion of whole heightVolts
+ 		// ?? let fracAmount = -deltaPixels / mVD.canvasHeight;
+ 		let fracAmount = mVD.yScale.invert(deltaPixels) / mVD.heightVolts;
+
+ 		// so this is the rule.  IF both are held down, it does both! (res for future...)
+ 		if (ev.shiftKey)
+			mVD.scrollVoltHandler(fracAmount);
+ 		if (ev.altKey)
+			mVD.zoomVoltHandler(fracAmount);
+		setVHeight(mVD.heightVolts);
+		setVBottom(mVD.bottomVolts);
+
+ 		if (traceWheel) {
+ 			console.log(`wheel event: deltaY=${ev.deltaY}  deltaMode=${ev.deltaMode} `
+ 				+` scaled delta=${mVD.yScale.invert(deltaPixels)} fracAmount=${fracAmount}`,
+ 				ev);
+ 		}
+
+ 		// we can't do the preventDefault() if this handler is passive.
+ 		// Hence all the kicking and screaming.
+//  		ev.preventDefault();
+//  		ev.stopPropagation();
+ 	}
+
+	// set the wheel event handler, with passive OFF and with capture so we can
+	// avoid passing it to anybody else.
+ 	const wheelHandlerOptions = {passive: false, capture: true};
+
+	// intercepted with a ref= react callback, we set the wheel event handler and
+	// remove it when done, as we should.  React 19+ apparently wants you to
+	// RETURN a cleanup function instead of calling svgRefCallback() with null.
+	const svgRefCallback = (se) => {
+		// not in use
+		//return;
+ 		if (!se)  {
+			// element went away.  (or this is the first render... in
+			// which case the remove is harmless.) must be exactly
+			// same args as the add call
+ 			svgEl.removeEventListener('wheel', wheelHandler, wheelHandlerOptions)
+ 		}
+
+ 		svgRef.current = svgEl = se;
+
+ 		if (svgEl) {
+ 			// all of this is to set passive here to false.   React gives us no way to do that.
+ 			svgEl.addEventListener('wheel', wheelHandler, wheelHandlerOptions);
+ 			svgEl.addEventListener('scroll', wheelHandler, wheelHandlerOptions);
+ 		}
+	}
 
 	/* *************************************************** rendering */
 
@@ -353,7 +374,7 @@ function VoltArea(props) {
 				d={pathAttribute} />
 			<path className='tactileLine' key='tactileLine' ref={tactileRef}
 				d={pathAttribute}
-				onPointerDown={pointerDown} />
+				onPointerDown={pointerDownOnTactile} />
 		</>;
 	}
 
@@ -396,11 +417,11 @@ function VoltArea(props) {
 		<svg className='VoltArea'
 			viewBox={viewBoxStr}
 			x={p.drawingLeft} width={p.drawingWidth} height={p.canvasInnerHeight}
-			ref={svgRef}
-			onPointerMove={pointerMove}
-			onPointerUp={pointerUp} onPointerLeave={pointerLeave}
+			onPointerMove={pointerMoveOnTactile}
+			onPointerUp={pointerUpFromTactile} onPointerLeave={pointerLeaveTactile}
+			onWheel={wheelHandler}
 		>
-			<g>
+			<g >
 				{renderAxes()}
 				{renderVoltagePath()}
 			</g>
@@ -415,3 +436,7 @@ function VoltArea(props) {
 }
 
 export default VoltArea;
+
+//
+// 			rffffffef={svgRef}
+// 			 onWheel={ev => console.log(`a wheelevent`, ev)}

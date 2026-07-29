@@ -1,12 +1,11 @@
 /*
-** Volt Overlay -- the offwhite voltage line, and its tactile accessories
+** Volt Overlay -- the offwhite voltage line, and its tactile accessories & interactions
 **	  for Squishy Electron
 ** Copyright (C) 2024-2026 Tactile Interactive, all rights reserved
 */
 
 import React, {useRef, useState, useReducer} from 'react';
 import PropTypes from 'prop-types';
-//import * as d3 from "d3";
 
 import VoltArea from '../volts/VoltArea.js';
 import VoltSidebar from '../volts/VoltSidebar.js';
@@ -14,15 +13,18 @@ import {getASetting, storeASetting} from '../utils/storeSettings.js';
 
 let traceGeometry = false;
 
+// holds the state for the potential buffer/line, and for the displayed top and bottom voltage React state, which change from scrolling and zooming the displayed voltage line and axes.
 const propTypes = {
 	// for first couple of renders, space and idunno are null
 	space: PropTypes.object,
 	mainVDisp: PropTypes.object,
 
 
-	// this can be null if stuff isn't ready.
+	// Actual canvas size, not counting borders.  these can be null if space isn't ready.
 	canvasInnerWidth: PropTypes.number.isRequired,
 	canvasInnerHeight: PropTypes.number.isRequired,
+
+	// for well continuum in 2d
 	bumperWidth: PropTypes.number.isRequired,
 
 	// this component is always rendered so it retains its state,
@@ -62,7 +64,7 @@ function VoltOverlay(props) {
 	(ix, volts) => voltDispatch({ix, volts});
 
 	// these are in our state, but ALSO in the mainVDisp, and settings, so keep them synched.
-	const [bottomVolts, _setBottomVolts] = useState(mainVDisp.bottomVolts);
+	const [bottomVolts, setBottomVolts] = useState(mainVDisp.bottomVolts);
 	mainVDisp.bottomVolts = bottomVolts;
 	if (getASetting('voltageSettings', 'bottomVolts') != bottomVolts)
 			storeASetting('voltageSettings', 'bottomVolts', bottomVolts);
@@ -72,9 +74,10 @@ function VoltOverlay(props) {
 	if (getASetting('voltageSettings', 'heightVolts') != heightVolts)
 			storeASetting('voltageSettings', 'heightVolts', heightVolts);
 
+	mainVDisp.setAPoint = setAPoint;
+
 	// practically speaking, use these functions whenever you set stuff.
 	// They set state, so  immediately after, changes will not be apparent.
-	mainVDisp.setAPoint = setAPoint;
 	mainVDisp.setBottomVolts = (bv) => {
 		_setBottomVolts(bv);
 		storeASetting('voltageSettings', 'bottomVolts', bv);
