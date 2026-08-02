@@ -57,7 +57,8 @@ export class ControlPanel extends React.Component {
 
 		// most of the state is kept here.  But, also, in the store settings for the next page reload.
 		this.state = {
-			// each of these params changes the state; here they are individually
+			// each of these params changes the state; here they are individually.
+			// Note each of these has to have a unique name!
 			...getAGroup('waveParams'),
 			...getAGroup('voltageParams'),
 			...getAGroup('voltageSettings'),
@@ -394,15 +395,15 @@ export class ControlPanel extends React.Component {
 
 	// change the state for the voltage params.  Just this.state
 	// pass an object with any or all of the params you want to change
-	setVoltageParams = (vP) => {
+	setVoltageParams = (newParams) => {
 		const s = this.state;
-		this.setState({ voltageBreed: vP.voltageBreed ?? s.voltageBreed,
-			voltageCenter: vP.voltageCenter ?? s.voltageCenter,
-			canyonPower: vP.canyonPower ?? s.canyonPower,
-			blockWidth: vP.blockWidth ?? s.blockWidth,
-			flatScale: vP.flatScale ?? s.flatScale,
-			blockScale: vP.blockScale ?? s.blockScale,
-			canyonScale: vP.canyonScale ?? s.canyonScale }
+		this.setState({ voltageBreed: newParams.voltageBreed ?? s.voltageBreed,
+			voltageCenter: newParams.voltageCenter ?? s.voltageCenter,
+			canyonPower: newParams.canyonPower ?? s.canyonPower,
+			blockWidth: newParams.blockWidth ?? s.blockWidth,
+			flatScale: newParams.flatScale ?? s.flatScale,
+			blockScale: newParams.blockScale ?? s.blockScale,
+			canyonScale: newParams.canyonScale ?? s.canyonScale }
 		);
 	}
 
@@ -427,16 +428,22 @@ export class ControlPanel extends React.Component {
 			voltageParams={this.getVoltageParams()}
 			setVoltageParams={this.setVoltageParams}
 			showVoltage={s.showVoltage}
-			changeShowVoltage={this.changeShowVoltage}
+			showVoltSwitchHandler={this.showVoltSwitchHandler}
 			saveMainVoltage={this.saveMainVoltage}
 			space={this.space}
 		/>;
 	}
 
-	changeShowVoltage = (ev) => {
+	// handler for the always/hover/never setting on CPToolbar
+	showVoltSwitchHandler = (ev) => {
 		const sv = ev.target.value;
 		this.setState({showVoltage: sv});
+
+		// i put this here before the contexxt cuz it was the only thing shared.
+		// prob should go in context eventually, somehow.
 		this.space.updateShowVoltage(sv);  // on the screen
+		let cp = this.context?.controlPanel;
+		if (cp) cp.showVoltage = sv;
 	}
 
 	// the Set Voltage button on the Set Voltage tab - always a familiar voltage profile

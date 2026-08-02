@@ -29,7 +29,7 @@ const propTypes = {
 
 	// showVoltage is a separate Setting (not param) for showing/hiding voltage over canvas
 	showVoltage: PropTypes.string.isRequired,
-	changeShowVoltage: PropTypes.func.isRequired,
+	showVoltSwitchHandler: PropTypes.func.isRequired,
 
 	// the SetVoltage button
 	saveMainVoltage:  PropTypes.func.isRequired,
@@ -42,7 +42,7 @@ const propTypes = {
 function SetVoltageTab(p) {
 	cfpt(propTypes, p);
 	// these are all the local versions, for use and setting in this Voltage Tab
-	const {voltageParams, setVoltageParams, showVoltage, changeShowVoltage,
+	const {voltageParams, setVoltageParams, showVoltage, showVoltSwitchHandler,
 		saveMainVoltage, space} = p;
 	const vP = voltageParams;
 	const setVP = setVoltageParams;
@@ -290,13 +290,13 @@ function SetVoltageTab(p) {
 	}
 	//  <sup>{(vP.canyonPower).toFixed(1)}</sup>
 
-	// right space.  soon to include: relaxation...
+	// right of the minigraph, new column.  soon to include: relaxation...
 	function renderShowVoltage() {
 		return <label className='ShowVoltageControl' >
 			Show Voltage
 			&nbsp;
 			<select name='showVoltage' value={p.showVoltage}
-						onChange={p.changeShowVoltage}>
+						onChange={p.showVoltSwitchHandler}>
 				<option value='always'>Always</option>
 				<option value='hover'>only while hovering</option>
 				<option value='never'>Never</option>
