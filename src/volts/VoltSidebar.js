@@ -21,7 +21,8 @@ let traceDragging = false;
 
 const propTypes = {
 		// x coordinate of the right edge or the bumper on the right side
-		drawingRight: PropTypes.number.isRequired,
+		// drawingLeft: PropTypes.number.isRequired,
+		// drawingWidth: PropTypes.number.isRequired,
 		canvasInnerHeight: PropTypes.number.isRequired,
 		bumperWidth: PropTypes.number,
 
@@ -34,15 +35,11 @@ function VoltSidebar(props) {
 	cfpt(propTypes, props);
 	let sidebarWidth = props.width ?? 200;  // ?? why is this undeffined?  nothing passed in.
 
-	let mainVDisp;
-	mainVDisp = props.space.vDisp;
+	let mainVDisp = props.space.vDisp;
 	if (!mainVDisp) return '';  // too early or first render
 
 	if (!mainVDisp.heightVolts  || mainVDisp.heightVolts <= 0)
 		throw `bad heightVolts ${mainVDisp.heightVolts}`
-
-	// so how far down is the thumb from top of rail in pix?
-	//thumbY = thumbFreedom * (1 - (mainVDisp.bottomVolts - mainVDisp.minBottom) / mainVDisp.heightVolts)
 
 	if (traceVoltageSidebar) {
 		console.log(`🍟 V Sidebar rend: width=${sidebarWidth}  heightVolts=${mainVDisp.heightVolts}  `
@@ -52,12 +49,11 @@ function VoltSidebar(props) {
 	// Hovering  to show/hide voltage - hovering over the sidebar
 	// buttons can make the voltage stuff disappear.  these make sure
 	// the voltage still shows if the mouse is over the sidebar.
+	const vo = document.querySelector('.WaveView .VoltOverlay');
 	const pointerEnter = ev => {
-		const vo = document.querySelector('.WaveView .VoltOverlay');
 		if (vo) vo.style.visibility = 'visible';
 	};
 	const pointerLeave = ev => {
-		const vo = document.querySelector('.WaveView .VoltOverlay');
 		if (vo) vo.style.visibility = '';
 	};
 

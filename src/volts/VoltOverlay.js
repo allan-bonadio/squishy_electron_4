@@ -4,16 +4,20 @@
 ** Copyright (C) 2024-2026 Tactile Interactive, all rights reserved
 */
 
-import React, {useRef, useState, useReducer} from 'react';
+import React, {useRef, useState, useReducer, useContext} from 'react';
+
 import PropTypes from 'prop-types';
 
 import VoltArea from '../volts/VoltArea.js';
 import VoltSidebar from '../volts/VoltSidebar.js';
 import {getASetting, storeASetting} from '../utils/storeSettings.js';
+import SquishContext from '../sPanel/SquishContext.js';
 
 let traceGeometry = false;
 
-// holds the state for the potential buffer/line, and for the displayed top and bottom voltage React state, which change from scrolling and zooming the displayed voltage line and axes.
+// holds the state for the potential buffer/line, and for the
+// displayed top and bottom voltage React state, which change from
+// scrolling and zooming the displayed voltage line and axes.
 const propTypes = {
 	// for first couple of renders, space and idunno are null
 	space: PropTypes.object,
@@ -26,16 +30,14 @@ const propTypes = {
 
 	// for well continuum in 2d
 	bumperWidth: PropTypes.number.isRequired,
-
-	// this component is always rendered so it retains its state,
-	// but won't draw anything if the checkbox is off
-	////showVoltage: PropTypes.string,
 };
 
 
 
 // this has all the interactive state for the voltage stuff as displayed over the wave.
 // Whole thing disappears/appears with mouse hover.
+// this component is always rendered so it retains its state,
+// but won't draw anything if it shouldn't
 function VoltOverlay(props) {
 	cfpt(propTypes, props);
 	const p = props;
@@ -43,28 +45,26 @@ function VoltOverlay(props) {
 	if (!mainVDisp)
 		throw `props.mainVDisp has no voltDisplay`;
 
+	const context = useContext(SquishContext);
+
 	/* ************************************************************************ state */
 
-	// is this too tedious/slow?  Voltage buffer itself, then bottom and height
+	// the whole voltageBuffer is state for this component
 	function voltReducer(voltageBuffer, change) {
-		// maybe I should also have an action for a sequence of points?
 		if (voltageBuffer)
 			voltageBuffer[change.ix] = change.volts;
 		return voltageBuffer;
 	}
-
-	// showVoltage state kept in Control Panel but duplicated here cuz here's where it's drawn
-	let [showVoltage, setShowVoltage] = useState(getASetting('voltageSettings', 'showVoltage'));
-
-	// see reducer above
 	const [vState, voltDispatch] = useReducer(voltReducer, mainVDisp.voltageBuffer);
 
-	// use this function to actually set a point in the voltage buffer, instead of just a regular assignment
-	const setAPoint =
-	(ix, volts) => voltDispatch({ix, volts});
+	// use this function to actually set a point in the voltage
+	// buffer, instead of just a regular assignment.  This is not
+	// saved from one session to the next.  TODO
+	const setAPoint = (ix, volts) => voltDispatch({ix, volts});
+	mainVDisp.setAPoint = setAPoint;
 
 	// these are in our state, but ALSO in the mainVDisp, and settings, so keep them synched.
-	const [bottomVolts, setBottomVolts] = useState(mainVDisp.bottomVolts);
+	const [bottomVolts, _setBottomVolts] = useState(mainVDisp.bottomVolts);
 	mainVDisp.bottomVolts = bottomVolts;
 	if (getASetting('voltageSettings', 'bottomVolts') != bottomVolts)
 			storeASetting('voltageSettings', 'bottomVolts', bottomVolts);
@@ -74,10 +74,11 @@ function VoltOverlay(props) {
 	if (getASetting('voltageSettings', 'heightVolts') != heightVolts)
 			storeASetting('voltageSettings', 'heightVolts', heightVolts);
 
-	mainVDisp.setAPoint = setAPoint;
-
-	// practically speaking, use these functions whenever you set stuff.
-	// They set state, so  immediately after, changes will not be apparent.
+	// these set & keep state for bottomVolts and heightVolts, so
+	// immediately after, changes will not be apparent, till after render. Practically
+	// speaking, use these functions whenever you set them.  These are
+	// NOT kept in the ControlPanel state, unlike most other settings.
+	//  But they ARE stored in the storeSettings.
 	mainVDisp.setBottomVolts = (bv) => {
 		_setBottomVolts(bv);
 		storeASetting('voltageSettings', 'bottomVolts', bv);
@@ -88,31 +89,44 @@ function VoltOverlay(props) {
 	}
 
 	// used by control panel when user changes ShowVoltage menu
+	// switch for showing voltage; menu in Volts tab
+	// move it to context someday TODO
+	let showVoltageRef = useRef(getASetting('voltageSettings', 'showVoltage'));
+	const showVoltage = showVoltageRef.current;
 	p.space.updateShowVoltage = (sv) => {
-		setShowVoltage(sv);
+		showVoltageRef.current = sv;
 	}
+
+// don't make another state here, the controlpanelholds the state
+// 	let [showVoltage, setShowVoltage] =
+// 		useState(getASetting('voltageSettings', 'showVoltage'));
+//
+// 	p.space.updateShowVoltage = (sv) => {
+// 		setShowVoltage(sv);
+// 	}
 
 	/* ********************************************************** rendering */
 	if (traceGeometry)
 		console.log(`vOverlay: ciWidth=${p.canvasInnerWidth} ciHeight=${p.canvasInnerHeight}`);
 
 	// the class on the section here does the showing/hiding when user mouses over.
-	// (but see another mechanism in the sidebar!)
 	return <section className={(showVoltage ?? 'hover') + 'ShowVoltage VoltOverlay'}
 			style={{width: p.width}} >
 		<VoltSidebar
 			mainVDisp={p.mainVDisp}
-			drawingRight={p.canvasInnerWidth - p.bumperWidth}
-			bumperWidth={p.bumperWidth}
+
 			canvasInnerHeight={p.canvasInnerHeight}
 			scrollVoltHandler={mainVDisp.setBottomVolts}
 			zoomVoltHandler={mainVDisp.zoomVoltHandler}
 			space={p.space}
+			bumperWidth={p.bumperWidth}
 		/>
 		<VoltArea
 			mainVDisp={p.mainVDisp}
 			drawingLeft={p.bumperWidth}
 			drawingWidth={p.canvasInnerWidth - 2 * p.bumperWidth}
+			//drawingRight={p.canvasInnerWidth - p.bumperWidth}
+
 			canvasInnerHeight={p.canvasInnerHeight}
 			space={p.space}
 			setAPoint={setAPoint}
@@ -121,3 +135,8 @@ function VoltOverlay(props) {
 }
 
 export default VoltOverlay;
+
+
+// 			drawingLeft={p.bumperWidth}
+// 			drawingWidth={p.canvasInnerWidth - 2 * p.bumperWidth}
+// 			//drawingRight={p.canvasInnerWidth - p.bumperWidth}

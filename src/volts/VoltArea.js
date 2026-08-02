@@ -20,9 +20,9 @@ import SquishContext from '../sPanel/SquishContext.js';
 let traceVoltageArea = false;
 
 let traceRendering = false;
-let traceProfileDragging = false;
+let traceProfileDragging = true;
 let traceTweening = false;
-let traceWheel = false;
+let traceWheel = true;
 
 let traceScrollStretch = false;
 let traceViewBox = false;
@@ -34,8 +34,6 @@ let DOUBLING_TIME = 2000;
 const propTypes = {
 	// includes scrollSetting, heightVolts, measuredMinVolts, measuredMaxVolts, xScale, yScale
 	mainVDisp: PropTypes.object,
-
-	//NOT NEEDED.  VoltOverlay shows and hides.  showVoltage: PropTypes.string.isRequired,
 
 	// for first couple of renders, space and idunno are null
 	space: PropTypes.object,
@@ -78,11 +76,15 @@ function VoltArea(props) {
 	let tactileEl = tactileRef.current;
 	const visibleRef = useRef();
 	let visibleEl = visibleRef.current;
+
 	const svgRef = useRef();
-	let svgEl, svgRect;
+	let svgEl   ;//TODO = svgRef.current;
+	let svgRect   ;//jTODO = svgEl?.getBoundingClientRect();
 	function setSvgEl() {
-		if (!svgRef.current)
+		if (!svgRef.current) {
+			dblog(`svgRef.current not set`)
 			return;
+		}
 		svgEl = svgRef.current;
 		svgRect = svgEl?.getBoundingClientRect();
 	}
@@ -309,7 +311,13 @@ function VoltArea(props) {
  		// ?? let fracAmount = -deltaPixels / mVD.canvasHeight;
  		let fracAmount = mVD.yScale.invert(deltaPixels) / mVD.heightVolts;
 
- 		// so this is the rule.  IF both are held down, it does both! (res for future...)
+
+		if (traceWheel) {
+			dblog(`fracAmount=${fracAmount}  deltaPixels=${deltaPixels} `
+				+ ` yScale.invert=${mVD.yScale.invert.domain()} ${mVD.yScale.invert.range()} `
+				+` heightVolts=${mVD.heightVolts}  `);
+		}
+		// so this is the rule.  (IF both are held down, it does both! res for future...)
  		if (ev.shiftKey)
 			mVD.scrollVoltHandler(fracAmount);
  		if (ev.altKey)
@@ -336,24 +344,24 @@ function VoltArea(props) {
 	// intercepted with a ref= react callback, we set the wheel event handler and
 	// remove it when done, as we should.  React 19+ apparently wants you to
 	// RETURN a cleanup function instead of calling svgRefCallback() with null.
-	const svgRefCallback = (se) => {
-		// not in use
-		//return;
- 		if (!se)  {
-			// element went away.  (or this is the first render... in
-			// which case the remove is harmless.) must be exactly
-			// same args as the add call
- 			svgEl.removeEventListener('wheel', wheelHandler, wheelHandlerOptions)
- 		}
-
- 		svgRef.current = svgEl = se;
-
- 		if (svgEl) {
- 			// all of this is to set passive here to false.   React gives us no way to do that.
- 			svgEl.addEventListener('wheel', wheelHandler, wheelHandlerOptions);
- 			svgEl.addEventListener('scroll', wheelHandler, wheelHandlerOptions);
- 		}
-	}
+// 	const svgRefCallback = (se) => {
+// 		// not in use
+// 		//return;
+//  		if (!se)  {
+// 			// element went away.  (or this is the first render... in
+// 			// which case the remove is harmless.) must be exactly
+// 			// same args as the add call
+//  			svgEl.removeEventListener('wheel', wheelHandler, wheelHandlerOptions)
+//  		}
+//
+//  		svgRef.current = svgEl = se;
+//
+//  		if (svgEl) {
+//  			// all of this is to set passive here to false.   React gives us no way to do that.
+//  			svgEl.addEventListener('wheel', wheelHandler, wheelHandlerOptions);
+//  			svgEl.addEventListener('scroll', wheelHandler, wheelHandlerOptions);
+//  		}
+// 	}
 
 	/* *************************************************** rendering */
 
@@ -420,6 +428,7 @@ function VoltArea(props) {
 			onPointerMove={pointerMoveOnTactile}
 			onPointerUp={pointerUpFromTactile} onPointerLeave={pointerLeaveTactile}
 			onWheel={wheelHandler}
+			ref={svgRef}
 		>
 			<g >
 				{renderAxes()}

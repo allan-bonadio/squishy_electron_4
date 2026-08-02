@@ -12,11 +12,10 @@ import familiarVolts from './familiarVolts.js';
 let tracePathAttribute = false;
 let tracePathIndividualPoints = false;
 
-let traceVoltArithmetic = false;
 let traceYScales = false;
-let traceVoltScales = false;
-let traceScrolling = false;
-let traceZooming = false;
+let traceVoltScales = true;
+let traceScrolling = true;
+let traceZooming = true;
 
 const {min, max, sqrt} = Math;
 
@@ -24,7 +23,8 @@ const {min, max, sqrt} = Math;
 const qe_Consts = qeConsts;
 
 // zooming in or out, changes the heightVolts by this factor either way.
-const zoomFactor = 1.1;
+const zoomFactor = 2;
+//const zoomFactor = 1.1;
 
 const isOK = (c) => {
 	if (c == null || !isFinite(c)) {
@@ -375,7 +375,7 @@ export class voltDisplay {
 	// frac = fraction of a height, +=scrolled to top.  - =scrolled toward bottom
 	// Other scroll mechanisms pass other proportional numbers
 	scrollVoltHandler(frac) {
-		let distance = this.heightVolts * frac / 4;
+		let distance = this.heightVolts * frac / 8;
 
 		this.setBottomVolts(this.bottomVolts + distance);
 
