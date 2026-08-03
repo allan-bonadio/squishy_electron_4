@@ -40,6 +40,8 @@ To begin integration, click on the Start button in the lower left corner of the 
 
 The rainbow colors show the phase of the wave,
 <img src=wave1.png />
+To scroll voltage, use ___shift___ with your mouse wheel.
+To zoom in or out, use ___option___ or ___alt___ with wheel.
 
 ## Starting Wave
 
@@ -50,7 +52,7 @@ The rainbow colors show the phase of the wave,
 <img src=setVoltage2.png style='float: left' />
 <video src=voltagePull.mp4 controls style='float: none' > </video>
 
-You can drag the offwhite voltage line on the main wave to change the voltage shape.
+To change the voltage shape, you can drag the offwhite voltage line on the main wave .
 Hold down shift for a straighter line.
 <div style='clear: both'></div>
 
@@ -60,6 +62,7 @@ Hold down shift for a straighter line.
 
 ## Integration
 
-Integration means solving Schrodinger's Equation for each time step, to get the shape of the electron wave.
+Integration means solving Schrodinger's Equation for each time step,
+to see how the electron wave changes over time.
 This might be limited by how fast your machine is.
 <img src=setIntegration2.png />
