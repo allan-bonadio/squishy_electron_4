@@ -13,7 +13,7 @@ let tracePathAttribute = false;
 let tracePathIndividualPoints = false;
 
 let traceYScales = false;
-let traceVoltScales = true;
+let traceVoltScales = false;
 let traceScrolling = true;
 let traceZooming = true;
 
@@ -106,12 +106,12 @@ export class voltDisplay {
 	// all of our properties, but not the datapoints.  Optional: pass voltage params
 	dumpVoltDisplay(title, voltageParams) {
 		this.findVoltExtremes();
-		console.log(`⚡️ voltD.${this.label}: ${title} @ ${this.voltageBuffer.byteOffset},
+		dblog(`⚡️ voltD.${this.label}: ${title} @ ${this.voltageBuffer.byteOffset},
 			bottomVolts: ${this.bottomVolts}   heightVolts: ${this.heightVolts.toFixed(0)} `
 				+`  (top volts: ${(this.bottomVolts + this.heightVolts).toFixed(0)})
-			measured voltage range: ${this.measuredMinVolts.toFixed(0)} ... ${this.measuredMaxVolts.toFixed(0)}`);
+			measured voltage range: ${this.measuredMinVolts.toFixed(4)} ... ${this.measuredMaxVolts.toFixed(4)}`);
 		if (voltageParams)
-			console.log(`    `, voltageParams);
+			dblog(`    `, voltageParams);
 	}
 
 	// dumps this.voltageBuffer
@@ -129,7 +129,7 @@ export class voltDisplay {
 				txt.push(voltageBuffer[ix].toFixed(0).padStart(10));
 			txt.push('\n');
 		}
-		console.log(txt.join(''));
+		dblog(txt.join(''));
 	}
 
 	/* ***************************** height and bottom (volt) calculations */
@@ -225,18 +225,18 @@ export class voltDisplay {
 		//Object.assign(this, this.drawDesc2D);  // copies it all over this obj
 
 		if (traceYScales) {
-			console.log(`${this.label}: bottomVolts=${this.bottomVolts} `
+			dblog(`${this.label}: bottomVolts=${this.bottomVolts} `
 				+` heightVolts=${this.heightVolts}   viewCanvasHeight=${viewCanvasHeight}`);
 		}
 
 		if (traceVoltScales) {
-			dumpVoltScales(drawingLeft, drawingWidth, viewCanvasHeight);
+			this.dumpVoltScales(drawingLeft, drawingWidth, viewCanvasHeight);
 		}
 		return true;
 	}
 
 	dumpVoltScales(drawingLeft, drawingWidth, viewCanvasHeight) {
-		console.log(`⚡️ ⚡️   voltagearea.setVoltScales()  done
+		dblog(`⚡️ ⚡️   voltagearea.setVoltScales()  done
 			X domain & range: `, this.xScale.domain(), this.xScale.range(), `
 			Y domain & range: `, this.yScale.domain(),  this.yScale.range(), `
 			Y UpsideDown: `, this.yUpsideDown.domain(),  this.yUpsideDown.range(),
@@ -258,7 +258,7 @@ export class voltDisplay {
 
 		const tpip = (x, y, title = '') => {
 			if (tracePathIndividualPoints)
-				console.log(`    ⚡️${title} x=${x}  y=${y}`)
+				dblog(`    ⚡️${title} x=${x}  y=${y}`)
 		};
 
 		// yawn too early?
@@ -279,7 +279,7 @@ export class voltDisplay {
 		let x, y, pt;
 
 		if (tracePathIndividualPoints)
-			console.log(`⚡️ makeVoltagePathAttribute begin case `);
+			dblog(`⚡️ makeVoltagePathAttribute begin case `);
 
 		// get ready to stop and start the pathline if needed
 		let didMove = false, didLine = false;
@@ -361,7 +361,7 @@ export class voltDisplay {
 		// spaces between xy pairs make them easier to read, and they repeat L
 		let final = points.join(' ');
 		if (tracePathAttribute)
-			console.log(`final path attribute`, final);
+			dblog(`final path attribute`, final);
 		if (tracePathIndividualPoints)
 			console.groupEnd(`makeVoltagePathAttribute pts`)
 		return final;
@@ -375,12 +375,14 @@ export class voltDisplay {
 	// frac = fraction of a height, +=scrolled to top.  - =scrolled toward bottom
 	// Other scroll mechanisms pass other proportional numbers
 	scrollVoltHandler(frac) {
-		let distance = this.heightVolts * frac / 8;
+		// adjust this till it feels right
+		let distance = this.heightVolts * frac * 0.2;
 
 		this.setBottomVolts(this.bottomVolts + distance);
 
 		if (traceScrolling)
-			console.log(`userScroll(frac=${frac}) => bottomVolts=${this.bottomVolts}  count=${this.scrollCount++}`);
+			dblog(`userScroll(frac=${frac}) => bottomVolts=${this.bottomVolts} `
+				+` count=${this.scrollCount++}`);
 	}
 
 	// called when human zooms in or out.  pass number for how much.  heightVolts expands

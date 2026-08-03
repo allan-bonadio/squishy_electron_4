@@ -20,9 +20,9 @@ import SquishContext from '../sPanel/SquishContext.js';
 let traceVoltageArea = false;
 
 let traceRendering = false;
-let traceProfileDragging = true;
+let traceProfileDragging = false;
 let traceTweening = false;
-let traceWheel = true;
+let traceWheel = false;
 
 let traceScrollStretch = false;
 let traceViewBox = false;
@@ -57,7 +57,7 @@ function VoltArea(props) {
 	const p = props;
 	const mVD = p.mainVDisp;
 	if (traceVoltageArea)
-		console.log(`⚡️ starting VoltArea`);
+		dblog(`⚡️⚡️ starting VoltArea`);
 	const context = useContext(SquishContext);
 
 	// must render when wheel changes these
@@ -82,7 +82,7 @@ function VoltArea(props) {
 	let svgRect   ;//jTODO = svgEl?.getBoundingClientRect();
 	function setSvgEl() {
 		if (!svgRef.current) {
-			dblog(`svgRef.current not set`)
+			dblog(`⚡️⚡️ svgRef.current not set`)
 			return;
 		}
 		svgEl = svgRef.current;
@@ -100,21 +100,21 @@ function VoltArea(props) {
 
 	/* ***************************************************  click & drag */
 
+	// NOT IN USE
 	// has the user dragged beyond the top/bottom?
 	function strayOutside(newVoltage) {
-
 		// dragged outside? scroll, or stretch.  The amount per pointerMoveOnTactile is
 		// supposed to be cpu-speed-independent, on whole.  If you just make it
 		// 'feel' right, it goes way too fast in 5 or 10 years.
 		let now = performance.now();
 		let howLong = (now - lastDragOutside) / DOUBLING_TIME;
 		if (traceScrollStretch)
-			console.log(`⚡️ strayOutside down how close?  newVoltage=${newVoltage} mVD.bottomVolts=${mVD.bottomVolts} `);
+			dblog(`⚡️⚡️ strayOutside down how close?  newVoltage=${newVoltage} mVD.bottomVolts=${mVD.bottomVolts} `);
 		if (newVoltage < mVD.bottomVolts) {
 			// dragging down
 			let howMuch = (mVD.bottomVolts - newVoltage) / mVD.heightVolts * howLong;
 			if (traceScrollStretch)
-				console.log(`⚡️ strayOutside down howMuch=${howMuch} `);
+				dblog(`⚡️⚡️ strayOutside down howMuch=${howMuch} `);
 			if (newVoltage < mVD.minBottom) {
 				// stretch heightVolts
 				mVD.heightVolts += mVD.heightVolts * howMuch;
@@ -133,7 +133,7 @@ function VoltArea(props) {
 			// dragging up
 			let howMuch = (newVoltage - mVD.maxTop) / mVD.heightVolts * howLong;
 			if (traceScrollStretch)
-				console.log(`⚡️  strayOutside up  howMuch=${howMuch} `)
+				dblog(`⚡️  strayOutside up  howMuch=${howMuch} `)
 			if (newVoltage > mVD.maxTop) {
 				// stretch heightVolts
 				mVD.heightVolts += mVD.heightVolts * howMuch;
@@ -174,7 +174,7 @@ function VoltArea(props) {
 			return;  // same old same old; these events come too fast
 
 		if (traceProfileDragging) {
-			console.log(`⚡⚡️ ${phase} on point (${ev.clientX.toFixed(1)}, ${ev.clientY.toFixed(1)}) `
+			dblog(`⚡⚡️ ${phase} on point (${ev.clientX.toFixed(1)}, ${ev.clientY.toFixed(1)}) `
 				+` voltage @ ix=${ix} changing from ${mVD.voltageBuffer[ix].toFixed(0)} to `
 				+`${newVoltage.toFixed(0)}`);
 		}
@@ -194,12 +194,12 @@ function VoltArea(props) {
 			let lo = Math.min(latestIx, ix);
 			for (let ixx = lo; ixx <= hi; ixx++) {
 				if (traceTweening)
-					console.log(`⚡️ tweening: set point [${ixx}] to ${tweenScale(ixx).toFixed(4)}`);
+					dblog(`⚡️ tweening: set point [${ixx}] to ${tweenScale(ixx).toFixed(4)}`);
 
 				p.setAPoint(ixx, tweenScale(ixx));
 				//mVD.voltageBuffer[ixx] = tweenScale(ixx);
 			}
-			if (traceTweening) console.log(`⚡️ tweening done`)
+			if (traceTweening) dblog(`⚡️ tweening done`)
 		}
 
 		latestIx = ix;
@@ -219,7 +219,7 @@ function VoltArea(props) {
 	const pointerDownOnTactile =
 	(ev) => {
 		if (traceProfileDragging)
-			console.log(`👈 👆  pointerDownOnTactile on tactile Line`, this, ev);
+			dblog(`👈 👆  pointerDownOnTactile on tactile Line`, this, ev);
 
 		// only react if the LEFT button is down
 		if (ev.buttons & 1) {
@@ -249,7 +249,7 @@ function VoltArea(props) {
 	(ev) => {
 		if (dragging) {
 			if (traceProfileDragging) {
-				console.log(`⚡⚡️ pointer UP on point (${ev.clientX.toFixed(1)}, ${ev.clientY.toFixed(1)}) `
+				dblog(`⚡⚡️ pointer UP on point (${ev.clientX.toFixed(1)}, ${ev.clientY.toFixed(1)}) `
 					+` voltage @ ix=${latestIx} changing from ${mVD.voltageBuffer[latestIx].toFixed(0)}`
 					+` to ${latestVoltage.toFixed(0)}`);
 			}
@@ -286,60 +286,71 @@ function VoltArea(props) {
 	// right now.  Moves the voltage line (but not its voltage) By
 	// default this is handled as a passive event, but we need active
 	// so we have to do it outselves.
- 	const wheelHandler =
- 	(ev) => {
- 		let deltaPixels;
- 		if (!ev.shiftKey && !ev.altKey) return;
- 		//dblog(`wheelHandler: shift=${ev.shiftKey}, alt=${ev.altKey}`, ev);
+	const wheelHandler =
+	(ev) => {
+		dblog(`⚡️⚡️ wheelHandler st: deltaMode=${ev.deltaMode} `
+			+` deltaX=${ev.deltaX} deltaY=${ev.deltaY} `
+			+`  shift=${ev.shiftKey}, alt=${ev.altKey}`, ev);
+		if (!ev.shiftKey && !ev.altKey) return;
 
- 		switch (ev.deltaMode) {
- 		case WheelEvent.DOM_DELTA_PIXEL:
- 			deltaPixels = ev.deltaY;
- 			break;
+		// if you hold down Shift, that means, wheel scrolls left and right.
+		// they do it for you.
+		let deltaXY = ev.deltaY;
+		if (ev.shiftKey) deltaXY = ev.deltaX + ev.deltaY;
 
- 		case WheelEvent.DOM_DELTA_LINE:
- 			deltaPixels = ev.deltaY * Math.sqrt(mVD.canvasHeight);
- 			break;
+		let deltaPixels;
+		const canvasHeight = mVD.viewCanvasHeight;
 
- 		case WheelEvent.DOM_DELTA_PAGE:
- 			deltaPixels = ev.deltaY * mVD.canvasHeight;
- 			break;
- 		}
+		switch (ev.deltaMode) {
+		case WheelEvent.DOM_DELTA_PIXEL:  // zero
+			deltaPixels = deltaXY;
+			break;
 
- 		// convert pixels delta to voltage delta to fraction delta
- 		// fractiion of whole heightVolts
- 		// ?? let fracAmount = -deltaPixels / mVD.canvasHeight;
- 		let fracAmount = mVD.yScale.invert(deltaPixels) / mVD.heightVolts;
+		case WheelEvent.DOM_DELTA_LINE:  // one
+			// √canvasHeight is about 1 em
+			deltaPixels = deltaXY * Math.sqrt(canvasHeight);
+			break;
 
+		case WheelEvent.DOM_DELTA_PAGE:  // two
+			deltaPixels = deltaXY * canvasHeight;
+			break;
+		}
+
+		// convert pixels delta to voltage delta to fraction delta
+		// fractiion of whole heightVolts
+		let fracAmount = -deltaPixels / canvasHeight;
+		// ?? let fracAmount = mVD.yScale.invert(deltaPixels) / mVD.heightVolts;
 
 		if (traceWheel) {
-			dblog(`fracAmount=${fracAmount}  deltaPixels=${deltaPixels} `
-				+ ` yScale.invert=${mVD.yScale.invert.domain()} ${mVD.yScale.invert.range()} `
-				+` heightVolts=${mVD.heightVolts}  `);
+			//debugger;
+			dblog(`⚡️⚡️ fracAmount=${fracAmount}  deltaPixels=${deltaPixels} `);
+			//dblog(` yScale.invert=`, mVD.yScale.invert?.domain(), mVD.yScale.invert?.range());
+			dblog(`⚡️⚡️ heightVolts=${mVD.heightVolts}  `);
 		}
-		// so this is the rule.  (IF both are held down, it does both! res for future...)
- 		if (ev.shiftKey)
+		// so this is the rule.  shift=scrolls volt profile.  opt=zoom.  (IF
+		// both are held down, it does both! res for future...)
+		if (ev.shiftKey)
 			mVD.scrollVoltHandler(fracAmount);
- 		if (ev.altKey)
+		if (ev.altKey)
 			mVD.zoomVoltHandler(fracAmount);
 		setVHeight(mVD.heightVolts);
 		setVBottom(mVD.bottomVolts);
 
- 		if (traceWheel) {
- 			console.log(`wheel event: deltaY=${ev.deltaY}  deltaMode=${ev.deltaMode} `
- 				+` scaled delta=${mVD.yScale.invert(deltaPixels)} fracAmount=${fracAmount}`,
- 				ev);
- 		}
+		if (traceWheel) {
+			dblog(`⚡️⚡️ wheelHandler en: deltaMode=${ev.deltaMode}   `
+			+` deltaX=${ev.deltaX} deltaY=${ev.deltaY} deltaXY=${deltaXY}`
+			+`  shift=${ev.shiftKey}, alt=${ev.altKey}`, ev);
+		}
 
- 		// we can't do the preventDefault() if this handler is passive.
- 		// Hence all the kicking and screaming.
+		// we can't do the preventDefault() if this handler is passive.
+		// Hence all the kicking and screaming.
 //  		ev.preventDefault();
 //  		ev.stopPropagation();
- 	}
+	}
 
 	// set the wheel event handler, with passive OFF and with capture so we can
 	// avoid passing it to anybody else.
- 	const wheelHandlerOptions = {passive: false, capture: true};
+	const wheelHandlerOptions = {passive: false, capture: true};
 
 	// intercepted with a ref= react callback, we set the wheel event handler and
 	// remove it when done, as we should.  React 19+ apparently wants you to
@@ -370,12 +381,12 @@ function VoltArea(props) {
 		// this is goofy ... shouldn't this already be set into mVD!?!?!  TODO
 		//mVD.drawDesc2D.addScales(mVD);
 		if (!mVD.xScale || !mVD.yScale)
-			throw `no xScale ${mVD.xScale} or yScale ${mVD.yScale} `;
+			throw `⚡️⚡️ no xScale ${mVD.xScale} or yScale ${mVD.yScale} `;
 
 		// the lines themselves: exactly overlapping.  tactile wider than visible.
 		const pathAttribute = mVD.makeVoltagePathAttribute(mVD.yScale);
 		if (traceRendering)
-			console.log(`⚡️ VoltArea.pathAttribute: `, pathAttribute);
+			dblog(`⚡️⚡️ VoltArea.pathAttribute: `, pathAttribute);
 
 		return <>
 			<path className='visibleLine' key='visibleLine' ref={visibleRef}
@@ -397,7 +408,7 @@ function VoltArea(props) {
 	// axis for voltage.  Makes no sense if no axis there.
 	function renderAxes() {
 		let axis = d3_axisLeft(mVD.yUpsideDown);
-		axis.ticks(3, 's');
+		axis.ticks(4, 's');
 
 		let voltageAxis = ReactFauxDOM.createElement('g');
 		let vAx = d3_select(voltageAxis);
@@ -419,7 +430,7 @@ function VoltArea(props) {
 
 	let viewBoxStr = `${p.drawingLeft} 0 ${p.drawingWidth} ${p.canvasInnerHeight}`;
 	if (traceViewBox) {
-        dblog(`⚡️  svg viewBox ${viewBoxStr}`);
+       dblog(`⚡️⚡️  svg viewBox ${viewBoxStr}`);
 	}
 	let vArea = (
 		<svg className='VoltArea'
@@ -439,7 +450,7 @@ function VoltArea(props) {
 	);
 
 	if (traceRendering)
-		console.log(`⚡️ VoltArea render done`);
+		dblog(`⚡️⚡️ VoltArea render done`);
 
 	return vArea;
 }
@@ -448,4 +459,4 @@ export default VoltArea;
 
 //
 // 			rffffffef={svgRef}
-// 			 onWheel={ev => console.log(`a wheelevent`, ev)}
+// 			 onWheel={ev => dblog(`a wheelevent`, ev)}
