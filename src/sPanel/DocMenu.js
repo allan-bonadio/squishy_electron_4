@@ -38,12 +38,12 @@ function DocMenu(props) {
 	}
 
 	return (
-		<select id='DocMenu' onChange={handleSelect}>
-			<option value='docs' >&nbsp; docs</option>
-			<option value='intro'>Intro</option>
+		<select id='DocMenu' name='DocMenu' onChange={handleSelect} value='docs'>
+			<option value='docs' disabled >&nbsp; docs</option>
 			<option value='gettingStarted'>Getting Started</option>
 			<option value='naturalWaves'>Natural Waves</option>
 			<option value='digitalWaves'>Digital Waves</option>
+			<option value='intro'>inspiration</option>
 		</select>
 	);
 }
