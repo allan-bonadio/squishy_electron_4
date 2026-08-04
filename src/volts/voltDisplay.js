@@ -313,6 +313,7 @@ export class voltDisplay {
 			// make the voltage buffer wraparound
 			voltageBuffer[0] = voltageBuffer[end-1];
 			voltageBuffer[end+start] = voltageBuffer[1];
+			end += 1;
 			didMove = false;
 			didLine = false;
 			break;
