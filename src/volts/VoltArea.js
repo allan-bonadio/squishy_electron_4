@@ -64,13 +64,6 @@ function VoltArea(props) {
 	let [vBottom, setVBottom] = useState(mVD.bottomVolts);
 	let[ vHeight, setVHeight] = useState(mVD.heightVolts);
 
-
-
-	// svg element ref.
-	// const svgRef = useRef();
-	// let svgEl = svgRef.current;
-	// let svgRect = svgEl?.getBoundingClientRect();
-
 	// <path refs
 	const tactileRef = useRef();
 	let tactileEl = tactileRef.current;
