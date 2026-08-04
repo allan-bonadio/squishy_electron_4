@@ -61,11 +61,15 @@ The electrons do orbit, but the details are all different.
 ![stupid atom]{stupidAtom.jpg}
 This one's all jazzed up with glowing stuff and shine as if there's lights down there.
 
-First of all, you see stuff with photons — packets of light.  They're waves, and their wavelengths are about 400 to 700 nanometers (which are 10 ⁻⁹)*.  The atoms, themselves, are about 100 to 200 picometers (which are 10 ⁻¹²) — a thousand times smaller.  So, it's like trying to find a pinhead, by going around, and trying to bounce a basketball off of it.
+First of all, you see stuff with photons — packets of light.
+They're waves, and their wavelengths (cycle lengths) are tiny, 400 to 700 nanometers (.000 400 to .000 700 millimeter)*.
+The atoms, themselves, are about 100 to 200 picometers (.000 000 100 millimeter) — a thousand times smaller.
+So, it's like trying to find a pinhead, by going around the room, and trying to bounce a basketball off of it.
 
 But, we know something about atoms and we can describe it geometrically, even if our photons are too big and clumsy to use.
 
 ## Atoms
+
 Almost all of the size of an atom is its electron shells.
 The electrons would be flying all around, except the nucleus has protons,
 that attract the electrons, and mostly keep them in their orbits.
@@ -81,7 +85,6 @@ This is a whole topic named Chemistry.
 The nucleus is about 100,000 times smaller than the whole atom's size.
 But, it's got almost all the mass; electrons are 1/2000 of the mass of neutrons or protons.
 This is a whole topic named Nuclear Physics.
-
 
 So, the atom is kindof like a balloon with a tiny lead weight in the middle,
 suspended with rubber bands.
