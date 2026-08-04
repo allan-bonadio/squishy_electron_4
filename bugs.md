@@ -1,10 +1,10 @@
-#  bugs and wishlist items for Squishy Electron
+#  bugs and wishlist items for Squishy Electron.  always out of date.
 
 😡 = needed before MVP
 
 ## Project
 
-- Find a replacement for CreateReactApp - no longer supported:
+- Find a replacement for CreateReactApp - which is no longer supported:
 	** - Vite, seems comparable complexity to CRA
 	* *- Next.js, more complex.  Does server side rendering & SEO stuff
 	- Remix, similar to Next, but different.
@@ -23,7 +23,7 @@
 
 - chord pulse should be harmonics of the full width.  Needs an overhaul, and re-enabling.
 
-😡 *- SetWave: Sliding the frequency slider really fast screws something up.  The
+√ *- SetWave: Sliding the frequency slider really fast screws something up.  The
 events come  too fast.  maybe need 'passive' mode?  Or capture mode?
 Now the offset slider.  JUST the offset slider.  Doing it slowly is OK.
 
@@ -38,10 +38,11 @@ Now the offset slider.  JUST the offset slider.  Doing it slowly is OK.
 
 ## GL & WaveView
 
-- left tic marks rarely draw.  😀
+√ - left tic marks rarely draw.  😀
 
 
-😡- display Garland Spiral in 3d could be easy.  haha
+* - display Garland Spiral in 3d could be easy.  haha
+	sortof works - time consuming
 
 * - should have x axis on the bottom marked in nm
 
