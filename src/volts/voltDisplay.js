@@ -323,7 +323,7 @@ export class voltDisplay {
 				+` makeVoltagePathAttribute()`);
 		}
 
-		for (let ix = start; ix <= end; ix++) {
+		for (let ix = start; ix < end; ix++) {
 			x = this.xScale(ix);
 			if ((x==null) || !isFinite(x))
 				debugger;
