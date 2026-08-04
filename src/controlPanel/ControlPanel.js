@@ -24,6 +24,7 @@ let traceSetPanels = false;
 let traceBeginFinish = false;
 let traceContext = false;
 let traceQuickDtFactor = false;
+let traceShowVoltage = true;
 
 // integrations always need specific numbers of steps.  But there's always one
 // more. maybe this should be defined in the grinder.  Hey, isn't this really
@@ -437,16 +438,22 @@ export class ControlPanel extends React.Component {
 	// handler for the always/hover/never setting on CPToolbar
 	showVoltSwitchHandler = (ev) => {
 		const sv = ev.target.value;
+		const s = this.state;
+		if (traceShowVoltage)
+			dblog(` showVoltSw Hand (${sv}), prev sh Volt=${s.showVoltage}`);
 		this.setState({showVoltage: sv});
 
 		// i put this here before the contexxt cuz it was the only thing shared.
 		// prob should go in context eventually, somehow.
 		this.space.updateShowVoltage(sv);  // on the screen
+
+		// does this do anything??@?@ TODO
 		let cp = this.context?.controlPanel;
 		if (cp) cp.showVoltage = sv;
 	}
 
-	// the Set Voltage button on the Set Voltage tab - always a familiar voltage profile
+	// the Set Voltage button on the Set Voltage tab - always a
+	// familiar voltage profile
 	saveMainVoltage = (ev) => {
 		let voltageParams = this.getVoltageParams()
 		this.setVoltageParams(voltageParams);  // to display in volt tab

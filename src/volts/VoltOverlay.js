@@ -14,6 +14,7 @@ import {getASetting, storeASetting} from '../utils/storeSettings.js';
 import SquishContext from '../sPanel/SquishContext.js';
 
 let traceGeometry = false;
+let traceShowVoltage = true;
 
 // holds the state for the potential buffer/line, and for the
 // displayed top and bottom voltage React state, which change from
@@ -88,28 +89,27 @@ function VoltOverlay(props) {
 		storeASetting('voltageSettings', 'heightVolts', hv);
 	}
 
-	// used by control panel when user changes ShowVoltage menu
-	// switch for showing voltage; menu in Volts tab
-	// move it to context someday TODO
-	let showVoltageRef = useRef(getASetting('voltageSettings', 'showVoltage'));
-	const showVoltage = showVoltageRef.current;
-	p.space.updateShowVoltage = (sv) => {
-		showVoltageRef.current = sv;
-	}
+	// for showing voltage; menu in Volts tab, but VoltOverlay needs
+	// to be re-rendered, too.
+	let [showVoltage, setShowVoltage]
+		= useState(getASetting('voltageSettings', 'showVoltage'));
 
-// don't make another state here, the controlpanelholds the state
-// 	let [showVoltage, setShowVoltage] =
-// 		useState(getASetting('voltageSettings', 'showVoltage'));
-//
-// 	p.space.updateShowVoltage = (sv) => {
-// 		setShowVoltage(sv);
-// 	}
+	// calle by control panel when user changes ShowVoltage menu switch, to pass it along
+	p.space.updateShowVoltage = (sv) => {
+		if (traceShowVoltage) dblog(` updateShowVoltage(${sv}), prev `
+			+` showVoltage from showVoltageRef=${showVoltage}  former setting `
+			+` getASetting(showVoltage)=${getASetting('voltageSettings', 'showVoltage')}`);
+		setShowVoltage(sv);
+		storeASetting('voltageSettings', 'showVoltage', sv);
+	}
 
 	/* ********************************************************** rendering */
 	if (traceGeometry)
 		console.log(`vOverlay: ciWidth=${p.canvasInnerWidth} ciHeight=${p.canvasInnerHeight}`);
 
 	// the class on the section here does the showing/hiding when user mouses over.
+	if (traceShowVoltage)
+		dblog(` about to render VoltOverlay, showVoltage ref=${showVoltage}`)
 	return <section className={(showVoltage ?? 'hover') + 'ShowVoltage VoltOverlay'}
 			style={{width: p.width}} >
 		<VoltSidebar
