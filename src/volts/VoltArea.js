@@ -92,6 +92,8 @@ function VoltArea(props) {
 	let latestVoltage;
 	let latestIx;
 
+	let waveElementRef = useRef();
+	let waveElement = waveElementRef.current;
 
 	/* ***************************************************  click & drag */
 
@@ -221,6 +223,16 @@ function VoltArea(props) {
 			// somehow this breaks drawing the voltage line  🤔
 			//svgEl.setPointerCapture(ev.pointerId);
 
+			// try fixing the wave
+
+			waveElement = ev.target;
+			while (waveElement && waveElement.className != 'WaveView')
+				waveElement = waveElement.parentElement;
+			waveElementRef.current = waveElement;
+			if (waveElement)
+				waveElement.style.position = 'fixed';
+
+
 			draggingRef.current = dragging = true;
 			onePoint(ev);
 			ev.target.setPointerCapture(ev.pointerId);  // so we even get drags OUTSIDE
@@ -279,6 +291,11 @@ function VoltArea(props) {
 		// only if pointer up, not for leave, so user can drag as far as they want
 		draggingRef.current = dragging = false;
 		dragging = false;
+
+		// playing with fire
+		if (waveElement)
+			waveElement.style.position = 'relative';
+
 	}
 
 	/* ************************************************* mouse Wheel */
