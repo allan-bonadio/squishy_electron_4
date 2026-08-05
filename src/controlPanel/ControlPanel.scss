@@ -238,8 +238,13 @@
 	&.waveParamSliders {
 		//width: 30em;
 
-		input {
+		input[type="number"] {
 			display: inline;
+			width: 5em;
+		}
+		input[type="range"] {
+			display: inline;
+			width: 8em;
 		}
 
 		h3 {
