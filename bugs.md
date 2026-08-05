@@ -50,9 +50,7 @@ Now the offset slider.  JUST the offset slider.  Doing it slowly is OK.
 
 ## Voltage
 
-- voltage area: dragging beyond bounds should expand scale.  Actually,
-now, it just breaks stuff and gives you a really low or high boundary.
-Needs fixing.
+- voltage area: dragging beyond bounds should expand scale.
 
 - option to have voltage relax back to zero (or whatever's set in the
 tab)
@@ -68,19 +66,23 @@ tab)
 per thread. And way of each thread claiming the border and moving it in
 or out depending.
 
+- need a spectrum/momentum/energy display
 
-- I think it doesn't conserve energy - gotta check this out.  I'm pretty
-certain it doesn't. But now I have FFTs to measure it at least.  If you think about it, pushing up the potential will certainly increase energy.
+- I think it doesn't conserve energy - gotta check this out.  with
+spectrum/momentum/energy display.  I'm pretty certain it doesn't. But
+now I have FFTs to measure it at least.  If you think about it,
+pushing up the potential will certainly increase energy.
 
-- RK4?  probably not.
-
-- qGrinder really needs to be broken in two.  (or three?)  And whole schrodinger directory.  ONe needs to handle the threadsf and (?) grinding.  Or something.  Use the name of that Hidden Figures chick from nasa for a new dir.
+- qGrinder really needs to be broken in two.  (or three?)  And whole
+schrodinger directory.  ONe needs to handle the threadsf and (?)
+grinding.  Or something.  Use the name of that Hidden Figures chick
+from nasa for a new dir.
 
 😡- Should allow almost any number N, not just powers of 2
 
 😡- really need a nyquist filter, plus maybe higher freqs.  MVP: just a fixed nyquist.
 
-😡- should auto-slow if divergence gets high
+😡- should auto-slow if divergence gets high?
 
 
 ## Docs
