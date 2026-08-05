@@ -14,8 +14,8 @@ let tracePathIndividualPoints = false;
 
 let traceYScales = false;
 let traceVoltScales = false;
-let traceScrolling = true;
-let traceZooming = true;
+let traceScrolling = false;
+let traceZooming = false;
 
 const {min, max, sqrt} = Math;
 
