@@ -22,7 +22,7 @@ let traceVoltageArea = false;
 let traceRendering = false;
 let traceProfileDragging = false;
 let traceTweening = false;
-let traceWheel = false;
+let traceWheel = true;
 
 let traceScrollStretch = false;
 let traceViewBox = false;
@@ -86,7 +86,9 @@ function VoltArea(props) {
 	//const dragCountRef = useRef(0);
 
 	// variables while dragging
-	let dragging = false;
+	const draggingRef = useRef();
+	let dragging = draggingRef.current;
+	//let dragging = false;
 	let latestVoltage;
 	let latestIx;
 
@@ -207,8 +209,7 @@ function VoltArea(props) {
 		visibleEl.setAttribute('d', dAttr);
 	}
 
-	// pointer down on the path.tactile element.  The VoltArea function is not
-	// called during dragging; only at the end.
+	// pointer down on the path.tactile element, NOT on the VoltArea
 	const pointerDownOnTactile =
 	(ev) => {
 		if (traceProfileDragging)
@@ -220,8 +221,9 @@ function VoltArea(props) {
 			// somehow this breaks drawing the voltage line  🤔
 			//svgEl.setPointerCapture(ev.pointerId);
 
-			dragging = true;
+			draggingRef.current = dragging = true;
 			onePoint(ev);
+			ev.target.setPointerCapture(ev.pointerId);  // so we even get drags OUTSIDE
 			ev.preventDefault();
 			ev.stopPropagation();
 		}
@@ -242,20 +244,22 @@ function VoltArea(props) {
 	(ev) => {
 		if (dragging) {
 			if (traceProfileDragging) {
-				dblog(`⚡⚡️ pointer UP on point (${ev.clientX.toFixed(1)}, ${ev.clientY.toFixed(1)}) `
+				dblog(`⚡⚡️ pointer LEAVE on point (${ev.clientX.toFixed(1)}, ${ev.clientY.toFixed(1)}) `
 					+` voltage @ ix=${latestIx} changing from ${mVD.voltageBuffer[latestIx].toFixed(0)}`
 					+` to ${latestVoltage.toFixed(0)}`);
 			}
 
+			// ignore it!
+
 			// remind everybody that this episode is over.  Tune in next week.  next pointerdown.
 			//dragging = false;
-			latestIx = latestVoltage = undefined;
-			//setChangeCounter(changeCounter++);
-
-			if (traceProfileDragging)
-				mVD.dumpVoltage('pointer up', 8);
-			ev.preventDefault();
-			ev.stopPropagation();
+// 			latestIx = latestVoltage = undefined;
+// 			//setChangeCounter(changeCounter++);
+//
+// 			if (traceProfileDragging)
+// 				mVD.dumpVoltage('pointer Leave', 8);
+// 			ev.preventDefault();
+// 			ev.stopPropagation();
 		}
 	}
 
@@ -272,16 +276,19 @@ function VoltArea(props) {
 				// else
 				// 	context.controlPanel.beginAnimating(ev);
 		}
-		dragging = false;  // only if pointer up, not for leave, so user can drag as far as they want
+		// only if pointer up, not for leave, so user can drag as far as they want
+		draggingRef.current = dragging = false;
+		dragging = false;
 	}
 
+	/* ************************************************* mouse Wheel */
 	// Used to scroll & zoom the voltage line we only do vertical.
 	// right now.  Moves the voltage line (but not its voltage) By
 	// default this is handled as a passive event, but we need active
 	// so we have to do it outselves.
 	const wheelHandler =
 	(ev) => {
-		dblog(`⚡️⚡️ wheelHandler st: deltaMode=${ev.deltaMode} `
+		if (traceWheel) dblog(`⚡️⚡️ wheelHandler st: deltaMode=${ev.deltaMode} `
 			+` deltaX=${ev.deltaX} deltaY=${ev.deltaY} `
 			+`  shift=${ev.shiftKey}, alt=${ev.altKey}`, ev);
 		if (!ev.shiftKey && !ev.altKey) return;
