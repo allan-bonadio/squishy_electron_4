@@ -85,7 +85,7 @@ struct qGrinder {
 
 	/* ************************* grinding calculations */
 
-	// called by JS to start a lap calc (maybe) now done in JS
+	// called by JS to start a lap calc. Maybe this one or done in JS
 	void triggerIteration(void);
 
 	// figure out the total elapsed time for each thread, average of all, max of all...
@@ -111,6 +111,7 @@ struct qGrinder {
 	void tallyUpKinks(struct qCavity *qcavity);
 	void measureDivergence(void);
 
+	void nyquistFilter(double strength, qCx *orig, qCx *scratch);
 
 	/* *********************************************** instance variables */
 	// please keep alignment stable and correct!  See also eGrinder.js Keep

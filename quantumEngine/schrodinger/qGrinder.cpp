@@ -237,7 +237,7 @@ void qGrinder::qGrinder::copyToStage(void) {
 static int tally = 0;
 
 // if these two derivatives differ in sign, increment the tally.
-// In other words, if there's a kink.
+// In other words, count the kinks.
 static void difft(double p, double q, double r) {
 	if (p > q && q < r) tally++;
 	if (p < q && q > r) tally++;
@@ -371,10 +371,26 @@ void qGrinder::oneLap() {
 	}
 
 	qCheckReset();
+
+	// turn this on or off for testing to see if nyquist filter works
+	nyquistFilter(1.0, wave0, wave2);
 }
 
 void grinder_oneLap(qGrinder *pointer) { pointer->oneLap(); }
 
+// not sure about this.  REally not sure.
+void qGrinder::nyquistFilter(double strength, qCx *orig, qCx *scratch) {
+	qDimension *dims = space->dimensions;
+	 speedyLog("🧶 start of nyquistFilter nPoints=%d, start=%d, end=%d\n",
+			space->nPoints, dims->start, dims->end);
+
+
+	for (int ix = dims->start; ix < dims->end; ix++) {
+		// average with neighbors to smooth it out
+		scratch[ix] = (orig[ix] + (orig[ix-1] + orig[ix+1]) / 2) / 2;
+	}
+	memcpy(orig, scratch, dims->nPoints * sizeof(qCx));
+}
 
 /* ********************************************************** threaded integration  */
 
