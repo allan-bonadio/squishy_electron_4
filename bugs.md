@@ -93,7 +93,7 @@ from nasa for a new dir.
 
 - behavior of different familiar waveforms, different familiar voltages
 
-- complex numbers, fourier transform
+- complex numbers
 
 - the voltage
 

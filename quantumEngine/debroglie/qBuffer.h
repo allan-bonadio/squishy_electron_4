@@ -60,7 +60,10 @@ struct qBuffer {
 	void fixBoundaries(void) { this->fixThoseBoundaries(); };
 
 	void fill(qCx value = 0);
+
+	// copy numbers from src to dest.  either can be null, which means this's wave.
 	void copyThatWave(qCx *dest, qCx *src, int length = -1);
+
 	void copyBuffer(qBuffer *dest, qBuffer *src);
 	void copyFrom(qBuffer *src);
 	void copyTo(qBuffer *dest);
