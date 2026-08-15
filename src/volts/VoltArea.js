@@ -95,7 +95,11 @@ function VoltArea(props) {
 	let waveElementRef = useRef();
 	let waveElement = waveElementRef.current;
 
-	/* ***************************************************  click & drag */
+	// the wheel events come too quickly!  Slow them down.
+	let wheelTamperRef = useRef();
+	let wheelTamper = wheelTamperRef.current;
+
+	/* ********************************************  click & drag */
 
 	// NOT IN USE
 	// has the user dragged beyond the top/bottom?
@@ -225,12 +229,12 @@ function VoltArea(props) {
 
 			// try fixing the wave
 
-			waveElement = ev.target;
-			while (waveElement && waveElement.className != 'WaveView')
-				waveElement = waveElement.parentElement;
-			waveElementRef.current = waveElement;
-			if (waveElement)
-				waveElement.style.position = 'fixed';
+			// waveElement = ev.target;
+			// while (waveElement && waveElement.className != 'WaveView')
+			// 	waveElement = waveElement.parentElement;
+			// waveElementRef.current = waveElement;
+			// if (waveElement)
+			// 	waveElement.style.position = 'fixed';
 
 
 			draggingRef.current = dragging = true;
@@ -293,8 +297,8 @@ function VoltArea(props) {
 		dragging = false;
 
 		// playing with fire
-		if (waveElement)
-			waveElement.style.position = 'relative';
+		// if (waveElement)
+		// 	waveElement.style.position = 'relative';
 
 	}
 
@@ -305,9 +309,6 @@ function VoltArea(props) {
 	// so we have to do it outselves.
 	const wheelHandler =
 	(ev) => {
-		if (traceWheel) dblog(`⚡️⚡️ wheelHandler st: deltaMode=${ev.deltaMode} `
-			+` deltaX=${ev.deltaX} deltaY=${ev.deltaY} `
-			+`  shift=${ev.shiftKey}, alt=${ev.altKey}`, ev);
 		if (!ev.shiftKey && !ev.altKey) return;
 
 		// if you hold down Shift, that means, wheel scrolls left and right.
@@ -332,6 +333,15 @@ function VoltArea(props) {
 			deltaPixels = deltaXY * canvasHeight;
 			break;
 		}
+
+		// wheel events come too fast
+		wheelTamperRef.current
+
+		if (traceWheel) dblog(`⚡️⚡️ wheelHandler st: deltaMode=${ev.deltaMode} `
+			+` deltaX=${ev.deltaX} deltaY=${ev.deltaY} `
+			+`  shift=${ev.shiftKey}, alt=${ev.altKey}`, ev);
+
+
 
 		// convert pixels delta to voltage delta to fraction delta
 		// fractiion of whole heightVolts
