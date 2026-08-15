@@ -378,6 +378,9 @@ void qGrinder::oneLap() {
 
 void grinder_oneLap(qGrinder *pointer) { pointer->oneLap(); }
 
+#define NYQUIST_WEIGHT     0.01
+#define ORIG_WEIGHT     (1 - NYQUIST_WEIGHT)
+
 // not sure about this.  REally not sure.
 void qGrinder::nyquistFilter(double strength, qCx *orig, qCx *scratch) {
 	qDimension *dims = space->dimensions;
@@ -387,7 +390,8 @@ void qGrinder::nyquistFilter(double strength, qCx *orig, qCx *scratch) {
 
 	for (int ix = dims->start; ix < dims->end; ix++) {
 		// average with neighbors to smooth it out
-		scratch[ix] = (orig[ix] + (orig[ix-1] + orig[ix+1]) / 2) / 2;
+		scratch[ix] = orig[ix] * ORIG_WEIGHT
+			+ (orig[ix-1] + orig[ix+1]) * NYQUIST_WEIGHT / 2;
 	}
 	memcpy(orig, scratch, dims->nPoints * sizeof(qCx));
 }
