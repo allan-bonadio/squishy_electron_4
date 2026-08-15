@@ -229,7 +229,8 @@ export class WaveView extends React.Component {
 
 			<div className='widgetArea' key='widgetArea'
 						style={{flexBasis: betweenBumpers +'px',
-								height: this.canvasInnerHeight+'px'}}>
+								height: this.canvasInnerHeight+'px',
+								width: this.canvasInnerWidth+'px'}}>
 
 				<section className='timeOverlay'
 					style={{maxWidth: this.canvasInnerWidth +'px'}}>
