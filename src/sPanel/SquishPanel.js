@@ -31,7 +31,7 @@ import {waitForSpaceCreatedPromise} from '../wave/waveContext.js';	// TODO: get 
 // runtime debugging flags - you can change in the debugger or here
 let tracePromises = false;
 let traceSquishPanel = true;
-let traceWidth = false;
+let traceWidth = true;
 let traceSBIUpdate = false;
 let traceNewSpace = true;
 

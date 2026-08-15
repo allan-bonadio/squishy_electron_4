@@ -13,8 +13,8 @@ import VoltSidebar from '../volts/VoltSidebar.js';
 import {getASetting, storeASetting} from '../utils/storeSettings.js';
 import SquishContext from '../sPanel/SquishContext.js';
 
-let traceGeometry = false;
-let traceShowVoltage = true;
+let traceGeometry = true;
+let traceShowVoltage = false;
 
 // holds the state for the potential buffer/line, and for the
 // displayed top and bottom voltage React state, which change from

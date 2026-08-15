@@ -18,7 +18,7 @@
 // useful in cmath: isnan(double) isinf(double) NAN INFINITY  isfinite()
 // ilogb(double)
 
-// my streamlined complex class
+// my streamlined complex class.  See also qCx.cpp for the non-inline overloads
 class qCx {
 public:
 	double re;
