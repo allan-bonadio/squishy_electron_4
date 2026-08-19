@@ -22,7 +22,7 @@ const VERTICES_PER_TIC = 2;  // left end, then right end
 const FLOATS_PER_TIC = FLOATS_PER_VERTEX * VERTICES_PER_TIC;
 
 // AVG_ψ is 1/N, the height of a circular wave
-const TICS_PER_AVG_PSI  = 2;  // testing
+const TICS_PER_AVG_PSI  = 1;
 
 const BUFFER_ID = 1;
 
@@ -136,7 +136,7 @@ export class ticDrawing extends abstractDrawing {
 
 		// this is number of tics should be, except we skip the one at zero
 		let nTics = Math.floor(TICS_PER_AVG_PSI * highestPerAvgPsi - .1);
-		nTics = this.nTics = Math.min(nTics, BUFFER_MAX_NTICS) - 1;
+		nTics = this.nTics = Math.min(nTics, BUFFER_MAX_NTICS);
 
 		// now fill it in.  avoid tic 0 cuz it's always at the edge.  Buffer starts at tic 1.
 		let cb = this.coordBuffer;
