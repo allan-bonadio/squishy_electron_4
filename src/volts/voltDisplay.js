@@ -391,7 +391,7 @@ export class voltDisplay {
 	// + = zoom in, voltage height reduces   – = zoom out, voltage height increases
 	zoomVoltHandler(inAmount) {
 		// keep looking at same place (in the center)
-		inAmount = -inAmount;  // match google maps
+		inAmount = -.5 * inAmount;  // match google maps; tone it down
 		let midView = this.bottomVolts + this.heightVolts/2;
 
 		if (traceZooming)

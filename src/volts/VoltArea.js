@@ -70,6 +70,107 @@ function VoltArea(props) {
 	const visibleRef = useRef();
 	let visibleEl = visibleRef.current;
 
+	// variables while dragging
+	const draggingRef = useRef();
+	let dragging = draggingRef.current;
+	//let dragging = false;
+	let latestVoltage;
+	let latestIx;
+
+	// the WaveView
+	let waveElementRef = useRef();
+	let waveElement = waveElementRef.current;
+
+	// the wheel events come too quickly!  Slow them down.
+	let wheelTamperRef = useRef();
+	let wheelTamper = wheelTamperRef.current;
+
+
+	/* ************************************************* mouse Wheel */
+	// Used to scroll & zoom the voltage line we only do vertical.
+	// right now.  Moves the voltage line (but not its voltage) By
+	// default this is handled as a passive event, but we need active
+	// so we have to do it outselves.
+	const wheelHandler =
+	(ev) => {
+		if (!ev.shiftKey && !ev.altKey) return;
+
+		// if you hold down Shift, that means, wheel scrolls left and right.
+		// they do it for you.
+		let deltaXY = ev.deltaY;
+		if (ev.shiftKey) deltaXY = ev.deltaX + ev.deltaY;
+
+		let deltaPixels;
+		const canvasHeight = mVD.viewCanvasHeight;
+
+		switch (ev.deltaMode) {
+		case WheelEvent.DOM_DELTA_PIXEL:  // zero
+			deltaPixels = deltaXY;
+			break;
+
+		case WheelEvent.DOM_DELTA_LINE:  // one
+			// √canvasHeight is about 1 em
+			deltaPixels = deltaXY * Math.sqrt(canvasHeight);
+			break;
+
+		case WheelEvent.DOM_DELTA_PAGE:  // two
+			deltaPixels = deltaXY * canvasHeight;
+			break;
+		}
+
+		// wheel events come too fast
+		wheelTamperRef.current
+
+		if (traceWheel) dblog(`⚡️⚡️ wheelHandler st: deltaMode=${ev.deltaMode} `
+			+` deltaX=${ev.deltaX} deltaY=${ev.deltaY} `
+			+`  shift=${ev.shiftKey}, alt=${ev.altKey}`, ev);
+
+
+
+		// convert pixels delta to voltage delta to fraction delta
+		// fractiion of whole heightVolts
+		let fracAmount = -deltaPixels / canvasHeight;
+		// ?? let fracAmount = mVD.yScale.invert(deltaPixels) / mVD.heightVolts;
+
+		if (traceWheel) {
+			//debugger;
+			dblog(`⚡️⚡️ fracAmount=${fracAmount}  deltaPixels=${deltaPixels} `);
+			//dblog(` yScale.invert=`, mVD.yScale.invert?.domain(), mVD.yScale.invert?.range());
+			dblog(`⚡️⚡️ heightVolts=${mVD.heightVolts}  `);
+		}
+		// so this is the rule.  shift=scrolls volt profile.  opt=zoom.  (IF
+		// both are held down, it does both! res for future...)
+		if (ev.shiftKey)
+			mVD.scrollVoltHandler(fracAmount);
+		if (ev.altKey)
+			mVD.zoomVoltHandler(fracAmount);
+		setVHeight(mVD.heightVolts);
+		setVBottom(mVD.bottomVolts);
+
+		if (traceWheel) {
+			dblog(`⚡️⚡️ wheelHandler en: deltaMode=${ev.deltaMode}   `
+			+` deltaX=${ev.deltaX} deltaY=${ev.deltaY} deltaXY=${deltaXY}`
+			+`  shift=${ev.shiftKey}, alt=${ev.altKey}`, ev);
+		}
+
+		// we can't do the preventDefault() if this handler is passive.
+		// Hence all the kicking and screaming.
+  		ev.preventDefault();
+  		ev.stopPropagation();
+	}
+
+	// intercept scroll events
+	const scrollHandler =
+	(ev) => {
+		//if (!ev.shiftKey && !ev.altKey) return;
+
+		if (traceWheel) {
+			dblog(`⎈ ⎈ scrollHandler en: deltaMode=${ev.deltaMode}   `
+			+` deltaX=${ev.deltaX} deltaY=${ev.deltaY} deltaXY=${deltaXY}`
+			+`  shift=${ev.shiftKey}, alt=${ev.altKey}`, ev);
+		}
+	}
+
 	const svgRef = useRef();
 	let svgEl   ;//TODO = svgRef.current;
 	let svgRect   ;//jTODO = svgEl?.getBoundingClientRect();
@@ -80,24 +181,12 @@ function VoltArea(props) {
 		}
 		svgEl = svgRef.current;
 		svgRect = svgEl?.getBoundingClientRect();
+		svgEl.addEventListener('wheel', wheelHandler, {passive: false});
 	}
-	setSvgEl();  // might be already set
+	//setSvgEl();  // might be already set
 	useEffect(setSvgEl);  // otherwise this will set it
 	//const dragCountRef = useRef(0);
 
-	// variables while dragging
-	const draggingRef = useRef();
-	let dragging = draggingRef.current;
-	//let dragging = false;
-	let latestVoltage;
-	let latestIx;
-
-	let waveElementRef = useRef();
-	let waveElement = waveElementRef.current;
-
-	// the wheel events come too quickly!  Slow them down.
-	let wheelTamperRef = useRef();
-	let wheelTamper = wheelTamperRef.current;
 
 	/* ********************************************  click & drag */
 
@@ -227,16 +316,6 @@ function VoltArea(props) {
 			// somehow this breaks drawing the voltage line  🤔
 			//svgEl.setPointerCapture(ev.pointerId);
 
-			// try fixing the wave
-
-			// waveElement = ev.target;
-			// while (waveElement && waveElement.className != 'WaveView')
-			// 	waveElement = waveElement.parentElement;
-			// waveElementRef.current = waveElement;
-			// if (waveElement)
-			// 	waveElement.style.position = 'fixed';
-
-
 			draggingRef.current = dragging = true;
 			onePoint(ev);
 			ev.target.setPointerCapture(ev.pointerId);  // so we even get drags OUTSIDE
@@ -302,105 +381,6 @@ function VoltArea(props) {
 
 	}
 
-	/* ************************************************* mouse Wheel */
-	// Used to scroll & zoom the voltage line we only do vertical.
-	// right now.  Moves the voltage line (but not its voltage) By
-	// default this is handled as a passive event, but we need active
-	// so we have to do it outselves.
-	const wheelHandler =
-	(ev) => {
-		if (!ev.shiftKey && !ev.altKey) return;
-
-		// if you hold down Shift, that means, wheel scrolls left and right.
-		// they do it for you.
-		let deltaXY = ev.deltaY;
-		if (ev.shiftKey) deltaXY = ev.deltaX + ev.deltaY;
-
-		let deltaPixels;
-		const canvasHeight = mVD.viewCanvasHeight;
-
-		switch (ev.deltaMode) {
-		case WheelEvent.DOM_DELTA_PIXEL:  // zero
-			deltaPixels = deltaXY;
-			break;
-
-		case WheelEvent.DOM_DELTA_LINE:  // one
-			// √canvasHeight is about 1 em
-			deltaPixels = deltaXY * Math.sqrt(canvasHeight);
-			break;
-
-		case WheelEvent.DOM_DELTA_PAGE:  // two
-			deltaPixels = deltaXY * canvasHeight;
-			break;
-		}
-
-		// wheel events come too fast
-		wheelTamperRef.current
-
-		if (traceWheel) dblog(`⚡️⚡️ wheelHandler st: deltaMode=${ev.deltaMode} `
-			+` deltaX=${ev.deltaX} deltaY=${ev.deltaY} `
-			+`  shift=${ev.shiftKey}, alt=${ev.altKey}`, ev);
-
-
-
-		// convert pixels delta to voltage delta to fraction delta
-		// fractiion of whole heightVolts
-		let fracAmount = -deltaPixels / canvasHeight;
-		// ?? let fracAmount = mVD.yScale.invert(deltaPixels) / mVD.heightVolts;
-
-		if (traceWheel) {
-			//debugger;
-			dblog(`⚡️⚡️ fracAmount=${fracAmount}  deltaPixels=${deltaPixels} `);
-			//dblog(` yScale.invert=`, mVD.yScale.invert?.domain(), mVD.yScale.invert?.range());
-			dblog(`⚡️⚡️ heightVolts=${mVD.heightVolts}  `);
-		}
-		// so this is the rule.  shift=scrolls volt profile.  opt=zoom.  (IF
-		// both are held down, it does both! res for future...)
-		if (ev.shiftKey)
-			mVD.scrollVoltHandler(fracAmount);
-		if (ev.altKey)
-			mVD.zoomVoltHandler(fracAmount);
-		setVHeight(mVD.heightVolts);
-		setVBottom(mVD.bottomVolts);
-
-		if (traceWheel) {
-			dblog(`⚡️⚡️ wheelHandler en: deltaMode=${ev.deltaMode}   `
-			+` deltaX=${ev.deltaX} deltaY=${ev.deltaY} deltaXY=${deltaXY}`
-			+`  shift=${ev.shiftKey}, alt=${ev.altKey}`, ev);
-		}
-
-		// we can't do the preventDefault() if this handler is passive.
-		// Hence all the kicking and screaming.
-//  		ev.preventDefault();
-//  		ev.stopPropagation();
-	}
-
-	// set the wheel event handler, with passive OFF and with capture so we can
-	// avoid passing it to anybody else.
-	const wheelHandlerOptions = {passive: false, capture: true};
-
-	// intercepted with a ref= react callback, we set the wheel event handler and
-	// remove it when done, as we should.  React 19+ apparently wants you to
-	// RETURN a cleanup function instead of calling svgRefCallback() with null.
-// 	const svgRefCallback = (se) => {
-// 		// not in use
-// 		//return;
-//  		if (!se)  {
-// 			// element went away.  (or this is the first render... in
-// 			// which case the remove is harmless.) must be exactly
-// 			// same args as the add call
-//  			svgEl.removeEventListener('wheel', wheelHandler, wheelHandlerOptions)
-//  		}
-//
-//  		svgRef.current = svgEl = se;
-//
-//  		if (svgEl) {
-//  			// all of this is to set passive here to false.   React gives us no way to do that.
-//  			svgEl.addEventListener('wheel', wheelHandler, wheelHandlerOptions);
-//  			svgEl.addEventListener('scroll', wheelHandler, wheelHandlerOptions);
-//  		}
-// 	}
-
 	/* *************************************************** rendering */
 
 	// this one actually draws the voltage line, normally
@@ -455,7 +435,8 @@ function VoltArea(props) {
 	// superfluous?  no.
 	mVD.setVoltScales(p.drawingLeft, p.drawingWidth, p.canvasInnerHeight);
 
-	let viewBoxStr = `${p.drawingLeft} 0 ${p.drawingWidth} ${p.canvasInnerHeight}`;
+	let viewBoxStr = `L=${p.drawingLeft} 0 W=${p.drawingWidth} `
+		+` H=${p.canvasInnerHeight}`;
 	if (traceViewBox) {
        dblog(`⚡️⚡️  svg viewBox ${viewBoxStr}`);
 	}
@@ -465,7 +446,6 @@ function VoltArea(props) {
 			x={p.drawingLeft} width={p.drawingWidth} height={p.canvasInnerHeight}
 			onPointerMove={pointerMoveOnTactile}
 			onPointerUp={pointerUpFromTactile} onPointerLeave={pointerLeaveTactile}
-			onWheel={wheelHandler}
 			ref={svgRef}
 		>
 			<g >
@@ -484,6 +464,42 @@ function VoltArea(props) {
 
 export default VoltArea;
 
-//
+
+/* ********************************** removed code i'm too chicken to delete */
+//			onWheel={wheelHandler}
+///			onScroll={scrollHandler}
+
 // 			rffffffef={svgRef}
 // 			 onWheel={ev => dblog(`a wheelevent`, ev)}
+
+			// try fixing the wave
+
+			// waveElement = ev.target;
+			// while (waveElement && waveElement.className != 'WaveView')
+			// 	waveElement = waveElement.parentElement;
+			// waveElementRef.current = waveElement;
+			// if (waveElement)
+			// 	waveElement.style.position = 'fixed';
+
+	// intercepted with a ref= react callback, we set the wheel event handler and
+	// remove it when done, as we should.  React 19+ apparently wants you to
+	// RETURN a cleanup function instead of calling svgRefCallback() with null.
+// 	const svgRefCallback = (se) => {
+// 		// not in use
+// 		//return;
+//  		if (!se)  {
+// 			// element went away.  (or this is the first render... in
+// 			// which case the remove is harmless.) must be exactly
+// 			// same args as the add call
+//  			svgEl.removeEventListener('wheel', wheelHandler, wheelHandlerOptions)
+//  		}
+//
+//  		svgRef.current = svgEl = se;
+//
+//  		if (svgEl) {
+//  			// all of this is to set passive here to false.   React gives us no way to do that.
+//  			svgEl.addEventListener('wheel', wheelHandler, wheelHandlerOptions);
+//  			svgEl.addEventListener('scroll', wheelHandler, wheelHandlerOptions);
+//  		}
+// 	}
+
