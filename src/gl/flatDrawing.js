@@ -115,8 +115,10 @@ export class flatDrawing extends abstractDrawing {
 					this.maxHeight = this.avatar.double0;
 				else {
 					// relax changes.  how	quickly?
-					this.maxHeight = this.avatar.double0;
+					//this.maxHeight = this.avatar.double0;
 					//this.maxHeight = (this.maxHeight * 3 + this.avatar.double0) / 4;
+					//this.maxHeight = (this.maxHeight * 15 + this.avatar.double0) / 16;
+					this.maxHeight = (this.maxHeight * 31 + this.avatar.double0) / 32;
 				}
 
 				if (traceMaxHeight)
