@@ -1,5 +1,5 @@
 /*
-** voltDisplay test -- testing hte math for viewing and zooming the voltage in the WaveView
+** voltDisplay test -- testing the math for viewing and zooming the voltage in the WaveView
 ** Copyright (C) 2022-2026 Tactile Interactive, all rights reserved
 */
 
@@ -12,7 +12,7 @@ import qeConsts from '../engine/qeConsts.js';
 let traceObj = false;
 
 
-	qeConsts.ERROR_RADIUS = 1e-12;
+////qeConsts.ERROR_RADIUS = 1e-12;
 
 
 // minimal expectation checks to see if it's ok.  for almost all tests.

@@ -266,7 +266,7 @@ class sAnimator {
 		requestAnimationFrame(this.rAFHandler);
 	}
 
-	/* *************************************  runningDiagnosticCycle of circular wave*/
+	/* **********************  runningDiagnosticCycle of circular wave */
 
 	// special test code.  From years ago.   years and years.  probably broken
 

@@ -117,6 +117,65 @@ and an electron buzzing around the outside.
 
 # The End
 
+For a quantum state with angular momentum quantum number
+ℓ = 1
+ℓ=1:
+
+The allowed orbital angular momentum magnitude is
+∣ L ∣ = ℓ ( ℓ + 1 ) ℏ = 1 ⋅ 2   ℏ = 2   ℏ . ∣L∣=  ℓ(ℓ+1)ℏ ​  =  1⋅2 ​  ℏ=  2 ​  ℏ.
+The allowed  z z-component values are
+L z = m ℓ ℏ , m ℓ ∈ { − 1 , 0 , + 1 } L  z ​  =m  ℓ
+ ℏ,m
+ℓ
+
+ ∈{−1,0,+1} so
+L
+z
+∈
+{
+−
+ℏ
+,
+
+0
+,
+
++
+ℏ
+}
+.
+L
+z
+
+ ∈{−ℏ,0,+ℏ}.
+The number of possible
+m
+ℓ
+m
+ℓ
+
+  values is
+2
+ℓ
++
+1
+=
+3
+2ℓ+1=3 (the “
+p
+p” states in atoms).
+If you meant total angular momentum
+j
+j or spin
+s
+s (not orbital
+ℓ
+ℓ), tell me and I’ll compute those too.
+
+
+
+
+
 Sorry, haven't had a chance to edit the rest of this, so it's kindof a mess.
 
 🫣
