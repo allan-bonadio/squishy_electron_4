@@ -7,7 +7,7 @@ import {expect} from '@jest/globals';
 
 // these two cause it to barf.  I'll figure it out someday.
 //import { render, screen } from '@testing-library/react';
-//import App from './App';
+import App from './App.js';
 
 debugger;
 
