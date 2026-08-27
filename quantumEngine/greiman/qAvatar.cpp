@@ -131,18 +131,25 @@ int charsUsed;
 void qAvatar::dumpMeta(const char *title) {
 	if (!title) title = "no title 🧨 🧨";
 	printf("\n🚥 🚥  ==== '%s' Avatar |  magic: " MAGIC_FORMAT "     '%s'   \n",
-		title, magic>>3, magic>>2, magic>>1, magic, label);
+		title, MAGIC_ARGS, label);
+		//title, magic>>3, magic>>2, magic>>1, magic, label);
+
+
 
 	printf("   int0 = %10d   int1 = %10d    double0 = %12.6g   double1 = %12.6g\n",
 		int0, int1, double0, double1);
 
+	printf("viewBufInfo s: \n");
+	for (int bb = 0; bb < 4; bb++)
+		printf("     fArray=%p    nVertices=%d   nCoords=%d  \n", viewBuffers[bb].fArray, viewBuffers[bb].nVertices, viewBuffers[bb].nCoords);
+
 	printf("        ==== end of qAvatar ====🚥 🚥 \n\n");
 }
 
-// dump out ALL the vertex buffer data, according to bufferMask.
+// dump out ALL the vertex buffer data, according to the buffers in bufferMask.
 // bitwise OR together: 1=buf 0, 2=buf1, 4=buf2, 8=buf3,
-// bufferMask is a bit-mask: 1=viewbuf[0], 2=viewbuf[1],4=buf2, 8=buf3, etc
 // Always omits buffers that aren't there yet.
+// NEVER use this on buffers of different lengths
 void qAvatar::dumpEachViewBuffer(int bufferMask, const char *title) {
 	txt[TXTLEN - 1] = 101;
 	if (!title) title = "no title 🧨 🧨";
@@ -179,20 +186,23 @@ void qAvatar::dumpEachViewBuffer(int bufferMask, const char *title) {
 	charsUsed = 0;
 
 	// fmd the length of the longest buffer
-	int longestBuffer = -1;
+	int bufferLen = -1;
 	which = bufferMask;
 	for (int bufferIx = 0; (bufferIx < MAX_N_BUFFERS) && which; bufferIx++) {
 		if ((which & 1) && NULL != viewBuffers[bufferIx].fArray) {
 			int nv = viewBuffers[bufferIx].nVertices;
-			if (nv > longestBuffer)
-				longestBuffer = nv;
+			printf("dumpEachViewBuffer:  this buffer %d nVertices=%d  first buffer len=%d\n",
+				bufferIx, bufferLen, nv);
+			if (bufferLen > 0 && nv != bufferLen)
+				throw "dumpEachViewBuffer: Do not use on different sized buffers! ";
 		}
+		which >>= 1;
 	}
 
 
 	// Actual Buffer Data.  one ROW PER VERTEX... so a bit convoluted
 	// TODO: handle buffers with different lengths
-	for (int vertexIx = 0; vertexIx < longestBuffer; vertexIx++) {
+	for (int vertexIx = 0; vertexIx < bufferLen; vertexIx++) {
 		// on this line: do which viewBuffers at vertexIx, and each of their coordinates
 			// row heading
 		charsUsed += snprintf(txt+charsUsed, TXTLEN - charsUsed, "%4d ", vertexIx);
@@ -204,7 +214,8 @@ void qAvatar::dumpEachViewBuffer(int bufferMask, const char *title) {
 				float *vertexStart = viewBuffers[bufferIx].fArray + nC * vertexIx;
 
 				for (int coordIx = 0; coordIx < nC; coordIx++) {
-					charsUsed += snprintf(txt+charsUsed, TXTLEN - charsUsed, " %9.3f ", vertexStart[coordIx]);
+					charsUsed += snprintf(txt+charsUsed, TXTLEN - charsUsed, " %9.3f ",
+						vertexStart[coordIx]);
 				}
 				charsUsed += snprintf(txt+charsUsed, TXTLEN - charsUsed, "    ");
 			}  // end of vb buffer IF stmt
@@ -230,12 +241,12 @@ void qAvatar::dumpEachViewBuffer(int bufferMask, const char *title) {
 void qAvatar::dumpComplexViewBuffer(int bufIx, int nPoints, const char *title) {
 	float *fArray = viewBuffers[bufIx].fArray;  // to here
 	float prevPhase =0;
-	#define REAL_IMAG_SERIAL      "%5d |  %8.4f  %8.4f  %4.0f  %7.0f |"
+	#define REAL_IMAG_SERIAL      "%5d |  %8.4f  %8.4f   %2.0f  %5.0f |"
 	#define PHASE_MAGNITUDE  "  %9.3f  %9.3f  %9.3f  m𝜓/nm\n"
 
 	if (!title) title = "";
-	printf("==== 🚦  dump cx view buffer Array %p len %d | %s\n", fArray, nPoints, title);
-	printf("   ix |     re        im       ---  serial |        𝜃           d𝜃         magn\n");
+	printf("==== 🚦  dump cx view buffer Array= %p nPoints= %d | %s\n", fArray, nPoints, title);
+	printf("   ix |     re        im      ---  serial |        𝜃           d𝜃         magn\n");
 	for (int i = 0; i < nPoints; i++) {
 		// two rows at a time, only the second one has phase & mag info
 		float *row = fArray + i * 8;
