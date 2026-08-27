@@ -32,7 +32,7 @@ let pointSize = traceDrawPoints ? `gl_PointSize = 5.;` : '';
 
 /*
 ** data format of attributes:  2 column table of floats
-** x and y coords, 2 pairs in sequence, each a line segment unconnected.
+** x and y ticCoords, 2 pairs in sequence, each a line segment unconnected.
 ** Y coord is same units as flat display; x unit is native WebGL -1...+1
 */
 
@@ -42,14 +42,14 @@ let pointSize = traceDrawPoints ? `gl_PointSize = 5.;` : '';
 // all this really has to do is shovel out the points.  The LINE drawing mode alternates line endings
 const vertexShaderSrc = `// ticDrawing vertex
 #line 42
-attribute vec2 coords;
+attribute vec2 ticCoords;
 uniform float maxHeight;
 //varying highp vec4 vColor;
 
 void main() {
-	float y = coords.y / maxHeight;
+	float y = ticCoords.y / maxHeight;
 	y = 1. - 2. * y;
-	gl_Position = vec4(coords.x, y, 0., 1.);
+	gl_Position = vec4(ticCoords.x, y, 0., 1.);
 
 	//vColor = vec4(.5, 1., 1., 1.);
 
@@ -76,7 +76,7 @@ export class ticDrawing extends abstractDrawing {
 		//debugger;
 		this.avatar = scene.avatar;
 		this.coordBuffer = this.avatar.attachViewBuffer(this.scene.ticAvatarID, null,
-			2, BUFFER_MAX_NTICS * FLOATS_PER_TIC, 'coords');
+			2, BUFFER_MAX_NTICS * FLOATS_PER_TIC, 'ticCoords');
 		//this.coordBuffer = new Float32Array(BUFFER_MAX_NTICS * FLOATS_PER_TIC);
 
 		this.vertexShaderSrc = vertexShaderSrc;
@@ -105,13 +105,13 @@ export class ticDrawing extends abstractDrawing {
 			}
 		);
 
-		this.coordsAttr = new drawingAttribute('coords', this,
+		this.ticCoordsAttr = new drawingAttribute('ticCoords', this,
 			FLOATS_PER_VERTEX, () => this.generateTics());
 	}
 
 	// generate the current tics, for the attribute's reloadFunc
 	generateTics() {
-		// x, in clip coords -1....+1.  Width is really length of tic
+		// x, in clip ticCoords -1....+1.  Width is really length of tic
 		let ticWidth = 0.02;
 		//let ticWidth = 0.01;
 		//let ticWidth = 2000 / this.gl.drawingBufferWidth;
@@ -194,7 +194,7 @@ export class ticDrawing extends abstractDrawing {
 			gl.drawArrays(gl.POINTS, 0, this.vertexCount);
 
 		if (traceAvatarAfterDrawing)
-			this.avatar.dumpEachViewBuffer(3, `done drawing tics`);
+			this.avatar.dumpEachViewBuffer(1 << BUFFER_ID, `done drawing tics`);
 	}
 }
 
