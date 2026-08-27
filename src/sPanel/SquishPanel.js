@@ -30,10 +30,10 @@ import {waitForSpaceCreatedPromise} from '../wave/waveContext.js';	// TODO: get 
 
 // runtime debugging flags - you can change in the debugger or here
 let tracePromises = false;
-let traceSquishPanel = true;
-let traceWidth = true;
+let traceSquishPanel = false;
+let traceWidth = false;
 let traceSBIUpdate = false;
-let traceNewSpace = true;
+let traceNewSpace = false;
 
 /* ************************************************ construction & reconstruction */
 

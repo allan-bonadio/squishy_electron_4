@@ -14,10 +14,10 @@ import {getASetting, storeASetting, getAGroup, storeAGroup}
 	from '../utils/storeSettings.js';
 import sSettings from '../utils/sSettings.js';
 
-let traceOrient = true;
+let traceOrient = false;
 let traceDontShowPivotOverlay = false;
-let traceShowOrient3D = true;
-let traceAction = true;
+let traceShowOrient3D = false;
+let traceAction = false;
 
 const propTypes = {
 	nStates: PropTypes.number,

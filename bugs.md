@@ -34,7 +34,7 @@ Now the offset slider.  JUST the offset slider.  Doing it slowly is OK.
 
 - need a hamburger menu for things like the above.
 
-😡😡- resetWaveHandler sometimes displays a kinked wave - click a second time and it's ok
+√ - resetWaveHandler sometimes displays a kinked wave - click a second time and it's ok (cannot replicate)
 
 ## GL & WaveView
 
@@ -46,8 +46,8 @@ Now the offset slider.  JUST the offset slider.  Doing it slowly is OK.
 
 * - should have x axis on the bottom marked in nm
 
-* - VoltLine dragging: if it's scrolled, the line is in the wrong pos (related to fixed position).
-* - fixed position sometimes doesn't work.  I need to figure out something.  If fixed is constant on SP, there's no way to scroll to the bottom.
+√ - VoltLine dragging: if it's scrolled, the line is in the wrong pos (related to fixed position).
+√ - fixed position sometimes doesn't work.  I need to figure out something.  If fixed is constant on SP, there's no way to scroll to the bottom.
 
 ## Voltage
 

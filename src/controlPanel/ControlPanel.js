@@ -24,7 +24,7 @@ let traceSetPanels = false;
 let traceBeginFinish = false;
 let traceContext = false;
 let traceQuickDtFactor = false;
-let traceShowVoltage = true;
+let traceShowVoltage = false;
 
 // integrations always need specific numbers of steps.  But there's always one
 // more. maybe this should be defined in the grinder.  Hey, isn't this really

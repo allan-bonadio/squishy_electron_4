@@ -38,7 +38,7 @@ let traceOrient = false;
 
 let traceRotMatrix = false;
 
-let traceShowOrient3D = true;
+let traceShowOrient3D = false;
 let traceDontShowPivotOverlay = false;
 
 const round = (n) => Math.round(n, 1);

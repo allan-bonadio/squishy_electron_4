@@ -13,7 +13,7 @@ import {tooOldTerminate} from '../utils/errors.js';
 // webgl-debug: can wrap a gl in checking code.  Spector browser plugin does
 // this.  Now doing this.
 
-let traceVersion = true;
+let traceVersion = false;
 
 // the gl Tests aren't tuned in to node_modules; use the https form for those.
 // the app is fine with it, so use the regular form.

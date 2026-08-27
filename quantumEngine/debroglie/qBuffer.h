@@ -35,12 +35,13 @@ struct qBuffer {
 	// length is length in qCxs
 	void initBuffer(int length, qCx *useThisBuffer = NULL);
 
-	// print one complex number, plus maybe some more calculated metrics for that point,
-	// on a line in the dump on stdout.
+	// print one complex number, plus maybe some more calculated metrics
+	// for that point, on a line in the dump on stdout.
 	static double dumpRow(char buf[200], int ix, qCx w, double *pPrevPhase, bool withExtras);
 
 	// print any segment of any buffer
-	// you can use this on waves or spectrums; for the latter, leave off the start and the rest
+	// you can use this on waves or spectrums; for the latter,
+	// leave off the start and the rest
 	static void dumpSegment(qCx *wave, bool withExtras = true,
 		int start = 0, int end = -1, int continuum = 0);
 

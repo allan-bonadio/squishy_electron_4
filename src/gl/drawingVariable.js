@@ -130,7 +130,7 @@ export class drawingUniform extends drawingVariable {
 
 		if (traceUniforms) {
 			dblog(`🍯 drawingUniform reloaded U variable '${this.varName}' in `);
-			dblog(`			   ${this.drawing.avatarLabel} uniform gl.${method}`, args);
+			dblog(`			   ${this.drawing.avatarLabel} uniform gl.${method}()`, args);
 			dblog(`            value = `, value);
 		}
 	}

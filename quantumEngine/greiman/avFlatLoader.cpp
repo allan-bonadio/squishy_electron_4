@@ -12,6 +12,7 @@
 static const bool traceViewBuffer = false;
 static const bool traceHighest = false;
 static const bool traceInDetail = false;  // blow-by-blow, verbose
+static const bool traceEachRow = false;  // except for these
 static const bool traceCavityDump = false;  // dumps it; verbose
 
 
@@ -53,7 +54,7 @@ void avFlatLoader(qAvatar *avatar, int bufIx, qCavity *cavity, int nPoints) {
 	for (int pointNum = 0; pointNum < nPoints; pointNum++) {
 		float *twoRowPtr = fArray + pointNum * 8;
 		if (traceInDetail)
-			printf("🚦 avFlatLoader(pointNum=%d):  fArray base=%p  twoRowPtr=%p\n",
+			printf("🚦 avFlatLoader ptrs(pointNum=%d):  fArray base=%p  twoRowPtr=%p\n",
 				pointNum, fArray, twoRowPtr);
 
 		qCx *wavePtr = wave + pointNum;
@@ -79,8 +80,9 @@ void avFlatLoader(qAvatar *avatar, int bufIx, qCavity *cavity, int nPoints) {
 		if (height > highest)
 			highest = height;
 
-		if (traceInDetail) {
-			printf("🚦 avFlatLoader(pointNum %d): %8f %8f %8f %8f    %8f %8f %8f %8f   height=%10lf\n",
+		if (traceEachRow) {
+			printf("🚦 avFlatLoader Each 2Rowz(pointNum %d): %8f %8f %8f %8f  "
+					"  %8f %8f %8f %8f   height=%10lf\n",
 				pointNum, twoRowPtr[0], twoRowPtr[1], twoRowPtr[2], twoRowPtr[3],
 				twoRowPtr[4], twoRowPtr[5], twoRowPtr[6], twoRowPtr[7],
 				height);

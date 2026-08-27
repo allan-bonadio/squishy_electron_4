@@ -26,8 +26,9 @@ static bool traceTrigger = false;
 
 static bool traceIntegration = false;
 static bool traceIntegrationDetailed = false;
+static bool tracePostLapWave = true;
 
-static bool traceJustWave = false;
+static bool traceJustWave = true;
 
 static bool dumpFFHiResSpectums = false;
 static bool traceIProd = false;
@@ -40,6 +41,8 @@ static bool traceKinks = false;
 static bool traceAggregate = false;
 static bool traceThreadsHaveFinished = false;
 static bool traceTHFBenchmarks = false;
+static bool traceNyquist = false;
+
 
 // RK2
 #define MIDPOINT_METHOD
@@ -92,7 +95,8 @@ qGrinder::qGrinder(qSpace *sp, int nGrWorkers, const char *lab)
 
 		printf("	  the qSpace for 🪓 grinder %s:   magic=" MAGIC_FORMAT " spacelabel=%s\n",
 			label, MAGIC_ARGS, space->label);
-		printf("		 nDimesions=%d   nStates=%d nPoints=%d voltage=%p spectrumLength=%d  samplePoint=%d\n",
+		printf("		 nDimesions=%d   nStates=%d nPoints=%d voltage=%p "
+							" spectrumLength=%d  samplePoint=%d\n",
 			space->nDimensions, space->nStates, space->nPoints,
 			space->voltage, space->spectrumLength,
 			samplePoint);
@@ -312,7 +316,7 @@ void qGrinder::oneLap() {
 		// dtFactor is in controlpanel state  only
 	}
 	if (0 == stretchedDt)
-		throw std::runtime_error("allocateWave() - stretchedDt is zero");
+		throw std::runtime_error("qGrinder::oneLap() - stretchedDt is zero");
 
 	if (traceIntegrationDetailed)
 		qGrinder::dumpObj("qGrinder 🪓 dump of oneLap()");
@@ -374,6 +378,14 @@ void qGrinder::oneLap() {
 
 	// turn this on or off for testing to see if nyquist filter works
 	nyquistFilter(1.0, wave0, wave2);
+
+	if (tracePostLapWave) {
+		printf("lap %d finished, the wave:\n", lapSerial);
+		flick->dumpSegment(flick->wave, false, 0,
+			space->dimensions->nPoints, space->dimensions->continuum);
+	}
+
+	lapSerial++;
 }
 
 void grinder_oneLap(qGrinder *pointer) { pointer->oneLap(); }
@@ -384,9 +396,10 @@ void grinder_oneLap(qGrinder *pointer) { pointer->oneLap(); }
 // not sure about this.  REally not sure.
 void qGrinder::nyquistFilter(double strength, qCx *orig, qCx *scratch) {
 	qDimension *dims = space->dimensions;
-	 speedyLog("🧶 start of nyquistFilter nPoints=%d, start=%d, end=%d\n",
+	if (traceNyquist) {
+		speedyLog("🧶 start of nyquistFilter nPoints=%d, start=%d, end=%d\n",
 			space->nPoints, dims->start, dims->end);
-
+	}
 
 	for (int ix = dims->start; ix < dims->end; ix++) {
 		// average with neighbors to smooth it out
@@ -437,8 +450,8 @@ void qGrinder::threadsHaveFinished() {
 	aggregateCalcTime();
 
 	if (traceTHFBenchmarks && 0 == (lapSerial & 63)) {
-		speedyLog("🪓 threadsHaveFinished()— aggregateCalcTime()÷64 at %10.6lf ms - needsRepaint=%hhu"
-			" shouldBeIntegrating=%hhu   isIntegrating=%hhu\n",
+		speedyLog("🪓 threadsHaveFinished()— aggregateCalcTime()÷64 at %10.6lf ms - "
+			"needsRepaint=%hhu shouldBeIntegrating=%hhu   isIntegrating=%hhu\n",
 			getTimeDouble() - thfTime, needsRepaint, shouldBeIntegrating, isIntegrating);
 	}
 

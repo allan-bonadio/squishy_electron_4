@@ -9,6 +9,7 @@ import cx2rygb from './cx2rygb/cx2rygb.glsl.js';
 import qeFuncs from '../engine/qeFuncs.js';
 import qeConsts from '../engine/qeConsts.js';
 
+let traceAvatarBeforeDrawing = false;
 let traceAvatarAfterDrawing = false;
 let traceMaxHeight = false;
 let traceFlatDrawing = false;
@@ -145,7 +146,13 @@ export class flatDrawing extends abstractDrawing {
 		let nPoints = this.nPoints = this.space.nPoints;
 		let nStates = this.space.nStates;
 		this.barWidthUniform = new drawingUniform('barWidth', this,
-			() => ( { value: barWidth, type: '1f' } )
+			() => {
+				if (!isFinite(barWidth)) {
+					debugger;
+					throw `barWidth not finite: ${barWidth}`;
+				}
+				return {value: barWidth, type: '1f' };
+			}
 		);
 		if (traceFlatDrawing) console.log(`♭♭♭ barWidth frac of 1= ${barWidth}`);
 
@@ -160,7 +167,7 @@ export class flatDrawing extends abstractDrawing {
 			if (traceReloadRow) {
 				console.log(`♭♭♭ flatDrawing  ${this.avatarLabel}: at row getViewBuffer() `
 					+` loading to ${this.avatar.label}	 this.vertexCount=${this.vertexCount} `
-					+` total floats=${this.vertexCount * this.rowFloats}  double0=this.avatar.double0`);
+					+` total floats=${this.vertexCount * this.rowFloats}  double0=$ {this.avatar.double0}`);
 			}
 
 			return this.avatar.getViewBuffer(this.scene.flatAvatarID);
@@ -190,6 +197,9 @@ export class flatDrawing extends abstractDrawing {
 		// this.drawVariables.forEach(v => v.reloadVariable());
 		// //this.drawVariables.forEach(v => v.reloadVariable());
 		// this.theAttribute.reloadVariable();
+		if (traceAvatarBeforeDrawing)
+			this.avatar.dumpComplexViewBuffer(this.scene.flatAvatarID, this.nPoints,
+					`♭♭♭ before drawing in flatDrawing.js`);
 
 		gl.drawArrays(gl.TRIANGLE_STRIP, 0, this.vertexCount);
 		if (traceFlatDrawing) {
@@ -209,9 +219,10 @@ export class flatDrawing extends abstractDrawing {
 
 		// i think this is problematic
 		if (traceAvatarAfterDrawing) {
-			this.avatar.dumpEachViewBuffer(3, `done drawing flat`);
-			this.avatar.dumpComplexViewBuffer(this.scene.flatAvatarID, this.nPoints,
-					`♭♭♭ finished drawing in flatDrawing.js`);
+			this.avatar.dumpMeta(`traceAvatarAfterDrawing:`);
+			this.avatar.dumpEachViewBuffer(1, `done drawing flat`);
+			this.avatar.dumpComplexViewBuffer(this.scene.flatAvatarID,
+				this.nPoints, `♭♭♭ finished drawing in flatDrawing.js`);
 			console.log(`♭♭♭ barWidthUniform=`, this.barWidthUniform.reloadFunc(),
 				+` maxHeightUniform=`, this.maxHeightUniform.reloadFunc());
 		}

@@ -15,7 +15,7 @@ const d2r = Math.PI / 180;
 
 let traceOrientation= true;
 let traceRotMatrix = false;
-let traceProjMatrix = true;
+let traceProjMatrix = false;
 let traceOffMatrix = false;
 
 

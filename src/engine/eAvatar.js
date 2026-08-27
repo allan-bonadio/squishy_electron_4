@@ -182,7 +182,8 @@ class eAvatar extends eObject {
 
 	dumpComplexViewBuffer(bufIx, nPoints, title) {
 		console.group(title);
-		qeFuncs.avatar_dumpComplexViewBuffer(this._pointer_, bufIx, nPoints, title);
+		// since we already printed the title, don't do it again
+		qeFuncs.avatar_dumpComplexViewBuffer(this._pointer_, bufIx, nPoints, '');
 		console.groupEnd();
 	}
 

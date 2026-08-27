@@ -203,7 +203,7 @@ void qFlick::dumpOverview(const char *title) {
 	printf("==== Flick Overview End ====\n");
 }
 
-/* ************************************************************ Vischer calcs on waves in-progress  */
+/* ******************************************** Vischer calcs on waves in-progress  */
 // not sure if we actually need these.  Sorry, lots of commented-out code.
 
 // calculate the complex value, re + i im, at this point and doubleSerial

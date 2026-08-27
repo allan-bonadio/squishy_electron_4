@@ -17,7 +17,7 @@ import {interpretCppException} from '../utils/errors.js';
 import {MAX_DIMENSIONS, N_THREADS} from './eEngine.js';
 //import drawDesc2D from '../wave/drawDesc2D.js';
 
-let traceSpace = true;
+let traceSpace = false;
 let traceFamiliarWave = false;
 let traceGlobalSpace = false;
 

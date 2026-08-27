@@ -54,6 +54,7 @@ struct qAvatar {
 	int magic;
 
 	// args that many loaders need.  Optional but NOT set by the constructor or anything.
+	// often null if not used
 	struct qSpace *space;
 	struct qCavity *cavity;
 
