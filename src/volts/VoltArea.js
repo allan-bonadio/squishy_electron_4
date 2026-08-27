@@ -22,7 +22,7 @@ let traceVoltageArea = false;
 let traceRendering = false;
 let traceProfileDragging = false;
 let traceTweening = false;
-let traceWheel = true;
+let traceWheel = false;
 
 let traceScrollStretch = false;
 let traceViewBox = false;
@@ -64,26 +64,26 @@ function VoltArea(props) {
 	let [vBottom, setVBottom] = useState(mVD.bottomVolts);
 	let[ vHeight, setVHeight] = useState(mVD.heightVolts);
 
-	// <path refs
+	// lots of refs.  wish i had This to hang them off of.
+	const selfRef = useRef({dragging: false, wheelTamper: null});
+	let {dragging, wheelTamper} = selfRef.current;
+
 	const tactileRef = useRef();
-	let tactileEl = tactileRef.current;
 	const visibleRef = useRef();
-	let visibleEl = visibleRef.current;
 
 	// variables while dragging
-	const draggingRef = useRef();
-	let dragging = draggingRef.current;
-	//let dragging = false;
+// 	const draggingRef = useRef();
+// 	let dragging = draggingRef.current;
 	let latestVoltage;
 	let latestIx;
 
 	// the WaveView
-	let waveElementRef = useRef();
-	let waveElement = waveElementRef.current;
+// 	let waveElementRef = useRef();
+// 	let waveElement = waveElementRef.current;
 
 	// the wheel events come too quickly!  Slow them down.
-	let wheelTamperRef = useRef();
-	let wheelTamper = wheelTamperRef.current;
+// 	let wheelTamperRef = useRef();
+// 	let wheelTamper = wheelTamperRef.current;
 
 
 	/* ************************************************* mouse Wheel */
@@ -119,15 +119,13 @@ function VoltArea(props) {
 		}
 
 		// wheel events come too fast
-		wheelTamperRef.current
+		//wheelTamperRef.current
 
 		if (traceWheel) dblog(`⚡️⚡️ wheelHandler st: deltaMode=${ev.deltaMode} `
 			+` deltaX=${ev.deltaX} deltaY=${ev.deltaY} `
 			+`  shift=${ev.shiftKey}, alt=${ev.altKey}`, ev);
 
-
-
-		// convert pixels delta to voltage delta to fraction delta
+		// convert pixels delta to fraction delta
 		// fractiion of whole heightVolts
 		let fracAmount = -deltaPixels / canvasHeight;
 		// ?? let fracAmount = mVD.yScale.invert(deltaPixels) / mVD.heightVolts;
@@ -155,38 +153,37 @@ function VoltArea(props) {
 
 		// we can't do the preventDefault() if this handler is passive.
 		// Hence all the kicking and screaming.
-  		ev.preventDefault();
-  		ev.stopPropagation();
+		ev.preventDefault();
+		ev.stopPropagation();
 	}
 
 	// intercept scroll events
-	const scrollHandler =
-	(ev) => {
-		//if (!ev.shiftKey && !ev.altKey) return;
-
-		if (traceWheel) {
-			dblog(`⎈ ⎈ scrollHandler en: deltaMode=${ev.deltaMode}   `
-			+` deltaX=${ev.deltaX} deltaY=${ev.deltaY} deltaXY=${deltaXY}`
-			+`  shift=${ev.shiftKey}, alt=${ev.altKey}`, ev);
-		}
-	}
+// 	const scrollHandler =
+// 	(ev) => {
+// 		//if (!ev.shiftKey && !ev.altKey) return;
+//
+// 		if (traceWheel) {
+// 			dblog(`⎈ ⎈ scrollHandler en: deltaMode=${ev.deltaMode}   `
+// 			+` deltaX=${ev.deltaX} deltaY=${ev.deltaY} deltaXY=${deltaXY}`
+// 			+`  shift=${ev.shiftKey}, alt=${ev.altKey}`, ev);
+// 		}
+// 	}
 
 	const svgRef = useRef();
-	let svgEl   ;//TODO = svgRef.current;
-	let svgRect   ;//jTODO = svgEl?.getBoundingClientRect();
+	let svgEl;
+	let svgRect;
 	function setSvgEl() {
 		if (!svgRef.current) {
-			dblog(`⚡️⚡️ svgRef.current not set`)
+			dblog(`⚡️⚡️ svgRef.current not set`);  // shouldn't happen
 			return;
 		}
 		svgEl = svgRef.current;
 		svgRect = svgEl?.getBoundingClientRect();
-		svgEl.addEventListener('wheel', wheelHandler, {passive: false});
+		svgEl?.addEventListener('wheel', wheelHandler, {passive: false});
 	}
 	//setSvgEl();  // might be already set
 	useEffect(setSvgEl);  // otherwise this will set it
 	//const dragCountRef = useRef(0);
-
 
 	/* ********************************************  click & drag */
 
@@ -300,8 +297,8 @@ function VoltArea(props) {
 		// now show it. generate a new path attribute for both lines.  Same attr value.
 		// Go around React for speed.
 		let dAttr = mVD.makeVoltagePathAttribute(mVD.yScale);
-		tactileEl.setAttribute('d', dAttr);
-		visibleEl.setAttribute('d', dAttr);
+		tactileRef.current?.setAttribute('d', dAttr);
+		visibleRef.current?.setAttribute('d', dAttr);
 	}
 
 	// pointer down on the path.tactile element, NOT on the VoltArea
@@ -316,7 +313,7 @@ function VoltArea(props) {
 			// somehow this breaks drawing the voltage line  🤔
 			//svgEl.setPointerCapture(ev.pointerId);
 
-			draggingRef.current = dragging = true;
+			selfRef.current.dragging = dragging = true;
 			onePoint(ev);
 			ev.target.setPointerCapture(ev.pointerId);  // so we even get drags OUTSIDE
 			ev.preventDefault();
@@ -335,16 +332,16 @@ function VoltArea(props) {
 		}
 	}
 
-	const pointerLeaveTactile =
-	(ev) => {
-		if (dragging) {
-			if (traceProfileDragging) {
-				dblog(`⚡⚡️ pointer LEAVE on point (${ev.clientX.toFixed(1)}, ${ev.clientY.toFixed(1)}) `
-					+` voltage @ ix=${latestIx} changing from ${mVD.voltageBuffer[latestIx].toFixed(0)}`
-					+` to ${latestVoltage.toFixed(0)}`);
-			}
+// 	const pointerLeaveTactile =
+// 	(ev) => {
+// 		if (dragging) {
+// 			if (traceProfileDragging) {
+// 				dblog(`⚡⚡️ pointer LEAVE on point (${ev.clientX.toFixed(1)}, ${ev.clientY.toFixed(1)}) `
+// 					+` voltage @ ix=${latestIx} changing from ${mVD.voltageBuffer[latestIx].toFixed(0)}`
+// 					+` to ${latestVoltage.toFixed(0)}`);
+// 		}
 
-			// ignore it!
+		// ignore it!
 
 			// remind everybody that this episode is over.  Tune in next week.  next pointerdown.
 			//dragging = false;
@@ -355,13 +352,13 @@ function VoltArea(props) {
 // 				mVD.dumpVoltage('pointer Leave', 8);
 // 			ev.preventDefault();
 // 			ev.stopPropagation();
-		}
-	}
+// 		}
+// 	}
 
 	const pointerUpFromTactile =
 	(ev) => {
 		if (dragging) {
-			pointerLeaveTactile(ev);
+			//pointerLeaveTactile(ev);
 		}
 		else {
 			// just a mouse release, not on anything else, can stop animation (but not start it again)
@@ -372,8 +369,7 @@ function VoltArea(props) {
 				// 	context.controlPanel.beginAnimating(ev);
 		}
 		// only if pointer up, not for leave, so user can drag as far as they want
-		draggingRef.current = dragging = false;
-		dragging = false;
+		selfRef.current.dragging = dragging = false;
 
 		// playing with fire
 		// if (waveElement)
@@ -408,8 +404,8 @@ function VoltArea(props) {
 	// Instead of handing the function around, just attach it to the space; everybody has a copy
 	p.space.updateDrawnVoltagePath = function updateDrawnVoltagePath() {
 		const pathAttribute = mVD.makeVoltagePathAttribute(mVD.yScale);
-		visibleEl.setAttribute('d', pathAttribute);
-		tactileEl.setAttribute('d', pathAttribute);
+		tactileRef.current?.setAttribute('d', pathAttribute);
+		visibleRef.current?.setAttribute('d', pathAttribute);
 	}
 
 	// axis for voltage.  Makes no sense if no axis there.
@@ -435,17 +431,17 @@ function VoltArea(props) {
 	// superfluous?  no.
 	mVD.setVoltScales(p.drawingLeft, p.drawingWidth, p.canvasInnerHeight);
 
-	let viewBoxStr = `L=${p.drawingLeft} 0 W=${p.drawingWidth} `
-		+` H=${p.canvasInnerHeight}`;
+	let viewBoxStr = `${p.drawingLeft} 0 ${p.drawingWidth} `
+		+` ${p.canvasInnerHeight}`;
 	if (traceViewBox) {
-       dblog(`⚡️⚡️  svg viewBox ${viewBoxStr}`);
+       dblog(`⚡️⚡️  svg viewBox: L T Width Height: ${viewBoxStr}`);
 	}
 	let vArea = (
 		<svg className='VoltArea'
 			viewBox={viewBoxStr}
 			x={p.drawingLeft} width={p.drawingWidth} height={p.canvasInnerHeight}
 			onPointerMove={pointerMoveOnTactile}
-			onPointerUp={pointerUpFromTactile} onPointerLeave={pointerLeaveTactile}
+			onPointerUp={pointerUpFromTactile}
 			ref={svgRef}
 		>
 			<g >
@@ -471,6 +467,8 @@ export default VoltArea;
 
 // 			rffffffef={svgRef}
 // 			 onWheel={ev => dblog(`a wheelevent`, ev)}
+
+//onPointerLeave={pointerLeaveTactile}
 
 			// try fixing the wave
 
