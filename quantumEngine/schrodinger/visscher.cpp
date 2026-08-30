@@ -224,7 +224,6 @@ void qGrinder::hitRealImaginary(qCx *newW, qCx *oldW, qCx *hamiltW, double dt) {
 // each of these is 4 hits = 2 steps of dt
 void qGrinder::stepMidpoint(qCx *newW, qCx *oldW, qCx *scratch, double dt) {
 	// first calculate the normal step taking derivatives at the beginning of dt
-	// already done in hit func flick->fixThoseBoundaries(oldW);
 	hitReal(scratch, oldW, oldW, dt);
 	hitImaginary(scratch, oldW, oldW, dt);
 
