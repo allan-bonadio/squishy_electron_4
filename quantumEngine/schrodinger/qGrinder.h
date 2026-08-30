@@ -111,7 +111,7 @@ struct qGrinder {
 	void tallyUpKinks(struct qCavity *qcavity);
 	void measureDivergence(void);
 
-	void nyquistFilter(double strength, qCx *orig, qCx *scratch);
+	void nyquistFilter(qCx *scratch);
 
 	/* *********************************************** instance variables */
 	// please keep alignment stable and correct!  See also eGrinder.js Keep

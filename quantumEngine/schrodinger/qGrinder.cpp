@@ -299,6 +299,29 @@ void qGrinder::measureDivergence() {
 	}
 }
 
+/* ********************************************************** nyquist filter */
+
+#define NYQUIST_WEIGHT     0.01
+#define ORIG_WEIGHT     (1 - NYQUIST_WEIGHT)
+
+// not sure about this.  REally not sure.
+void qGrinder::nyquistFilter(qCx *scratch) {
+	qCx *orig = flick->wave;
+	flick->fixThoseBoundaries(orig);
+	qDimension *dims = space->dimensions;
+	if (traceNyquist) {
+		speedyLog("🪓 start of nyquistFilter nPoints=%d, start=%d, end=%d\n",
+			space->nPoints, dims->start, dims->end);
+	}
+
+	for (int ix = dims->start; ix < dims->end; ix++) {
+		// average with neighbors to smooth it out
+		scratch[ix] = orig[ix] * ORIG_WEIGHT
+			+ (orig[ix-1] + orig[ix+1]) * NYQUIST_WEIGHT / 2;
+	}
+	memcpy(orig, scratch, dims->nPoints * sizeof(qCx));
+}
+
 /* ********************************************************** doing Integration */
 
 // Integrates one lap, one iteration, on single thread.  Does several
@@ -376,8 +399,7 @@ void qGrinder::oneLap() {
 
 	qCheckReset();
 
-	// turn this on or off for testing to see if nyquist filter works
-	nyquistFilter(1.0, wave0, wave2);
+	//nyquistFilter(wave2);
 
 	if (tracePostLapWave) {
 		printf("lap %d finished, the wave:\n", lapSerial);
@@ -389,25 +411,6 @@ void qGrinder::oneLap() {
 }
 
 void grinder_oneLap(qGrinder *pointer) { pointer->oneLap(); }
-
-#define NYQUIST_WEIGHT     0.01
-#define ORIG_WEIGHT     (1 - NYQUIST_WEIGHT)
-
-// not sure about this.  REally not sure.
-void qGrinder::nyquistFilter(double strength, qCx *orig, qCx *scratch) {
-	qDimension *dims = space->dimensions;
-	if (traceNyquist) {
-		speedyLog("🧶 start of nyquistFilter nPoints=%d, start=%d, end=%d\n",
-			space->nPoints, dims->start, dims->end);
-	}
-
-	for (int ix = dims->start; ix < dims->end; ix++) {
-		// average with neighbors to smooth it out
-		scratch[ix] = orig[ix] * ORIG_WEIGHT
-			+ (orig[ix-1] + orig[ix+1]) * NYQUIST_WEIGHT / 2;
-	}
-	memcpy(orig, scratch, dims->nPoints * sizeof(qCx));
-}
 
 /* ********************************************************** threaded integration  */
 
