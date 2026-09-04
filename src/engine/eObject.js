@@ -28,9 +28,12 @@ class eObject {
 		// These do not consume bytes; they merely allow addressing.
 		// writable, enumerable and configurable are all false, so these are frozen.
 		Object.defineProperty(this, '_pointer_', {value: pointer});
-		Object.defineProperty(this, '_doubles_', {value: new Float64Array(window.Module.HEAPF64.buffer, pointer, 40)});
-		Object.defineProperty(this, '_ints_', {value: new Int32Array(window.Module.HEAP32.buffer, pointer, 80)});
-		Object.defineProperty(this, '_bytes_', {value: new Uint8Array(window.Module.HEAPU8.buffer, pointer, 320)});
+		Object.defineProperty(this, '_doubles_',
+			{value: new Float64Array(window.Module.HEAPF64.buffer, pointer, 40)});
+		Object.defineProperty(this, '_ints_',
+			{value: new Int32Array(window.Module.HEAP32.buffer, pointer, 80)});
+		Object.defineProperty(this, '_bytes_',
+			{value: new Uint8Array(window.Module.HEAPU8.buffer, pointer, 320)});
 	}
 }
 
