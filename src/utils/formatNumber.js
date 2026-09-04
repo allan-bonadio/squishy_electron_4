@@ -9,7 +9,7 @@ let formatterObj = new Intl.NumberFormat('en-US',
 	{notation: 'engineering', useGrouping: 'min2', signDisplay: 'negative',
 		minimumFractionDigits: 3});
 
-dblog(`formatter options: `, formatterObj.resolvedOptions());
+//dblog(`formatter options: `, formatterObj.resolvedOptions());
 
 let formatter = formatterObj.format;
 
