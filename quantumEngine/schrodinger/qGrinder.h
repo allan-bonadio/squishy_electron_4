@@ -163,6 +163,10 @@ struct qGrinder {
 	// = dtFactor * space->dt
 	double stretchedDt;
 
+	// for the nyquist filter
+	double nyquistWeight;
+	double origWeight;
+
 	// this is ℏ / 2 m_e dx², the coefficient on Schrodinger's for the second
 	// derivative. DX is the linear spacing between datapoints.  Actually,  this
 	// should be specific to the dimension that we're integrating along.  So it

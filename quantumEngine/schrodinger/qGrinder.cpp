@@ -26,9 +26,9 @@ static bool traceTrigger = false;
 
 static bool traceIntegration = false;
 static bool traceIntegrationDetailed = false;
-static bool tracePostLapWave = true;
+static bool tracePostLapWave = false;
 
-static bool traceJustWave = true;
+static bool traceJustWave = false;
 
 static bool dumpFFHiResSpectums = false;
 static bool traceIProd = false;
@@ -55,6 +55,7 @@ static std::runtime_error nullException("");
 qGrinder::qGrinder(qSpace *sp, int nGrWorkers, const char *lab)
 	: magic('Grnd'), space(sp), spect(NULL),
 		videoFP(.05), stretchedDt(1),
+		nyquistWeight(0.01), origWeight(0.99),
 		elapsedTime(0), nGrWorkers(nGrWorkers),
 		integrationEx(nullException), exceptionCode(""), _zero(0), hadException(false),
 		shouldBeIntegrating(false), isIntegrating(false),
@@ -154,6 +155,12 @@ void qGrinder::formatDirectOffsets(void) {
 
 	makeDoubleGetter(stretchedDt);
 	makeDoubleSetter(stretchedDt);
+
+	makeDoubleGetter(nyquistWeight);
+	makeDoubleSetter(nyquistWeight);
+	makeDoubleGetter(origWeight);
+	makeDoubleSetter(origWeight);
+
 	// d2Coeff
 	makeDoubleGetter(divergence);
 	makeDoubleGetter(elapsedTime);
@@ -316,8 +323,8 @@ void qGrinder::nyquistFilter(qCx *scratch) {
 
 	for (int ix = dims->start; ix < dims->end; ix++) {
 		// average with neighbors to smooth it out
-		scratch[ix] = orig[ix] * ORIG_WEIGHT
-			+ (orig[ix-1] + orig[ix+1]) * NYQUIST_WEIGHT / 2;
+		scratch[ix] = orig[ix] * origWeight
+			+ (orig[ix-1] + orig[ix+1]) * nyquistWeight / 2;
 	}
 	memcpy(orig, scratch, dims->nPoints * sizeof(qCx));
 }
@@ -399,7 +406,7 @@ void qGrinder::oneLap() {
 
 	qCheckReset();
 
-	//nyquistFilter(wave2);
+	nyquistFilter(wave2);
 
 	if (tracePostLapWave) {
 		printf("lap %d finished, the wave:\n", lapSerial);

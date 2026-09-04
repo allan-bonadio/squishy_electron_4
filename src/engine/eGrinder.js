@@ -36,13 +36,14 @@ class eGrinder extends eObject {
 	// eSpace we're in , creates its eGrinder
 	constructor(space) {
 		super();
-	//constructor(space, avatar, pointer) {
 		let pointer = qeFuncs.grinder_create(space._pointer_, 1, 'main');
-		/// ummm...
-		//prepForDirectAccessors(this, pointer);
-		// ?? this.label = window.Module.AsciiToString(this._label);
 		this.setPointer(pointer);
 		this.space = space;
+
+		let ny = getASetting('lapSettings', 'nyquistWeight');
+		this.nyquistWeight = ny;
+		this.origWeight = 1 - ny;
+
 // 		this.avatar = avatar;  // the avatar it loads into
 // 		avatar.grinder = this;
 
@@ -86,28 +87,32 @@ class eGrinder extends eObject {
 
 	get stretchedDt() { return this._doubles_[7]; }
 	set stretchedDt(a) { this._doubles_[7] = a; }
-	get divergence() { return this._doubles_[9]; }
-	get elapsedTime() { return this._doubles_[10]; }
-	set elapsedTime(a) { this._doubles_[10] = a; }
-	get nGrWorkers() { return this._ints_[23]; }
-	startAtomicOffset = 24;
-	get startAtomic() { return this._ints_[24]; }
+	get nyquistWeight() { return this._doubles_[8]; }
+	set nyquistWeight(a) { this._doubles_[8] = a; }
+	get origWeight() { return this._doubles_[9]; }
+	set origWeight(a) { this._doubles_[9] = a; }
+	get divergence() { return this._doubles_[11]; }
+	get elapsedTime() { return this._doubles_[12]; }
+	set elapsedTime(a) { this._doubles_[12] = a; }
+	get nGrWorkers() { return this._ints_[27]; }
+	startAtomicOffset = 28;
+	get startAtomic() { return this._ints_[28]; }
 
-	get _exceptionCode() { return this._pointer_ + 112; }
-	get hadException() { return Boolean(this._bytes_[127]); }
-	set hadException(a) { this._bytes_[127] = Boolean(a); }
-	get _label() { return this._pointer_ + 128; }
+	get _exceptionCode() { return this._pointer_ + 128; }
+	get hadException() { return Boolean(this._bytes_[143]); }
+	set hadException(a) { this._bytes_[143] = Boolean(a); }
+	get _label() { return this._pointer_ + 144; }
 
-	get shouldBeIntegrating() { return Boolean(this._bytes_[160]); }
-	set shouldBeIntegrating(a) { this._bytes_[160] = Boolean(a); }
-	get isIntegrating() { return Boolean(this._bytes_[161]); }
-	set isIntegrating(a) { this._bytes_[161] = Boolean(a); }
-	get pleaseFFT() { return Boolean(this._bytes_[162]); }
-	set pleaseFFT(a) { this._bytes_[162] = Boolean(a); }
-	get needsRepaint() { return Boolean(this._bytes_[163]); }
-	set needsRepaint(a) { this._bytes_[163] = Boolean(a); }
-	get sentinel() { return this._bytes_[164]; }
-	set sentinel(a) { this._bytes_[164] = a; }
+	get shouldBeIntegrating() { return Boolean(this._bytes_[176]); }
+	set shouldBeIntegrating(a) { this._bytes_[176] = Boolean(a); }
+	get isIntegrating() { return Boolean(this._bytes_[177]); }
+	set isIntegrating(a) { this._bytes_[177] = Boolean(a); }
+	get pleaseFFT() { return Boolean(this._bytes_[178]); }
+	set pleaseFFT(a) { this._bytes_[178] = Boolean(a); }
+	get needsRepaint() { return Boolean(this._bytes_[179]); }
+	set needsRepaint(a) { this._bytes_[179] = Boolean(a); }
+	get sentinel() { return this._bytes_[180]; }
+	set sentinel(a) { this._bytes_[180] = a; }
 
 	/* ******************* end of direct accessors */
 
