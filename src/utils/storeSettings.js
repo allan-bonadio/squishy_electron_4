@@ -201,9 +201,12 @@ export function createStoreSettings() {
 	// set in integration tab
 	makeParam('lapSettings', 'shouldBeIntegrating', false,	[false, true]);
 	//makeParam('lapSettings', 'chosenFP', 50, {min: 16, max: 60_001});
-	makeParam('lapSettings', 'dtFactor', 1, {min: 1e-6, max: 100, });
+	makeParam('lapSettings', 'dtFactor', 1, {min: 1e-3, max: 100, });
 	//makeParam('lapSettings', 'stepsPerLap', 10, {min: 2, max: 50});
 	//makeParam('lapSettings', 'lowPassFilter', 50, {min: 0, max: 75});
+
+	// used by nyquist filter
+	makeParam('lapSettings', 'nyquistWeight', 0.01, {min: 1e-6, max: 0.1, });
 
 	localStorage.removeItem("frameSettings");  // old name for lapSettings
 
@@ -228,7 +231,7 @@ export function createStoreSettings() {
 	makeParam('miscSettings', 'showingTab', 'wave',
 		['wave', 'voltage', 'space', 'integration', 'rainbow']);
 
-	// set by size box on main view
+	// set by size box on main view & vista
 	makeParam('miscSettings', 'viewHeight', 402, {min: 50, max: 1e4});
 	makeParam('miscSettings', 'vistaHeight', 402, {min: 50, max: 1e4});
 

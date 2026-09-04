@@ -10,7 +10,7 @@ import {getASetting} from '../utils/storeSettings.js';
 import sSettings from '../utils/sSettings.js';
 import InteStats from './InteStats.js';
 
-let traceSliderChanges = false;
+let traceSliderChanges = true;
 
 // set prop types
 const propTypes = {
@@ -23,11 +23,9 @@ const propTypes = {
 		getQuickDtFactor: PropTypes.func.isRequired,
 		setQuickDtFactor: PropTypes.func.isRequired,
 		saveDtFactor: PropTypes.func.isRequired,
-		//setDtFactor: PropTypes.func.isRequired,
-		//stepsPerLap: PropTypes.number.isRequired,
-		//setStepsPerLap: PropTypes.func.isRequired,
-		//lowPassFilter: PropTypes.number.isRequired,
-		//setLowPassFilter: PropTypes.func.isRequired,
+
+		nyquistWeight: PropTypes.number.isRequired,
+		setNyquistWeight: PropTypes.func.isRequired,
 	};
 
 
@@ -48,52 +46,91 @@ function SetIntegrationTab(props) {
 	// ...Math.max(0, 1 -Math.ceil(Math.log10(lowPassStep)));
 
 	// as user drags slider
-	const handleChange = (power, ix) => {
+	const handleDtChange = (power, ix) => {
 		if (traceSliderChanges)
 			console.log(`🏃🏽 🏃🏽 ch dtFactor ix=${ix}  power=${power}`);
 		props.setQuickDtFactor(power);
 	}
 
 	// when user lifts up, they're done (for now) so save it
-	const handlePointerUp = (ev) => {
+	const handleDtPointerUp = (ev) => {
 		props.saveDtFactor();
 	}
 
+	const handleNyChange = (power, ix) => {
+		if (traceSliderChanges)
+			console.log(`🏃🏽 🏃🏽 ch ny ix=${ix}  power=${power}`);
+		props.setNyquistWeight(power);
+	}
+
+	// when user lifts up, they're done (for now) so save it
+	const handleNyPointerUp = (ev) => {}
+
 	// Unlike other tabs, all these are instant-update.
 
-	let mini = sSettings.minMaxes.lapSettings.dtFactor.min;
-	let maxi = sSettings.minMaxes.lapSettings.dtFactor.max;
+	let dtMini = sSettings.minMaxes.lapSettings.dtFactor.min;
+	let dtMaxi = sSettings.minMaxes.lapSettings.dtFactor.max;
+
+	let nyMini = sSettings.minMaxes.lapSettings.nyquistWeight.min;
+	let nyMaxi = sSettings.minMaxes.lapSettings.nyquistWeight.max;
 
 	return (<div className='SetIntegrationTab controlPanelPanel'>
 		<div className='sliderBlock'>
 			<h3>Integration Controls</h3>
 
-			<p className='discussion'>
+			<p className='discussion genDesc'>
 			Schrodinger's equation can diverge (explode) into high frequencies,
-			ruining a simulation.
+			ruining a simulation.  Here are some ways you can deal with it.
+			</p>
+
+			<h4>∆t</h4>
+			<p className='discussion'>
+			The time increment, <i>∆t</i>, is crucial.
 			In order to guarantee convergence (not exploding),
-			we must use a time increment, <i>∆t</i>, small enough, according to the
-			von Neumann stability criteria.
-			This might lead to very slow integration.
-			You can speed this up a bit by bending the rules and
-			stretching <i>∆t</i>, at the risk of diverging.
+			it must be small enough for a smooth progression of virtual time.
+			But, this might lead to a very slow integration.
 			</p>
 
 			<LogSlider
 				unique='dtFactorSlider'
 				className='dtFactorSlider cpSlider'
-				label='stretch factor for time increment'
-				minLabel={mini}
-				maxLabel={maxi}
+				label='<i>∆t</i>'
+				minLabel={dtMini}
+				maxLabel={dtMaxi}
 
 				currentPower={props.getQuickDtFactor()}
-				sliderPowerMin={mini}
-				sliderPowerMax={maxi}
+				sliderPowerMin={dtMini}
+				sliderPowerMax={dtMaxi}
 				stepsPerDecade={6}
 
-				handleChange={handleChange}
+				handleChange={handleDtChange}
 
-				handlePointerUp={handlePointerUp}
+				handlePointerUp={handleDtPointerUp}
+			/>
+
+
+			<h4>Nyquist Filter</h4>
+			<p className='discussion nyquistDesc'>
+			When a run starts diverging, the first frequency affected is
+			the Nyquist frequency, in this case {N}.
+
+			</p>
+
+			<LogSlider
+				unique='nyquistSlider'
+				className='nyquistSlider cpSlider'
+				label='filtering out Nyquist'
+				minLabel={nyMini}
+				maxLabel={nyMaxi}
+
+				currentPower={props.nyquistWeight}
+				sliderPowerMin={nyMini}
+				sliderPowerMax={nyMaxi}
+				stepsPerDecade={6}
+
+				handleChange={handleNyChange}
+
+				handlePointerUp={handleNyPointerUp}
 			/>
 
 		</div>

@@ -67,6 +67,8 @@ export class ControlPanel extends React.Component {
 
 			// official dtFactor here in the state.  quick one on this.quickDtFactor
 			dtFactor: getASetting('lapSettings', 'dtFactor'),
+			nyquistWeight: getASetting('lapSettings', 'nyquistWeight'),
+
 			showingTab: getASetting('miscSettings', 'showingTab'),
 		}
 
@@ -276,9 +278,13 @@ export class ControlPanel extends React.Component {
 		}
 	}
 
-// props.getQuickDtFactor
-// this.getQuickDtFactor
 
+	/* ************************************************* nyquist Weight */
+
+
+	setNyquistWeight = (nyquistWeight) => {
+		this.setState({nyquistWeight});
+	}
 
 	/* ********************************************** misc */
 
@@ -470,6 +476,10 @@ export class ControlPanel extends React.Component {
 			saveDtFactor={this.saveDtFactor}
 			dtFactor={this.state.dtFactor}
 			setDtFactor={this.setDtFactor}
+
+			nyquistWeight={this.state.nyquistWeight}
+			setNyquistWeight={this.setNyquistWeight}
+
 			N={this.N}
 		/>;
 	}
