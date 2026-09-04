@@ -36,7 +36,7 @@ function createGoodPowers(spd, mini, maxi, substitutes) {
 }
 
 
-/* ****************************************************************** component */
+/* ********************************************* component */
 
 // a class component so we have a This to average setting so it doesn't vibrate.
 // but it uses no state - should it be a func component that saves the average?
@@ -65,6 +65,10 @@ class LogSlider extends React.Component {
 		twoSided: PropTypes.bool,  // true to also handle negative numbers and zeros
 
 		stepsPerDecade: PropTypes.number.isRequired,
+		nDecimals: PropTypes.oneOfType([
+			PropTypes.string,
+			PropTypes.number,
+		]),
 
 		// because sometimes floating point arithmetic leaves roundoff error, as a convenience,
 		// we can trim your power numbers.  The indexes are always integers; no need to round them.
@@ -175,6 +179,7 @@ class LogSlider extends React.Component {
 		const spd = p.stepsPerDecade;
 		const cur = p.currentPower;
 		if (undefined == cur) debugger;
+		const nDecimals = +p.nDecimals;
 
 		// the actual css ID used for the datalist.  doesn't include class?
 		const uniqueId = `LogSliderDataList-${p.unique.replace(/\W+/, '_')}`;
@@ -191,15 +196,18 @@ class LogSlider extends React.Component {
 		if (traceThisSlider.test(p.unique)) console.log(
 			`LogSlider render..  spd=${spd}, cur=${cur}   twoIx=${twoIx} props=`, p);
 
+		const minLabel = p.minLabel ? p.minLabel.toFixed(nDecimals) : 'low';
+		const maxLabel = p.maxLabel ? p.maxLabel.toFixed(nDecimals) : 'high';
+
 		// the default for this is annotation true, so undefined means true.
 		const annotation = (p.annotation ?? true)
 			?   <aside>
-					<div className='left'>{p.minLabel ?? 'low'}</div>
+					<div className='left'>{minLabel}</div>
 					<div className='middle'>
-						<b>{p.label ?? 'how much'}</b>: <big>{thousands(cur)}</big>
+						<b>{p.label ?? 'how much'}</b>: <big>{cur.toFixed(nDecimals)}</big>
 						{this.wasOriginal}
 					</div>
-					<div className='right'>{p.maxLabel ?? 'high'}</div>
+					<div className='right'>{maxLabel}</div>
 				</aside>
 			: undefined;
 

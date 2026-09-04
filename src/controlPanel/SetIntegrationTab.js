@@ -49,7 +49,7 @@ function SetIntegrationTab(props) {
 	const handleDtChange = (power, ix) => {
 		if (traceSliderChanges)
 			console.log(`🏃🏽 🏃🏽 ch dtFactor ix=${ix}  power=${power}`);
-		props.setQuickDtFactor(power);
+		props.setQuickDtFactor(power / 1000);
 	}
 
 	// when user lifts up, they're done (for now) so save it
@@ -68,8 +68,8 @@ function SetIntegrationTab(props) {
 
 	// Unlike other tabs, all these are instant-update.
 
-	let dtMini = sSettings.minMaxes.lapSettings.dtFactor.min;
-	let dtMaxi = sSettings.minMaxes.lapSettings.dtFactor.max;
+	let dtMini = sSettings.minMaxes.lapSettings.dtFactor.min * 1000;
+	let dtMaxi = sSettings.minMaxes.lapSettings.dtFactor.max * 1000;
 
 	let nyMini = sSettings.minMaxes.lapSettings.nyquistWeight.min;
 	let nyMaxi = sSettings.minMaxes.lapSettings.nyquistWeight.max;
@@ -94,11 +94,12 @@ function SetIntegrationTab(props) {
 			<LogSlider
 				unique='dtFactorSlider'
 				className='dtFactorSlider cpSlider'
-				label='<i>∆t</i>'
+				label='∆t'
 				minLabel={dtMini}
 				maxLabel={dtMaxi}
 
-				currentPower={props.getQuickDtFactor()}
+				currentPower={props.getQuickDtFactor() * 1000}
+				nDecimals='0'
 				sliderPowerMin={dtMini}
 				sliderPowerMax={dtMaxi}
 				stepsPerDecade={6}
@@ -112,7 +113,8 @@ function SetIntegrationTab(props) {
 			<h4>Nyquist Filter</h4>
 			<p className='discussion nyquistDesc'>
 			When a run starts diverging, the first frequency affected is
-			the Nyquist frequency, in this case {N}.
+			the Nyquist frequency, in this case {N/2}.
+			This is a notch filter that reduces that frequency.
 
 			</p>
 
@@ -124,6 +126,7 @@ function SetIntegrationTab(props) {
 				maxLabel={nyMaxi}
 
 				currentPower={props.nyquistWeight}
+				nDecimals='6'
 				sliderPowerMin={nyMini}
 				sliderPowerMax={nyMaxi}
 				stepsPerDecade={6}
