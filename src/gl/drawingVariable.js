@@ -208,10 +208,10 @@ export class drawingAttribute extends drawingVariable {
 				+` glBuffer to tupleWidth=${this.tupleWidth}`);
 
 		gl.bufferData(gl.ARRAY_BUFFER, floatArray, gl.DYNAMIC_DRAW);
-		if (traceAttributes || traceAttributesFull)
-
+		if (traceAttributes || traceAttributesFull) {
 			dblog(`🍯 reload drawingAttribute '${this.varName}' in ${this.drawing.drawingName}`
 				+ ` reloaded, ${this.nTuples}  tuples of ${this.tupleWidth} floats each`);
+		}
 
 		if (traceAttributesFull) {
 			for (let t = 0; t < this.nTuples; t++) {

@@ -212,6 +212,9 @@ export class WaveView extends React.Component {
 
 		let betweenBumpers = this.canvasInnerWidth - 2 * this.bumperWidth;
 
+		// insert this into the article to see when you get focus
+		//onFocus={ev => console.log(`WaveView focus ON`)}
+
 		// the glScene is one layer.  Over that is the widget area	Bumpers are outside.
 		return (
 		<article className='WaveView'
@@ -219,7 +222,6 @@ export class WaveView extends React.Component {
 				display: (p.show2D ? 'flex' : 'none')}}
 			onPointerEnter={this.hoverEnter} onPointerLeave={this.hoverLeave}
 			onPointerUp={this.finishIntegration}
-			onFocus={ev => console.log(`WaveView focus ON`)}
 			ref={this.grabWaveViewEl}>
 
 			<div className='bumper left' key='left'
