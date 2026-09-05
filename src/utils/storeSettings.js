@@ -200,10 +200,7 @@ export function createStoreSettings() {
 
 	// set in integration tab
 	makeParam('lapSettings', 'shouldBeIntegrating', false,	[false, true]);
-	//makeParam('lapSettings', 'chosenFP', 50, {min: 16, max: 60_001});
-	makeParam('lapSettings', 'dtFactor', 1, {min: 1e-3, max: 100, });
-	//makeParam('lapSettings', 'stepsPerLap', 10, {min: 2, max: 50});
-	//makeParam('lapSettings', 'lowPassFilter', 50, {min: 0, max: 75});
+	makeParam('lapSettings', 'dtFactor', 1, {min: 1e-3, max: 3, });
 
 	// used by nyquist filter
 	makeParam('lapSettings', 'nyquistWeight', 0.01, {min: 1e-6, max: 0.1, });
