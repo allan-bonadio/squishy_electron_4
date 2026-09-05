@@ -156,7 +156,7 @@ export class flatDrawing extends abstractDrawing {
 		);
 		if (traceFlatDrawing) console.log(`♭♭♭ barWidth frac of 1= ${barWidth}`);
 
-		this.vertexCount = nPoints * 2;	 // nPoints * vertsPerBar
+		this.vertexCount = nStates * 2;	 // nStates * vertsPerBar
 		this.rowFloats = 4;
 		new drawingAttribute('row', this, this.rowFloats,
 			() => {
@@ -201,7 +201,9 @@ export class flatDrawing extends abstractDrawing {
 			this.avatar.dumpComplexViewBuffer(this.scene.flatAvatarID, this.nPoints,
 					`♭♭♭ before drawing in flatDrawing.js`);
 
-		gl.drawArrays(gl.TRIANGLE_STRIP, 0, this.vertexCount);
+		let start = this.space.start * 2;
+
+		gl.drawArrays(gl.TRIANGLE_STRIP, start, this.vertexCount);
 		if (traceFlatDrawing) {
 			console.log(`♭♭♭just drewArays-flat on avatar ptr=${this.avatar._pointer_} `
 				+` this.avatar.label=${this.avatar.label}, `
@@ -211,11 +213,11 @@ export class flatDrawing extends abstractDrawing {
 		if (traceDrawLines) {
 			gl.lineWidth(1);  // it's the only option anyway
 
-			gl.drawArrays(gl.GL_LINE_STRIP, 0, this.vertexCount);
+			gl.drawArrays(gl.GL_LINE_STRIP, start, this.vertexCount);
 		}
 
 		if (traceDrawPoints)
-			gl.drawArrays(gl.POINTS, 0, this.vertexCount);
+			gl.drawArrays(gl.POINTS, start, this.vertexCount);
 
 		// i think this is problematic
 		if (traceAvatarAfterDrawing) {
