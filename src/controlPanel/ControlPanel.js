@@ -424,8 +424,14 @@ export class ControlPanel extends React.Component {
 	resetVoltageHandler = (ev) => {
 		const voltageParams = getAGroup('voltageParams');
 		this.setVoltageParams(voltageParams);
-		this.space.vDisp.setAutoRange(voltageParams);
-		this.space.updateDrawnVoltagePath();
+		//this.space.vDisp.decideBottomHeightVolts();
+		//this.space.vDisp.setAutoRange(voltageParams);
+		//this.setAndRenderFamiliarVoltage(voltageParams);
+		//this.space.updateDrawnVoltagePath();
+
+		this.space.vDisp.setFamiliarVoltage(vP);
+		this.space.vDisp.decideBottomHeightVolts();
+		this.space.updateDrawnVoltagePath();  // visible change on screen
 	}
 
 	renderVoltageTab = () => {
