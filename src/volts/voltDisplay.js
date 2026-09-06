@@ -33,8 +33,49 @@ const isOK = (c) => {
 	}
 }
 
+
+/* Guilde to voltDisplay Fields:
+
+label — just an identifier for debugging
+
+space — The Space all of this is in
+	copied from space: start, end, continuum
+	halfN = N/2 or nStates/2
+
+barWidth — width of a canvas bar = drawingWidth / N
+
+voltParams:
+	voltageBreed, voltageCenter, blockWidth,
+	flatScale, blockScale, canyonPower, canyonScale
+
+drawingLeft, drawingWidth — where (x) to draw the volt profile
+
+measuredMinVolts, measuredMaxVolts — given a voltage buffer,
+	call findVoltExtremes() to get the max and min in the buffer
+
+bottomVolts, heightVolts — voltArea displayed bottom is at bottomVolts; top is at bottom+height
+setBottomVolts(), setHeightVolts() —
+
+points — list of vertices in voltage profile <path, each a short string, collected is the d attribute for the <path
+
+scrollCount, zoomCount
+
+setAPoint() — use this to alter a single point in the voltage  buffer.  Invalidates VoltArea so it rerenders.
+
+ƒ setFamiliarDomain(voltageParams, vWidth, vHeight)
+
+ƒ setFamiliarVoltage(voltageParams) — creates all the voltage profiles the Volt tab can do
+
+viewCanvasWidth, viewCanvasHeight — actual size of VoltArea (= size of Canvas)
+
+voltageBuffer — actual buffer as used in integration
+
+xScale, yScale, yUpsideDown — mapping from volts to coordinates on VoltArea
+*/
+
+
 // this contains the voltage scrolling and zooming numbers and what's
-// visible. NOT A COMPONENT; just an object that components use to
+// visible. NOT A react COMPONENT; just an object that components use to
 // manage voltage numbers and buffers.
 export class voltDisplay {
 	// make it from given voltSettings obj. Note we don't get the buffer from the space,
@@ -80,13 +121,6 @@ export class voltDisplay {
 		// in case the numbers are crazy
 		this.decideBottomHeightVolts();
 	}
-
-	// set ANY field, from the 'from' argument, into this
-	// from = {aField: aValue, anotherField: anotherValue}
-	// does anybody use this?>!?  TODO
-	// setSettings(from) {
-	// 	Object.assign(this, from);
-	// }
 
 	// create a voltDisplay the way the space needs it.  Also the view canvas.
 	static newForSpace(space, viewCanvasHeight) {

@@ -134,11 +134,6 @@ const familiarVolts = {
 			bottom = -MARGIN;
 			break;
 
-		// case 'slot':
-		// 	height = abs(voltageParams.slotScale) + 2*MARGIN;
-		// 	bottom = -abs(voltageParams.slotScale) - MARGIN;
-		// 	break;
-
 		case 'block':
 			height = abs(voltageParams.blockScale) + 2*MARGIN
 			bottom = -MARGIN;
