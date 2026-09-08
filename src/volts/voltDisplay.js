@@ -119,7 +119,9 @@ export class voltDisplay {
 
 		// adjust the range over which the user can slide the bottomVolts,
 		// in case the numbers are crazy
-		this.decideBottomHeightVolts();
+		//this.decideBottomHeightVolts();
+		this.bottomVolts = getASetting('voltageSettings', 'bottomVolts');
+		this.heightVolts = getASetting('voltageSettings', 'heightVolts');
 	}
 
 	// create a voltDisplay the way the space needs it.  Also the view canvas.
