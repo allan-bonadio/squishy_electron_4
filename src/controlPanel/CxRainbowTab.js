@@ -4,14 +4,25 @@
 */
 
 import React from 'react';
-//import PropTypes, {checkPropTypes} from 'prop-types';
+import PropTypes from 'prop-types';
 
 import GLScene from '../gl/GLScene.js';
 
 const RAINBOW_SIZE = 200;
 
+const propTypes = {
+	// only present after eSpace promise
+	space: PropTypes.shape({
+		pointer: PropTypes.number,
+		dimensions: PropTypes.arrayOf(PropTypes.object),
+	}),
+};
+
+
 // a component that renders the rainbow circle.  No props.
 function CxRainbowTab(props) {
+	cfpt(propTypes, props);
+
 	return <div className='CxRainbowTab  controlPanelPanel'
 			title="This tab shows the colors of the wave."
 			style={{textAlign: 'left'}}>
@@ -21,6 +32,7 @@ function CxRainbowTab(props) {
 			<div key='theCanvas'
 					style={{flex: '0 0 100px', padding: '1em', backgroundColor: 'black'}}>
 				<GLScene
+					space={props.space}
 					sceneClassName='rainbowScene' sceneName='CxRainbow'
 					paintingNeeds={{}}
 					canvasInnerWidth={RAINBOW_SIZE}

@@ -71,6 +71,7 @@ const propTypes = {
 
 	resetWaveHandler: PropTypes.func.isRequired,
 	resetVoltageHandler: PropTypes.func.isRequired,
+	resetVoltageHandler: PropTypes.func.isRequired,
 
 	activate2D: PropTypes.func.isRequired,
 	activate3D: PropTypes.func.isRequired,
@@ -203,6 +204,11 @@ function CPToolbar(props) {
 		</div>
 
 		{render2D3D()}
+
+		<div className='toolbarWidget resetButton all'>
+				<button className='dark' onClick={props.resetAllHandler} >Reset All</button>
+		</div>
+
 	</div>);
 }
 
@@ -214,3 +220,4 @@ export default CPToolbar;
 // 				<button className={'twoD3D '+(context.show3D ? 'butOn' : 'butOff')}
 // 						onClick={p.activate3D}>3D</button>
 // 		</div>
+// style='font-size: .64'

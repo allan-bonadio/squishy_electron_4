@@ -21,20 +21,20 @@ let traceRainbowDrawing = false;
 const vertexShaderSrc = `${cx2rygb}
 #line 23
 precision highp float;
-attribute vec2 pos;
+attribute vec2 sliceEdge;
 //attribute vec3 col;
-attribute vec2 wave;
+attribute vec2 colorWave;
 varying vec3 colorVar;
 
 void main() {
 	gl_PointSize = 4.;
-	gl_Position = vec4(pos, 0, 1);
+	gl_Position = vec4(sliceEdge, 0, 1);
 
 	// for testing w fake color
 	//colorVar = col;
 
 	// for actual testing of cx to rygb
-	colorVar = cx2rygb(wave);
+	colorVar = cx2rygb(colorWave);
 }
 `;
 
@@ -76,44 +76,44 @@ export class rainbowDrawing extends abstractDrawing {
 		if (traceRainbowDrawing)
 			console.log(`🌈 🌈 rainbow: creatingVariables`);
 
-		const pos = this.pos = this.avatar.attachViewBuffer(
-			this.scene.posAvatarID, null, 2, nVERTS, 'pos');
+		this.sliceEdge = this.avatar.attachViewBuffer(
+			this.scene.sliceEdge, null, 2, nVERTS, 'sliceEdge');
 		//const col = this.col = this.avatar.attachViewBuffer(1, null, 3, nVERTS, 'col');
-		const wave = this.wave = this.avatar.attachViewBuffer(this.scene.colorAvatarID, null, 2, nVERTS, 'wave');  // unused?  TODO
+		this.colorWave = this.avatar.attachViewBuffer(this.scene.colorWave, null, 2, nVERTS, 'colorWave');
 
 		// load the data before sending off the buffers
 		this.loader(this.avatar);
 
-		this.posAttr = new drawingAttribute('pos', this, 2, () => {
-			return pos;
+		this.sliceEdgeAttr = new drawingAttribute('sliceEdge', this, 2, () => {
+			return this.sliceEdge;
 		});
 
 		// this.colAttr = new drawingAttribute('col', this, 3, () => {
 		//	return col;
 		// });
 
-		this.waveAttr = new drawingAttribute('wave', this, 2, () => {
-			return wave;
+		this.colorWaveAttr = new drawingAttribute('colorWave', this, 2, () => {
+			return this.colorWave;
 		});
 	}
 
 
 	// load up the avatar with numbers.	 We generate bare coords ±1
 	loader(avatar) {
-		const pos = avatar.getViewBuffer(this.scene.rgbVanePosAvatarID);
+		const sliceEdge = avatar.getViewBuffer(this.scene.rgbVanesliceEdgeAvatarID);
 		//const col = avatar.getViewBuffer(1);
-		const wave = avatar.getViewBuffer(this.scene.rgbVaneColorAvatarID);
+		const colorWave = avatar.getViewBuffer(this.scene.rgbVaneColorAvatarID);
 		let p = 0, c = 0, w = 0;
 		const RADIUS = 1;
 		const originX = 0, originY = 0;
 
 		// the starting point
-		pos[p+0] = originX;
-		pos[p+1] = originY;
+		this.sliceEdge[p+0] = originX;
+		this.sliceEdge[p+1] = originY;
 
 		///col[c+0] = col[c+1] = col[c+2] = 1;
 
-		wave[w+0] = wave[w+1] = 0;
+		this.colorWave[w+0] = this.colorWave[w+1] = 0;
 
 		// all the vertices, plus the initial [1] vert again
 		for (let s = 0; s <= nSEGS; s++) {
@@ -124,20 +124,20 @@ export class rainbowDrawing extends abstractDrawing {
 			let angle = s * RADIANS_PER_SEG;
 			let si0 = Math.sin(angle);
 			let co0 = Math.cos(angle);
-			// console.log(`seg: ${s}  angle: ${angle.toFixed(4)} `
-			//	+` degrees: ${(angle * 180 / 3.1415926535898).toFixed(4)} `
-			//	+` sine ${si0.toFixed(4)}	cosine ${co0.toFixed(4)}`);
+			console.log(`seg: ${s}  angle: ${angle.toFixed(4)} `
+			+` degrees: ${(angle * 180 / 3.1415926535898).toFixed(4)} `
+			+` sine ${si0.toFixed(4)}	cosine ${co0.toFixed(4)}`);
 
-			pos[p + 0] = RADIUS * co0 + originX;
-			pos[p + 1] = RADIUS * si0 + originY;
+			this.sliceEdge[p + 0] = RADIUS * co0 + originX;
+			this.sliceEdge[p + 1] = RADIUS * si0 + originY;
 
 
 			// col[c + 0] = (si0 + 1) / 2;
 			// col[c + 1] = (co0 + 1) / 2;
 			// col[c + 2] = 0;
 
-			wave[w + 0] = co0;
-			wave[w + 1] = si0;
+			this.colorWave[w + 0] = co0;
+			this.colorWave[w + 1] = si0;
 
 			// complexToRYGB(&cx, colors[p]);
 		}
@@ -160,7 +160,7 @@ export class rainbowDrawing extends abstractDrawing {
 		//this.theAttribute?.reloadVariable();
 
 		//this.posAttr.reloadVariable();
-		//this.waveAttr.reloadVariable();
+		//this.colorWaveAttr.reloadVariable();
 
 		// this.colAttr = new drawingAttribute('col', this, 3, () => {
 		//	return col;

@@ -429,9 +429,16 @@ export class ControlPanel extends React.Component {
 		//this.setAndRenderFamiliarVoltage(voltageParams);
 		//this.space.updateDrawnVoltagePath();
 
-		this.space.vDisp.setFamiliarVoltage(vP);
+		this.space.vDisp.setFamiliarVoltage(voltageParams);
 		this.space.vDisp.decideBottomHeightVolts();
 		this.space.updateDrawnVoltagePath();  // visible change on screen
+	}
+
+	// fills in the voltage buffer with familiar voltage most recently set for
+	// stored voltageParams. called when user clicks reset voltage on cptoolbar
+	resetAllHandler = (ev) => {
+		localStorage.clear();
+		location = location;
 	}
 
 	renderVoltageTab = () => {
@@ -493,7 +500,9 @@ export class ControlPanel extends React.Component {
 	/* ********************************************** rainbow tab */
 
 	// Just a display.  No controls, no settings.
-	renderRainbowTab = () => <CxRainbowTab />;
+	renderRainbowTab = () => {
+		return <CxRainbowTab space={this.space} />;
+	}
 
 	/* ********************************************** tabs */
 
@@ -557,6 +566,7 @@ export class ControlPanel extends React.Component {
 
 			// startOver buttons
 			resetWaveHandler={this.resetWaveHandler}
+			resetVoltageHandler={this.resetVoltageHandler}
 			resetVoltageHandler={this.resetVoltageHandler}
 
 			N={this.N}
