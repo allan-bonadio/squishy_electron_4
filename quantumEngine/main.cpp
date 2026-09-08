@@ -17,7 +17,7 @@
 // all these param names must be lower case for some reason.
 EM_JS(int, qeStarted, (int max_dimensions, int n_threads, int sqdevel), {
 	const started = Date.now();
-	const bailoutTime = started + 300_000;
+	const bailoutTime = started + 30_000;
 
 	// sometimes these things start in the wrong order
 	let inter = setInterval(() => {
@@ -38,7 +38,7 @@ EM_JS(int, qeStarted, (int max_dimensions, int n_threads, int sqdevel), {
 			}
 			console.log(`try again later, see if cpp set up yet  `, tim.toTimeString());
 		}
-	}, 500);
+	}, 2000);
 });
 
 
