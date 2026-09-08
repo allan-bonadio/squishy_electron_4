@@ -183,7 +183,8 @@ export function createStoreSettings() {
 	makeParam('voltageParams', 'canyonPower', 2, {min: 0.1, max: 20});
 	makeParam('voltageParams', 'canyonScale', 0, {min: 0, max: AMPLE_VOLTS});
 
-	// those were Params - only active when user clicks Set or whatever.  Next are instantaneous settings.
+	// those were Params - only active when user clicks Set or whatever.  Next
+	// are instantaneous settings.
 
 	// sets whether the voltage line shows or not.  Saved here but also in ControlPanel state
 	makeParam('voltageSettings', 'showVoltage', 'hover', ['always', 'hover', 'never']);

@@ -10,23 +10,23 @@ import {getASetting} from '../utils/storeSettings.js';
 import sSettings from '../utils/sSettings.js';
 import InteStats from './InteStats.js';
 
-let traceSliderChanges = true;
+let traceSliderChanges = false;
 
 // set prop types
 const propTypes = {
-		// only present after eSpace promise
-		space: PropTypes.shape({
-			pointer: PropTypes.number,
-			dimensions: PropTypes.arrayOf(PropTypes.object).isRequired,
-		}),
+	// only present after eSpace promise
+	space: PropTypes.shape({
+		pointer: PropTypes.number,
+		dimensions: PropTypes.arrayOf(PropTypes.object),
+	}),
 
-		getQuickDtFactor: PropTypes.func.isRequired,
-		setQuickDtFactor: PropTypes.func.isRequired,
-		saveDtFactor: PropTypes.func.isRequired,
+	getQuickDtFactor: PropTypes.func.isRequired,
+	setQuickDtFactor: PropTypes.func.isRequired,
+	saveDtFactor: PropTypes.func.isRequired,
 
-		nyquistWeight: PropTypes.number.isRequired,
-		setNyquistWeight: PropTypes.func.isRequired,
-	};
+	nyquistWeight: PropTypes.number.isRequired,
+	setNyquistWeight: PropTypes.func.isRequired,
+};
 
 
 

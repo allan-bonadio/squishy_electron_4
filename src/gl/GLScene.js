@@ -73,10 +73,11 @@ const propTypes = {
 // - its own closure and variable values.
 // for the main GLScene:
 // Can NOT instantiate this until after the space promise has resolved
-// TODO: split this into general gl canvas, and WaveCanvas
+// TODO: split this into general gl canvas, and WaveCanvas or 3d canvas
 function GLScene(props) {
 	cfpt(propTypes, props);
 	const p = props;
+
 	//dblog(`starting GLScene(render), sceneName=${p.sceneName}`);
 
 	if (traceMatrix && p.paintingNeeds.unifiedMatrix)
