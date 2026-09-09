@@ -17,6 +17,10 @@ const propTypes = {
 	max: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
 	step: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
 
+	// mins and maxes for the text box, if differrent
+	tMin: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+	tMax: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+
 	handleChange: PropTypes.func,
 
 	// dom ID of <datalist> element
@@ -69,7 +73,7 @@ function TextNSlider(props) {
 		// to tweak the display in the text box, do it in the render.  Then when retrieving the number, convert it back.
 		controls = <>
 			<input type='number' placeholder={p.label || ''} name={p.label}
-					value={value} min={p.min} max={p.max}
+					value={value} min={p.tMin ?? p.min} max={p.tMax ?? p.max}
 					step={p.step || 'any'}
 					size='7'
 					onChange={handleText} />

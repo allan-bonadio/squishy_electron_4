@@ -164,7 +164,7 @@ export function createStoreSettings() {
 	// truth.
 
 	makeParam('waveParams', 'waveBreed', 'gaussian', ['circular', 'standing', 'gaussian', 'chord']);
-	makeParam('waveParams', 'waveFrequency', 6, {min: -5, max: 5, step: 0.5});
+	makeParam('waveParams', 'waveFrequency', 6, {min: -10, max: 10, step: 0.5});
 	makeParam('waveParams', 'pulseWidth', 10, {min: 1, max: 20});
 	makeParam('waveParams', 'pulseCenter', 20, {min: 0, max: 100});
 
@@ -201,7 +201,7 @@ export function createStoreSettings() {
 
 	// set in integration tab
 	makeParam('lapSettings', 'shouldBeIntegrating', false,	[false, true]);
-	makeParam('lapSettings', 'dtFactor', 1, {min: 1e-3, max: 3, });
+	makeParam('lapSettings', 'dtFactor', .5, {min: 1e-3, max: 3, });
 
 	// used by nyquist filter
 	makeParam('lapSettings', 'nyquistWeight', 0.01, {min: 1e-6, max: 0.1, });

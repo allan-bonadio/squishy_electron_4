@@ -145,6 +145,8 @@ function SetWaveTab(props) {
 			value={+waveParams.waveFrequency}
 			min={-highestFrequency}
 			max={highestFrequency}
+			tMin={-50}
+			tMax={50}
 			step={'standing' == breed ? .5 : 1}
 			handleChange={setWaveFrequency}
 			title={`how many cycles your wave should have, along the ${alongThe}`}
