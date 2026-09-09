@@ -20,7 +20,7 @@ let traceTwoSided = false;
 // twoSided results in a two-sided scale, going through positives,
 // negatives, and zero.  It's symmetric so absolute highest is
 // negative of absolute lowest.  So if the one-sided slider has 7
-// indices, the twoSided slider has 15: 7 on the positive side, 7 on
+// indices, the twoSided slider has 15 positions: 7 on the positive side, 7 on
 // the negative side, and zero.  sliderPowerMin and sliderPowerMax describe the
 // positive side; the negative side is the same in reverse order.
 

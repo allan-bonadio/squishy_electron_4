@@ -11,7 +11,7 @@ import qeConsts from './qeConsts.js';
 
 let traceCreation = false;
 //let traceHighest = false;
-let traceAttachViewBuffer = true;
+let traceAttachViewBuffer = false;
 
 // HOW TO USE     use avatars this way:
 // create one with eAvatar.createAvatar()
@@ -92,7 +92,7 @@ class eAvatar extends eObject {
 	// array in JS
 	attachViewBuffer(whichBuffer, useThisMemory,
 				nCoordsPerVertex, nVertices, name) {
-		if (traceAttachViewBuffer) console.trace(`attachViewBuffer 🧶 name:${name} `
+		if (traceAttachViewBuffer) dblog(`attachViewBuffer 🧶 name:${name} `
 			+` whichBuffer=${whichBuffer}`)
 		if (this.typedArrays[whichBuffer]) {
 			console.trace(`🚦 duplicate buffer \x1b[33m name:${name} `
