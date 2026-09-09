@@ -567,7 +567,7 @@ export class ControlPanel extends React.Component {
 			// startOver buttons
 			resetWaveHandler={this.resetWaveHandler}
 			resetVoltageHandler={this.resetVoltageHandler}
-			resetVoltageHandler={this.resetVoltageHandler}
+			resetAllHandler={this.resetAllHandler}
 
 			N={this.N}
 			space={this.space}
