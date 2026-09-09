@@ -102,6 +102,34 @@ export class flatDrawing extends abstractDrawing {
 		this.fragmentShaderSrc = fragmentShaderSrc;
 	}
 
+	relaxHighest = () => {
+		if (!this.maxHeight) {
+			// first time around
+			this.maxHeight = this.avatar.double0;
+			return;
+		}
+		let ratio = Math.abs(this.avatar.double0 / this.maxHeight);
+		if (ratio > 1) {
+			// too high - fix it immediately
+			this.maxHeight = (this.maxHeight * 15 + this.avatar.double0) / 16;
+			//this.maxHeight = this.avatar.double0;
+			return;
+		}
+
+		if (ratio < .5) {
+			//dblog(4);
+			this.maxHeight = (this.maxHeight * 3 + this.avatar.double0) / 4;
+		}
+		else if (ratio < .9) {
+			//dblog(16);
+			this.maxHeight = (this.maxHeight * 15 + this.avatar.double0) / 16;
+		}
+		else {
+			//dblog(256);
+			this.maxHeight = (this.maxHeight * 255 + this.avatar.double0) / 256;
+		}
+	}
+
 	// loads view buffer from corresponding wave, calculates highest norm.
 	// one time set up of variables for this drawing, every time canvas and scene is recreated
 	createVariables() {
@@ -112,14 +140,16 @@ export class flatDrawing extends abstractDrawing {
 		this.maxHeightUniform = new drawingUniform('maxHeight', this,
 			() => {
 				// fresh out of the loader, maxHeight wobbles up and down. Smooth it.
-				if (!this.maxHeight)  // ??
+				if (!this.maxHeight) {
+					// first time around
 					this.maxHeight = this.avatar.double0;
+				}
 				else {
-					// relax changes.  how	quickly?
+					// relax changes.  how	quickly? depends on how fast it's changing
+					this.relaxHighest();
+
 					//this.maxHeight = this.avatar.double0;
-					//this.maxHeight = (this.maxHeight * 3 + this.avatar.double0) / 4;
 					//this.maxHeight = (this.maxHeight * 15 + this.avatar.double0) / 16;
-					this.maxHeight = (this.maxHeight * 31 + this.avatar.double0) / 32;
 				}
 
 				if (traceMaxHeight)
