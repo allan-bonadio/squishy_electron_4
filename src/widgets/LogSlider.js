@@ -35,6 +35,9 @@ function createGoodPowers(spd, mini, maxi, substitutes) {
 	return valz;
 }
 
+const cleanup = (p, lab) => ('number' == typeof p)
+		? p.toFixed(nDecimals)
+		: p ?? lab;
 
 /* ********************************************* component */
 
@@ -196,8 +199,8 @@ class LogSlider extends React.Component {
 		if (traceThisSlider.test(p.unique)) console.log(
 			`LogSlider render..  spd=${spd}, cur=${cur}   twoIx=${twoIx} props=`, p);
 
-		const minLabel = p.minLabel ? p.minLabel.toFixed(nDecimals) : 'low';
-		const maxLabel = p.maxLabel ? p.maxLabel.toFixed(nDecimals) : 'high';
+		const minLabel = cleanup(p.minLabel, 'low');
+		const maxLabel = cleanup(p.maxLabel, 'high');
 
 		// the default for this is annotation true, so undefined means true.
 		const annotation = (p.annotation ?? true)

@@ -53,24 +53,30 @@ drawingLeft, drawingWidth — where (x) to draw the volt profile
 measuredMinVolts, measuredMaxVolts — given a voltage buffer,
 	call findVoltExtremes() to get the max and min in the buffer
 
-bottomVolts, heightVolts — voltArea displayed bottom is at bottomVolts; top is at bottom+height
+bottomVolts, heightVolts — voltArea displayed bottom is at
+bottomVolts; top is at bottom+height
 setBottomVolts(), setHeightVolts() —
 
-points — list of vertices in voltage profile <path, each a short string, collected is the d attribute for the <path
+points — list of vertices in voltage profile <path, each a short
+string, collected is the d attribute for the <path
 
 scrollCount, zoomCount
 
-setAPoint() — use this to alter a single point in the voltage  buffer.  Invalidates VoltArea so it rerenders.
+setAPoint() — use this to alter a single point in the voltage  buffer.
+ Invalidates VoltArea so it rerenders.
 
 ƒ setFamiliarDomain(voltageParams, vWidth, vHeight)
 
-ƒ setFamiliarVoltage(voltageParams) — creates all the voltage profiles the Volt tab can do
+ƒ setFamiliarVoltage(voltageParams) — creates all the voltage profiles
+the Volt tab can do
 
-viewCanvasWidth, viewCanvasHeight — actual size of VoltArea (= size of Canvas)
+viewCanvasWidth, viewCanvasHeight — actual size of VoltArea (= size of
+Canvas)
 
 voltageBuffer — actual buffer as used in integration
 
-xScale, yScale, yUpsideDown — mapping from volts to coordinates on VoltArea
+xScale, yScale, yUpsideDown — mapping from volts to coordinates on
+VoltArea
 */
 
 
