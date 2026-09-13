@@ -17,9 +17,9 @@ const propTypes = {
 	max: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
 	step: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
 
-	// mins and maxes for the text box, if differrent
-	tMin: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
-	tMax: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+	// mins and maxes for the slider, if differrent
+	sMin: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+	sMax: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
 
 	handleChange: PropTypes.func,
 
@@ -73,12 +73,12 @@ function TextNSlider(props) {
 		// to tweak the display in the text box, do it in the render.  Then when retrieving the number, convert it back.
 		controls = <>
 			<input type='number' placeholder={p.label || ''} name={p.label}
-					value={value} min={p.tMin ?? p.min} max={p.tMax ?? p.max}
+					value={value} min={p.min} max={p.max}
 					step={p.step || 'any'}
 					size='7'
 					onChange={handleText} />
 			<input type='range'
-					value={value} min={p.min} max={p.max} name={p.label}
+					value={value} min={p.sMin ?? p.min} max={p.sMax ?? p.max} name={p.label}
 					step={p.step || 'any'}
 					onChange={handleSlider}/>
 		</>;

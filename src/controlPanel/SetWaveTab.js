@@ -138,6 +138,7 @@ function SetWaveTab(props) {
 	let highestFrequency = space.nStates / 2 - 1;
 	highestFrequency = Math.min(
 		sSettings.minMaxes.waveParams.waveFrequency.max, highestFrequency);
+	let moderateFrequency = Math.round(highestFrequency * .3);
 
 	// sliders for each param besides breed
 	const waveParamSliders = <>
@@ -145,8 +146,8 @@ function SetWaveTab(props) {
 			value={+waveParams.waveFrequency}
 			min={-highestFrequency}
 			max={highestFrequency}
-			tMin={-50}
-			tMax={50}
+			sMin={-moderateFrequency}
+			sMax={moderateFrequency}
 			step={'standing' == breed ? .5 : 1}
 			handleChange={setWaveFrequency}
 			title={`how many cycles your wave should have, along the ${alongThe}`}
