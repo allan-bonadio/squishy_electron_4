@@ -225,7 +225,7 @@ void qAvatar::dumpEachViewBuffer(int bufferMask, const char *title) {
 				charsUsed += snprintf(txt+charsUsed, TXTLEN - charsUsed, "    ");
 			}
 			if (101 != txt[TXTLEN - 1])
-				throw std::runtime_error("qAvatar::dumpComplexViewBuffer() overflowed txt buffer in vex!!");
+				throw std::runtime_error("qAvatar::dumpEachViewBuffer() overflowed txt buffer in vex!!");
 			which >>= 1;
 		}  // end of vb buffer loop
 		printf(" %s\n", txt);  // end of one line
