@@ -109,7 +109,7 @@ export class voltDisplay {
 		else if (space.continuum == qeConsts.contWELL) {
 			// eg for N=8, 8 segments plus two on ends that go to ∞,
 			// so segment 0 === 9 = ∞
-			this.barWidth = 1 / space.nPoints;
+			this.barWidth = 1 / (space.nPoints - 1);
 			this.start = 0;
 			this.end = space.nPoints;
 		}
@@ -347,7 +347,7 @@ export class voltDisplay {
 			//end += 1;
 			x = this.xScale(end).toFixed(1);
 			points[end] = `L${x},` + skyHigh;
-			end--;  // don't overwrite the last one we just made
+			//end--;  // don't overwrite the last one we just made
 			tpip(x, skyHigh, '️right bumper');
 			break;
 

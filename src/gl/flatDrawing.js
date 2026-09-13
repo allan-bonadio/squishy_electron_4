@@ -130,12 +130,32 @@ export class flatDrawing extends abstractDrawing {
 		}
 	}
 
+	figureBarWidth() {
+		const space = this.space;
+		if (space.continuum == qeConsts.contENDLESS) {
+			// eg for N=8, 8 segments and segment 0===8 and 1===9
+			this.barWidth = 1 / space.nStates;
+			this.vertexCount = (space.nPoints - 1) * 2;	 // nStates * vertsPerBar
+		}
+		else if (space.continuum == qeConsts.contWELL) {
+			// eg for N=8, 8 segments plus two on ends that go to ∞,
+			// so segment 0 === 9 = ∞
+			this.barWidth = 1 / (space.nStates + 1);
+			this.vertexCount = space.nPoints * 2;	 // nStates * vertsPerBar
+		}
+		else {
+			throw `bad space continuum ${space.continuum}`;
+		}
+	}
+
 	// loads view buffer from corresponding wave, calculates highest norm.
 	// one time set up of variables for this drawing, every time canvas and scene is recreated
 	createVariables() {
 		this.gl.useProgram(this.program);
 		if (traceFlatDrawing)
 			console.log(`♭♭♭ flatDrawing ${this.sceneName}: creatingVariables`);
+
+		this.figureBarWidth();
 
 		this.maxHeightUniform = new drawingUniform('maxHeight', this,
 			() => {
@@ -169,30 +189,31 @@ export class flatDrawing extends abstractDrawing {
 		// there's 7 bars between. 9 bars total, 10 edges, matching the 10 = nPoints
 		// So, the same for WELL and ENDLESS
 
-		//window.flatDrwSpace = this.space;////TODO
 		let {start, end} = this.space;
-		let barWidth = this.space.vDisp.barWidth;
+		//let barWidth = this.space.vDisp.barWidth;
+		// just testing  barWidth /= 2;
 
 		let nPoints = this.nPoints = this.space.nPoints;
 		let nStates = this.space.nStates;
 		this.barWidthUniform = new drawingUniform('barWidth', this,
 			() => {
-				if (!isFinite(barWidth)) {
+				if (!isFinite(this.barWidth)) {
 					debugger;
-					throw `barWidth not finite: ${barWidth}`;
+					throw `barWidth not finite: ${this.barWidth}`;
 				}
-				return {value: barWidth, type: '1f' };
+				return {value: this.barWidth, type: '1f' };
 			}
 		);
-		if (traceFlatDrawing) console.log(`♭♭♭ barWidth frac of 1= ${barWidth}`);
+		if (traceFlatDrawing) console.log(`♭♭♭ barWidth frac of 1= ${this.barWidth}`);
 
-		this.vertexCount = nStates * 2;	 // nStates * vertsPerBar
 		this.rowFloats = 4;
 		new drawingAttribute('row', this, this.rowFloats,
 			() => {
 			//debugger;
+			let  cav = this.scene.paintingNeeds.cavity;
+			cav.fixBoundaries();
 			qeFuncs.avatar_avFlatLoader(this.avatar._pointer_, this.scene.flatAvatarID,
-					this.scene.paintingNeeds.cavity._pointer_, nPoints);
+					cav._pointer_, nPoints);
 
 			if (traceReloadRow) {
 				console.log(`♭♭♭ flatDrawing  ${this.avatarLabel}: at row getViewBuffer() `
@@ -212,28 +233,13 @@ export class flatDrawing extends abstractDrawing {
 				+` maxHeight=${this.maxHeight}`);
 		}
 		const gl = this.gl;
-		// done in abstractScene.drawAllDrawings   this.gl.useProgram(this.program);
 
-		// not used anywhere
-		// let bw = this.scene.paintingNeeds.bumperWidth;
-		// //gl.viewport(bw, 0, width - 2 * bw, height);
-		// if (traceViewport) {
-		//	console.log(`♭♭♭ flatDrawing set viewport on avatar=${this.avatarLabel}: `
-		//  +` width-2bw=${width - 2 * bw}, height=${height}  `
-		//  +` drawing ${this.vertexCount/2} points`);
-		// }
-
-		// done in abstractScene.drawAllDrawings
-		// this.drawVariables.forEach(v => v.reloadVariable());
-		// //this.drawVariables.forEach(v => v.reloadVariable());
-		// this.theAttribute.reloadVariable();
 		if (traceAvatarBeforeDrawing)
 			this.avatar.dumpComplexViewBuffer(this.scene.flatAvatarID, this.nPoints,
 					`♭♭♭ before drawing in flatDrawing.js`);
 
-		let start = this.space.start * 2;
-
-		gl.drawArrays(gl.TRIANGLE_STRIP, start, this.vertexCount);
+		// remember for endless: we draw N+1 bars with N+2 edges (2 on edges)
+		gl.drawArrays(gl.TRIANGLE_STRIP, 0, this.vertexCount);
 		if (traceFlatDrawing) {
 			console.log(`♭♭♭just drewArays-flat on avatar ptr=${this.avatar._pointer_} `
 				+` this.avatar.label=${this.avatar.label}, `
@@ -243,11 +249,11 @@ export class flatDrawing extends abstractDrawing {
 		if (traceDrawLines) {
 			gl.lineWidth(1);  // it's the only option anyway
 
-			gl.drawArrays(gl.GL_LINE_STRIP, start, this.vertexCount);
+			gl.drawArrays(gl.GL_LINE_STRIP, 0, this.vertexCount);
 		}
 
 		if (traceDrawPoints)
-			gl.drawArrays(gl.POINTS, start, this.vertexCount);
+			gl.drawArrays(gl.POINTS, 0, this.vertexCount);
 
 		// i think this is problematic
 		if (traceAvatarAfterDrawing) {
