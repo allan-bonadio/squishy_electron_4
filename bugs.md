@@ -49,6 +49,9 @@ Now the offset slider.  JUST the offset slider.  Doing it slowly is OK.
 √ - VoltLine dragging: if it's scrolled, the line is in the wrong pos (related to fixed position).
 √ - fixed position sometimes doesn't work.  I need to figure out something.  If fixed is constant on SP, there's no way to scroll to the bottom.
 
+- WaveView freezes after you use ed
+- waveView autoranging is funny...
+
 ## Voltage
 
 - voltage area: dragging beyond bounds should expand scale.
