@@ -43,7 +43,7 @@ FEATURES="-ffast-math  -lembind  $D_E_C"
 
 EXPORTS="-sEXPORTED_FUNCTIONS=@building/exports.json -sEXPORTED_RUNTIME_METHODS=@building/runMethods.json"
 DEFINES=" -DqDEV_VERSION -DMAX_DIMENSIONS=$MAX_DIMENSIONS "
-INCLUDES=" -I$EMSDK/upstream/emscripten/cache/sysroot/include -include emscripten.h -include squish.h "
+INCLUDES=" -I$EMSDK/upstream/emscripten/cache/sysroot/include -include emscripten.h -include stdio.h -include squish.h "
 
 # INVOKE_RUN=0 and IGNORE_MISSING_MAIN avoids main.cpp main() - not what we're doing
 MISC="-sFILESYSTEM=0 -sINVOKE_RUN=1 -Wno-limited-postlink-optimizations -sSUPPORT_LONGJMP=0"
@@ -69,7 +69,7 @@ DISABLE_GL="-sGL_MAX_TEMP_BUFFER_SIZE=0 -sGL_EMULATE_GLES_VERSION_STRING_FORMAT=
 DISABLE_FS="-sFILESYSTEM=0 -sFETCH_SUPPORT_INDEXEDDB=0  "
 
 # most c++ files, except main.cpp, testing files, worker files.
-# omit those, so testing can also use this and compile & run itself (see testing/cppu*).
+# omit those, so testing can also use allCpp.list and compile & run itself (see testing/cppu*).
 allCpp=`cat building/allCpp.list`
 
 echo "starting at"  `date '+%a %d, %H:%M:%S'`
