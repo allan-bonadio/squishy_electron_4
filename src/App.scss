@@ -40,16 +40,64 @@ big {
 
 
 /* **************************************** app outer components */
-h2.App-header {
-	text-align: center;
+
+/* raw h2:
+h2 {
+	display: block;
+	font-size: 1.5em;
+	margin-block-start: 0.83em;
+	margin-block-end: 0.83em;
+	margin-inline-start: 0px;
+	margin-inline-end: 0px;
+	font-weight: bold;
+	unicode-bidi: isolate;
+}
+*/
+
+
+
+.App-header {
+	//text-align: center;
+	margin-block-start: 0.8em;
+	margin-block-end: 0.8em;
 	color: black;
 	background-color: white;
 	background-image: linear-gradient(#fef, #fee, #ffe, #efe, #eff, #eef);
 	padding: 0 0;
 	position: relative;
+	//height: 3em;
+	padding-top: .512em;
+
+	.sqTitle {
+		float: left;
+		margin-inline: 1em;
+		vertical-align: middle;
+		font-size: 1.5625em;
+	}
+
+	.vision {
+		float: right;
+		margin-right: 1em;
+		//margin-top: .2em;
+		display: inline-block;
+		vertical-align: middle;
+		line-height: 1em;
+		//position: absolute;
+		//bottom: 0;
+		//right: 0;
+		font-size: .8em;
+		font-weight: normal;
+	}
+
+	.splatImage {
+		float: left;
+		vertical-align: middle;
+		height: 2.2em;
+		margin-top:-2px;
+	}
 
 	.fontSizer {
-		position: absolute;
+		float: right;
 		bottom: 0;
 		right: 6px;
 		font-weight: normal;
@@ -59,10 +107,10 @@ h2.App-header {
 		}
 	}
 
-}
+	.floatEnder {
+		clear: both;
+	}
 
-.splatImage {
-	vertical-align: middle;
 }
 
 footer {

@@ -188,14 +188,17 @@ class App extends React.Component {
 
 		return (
 			<main className="App" ref={el => this.appEl = el}>
-				<h2 className="App-header">
-					{this.renderFontSizer()}
+				<div className="App-header">
 					<DocMenu bodyWidth={document.body.clientWidth} />
-					<img className='splatImage' src='/images/splat.png'
-						width='100px' alt='squishy icon'/>
 					&nbsp; &nbsp;
-					Squishy Electron
-				</h2>
+					<div className='sqTitle' >Squishy Electron</div>
+					<img className='splatImage' src='/images/splat.png'
+						alt='squishy icon'/>
+					{this.renderFontSizer()}
+					<div className='vision'>Quantum Mechanics you
+						<br/>can get your hands around</div>
+					<div className='floatEnder' />
+				</div>
 				<DocReader  bodyWidth={document.body.clientWidth} />
 
 				{sqPanel}
