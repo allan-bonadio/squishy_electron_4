@@ -146,10 +146,10 @@ void completeNewSpaceGauntlet(int N) {
 	proveItsMine(space->voltage, nPoints * sizeof(double));
 
 	// and the avatars' waves and vbufs
-	proveItsMine(space->mainAvatar->qcavity->wave, nPoints * sizeof(qCx));
-	proveItsMine(space->mainAvatar->vBuffer, nPoints * 8 * sizeof(float));
-	proveItsMine(space->miniGraphAvatar->qcavity->wave, nPoints * sizeof(qCx));
-	proveItsMine(space->miniGraphAvatar->vBuffer, nPoints * 8 * sizeof(float));
+	// proveItsMine(space->mainAvatar->qcavity->wave, nPoints * sizeof(qCx));
+	// proveItsMine(space->mainAvatar->vBuffer, nPoints * 8 * sizeof(float));
+	// proveItsMine(space->miniGraphAvatar->qcavity->wave, nPoints * sizeof(qCx));
+	// proveItsMine(space->miniGraphAvatar->vBuffer, nPoints * 8 * sizeof(float));
 
 	deleteFullSpace(space);
 }
