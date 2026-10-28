@@ -4,7 +4,18 @@
 */
 
 #include <pthread.h>
-#include <emscripten/threading.h>
+
+// ifdef EMSCRIPTEN - why is there no such symbol?
+#ifdef EMSCRIPTEN_RESULT_DEFERRED
+	#include <emscripten/threading.h>
+#else
+// 	#include <mutex>
+// 	// we only use u32 atomics
+// 	#define emscripten_atomic_load_u32 atomic_load
+// 	#define emscripten_atomic_store_u32 atomic_store
+// 	#define emscripten_atomic_add_u32 atomic_add
+
+#endif
 
 /*
 Some Calculation/Grinder terms:
