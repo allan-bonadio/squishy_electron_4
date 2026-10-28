@@ -5,9 +5,7 @@ description: Explains what Quantum Mechanics is
 
 # Quantum Mechanics
 
-Quantum Mechanics is what they call the physics of very small things.
-
-It's actually a bad name for the concept.  The first branch of physics that anybody studied was just about things moving around, and also, things NOT moving around, and why.
+__Quantum Mechanics__ is what they call the physics of very small things.
 
 ## History
 
@@ -15,7 +13,9 @@ It's actually a bad name for the concept.  The first branch of physics that anyb
 Ancient Greeks like
 [Aristotle](https://en.wikipedia.org/wiki/Aristotle), the
 [Pythagoreans](https://en.wikipedia.org/wiki/Pythagoras),
-[Ctesibius](https://en.wikipedia.org/wiki/Ctesibius), and [Archimedes](https://en.wikipedia.org/wiki/Archimedes) argued over things like whether a vacuum could exist or not — a place with nothing in it.
+[Ctesibius](https://en.wikipedia.org/wiki/Ctesibius),
+and [Archimedes](https://en.wikipedia.org/wiki/Archimedes)
+argued over things like whether a vacuum could exist or not — a place with nothing in it.
 There's a limit to what these early 'physicists' could do;
 back then, things that were 'fast' were, like, a fast horse.
 Flat surfaces were always lumpy, so they couldn't visualize any place that had no friction.
@@ -27,8 +27,10 @@ They thought that that was a physical law of nature.
 were some of the first philosophers  to dream up the idea of an atom —
 something that was 'uncuttable'.
 You take a piece of cheese, cut it in half, and each piece is cheese.
+You take one of those pieces and cut it in half, and, again, both pieces are still cheese.
 You do it again, and again, each piece is cheese.
 Do you get to the end — a piece that stops being cheese after being cut?
+Or, does it just keep on going?
 These were thought up centuries BCE.
 
 ### Middle Ages
@@ -46,16 +48,18 @@ Newton began understanding gravity, friction and some of the actual laws of moti
 By the early 1800s, they knew about chemical elements and compounds,
 from centuries of alchemy.
 [John_Dalton](https://en.wikipedia.org/wiki/John_Dalton)
-first figured out that elements combined in integer ratios.
+first figured out that elements combined in integer ratios (whole number fractions, like 5/17ths).
 For instance, cuprite, a red copper mineral, has one atom of coppper, and two atoms of oxygen.
 But black copper, has one of each.
-By experimentation, he figured out the ratios of atoms of all compounds were integers.
+(It took some experimentation to figure out that the metal you get out of each is the same.)
+By experimentation, he figured out the ratios of atoms of all the compounds he tested, were integers.
 
-Electricity and Magnetism (they are related) was the next big area of physics.  Back then, electricity, magnetism and light were thought of as separate things.  In the middle ages, [al-Haytham](https://en.wikipedia.org/wiki/Ibn_al-Haytham),
+Electricity and Magnetism (they are related) was the next big area of physics.
+Back then, electricity, magnetism and light were thought of as separate things.  In the middle ages, [al-Haytham](https://en.wikipedia.org/wiki/Ibn_al-Haytham),
 [Shen Kuo](https://en.wikipedia.org/wiki/Shen Kuo) , and
 [Cardano](https://en.wikipedia.org/wiki/Cardano)  worked on these topics.  During the Renaissance,
 [Kepler](https://en.wikipedia.org/wiki/Kepler) ,
-[Benjamin Franklin](https://en.wikipedia.org/wiki/Benjamin Franklin) ,
+[Benjamin Franklin](https://en.wikipedia.org/wiki/Benjamin_Franklin) ,
 [Galvani](https://en.wikipedia.org/wiki/Galvani) , and
 [Volta](https://en.wikipedia.org/wiki/Volta)  continued this work.  In the 1800s,
 [Ørsted](https://en.wikipedia.org/wiki/Ørsted)  and
@@ -67,17 +71,72 @@ In all of that, mechanics was seen as fundamental bedrock, and electromagnetism 
 
 ### Quantum
 
-Quantum came about from around 1900, when it turned out that light (now understood to be individual particles) would only be emitted by an atom in certain energy amounts (colors).  In fact, [Rydberg] figured out that each atom had a list of energy levels it could be in, and the photons would always have an amount of energy that was the difference between two of the levels.  These were not equally spaced, which made it harder to tease out what was really happening.  Instead, they were like 1, ¼, ¹⁄₉, ¹⁄₁₆, basically 1/n² where n is 0, 1, 2, ....  So you might have a photon come out that had an energy of ¹⁄₉ – ¹⁄₁₆, which is ⁷⁄₁₄₄.  Not very quantum-like.  But, other quantities were, like the angular momentum of an orbit, at ℏ, 2ℏ, 3ℏ, ....  And, ultimately, when they found ways for electrons to be created and destroyed, that even the number of electrons is a quantum number.  You cannot have 3½ electrons.  Things get more complicated after that.
+Quantum is actually a bad name for the concept.  The first branch of physics that anybody studied was just about things moving around, and also, things NOT moving around, and why.  They called this Mechanics, the science of machines.  If you learn physics, the first part you learn is Mechanics.  (Then, comes electrodynamics, which they figured out in the 1800s.)
+
+So when they started trying to figure out how atoms work in the early 1900s, a big part of what they were figuring out was simply existence and location.  There's electrons in an atom, but where?  They travel to and from their atoms, but how?
+
+The biggest names in physics at the time were wondering this, coming up with ideas, and then other physicists would disprove them. They called this Quantum Mechanics.
+
+Quantum came about from around 1900, when it turned out that light (now understood to be individual particles) would only be emitted by an atom in certain energy amounts (colors).  But, how that worked was a mystery.  A big breakthrough happened when they started looking just at Hydrogen, the simplest atom.  A guy named [Balmer](https://en.wikipedia.org/wiki/Johann_Jakob_Balmer)
+found a series of energies that were all proportional to ¼ - 1/_n_².
+This was a big  breakthrough — finally a pattern.
+
+In fact, [Rydberg](https://en.wikipedia.org/wiki/Viktor_Rydberg)  figured out that each hydrogen atom had a list of energy levels it could be in, and the photons would always have an amount of energy that was the difference between two of the levels.  These were not equally spaced, which made it harder to tease out what was really happening.  Instead, the energy levels were proportional to 1, ¼, ¹⁄₉, ¹⁄₁₆, basically 1/n² where n is 0, 1, 2, .... and so on.  So you might have a photon come out that had an energy of ¹⁄₉ – ¹⁄₁₆, which is ⁷⁄₁₄₄.  Not very obvious.  But Rydberg figured it out.
+
+But, other quantities were quantized, like the angular momentum of an orbit, at ℏ, 2ℏ, 3ℏ, ....  And, ultimately, when they found ways for electrons to be created and destroyed, that even the number of electrons is a quantum number.  You cannot have 3½ electrons.  (Things get more complicated after that.)
+
+(Angular momentum is like momentum, but it keeps spinning things spinning.  It even works for things that aren't spinning; if a spacecraft passes by the moon, it's angular momentum stays constant, because the distance is part of the angular momentum.)
+
+[Niels Bohr](https://en.wikipedia.org/wiki/Niels_Bohr) really figured out the weird parts of Quantum Mechanics.
+Most of the other physicists would read about some experiment, formulate a theory, and publish it,
+only to have it disproven by some other experiment.
+Bohr, although a theorist, stuck to experimental results.
+He knew these were slippery concepts.
+The experimentalists would go and do an experiment, and Bohr would take the results at face value,
+no more.
+He would go and visit these laboratories, and talk to the physicists and chemists who did them.
+The idea was to distill all these results down to a theory that fit ALL of the experimental results, at the same time.
+Without jumping to conclusions too quickly.
+An early result was the [Bohr Atom](https://en.wikipedia.org/wiki/Bohr_model).
+It was a real breakthrough that explained so many results at the time.
+
+So, for instance, he insisted on the Complementarity Principle.
+One part of that was that an electron or photon could be thought of as a particle,
+or as a wave, but not both at the same time.
+This shows you how slippery all of this was; everybody had insisted that one or the other was true.
 
 ### Atom Development
 
 This goes over many developments:
 ![History of Atom](History-of-the-Atom-2023.webp)
 
+
+### The Fifth Solvay Conference on Physics
+
+![Fifth Solvay Conference on Physics](Solvay_conference_1927.jpg)
+In 1927, a conference was held that assembled most of the physics heavy-hitters of the time.
+In the photo:
+
+A. Piccard, E. Henriot, P. Ehrenfest, E. Herzen, Th. De Donder, E. Schrödinger, J.E. Verschaffelt, W. Pauli, W. Heisenberg, R.H. Fowler, L. Brillouin
+
+P. Debye, M. Knudsen, W.L. Bragg, H.A. Kramers, P.A.M. Dirac, A.H. Compton, L. de Broglie, M. Born, N. Bohr
+
+I. Langmuir, M. Planck, M. Skłodowska-Curie, H.A. Lorentz, A. Einstein, P. Langevin, Ch. E. Guye, C.T.R. Wilson, O.W. Richardson
+
+Seventeen of the 29 attendees were or became Nobel Prize winners.
+seventeen had won or would soon win a Nobel Prize
+
+There's a story about the two biggest names at the conference, Bohr and Einstein.
+Einstein refused to believe the probabilistic parts of Quantum.
+He kept on challenging Bohr (at breakfast) with disproofs, and Bohr would come back the next day with an answer.
+Eventually, Einstein's interpretation was disproved by
+[John Bell](https://en.wikipedia.org/wiki/John_Stewart_Bell) in 1964.
+
 # Quantum States
 
 Quantum Mechanics, for me, was a sort of jumble of ideas at first.
-Then, I started reading a book by Paul Dirac, one of the fathers of modern quantum mechanics.
+Then, I started reading a book by [Paul Dirac](https://en.wikipedia.org/wiki/Paul_Dirac),
+one of the fathers of modern quantum mechanics.
 
 I was a fan of General Relativity at the time.
 It's the physics of gravity, above and beyond what Newton had developed.
