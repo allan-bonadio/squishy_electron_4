@@ -178,18 +178,18 @@ The waviness comes in when it moves around.
 
 As with other waves, you need the sine and the cosine to make it work.
 Unlike other waves, the sine and cosine aren't different things, like the speed and acceleration.
-Mathematically, the best way to represent them is with complex numbers.
-You know, _a_ + _b_ _i_.
+Mathematically, the best way to represent them is with [[complex numbers]].
+You know, a + b _i_.
 Then, the sine can be the imaginary part, and the cosine can be the real part.
 Or, vice versa.  As a function of time t, here's a wave function:
 
-$$\psi = \cos \omega t + i \sin \omega t$$
+$$\psi = \cos  \omega t + i  \sin \omega t$$
 
-% There's a symmetry like this.
+There's a symmetry like this.
 The ω is the frequency, kindof like the number of beats per second for the wave.
 The higher the ω, the faster the beats come, and the faster the electron travels.
-% If you have a quantum mechanical wave, represented by complex numbers
+
+## More Info
 
 Here's a writeup about
 [Quantum Mechanics]
-## More Info
