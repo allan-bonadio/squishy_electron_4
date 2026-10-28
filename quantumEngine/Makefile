@@ -3,6 +3,7 @@
 ## Copyright (C) 2021-2026 Tactile Interactive, all rights reserved
 ##
 
+# dev building; see maint/ for production
 wasm/quantumEngine.wasm wasm/quantumEngine.js : *.cpp *.h */*.h */*.cpp building/exports.json building/build*.sh building/allCpp.list
 	building/buildDev.sh
 

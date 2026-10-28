@@ -84,9 +84,9 @@ from nasa for a new dir.
 
 😡- Should allow almost any number N, not just powers of 2
 
-😡- really need a nyquist filter, plus maybe higher freqs.  MVP: just a fixed nyquist.
+√- really need a nyquist filter, plus maybe higher freqs.  MVP: just a fixed nyquist.
 
-😡- should auto-slow if divergence gets high?
+😡- should auto-slow if divergence gets high?  and/or increase the nyquist freq?
 
 
 ## Docs

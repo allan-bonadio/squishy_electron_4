@@ -3,14 +3,6 @@ title: Digital Waves
 description: What happens to waves in a computer
 -->
 
-<!-- 	img {
-		width: 62em;
-		height: 20em;
-		float: none;
-		margin: 1em;
-	}
--->
-
 <style>
 	/* centered, large */
 	img.single {

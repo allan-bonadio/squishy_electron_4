@@ -8,7 +8,6 @@
 #  [CPPUTEST](https://cpputest.github.io)
 # then in your .profile (or wherever) define  CPPUTEST_HOME to point to its root dir
 # (with AUTHORS README.md  lib/ and include/ in it)
-)
 
 # To run all the tests, run it like this:
 #   quantumEngine> make test
