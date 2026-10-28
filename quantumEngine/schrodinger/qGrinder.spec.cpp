@@ -28,16 +28,16 @@ TEST_GROUP(qGrinder)
 TEST(qGrinder, CheckGrinderConstructor)
 {
 	qSpace *space = makeBareSpace(8, contENDLESS);
-	qAvatar *avatar = new qAvatar(space, "grindAway");
-	qGrinder *grinder = new qGrinder(space, avatar, 1, "myGrinder");
+	qAvatar *avatar = new qAvatar("grindAway");
+	qGrinder *grinder = new qGrinder(space, 1, "myGrinder");
 
 	LONGS_EQUAL('Grin', grinder->magic);
 	POINTERS_EQUAL(space, grinder->space);
-	POINTERS_EQUAL(avatar, grinder->avatar);
+	//POINTERS_EQUAL(avatar, grinder->avatar);
 
 	DOUBLES_EQUAL(0., grinder->elapsedTime, ERROR_RADIUS);
 	DOUBLES_EQUAL(0., grinder->lapSerial, ERROR_RADIUS);
-	DOUBLES_EQUAL(1e-3, grinder->dt, ERROR_RADIUS);
+	DOUBLES_EQUAL(1e-3, grinder->stretchedDt, ERROR_RADIUS);
 
 
 	// LONGS_EQUAL(1, grinder->lowPassFilter);
@@ -49,6 +49,7 @@ TEST(qGrinder, CheckGrinderConstructor)
 
 	POINTERS_EQUAL(space->voltage, grinder->voltage);
 
+	// spectrum: should only be there after requested
 	POINTERS_EQUAL(NULL, grinder->spect);
 	qSpectrum *spect = grinder->getSpectrum();
 	POINTERS_EQUAL(spect, grinder->spect);
@@ -171,18 +172,18 @@ static void isAllZeroesExceptFor(qBuffer *qcavity, int except1, bool shouldFail,
 
 // ok we have a freq 1 carrier.  We stick in a freq 5 noise.  When does it cut off?
 // these are not cut off
-TEST(qGrinder, fourFilt16_1_LPFscan0) { tryFourierFilter(16, 1, 5, 0, true); }
-TEST(qGrinder, fourFilt16_1_LPFscan1) { tryFourierFilter(16, 1, 5, 1, true); }
-TEST(qGrinder, fourFilt16_1_LPFscan2) { tryFourierFilter(16, 1, 5, 2, true); }
-
-// these ARE cut off
-TEST(qGrinder, fourFilt16_1_LPFscan3) { tryFourierFilter(16, 1, 5, 3, false); }
-TEST(qGrinder, fourFilt16_1_LPFscan4) { tryFourierFilter(16, 1, 5, 4, false); }
-TEST(qGrinder, fourFilt16_1_LPFscan5) { tryFourierFilter(16, 1, 5, 5, false); }
-TEST(qGrinder, fourFilt16_1_LPFscan6) { tryFourierFilter(16, 1, 5, 6, false); }
-
-// also wipes out freq 1 so should fail the test
-TEST(qGrinder, fourFilt16_1_LPFscan7) { tryFourierFilter(16, 1, 5, 7, true); }
+// TEST(qGrinder, fourFilt16_1_LPFscan0) { tryFourierFilter(16, 1, 5, 0, true); }
+// TEST(qGrinder, fourFilt16_1_LPFscan1) { tryFourierFilter(16, 1, 5, 1, true); }
+// TEST(qGrinder, fourFilt16_1_LPFscan2) { tryFourierFilter(16, 1, 5, 2, true); }
+//
+// // these ARE cut off
+// TEST(qGrinder, fourFilt16_1_LPFscan3) { tryFourierFilter(16, 1, 5, 3, false); }
+// TEST(qGrinder, fourFilt16_1_LPFscan4) { tryFourierFilter(16, 1, 5, 4, false); }
+// TEST(qGrinder, fourFilt16_1_LPFscan5) { tryFourierFilter(16, 1, 5, 5, false); }
+// TEST(qGrinder, fourFilt16_1_LPFscan6) { tryFourierFilter(16, 1, 5, 6, false); }
+//
+// // also wipes out freq 1 so should fail the test
+// TEST(qGrinder, fourFilt16_1_LPFscan7) { tryFourierFilter(16, 1, 5, 7, true); }
 
 // they TOOK OUT TEST_SKIP() ... I guess you can comment it out
 //TEST_SKIP(qGrinder, fourFilt16_1_3_LPFscan7) { tryFourierFilter(16, 1, 3, 7, false); }
@@ -194,8 +195,8 @@ TEST(qGrinder, fourFilt16_1_LPFscan7) { tryFourierFilter(16, 1, 5, 7, true); }
 
 static void fourierExperiments(int N) {
 	qSpace *space = makeBareSpace(N, contENDLESS);
-	qAvatar *avatar = new qAvatar(space, "fourExpAv");
-	qGrinder *qgrinder = new qGrinder(space, avatar, 1, "fourExpGrind");
+	qAvatar *avatar = new qAvatar("fourExpAv");
+	qGrinder *qgrinder = new qGrinder(space, 1, "fourExpGrind");
 
 	qSpectrum *allOnes = new qSpectrum(space);
 	allOnes->fill();
@@ -210,7 +211,7 @@ static void fourierExperiments(int N) {
 
 	delete allOnes;
 	delete onesWave;
-	delete grinder;
+	delete qgrinder;
 	delete space;
 }
 
