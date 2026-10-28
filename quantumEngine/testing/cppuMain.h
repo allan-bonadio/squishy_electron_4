@@ -13,3 +13,7 @@ extern struct SimpleString StringFrom(const qCx value);
 extern void compareWaves(struct qBuffer *expected, struct qBuffer *actual);
 
 
+extern "C" {
+	int main();
+}
+

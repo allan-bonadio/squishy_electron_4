@@ -29,7 +29,7 @@ static void dumpSizes(void) {
 }
 
 
-int main(int ac, char** av)
+int _main(int ac, char** av)
 {
 	dumpSizes();
 
