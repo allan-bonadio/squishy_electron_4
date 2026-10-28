@@ -1,5 +1,7 @@
 #!/usr/bin/env node
 
+// bugs: in the <head header: meta description and title are undefined.
+
 import fs from 'node:fs';
 import fsp from 'node:fs/promises';
 import {exec, execSync} from 'node:child_process';
@@ -117,6 +119,12 @@ function populateMDTemplate(contents, mdPath) {
 
 		buildTime: (new Date()).toLocaleString(),
 	};
+	if (traceMetadata) {
+		let xVars = {...variables, body: '(body omitted)'};
+		console.info(`the vars, top of populateMDTemplate(): `, xVars);
+	}
+
+
 
 	// the metadata.  Opening and closing HTML comment syntax must each be
 	// on a line on its own.  Must start at start of file.  Lines in between
@@ -124,20 +132,30 @@ function populateMDTemplate(contents, mdPath) {
 	let yaml = contents.replace(/^<!--\n(.*)\n-->\n.*$/s, '$1');
 
 	// but that doesn't mean the yaml is correct syntax
-	let js = {};
 	if (traceMetadata)
 		console.info(`the yaml: ''${yaml}''`);
+	let js = {};
 	if (yaml) {
 		try {
 			// if present, that yaml block can override any other variables
+			yaml += '\n';
+			if (traceMetadata)
+				console.info(`the yaml exactly: '${yaml}'`);
 			let js = YAML.parse(yaml);
 			if (traceMetadata)
-				console.info(`the resulting object: `, js);
+				console.info(`more vars in the js object: `, js);
 		} catch (ex) {
 			js = {description: ex.message};
-			console.error(`parsing yaml, ${ex.message}, but parsing will continue`);
+			console.error(`Error parsing yaml, ${ex.message}, but parsing will continue`);
 		}
-		Object.assign(variables, js);
+		variables.title = js.title;
+		variables.description = js.description;
+		//variables = Object.assign(variables, js);
+		if (traceMetadata) {
+			let vvv = {...variables};
+			delete vvv.body;
+			console.info(`FINAL: variables to be plugged in: `, vvv);
+		}
 	}
 
 	// final templating plugins.  Any var that's not in the template never shows up.
@@ -147,11 +165,12 @@ function populateMDTemplate(contents, mdPath) {
 	let html = template
 		.replace('〖body〗', variables.body)
 		.replace('〖title〗', variables.title)
-		.replace('〖fromFile〗', variables.mdPath)
+		.replace('〖fromFile〗', variables.fromFile)
 		.replace('〖description〗', variables.description)
 		.replace('〖buildTime〗', (new Date()).toLocaleString());
 	if (traceControlFlow)
 		console.log(`txlated the md file ${mdPath}! for html ${html.length} bytes.`);
+	//console.log(html);
 	return html;
 }
 
@@ -164,6 +183,7 @@ function compileAnMDFile(mdPath) {
 
 	return readTextFile(mdPath, {encoding: 'utf8'})
 	.then(contents => {
+		debugger;
 		if (traceControlFlow)
 			console.log(`read the md file ${mdPath}!  ${contents.length} bytes.`);
 
